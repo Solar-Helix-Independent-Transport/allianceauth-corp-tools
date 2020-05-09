@@ -1,0 +1,52 @@
+{% extends 'allianceauth/base.html' %}
+{% load i18n %}
+{% block page_title %}{% trans "Corp Tools!" %}{% endblock %}
+{% block extra_css %}
+{% include 'bundles/datatables-css.html' %}
+
+ <style>
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+.flex-wrap {
+    display: -webkit-flex; /* Safari */
+    -webkit-flex-wrap: wrap; /* Safari 6.1+ */
+    display: flex;
+    flex-wrap: wrap;
+}
+.flex-item {
+    padding: 8px;
+    margin: 4px;
+    border-radius: 15px; /* 5px rounded corners */
+    border-width: 1px;
+    border-style: solid;
+    border-color: #555;
+}
+.form-control {
+    margin: 2px;
+}
+
+
+</style>
+
+{% endblock extra_css %}
+{% block content %}
+    <div class="col-lg-12">
+        <div class="col-lg-10 col-lg-offset-1 container">
+            {%if show_menu %}
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <ul class="nav navbar-nav ">
+                       {% if perms.alliancetools.add_alliancetoolcharacter %}<li><a href="{% url 'alliancetools:add_char' %}">{% trans "Add All Token" %}</a></li>{% endif %}
+                    </ul>
+                </div>
+            </nav>{% endif %}
+            {% block at_block %}{% endblock %}
+        </div>
+
+    </div>
+{% endblock %}

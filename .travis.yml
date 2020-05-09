@@ -1,0 +1,17 @@
+language: python
+sudo: false
+cache: pip
+dist: xenial
+install:
+  - pip install coveralls>=1.1 tox
+# command to run tests
+script:
+  - tox
+after_success:
+  coveralls
+services:
+  - redis-server
+matrix:
+  include:
+   - env: TOXENV=py36
+     python: '3.6.7'
