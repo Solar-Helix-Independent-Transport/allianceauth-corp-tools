@@ -1,6 +1,6 @@
 import logging
 from celery import shared_task
-from ..models import CharacterAudit, CorporationHistory, EveName, Token  # Todo 
+from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, SkillTotals
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 
@@ -35,12 +35,11 @@ def update_corp_history(character_id):
                                                             'is_deleted': corp.get('is_deleted', False),
                                                             'start_date': corp.get('start_date')})
 
-@shared_task
-def update_character_skills(character_id):
+def update_character_skill_list(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
     logger.debug("Updating Skills and Queue for: {}".format(audit_char.character.character_name))
 
-    req_scopes = ['esi-skills.read_skills.v1', 'esi-skills.read_skillqueue.v1']
+    req_scopes = ['esi-skills.read_skills.v1']
 
     token = Token.get_token(character_id, req_scopes)
 
@@ -50,37 +49,152 @@ def update_character_skills(character_id):
     skills = providers.esi.client.Skills.get_characters_character_id_skills(character_id=character_id,
                                                                             token=token.valid_access_token()).result()
 
-    # Update SeatCharacter model with correct SP values.
-    #seat_char.total_sp = skills.get('total_sp', 0)
-    #seat_char.unallocated_sp = skills.get('unallocated_sp', 0)
-    #seat_char.save()
+    Skill.objects.filter(character=audit_char).delete()  # Delete current SkillList
+    
+    SkillTotals.objects.update_or_create(character = audit_char,
+                                         defaults = {
+                                             'total_sp':skills.get('total_sp', 0),
+                                             'unallocated_sp':skills.get('unallocated_sp', 0)
+                                         })
 
+    _create_skills = []
     for skill in skills.get('skills', []):
+        skill_name, created = EveItemType.objects.get_or_create_from_esi(skill.get('skill_id'))
+        _skill = Skill(character=audit_char, 
+                        skill_id=skill.get('skill_id'),
+                        skill_name=skill_name,
+                        active_skill_level=skill.get('active_skill_level'),
+                        skillpoints_in_skill=skill.get('skillpoints_in_skill'),
+                        trained_skill_level=skill.get('trained_skill_level'))
 
-        skill_item, created = Skill.objects \
-            .update_or_create(character=seat_char, skill_id=skill.get('skill_id'),
-                              defaults={
-                                  'active_skill_level': skill.get('active_skill_level'),
-                                  'skillpoints_in_skill': skill.get('skillpoints_in_skill'),
-                                  'trained_skill_level': skill.get('trained_skill_level')})
+        _create_skills.append(_skill)
 
-    # ----- Skill Queue -----
-    SkillQueue.objects.filter(character=seat_char).delete()  # Delete current SkillQueue
+    Skill.objects.bulk_create(_create_skills)
 
-    queue = c.Skills.get_characters_character_id_skillqueue(character_id=character_id).result()
+def update_character_skill_queue(character_id):
+    audit_char = CharacterAudit.objects.get(character__character_id=character_id)
+    logger.debug("Updating Skills and Queue for: {}".format(audit_char.character.character_name))
 
+    req_scopes = ['esi-skills.read_skillqueue.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+
+    queue = providers.esi.client.Skills.get_characters_character_id_skillqueue(character_id=character_id,
+                                                                               token=token.valid_access_token()).result()
+
+    SkillQueue.objects.filter(character=audit_char).delete()  # Delete current SkillList
+    
     items = []
     for item in queue:
-        queue_item = SkillQueue(character=seat_char,
+        skill_name, created = EveItemType.objects.get_or_create_from_esi(item.get('skill_id'))
+        queue_item = SkillQueue(character=audit_char,
                                 finish_level=item.get('finished_level'), 
                                 queue_position=item.get('queue_position'),
                                 skill_id=item.get('skill_id'), 
+                                skill_name=skill_name,
                                 finish_date=item.get('finish_date', None),
                                 level_end_sp=item.get('level_end_sp', None),
                                 level_start_sp=item.get('level_start_sp', None),
                                 start_date=item.get('start_date', None),
                                 training_start_sp=item.get('training_start_sp', None))
         items.append(queue_item)
+
     SkillQueue.objects.bulk_create(items)
 
-    
+def update_character_assets(character_id):
+    audit_char = CharacterAudit.objects.get(character__character_id=character_id)
+    logger.debug("Updating Assets for: {}".format(audit_char.character.character_name))
+
+    req_scopes = ['esi-assets.read_assets.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+
+    assets = providers.esi.client.Assets.get_characters_character_id_assets(character_id=character_id,
+                                                                            token=token.valid_access_token()).result_all_pages()
+
+    delete_query = CharacterAsset.objects.filter(character=audit_char)  # Flush Assets
+    if delete_query.exists():
+        delete_query._raw_delete(delete_query.db) # speed and we are not caring about f-keys or signals on these models 
+
+
+    _current_type_ids = []
+    items = []
+    for item in assets:
+        if item.get('type_id') not in _current_type_ids:
+            _current_type_ids.append(item.get('type_id'))
+
+        asset_item = CharacterAsset(character=audit_char,
+                                    blueprint_copy=item.get('is_blueprint_copy'), 
+                                    singleton=item.get('is_singleton'),
+                                    item_id=item.get('item_id'), 
+                                    location_flag=item.get('location_flag'),
+                                    location_id=item.get('location_id'),
+                                    location_type=item.get('location_type'),
+                                    quantity=item.get('quantity'),
+                                    type_id=item.get('type_id'),
+                                    type_name_id=item.get('type_id')
+                                    )
+        items.append(asset_item)
+    EveItemType.objects.create_bulk_from_esi(_current_type_ids)
+    CharacterAsset.objects.bulk_create(items)
+
+def update_character_wallet(character_id):
+    audit_char = CharacterAudit.objects.get(character__character_id=character_id)
+    logger.debug("Updating wallet transactions for: {}".format(audit_char.character.character_name))
+
+    req_scopes = ['esi-wallet.read_character_wallet.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+
+    journal_items = providers.esi.client.Wallet.get_characters_character_id_wallet_journal(character_id=character_id,
+                                                                            token=token.valid_access_token()).result_all_pages()
+
+    _current_journal = CharacterWalletJournalEntry.objects.filter(character=audit_char).values_list('entry_id', flat=True) # TODO add time filter
+    _current_eve_ids = list(EveName.objects.all().values_list('eve_id', flat=True))
+
+    _new_names = []
+
+    items = []
+    for item in journal_items:
+        if item.get('entry_id') not in _current_journal:
+            if item.get('second_party_id') not in _current_eve_ids:
+                _new_names.append(item.get('second_party_id'))
+                _current_eve_ids.append(item.get('second_party_id'))
+            if item.get('first_party_id') not in _current_eve_ids:
+                _new_names.append(item.get('first_party_id'))
+                _current_eve_ids.append(item.get('first_party_id'))
+                
+            asset_item = CharacterWalletJournalEntry(character=audit_char,
+                                        amount=item.get('amount'), 
+                                        balance=item.get('balance'),
+                                        context_id=item.get('context_id'), 
+                                        context_id_type=item.get('context_id_type'),
+                                        date=item.get('date'),
+                                        description=item.get('description'),
+                                        first_party_id=item.get('first_party_id'),
+                                        first_party_name_id=item.get('first_party_id'),
+                                        entry_id=item.get('id'),
+                                        reason=item.get('reason'),
+                                        ref_type=item.get('ref_type'),
+                                        second_party_id=item.get('second_party_id'),
+                                        second_party_name_id=item.get('second_party_id'),
+                                        tax=item.get('tax'),
+                                        tax_receiver_id=item.get('tax_receiver_id'),
+                                        )
+            items.append(asset_item)
+
+    created_names = EveName.objects.create_bulk_from_esi(_new_names)
+    if created_names:
+        CharacterWalletJournalEntry.objects.bulk_create(items)
+    else: 
+        raise Exception("ESI Fail")
+

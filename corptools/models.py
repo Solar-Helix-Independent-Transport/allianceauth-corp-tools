@@ -11,7 +11,7 @@ from esi.models import Token
 from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter
 from allianceauth.notifications import notify
 
-from .managers import EveNameManager
+from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager
 
 from model_utils import Choices
 
@@ -68,16 +68,20 @@ class CorporationAudit(models.Model):
 # ************************ Helper Models
 # Eve Item Type
 
+
 class EveItemCategory(models.Model):
+    objects = EveCategoryManager()
     category_id = models.BigIntegerField(primary_key=True) 
     name = models.CharField(max_length=255) # unknown max
 
 class EveItemGroup(models.Model):
+    objects = EveGroupManager()
     group_id = models.BigIntegerField(primary_key=True) 
     name = models.CharField(max_length=255) # unknown max
     category = models.ForeignKey(EveItemCategory, on_delete=models.SET_NULL, null=True, default=None)    
 
 class EveItemType(models.Model):
+    objects = EveItemTypeManager()
     type_id = models.BigIntegerField(primary_key=True) 
     name = models.CharField(max_length=255) # unknown max
     group = models.ForeignKey(EveItemGroup, on_delete=models.SET_NULL, null=True, default=None)    
@@ -88,6 +92,11 @@ class EveItemType(models.Model):
     volume = models.FloatField(null=True, default=None)
     published = models.BooleanField()
     radius = models.FloatField(null=True, default=None)
+
+class EveItemDogmaAttribute(models.Model):
+    eve_type = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None)
+    attribute_id = models.BigIntegerField(null=True, default=None) 
+    value = models.FloatField(null=True, default=None)
 
 class InvTypeMaterials(models.Model):
     qty = models.IntegerField()
@@ -138,12 +147,13 @@ class MapSystem(models.Model):
 class Asset(models.Model):
     blueprint_copy = models.NullBooleanField(default=None)
     singleton = models.BooleanField()
-    item_id = models.BigIntegerField(unique=True)
+    item_id = models.BigIntegerField()
     location_flag = models.CharField(max_length=50)
     location_id = models.BigIntegerField()
     location_type = models.CharField(max_length=25)
     quantity = models.IntegerField()
     type_id = models.IntegerField()
+    type_name = models.ForeignKey(EveItemType, on_delete=models.CASCADE, null=True, default=None) 
 
     #extra's
     name = models.CharField(max_length=255, null=True, default=None)
@@ -167,9 +177,16 @@ class CharacterAsset(Asset):
 
 # ************************ Character Models
 # Character Skill
+class SkillTotals(models.Model):
+    character = models.OneToOneField(CharacterAudit, on_delete=models.CASCADE)
+
+    total_sp = models.BigIntegerField()
+    unallocated_sp = models.IntegerField()
+
 class Skill(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
     skill_id = models.IntegerField()
+    skill_name = models.ForeignKey(EveItemType, on_delete=models.CASCADE, null=True, default=None) 
     active_skill_level = models.IntegerField()
     skillpoints_in_skill = models.BigIntegerField()
     trained_skill_level = models.IntegerField()
@@ -180,6 +197,8 @@ class Skill(models.Model):
             return False
         return True  # is alpha clone 
 
+    class Meta:
+        unique_together = (("character", "skill_id"),)
 
 # Skill Queue Model
 class SkillQueue(models.Model):
@@ -188,7 +207,7 @@ class SkillQueue(models.Model):
     finish_level = models.IntegerField()
     queue_position = models.IntegerField()
     skill_id = models.IntegerField()
-    skill_name = models.ForeignKey(EveItemType, on_delete=models.CASCADE) 
+    skill_name = models.ForeignKey(EveItemType, on_delete=models.CASCADE, null=True, default=None) 
 
     # Fields that may or may not be present
     finish_date = models.DateTimeField(null=True, default=None)
@@ -199,7 +218,7 @@ class SkillQueue(models.Model):
 
     @property
     def sp_hour(self):
-        return 0 # do some math
+        return -1 # do some math
 
 # Corporation history
 class CorporationHistory(models.Model):
@@ -211,6 +230,44 @@ class CorporationHistory(models.Model):
     record_id = models.IntegerField()
     start_date = models.DateTimeField()
 
+# ************************ Wallet Models 
+class WalletJournalEntry(models.Model):
+    amount = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
+    balance = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
+    context_id = models.BigIntegerField(null=True, default=None)
+    _context_type_enum = Choices('structure_id', 'station_id', 'market_transaction_id', 'character_id',
+                                 'corporation_id', 'alliance_id', 'eve_system', 'industry_job_id',
+                                 'contract_id', 'planet_id', 'system_id', 'type_id')
+    context_id_type = models.CharField(max_length=30, choices=_context_type_enum, null=True, default=None)
+    date = models.DateTimeField()
+    description = models.CharField(max_length=500)
+    first_party_id = models.IntegerField(null=True, default=None)
+    entry_id = models.BigIntegerField()
+    reason = models.CharField(max_length=500, null=True, default=None)
+    ref_type = models.CharField(max_length=72)
+    second_party_id = models.IntegerField(null=True, default=None)
+    tax = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
+    tax_receiver_id = models.IntegerField(null=True, default=None)
+
+
+    class Meta:
+        abstract = True
+
+class CorporationWalletDivision(models.Model):
+    corporation = models.ForeignKey(CorporationAudit, on_delete=models.CASCADE, related_name='corporation_division')
+
+    balance = models.DecimalField(max_digits=20, decimal_places=2)
+    division = models.IntegerField()
+
+class CorporationWalletJournalEntry(WalletJournalEntry):
+    division = models.ForeignKey(CorporationWalletDivision, on_delete=models.CASCADE)
+    first_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='corp_first_party')
+    second_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='corp_second_party')
+
+class CharacterWalletJournalEntry(WalletJournalEntry):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+    first_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_first_party')
+    second_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_second_party')
 
 # ************************ Corp Models
 # Structure models 
@@ -290,12 +347,12 @@ class OreTax(models.Model):
 class OreTaxRates(models.Model):
     tag = models.CharField(max_length=500, default="")
     refine_rate = models.DecimalField(max_digits=5, decimal_places=2, default=87.5)
-    r0 = models.DecimalField(max_digits=5, decimal_places=2)
-    r4 = models.DecimalField(max_digits=5, decimal_places=2)
-    r8 = models.DecimalField(max_digits=5, decimal_places=2)
-    r16 = models.DecimalField(max_digits=5, decimal_places=2)
-    r32 = models.DecimalField(max_digits=5, decimal_places=2)
-    r64 = models.DecimalField(max_digits=5, decimal_places=2)
+    r0 = models.DecimalField(max_digits=5, decimal_places=2)  # normal
+    r4 = models.DecimalField(max_digits=5, decimal_places=2)  # ubiq
+    r8 = models.DecimalField(max_digits=5, decimal_places=2)  # comon
+    r16 = models.DecimalField(max_digits=5, decimal_places=2) # uncom
+    r32 = models.DecimalField(max_digits=5, decimal_places=2) # rare  
+    r64 = models.DecimalField(max_digits=5, decimal_places=2) # best
 
 
 class MiningTax(models.Model):

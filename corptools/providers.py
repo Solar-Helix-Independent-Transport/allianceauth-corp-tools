@@ -1,6 +1,6 @@
-from esi.providers import BaseEsiResponseClient
+from esi.clients import EsiClientProvider
 
-class CorpToolsESIClient(BaseEsiResponseClient):
+class CorpToolsESIClient(EsiClientProvider):
     
     def _get_category(self, category_id, updates):
         from corptools.models import EveItemCategory
@@ -10,14 +10,16 @@ class CorpToolsESIClient(BaseEsiResponseClient):
         category = EveItemCategory(category_id=category_id,
                         name=category.get('name'))
 
-        if category_id in updates:
-            return category, False, groups
-        else:
-            return False, category, groups
+        if updates:
+            if category_id in updates:
+                return category, False, groups
+            else:
+                return False, category, groups
+        #category.save()
         return category
 
     def _get_group(self, group_id, updates):
-        from corptools.models import EveItemGroup
+        from corptools.models import EveItemGroup, EveItemCategory
 
         group = self.client.Universe.get_universe_groups_group_id(group_id=group_id).result()
         eve_types = group.get('types', [])
@@ -25,16 +27,26 @@ class CorpToolsESIClient(BaseEsiResponseClient):
                             category_id=group.get('category_id'),
                             name=group.get('name'))
 
-        if group_id in updates:
-            return group, False, eve_types
-        else:
-            return False, group, eve_types
+        if updates:
+            if group_id in updates:
+                return group, False, eve_types
+            else:
+                return False, group, eve_types
+        #group.save()
         return group
 
     def _get_eve_type(self, type_id, updates):
-        from corptools.models import EveItemType
+        from corptools.models import EveItemType, EveItemDogmaAttribute
 
         eve_type = self.client.Universe.get_universe_types_type_id(type_id=type_id).result()
+        dogma = []
+        if eve_type.get('dogma_attributes'):
+            for d_at in eve_type.get('dogma_attributes', []):
+                d_at_temp = EveItemDogmaAttribute(eve_type_id=type_id,
+                                                attribute_id=d_at.get("attribute_id"),
+                                                value=d_at.get('value'))
+                dogma.append(d_at_temp)
+
         eve_type = EveItemType(type_id=type_id,
                                 group_id=eve_type.get('group_id'),
                                 name=eve_type.get('name'),
@@ -46,12 +58,13 @@ class CorpToolsESIClient(BaseEsiResponseClient):
                                 published=eve_type.get('published'),
                                 radius=eve_type.get('radius')
                                 )
-
-        if type_id in updates:
-            return eve_type, False
-        else:
-            return False, eve_type
-        return eve_type
+        if updates:
+            if type_id in updates:
+                return eve_type, False, dogma
+            else:
+                return False, eve_type, dogma
+        #eve_type.save()
+        return eve_type, dogma
 
     def _get_region(self, region_id, updates):
         from corptools.models import MapRegion
@@ -100,6 +113,5 @@ class CorpToolsESIClient(BaseEsiResponseClient):
             return system, False
         else:
             return False, system
-
 
 esi = CorpToolsESIClient()

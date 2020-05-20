@@ -1,0 +1,81 @@
+{% extends 'corptools/base.html' %}
+{% block audit_title %}
+<h4 class="text-center">Account Level Assets</h4>
+{% endblock %}
+{% block ct_block %}
+<div class="col-md-12 flex-container flex-wrap">
+<div class="col-md-4">
+    <div class="panel panel-primary">
+        <div class="panel-heading text-center"> Capital Ships </div>
+        <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
+            <table class="table">
+                {% for g in capital_asset_groups %}
+                <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
+                {% endfor %}
+            </table>
+        </div>    
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="panel panel-primary">
+        <div class="panel-heading text-center "> Sub-Capital Ships </div>
+        <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
+            <table class="table">
+                {% for g in subcap_asset_groups %}
+                <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
+                {% endfor %}
+            </table>
+        </div>    
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="panel panel-primary">
+        <div class="panel-heading text-center"> Notable Others Assets </div>
+        <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
+            <table class="table">
+                {% for g in noteable_asset_groups %}
+                <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
+                {% endfor %}
+            </table>
+        </div>    
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="panel panel-primary">
+        <div class="panel-heading text-center"> BPO's </div>
+        <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
+            <table class="table">
+                {% for g in bpo_asset_groups %}
+                <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
+                {% endfor %}
+            </table>
+        </div>    
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="panel panel-primary">
+        <div class="panel-heading text-center"> Structures </div>
+        <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
+            <table class="table">
+                {% for g in structure_asset_groups %}
+                <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
+                {% endfor %}
+            </table>
+        </div>    
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="panel panel-primary">
+        <div class="panel-heading text-center"> Rest </div>
+        <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
+            <table class="table">
+                {% for g in remaining_asset_groups %}
+                <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
+                {% endfor %}
+            </table>
+        </div>    
+    </div>
+</div>
+</div>
+
+{% endblock %}
