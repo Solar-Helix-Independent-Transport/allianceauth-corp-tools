@@ -41,6 +41,7 @@ CHAR_REQUIRED_SCOPES = [
 @login_required
 @token_required(scopes=CHAR_REQUIRED_SCOPES)
 def add_char(request, token):
+    CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
     return redirect('corptools:view')
 
 
@@ -54,10 +55,11 @@ def admin(request):
     # get available models
     names = EveName.objects.all().count()
     types = EveItemType.objects.all().count()
+    dogma = EveItemDogmaAttribute.objects.all().count()
     groups = EveItemGroup.objects.all().count()
     categorys = EveItemCategory.objects.all().count()
-    characters = EveItemCategory.objects.all().count()
-    corpations = EveItemCategory.objects.all().count()
+    characters = CharacterAudit.objects.all().count()
+    corpations = CorporationAudit.objects.all().count()
     type_mets = InvTypeMaterials.objects.count()
     regions = MapRegion.objects.all().count()
     constellations = MapConstellation.objects.all().count()
@@ -66,6 +68,7 @@ def admin(request):
     context = {
         "names": names,
         "types": types,
+        "dogma": dogma,
         "groups": groups,
         "categorys": categorys,
         "characters": characters,

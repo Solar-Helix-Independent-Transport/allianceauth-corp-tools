@@ -184,7 +184,7 @@ def process_category_from_esi(category_id):
 
     return output
 
-def process_bulk_types_from_esi(type_ids, update_models=False):
+def process_bulk_types_from_esi(type_ids, update_models=True):
 
     _items = type_ids
     _items_models_creates = []
@@ -252,9 +252,6 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
         if __category_update:
             _categories_model_updates.append(__category_update)
 
-    dogma_query = EveItemDogmaAttribute.objects.filter(eve_type_id__in=_items)
-    if dogma_query.exists():
-        dogma_query._raw_delete(dogma_query.db) # speed and we are not caring about f-keys or signals on these models 
 
     if len(_categories_model_creates) > 0:
         EveItemCategory.objects.bulk_create(_categories_model_creates, batch_size=1000, ignore_conflicts=True)  # bulk create
@@ -274,6 +271,10 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
                                     'mass', 'packaged_volume','portion_size',
                                     'volume','published','radius'], batch_size=1000)  # bulk update
     if len(_dogma_models_creates) > 0:
+        dogma_query = EveItemDogmaAttribute.objects.filter(eve_type_id__in=_items)
+        if dogma_query.exists():
+            dogma_query._raw_delete(dogma_query.db) # speed and we are not caring about f-keys or signals on these models 
+
         EveItemDogmaAttribute.objects.bulk_create(_dogma_models_creates, batch_size=1000, ignore_conflicts=True)  # bulk create
 
     output = "Category: (Updated:{}, Created:{}): " \

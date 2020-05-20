@@ -72,16 +72,3 @@ def assets(request, character_id=None):
     }
 
     return render(request, 'corptools/character/assets.html', context=context)
-
-
-@login_required
-def assets(request, character_id=None):
-    # get available models
-
-    if character_id is None:
-        character_id = request.user.profile.main_character.character_id
-        character_ids = CharacterAudit.objects.get(character__character_id=character_id).character.character_ownership.user.character_ownerships.all().values_list('character__character_id', flat=True)
-    else:
-        character_ids = [character_id]
-
-    CharacterWalletJournalEntry.objects.filter(character__character___character_id__in=character_ids)
