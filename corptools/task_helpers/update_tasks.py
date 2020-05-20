@@ -116,12 +116,12 @@ def update_ore_comp_table_from_fuzzworks():
 
 def process_category_from_esi(category_id):
     _current_categories = EveItemCategory.objects.all().values_list('category_id', flat=True)
-    _category_models_updates, _category_models_creates, _groups = providers.esi._get_category(category_id, updates=_current_categories)
+    _category, _category_creates, _groups = providers.esi._get_category(category_id, updates=_current_categories)
 
-    if _category_models_updates:
-        EveItemCategory.objects.bulk_update([_category_models_updates], ['name'])
-    if _category_models_creates:
-        _category_models_creates.save()
+    if not _category_creates:
+        EveItemCategory.objects.bulk_update([_category], ['name'])
+    else:
+        _category.save()
 
     _groups_model_updates = []
     _groups_model_creates = []
@@ -138,12 +138,12 @@ def process_category_from_esi(category_id):
             _processes.append(executor.submit(providers.esi._get_group, group, _current_groups))
 
     for task in as_completed(_processes):
-        __group_upd, __group_new, __items_list = task.result()
+        __group, __group_new, __items_list = task.result()
         _items += __items_list
-        if __group_upd:
-            _groups_model_updates.append(__group_upd)
-        if __group_new:
-            _groups_model_creates.append(__group_new)
+        if not __group_new:
+            _groups_model_updates.append(__group)
+        else:
+            _groups_model_creates.append(__group)
 
     EveItemGroup.objects.bulk_update(_groups_model_updates, ['name', 'category_id'], batch_size=1000)  # bulk update
     EveItemGroup.objects.bulk_create(_groups_model_creates, batch_size=1000)  # bulk create
@@ -155,22 +155,23 @@ def process_category_from_esi(category_id):
             _processes.append(executor.submit(providers.esi._get_eve_type, item, _current_items))
 
     for task in as_completed(_processes):
-        __item_upd, __item_new, __item_dogma = task.result()
+        __item, __item_new, __item_dogma = task.result()
         _dogma_models_creates += __item_dogma
-        if __item_upd:
-            _items_models_updates.append(__item_upd)
-        if __item_new:
-            _items_models_creates.append(__item_new)
-
-    dogma_query = EveItemDogmaAttribute.objects.filter(eve_type_id__in=_items)
-    if dogma_query.exists():
-        dogma_query._raw_delete(dogma_query.db) # speed and we are not caring about f-keys or signals on these models 
+        if not __item_new:
+            _items_models_updates.append(__item)
+        else:
+            _items_models_creates.append(__item)
 
     EveItemType.objects.bulk_update(_items_models_updates, 
                                         ['name', 'group_id', 'description', 
                                         'mass', 'packaged_volume','portion_size',
                                         'volume','published','radius'], batch_size=1000)  # bulk update
     EveItemType.objects.bulk_create(_items_models_creates, batch_size=1000)  # bulk create
+
+    dogma_query = EveItemDogmaAttribute.objects.filter(eve_type_id__in=_items)
+    if dogma_query.exists():
+        dogma_query._raw_delete(dogma_query.db) # speed and we are not caring about f-keys or signals on these models 
+
     EveItemDogmaAttribute.objects.bulk_create(_dogma_models_creates, batch_size=1000)  # bulk create
 
     output = "Category ({}): " \
@@ -184,9 +185,10 @@ def process_category_from_esi(category_id):
 
     return output
 
-def process_bulk_types_from_esi(type_ids, update_models=True):
+def process_bulk_types_from_esi(type_ids, update_models=False):
 
-    _items = type_ids
+    _items = set(type_ids)
+    _items_processed = []
     _items_models_creates = []
     _items_models_updates = []
     _dogma_models_creates = []
@@ -197,9 +199,9 @@ def process_bulk_types_from_esi(type_ids, update_models=True):
     _categories_model_creates = []
     _categories_model_updates = []
     _processes = []
-    _current_items = EveItemType.objects.all().values_list('type_id', flat=True)
-    _current_groups = EveItemGroup.objects.all().values_list('group_id', flat=True)
-    _current_categories = EveItemCategory.objects.all().values_list('category_id', flat=True)
+    _current_items = list(EveItemType.objects.all().values_list('type_id', flat=True))
+    _current_groups = list(EveItemGroup.objects.all().values_list('group_id', flat=True))
+    _current_categories = list(EveItemCategory.objects.all().values_list('category_id', flat=True))
 
     with ThreadPoolExecutor(max_workers=50) as executor:
         for item in _items:
@@ -207,50 +209,48 @@ def process_bulk_types_from_esi(type_ids, update_models=True):
                 _processes.append(executor.submit(providers.esi._get_eve_type, item, _current_items))
 
     for task in as_completed(_processes):
-        __item_update, __item_new, __item_dogma = task.result()
+        __item, __item_new, __item_dogma = task.result()
+        _items_processed.append(__item.type_id)
+
         if __item_new:
-            if __item_new.group_id not in _current_groups:
-                _current_groups.append(__item_new.group_id)
-            _groups.append(__item_new.group_id)
-            _items_models_creates.append(__item_new)
-        if __item_update:
-            if __item_update.group_id not in _current_groups:
-                _current_groups.append(__item_update.group_id)
-            _groups.append(__item_update.group_id)
-            _items_models_updates.append(__item_update)
+            _items_models_creates.append(__item)
+        else:
+            _items_models_updates.append(__item)
+        if __item.group_id not in _current_groups  or update_models:
+            _current_groups.append(__item.group_id)
+            _groups.append(__item.group_id)
+
         _dogma_models_creates += __item_dogma
 
     _processes = []
     with ThreadPoolExecutor(max_workers=50) as executor:
-        for group in _groups:
+        for group in set(_groups):
             if group not in _current_groups or update_models:
                 _processes.append(executor.submit(providers.esi._get_group, group, _current_groups))
 
     for task in as_completed(_processes):
-        __group_update, __group_new, types = task.result()
+        __group, __group_new, types = task.result()
         if __group_new:
-            if __group_new.category_id not in _current_categories:
-                _current_categories.append(__group_new.category_id)
-            _categories.append(__group_new.category_id)
-            _groups_model_creates.append(__group_new)
-        if __group_update:
-            if __group_update.category_id not in _current_categories:
-                _current_categories.append(__group_update.category_id)
-            _categories.append(__group_update.category_id)
-            _groups_model_updates.append(__group_update)
+            _groups_model_creates.append(__group)
+        else:
+            _groups_model_updates.append(__group)
+
+        if __group.category_id not in _current_categories  or update_models:
+            _current_categories.append(__group.category_id)
+            _categories.append(__group.category_id)
 
     _processes = []
     with ThreadPoolExecutor(max_workers=50) as executor:
-        for category in _categories:
+        for category in set(_categories):
             if category not in _current_categories or update_models:
                 _processes.append(executor.submit(providers.esi._get_category, category, _current_categories))
 
     for task in as_completed(_processes):
-        __category_update, __category_new, groups = task.result()
+        __category, __category_new, groups = task.result()
         if __category_new:
-            _categories_model_creates.append(__category_new)
-        if __category_update:
-            _categories_model_updates.append(__category_update)
+            _categories_model_creates.append(__category)
+        else:
+            _categories_model_updates.append(__category)
 
 
     if len(_categories_model_creates) > 0:
@@ -271,7 +271,7 @@ def process_bulk_types_from_esi(type_ids, update_models=True):
                                     'mass', 'packaged_volume','portion_size',
                                     'volume','published','radius'], batch_size=1000)  # bulk update
     if len(_dogma_models_creates) > 0:
-        dogma_query = EveItemDogmaAttribute.objects.filter(eve_type_id__in=_items)
+        dogma_query = EveItemDogmaAttribute.objects.filter(eve_type_id__in=_items_processed)
         if dogma_query.exists():
             dogma_query._raw_delete(dogma_query.db) # speed and we are not caring about f-keys or signals on these models 
 

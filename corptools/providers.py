@@ -14,7 +14,7 @@ class CorpToolsESIClient(EsiClientProvider):
             if category_id in updates:
                 return category, False, groups
             else:
-                return False, category, groups
+                return category, True, groups
         #category.save()
         return category
 
@@ -31,7 +31,7 @@ class CorpToolsESIClient(EsiClientProvider):
             if group_id in updates:
                 return group, False, eve_types
             else:
-                return False, group, eve_types
+                return group, True, eve_types
         #group.save()
         return group
 
@@ -62,7 +62,7 @@ class CorpToolsESIClient(EsiClientProvider):
             if type_id in updates:
                 return eve_type, False, dogma
             else:
-                return False, eve_type, dogma
+                return eve_type, True, dogma
         #eve_type.save()
         return eve_type, dogma
 
