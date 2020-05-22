@@ -2,6 +2,7 @@ import os
 from setuptools import find_packages, setup
 install_requires = [
     'allianceauth',
+    'esi @ git+git@gitlab.com:allianceauth/django-esi.git'
 ]
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
     README = readme.read()
