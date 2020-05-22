@@ -9,7 +9,7 @@ from allianceauth.project_template.project_name.settings.base import *
 CELERY_ALWAYS_EAGER = True  # Forces celery to run locally for testing
 
 INSTALLED_APPS += [
-    'corpstats',
+    'corptools',
 ]
 
 ROOT_URLCONF = 'tests.urls'

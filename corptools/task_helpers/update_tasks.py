@@ -115,7 +115,7 @@ def update_ore_comp_table_from_fuzzworks():
 
 
 def process_category_from_esi(category_id):
-    _current_categories = EveItemCategory.objects.all().values_list('category_id', flat=True)
+    _current_categories = list(EveItemCategory.objects.all().values_list('category_id', flat=True))
     _category, _category_creates, _groups = providers.esi._get_category(category_id, updates=_current_categories)
 
     if not _category_creates:
@@ -132,7 +132,7 @@ def process_category_from_esi(category_id):
     _dogma_models_creates = []
 
     _processes = []
-    _current_groups = EveItemGroup.objects.all().values_list('group_id', flat=True)
+    _current_groups = list(EveItemGroup.objects.all().values_list('group_id', flat=True))
     with ThreadPoolExecutor(max_workers=20) as executor:
         for group in _groups:
             _processes.append(executor.submit(providers.esi._get_group, group, _current_groups))
@@ -149,7 +149,7 @@ def process_category_from_esi(category_id):
     EveItemGroup.objects.bulk_create(_groups_model_creates, batch_size=1000)  # bulk create
 
     _processes = []
-    _current_items = EveItemType.objects.all().values_list('type_id', flat=True)
+    _current_items = list(EveItemType.objects.all().values_list('type_id', flat=True))
     with ThreadPoolExecutor(max_workers=50) as executor:
         for item in _items:
             _processes.append(executor.submit(providers.esi._get_eve_type, item, _current_items))

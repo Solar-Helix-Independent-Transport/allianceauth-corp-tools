@@ -5,12 +5,11 @@ class CorpToolsESIClient(EsiClientProvider):
     def _get_category(self, category_id, updates):
         from corptools.models import EveItemCategory
 
-        category = self.client.Universe.get_universe_categories_category_id(category_id=category_id).result()
-        groups = category.get('groups', [])
-        category = EveItemCategory(category_id=category_id,
-                        name=category.get('name'))
+        _category = self.client.Universe.get_universe_categories_category_id(category_id=category_id).result()
+        groups = _category.get('groups', [])
+        category = EveItemCategory(category_id=category_id,name=_category.get('name'))
 
-        if updates:
+        if updates is not False:
             if category_id in updates:
                 return category, False, groups
             else:
@@ -23,11 +22,9 @@ class CorpToolsESIClient(EsiClientProvider):
 
         group = self.client.Universe.get_universe_groups_group_id(group_id=group_id).result()
         eve_types = group.get('types', [])
-        group = EveItemGroup(group_id=group_id,
-                            category_id=group.get('category_id'),
-                            name=group.get('name'))
+        group = EveItemGroup(group_id=group_id, category_id=group.get('category_id'), name=group.get('name'))
 
-        if updates:
+        if updates is not False:
             if group_id in updates:
                 return group, False, eve_types
             else:
@@ -58,7 +55,7 @@ class CorpToolsESIClient(EsiClientProvider):
                                 published=eve_type.get('published'),
                                 radius=eve_type.get('radius')
                                 )
-        if updates:
+        if updates is not False:
             if type_id in updates:
                 return eve_type, False, dogma
             else:
