@@ -135,7 +135,7 @@ def process_category_from_esi(category_id):
     _current_groups = list(EveItemGroup.objects.all().values_list('group_id', flat=True))
     with ThreadPoolExecutor(max_workers=20) as executor:
         for group in _groups:
-            _processes.append(executor.submit(providers.esi._get_group, group, _current_groups))
+            _processes.append(executor.submit(providers.esi._get_group, group, updates=_current_groups))
 
     for task in as_completed(_processes):
         __group, __group_new, __items_list = task.result()
@@ -152,7 +152,7 @@ def process_category_from_esi(category_id):
     _current_items = list(EveItemType.objects.all().values_list('type_id', flat=True))
     with ThreadPoolExecutor(max_workers=50) as executor:
         for item in _items:
-            _processes.append(executor.submit(providers.esi._get_eve_type, item, _current_items))
+            _processes.append(executor.submit(providers.esi._get_eve_type, item, updates=_current_items))
 
     for task in as_completed(_processes):
         __item, __item_new, __item_dogma = task.result()

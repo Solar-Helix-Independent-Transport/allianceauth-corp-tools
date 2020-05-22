@@ -2,7 +2,7 @@ from esi.clients import EsiClientProvider
 
 class CorpToolsESIClient(EsiClientProvider):
     
-    def _get_category(self, category_id, updates):
+    def _get_category(self, category_id, updates=False):
         from corptools.models import EveItemCategory
 
         _category = self.client.Universe.get_universe_categories_category_id(category_id=category_id).result()
@@ -17,12 +17,12 @@ class CorpToolsESIClient(EsiClientProvider):
         #category.save()
         return category
 
-    def _get_group(self, group_id, updates):
-        from corptools.models import EveItemGroup, EveItemCategory
+    def _get_group(self, group_id, updates=False):
+        from corptools.models import EveItemGroup
 
-        group = self.client.Universe.get_universe_groups_group_id(group_id=group_id).result()
-        eve_types = group.get('types', [])
-        group = EveItemGroup(group_id=group_id, category_id=group.get('category_id'), name=group.get('name'))
+        _group = self.client.Universe.get_universe_groups_group_id(group_id=group_id).result()
+        eve_types = _group.get('types', [])
+        group = EveItemGroup(group_id=group_id, category_id=_group.get('category_id'), name=_group.get('name'))
 
         if updates is not False:
             if group_id in updates:
@@ -32,7 +32,7 @@ class CorpToolsESIClient(EsiClientProvider):
         #group.save()
         return group
 
-    def _get_eve_type(self, type_id, updates):
+    def _get_eve_type(self, type_id, updates=False):
         from corptools.models import EveItemType, EveItemDogmaAttribute
 
         eve_type = self.client.Universe.get_universe_types_type_id(type_id=type_id).result()
