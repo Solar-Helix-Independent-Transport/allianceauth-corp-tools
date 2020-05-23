@@ -1,0 +1,82 @@
+{% extends 'allianceauth/base.html' %}
+{% load i18n %}
+{% block page_title %}{% trans "Corp Tools!" %}{% endblock %}
+{% block extra_css %}
+{% include 'bundles/datatables-css.html' %}
+
+ <style>
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+.flex-wrap {
+    display: -webkit-flex; /* Safari */
+    -webkit-flex-wrap: wrap; /* Safari 6.1+ */
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.form-control {
+    margin: 2px;
+}
+
+
+.pannel-hieght-locked {
+  min-height: 300px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.scroll-bar-narrow::-webkit-scrollbar-track {
+    border-radius: 5px;
+
+}
+
+.scroll-bar-narrow::-webkit-scrollbar-track-piece {
+  background-color: #375a7f;
+  border-color: transparent;
+  border-width: 7px;
+  border-style: solid;
+  background-clip: padding-box;
+
+}
+
+.scroll-bar-narrow::-webkit-scrollbar
+{
+	width: 15px;
+    border-width: 5px;
+    background-color: transparent;
+}
+
+.scroll-bar-narrow::-webkit-scrollbar-thumb
+{
+    background-color: #375a7f;
+    border-radius: 10px;
+    border: 4px solid transparent;
+    background-clip: padding-box;
+}
+
+
+</style>
+
+{% endblock extra_css %}
+{% block content %}
+    <div class="col-lg-12">
+        <div class="col-lg-12 container">
+            {% block audit_title %}
+            {% endblock %}
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <ul class="nav navbar-nav ">
+                       <li><a href="">{% trans "Add new Token" %}</a></li>
+                    </ul>
+                </div>
+            </nav>
+            {% block ct_block %}{% endblock %}
+        </div>
+
+    </div>
+{% endblock %}

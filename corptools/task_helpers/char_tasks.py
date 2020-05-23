@@ -57,18 +57,20 @@ def update_character_skill_list(character_id):
                                              'unallocated_sp':skills.get('unallocated_sp', 0)
                                          })
 
+    _check_skills = []
     _create_skills = []
     for skill in skills.get('skills', []):
-        skill_name, created = EveItemType.objects.get_or_create_from_esi(skill.get('skill_id'))
+        _check_skills.append(skill.get('skill_id'))
         _skill = Skill(character=audit_char, 
                         skill_id=skill.get('skill_id'),
-                        skill_name=skill_name,
+                        skill_name_id=skill.get('skill_id'),
                         active_skill_level=skill.get('active_skill_level'),
                         skillpoints_in_skill=skill.get('skillpoints_in_skill'),
                         trained_skill_level=skill.get('trained_skill_level'))
 
         _create_skills.append(_skill)
 
+    EveItemType.objects.create_bulk_from_esi(_check_skills)
     Skill.objects.bulk_create(_create_skills)
 
 def update_character_skill_queue(character_id):
@@ -88,20 +90,21 @@ def update_character_skill_queue(character_id):
     SkillQueue.objects.filter(character=audit_char).delete()  # Delete current SkillList
     
     items = []
+    _check_skills = []
     for item in queue:
-        skill_name, created = EveItemType.objects.get_or_create_from_esi(item.get('skill_id'))
+        _check_skills.append(item.get('skill_id'))
         queue_item = SkillQueue(character=audit_char,
                                 finish_level=item.get('finished_level'), 
                                 queue_position=item.get('queue_position'),
                                 skill_id=item.get('skill_id'), 
-                                skill_name=skill_name,
+                                skill_name_id=item.get('skill_id'),
                                 finish_date=item.get('finish_date', None),
                                 level_end_sp=item.get('level_end_sp', None),
                                 level_start_sp=item.get('level_start_sp', None),
                                 start_date=item.get('start_date', None),
                                 training_start_sp=item.get('training_start_sp', None))
         items.append(queue_item)
-
+    EveItemType.objects.create_bulk_from_esi(_check_skills)
     SkillQueue.objects.bulk_create(items)
 
 def update_character_assets(character_id):

@@ -206,7 +206,7 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
     with ThreadPoolExecutor(max_workers=50) as executor:
         for item in _items:
             if item not in _current_items or update_models:
-                _processes.append(executor.submit(providers.esi._get_eve_type, item, _current_items))
+                _processes.append(executor.submit(providers.esi._get_eve_type, item, updates=_current_items))
 
     for task in as_completed(_processes):
         __item, __item_new, __item_dogma = task.result()
@@ -217,7 +217,6 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
         else:
             _items_models_updates.append(__item)
         if __item.group_id not in _current_groups  or update_models:
-            _current_groups.append(__item.group_id)
             _groups.append(__item.group_id)
 
         _dogma_models_creates += __item_dogma
@@ -226,7 +225,7 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
     with ThreadPoolExecutor(max_workers=50) as executor:
         for group in set(_groups):
             if group not in _current_groups or update_models:
-                _processes.append(executor.submit(providers.esi._get_group, group, _current_groups))
+                _processes.append(executor.submit(providers.esi._get_group, group, updates=_current_groups))
 
     for task in as_completed(_processes):
         __group, __group_new, types = task.result()
@@ -236,14 +235,13 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
             _groups_model_updates.append(__group)
 
         if __group.category_id not in _current_categories  or update_models:
-            _current_categories.append(__group.category_id)
             _categories.append(__group.category_id)
 
     _processes = []
     with ThreadPoolExecutor(max_workers=50) as executor:
         for category in set(_categories):
             if category not in _current_categories or update_models:
-                _processes.append(executor.submit(providers.esi._get_category, category, _current_categories))
+                _processes.append(executor.submit(providers.esi._get_category, category, updates=_current_categories))
 
     for task in as_completed(_processes):
         __category, __category_new, groups = task.result()
@@ -279,7 +277,7 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
 
     output = "Category: (Updated:{}, Created:{}): " \
              "Groups: (Updated:{}, Created:{}) " \
-             "Items: (Updated:{}, Created:{}, Dogma Attributes:{}".format(
+             "Items: (Updated:{}, Created:{}, Dogma Attributes:{})".format(
                                                       len(_categories_model_updates),
                                                       len(_categories_model_creates),
                                                       len(_groups_model_updates),
