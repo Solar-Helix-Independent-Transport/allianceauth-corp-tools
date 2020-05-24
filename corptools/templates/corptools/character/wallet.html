@@ -1,21 +1,188 @@
-{% extends 'corptools/base.html' %}
-{% block audit_title %}
-<h4 class="text-center">Account Level Wallet Breakdown</h4>
-{% endblock %}
+{% extends 'corptools/character/char_base.html' %}
 {% block ct_block %}
-<div class="col-md-12 flex-container flex-wrap">
-    <div class="col-md-4">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center"> Capital Ships </div>
-            <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
-                <table class="table">
-                    {% for g in capital_asset_groups %}
-                    <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
+{% load color %}
+
+<div class="col-md-12">
+    <div class="row panel panel-primary">
+        <div class="panel-heading text-center">Wallets</div>
+        <div class="panel-body">
+            <table id="wallet" class="table table-responsive">
+                <thead>
+                    <th>Date</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Amount</th>
+                    <th>Reason</th>
+                    <th>Ref Type</th>
+                    <th>Character Filter</th>
+                </thead>
+                <tbody>
+                    {% for t in wallet %}
+                    <tr>
+                        <td class="">{{t.date|date:"Y-m-d h:i"}}</td>
+                        <td class="">{{t.first_party_name.name}}</td>
+                        <td class="">{{t.second_party_name.name}}</td>
+                        <td class="">{{t.amount}}</td>
+                        <td class="">{{t.reason}}</td>
+                        <td class="">{{t.ref_type}}</td>
+                        <td class="">{{t.character.character.character_name}}</td>
+                    </tr>
                     {% endfor %}
-                </table>
-            </div>    
+                </tbody>
+            </table>
+        </div>    
+    </div>
+    <div class="row panel panel-primary">
+        <div class="panel-heading text-center">Wallet Activity</div>
+        <div class="panel-body">
+            <div height="150" width="150">
+                <div class="chartjs-size-monitor">
+                    <div class="chartjs-size-monitor-expand">
+                        <div class="">
+
+                        </div>
+                    </div>
+                    <div class="chartjs-size-monitor-shrink">
+                        <div class="">
+
+                        </div>
+                    </div>
+                </div>
+                <canvas id="canvas"  class="chartjs-render-monitor"></canvas> 
+            </div>
         </div>
     </div>
 </div>
 
+{% endblock %}
+{% block extra_javascript %}
+    {% include 'bundles/datatables-js.html' %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+	<script>!function(t){function e(t){var e={columns:[],columnsIdxList:[],bootstrap:!1,autoSize:!0,label:"Filter "};if("bootstrap"in t&&"boolean"==typeof t.bootstrap&&(e.bootstrap=t.bootstrap),"autoSize"in t&&"boolean"==typeof t.autoSize&&(e.autoSize=t.autoSize),"label"in t&&"string"==typeof t.label&&(e.label=t.label),"columns"in t)for(var i=0;i<t.columns.length;i++){var n=t.columns[i];if("idx"in n&&"number"==typeof n.idx){var o=n.idx;e.columns[o]={title:null,maxWidth:null,autoSize:!0},e.columnsIdxList.push(o),"title"in n&&"string"==typeof n.title&&(e.columns[o].title=n.title),"maxWidth"in n&&"string"==typeof n.maxWidth&&(e.columns[o].maxWidth=n.maxWidth),"autoSize"in n&&"boolean"==typeof n.autoSize&&(e.columns[o].autoSize=n.autoSize)}}return e}t(document).on("preInit.dt",function(i,n){if("dt"===i.namespace){var o=new t.fn.dataTable.Api(n),a=o.table().node().id,l=o.init();if("filterDropDown"in l){var r=e(l.filterDropDown);if(0!=r.columns.length){var u=o.table().container(),s=a+"_filterWrapper",c=s+" "+(r.bootstrap?"form-inline":"");t(u).prepend('<div id="'+s+'" class="'+c+'">'+r.label+"</div>"),o.columns(r.columnsIdxList).every(function(){var e=this.index(),i=null!==r.columns[e].title?r.columns[e].title:t(this.header()).html();""==i&&(i="column "+(e+1));var n="form-control "+a+"_filterSelect",o=a+"_filterSelect"+e;t("#"+s).append('<select id="'+o+'" class="'+n+'"></select>');var l=t("#"+o).empty().append('<option value="">('+i+")</option>");})}}}}),t(document).on("init.dt",function(i,n){if("dt"===i.namespace){var o=new t.fn.dataTable.Api(n),a=o.table().node().id,l=o.init();if("filterDropDown"in l){var r=e(l.filterDropDown);o.table().container();o.columns(r.columnsIdxList).every(function(){var e=this,i=e.index(),n=t("#"+(a+"_filterSelect"+i));n.on("change",function(){var i=t.fn.dataTable.util.escapeRegex(t(this).val());e.search(i?"^"+i+"$":"",!0,!1).draw()}),e.data().unique().sort().each(function(t,e){""!=t&&n.append('<option value="'+t+'">'+t+"</option>")})})}}})}(jQuery);</script>
+{% endblock %}
+{% block extra_script %}
+    var color = Chart.helpers.color
+    var data = {
+        labels : ["0000","0100","0200","0300","0400","0500","0600","0700","0800","0900","1000","1100","1200","1300","1400","1500","1600","1700","1800","1900","2000","2100","2200","2300"],
+        datasets : [{% for name, data in graphs.items %}{
+                label : "{{name}}",
+                {% random_colour as c %}borderColor: "{{ c }}",
+                backgroundColor: "{{c}}22",
+                data : [ {% for k, v in data.items %}{{v}},{% endfor %} ]
+            },{% endfor %}
+        ]
+    }
+    var options = {
+        scale: {
+            angleLines: {
+                display: true
+            },
+            {% if NIGHT_MODE %}
+            ticks: {
+                backdropColor : '#000000aa'
+            }{% endif %}
+
+        },
+        responsive: true,
+        legend: {
+            position: "right",
+            align: "middle",
+            labels: {
+                padding: 20
+              }
+        },
+        tooltips: {enabled: false},
+        hover: {mode: null},
+    
+
+    };
+    var img_eu = new Image();
+    var img_us = new Image();
+    var img_au = new Image();
+    img_eu.src = 'https://simple-repeat.com/img/pngimg/basic/stripe/Solid256stripeDiagonal4_16.png';
+    img_us.src = 'https://simple-repeat.com/img/pngimg/basic/stripe/Solid256stripeHorizontal4_8.png';
+    img_au.src = 'https://simple-repeat.com/img/pngimg/basic/stripe/Solid256stripeVertical4_8.png';
+
+    Chart.pluginService.register({
+        beforeDraw: chart => {
+            const { ctx, scale, config } = chart
+            const { xCenter, yCenter, drawingArea: radius } = scale
+            start_eu = Math.PI * 2 / 24 * (14 - 6);
+            stop_eu = Math.PI * 2 / 24 * (21 - 6);
+            start_us = Math.PI * 2 / 24 * (21 - 6);
+            stop_us = Math.PI * 2 / 24 * (4 - 6);
+            start_au = Math.PI * 2 / 24 * (5 - 6);
+            stop_au = Math.PI * 2 / 24 * (13 - 6);
+            colour = "#000000ff";
+            ctx.save();
+
+            ctx.globalAlpha = 0.2;
+
+            ctx.beginPath();
+            ctx.moveTo(xCenter, yCenter);
+            ctx.arc(xCenter, yCenter, radius, start_eu, stop_us);
+            ctx.fillStyle = colour;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(xCenter, yCenter);
+            ctx.arc(xCenter, yCenter, radius, start_eu, stop_eu);
+            ctx.fillStyle = ctx.createPattern(img_eu, 'repeat');
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(xCenter, yCenter);
+            ctx.arc(xCenter, yCenter, radius, start_us, stop_us);
+            ctx.fillStyle = ctx.createPattern(img_us, 'repeat');
+            ctx.fill();
+
+
+            ctx.beginPath();
+            ctx.moveTo(xCenter, yCenter);
+            ctx.arc(xCenter, yCenter, radius, start_au, stop_au);
+            ctx.fillStyle = colour;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(xCenter, yCenter);
+            ctx.arc(xCenter, yCenter, radius, start_au, stop_au);
+            ctx.fillStyle = ctx.createPattern(img_au, 'repeat');
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+
+            ctx.restore()
+        }
+    });
+    {% if NIGHT_MODE %}
+    Chart.defaults.global.defaultFontColor = 'White';
+    {% endif %}
+
+    $(document).ready(function() {
+
+        var ctx = document.getElementById('canvas').getContext('2d');
+        var myRadarChart = new Chart(ctx, {
+            type: 'radar',
+            data: data,
+            options: options
+        });
+        
+        $('#wallet').DataTable({
+            "filterDropDown": {
+					columns: [{
+						idx: 5
+                            },
+                            {
+						idx: 6
+                            }],
+                    bootstrap: true
+            },
+            "columnDefs": [
+                { "visible": false, "targets": [6] }
+            ],
+            "order": [
+                [0, "desc"]
+            ],
+            "pageLength": 25
+        });
+    });
 {% endblock %}

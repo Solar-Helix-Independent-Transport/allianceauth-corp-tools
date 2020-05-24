@@ -13,19 +13,27 @@ from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 from django.http import HttpResponse
 import csv
 import re
+import copy
 
 from ..models import *
+
+def get_alts(request, character_id):
+    if character_id is None:
+        main_char = request.user.profile.main_character
+    else:
+        main_char = EveCharacter.objects.get_character_by_id(character_id).character_ownership.user.profile.main_character
+
+    character_id = main_char.character_id
+    characters = CharacterAudit.objects.get(character__character_id=character_id).character.character_ownership.user.character_ownerships.all()
+    
+    return main_char, characters
 
 @login_required
 def assets(request, character_id=None):
     # get available models
 
-    if character_id is None:
-        character_id = request.user.profile.main_character.character_id
-        character_ids = CharacterAudit.objects.get(character__character_id=character_id).character.character_ownership.user.character_ownerships.all().values_list('character__character_id', flat=True)
-    else:
-        character_ids = [character_id]
-    
+    main_char, characters = get_alts (request, character_id)
+
     capital_groups = [30, 547, 659, 1538, 485, 902, 513, 944, 941]
     subcap_cat = [6]
     noteable_cats = [4, 20, 23, 25, 34, 35, 87, 91]
@@ -33,7 +41,7 @@ def assets(request, character_id=None):
     bpo_cats = [9]
 
     assets = CharacterAsset.objects\
-                .filter(character__character__character_id__in=character_ids)\
+                .filter(character__character__character_id__in=characters.values_list('character__character_id', flat=True))\
                 .values('type_name__group__group_id')\
                 .annotate(grp_total=Sum('quantity'))\
                 .annotate(grp_name=F('type_name__group__name'))\
@@ -63,6 +71,8 @@ def assets(request, character_id=None):
             remaining_asset_groups.append(grp)
         
     context = {
+        "main_char": main_char,
+        "alts": characters,
         "capital_asset_groups": capital_asset_groups,
         "noteable_asset_groups": noteable_asset_groups,
         "subcap_asset_groups": subcap_asset_groups,
@@ -72,3 +82,55 @@ def assets(request, character_id=None):
     }
 
     return render(request, 'corptools/character/assets.html', context=context)
+
+@login_required
+def wallet(request, character_id=None):
+    # get available models
+
+    main_char, characters = get_alts (request, character_id)
+
+    wallet_journal = CharacterWalletJournalEntry.objects\
+                        .filter(character__character__character_id__in=characters.values_list('character__character_id', flat=True))\
+                        .select_related('first_party_name', 'first_party_name', 'character__character')
+    
+    graph_data_model = {"0":0,
+                        "1":0,
+                        "2":0,
+                        "3":0,
+                        "4":0,
+                        "5":0,
+                        "6":0,
+                        "7":0,
+                        "8":0,
+                        "9":0,
+                        "10":0,
+                        "11":0,
+                        "12":0,
+                        "13":0,
+                        "14":0,
+                        "15":0,
+                        "16":0,
+                        "17":0,
+                        "18":0,
+                        "19":0,
+                        "20":0,
+                        "21":0,
+                        "22":0,
+                        "23":0}
+    # %-H	
+
+    graph_data = {}
+    for wd in wallet_journal:
+        if wd.character.character.character_name not in graph_data:
+            graph_data[wd.character.character.character_name] = copy.deepcopy(graph_data_model)
+
+        graph_data[wd.character.character.character_name][wd.date.strftime("%-H")] += 1
+    context = {
+        "main_char": main_char,
+        "alts": characters,
+        "wallet": wallet_journal,
+        "graphs": graph_data,
+    }
+
+    return render(request, 'corptools/character/wallet.html', context=context)
+

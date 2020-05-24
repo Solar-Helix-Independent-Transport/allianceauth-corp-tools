@@ -168,7 +168,7 @@ def update_character_wallet(character_id):
 
     items = []
     for item in journal_items:
-        if item.get('entry_id') not in _current_journal:
+        if item.get('id') not in _current_journal:
             if item.get('second_party_id') not in _current_eve_ids:
                 _new_names.append(item.get('second_party_id'))
                 _current_eve_ids.append(item.get('second_party_id'))

@@ -59,6 +59,15 @@
     background-clip: padding-box;
 }
 
+.img-pad
+{
+    padding: 5px;
+}
+
+#chartdiv {
+  width	: 100%;
+  height	: 500px;
+}								
 
 </style>
 
@@ -66,17 +75,72 @@
 {% block content %}
     <div class="col-lg-12">
         <div class="col-lg-12 container">
-            {% block audit_title %}
-            {% endblock %}
-            <nav class="navbar navbar-default">
-                <div class="container-fluid">
-                    <ul class="nav navbar-nav ">
-                       <li><a href="">{% trans "Add new Token" %}</a></li>
-                    </ul>
+            <br>
+            <div class="panel panel-primary">
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            <a class="navbar-brand" href="">Account Audit</a>
+                        </div>
+                
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav">
+                                <li class="">
+                                    <a href="">Public Data</a>
+                                </li>
+                                <li class="">
+                                    <a href="{% url 'corptools:assets' %}">Assets</a>
+                                </li>
+                                <li class="">
+                                    <a href="">Skills</a>
+                                </li>
+                                <li class="">
+                                    <a href="{% url 'corptools:wallet' %}">Wallet</a>
+                                </li>
+                            </ul>
+                            <ul class="nav navbar-nav pull-right">
+                                <li class="pull-right">
+                                    <a href="{% url 'corptools:add_char' %}">Add Token</a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </nav>
+    
+                <div class="panel panel-body">
+                    <div class="row">
+                        <div class="text-center col-md-2">
+                            <img class="ra-avatar img-circle" src="{{ main_char.portrait_url_128 }}">
+                            <h4>{{ main_char.character_name }}</h4>
+                        </div>
+                        <div class="text-center col-md-2 hidden-xs hidden-sm">
+                            <img class="ra-avatar img-circle" src="{{ main_char.corporation_logo_url_128 }}">
+                            <h4>{{ main_char.corporation_name }}</h4>
+                        </div>
+                        {% if main_char.alliance_id %}
+                            <div class="text-center col-md-2 hidden-xs hidden-sm">
+                                <img class="ra-avatar img-circle" src="{{ main_char.alliance_logo_url_128 }}">
+                                <h4>{{ main_char.alliance_name }}</h4>
+                            </div>
+                        {% endif %}
+                        <div class="col-xs-12 hidden-md hidden-lg"><hr></div>
+                        <div class="text-center col-md-6"  rowspan="2">
+                            <h4>Linked characters</h4> 
+                            {% for alt in alts|slice:":15" %}
+                                <span style="background-color: " class="label label-default"><img class="ra-avatar img-circle img-pad" src="{{ alt.character.portrait_url_32 }}"> {{ alt.character.character_name }}</span>
+                            {% endfor %}
+                            {% if alts.count > 15 %}<span class="label label-default">{{ alts.count|subtract:15 }} More... </span>{% endif %}
+                        </div>
+                    </div>
                 </div>
-            </nav>
+            </div>
             {% block ct_block %}{% endblock %}
-        </div>
-
     </div>
 {% endblock %}
