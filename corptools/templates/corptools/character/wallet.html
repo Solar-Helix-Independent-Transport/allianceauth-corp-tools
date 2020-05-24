@@ -1,6 +1,7 @@
 {% extends 'corptools/character/char_base.html' %}
 {% block ct_block %}
-{% load color %}
+{% load colors %}
+{% load l10n %}
 
 <div class="col-md-12">
     <div class="row panel panel-primary">
@@ -24,7 +25,7 @@
                         <td class="">{{t.second_party_name.name}}</td>
                         <td class="">{{t.amount}}</td>
                         <td class="">{{t.reason}}</td>
-                        <td class="">{{t.ref_type}}</td>
+                        <td class="">{{t.ref_type|deslug|title}}</td>
                         <td class="">{{t.character.character.character_name}}</td>
                     </tr>
                     {% endfor %}
@@ -66,7 +67,7 @@
         labels : ["0000","0100","0200","0300","0400","0500","0600","0700","0800","0900","1000","1100","1200","1300","1400","1500","1600","1700","1800","1900","2000","2100","2200","2300"],
         datasets : [{% for name, data in graphs.items %}{
                 label : "{{name}}",
-                {% random_colour as c %}borderColor: "{{ c }}",
+                {% random_bright_colour as c %}borderColor: "{{ c }}",
                 backgroundColor: "{{c}}22",
                 data : [ {% for k, v in data.items %}{{v}},{% endfor %} ]
             },{% endfor %}

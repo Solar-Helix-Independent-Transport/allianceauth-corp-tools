@@ -32,6 +32,8 @@ class CharacterAudit(models.Model):
     last_update_assets = models.DateTimeField(null=True, default=None, blank=True)
     cache_expire_assets = models.DateTimeField(null=True, default=None, blank=True)
 
+    balance = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
+
     def __str__(self):
         return "{}'s Character Data".format(self.character.character_name)
 

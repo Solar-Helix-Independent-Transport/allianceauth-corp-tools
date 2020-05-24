@@ -8,3 +8,11 @@ def addclass(value, arg):
 @register.filter(name='subtract')
 def subtract(value, arg):
     return value - arg
+
+@register.filter(name='deslug')
+def deslug(slugged):
+    try:
+        return slugged.replace('_', ' ')
+    except:
+        return slugged
+

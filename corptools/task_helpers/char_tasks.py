@@ -196,6 +196,13 @@ def update_character_wallet(character_id):
             items.append(asset_item)
 
     created_names = EveName.objects.create_bulk_from_esi(_new_names)
+
+    wallet_ballance = providers.esi.client.Wallet.get_characters_character_id_wallet(character_id=character_id,
+                                                                            token=token.valid_access_token()).result()
+
+    audit_char.balance=wallet_ballance
+    audit_char.save()
+
     if created_names:
         CharacterWalletJournalEntry.objects.bulk_create(items)
     else: 
