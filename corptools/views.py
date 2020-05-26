@@ -42,6 +42,7 @@ CHAR_REQUIRED_SCOPES = [
 @token_required(scopes=CHAR_REQUIRED_SCOPES)
 def add_char(request, token):
     CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
+    
     return redirect('corptools:view')
 
 

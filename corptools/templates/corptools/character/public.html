@@ -1,5 +1,6 @@
 {% extends 'corptools/character/char_base.html' %}
 {% load humanize  %}
+{% load evelinks %}
 {% block ct_block %}
 <div class="row flex-container flex-wrap">
     {% for name, data in table_data.items %}
@@ -26,7 +27,7 @@
                                     <tbody>
                                     {% for k, c in data.history.items %}
                                         <tr>
-                                            <td><img class="ra-avatar img-circle" src="https://images.evetech.net/corporations/{{c.id}}/logo?size=32"></td>
+                                            <td><img class="ra-avatar img-circle" src="{{ c.id|corporation_logo_url:32 }}"></td>
                                             <td>{{c.name}}</td>
                                             <td>{{c.started|date:"Y/m/d"}}</td>
                                         </tr> 

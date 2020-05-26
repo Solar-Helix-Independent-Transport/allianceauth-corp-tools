@@ -44,14 +44,19 @@ def process_all_categories():
 def update_all_characters():
     characters = CharacterAudit.objects.all().select_related('character')
     for char in characters:
-        logger.info("Starting Updates for {}".format(char.character.character_name))
-        que = []
-        que.append(update_char_corp_history.si(char.character.character_id))
-        que.append(update_char_skill_list.si(char.character.character_id))
-        que.append(update_char_skill_queue.si(char.character.character_id))
-        que.append(update_char_wallet.si(char.character.character_id))
-        que.append(update_char_assets.si(char.character.character_id))
-        chain(que).apply_async(priority=6)
+        update_character.apply_async(args=[char.character.character_id])
+
+@shared_task
+def update_character(char_id):
+    character = CharacterAudit.objects.filter(character__character_id=char_id).first()
+    logger.info("Starting Updates for {}".format(character.character.character_name))
+    que = []
+    que.append(update_char_corp_history.si(character.character.character_id))
+    que.append(update_char_skill_list.si(character.character.character_id))
+    que.append(update_char_skill_queue.si(character.character.character_id))
+    que.append(update_char_wallet.si(character.character.character_id))
+    que.append(update_char_assets.si(character.character.character_id))
+    chain(que).apply_async(priority=6)
 
 @shared_task
 def update_char_corp_history(character_id):
