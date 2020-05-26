@@ -13,7 +13,7 @@ class MemberAudit(MenuItemHook):
                               navactive=['corpstat:'])
 
     def render(self, request):
-        if request.user.has_perm('View Audit Role'):
+        if request.user.has_perm('corptools.view_characteraudit'):
             return MenuItemHook.render(self, request)
         return ''
 

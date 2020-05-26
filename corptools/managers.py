@@ -200,3 +200,48 @@ class EveCategoryManager(models.Manager):
             logger.exception('ESI Error id {} - {}'.format(eve_id, e))
             raise e
         return entity, created
+
+
+class AuditCharacterQuerySet(models.QuerySet):
+    def visible_to(self, user):
+        # superusers get all visible
+        if user.is_superuser:
+            logger.debug('Returning all characters for superuser %s.' % user)
+            return self
+
+        if user.has_perm('corptools.global_hr'):
+            logger.debug('Returning all characters for %s.' % user)
+            return self
+
+        try:
+            char = user.profile.main_character
+            assert char
+            # build all accepted queries
+            queries = [models.Q(character__character_ownership__user=user)]
+            if user.has_perm('corptools.alliance_hr'):
+                if char.alliance_id is not None:
+                    queries.append(models.Q(character__alliance_id=char.alliance_id))
+                else:
+                    queries.append(models.Q(character__corporation_id=char.corporation_id))
+            if user.has_perm('corptools.corp_hr'):
+                if user.has_perm('corptools.alliance_hr'):
+                    pass
+                else:
+                    queries.append(models.Q(character__corporation_id=char.corporation_id))
+            logger.debug('%s queries for user %s visible chracters.' % (len(queries), user))
+            # filter based on queries
+            query = queries.pop()
+            for q in queries:
+                query |= q
+            return self.filter(query)
+        except AssertionError:
+            logger.debug('User %s has no main character. Nothing visible.' % user)
+            return self.none()        
+
+
+class AuditCharacterManager(models.Manager):
+    def get_queryset(self):
+        return AuditCharacterQuerySet(self.model, using=self._db)
+
+    def visible_to(self, user):
+        return self.get_queryset().visible_to(user)

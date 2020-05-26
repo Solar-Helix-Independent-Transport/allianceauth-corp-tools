@@ -11,13 +11,16 @@ from esi.models import Token
 from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter
 from allianceauth.notifications import notify
 
-from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager
+from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager, AuditCharacterManager
 
 from model_utils import Choices
 
 logger = logging.getLogger(__name__)
 
 class CharacterAudit(models.Model):
+
+    objects = AuditCharacterManager()
+    
     character = models.OneToOneField(EveCharacter, on_delete=models.CASCADE)
 
     last_update_pub_data = models.DateTimeField(null=True, default=None, blank=True)

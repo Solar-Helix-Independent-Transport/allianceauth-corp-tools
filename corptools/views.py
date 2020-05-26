@@ -49,14 +49,16 @@ def add_char(request, token):
 @login_required
 def corptools_menu(request):
     # get available models
-    cas = CharacterAudit.objects.all()
+    cas = CharacterAudit.objects.visible_to(request.user).select_related('character__character_ownership__user__profile__main_character').prefetch_related('character__character_ownership__user__character_ownerships').prefetch_related('character__character_ownership__user__character_ownerships__character')
+
+
     chars = {}
     for char in cas:
         main = char.character.character_ownership.user.profile.main_character
         if main.character_name not in chars:
-            chars[str(main.character_id)] = {'main':main}
+            chars[str(main.character_id)] = {'main':main, 'audit':char}
         else:
-            chars[main.character_name][char.character.character_name] = char
+            pass
 
     return render(request, 'corptools/menu.html', context={'characters':chars})
 

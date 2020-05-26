@@ -1,11 +1,12 @@
 {% extends 'corptools/base.html' %}
 {% block ct_block %}
+{% if perms.corptools.admin %}
 <h4>Admin Stuff</h4>
 <a href="{% url 'corptools:add_char' %}">Add Character Token</a><br>
 <a href="{% url 'corptools:admin' %}">DB Admin</a><br>
-
+{% endif %}
 <h4>View People</h4>
 {% for char,alts in characters.items %}
-<a href="{% url 'corptools:overview' char %}">View {{alts.main.character_name}}</a><br>
+<a href="{% url 'corptools:overview' char %}">View {{alts.main.character_name}}</a><p class="small">{% for alt in alts.audit.character.character_ownership.user.character_ownerships.all %} {{alt.character.character_name}},{% endfor %}</p>
 {% endfor %}
 {% endblock %}

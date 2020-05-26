@@ -22,6 +22,12 @@ def get_alts(request, character_id):
         main_char = request.user.profile.main_character
     else:
         main_char = EveCharacter.objects.get_character_by_id(character_id).character_ownership.user.profile.main_character
+        
+    #check access
+    visible = CharacterAudit.objects.visible_to(request.user).values_list('character', flat=True)
+    if main_char.id not in visible:
+        raise PermissionDenied("You do not have access to view this character")
+    
 
     character_id = main_char.character_id
     characters = CharacterAudit.objects.get(character__character_id=character_id).character.character_ownership.user.character_ownerships.all().select_related('character', 'character__characteraudit')
