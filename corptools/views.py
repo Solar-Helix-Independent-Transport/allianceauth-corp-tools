@@ -42,14 +42,23 @@ CHAR_REQUIRED_SCOPES = [
 @token_required(scopes=CHAR_REQUIRED_SCOPES)
 def add_char(request, token):
     CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
-    
+
     return redirect('corptools:view')
 
 
 @login_required
 def corptools_menu(request):
     # get available models
-    return render(request, 'corptools/menu.html', context={})
+    cas = CharacterAudit.objects.all()
+    chars = {}
+    for char in cas:
+        main = char.character.character_ownership.user.profile.main_character
+        if main.character_name not in chars:
+            chars[str(main.character_id)] = {'main':main}
+        else:
+            chars[main.character_name][char.character.character_name] = char
+
+    return render(request, 'corptools/menu.html', context={'characters':chars})
 
 @login_required
 def admin(request):

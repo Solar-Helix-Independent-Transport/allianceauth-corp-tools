@@ -1,7 +1,11 @@
 {% extends 'corptools/base.html' %}
 {% block ct_block %}
-<p>Todo Make some views :-D</p>
+<h4>Admin Stuff</h4>
 <a href="{% url 'corptools:add_char' %}">Add Character Token</a><br>
 <a href="{% url 'corptools:admin' %}">DB Admin</a><br>
-<a href="{% url 'corptools:assets' %}">Assets Demo</a>
+
+<h4>View People</h4>
+{% for char,alts in characters.items %}
+<a href="{% url 'corptools:overview' char %}">View {{alts.main.character_name}}</a><br>
+{% endfor %}
 {% endblock %}

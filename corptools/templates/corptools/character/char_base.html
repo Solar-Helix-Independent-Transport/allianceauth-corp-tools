@@ -104,16 +104,16 @@ table.dataTable tbody td {
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul class="nav navbar-nav">
                                 <li class="">
-                                    <a href="{% url 'corptools:overview' %}">Overview</a>
+                                    <a href="{% url 'corptools:overview' main_char.character_id %}">Overview</a>
                                 </li>
                                 <li class="">
-                                    <a href="{% url 'corptools:assets' %}">Assets</a>
+                                    <a href="{% url 'corptools:assets' main_char.character_id%}">Assets</a>
                                 </li>
                                 <li class="">
                                     <a href="">Skills</a>
                                 </li>
                                 <li class="">
-                                    <a href="{% url 'corptools:wallet' %}">Wallet</a>
+                                    <a href="{% url 'corptools:wallet' main_char.character_id %}">Wallet</a>
                                 </li>
                             </ul>
                             <ul class="nav navbar-nav pull-right">
