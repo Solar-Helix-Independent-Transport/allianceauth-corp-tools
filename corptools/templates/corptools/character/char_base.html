@@ -7,6 +7,10 @@
 {% include 'bundles/datatables-css.html' %}
 
  <style>
+.noheader thead {
+  display: none;
+}
+
 .flex-container {
     display: flex;
     flex-direction: row;
@@ -31,10 +35,15 @@
   justify-content: center;
 }
 
-
 .pannel-hieght-locked {
   min-height: 300px;
   max-height: 300px;
+  overflow-y: auto;
+}
+
+.panel-height-locked-large {
+  min-height: 600px;
+  max-height: 600px;
   overflow-y: auto;
 }
 
@@ -81,6 +90,13 @@ table.dataTable tbody td {
   height	: 500px;
 }								
 
+tr.group,
+        tr.group:hover {
+            background-color: #3498DB !important;
+        }
+
+
+
 </style>
 
 {% endblock extra_css %}
@@ -98,7 +114,7 @@ table.dataTable tbody td {
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                             </button>
-                            <a class="navbar-brand" href="">Account Audit</a>
+                            <a class="navbar-brand" href="{% url 'corptools:view' %}">Account Audit</a>
                         </div>
                 
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -110,7 +126,7 @@ table.dataTable tbody td {
                                     <a href="{% url 'corptools:assets' main_char.character_id%}">Assets</a>
                                 </li>
                                 <li class="">
-                                    <a href="">Skills</a>
+                                    <a href="{% url 'corptools:skills' main_char.character_id%}">Skills</a>
                                 </li>
                                 <li class="">
                                     <a href="{% url 'corptools:wallet' main_char.character_id %}">Wallet</a>

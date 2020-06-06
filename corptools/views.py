@@ -60,6 +60,9 @@ def corptools_menu(request):
         else:
             pass
 
+    if len(chars) == 1:
+        return redirect('corptools:overview', chars[list(chars.keys())[0]]['main'].character_id)
+
     return render(request, 'corptools/menu.html', context={'characters':chars})
 
 @login_required

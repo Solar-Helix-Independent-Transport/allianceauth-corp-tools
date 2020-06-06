@@ -159,3 +159,65 @@ def pub_data(request, character_id=None):
 
     return render(request, 'corptools/character/public.html', context=context)
 
+@login_required
+def skills(request, character_id=None):
+    # get available models
+
+    main_char, characters, net_worth = get_alts (request, character_id)
+    character_ids = characters.values_list('character__character_id', flat=True)
+
+    queues = SkillQueue.objects.filter(character__character__character_id__in=character_ids)\
+                .select_related('skill_name', 'character__character')
+    skills = Skill.objects.filter(character__character__character_id__in=character_ids)\
+                .select_related('skill_name', 'skill_name__group', 'character__character')\
+                .order_by('skill_name__name')
+
+    totals = SkillTotals.objects.filter(character__character__character_id__in=character_ids)
+
+    skill_tables = {}
+    for skill in skills:
+        char =  skill.character.character.character_name
+        grp = skill.skill_name.group.name
+        if char not in skill_tables:
+            skill_tables[char] = {"character":skill.character, "omega": True, "skills":{}, "queue":[]}
+        if grp not in skill_tables[char]["skills"]:
+            skill_tables[char]["skills"][grp] = {}
+
+        skill_tables[char]["skills"][grp][skill.skill_name.name] = {
+                            "sp_total":skill.skillpoints_in_skill,
+                            "active_level":skill.active_skill_level,
+                            "trained_level":skill.trained_skill_level,
+                        }
+        if skill.alpha:
+            skill_tables[char]["omega"] = False
+    
+    for que in queues:
+        char = que.character.character.character_name
+        if char not in skill_tables:
+            skill_tables[char] = {"character":que.character, "omega": True, "skills":{}, "queue":[]}
+        skill_tables[char]["queue"].append(
+            {
+                "queue_position": que.queue_position,
+                "skill_name": que.skill_name.name,
+                "finish_date": que.finish_date,
+                "finish_level": que.finish_level
+            }
+        )
+    
+    for total in totals:
+        char = total.character.character.character_name
+        if char not in skill_tables:
+            skill_tables[char] = {"character":total.character, "omega": True, "skills":{}, "queue":[]}
+        skill_tables[char]["total_sp"] = total.total_sp
+        skill_tables[char]["unallocated_sp"] = total.unallocated_sp
+
+    context = {
+        "main_char": main_char,
+        "alts": characters,
+        "net_worth": net_worth,
+
+        "skill_tables": skill_tables,
+    }
+
+    return render(request, 'corptools/character/skills.html', context=context)
+

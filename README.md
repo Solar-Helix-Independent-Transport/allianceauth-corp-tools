@@ -39,18 +39,20 @@ Active Devs:
  3. run migrations and restart auth
  4. run the `manage.py setup_corptools_db` to initialize the DB models and fire off the initial update tasks.
  5. setup your perms as documented below
- 6. add characters and corp tokens.
+ 6. add characters and corp tokens as required.
  7. prepare for pingagedon.
 
 ## Permissions
-If you are coming fromn the inbuilt module simply replace your perms from `corputils` with the matching `corpstats` perm
+If you are coming fromn the inbuilt module simply replace your perms from `corputils` with the matching `cornstalks` perm
 
  Perm | Admin Site	 | Auth Site 
  --- | --- | --- 
 ``` not yet ```
 
 ## Usage
-``` not yet ```
+click it and use it?
+
+
 
 ## Contributing
 Make sure you have signed the [License Agreement](https://developers.eveonline.com/resource/license-agreement) by logging in at https://developers.eveonline.com before submitting any pull requests.

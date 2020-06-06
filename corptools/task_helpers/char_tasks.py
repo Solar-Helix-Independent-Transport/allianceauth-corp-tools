@@ -119,7 +119,7 @@ def update_character_assets(character_id):
         return "No Tokens"
 
     assets = providers.esi.client.Assets.get_characters_character_id_assets(character_id=character_id,
-                                                                            token=token.valid_access_token()).result_all_pages()
+                                                                            token=token.valid_access_token()).results()
 
     delete_query = CharacterAsset.objects.filter(character=audit_char)  # Flush Assets
     if delete_query.exists():
@@ -159,7 +159,7 @@ def update_character_wallet(character_id):
         return "No Tokens"
 
     journal_items = providers.esi.client.Wallet.get_characters_character_id_wallet_journal(character_id=character_id,
-                                                                            token=token.valid_access_token()).result_all_pages()
+                                                                            token=token.valid_access_token()).results()
 
     _current_journal = CharacterWalletJournalEntry.objects.filter(character=audit_char).values_list('entry_id', flat=True) # TODO add time filter
     _current_eve_ids = list(EveName.objects.all().values_list('eve_id', flat=True))
