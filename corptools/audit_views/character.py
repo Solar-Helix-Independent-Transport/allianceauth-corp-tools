@@ -21,7 +21,10 @@ def get_alts(request, character_id):
     if character_id is None:
         main_char = request.user.profile.main_character
     else:
-        main_char = EveCharacter.objects.get_character_by_id(character_id).character_ownership.user.profile.main_character
+        main_char = EveCharacter.objects\
+            .select_related('character_ownership','character_ownership__user__profile','character_ownership__user__profile__main_character', )\
+            .get(character_id=int(character_id))\
+            .character_ownership.user.profile.main_character
         
     #check access
     visible = CharacterAudit.objects.visible_to(request.user).values_list('character', flat=True)
@@ -30,7 +33,10 @@ def get_alts(request, character_id):
     
 
     character_id = main_char.character_id
-    characters = CharacterAudit.objects.get(character__character_id=character_id).character.character_ownership.user.character_ownerships.all().select_related('character', 'character__characteraudit')
+    characters = CharacterAudit.objects\
+                .select_related('character', 'character__character_ownership','character__character_ownership__user','character__character_ownership__character')\
+                .prefetch_related('character__character_ownership')\
+                .get(character__character_id=character_id).character.character_ownership.user.character_ownerships.all().select_related('character', 'character__characteraudit')
     net_worth = 0
     for character in characters:
         try:
@@ -172,7 +178,8 @@ def skills(request, character_id=None):
                 .select_related('skill_name', 'skill_name__group', 'character__character')\
                 .order_by('skill_name__name')
 
-    totals = SkillTotals.objects.filter(character__character__character_id__in=character_ids)
+    totals = SkillTotals.objects.filter(character__character__character_id__in=character_ids)\
+                .select_related('character__character')
 
     skill_tables = {}
     for skill in skills:
