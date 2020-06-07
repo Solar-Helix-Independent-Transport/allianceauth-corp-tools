@@ -1,7 +1,34 @@
 {% extends 'corptools/base.html' %}
 <!-- TODO Make this nicer in some way... -->
 {% block ct_block %}
-<h3 >View Accounts</h4>
+<br>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'corptools:view' %}">Account Audit</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                {% if perms.corptools.admin %}
+                 <li><a class="" href="{% url 'corptools:admin' %}">DB Admin</a></li>
+                {% endif %}
+            </ul>
+            <ul class="nav navbar-nav pull-right">
+                <li class="pull-right">
+                    <a href="{% url 'corptools:add_char' %}">Add Character Token</a>
+                </li>
+            </ul>
+        </div>
+        
+    </div>
+</nav>
 <div class="col-md-12">
     <table class="table table-responsive dateTable" id="characters">
         <thead>
@@ -27,11 +54,6 @@
         </tbody>
     </table>
 </div>
-{% if perms.corptools.admin %}
-    <h4>Admin Stuffs</h4>
-    <a href="{% url 'corptools:add_char' %}">Add Character Token</a><br>
-    <a href="{% url 'corptools:admin' %}">DB Admin</a><br>
-{% endif %}
 
 {% endblock %}
 {% block extra_javascript %}
