@@ -26,7 +26,7 @@ class EveNameManager(models.Manager):
             from corptools.models import EveName
             response = providers.esi.client.Universe.post_universe_names(
                         ids=eve_ids
-                    ).result_all_pages()
+                    ).results()
             new_names = []
             for entity in response:
                 new_names.append(EveName(

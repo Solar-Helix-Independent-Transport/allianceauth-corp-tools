@@ -7,7 +7,7 @@ from . import urls
 class MemberAudit(MenuItemHook):
     def __init__(self):
         MenuItemHook.__init__(self,
-                              _('Member Info'),
+                              _('Member Audit'),
                               'fa fa-eye fa-fw',
                               'corptools:view',
                               navactive=['corpstat:'])
