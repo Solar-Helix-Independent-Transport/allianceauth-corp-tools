@@ -111,15 +111,19 @@ def wallet(request, character_id=None):
                         .filter(character__character__character_id__in=characters.values_list('character__character_id', flat=True))\
                         .select_related('first_party_name', 'second_party_name', 'character__character')
     
-    graph_data_model = {"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0,"13":0,"14":0,"15":0,"16":0,"17":0,"18":0,"19":0,"20":0,"21":0,"22":0,"23":0}
+    graph_data_model = {"0000":{},"0100":{},"0200":{},"0300":{},"0400":{},"0500":{},"0600":{},"0700":{},"0800":{},"0900":{},"1000":{},"1100":{},"1200":{},"1300":{},"1400":{},"1500":{},"1600":{},"1700":{},"1800":{},"1900":{},"2000":{},"2100":{},"2200":{},"2300":{}}
     # %-H	
-    graph_data = {}
+    graph_people = []
     chord_data = {}
     transactions = []
     for wd in wallet_journal:
-        if wd.character.character.character_name not in graph_data:
-            graph_data[wd.character.character.character_name] = copy.deepcopy(graph_data_model)
-        graph_data[wd.character.character.character_name][wd.date.strftime("%-H")] += 1
+        dt = wd.date.strftime("%H") + "00"
+        cn = wd.character.character.character_name
+        if cn not in graph_people:
+            graph_people.append(cn)
+        if cn not in graph_data_model[dt]:
+            graph_data_model[dt][cn] = 0
+        graph_data_model[dt][cn] += 1
 
         wallet_type_tracking = ['corporation_account_withdrawal', 'player_trading', 'player_donation']
         if wd.ref_type in wallet_type_tracking:
@@ -147,7 +151,8 @@ def wallet(request, character_id=None):
         "alts": characters,
         "net_worth": net_worth,
         "wallet": wallet_journal,
-        "graphs": graph_data,
+        "graphs": graph_data_model,
+        "graph_people": graph_people,
         "chords": chord_data,
     }
 

@@ -36,28 +36,14 @@
     <div class="row panel panel-primary">
         <div class="panel-heading text-center">Wallet Activity</div>
         <div class="panel-body">
-            <div height="150" width="150">
-                <div class="chartjs-size-monitor">
-                    <div class="chartjs-size-monitor-expand">
-                        <div class="">
-
-                        </div>
-                    </div>
-                    <div class="chartjs-size-monitor-shrink">
-                        <div class="">
-
-                        </div>
-                    </div>
-                </div>
-                <canvas id="canvas"  class="chartjs-render-monitor"></canvas> 
-            </div>
+            <div  id="chartdiv-polar" style="min-height: 600px;"></div>
         </div>
     </div>
     <div class="row panel panel-primary">
         <div class="panel-heading text-center">Interaction Map</div>
         <div class="panel-body">
             
-            <div  id="chartdiv"></div>
+            <div  id="chartdiv" style="min-height: 600px;"></div>
             <div class="pull-right"><button id="toggle-interaction" class="btn btn-info">Toggle to <span id="toggle-text">Isk Amount</span></button></div>
     </div>
 </div>
@@ -75,111 +61,9 @@
 	<script>!function(t){function e(t){var e={columns:[],columnsIdxList:[],bootstrap:!1,autoSize:!0,label:"Filter "};if("bootstrap"in t&&"boolean"==typeof t.bootstrap&&(e.bootstrap=t.bootstrap),"autoSize"in t&&"boolean"==typeof t.autoSize&&(e.autoSize=t.autoSize),"label"in t&&"string"==typeof t.label&&(e.label=t.label),"columns"in t)for(var i=0;i<t.columns.length;i++){var n=t.columns[i];if("idx"in n&&"number"==typeof n.idx){var o=n.idx;e.columns[o]={title:null,maxWidth:null,autoSize:!0},e.columnsIdxList.push(o),"title"in n&&"string"==typeof n.title&&(e.columns[o].title=n.title),"maxWidth"in n&&"string"==typeof n.maxWidth&&(e.columns[o].maxWidth=n.maxWidth),"autoSize"in n&&"boolean"==typeof n.autoSize&&(e.columns[o].autoSize=n.autoSize)}}return e}t(document).on("preInit.dt",function(i,n){if("dt"===i.namespace){var o=new t.fn.dataTable.Api(n),a=o.table().node().id,l=o.init();if("filterDropDown"in l){var r=e(l.filterDropDown);if(0!=r.columns.length){var u=o.table().container(),s=a+"_filterWrapper",c=s+" "+(r.bootstrap?"form-inline":"");t(u).prepend('<div id="'+s+'" class="'+c+'">'+r.label+"</div>"),o.columns(r.columnsIdxList).every(function(){var e=this.index(),i=null!==r.columns[e].title?r.columns[e].title:t(this.header()).html();""==i&&(i="column "+(e+1));var n="form-control "+a+"_filterSelect",o=a+"_filterSelect"+e;t("#"+s).append('<select id="'+o+'" class="'+n+'"></select>');var l=t("#"+o).empty().append('<option value="">('+i+")</option>");})}}}}),t(document).on("init.dt",function(i,n){if("dt"===i.namespace){var o=new t.fn.dataTable.Api(n),a=o.table().node().id,l=o.init();if("filterDropDown"in l){var r=e(l.filterDropDown);o.table().container();o.columns(r.columnsIdxList).every(function(){var e=this,i=e.index(),n=t("#"+(a+"_filterSelect"+i));n.on("change",function(){var i=t.fn.dataTable.util.escapeRegex(t(this).val());e.search(i?"^"+i+"$":"",!0,!1).draw()}),e.data().unique().sort().each(function(t,e){""!=t&&n.append('<option value="'+t+'">'+t+"</option>")})})}}})}(jQuery);</script>
 {% endblock %}
 {% block extra_script %}
-    var color = Chart.helpers.color
-    var data = {
-        labels : ["0000","0100","0200","0300","0400","0500","0600","0700","0800","0900","1000","1100","1200","1300","1400","1500","1600","1700","1800","1900","2000","2100","2200","2300"],
-        datasets : [{% for name, data in graphs.items %}{
-                label : "{{name}}",
-                {% random_bright_colour as c %}borderColor: "{{ c }}",
-                backgroundColor: "{{c}}22",
-                data : [ {% for k, v in data.items %}{{v}},{% endfor %} ]
-            },{% endfor %}
-        ]
-    }
-    var options = {
-        scale: {
-            angleLines: {
-                display: true
-            },
-            {% if NIGHT_MODE %}
-            ticks: {
-                backdropColor : '#000000aa'
-            }{% endif %}
-
-        },
-        responsive: true,
-        legend: {
-            position: "right",
-            align: "middle",
-            labels: {
-                padding: 20
-              }
-        },
-        tooltips: {enabled: false},
-        hover: {mode: null},
-    
-
-    };
-    var img_eu = new Image();
-    var img_us = new Image();
-    var img_au = new Image();
-    img_eu.src = 'https://simple-repeat.com/img/pngimg/basic/stripe/Solid256stripeDiagonal4_16.png';
-    img_us.src = 'https://simple-repeat.com/img/pngimg/basic/stripe/Solid256stripeHorizontal4_8.png';
-    img_au.src = 'https://simple-repeat.com/img/pngimg/basic/stripe/Solid256stripeVertical4_8.png';
-
-    Chart.pluginService.register({
-        beforeDraw: chart => {
-            const { ctx, scale, config } = chart
-            const { xCenter, yCenter, drawingArea: radius } = scale
-            start_eu = Math.PI * 2 / 24 * (14 - 6);
-            stop_eu = Math.PI * 2 / 24 * (21 - 6);
-            start_us = Math.PI * 2 / 24 * (21 - 6);
-            stop_us = Math.PI * 2 / 24 * (4 - 6);
-            start_au = Math.PI * 2 / 24 * (5 - 6);
-            stop_au = Math.PI * 2 / 24 * (13 - 6);
-            colour = "#000000ff";
-            ctx.save();
-
-            ctx.globalAlpha = 0.2;
-
-            ctx.beginPath();
-            ctx.moveTo(xCenter, yCenter);
-            ctx.arc(xCenter, yCenter, radius, start_eu, stop_us);
-            ctx.fillStyle = colour;
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.moveTo(xCenter, yCenter);
-            ctx.arc(xCenter, yCenter, radius, start_eu, stop_eu);
-            ctx.fillStyle = ctx.createPattern(img_eu, 'repeat');
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.moveTo(xCenter, yCenter);
-            ctx.arc(xCenter, yCenter, radius, start_us, stop_us);
-            ctx.fillStyle = ctx.createPattern(img_us, 'repeat');
-            ctx.fill();
-
-
-            ctx.beginPath();
-            ctx.moveTo(xCenter, yCenter);
-            ctx.arc(xCenter, yCenter, radius, start_au, stop_au);
-            ctx.fillStyle = colour;
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.moveTo(xCenter, yCenter);
-            ctx.arc(xCenter, yCenter, radius, start_au, stop_au);
-            ctx.fillStyle = ctx.createPattern(img_au, 'repeat');
-            ctx.fill();
-            ctx.globalAlpha = 1.0;
-
-            ctx.restore()
-        }
-    });
-    {% if NIGHT_MODE %}
-    Chart.defaults.global.defaultFontColor = 'White';
-    {% endif %}
 
     $(document).ready(function() {
-
-        var ctx = document.getElementById('canvas').getContext('2d');
-        var myRadarChart = new Chart(ctx, {
-            type: 'radar',
-            data: data,
-            options: options
-        });
-        
+       
         $('#wallet').DataTable({
             "filterDropDown": {
 					columns: [{
@@ -229,14 +113,11 @@
         {% endfor %}
     {% endfor %}
     ]
-    am4core.ready(function() {
 
-        // Themes begin
-        am4core.useTheme(am4themes_animated);
-        // Themes end
-        
+    am4core.ready(function() {
         chart = am4core.create("chartdiv", am4charts.ChordDiagram);
-        
+        chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
         // colors of main characters
         chart.colors.saturation = 0.45;
         chart.colors.step = 3;
@@ -365,6 +246,86 @@
         var hoverState = linkTemplate.states.create("hover");
         hoverState.properties.fillOpacity = 0.7;
         hoverState.properties.strokeOpacity = 0.7;
-                
-        }); // end am4core.ready()
+                      
+        // Themes begin
+        am4core.useTheme(am4themes_animated);
+        // Themes end
+        
+        var chart_polar = am4core.create("chartdiv-polar", am4charts.RadarChart);
+        chart_polar.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+        let data = [
+            {% for gd, data in graphs.items %}{
+                category: "{{gd}}",
+                {% for k, v in data.items %}
+                "{{k}}": {{v}},{% endfor %}
+            },
+            {% endfor %}    
+        ]
+
+        chart_polar.data = data;
+        chart_polar.radius = am4core.percent(100);
+        chart_polar.numberFormatter.numberFormat = "#"
+
+        var categoryAxis = chart_polar.xAxes.push(new am4charts.CategoryAxis());
+        categoryAxis.dataFields.category = "category";
+        categoryAxis.renderer.labels.template.location = 0.5;
+        categoryAxis.renderer.tooltipLocation = 0.5;
+
+        var valueAxis = chart_polar.yAxes.push(new am4charts.ValueAxis());
+        valueAxis.tooltip.disabled = true;
+        valueAxis.renderer.labels.template.horizontalCenter = "left";
+
+        {% if NIGHT_MODE %}
+        valueAxis.renderer.labels.template.fill = am4core.color("white");
+        categoryAxis.renderer.labels.template.fill = am4core.color("white");
+        {% endif %}
+
+        {% for series in graph_people %}
+            var series{{ forloop.count }} = chart_polar.series.push(new am4charts.RadarColumnSeries());
+            series{{ forloop.count }}.name = "{{series}}";
+            series{{ forloop.count }}.dataFields.categoryX = "category";
+            series{{ forloop.count }}.dataFields.valueY = "{{series}}";
+            series{{ forloop.count }}.stroke = am4core.color("#ffffff");
+            series{{ forloop.count }}.fill = chart_polar.colors.next();
+            series{{ forloop.count }}.columns.template.strokeOpacity = 0.2;
+            series{{ forloop.count }}.stacked = true;
+            series{{ forloop.count }}.sequencedInterpolation = true;
+            series{{ forloop.count }}.columns.template.width = am4core.percent(100);
+            series{{ forloop.count }}.columns.template.tooltipText = "{name}: {valueY.value}";
+        {% endfor %}
+        chart_polar.seriesContainer.zIndex = -1;
+
+        chart_polar.scrollbarY = new am4core.Scrollbar();
+        chart_polar.scrollbarY.exportable = false;
+
+        var range1 = categoryAxis.axisRanges.create();
+        range1.category = "0000";
+        range1.endCategory = "0500";
+        range1.axisFill.fill = am4core.color("#0066CC");
+        range1.axisFill.fillOpacity = 0.2;
+        var range2 = categoryAxis.axisRanges.create();
+        range2.category = "2100";
+        range2.endCategory = "2300";
+        range2.axisFill.fill = am4core.color("#0066CC");
+        range2.axisFill.fillOpacity = 0.2;
+
+        var range3 = categoryAxis.axisRanges.create();
+        range3.category = "1400";
+        range3.endCategory = "2000";
+        range3.axisFill.fill = am4core.color("#CC3333");
+        range3.axisFill.fillOpacity = 0.2;
+        var range2 = categoryAxis.axisRanges.create();
+        range2.category = "0700";
+        range2.endCategory = "1200";
+        range2.axisFill.fill = am4core.color("#55AB55");
+        range2.axisFill.fillOpacity = 0.2;
+
+        chart_polar.cursor = new am4charts.RadarCursor();
+        chart_polar.cursor.xAxis = categoryAxis;
+        chart_polar.cursor.fullWidthXLine = true;
+        chart_polar.cursor.lineX.strokeOpacity = 0;
+        chart_polar.cursor.lineX.fillOpacity = 0.1;
+        chart_polar.cursor.lineX.fill = am4core.color("#000000");
+    }); // end am4core.ready()
         {% endblock %}
