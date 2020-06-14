@@ -246,11 +246,7 @@
         var hoverState = linkTemplate.states.create("hover");
         hoverState.properties.fillOpacity = 0.7;
         hoverState.properties.strokeOpacity = 0.7;
-                      
-        // Themes begin
-        am4core.useTheme(am4themes_animated);
-        // Themes end
-        
+                            
         var chart_polar = am4core.create("chartdiv-polar", am4charts.RadarChart);
         chart_polar.hiddenState.properties.opacity = 0; // this creates initial fade-in
 
@@ -264,7 +260,7 @@
         ]
 
         chart_polar.data = data;
-        chart_polar.radius = am4core.percent(100);
+        chart_polar.radius = am4core.percent(90);
         chart_polar.numberFormatter.numberFormat = "#"
 
         var categoryAxis = chart_polar.xAxes.push(new am4charts.CategoryAxis());
@@ -327,5 +323,6 @@
         chart_polar.cursor.lineX.strokeOpacity = 0;
         chart_polar.cursor.lineX.fillOpacity = 0.1;
         chart_polar.cursor.lineX.fill = am4core.color("#000000");
+
     }); // end am4core.ready()
         {% endblock %}
