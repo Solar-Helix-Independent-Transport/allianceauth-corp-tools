@@ -8,40 +8,40 @@ class MemberAudit(MenuItemHook):
     def __init__(self):
         MenuItemHook.__init__(self,
                               _('Member Audit'),
-                              'fa fa-eye fa-fw',
+                              'far fa-eye fa-fw',
                               'corptools:view',
-                              navactive=['corpstat:'])
+                              navactive=['corptools:'])
 
     def render(self, request):
         if request.user.has_perm('corptools.view_characteraudit'):
             return MenuItemHook.render(self, request)
         return ''
 
-class Structures(MenuItemHook):
-    def __init__(self):
-        MenuItemHook.__init__(self,
-                              _('Structures'),
-                              'fa fa-building fa-fw',
-                              'corptools:view',
-                              navactive=['corpstat:'])
+#class Structures(MenuItemHook):
+#    def __init__(self):
+#        MenuItemHook.__init__(self,
+#                              _('Structures'),
+#                              'fa fa-building fa-fw',
+#                              'corptools:view',
+#                              navactive=['corptools:'])
 
-    def render(self, request):
-        if request.user.has_perm('View Structures Role'):
-            return MenuItemHook.render(self, request)
-        return ''
+    #def render(self, request):
+    #    if request.user.has_perm('View Structures Role'):
+    #        return MenuItemHook.render(self, request)
+    #    return ''
 
-class Moons(MenuItemHook):
-    def __init__(self):
-        MenuItemHook.__init__(self,
-                              _('Moon Timers'),
-                              'fa fa-moon-o fa-fw',
-                              'corptools:view',
-                              navactive=['corpstat:'])
+#class Moons(MenuItemHook):
+#    def __init__(self):
+#        MenuItemHook.__init__(self,
+#                              _('Moon Timers'),
+#                              'fa fa-moon-o fa-fw',
+#                              'corptools:view',
+#                              navactive=['corptools:'])
 
-    def render(self, request):
-        if request.user.has_perm('View Moon Role'):
-            return MenuItemHook.render(self, request)
-        return ''
+#    def render(self, request):
+#        if request.user.has_perm('View Moon Role'):
+#            return MenuItemHook.render(self, request)
+#        return ''
 
 
 #@hooks.register('menu_item_hook')

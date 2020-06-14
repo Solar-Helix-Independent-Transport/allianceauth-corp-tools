@@ -53,12 +53,27 @@
             </div>
         </div>
     </div>
+    <div class="row panel panel-primary">
+        <div class="panel-heading text-center">Interaction Map</div>
+        <div class="panel-body">
+            
+            <div height="400px" width="100%">
+                <div id="chartdiv"></div>
+            </div>
+            <div class="pull-right"><button id="toggle-interaction" class="btn btn-info">Toggle to Toggle to <span id="toggle-text">Isk Amount</span></button></div>
+    </div>
 </div>
 
 {% endblock %}
 {% block extra_javascript %}
     {% include 'bundles/datatables-js.html' %}
+
+    <script src="https://www.amcharts.com/lib/4/core.js"></script>
+    <script src="https://www.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+
 	<script>!function(t){function e(t){var e={columns:[],columnsIdxList:[],bootstrap:!1,autoSize:!0,label:"Filter "};if("bootstrap"in t&&"boolean"==typeof t.bootstrap&&(e.bootstrap=t.bootstrap),"autoSize"in t&&"boolean"==typeof t.autoSize&&(e.autoSize=t.autoSize),"label"in t&&"string"==typeof t.label&&(e.label=t.label),"columns"in t)for(var i=0;i<t.columns.length;i++){var n=t.columns[i];if("idx"in n&&"number"==typeof n.idx){var o=n.idx;e.columns[o]={title:null,maxWidth:null,autoSize:!0},e.columnsIdxList.push(o),"title"in n&&"string"==typeof n.title&&(e.columns[o].title=n.title),"maxWidth"in n&&"string"==typeof n.maxWidth&&(e.columns[o].maxWidth=n.maxWidth),"autoSize"in n&&"boolean"==typeof n.autoSize&&(e.columns[o].autoSize=n.autoSize)}}return e}t(document).on("preInit.dt",function(i,n){if("dt"===i.namespace){var o=new t.fn.dataTable.Api(n),a=o.table().node().id,l=o.init();if("filterDropDown"in l){var r=e(l.filterDropDown);if(0!=r.columns.length){var u=o.table().container(),s=a+"_filterWrapper",c=s+" "+(r.bootstrap?"form-inline":"");t(u).prepend('<div id="'+s+'" class="'+c+'">'+r.label+"</div>"),o.columns(r.columnsIdxList).every(function(){var e=this.index(),i=null!==r.columns[e].title?r.columns[e].title:t(this.header()).html();""==i&&(i="column "+(e+1));var n="form-control "+a+"_filterSelect",o=a+"_filterSelect"+e;t("#"+s).append('<select id="'+o+'" class="'+n+'"></select>');var l=t("#"+o).empty().append('<option value="">('+i+")</option>");})}}}}),t(document).on("init.dt",function(i,n){if("dt"===i.namespace){var o=new t.fn.dataTable.Api(n),a=o.table().node().id,l=o.init();if("filterDropDown"in l){var r=e(l.filterDropDown);o.table().container();o.columns(r.columnsIdxList).every(function(){var e=this,i=e.index(),n=t("#"+(a+"_filterSelect"+i));n.on("change",function(){var i=t.fn.dataTable.util.escapeRegex(t(this).val());e.search(i?"^"+i+"$":"",!0,!1).draw()}),e.data().unique().sort().each(function(t,e){""!=t&&n.append('<option value="'+t+'">'+t+"</option>")})})}}})}(jQuery);</script>
 {% endblock %}
 {% block extra_script %}
@@ -186,4 +201,169 @@
             "pageLength": 25
         });
     });
-{% endblock %}
+    
+
+    $("#toggle-interaction").on("click", function() {
+        if (show_count){
+            chart.data = amount_data;
+            show_count = false;
+            $('#toggle-text').text('Interaction Count');
+        } else {
+            chart.data = count_data;
+            show_count = true;
+            $('#toggle-text').text('Isk Amount');
+        }
+
+    });
+    var chart = null;
+    var show_count = true;
+    var count_data = [
+    {% for fp, data in chords.items %}
+        {% for sp, am in data.items %} 
+            {"from":"{{fp}}", "to":"{{sp}}", "value":{{am.c}}},
+        {% endfor %}
+    {% endfor %}
+    ]
+    var amount_data = [
+    {% for fp, data in chords.items %}
+        {% for sp, am in data.items %} 
+            {"from":"{{fp}}", "to":"{{sp}}", "value":{{am.a}}},
+        {% endfor %}
+    {% endfor %}
+    ]
+    am4core.ready(function() {
+
+        // Themes begin
+        am4core.useTheme(am4themes_animated);
+        // Themes end
+        
+        chart = am4core.create("chartdiv", am4charts.ChordDiagram);
+        
+        // colors of main characters
+        chart.colors.saturation = 0.45;
+        chart.colors.step = 3;
+        var colors = {
+            {% for fp in chords.keys %}
+                "{{fp}}":chart.colors.next(),
+            {% endfor %}
+        }
+        
+        9
+        chart.data = count_data;
+
+        chart.dataFields.fromName = "from";
+        chart.dataFields.toName = "to";
+        chart.dataFields.value = "value";
+        
+        chart.nodePadding = 1;
+        chart.minNodeSize = 0.1;
+        chart.startAngle = 80;
+        chart.endAngle = chart.startAngle + 360;
+        chart.sortBy = "value";
+        chart.fontSize = 10;
+        //chart.nonRibbon = true;
+        //chart.nonScaling = false;
+
+        var nodeTemplate = chart.nodes.template;
+        nodeTemplate.readerTitle = "Click to show/hide or drag to rearrange";
+        nodeTemplate.showSystemTooltip = true;
+        nodeTemplate.propertyFields.fill = "color";
+        nodeTemplate.tooltipText = "{name}'s Transferred: ${total}";
+        
+        // when rolled over the node, make all the links rolled-over
+        nodeTemplate.events.on("over", function(event) {    
+            var node = event.target;
+            node.outgoingDataItems.each(function(dataItem) {
+                if(dataItem.toNode){
+                    dataItem.link.isHover = true;
+                    dataItem.toNode.label.isHover = true;
+                }
+            })
+            node.incomingDataItems.each(function(dataItem) {
+                if(dataItem.fromNode){
+                    dataItem.link.isHover = true;
+                    dataItem.fromNode.label.isHover = true;
+                }
+            }) 
+        
+            node.label.isHover = true;   
+        })
+        
+        // when rolled out from the node, make all the links rolled-out
+        nodeTemplate.events.on("out", function(event) {
+            var node = event.target;
+            node.outgoingDataItems.each(function(dataItem) {        
+                if(dataItem.toNode){
+                    dataItem.link.isHover = false;                
+                    dataItem.toNode.label.isHover = false;
+                }
+            })
+            node.incomingDataItems.each(function(dataItem) {
+                if(dataItem.fromNode){
+                    dataItem.link.isHover = false;
+                   dataItem.fromNode.label.isHover = false;
+                }
+            })
+        
+            node.label.isHover = false;
+        })
+        
+        var label = nodeTemplate.label;
+        label.relativeRotation = 90;
+        
+        label.fillOpacity = 0.4;
+        let labelHS = label.states.create("hover");
+        labelHS.properties.fillOpacity = 1;
+        
+        nodeTemplate.cursorOverStyle = am4core.MouseCursorStyle.pointer;
+        // this adapter makes non-main character nodes to be filled with color of the main character
+        nodeTemplate.adapter.add("fill", function(fill, target) {
+            let node = target;
+            let counters = {};
+            let mainChar = false;
+            node.incomingDataItems.each(function(dataItem) {
+                if(colors[dataItem.toName]){
+                    mainChar = true;
+                }
+        
+                if(isNaN(counters[dataItem.fromName])){
+                    counters[dataItem.fromName] = dataItem.value;
+                }
+                else{
+                    counters[dataItem.fromName] += dataItem.value;
+                }
+            })
+            if(mainChar){
+                return fill;
+            }
+        
+            let count = 0;
+            let color;
+            let biggest = 0;
+            let biggestName;
+        
+            for(var name in counters){
+                if(counters[name] > biggest){
+                    biggestName = name;
+                    biggest = counters[name]; 
+                }        
+            }
+            if(colors[biggestName]){
+                fill = colors[biggestName];
+            }
+          
+            return fill;
+        })
+        
+        // link template
+        var linkTemplate = chart.links.template;
+        linkTemplate.strokeOpacity = 0;
+        linkTemplate.fillOpacity = 0.15;
+        linkTemplate.tooltipText = "{fromName} > {toName}:{value.value}";
+        
+        var hoverState = linkTemplate.states.create("hover");
+        hoverState.properties.fillOpacity = 0.7;
+        hoverState.properties.strokeOpacity = 0.7;
+                
+        }); // end am4core.ready()
+        {% endblock %}

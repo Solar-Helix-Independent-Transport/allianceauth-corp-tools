@@ -39,6 +39,7 @@ CHAR_REQUIRED_SCOPES = [
     ]
 
 @login_required
+@permission_required('corptools.view_characteraudit')
 @token_required(scopes=CHAR_REQUIRED_SCOPES)
 def add_char(request, token):
     CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
@@ -47,6 +48,7 @@ def add_char(request, token):
 
 
 @login_required
+@permission_required('corptools.view_characteraudit')
 def corptools_menu(request):
     # get available models
     cas = CharacterAudit.objects.visible_to(request.user).select_related('character__character_ownership__user__profile__main_character').prefetch_related('character__character_ownership__user__character_ownerships').prefetch_related('character__character_ownership__user__character_ownerships__character')
@@ -66,6 +68,7 @@ def corptools_menu(request):
     return render(request, 'corptools/menu.html', context={'characters':chars})
 
 @login_required
+@permission_required('corptools.view_characteraudit')
 def admin(request):
     # get available models
     names = EveName.objects.all().count()

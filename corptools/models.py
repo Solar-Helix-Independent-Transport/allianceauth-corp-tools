@@ -186,7 +186,7 @@ class SkillTotals(models.Model):
     character = models.OneToOneField(CharacterAudit, on_delete=models.CASCADE)
 
     total_sp = models.BigIntegerField()
-    unallocated_sp = models.IntegerField()
+    unallocated_sp = models.IntegerField(null=True, default=None)
 
 class Skill(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)

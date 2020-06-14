@@ -49,7 +49,7 @@ def get_alts(request, character_id):
 def assets(request, character_id=None):
     # get available models
 
-    main_char, characters, net_worth = get_alts (request, character_id)
+    main_char, characters, net_worth = get_alts(request, character_id)
 
     capital_groups = [30, 547, 659, 1538, 485, 902, 513, 944, 941]
     subcap_cat = [6]
@@ -114,10 +114,33 @@ def wallet(request, character_id=None):
     graph_data_model = {"0":0,"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0,"10":0,"11":0,"12":0,"13":0,"14":0,"15":0,"16":0,"17":0,"18":0,"19":0,"20":0,"21":0,"22":0,"23":0}
     # %-H	
     graph_data = {}
+    chord_data = {}
+    transactions = []
     for wd in wallet_journal:
         if wd.character.character.character_name not in graph_data:
             graph_data[wd.character.character.character_name] = copy.deepcopy(graph_data_model)
         graph_data[wd.character.character.character_name][wd.date.strftime("%-H")] += 1
+
+        wallet_type_tracking = ['corporation_account_withdrawal', 'player_trading', 'player_donation']
+        if wd.ref_type in wallet_type_tracking:
+            if wd.entry_id not in transactions:
+                if wd.amount > 0:
+                    fp = wd.first_party_name.name
+                    sp = wd.second_party_name.name
+                    am = wd.amount
+                else:
+                    sp = wd.first_party_name.name
+                    fp = wd.second_party_name.name
+                    am = wd.amount * -1
+
+                if fp not in chord_data:
+                    chord_data[fp] = {}
+                if sp not in chord_data[fp]:
+                    chord_data[fp][sp] = {"a":0,"c":0}
+
+                transactions.append(wd.entry_id)
+                chord_data[fp][sp]["a"] += am
+                chord_data[fp][sp]["c"] += 1
 
     context = {
         "main_char": main_char,
@@ -125,6 +148,7 @@ def wallet(request, character_id=None):
         "net_worth": net_worth,
         "wallet": wallet_journal,
         "graphs": graph_data,
+        "chords": chord_data,
     }
 
     return render(request, 'corptools/character/wallet.html', context=context)
