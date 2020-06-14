@@ -57,10 +57,8 @@
         <div class="panel-heading text-center">Interaction Map</div>
         <div class="panel-body">
             
-            <div height="400px" width="100%">
-                <div id="chartdiv"></div>
-            </div>
-            <div class="pull-right"><button id="toggle-interaction" class="btn btn-info">Toggle to Toggle to <span id="toggle-text">Isk Amount</span></button></div>
+            <div  id="chartdiv"></div>
+            <div class="pull-right"><button id="toggle-interaction" class="btn btn-info">Toggle to <span id="toggle-text">Isk Amount</span></button></div>
     </div>
 </div>
 
@@ -310,8 +308,11 @@
         
         var label = nodeTemplate.label;
         label.relativeRotation = 90;
-        
-        label.fillOpacity = 0.4;
+        {% if NIGHT_MODE %}
+        label.fill = am4core.color("white");
+        {% endif %}
+        label.fillOpacity = 0.8;
+
         let labelHS = label.states.create("hover");
         labelHS.properties.fillOpacity = 1;
         
