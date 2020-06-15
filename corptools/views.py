@@ -56,10 +56,11 @@ def corptools_menu(request):
     for char in cas:
         try:
             main = char.character.character_ownership.user.profile.main_character
-            if main.character_name not in chars:
-                chars[str(main.character_id)] = {'main':main, 'audit':char}
+            if main:
+                if main.character_name not in chars:
+                    chars[str(main.character_id)] = {'main':main, 'audit':char}
             else:
-                pass
+                orphans.append(char)
         except ObjectDoesNotExist:
             orphans.append(char)
 
