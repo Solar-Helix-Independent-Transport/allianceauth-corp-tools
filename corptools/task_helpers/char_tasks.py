@@ -34,6 +34,7 @@ def update_corp_history(character_id):
                                                             'corporation_name': corp_name,
                                                             'is_deleted': corp.get('is_deleted', False),
                                                             'start_date': corp.get('start_date')})
+    return "Finished pub data for: {}".format(audit_char.character.character_name)
 
 def update_character_skill_list(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
@@ -72,6 +73,7 @@ def update_character_skill_list(character_id):
 
     EveItemType.objects.create_bulk_from_esi(_check_skills)
     Skill.objects.bulk_create(_create_skills)
+    return "Finished skills for: {}".format(audit_char.character.character_name)
 
 def update_character_skill_queue(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
@@ -106,6 +108,7 @@ def update_character_skill_queue(character_id):
         items.append(queue_item)
     EveItemType.objects.create_bulk_from_esi(_check_skills)
     SkillQueue.objects.bulk_create(items)
+    return "Finished skill queue for: {}".format(audit_char.character.character_name)
 
 def update_character_assets(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
@@ -146,6 +149,7 @@ def update_character_assets(character_id):
         items.append(asset_item)
     EveItemType.objects.create_bulk_from_esi(_current_type_ids)
     CharacterAsset.objects.bulk_create(items)
+    return "Finished assets for: {}".format(audit_char.character.character_name)
 
 def update_character_wallet(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
@@ -208,3 +212,4 @@ def update_character_wallet(character_id):
     else: 
         raise Exception("ESI Fail")
 
+    return "Finished wallet transactions for: {}".format(audit_char.character.character_name)
