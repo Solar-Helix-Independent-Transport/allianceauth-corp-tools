@@ -39,13 +39,10 @@ CHAR_REQUIRED_SCOPES = [
     ]
 
 @login_required
-@permission_required('corptools.view_characteraudit')
 @token_required(scopes=CHAR_REQUIRED_SCOPES)
 def add_char(request, token):
     CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
-
     return redirect('corptools:view')
-
 
 @login_required
 @permission_required('corptools.view_characteraudit')
@@ -55,20 +52,23 @@ def corptools_menu(request):
 
 
     chars = {}
+    orphans = []
     for char in cas:
-        main = char.character.character_ownership.user.profile.main_character
-        if main.character_name not in chars:
-            chars[str(main.character_id)] = {'main':main, 'audit':char}
-        else:
-            pass
+        try:
+            main = char.character.character_ownership.user.profile.main_character
+            if main.character_name not in chars:
+                chars[str(main.character_id)] = {'main':main, 'audit':char}
+            else:
+                pass
+        except ObjectDoesNotExist:
+            orphans.append(char)
 
     if len(chars) == 1:
         return redirect('corptools:overview', chars[list(chars.keys())[0]]['main'].character_id)
 
-    return render(request, 'corptools/menu.html', context={'characters':chars})
+    return render(request, 'corptools/menu.html', context={'characters':chars, 'orphans':orphans})
 
 @login_required
-@permission_required('corptools.view_characteraudit')
 def admin(request):
     # get available models
     names = EveName.objects.all().count()
