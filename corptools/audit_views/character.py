@@ -29,9 +29,11 @@ def get_alts(request, character_id):
     #check access
     visible = CharacterAudit.objects.visible_to(request.user).values_list('character_id', flat=True)
     if main_char.id not in visible:
+        logger.warning(f"{request.user} Can See {list(visible)}, requested {main_char.id}")
         raise PermissionDenied("You do not have access to view this character")
     
     if not request.user.has_perm('corptools.view_characteraudit'):
+        logger.warning(f"{request.user} doesnot have Perm requested, Requested {main_char.id}")
         raise PermissionDenied("You do not have access to view this character")
 
     character_id = main_char.character_id
