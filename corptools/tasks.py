@@ -64,7 +64,7 @@ def update_char_corp_history(character_id):
         return update_corp_history(character_id)
     except Exception as e:
         logger.exception(e)
-        return False
+        return "Failed"
 
 @shared_task
 def update_char_skill_list(character_id):
@@ -72,7 +72,7 @@ def update_char_skill_list(character_id):
         return update_character_skill_list(character_id)
     except Exception as e:
         logger.exception(e)
-        return False
+        return "Failed"
 
 
 @shared_task
@@ -81,7 +81,7 @@ def update_char_skill_queue(character_id):
         return update_character_skill_queue(character_id)
     except Exception as e:
         logger.exception(e)
-        return False
+        return "Failed"
 
 
 @shared_task
@@ -90,7 +90,7 @@ def update_char_assets(character_id):
         return update_character_assets(character_id)
     except Exception as e:
         logger.exception(e)
-        return False
+        return "Failed"
 
 @shared_task
 def update_char_wallet(character_id):
@@ -98,4 +98,4 @@ def update_char_wallet(character_id):
         return update_character_wallet(character_id)
     except Exception as e:
         logger.exception(e)
-        return False
+        return "Failed"
