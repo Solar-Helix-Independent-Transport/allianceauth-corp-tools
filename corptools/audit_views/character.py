@@ -25,26 +25,31 @@ def get_alts(request, character_id):
             .select_related('character_ownership','character_ownership__user__profile','character_ownership__user__profile__main_character', )\
             .get(character_id=int(character_id))\
             .character_ownership.user.profile.main_character
-        
+    
+    linked_characters = main_char.character_ownership.user.character_ownerships.all().values_list('character_id', flat=True)
     #check access
     visible = CharacterAudit.objects.visible_to(request.user).values_list('character_id', flat=True)
     if main_char.id not in visible:
         logger.warning(f"{request.user} Can See {list(visible)}, requested {main_char.id}")
-        raise PermissionDenied("You do not have access to view this character")
+        if main_char.id in linked_characters:
+            pass
+        else:
+            raise PermissionDenied("You do not have access to view this character")
     
     if not request.user.has_perm('corptools.view_characteraudit'):
         logger.warning(f"{request.user} doesnot have Perm requested, Requested {main_char.id}")
         raise PermissionDenied("You do not have access to view this character")
 
     character_id = main_char.character_id
-    characters = CharacterAudit.objects\
-                .select_related('character', 'character__character_ownership','character__character_ownership__user','character__character_ownership__character')\
-                .prefetch_related('character__character_ownership')\
-                .get(character__character_id=character_id).character.character_ownership.user.character_ownerships.all().select_related('character', 'character__characteraudit')
+    characters = EveCharacter.objects\
+                .select_related('character_ownership__user','character_ownership__character')\
+                .prefetch_related('character_ownership')\
+                .filter(id__in=linked_characters).select_related('characteraudit')
+
     net_worth = 0
     for character in characters:
         try:
-            net_worth+=character.character.characteraudit.balance
+            net_worth+=character.characteraudit.balance
         except:
             pass
     return main_char, characters, net_worth
@@ -62,12 +67,13 @@ def assets(request, character_id=None):
     bpo_cats = [9]
 
     assets = CharacterAsset.objects\
-                .filter(character__character__character_id__in=characters.values_list('character__character_id', flat=True))\
+                .filter(character__character__character_id__in=characters.values_list('character_id', flat=True))\
                 .values('type_name__group__group_id')\
                 .annotate(grp_total=Sum('quantity'))\
                 .annotate(grp_name=F('type_name__group__name'))\
                 .annotate(grp_id=F('type_name__group_id'))\
                 .annotate(cat_id=F('type_name__group__category_id'))\
+                .annotate(is_bpc=F('blueprint_copy'))\
                 .order_by('-grp_total')
     
     capital_asset_groups = []
@@ -86,7 +92,7 @@ def assets(request, character_id=None):
             noteable_asset_groups.append(grp)
         elif grp['cat_id'] in structure_cats:
             structure_asset_groups.append(grp)
-        elif grp['cat_id'] in bpo_cats:
+        elif grp['cat_id'] in bpo_cats and not grp['is_bpc']:
             bpo_asset_groups.append(grp)
         else:
             remaining_asset_groups.append(grp)
@@ -112,7 +118,7 @@ def wallet(request, character_id=None):
     main_char, characters, net_worth = get_alts (request, character_id)
 
     wallet_journal = CharacterWalletJournalEntry.objects\
-                        .filter(character__character__character_id__in=characters.values_list('character__character_id', flat=True))\
+                        .filter(character__character__character_id__in=characters.values_list('character_id', flat=True))\
                         .select_related('first_party_name', 'second_party_name', 'character__character')
     
     graph_data_model = {"0000":{},"0100":{},"0200":{},"0300":{},"0400":{},"0500":{},"0600":{},"0700":{},"0800":{},"0900":{},"1000":{},"1100":{},"1200":{},"1300":{},"1400":{},"1500":{},"1600":{},"1700":{},"1800":{},"1900":{},"2000":{},"2100":{},"2200":{},"2300":{}}
@@ -167,7 +173,7 @@ def pub_data(request, character_id=None):
     # get available models
 
     main_char, characters, net_worth = get_alts (request, character_id)
-    character_ids = characters.values_list('character__character_id', flat=True)
+    character_ids = characters.values_list('character_id', flat=True)
     corp_histories = CorporationHistory.objects\
                         .filter(character__character__character_id__in=character_ids)\
                         .select_related('character__character', 'corporation_name')
@@ -181,7 +187,7 @@ def pub_data(request, character_id=None):
 
     table_data = {}
     for char in characters:
-        table_data[char.character.character_name] = {"character":char.character,"history":{},"bio":"Nothing of value is here"}
+        table_data[char.character_name] = {"character":char,"history":{},"bio":"Nothing of value is here"}
 
     for h in corp_histories:
         table_data[h.character.character.character_name]["history"][str(h.record_id)] = {"name": h.corporation_name.name, "id":h.corporation_id, "started":h.start_date, "open": h.is_deleted}
@@ -203,7 +209,7 @@ def skills(request, character_id=None):
     # get available models
 
     main_char, characters, net_worth = get_alts (request, character_id)
-    character_ids = characters.values_list('character__character_id', flat=True)
+    character_ids = characters.values_list('character_id', flat=True)
 
     queues = SkillQueue.objects.filter(character__character__character_id__in=character_ids)\
                 .select_related('skill_name', 'character__character')

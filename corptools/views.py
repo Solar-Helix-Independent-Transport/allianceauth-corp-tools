@@ -15,6 +15,7 @@ import csv
 import re
 from itertools import chain
 from .models import * 
+from .tasks import update_character
 
 CHAR_REQUIRED_SCOPES = [
     'esi-calendar.read_calendar_events.v1',
@@ -42,6 +43,7 @@ CHAR_REQUIRED_SCOPES = [
 @token_required(scopes=CHAR_REQUIRED_SCOPES)
 def add_char(request, token):
     CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
+    update_character.apply_async(args=[token.character_id], priority=6)
     return redirect('corptools:view')
 
 @login_required

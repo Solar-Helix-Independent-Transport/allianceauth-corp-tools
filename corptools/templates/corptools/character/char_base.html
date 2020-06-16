@@ -162,7 +162,7 @@ tr.group,
                         <div class="text-center col-md-6"  rowspan="2">
                             <h4>Linked characters</h4> 
                             {% for alt in alts|slice:":15" %}
-                        <span style="background-color: {% if alt.character.characteraudit %}#008844{% else %}#AA0000{% endif %}" class="label label-default"><img class="ra-avatar img-circle img-pad" src="{{ alt.character.portrait_url_32 }}"> {{ alt.character.character_name }}</span>
+                        <span style="background-color: {% if alt.characteraudit %}#008844{% else %}#AA0000{% endif %}" class="label label-default"><img class="ra-avatar img-circle img-pad" src="{{ alt.portrait_url_32 }}"> {{ alt.character_name }}</span>
                             {% endfor %}
                             {% if alts.count > 15 %}<span class="label label-default">{{ alts.count|subtract:15 }} More... </span>{% endif %}
                             <br>
