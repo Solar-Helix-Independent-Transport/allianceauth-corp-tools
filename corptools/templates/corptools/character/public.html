@@ -23,6 +23,7 @@
                                         <th></th>
                                         <th>Corporations</th>
                                         <th>Joined</th>
+                                        <th></th>
                                     </thead>
                                     <tbody>
                                     {% for k, c in data.history.items %}
@@ -30,6 +31,7 @@
                                             <td><img class="ra-avatar img-circle" src="{{ c.id|corporation_logo_url:32 }}"></td>
                                             <td>{{c.name}}</td>
                                             <td>{{c.started|date:"Y/m/d"}}</td>
+                                            <td>{{c.record_id}}</td>
                                         </tr> 
                                     {% endfor %}
                                     </tbody>
@@ -38,7 +40,7 @@
                     {% else %}
                     <div class="col-md-8 flex-middle text-center pannel-hieght-locked">
                         <div class="alert alert-warning"><h4 class="alert-heading">No Data</h4>
-                        <p>You probably need to load a token!</p></div>
+                        <p>You probably need to load a token, or wait for an update to run!</p></div>
                     </div>
                     {% endif %}
                 </div>    
@@ -57,12 +59,13 @@ $(document).ready(function() {
         "paging":   false,
         "ordering": true,
         "searching":  false,
+        "ordering":  false,
         "info":     false,
         "columnDefs": [
         { "sortable": false, "targets": [0] }
     ],
 "order": [
-            [2, "desc"]
+            [3, "desc"]
         ]
     });
     } );
