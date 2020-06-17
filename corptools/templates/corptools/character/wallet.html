@@ -39,6 +39,7 @@
             <div  id="chartdiv-polar" style="min-height: 600px;"></div>
         </div>
     </div>
+    {% if manager_perms %}
     <div class="row panel panel-primary">
         <div class="panel-heading text-center">Interaction Map</div>
         <div class="panel-body">
@@ -46,6 +47,7 @@
             <div  id="chartdiv" style="min-height: 600px;"></div>
             <div class="pull-right"><button id="toggle-interaction" class="btn btn-info">Toggle to <span id="toggle-text">Isk Amount</span></button></div>
     </div>
+    {% endif %}
 </div>
 
 {% endblock %}
@@ -115,6 +117,8 @@
     ]
 
     am4core.ready(function() {
+        {% if manager_perms %}
+
         chart = am4core.create("chartdiv", am4charts.ChordDiagram);
         chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
 
@@ -246,7 +250,8 @@
         var hoverState = linkTemplate.states.create("hover");
         hoverState.properties.fillOpacity = 0.7;
         hoverState.properties.strokeOpacity = 0.7;
-                            
+        {% endif %}
+
         var chart_polar = am4core.create("chartdiv-polar", am4charts.RadarChart);
         chart_polar.hiddenState.properties.opacity = 0; // this creates initial fade-in
 
@@ -323,6 +328,5 @@
         chart_polar.cursor.lineX.strokeOpacity = 0;
         chart_polar.cursor.lineX.fillOpacity = 0.1;
         chart_polar.cursor.lineX.fill = am4core.color("#000000");
-
     }); // end am4core.ready()
         {% endblock %}
