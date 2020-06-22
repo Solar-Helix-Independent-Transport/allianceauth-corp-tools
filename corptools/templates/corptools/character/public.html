@@ -31,7 +31,7 @@
                                             <td><img class="ra-avatar img-circle" src="{{ c.id|corporation_logo_url:32 }}"></td>
                                             <td>{{c.name}}</td>
                                             <td>{{c.started|date:"Y/m/d"}}</td>
-                                            <td>{{c.record_id}}</td>
+                                            <td>{{k}}</td>
                                         </tr> 
                                     {% endfor %}
                                     </tbody>
@@ -62,7 +62,8 @@ $(document).ready(function() {
         "ordering":  false,
         "info":     false,
         "columnDefs": [
-        { "sortable": false, "targets": [0] }
+        { "sortable": false, "targets": [0] },
+        { "visible": false, "targets": [3] }
     ],
 "order": [
             [3, "desc"]
