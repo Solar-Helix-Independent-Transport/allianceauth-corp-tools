@@ -1,5 +1,6 @@
 {% extends 'corptools/base.html' %}
 {% block ct_block %}
+<h2 class="text-center">Admin Info!</h2>
 <div class="col-md-6">
     <div class="panel panel-primary">
         <div class="panel-heading text-center"> DataBase </div>
@@ -17,6 +18,29 @@
                 <tr><td class="">Constellations</td><td class="text-right"><span class="badge">{{constellations}}</span></td></tr> 
                 <tr><td class="">Systems</td><td class="text-right"><span class="badge">{{systems}}</span></td></tr> 
             </table>
+        </div>    
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="panel panel-primary">
+        <div class="panel-heading text-center">Task Helper!</div>
+        <div class="panel-body text-center">
+            <form action="{% url 'corptools:run_tasks' %}" method="post">
+                {% csrf_token %}
+                <span class="label label-info"><label for="run_universe">Update Map Data:</label>
+                    <input type="checkbox" name="run_universe" class="form-check" id="run_universe">
+                </span><br><br>
+                <span class="label label-info"><label for="run_update_all">Force Character Update:</label>
+                    <input type="checkbox" name="run_update_all" class="form-check" id="run_update_all">
+                </span><br><br>
+                <span class="label label-info"><label for="run_update_eve_models">Update Eve Models:</label>
+                    <input type="checkbox" name="run_update_eve_models" class="form-check" id="run_update_eve_models">
+                </span><br><br>
+                <span class="label label-info"><label for="run_corp_updates">Update Corp Updates:</label>
+                    <input type="checkbox" name="run_corp_updates" class="form-check" id="run_corp_updates" disabled>
+                </span><br><br>
+                <input type="submit" value="Submit" class="btn col-md-12 btn-primary">
+            </form>
         </div>    
     </div>
 </div>

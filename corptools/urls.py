@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^$', views.corptools_menu, name='view'),
     url(r'^add_char/$', views.add_char, name='add_char'),
     url(r'^admin/$', views.admin, name='admin'),
+    url(r'^run_tasks/$', views.admin_run_tasks, name='run_tasks'),
     url(r'^assets/$', assets, name='assets'),
     url(r'^assets/(?P<character_id>(\d)*)/$', assets, name='assets'),
     url(r'^wallet/$', wallet, name='wallet'),

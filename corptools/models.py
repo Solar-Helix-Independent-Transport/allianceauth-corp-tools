@@ -307,6 +307,7 @@ class Structure(models.Model):
     system_name = models.ForeignKey(MapSystem, on_delete=models.SET_NULL, null=True, default=None)
     type_name = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None)
     closest_celestial = models.ForeignKey(StructureCelestial, on_delete=models.SET_NULL, null=True, default=None)
+    last_online_time = models.DateTimeField(null=True, default=None)
 
     @property
     def services(self):
@@ -320,7 +321,16 @@ class Structure(models.Model):
         except:
             return False
 
-
+    @property
+    def abandoned(self):
+        if self.last_online_time:
+            abandonded = self.last_online_time + datetime.timedelta(days=7)
+            if timezone.now() > abandonded:
+                return True
+            else:
+                return False
+        return True # Fallback to abandonded. wosrt case its 7 days early
+        
 class StructureService(models.Model):
     structure = models.ForeignKey(Structure, on_delete=models.CASCADE)
 
@@ -334,7 +344,7 @@ class MiningTaxPaymentCorp(models.Model):
     corp = models.ForeignKey(EveCorporationInfo, on_delete=models.CASCADE, related_name='payment_corp_mining_tax')
 
     def __str__(self):
-        return "Moon Payments are sent to: {0}".format(self.corp.corporation_name)
+        return "Moon Payments Processed From: {0}".format(self.corp.corporation_name)
 
 # Market History ( GMetrics )
 class OrePrice(models.Model):
@@ -348,27 +358,26 @@ class OreTax(models.Model):
     price = models.DecimalField(max_digits=20, decimal_places=2)
     last_update = models.DateTimeField(auto_now=True)
 
-
 class OreTaxRates(models.Model):
-    tag = models.CharField(max_length=500, default="")
+    tag = models.CharField(max_length=500, default="Mining Tax")
     refine_rate = models.DecimalField(max_digits=5, decimal_places=2, default=87.5)
-    r0 = models.DecimalField(max_digits=5, decimal_places=2)  # normal
-    r4 = models.DecimalField(max_digits=5, decimal_places=2)  # ubiq
-    r8 = models.DecimalField(max_digits=5, decimal_places=2)  # comon
-    r16 = models.DecimalField(max_digits=5, decimal_places=2) # uncom
-    r32 = models.DecimalField(max_digits=5, decimal_places=2) # rare  
-    r64 = models.DecimalField(max_digits=5, decimal_places=2) # best
-
+    ore_rate = models.DecimalField(max_digits=5, decimal_places=2)  # normal
+    ubiquitous_rate = models.DecimalField(max_digits=5, decimal_places=2)  # ubiq
+    common_rate = models.DecimalField(max_digits=5, decimal_places=2)  # comon
+    uncommon_rate = models.DecimalField(max_digits=5, decimal_places=2) # uncom
+    rare_rate = models.DecimalField(max_digits=5, decimal_places=2) # rare  
+    excptional_rate = models.DecimalField(max_digits=5, decimal_places=2) # best
 
 class MiningTax(models.Model):
     corp = models.ForeignKey(EveCorporationInfo, on_delete=models.CASCADE, related_name='corp_mining_tax')
-    tax_rate = models.ForeignKey(OreTaxRates, on_delete=models.CASCADE)
+    tax_rate = models.ForeignKey(OreTaxRates, on_delete=models.CASCADE, null=True, default=None, blank=True)
+    use_variable_tax = models.BooleanField(default=False)
+    flat_tax_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=None, blank=True) # best
     region = models.CharField(max_length=50, null=True, default=None, blank=True)
     constellation = models.CharField(max_length=50, null=True, default=None, blank=True)
     system = models.CharField(max_length=50, null=True, default=None, blank=True)
     moon = models.CharField(max_length=50, null=True, default=None, blank=True)
     rank = models.IntegerField(default=0, null=True, blank=True)
-    use_variable_tax = models.BooleanField(default=False)
 
     def __str__(self):
         area = "Everywhere"
@@ -380,5 +389,10 @@ class MiningTax(models.Model):
             area = self.system
         elif self.moon:
             area = self.moon
-        #return "#{3}: Mining Tax of {0}% for {1}: {2}".format(self.tax_rate*100, self.corp, area, self.rank)
-        return "{2}".format(self.tax_rate*100, self.corp, area, self.rank)
+        #return 
+        rate = ""
+        if self.use_variable_tax:
+            rate = " Variable ({})".format(self.tax_rate.tag)
+        else:
+            rate = "{}%".format(self.tax_rate*100)
+        return "#{3}: Mining Tax {0} for {1}: {2}".format(rate, self.corp, area, self.rank)
