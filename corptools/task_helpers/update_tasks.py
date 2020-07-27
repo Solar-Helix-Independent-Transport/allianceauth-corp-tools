@@ -4,9 +4,9 @@ import bz2
 import json
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
+from esi.models import Token
 from corptools import providers
-from corptools.models import MapConstellation, MapRegion, MapSystem, InvTypeMaterials, EveItemCategory, EveItemGroup, EveItemType, EveItemDogmaAttribute
+from corptools.models import MapConstellation, MapRegion, MapSystem, InvTypeMaterials, EveItemCategory, EveItemGroup, EveItemType, EveItemDogmaAttribute, EveLocation
 
 import logging
 logger = logging.getLogger(__name__)
@@ -289,3 +289,58 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
     logger.debug(output)
 
     return True
+
+
+def fetch_location_name(location_id, location_flag, character_id):
+    """Takes a location_id and character_id and returns a location model for items in a station/structure or in space"""
+    req_scopes = ['esi-universe.read_structures.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+    existing = EveLocation.objects.filter(location_id=location_id)
+    accepted_location_flags = ['AssetSafety',
+                               'Deliveries',
+                               'Hangar',
+                               'HangarAll']
+
+    if location_flag not in accepted_location_flags:
+        return None # ship fits or in cargo holds or what ever also dont care
+
+    if existing.exists():
+        return existing.first()
+
+    if location_id == 2004:
+        # ASSET SAFETY
+        return EveLocation(location_id=location_id, 
+                           location_name="Asset Safety")
+    elif 30000000 < location_id < 33000000: # Solar System
+        system = MapSystem.objects.filter(system_id=location_id)
+        if not system.exists():
+            logger.error("Unknown System, Have you populated the map?")
+            #TODO Do i fire the map population task here?
+            return None
+        else:
+            system = system.first()
+        return EveLocation(location_id=location_id, 
+                           location_name=system.name,
+                           system=system)
+    elif 60000000 < location_id < 64000000: # Station ID
+        station = providers.esi.client.Universe.get_universe_stations_station_id(station_id=location_id).result()
+        system = MapSystem.objects.filter(system_id=station.get('system_id'))
+        if not system.exists():
+            logger.error("Unknown System, Have you populated the map?")
+            #TODO Do i fire the map population task here?
+            return None
+        return EveLocation(location_id=location_id, 
+                           location_name=station.get('name'),
+                           system_id=station.get('system_id'))
+    else: # Structure id?
+        structure = providers.esi.client.Universe.get_universe_structures_structure_id(structure_id=location_id, token=token.valid_access_token()).result()
+        system = MapSystem.objects.filter(system_id=structure.get('solar_system_id'))
+        if not system.exists():
+            logger.error("Unknown System, Have you populated the map?")
+            #TODO Do i fire the map population task here?
+            return None
+        return EveLocation(location_id=location_id, 
+                           location_name=structure.get('name'),
+                           system_id=structure.get('solar_system_id'))
+

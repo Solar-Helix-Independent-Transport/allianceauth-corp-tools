@@ -1,11 +1,13 @@
+import datetime
 import logging
 import os
 
 from celery import shared_task, chain
+from django.utils import timezone
 
-from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, process_category_from_esi
+from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, process_category_from_esi, fetch_location_name
 from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_skill_queue, update_character_wallet
-from .models import CharacterAudit
+from .models import CharacterAudit, CharacterAsset
 from . import providers
 
 logger = logging.getLogger(__name__)
@@ -99,3 +101,32 @@ def update_char_wallet(character_id):
     except Exception as e:
         logger.exception(e)
         return "Failed"
+
+@shared_task
+def update_location(location_id):
+    asset = CharacterAsset.objects.filter(location_id=location_id).first()
+    location = fetch_location_name(location_id, asset.location_flag, asset.character.character.character_id)
+    if location is not None:
+        location.save()
+        CharacterAsset.objects.filter(location_id=location_id).update(location_name_id=location_id)
+
+def location_last_checked(location_id):
+    cache_tag = "loc_id_{}".format(location_id)
+    #cache.get(cache_tag)
+    
+@shared_task
+def update_all_locations():
+    location_flags = ['AssetSafety',
+                      'Deliveries',
+                      'Hangar',
+                      'HangarAll']
+
+    expire = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=7)  # 1 week refresh
+
+    queryset = CharacterAsset.objects.filter(location_flag__in=location_flags, location_name=None)
+    queryset = queryset | CharacterAsset.objects.filter(location_flag__in=location_flags, location_name__last_update__lte=expire)
+
+    for location in queryset.values('location_id').distinct():
+        print(location.get('location_id'))
+        update_location.apply_async(args=[location.get('location_id')], priority=6)
+    
