@@ -3,6 +3,7 @@ import requests
 import bz2
 import json
 
+from bravado.exception import HTTPForbidden
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from esi.models import Token
 from corptools import providers
@@ -334,7 +335,12 @@ def fetch_location_name(location_id, location_flag, character_id):
                            location_name=station.get('name'),
                            system_id=station.get('system_id'))
     else: # Structure id?
-        structure = providers.esi.client.Universe.get_universe_structures_structure_id(structure_id=location_id, token=token.valid_access_token()).result()
+        try: 
+            structure = providers.esi.client.Universe.get_universe_structures_structure_id(structure_id=location_id, token=token.valid_access_token()).result()
+        except HTTPForbidden as e:  # no access
+            # TODO add this to cache so we don't keep hitting it
+            logger.error("Failed to get location:{}, Error:{}, Errors Remaining:{}".format(location_id, e.message, e.response.headers.get('x-esi-error-limit-remain')))
+            return None
         system = MapSystem.objects.filter(system_id=structure.get('solar_system_id'))
         if not system.exists():
             logger.error("Unknown System, Have you populated the map?")
