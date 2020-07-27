@@ -15,8 +15,8 @@ import csv
 import re
 from itertools import chain
 from .models import * 
-from .tasks import update_character
 
+from authanalitics.tasks import update_char
 CHAR_REQUIRED_SCOPES = [
     'esi-calendar.read_calendar_events.v1',
     'esi-characters.read_notifications.v1',

@@ -127,6 +127,7 @@ class EveName(models.Model):
     CORPORATION = "corporation"
     ALLIANCE = "alliance"
 
+
 class MapRegion(models.Model):
     region_id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -149,6 +150,12 @@ class MapSystem(models.Model):
     constellation = models.ForeignKey(MapConstellation, on_delete=models.SET_NULL, null=True, default=None)
 
 # ************************ Asset Models
+class EveLocation(models.Model):
+    location_id = models.BigIntegerField(primary_key=True)
+    location_name = models.CharField(max_length=255)
+    system = models.ForeignKey(MapSystem, on_delete=models.SET_NULL, null=True, default=None)
+    last_update = models.DateTimeField(auto_now=True)
+
 class Asset(models.Model):
     blueprint_copy = models.NullBooleanField(default=None)
     singleton = models.BooleanField()
@@ -158,7 +165,8 @@ class Asset(models.Model):
     location_type = models.CharField(max_length=25)
     quantity = models.IntegerField()
     type_id = models.IntegerField()
-    type_name = models.ForeignKey(EveItemType, on_delete=models.CASCADE, null=True, default=None) 
+    type_name = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None) 
+    location_name = models.ForeignKey(EveLocation, on_delete=models.SET_NULL, null=True, default=None) 
 
     #extra's
     name = models.CharField(max_length=255, null=True, default=None)
