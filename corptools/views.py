@@ -17,7 +17,6 @@ from itertools import chain
 from .models import * 
 from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi
 
-from authanalitics.tasks import update_char
 CHAR_REQUIRED_SCOPES = [
     'esi-calendar.read_calendar_events.v1',
     'esi-characters.read_notifications.v1',
