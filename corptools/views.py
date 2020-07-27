@@ -15,6 +15,7 @@ import csv
 import re
 from itertools import chain
 from .models import * 
+from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi
 
 from authanalitics.tasks import update_char
 CHAR_REQUIRED_SCOPES = [
@@ -72,6 +73,7 @@ def corptools_menu(request):
     return render(request, 'corptools/menu.html', context={'characters':chars, 'orphans':orphans})
 
 @login_required
+@permission_required('corptools.admin')
 def admin(request):
     # get available models
     names = EveName.objects.all().count()
@@ -101,4 +103,17 @@ def admin(request):
     }
     return render(request, 'corptools/admin.html', context=context)
 
-
+@login_required
+@permission_required('corptools.admin')
+def admin_run_tasks(request):
+    if request.method == 'POST':
+        if request.POST.get('run_universe'):
+            update_or_create_map.apply_async(priority=6)
+        if request.POST.get('run_update_all'):
+            update_all_characters.apply_async(priority=6)
+        if request.POST.get('run_update_eve_models'):
+            update_ore_comp_table.apply_async(priority=6)
+            process_ores_from_esi.apply_async(priority=6)
+        if request.POST.get('run_corp_updates'):
+            pass  # no task yet
+    return redirect('corptools:admin')
