@@ -291,6 +291,8 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
 
     return True
 
+def set_error_count_flag():
+    return cache.set("esi_errors_timeout", 1, 60)
 
 def fetch_location_name(location_id, location_flag, character_id):
     """Takes a location_id and character_id and returns a location model for items in a station/structure or in space"""
@@ -338,8 +340,9 @@ def fetch_location_name(location_id, location_flag, character_id):
         try: 
             structure = providers.esi.client.Universe.get_universe_structures_structure_id(structure_id=location_id, token=token.valid_access_token()).result()
         except HTTPForbidden as e:  # no access
-            # TODO add this to cache so we don't keep hitting it
-            logger.error("Failed to get location:{}, Error:{}, Errors Remaining:{}".format(location_id, e.message, e.response.headers.get('x-esi-error-limit-remain')))
+            if  e.response.headers.get('x-esi-error-limit-remain') < 50:
+                set_error_count_flag()
+            logger.error("Failed to get location:{}, Error:{}, Errors Remaining:{}, Time Remaining: {}".format(location_id, e.message, e.response.headers.get('x-esi-error-limit-remain'), e.response.headers.get('x-esi-error-limit-reset')))
             return None
         system = MapSystem.objects.filter(system_id=structure.get('solar_system_id'))
         if not system.exists():

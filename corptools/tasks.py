@@ -1,11 +1,15 @@
 import datetime
 import logging
 import os
+import json
 
 from celery import shared_task, chain
 from django.utils import timezone
+from django.core.cache import cache
 
 from allianceauth.services.tasks import QueueOnce
+from django.core.serializers.json import DjangoJSONEncoder
+from django.utils import timezone
 
 from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, process_category_from_esi, fetch_location_name
 from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_skill_queue, update_character_wallet
@@ -91,7 +95,10 @@ def update_char_skill_queue(self, character_id):
 @shared_task(bind=True, base=QueueOnce)
 def update_char_assets(self, character_id):
     try:
-        return update_character_assets(character_id)
+        results = update_character_assets(character_id)
+        update_all_locations.apply_async(priority=7)
+        return results
+
     except Exception as e:
         logger.exception(e)
         return "Failed"
@@ -104,23 +111,68 @@ def update_char_wallet(self, character_id):
         logger.exception(e)
         return "Failed"
 
+def build_location_cache_tag(location_id):
+    return "loc_id_{}".format(location_id)
+
+def get_error_count_flag():
+    return cache.get("esi_errors_timeout", False)
+
+def location_get(location_id):
+    cache_tag = build_location_cache_tag(location_id)
+    data = json.loads(cache.get(cache_tag,'{"date":false, "characters":[]}'))
+    if data.get('date') is not False:
+        data['date'] = datetime.datetime.strptime(data.get('date'), "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
+    return data
+
+def location_set(location_id, character_id):
+    cache_tag = build_location_cache_tag(location_id)
+    date = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=7)
+    data = location_get(location_id)
+    if data.get('date') is not False:
+        if data.get('date') < date:
+            data.get('characters').append(character_id) 
+            cache.set(cache_tag, json.dumps(data, cls=DjangoJSONEncoder), None)
+            return True
+        else:
+            data['date'] = datetime.datetime.utcnow().replace(tzinfo=timezone.utc)
+            data['characters'] = [character_id]
+            cache.set(cache_tag, json.dumps(data, cls=DjangoJSONEncoder), None)
+
+    if character_id not in data.get('characters'):
+        data.get('characters').append(character_id) 
+        data['date'] = datetime.datetime.utcnow().replace(tzinfo=timezone.utc)
+        cache.set(cache_tag, json.dumps(data, cls=DjangoJSONEncoder), None)
+        return True
+    
+    return False
+
 @shared_task(bind=True, base=QueueOnce)
 def update_location(self, location_id):
-    asset = CharacterAsset.objects.filter(location_id=location_id).first()
+    if get_error_count_flag():
+        self.retry(countdown=60)
+    cached_data = location_get(location_id)
+    date = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=7)
+    asset = CharacterAsset.objects.filter(location_id=location_id)
+    if cached_data.get('date') is not False:
+        if cached_data.get('date') > date:
+            asset = asset.exclude(character__character__character_id__in=cached_data.get('characters'))
+
+    if asset.exists():
+        print(asset.query)
+        asset = asset.first()
+    else:
+        return "No more Characters for Location_id: {}".format(location_id)
+
     location = fetch_location_name(location_id, asset.location_flag, asset.character.character.character_id)
     if location is not None:
         location.save()
         CharacterAsset.objects.filter(location_id=location_id).update(location_name_id=location_id)
     else:
-        logger.error("Failed Location_id: {} will try again in 7 days".format(location_id))
-        # TODO add caching blocks
+        location_set(location_id, asset.character.character.character_id)
+        return "Failed Location_id: {}".format(location_id)
 
-def location_last_checked(location_id):
-    cache_tag = "loc_id_{}".format(location_id)
-    #cache.get(cache_tag)
-    
-@shared_task
-def update_all_locations():
+@shared_task(bind=True, base=QueueOnce)
+def update_all_locations(self):
     location_flags = ['AssetSafety',
                       'Deliveries',
                       'Hangar',
@@ -134,4 +186,3 @@ def update_all_locations():
     for location in queryset.values('location_id').distinct():
         print(location.get('location_id'))
         update_location.apply_async(args=[location.get('location_id')], priority=6)
-    
