@@ -7,6 +7,7 @@ app_name = 'corptools'
 urlpatterns = [
     url(r'^$', views.corptools_menu, name='view'),
     url(r'^add_char/$', views.add_char, name='add_char'),
+    url(r'^add_corp/$', views.add_corp, name='add_corp'),
     url(r'^admin/$', views.admin, name='admin'),
     url(r'^run_tasks/$', views.admin_run_tasks, name='run_tasks'),
     url(r'^assets/$', assets, name='assets'),

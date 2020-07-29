@@ -1,6 +1,6 @@
 import logging
 from celery import shared_task
-from ..models import CorporationWalletJournalEntry
+from ..models import CorporationWalletJournalEntry, CorporationAudit, CorporationWalletDivision, EveName
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 
@@ -19,176 +19,115 @@ import datetime
 
 logger = logging.getLogger(__name__)
 
-@shared_task
-def update_corp_wallet_journal(character_id, wallet_division, full_update=False):  # pagnated results
-    
-    def journal_db_update(_transaction, _division, existing_id, name_ids):
-        """ Build Wallet Database Model """
-        first_name = False
-        second_name = False
-
-        if not _transaction.get('id') in existing_id:
-            try:
-                if _transaction.get('second_party_id') and _transaction.get('second_party_id') not in name_ids:
-                    _get_new_eve_name(_transaction.get('second_party_id'))
-                    name_ids.append(_transaction.get('second_party_id'))
-                    second_name = True
-                elif _transaction.get('second_party_id') and _transaction.get('second_party_id') in name_ids:
-                    second_name = True
-            except Exception as e:
-                print(e)
-
-            try:
-                if _transaction.get('first_party_id') and _transaction.get('first_party_id') not in name_ids:
-                    _get_new_eve_name(_transaction.get('first_party_id'))
-                    name_ids.append(_transaction.get('first_party_id'))
-                    first_name = True
-                elif _transaction.get('first_party_id') and _transaction.get('first_party_id') in name_ids:
-                    first_name = True
-            except Exception as e:
-                print(e)
-
-            _journal_item = CorporationWalletJournalEntry(
-                division=_division,
-                entry_id=_transaction.get('id'),
-                amount=_transaction.get('amount'),
-                balance=_transaction.get('balance'),
-                context_id=_transaction.get('context_id'),
-                context_id_type=_transaction.get('context_id_type'),
-                date=_transaction.get('date'),
-                description=_transaction.get('description'),
-                first_party_id=_transaction.get('first_party_id'),
-                reason=_transaction.get('reason'),
-                ref_type=_transaction.get('ref_type'),
-                second_party_id=_transaction.get('second_party_id'),
-                tax=_transaction.get('tax'),
-                tax_reciever_id=_transaction.get('tax_reciever_id'))
-
-            if first_name:
-                _journal_item.first_party_name_id=_transaction.get('first_party_id')
-            if second_name:
-                _journal_item.second_party_name_id=_transaction.get('second_party_id')
-
-
-            return _journal_item
+def get_corp_token(corp_id, scopes, req_roles):
+    """
+    Helper method to get a token for a specific character from a specific corp with specific scopes
+    :param corp_id: Corp to filter on.
+    :param scopes: array of ESI scope strings to search for.
+    :param req_roles: roles required on the character.
+    :return: :class:esi.models.Token or False
+    """
+    char_ids = EveCharacter.objects.filter(corporation_id=corp_id).values('character_id')
+    tokens = Token.objects \
+            .filter(character_id__in=char_ids) \
+            .require_scopes(scopes)
+            
+    for token in tokens:
+        roles = providers.esi.client.Character.get_characters_character_id_roles(character_id=token.character_id,
+                                                    token=token.valid_access_token()).result()
+        has_roles = False
+        for role in roles.get('roles', []):
+            if role in req_roles:
+                has_roles = True
+        
+        if has_roles:
+            return token
         else:
-            return False
+            pass #TODO Maybe remove token?
+
+    return False
+
+def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):  # pagnated results
+    audit_corp = CorporationAudit.objects.get(corporation__corporation_id=corp_id)
+    division = CorporationWalletDivision.objects.get(corporation=audit_corp, division=wallet_division)
+    logger.debug("Updating wallet transactions for: {} (Div: {})".format(audit_corp.corporation.corporation_name, division))
 
     req_scopes = ['esi-wallet.read_corporation_wallets.v1', 'esi-characters.read_corporation_roles.v1']
-
     req_roles = ['CEO', 'Director', 'Accountant', 'Junior_Accountant']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
         return "No Tokens"
 
-    # check roles!
-    operation = providers.esi.client.Character.get_characters_character_id_roles(character_id=character_id, 
-                                                    token=token.valid_access_token())
-    operation.request_config.also_return_response = True
-    roles, result = operation.result()
-    _character = AllianceToolCharacter.objects.get(character__character_id=character_id)
-
-    has_roles = False
-    for role in roles.get('roles', []):
-        if role in req_roles:
-            has_roles = True
-
-    if not has_roles:
-        _character.update_wallet = False
-        _character.save()
-        return "No Roles on Character"
-
-
-    _corporation = EveCorporationInfo.objects.get(corporation_id=_character.character.corporation_id)
-    _division = CorporationWalletDivision.objects.get(corporation=_corporation, division=wallet_division)
-
-    bulk_wallet_items = []
-    name_ids = []
-    cache_expires = 0
-    wallet_page = 1
-    total_pages = 1
-    name_ids = list(EveName.objects.all().values_list('eve_id', flat=True))
-    last_thrity = list(CorporationWalletJournalEntry.objects.filter( division=_division,
-        date__gt=(datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=60))).values_list(
-        'entry_id', flat=True))
-
-    while wallet_page <= total_pages:
-        # logger.info("{0}: Wallet Page{1}/{2}".format(_character.character.character_name, wallet_page, total_pages))
-        operation = providers.esi.client.Wallet.get_corporations_corporation_id_wallets_division_journal(
-                        corporation_id=_corporation.corporation_id,
+    journal_items = providers.esi.client.Wallet.get_corporations_corporation_id_wallets_division_journal(corporation_id=audit_corp.corporation.corporation_id,
                         division=wallet_division,
-                        page=wallet_page,
-                        token=token.valid_access_token())
+                        token=token.valid_access_token()).results()
 
-        operation.request_config.also_return_response = True
-        journal, result = operation.result()
-        total_pages = int(result.headers['X-Pages'])
-        cache_expires = datetime.datetime.strptime(result.headers['Expires'], '%a, %d %b %Y %H:%M:%S GMT').replace(
-            tzinfo=timezone.utc)
+    _current_journal = CorporationWalletJournalEntry.objects.filter(division=division).values_list('entry_id', flat=True) # TODO add time filter
+    _current_eve_ids = list(EveName.objects.all().values_list('eve_id', flat=True))
 
-        for transaction in journal:
-            _j_ob = journal_db_update(transaction, _division, last_thrity, name_ids)
-            if _j_ob:
-                bulk_wallet_items.append(_j_ob)  # return'd values not needed
-            else:
-                # old!
-                if not full_update:
-                    wallet_page = total_pages
-                    break
+    _new_names = []
 
-        wallet_page += 1
+    items = []
+    for item in journal_items:
+        if item.get('id') not in _current_journal:
+            if item.get('second_party_id') not in _current_eve_ids:
+                _new_names.append(item.get('second_party_id'))
+                _current_eve_ids.append(item.get('second_party_id'))
+            if item.get('first_party_id') not in _current_eve_ids:
+                _new_names.append(item.get('first_party_id'))
+                _current_eve_ids.append(item.get('first_party_id'))
+                
+            wallet_item = CorporationWalletJournalEntry(division=division,
+                                        amount=item.get('amount'), 
+                                        balance=item.get('balance'),
+                                        context_id=item.get('context_id'), 
+                                        context_id_type=item.get('context_id_type'),
+                                        date=item.get('date'),
+                                        description=item.get('description'),
+                                        first_party_id=item.get('first_party_id'),
+                                        first_party_name_id=item.get('first_party_id'),
+                                        entry_id=item.get('id'),
+                                        reason=item.get('reason'),
+                                        ref_type=item.get('ref_type'),
+                                        second_party_id=item.get('second_party_id'),
+                                        second_party_name_id=item.get('second_party_id'),
+                                        tax=item.get('tax'),
+                                        tax_receiver_id=item.get('tax_receiver_id'),
+                                        )
+            items.append(wallet_item)
 
-    CorporationWalletJournalEntry.objects.bulk_create(bulk_wallet_items, batch_size=500)
+    created_names = EveName.objects.create_bulk_from_esi(_new_names)
 
-    AllianceToolCharacter.objects.filter(character__character_id=character_id).update(
-        next_update_wallet=cache_expires,
-        last_update_wallet=datetime.datetime.utcnow().replace(tzinfo=timezone.utc))
+    if created_names:
+        CorporationWalletJournalEntry.objects.bulk_create(items)
+    else: 
+        raise Exception("DB Fail")
 
-    return "Finished wallet trans for: {0}".format(_character.character.character_name)
 
-
-@shared_task
-def update_corp_wallet_division(character_id, full_update=False):  # pagnated results
+def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
     # logger.debug("Started wallet divs for: %s" % str(character_id))
+    audit_corp = CorporationAudit.objects.get(corporation__corporation_id=corp_id)
 
     req_scopes = ['esi-wallet.read_corporation_wallets.v1', 'esi-characters.read_corporation_roles.v1']
     req_roles = ['CEO', 'Director', 'Accountant', 'Junior_Accountant']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
         return "No Tokens"
 
-
-    # check roles!
-    roles = providers.esi.client.Character.get_characters_character_id_roles(character_id=character_id,
-                                                    token=token.valid_access_token()).result()
-    _character = AllianceToolCharacter.objects.get(character__character_id=character_id)
-
-    has_roles = False
-    for role in roles.get('roles', []):
-        if role in req_roles:
-            has_roles = True
-
-    if not has_roles:
-        _character.update_wallet = False
-        _character.save()
-        return "No Roles on Character"
-
-    _corporation = EveCorporationInfo.objects.get(corporation_id=_character.character.corporation_id)
-
-    _divisions = providers.esi.client.Wallet.get_corporations_corporation_id_wallets(corporation_id=_corporation.corporation_id,
+    divisions = providers.esi.client.Wallet.get_corporations_corporation_id_wallets(corporation_id=audit_corp.corporation.corporation_id,
                                                     token=token.valid_access_token()).result()
 
-    for division in _divisions:
+    for division in divisions:
         _division_item, _created = CorporationWalletDivision.objects \
-            .update_or_create(corporation=_corporation, division=division.get('division'),
+            .update_or_create(corporation=audit_corp, division=division.get('division'),
                               defaults={'balance': division.get('balance')})
 
         if _division_item:
-            update_corp_wallet_journal(character_id, division.get('division'),
+            update_corp_wallet_journal(corp_id, division.get('division'),
                                        full_update=full_update)  # inline not async
 
-    return "Finished wallet divs for: {0}".format(_character.character.character_name)
+    return "Finished wallet divs for: {0}".format(audit_corp.corporation.corporation_name)

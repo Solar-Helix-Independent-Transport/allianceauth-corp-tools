@@ -13,6 +13,7 @@ from django.utils import timezone
 
 from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, process_category_from_esi, fetch_location_name
 from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_skill_queue, update_character_wallet
+from .task_helpers.corp_helpers import update_corp_wallet_division
 from .models import CharacterAudit, CharacterAsset
 from . import providers
 
@@ -186,3 +187,7 @@ def update_all_locations(self):
     for location in queryset.values('location_id').distinct():
         print(location.get('location_id'))
         update_location.apply_async(args=[location.get('location_id')], priority=6)
+
+@shared_task(bind=True, base=QueueOnce)
+def update_corp_wallet(self, corp_id):
+    update_corp_wallet_division(corp_id)
