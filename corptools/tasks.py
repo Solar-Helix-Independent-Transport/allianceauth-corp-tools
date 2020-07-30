@@ -14,7 +14,7 @@ from django.utils import timezone
 from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, process_category_from_esi, fetch_location_name
 from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_skill_queue, update_character_wallet
 from .task_helpers.corp_helpers import update_corp_wallet_division
-from .models import CharacterAudit, CharacterAsset
+from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit
 from . import providers
 
 logger = logging.getLogger(__name__)
@@ -159,7 +159,6 @@ def update_location(self, location_id):
             asset = asset.exclude(character__character__character_id__in=cached_data.get('characters'))
 
     if asset.exists():
-        print(asset.query)
         asset = asset.first()
     else:
         return "No more Characters for Location_id: {}".format(location_id)
@@ -181,13 +180,26 @@ def update_all_locations(self):
 
     expire = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=7)  # 1 week refresh
 
-    queryset = CharacterAsset.objects.filter(location_flag__in=location_flags, location_name=None)
-    queryset = queryset | CharacterAsset.objects.filter(location_flag__in=location_flags, location_name__last_update__lte=expire)
+    queryset1 = list(CharacterAsset.objects.filter(location_flag__in=location_flags, location_name=None).distinct().values_list('location_id', flat=True))
+    queryset2 = list(EveLocation.objects.filter(last_update__lte=expire).values_list('location_id', flat=True))
 
-    for location in queryset.values('location_id').distinct():
-        print(location.get('location_id'))
-        update_location.apply_async(args=[location.get('location_id')], priority=6)
+    for location in set(queryset1 + queryset2):
+        update_location.apply_async(args=[location], priority=6)
 
 @shared_task(bind=True, base=QueueOnce)
 def update_corp_wallet(self, corp_id):
     update_corp_wallet_division(corp_id)
+
+@shared_task
+def update_corp(corp_id):
+    corp = CorporationAudit.objects.get(corporation__corporation_id=corp_id)
+    logger.info("Starting Updates for {}".format(corp.corporation.corporation_name))
+    que = []
+    que.append(update_corp_wallet.si(corp_id))
+    chain(que).apply_async(priority=6)
+
+@shared_task
+def update_all_corps():
+    corps = CorporationAudit.objects.all().select_related('corporation')
+    for corp in corps:
+        update_corp.apply_async(args=[corp.corporation.corporation_id])

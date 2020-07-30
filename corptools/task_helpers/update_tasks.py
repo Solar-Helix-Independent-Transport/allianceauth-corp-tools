@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from esi.models import Token
 from corptools import providers
 from corptools.models import MapConstellation, MapRegion, MapSystem, InvTypeMaterials, EveItemCategory, EveItemGroup, EveItemType, EveItemDogmaAttribute, EveLocation
+from django.core.cache import cache
 
 import logging
 logger = logging.getLogger(__name__)
@@ -340,7 +341,7 @@ def fetch_location_name(location_id, location_flag, character_id):
         try: 
             structure = providers.esi.client.Universe.get_universe_structures_structure_id(structure_id=location_id, token=token.valid_access_token()).result()
         except HTTPForbidden as e:  # no access
-            if  e.response.headers.get('x-esi-error-limit-remain') < 50:
+            if  int(e.response.headers.get('x-esi-error-limit-remain')) < 50:
                 set_error_count_flag()
             logger.error("Failed to get location:{}, Error:{}, Errors Remaining:{}, Time Remaining: {}".format(location_id, e.message, e.response.headers.get('x-esi-error-limit-remain'), e.response.headers.get('x-esi-error-limit-reset')))
             return None
