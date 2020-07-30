@@ -110,21 +110,27 @@ def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
     # logger.debug("Started wallet divs for: %s" % str(character_id))
     audit_corp = CorporationAudit.objects.get(corporation__corporation_id=corp_id)
 
-    req_scopes = ['esi-wallet.read_corporation_wallets.v1', 'esi-characters.read_corporation_roles.v1']
-    req_roles = ['CEO', 'Director', 'Accountant', 'Junior_Accountant']
+    req_scopes = ['esi-wallet.read_corporation_wallets.v1', 'esi-characters.read_corporation_roles.v1', 'esi-corporations.read_divisions.v1' ]
+    req_roles = ['CEO', 'Director']
 
     token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
         return "No Tokens"
+    division_names = providers.esi.client.Corporation.get_corporations_corporation_id_divisions(corporation_id=audit_corp.corporation.corporation_id,
+                                                    token=token.valid_access_token()).result()
+    names = {}
+    for division in division_names.get('wallet'):
+        names[division.get('division')]=division.get('name')
 
     divisions = providers.esi.client.Wallet.get_corporations_corporation_id_wallets(corporation_id=audit_corp.corporation.corporation_id,
                                                     token=token.valid_access_token()).result()
-
+    
     for division in divisions:
         _division_item, _created = CorporationWalletDivision.objects \
             .update_or_create(corporation=audit_corp, division=division.get('division'),
-                              defaults={'balance': division.get('balance')})
+                              defaults={'balance': division.get('balance'),
+                                        'name':names[division.get('division')]})
 
         if _division_item:
             update_corp_wallet_journal(corp_id, division.get('division'),
