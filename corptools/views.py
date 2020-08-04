@@ -46,7 +46,8 @@ CHAR_REQUIRED_SCOPES = [
     'esi-ui.open_window.v1',
     'esi-ui.write_waypoint.v1',
     'esi-universe.read_structures.v1',
-    'esi-wallet.read_character_wallet.v1'
+    'esi-wallet.read_character_wallet.v1',
+    'esi-characters.read_fatigue.v1',
     ]
 
 CORP_REQUIRED_SCOPES = [
@@ -117,6 +118,7 @@ def admin(request):
     groups = EveItemGroup.objects.all().count()
     categorys = EveItemCategory.objects.all().count()
     characters = CharacterAudit.objects.all().count()
+    
     corpations = CorporationAudit.objects.all().count()
     type_mets = InvTypeMaterials.objects.count()
     regions = MapRegion.objects.all().count()

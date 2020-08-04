@@ -1,6 +1,6 @@
 import logging
 from celery import shared_task
-from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, SkillTotals
+from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, SkillTotals, Implant, JumpClone, Clone
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 
@@ -19,6 +19,7 @@ import datetime
 
 logger = logging.getLogger(__name__)
 
+
 def update_corp_history(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
     logger.debug("updating corp history for: {}".format(audit_char.character.character_name))
@@ -35,6 +36,7 @@ def update_corp_history(character_id):
                                                             'is_deleted': corp.get('is_deleted', False),
                                                             'start_date': corp.get('start_date')})
     return "Finished pub data for: {}".format(audit_char.character.character_name)
+
 
 def update_character_skill_list(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
@@ -75,6 +77,7 @@ def update_character_skill_list(character_id):
     Skill.objects.bulk_create(_create_skills)
     return "Finished skills for: {}".format(audit_char.character.character_name)
 
+
 def update_character_skill_queue(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
     logger.debug("Updating Skills and Queue for: {}".format(audit_char.character.character_name))
@@ -109,6 +112,7 @@ def update_character_skill_queue(character_id):
     EveItemType.objects.create_bulk_from_esi(_check_skills)
     SkillQueue.objects.bulk_create(items)
     return "Finished skill queue for: {}".format(audit_char.character.character_name)
+
 
 def update_character_assets(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
@@ -150,6 +154,7 @@ def update_character_assets(character_id):
     EveItemType.objects.create_bulk_from_esi(_current_type_ids)
     CharacterAsset.objects.bulk_create(items)
     return "Finished assets for: {}".format(audit_char.character.character_name)
+
 
 def update_character_wallet(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
@@ -213,3 +218,65 @@ def update_character_wallet(character_id):
         raise Exception("ESI Fail")
 
     return "Finished wallet transactions for: {}".format(audit_char.character.character_name)
+
+# TODO Refactor for a bit more speed
+def update_character_clones(character_id):
+    audit_char = CharacterAudit.objects.get(character__character_id=character_id)
+    logger.debug("Updating Clones and Implants for: {}".format(audit_char.character.character_name))
+
+    req_scopes = ['esi-clones.read_clones.v1', 'esi-clones.read_implants.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+    
+    jump_clones = providers.esi.client.Clones.get_characters_character_id_clones(character_id=character_id,
+                                        token=token.valid_access_token()).result()
+    
+    active_clone = providers.esi.client.Clones.get_characters_character_id_implants(character_id=character_id,
+                                        token=token.valid_access_token()).result()
+
+    clones = {}
+    clones[0] = active_clone
+    
+    char_clone, created = Clone.objects.update_or_create(character=audit_char, 
+                                                    defaults={
+                                                        'last_clone_jump_date': jump_clones.get('last_clone_jump_date'),
+                                                        'last_station_change_date': jump_clones.get('last_station_change_date'),
+                                                        'location_id': jump_clones.get('home_location').get('location_id'),
+                                                        'location_type': jump_clones.get('home_location').get('location_type'),
+                                                    })
+    
+    JumpClone.objects.filter(character=audit_char).delete() # remove all
+    implants = []
+    type_ids = []
+    for clone in jump_clones.get('jump_clones'):
+        _jumpclone = JumpClone.objects.create(character=audit_char, 
+                                                jump_clone_id=clone.get('jump_clone_id'), 
+                                                location_id=clone.get('location_id'), 
+                                                location_type=clone.get('location_type'), 
+                                                name=clone.get('name'))
+        
+        for implant in clone.get('implants'):
+            if implant not in type_ids:
+                type_ids.append(implant)
+            implants.append(Implant(clone=_jumpclone,
+                                    type_name_id=implant
+                                    )
+                            )
+
+    _jumpclone = JumpClone.objects.create(character=audit_char,
+                                            jump_clone_id=0,
+                                            name="Active Clone")
+
+    for implant in active_clone:
+        if implant not in type_ids:
+            type_ids.append(implant)
+        implants.append(Implant(clone=_jumpclone,
+                                type_name_id=implant,
+                                )
+                        )
+
+    EveItemType.objects.create_bulk_from_esi(type_ids)
+    Implant.objects.bulk_create(implants)

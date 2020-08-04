@@ -12,9 +12,9 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
 from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, process_category_from_esi, fetch_location_name
-from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_skill_queue, update_character_wallet
+from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_clones, update_character_skill_queue, update_character_wallet
 from .task_helpers.corp_helpers import update_corp_wallet_division
-from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit
+from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone
 from . import providers
 
 logger = logging.getLogger(__name__)
@@ -63,6 +63,7 @@ def update_character(char_id):
     que.append(update_char_corp_history.si(character.character.character_id))
     que.append(update_char_skill_list.si(character.character.character_id))
     que.append(update_char_skill_queue.si(character.character.character_id))
+    que.append(update_clones.si(character.character.character_id))
     que.append(update_char_wallet.si(character.character.character_id))
     que.append(update_char_assets.si(character.character.character_id))
     chain(que).apply_async(priority=6)
@@ -154,22 +155,40 @@ def update_location(self, location_id):
     cached_data = location_get(location_id)
     date = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=7)
     asset = CharacterAsset.objects.filter(location_id=location_id)
+    clone = Clone.objects.filter(location_id=location_id)
+    jumpclone = JumpClone.objects.filter(location_id=location_id)
     if cached_data.get('date') is not False:
         if cached_data.get('date') > date:
             asset = asset.exclude(character__character__character_id__in=cached_data.get('characters'))
+            clone = clone.exclude(character__character__character_id__in=cached_data.get('characters'))
+            jumpclone = jumpclone.exclude(character__character__character_id__in=cached_data.get('characters'))
+    
+    location_flag = None
+    char_id = None
 
     if asset.exists():
         asset = asset.first()
-    else:
+        char_id = asset.character.character.character_id
+        location_flag = asset.location_flag
+    elif clone.exists():
+        clone = clone.first()
+        char_id = clone.character.character.character_id
+    elif jumpclone.exists():
+        jumpclone = jumpclone.first()
+        char_id = jumpclone.character.character.character_id
+
+    if char_id is None:
         return "No more Characters for Location_id: {}".format(location_id)
 
-    location = fetch_location_name(location_id, asset.location_flag, asset.character.character.character_id)
+    location = fetch_location_name(location_id, location_flag, char_id)
     if location is not None:
         location.save()
         CharacterAsset.objects.filter(location_id=location_id).update(location_name_id=location_id)
+        Clone.objects.filter(location_id=location_id).update(location_name_id=location_id)
+        JumpClone.objects.filter(location_id=location_id).update(location_name_id=location_id)
     else:
         location_set(location_id, asset.character.character.character_id)
-        return "Failed Location_id: {}".format(location_id)
+        self.retry()
 
 @shared_task(bind=True, base=QueueOnce)
 def update_all_locations(self):
@@ -182,8 +201,10 @@ def update_all_locations(self):
 
     queryset1 = list(CharacterAsset.objects.filter(location_flag__in=location_flags, location_name=None).distinct().values_list('location_id', flat=True))
     queryset2 = list(EveLocation.objects.filter(last_update__lte=expire).values_list('location_id', flat=True))
-
-    for location in set(queryset1 + queryset2):
+    queryset3 = list(Clone.objects.filter(location_id__isnull=False, location_name_id__isnull=True).values_list('location_id', flat=True))
+    queryset4 = list(JumpClone.objects.filter(location_id__isnull=False, location_name_id__isnull=True).values_list('location_id', flat=True))
+    
+    for location in set(queryset1 + queryset2 + queryset3 + queryset4):
         update_location.apply_async(args=[location], priority=6)
 
 @shared_task(bind=True, base=QueueOnce)
@@ -203,3 +224,8 @@ def update_all_corps():
     corps = CorporationAudit.objects.all().select_related('corporation')
     for corp in corps:
         update_corp.apply_async(args=[corp.corporation.corporation_id])
+
+@shared_task
+def update_clones(char_id):
+    update_character_clones(char_id)
+    update_all_locations.apply_async(priority=7)

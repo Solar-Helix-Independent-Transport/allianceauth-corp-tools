@@ -307,7 +307,8 @@ def fetch_location_name(location_id, location_flag, character_id):
                                'HangarAll']
 
     if location_flag not in accepted_location_flags:
-        return None # ship fits or in cargo holds or what ever also dont care
+        if location_flag is not None:
+            return None # ship fits or in cargo holds or what ever also dont care   
 
     if existing.exists():
         return existing.first()
