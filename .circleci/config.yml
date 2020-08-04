@@ -61,7 +61,7 @@ jobs:
             twine upload dist/*
 workflows:
   version: 2
-  GlobalMods:
+  CorpTools:
     jobs:
       - BuildAndTest
       - Deploy:
