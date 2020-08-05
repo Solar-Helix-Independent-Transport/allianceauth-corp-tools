@@ -271,3 +271,35 @@ def skills(request, character_id=None):
 
     return render(request, 'corptools/character/skills.html', context=context)
 
+
+@login_required
+def clones(request, character_id=None):
+    # get available models
+
+    main_char, characters, net_worth = get_alts (request, character_id)
+    character_ids = characters.values_list('character_id', flat=True)
+    jump_clones = JumpClone.objects\
+                        .filter(character__character__character_id__in=character_ids)\
+                        .select_related('character__character', 'location_name').prefetch_related('implant_set', 'implant_set__type_name')
+    clones = Clone.objects\
+                        .filter(character__character__character_id__in=character_ids)\
+                        .select_related('character__character')
+
+    table_data = {}
+    for char in characters:
+        table_data[char.character_name] = {"character":char,"clones":{},"home":None, "cooldown":0}
+
+    for j in jump_clones:
+        table_data[j.character.character.character_name]["clones"][j.jump_clone_id] = {"name": j.name, "location":j.location_name, "implants": j.implant_set.all()}
+
+    #for c in clones:
+    #    table_data[c.get('char')]["total_sp"] = c.get('total_sp')
+
+    context = {
+        "main_char": main_char,
+        "alts": characters,
+        "net_worth": net_worth,
+        "table_data": table_data,
+    }
+
+    return render(request, 'corptools/character/clones.html', context=context)

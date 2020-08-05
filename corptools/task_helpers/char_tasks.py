@@ -219,7 +219,6 @@ def update_character_wallet(character_id):
 
     return "Finished wallet transactions for: {}".format(audit_char.character.character_name)
 
-# TODO Refactor for a bit more speed
 def update_character_clones(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
     logger.debug("Updating Clones and Implants for: {}".format(audit_char.character.character_name))

@@ -188,7 +188,7 @@ def update_location(self, location_id):
         JumpClone.objects.filter(location_id=location_id).update(location_name_id=location_id)
     else:
         location_set(location_id, asset.character.character.character_id)
-        self.retry()
+        self.retry(countdown=1)
 
 @shared_task(bind=True, base=QueueOnce)
 def update_all_locations(self):
