@@ -1,6 +1,6 @@
 import logging
 from celery import shared_task
-from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, SkillTotals, Implant, JumpClone, Clone
+from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, SkillTotals, Implant, JumpClone, Clone, EveLocation
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 
@@ -236,6 +236,7 @@ def update_character_clones(character_id):
     active_clone = providers.esi.client.Clones.get_characters_character_id_implants(character_id=character_id,
                                         token=token.valid_access_token()).result()
 
+    all_locations = list(EveLocation.objects.all().values_list('location_id', flat=True))
     clones = {}
     clones[0] = active_clone
     
@@ -250,12 +251,17 @@ def update_character_clones(character_id):
     JumpClone.objects.filter(character=audit_char).delete() # remove all
     implants = []
     type_ids = []
+
     for clone in jump_clones.get('jump_clones'):
-        _jumpclone = JumpClone.objects.create(character=audit_char, 
-                                                jump_clone_id=clone.get('jump_clone_id'), 
-                                                location_id=clone.get('location_id'), 
-                                                location_type=clone.get('location_type'), 
-                                                name=clone.get('name'))
+        _jumpclone = JumpClone(character=audit_char, 
+                                jump_clone_id=clone.get('jump_clone_id'), 
+                                location_id=clone.get('location_id'), 
+                                location_type=clone.get('location_type'), 
+                                name=clone.get('name'))
+        if clone.get('location_id') in all_locations:
+            _jumpclone.location_name_id = clone.get('location_id')
+        
+        _jumpclone.save()
         
         for implant in clone.get('implants'):
             if implant not in type_ids:

@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
-from django.db.models import Count, F, Sum, Max
+from django.db.models import Count, F, Sum, Max, Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from esi.decorators import token_required
@@ -60,20 +60,19 @@ def assets(request, character_id=None):
 
     main_char, characters, net_worth = get_alts(request, character_id)
 
-    capital_groups = [30, 547, 659, 1538, 485, 902, 513, 944, 883]
+    capital_groups = [30, 547, 659, 1538, 485, 902, 513, 883]
     subcap_cat = [6]
     noteable_cats = [4, 20, 23, 25, 34, 35, 87, 91]
     structure_cats = [22, 24, 40, 41, 46, 65, 66,]
     bpo_cats = [9]
 
     assets = CharacterAsset.objects\
-                .filter(character__character__character_id__in=characters.values_list('character_id', flat=True))\
+                .filter((Q(blueprint_copy=None) | Q(blueprint_copy=False)), character__character__character_id__in=characters.values_list('character_id', flat=True))\
                 .values('type_name__group__group_id')\
                 .annotate(grp_total=Sum('quantity'))\
                 .annotate(grp_name=F('type_name__group__name'))\
                 .annotate(grp_id=F('type_name__group_id'))\
                 .annotate(cat_id=F('type_name__group__category_id'))\
-                .annotate(is_bpc=F('blueprint_copy'))\
                 .order_by('-grp_total')
     
     capital_asset_groups = []
@@ -92,7 +91,7 @@ def assets(request, character_id=None):
             noteable_asset_groups.append(grp)
         elif grp['cat_id'] in structure_cats:
             structure_asset_groups.append(grp)
-        elif grp['cat_id'] in bpo_cats and not grp['is_bpc']:
+        elif grp['cat_id'] in bpo_cats:
             bpo_asset_groups.append(grp)
         else:
             remaining_asset_groups.append(grp)
