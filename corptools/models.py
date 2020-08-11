@@ -150,7 +150,7 @@ class MapSystem(models.Model):
     system_id = models.BigIntegerField(primary_key=True)
     security_status = models.FloatField()
     name = models.CharField(max_length=255)
-    x = models.FloatField()
+    x = models.FloatField() 
     y = models.FloatField()
     z = models.FloatField()
     security_class = models.CharField(max_length=255, null=True, default=None)

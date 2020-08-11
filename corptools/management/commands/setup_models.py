@@ -13,12 +13,12 @@ class Command(BaseCommand):
         if OreTaxRates.objects.all().count() == 0:
             OreTaxRates.objects.create(
                 tag="Ore Tax",
-                r0=0.2,
-                r4=0.2,
-                r8=0.2,
-                r16=0.2,
-                r32=0.2,
-                r64=0.2
+                ore_rate=0.2,
+                ubiquitous_rate=0.2,
+                common_rate=0.2,
+                uncommon_rate=0.2,
+                rare_rate=0.2,
+                excptional_rate=0.2
             )
 
         if options['inline']:
