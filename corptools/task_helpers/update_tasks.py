@@ -7,7 +7,7 @@ from bravado.exception import HTTPForbidden
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from esi.models import Token
 from corptools import providers
-from corptools.models import MapConstellation, MapRegion, MapSystem, InvTypeMaterials, EveItemCategory, EveItemGroup, EveItemType, EveItemDogmaAttribute, EveLocation
+from corptools.models import MapConstellation, MapRegion, MapSystem, InvTypeMaterials, EveItemCategory, EveItemGroup, EveItemType, EveItemDogmaAttribute, EveLocation, MapSystemGate
 from django.core.cache import cache
 
 import logging
@@ -26,6 +26,8 @@ def process_map_from_esi():
     _system_models_updates = []
     _system_models_creates = []
 
+    _gate_links_array = []
+    
     _processes = []
     _current_regions = MapRegion.objects.all().values_list('region_id', flat=True)
     with ThreadPoolExecutor(max_workers=20) as executor:
@@ -67,23 +69,50 @@ def process_map_from_esi():
             _processes.append(executor.submit(providers.esi._get_system, system, _current_systems))
 
     for task in as_completed(_processes):
-        __system_upd, __system_new = task.result()
+        __system_upd, __system_new, _gates = task.result()
         if __system_upd:
             _system_models_updates.append(__system_upd)
         if __system_new:
             _system_models_creates.append(__system_new)
+        if _gates:
+            _gate_links_array += _gates
 
     MapSystem.objects.bulk_update(_system_models_updates, ['name', 'constellation_id', 'star_id', 'security_class', 'x', 'y', 'z', 'security_status'], batch_size=1000)  # bulk update
     MapSystem.objects.bulk_create(_system_models_creates, batch_size=1000)  # bulk update
-   
+    
+    _processes = []
+    _gate_links_array = set(_gate_links_array)
+    with ThreadPoolExecutor(max_workers=50) as executor:
+        for gate in _gate_links_array:
+            _processes.append(executor.submit(providers.esi._get_stargate, gate))
+    
+    _unique_gate_links = {}
+    gate_models = []
+    for task in as_completed(_processes):
+        _to_sys, _from_sys = task.result()
+        if _to_sys not in _unique_gate_links:
+            _unique_gate_links[_to_sys] = []
+        if _from_sys not in _unique_gate_links:
+            _unique_gate_links[_to_sys].append(_from_sys)
+            gate_models.append(MapSystemGate(from_solar_system_id=_to_sys, to_solar_system_id=_from_sys))
+        elif _to_sys not in _unique_gate_links[_from_sys]:
+            _unique_gate_links[_to_sys].append(_from_sys)
+            gate_models.append(MapSystemGate(from_solar_system_id=_to_sys, to_solar_system_id=_from_sys))
+            
+    #print(_unique_gate_links)
+    MapSystemGate.objects.all().delete()
+    MapSystemGate.objects.bulk_create(gate_models)
+
     output = "Regions: (Updated:{}, Created:{}) " \
              "Constellations: (Updated:{}, Created:{}) " \
-             "Systems: (Updated:{}, Created:{})".format(len(_region_models_updates),
+             "Systems: (Updated:{}, Created:{}) "\
+             "Gates: (Created: {}/{})".format(len(_region_models_updates),
                                                       len(_region_models_creates),
                                                       len(_constelation_model_updates),
                                                       len(_constelation_model_creates),
                                                       len(_system_models_updates),
-                                                      len(_system_models_creates))
+                                                      len(_system_models_creates),
+                                                      len(gate_models), len(_gate_links_array))
 
     return output
 
@@ -354,4 +383,3 @@ def fetch_location_name(location_id, location_flag, character_id):
         return EveLocation(location_id=location_id, 
                            location_name=structure.get('name'),
                            system_id=structure.get('solar_system_id'))
-

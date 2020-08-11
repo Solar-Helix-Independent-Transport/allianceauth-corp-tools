@@ -1,5 +1,7 @@
 from esi.clients import EsiClientProvider
-
+import networkx as nx
+from django.utils import timezone
+import re
 class CorpToolsESIClient(EsiClientProvider):
 
     # TODO create provider dummy classes for use here to not have to deal with ORM model bullshit and maybe be more async?. 
@@ -98,6 +100,7 @@ class CorpToolsESIClient(EsiClientProvider):
         from corptools.models import MapSystem
 
         system = self.client.Universe.get_universe_systems_system_id(system_id=system_id).result()
+        gates = system.get('stargates', None)
         system = MapSystem(system_id=system_id,
                         constellation_id=system.get('constellation_id'),
                         name=system.get('name'),
@@ -109,8 +112,80 @@ class CorpToolsESIClient(EsiClientProvider):
                         z=system.get('position', {}).get('z'),
                         )
         if system_id in updates:
-            return system, False
+            return system, False, gates
         else:
-            return False, system
+            return False, system, gates
+    
+    def _get_stargate(self, gate_id):
+        gate = self.client.Universe.get_universe_stargates_stargate_id(stargate_id=gate_id).result()
+        return gate['system_id'], gate['destination']['system_id']
+
+class EveRouter():
+    def __init__(self):
+        self.G = nx.Graph()
+        self.last_update = None
+        self.bridges = {}
+    def bulid_graph(self):        
+        self.G.clear()
+        #logger.debug("Graph cleared.")
+        from .models import MapSystemGate, MapSystem, MapJumpBridge
+
+        systems = MapSystem.objects.values_list('system_id', flat=True)
+        gates = MapSystemGate.objects.values_list(
+            'from_solar_system_id', 'to_solar_system_id')
+        bridges_query = MapJumpBridge.objects.values_list(
+            'from_solar_system_id', 'to_solar_system_id', 'structure_id')
+        bridges = []
+        bridge_ids = {}
+        for b in bridges_query:
+            bridge_ids[b[0]] = b[2]
+            bridges.append([b[0], b[1]])
+        self.G.add_nodes_from(systems)
+        self.G.add_edges_from(gates, type="gate")
+        self.G.add_edges_from(bridges, type="bridge")
+        self.bridges = bridge_ids
+        self.last_update = timezone.now()
+
+    def route(self, source_id, destination_id):
+        from .models import MapSystem, MapJumpBridge
+        #logger.debug("----------")
+        #logger.debug(f"Source: {source_id}")
+        #logger.debug(f"Destination: {destination_id}")
+
+        if not self.last_update:
+            self.bulid_graph()
+        else:
+            last_update = MapJumpBridge.objects.latest("updated").updated
+            if last_update > self.last_update:
+                self.bulid_graph()
+
+        path = nx.shortest_path(self.G, source_id, destination_id)
+        path_length = len(path)-1
+        systems = MapSystem.objects.filter(system_id__in=path)
+        system_map = {}
+
+        for a in systems:
+            system_map[a.system_id] = a.name
+
+        output = {}
+        for i,p in enumerate(path):
+            output[i] = system_map[p]
+
+        dotlan_path = output[0].replace(" ", "_")
+        esi_points = []
+        for i in range(len(path)-1):
+            if self.G.get_edge_data(path[i], path[i+1])['type'] == 'bridge':
+                bridged_path = '::' + output[i+1].replace(" ", "_")
+                dotlan_path += bridged_path
+                esi_points.append(self.bridges[path[i]])
+            else:
+                gated_path = ':' + output[i+1].replace(" ", "_")
+                dotlan_path += gated_path
+        dotlan_path = re.sub(r'(?<!:)(:[^:\s]+)(?=:)(?!::)', '', dotlan_path)
+        esi_points.append(path[len(path)-1])
+        result = {'path': output, 'esi':esi_points, 'dotlan': dotlan_path, 'length': path_length}
+
+        return result
 
 esi = CorpToolsESIClient()
+routes = EveRouter()

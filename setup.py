@@ -3,7 +3,8 @@ from setuptools import find_packages, setup
 install_requires = [
     'allianceauth',
     'django-esi>=2.0.0b2',
-    'django-model-utils'
+    'django-model-utils',
+    'networkx'
 ]
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
     README = readme.read()

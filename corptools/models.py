@@ -127,16 +127,24 @@ class EveName(models.Model):
     CORPORATION = "corporation"
     ALLIANCE = "alliance"
 
+    def __str__(self):
+        return self.name
 
 class MapRegion(models.Model):
     region_id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, default=None, )
 
+    def __str__(self):
+        return self.name
+
 class MapConstellation(models.Model):
     constellation_id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     region = models.ForeignKey(MapRegion, on_delete=models.SET_NULL, null=True, default=None)
+
+    def __str__(self):
+        return self.name
 
 class MapSystem(models.Model):
     system_id = models.BigIntegerField(primary_key=True)
@@ -149,6 +157,26 @@ class MapSystem(models.Model):
     star_id = models.IntegerField(null=True, default=None)
     constellation = models.ForeignKey(MapConstellation, on_delete=models.SET_NULL, null=True, default=None)
 
+    def __str__(self):
+        return self.name
+
+class MapSystemGate(models.Model):
+    from_solar_system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="from_system")
+    to_solar_system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="to_system")
+
+    def __str__(self):
+        return (self.from_solar_system_id, self.to_solar_system_id)
+
+class MapJumpBridge(models.Model):
+    structure_id = models.BigIntegerField(primary_key=True)
+    from_solar_system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="bridge_from_system")
+    to_solar_system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="bridge_to_system")
+    owner = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.from_solar_system.name} >> {self.to_solar_system.name} ({self.structure_id})"
+        
 # ************************ Asset Models
 class EveLocation(models.Model):
     location_id = models.BigIntegerField(primary_key=True)
@@ -308,6 +336,13 @@ class CharacterWalletJournalEntry(WalletJournalEntry):
     first_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_first_party')
     second_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_second_party')
 
+# ************************ Fit Models
+class SkillList(models.Model):
+    last_update = models.DateTimeField(auto_now=True)
+    Name = models.CharField(max_length=500, null=True, default=None)
+    skill_list = models.TextField(null=True, default="")
+    eft = models.TextField(null=True, default="")
+
 # ************************ Corp Models
 # Structure models 
 class StructureCelestial(models.Model):
@@ -430,3 +465,4 @@ class MiningTax(models.Model):
         else:
             rate = "{}%".format(self.tax_rate*100)
         return "#{3}: Mining Tax {0} for {1}: {2}".format(rate, self.corp, area, self.rank)
+
