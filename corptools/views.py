@@ -154,3 +154,7 @@ def admin_run_tasks(request):
         if request.POST.get('run_corp_updates'):
             pass  # no task yet
     return redirect('corptools:admin')
+
+@login_required
+def routes(request):
+    return render(request, 'routes/index.html')
