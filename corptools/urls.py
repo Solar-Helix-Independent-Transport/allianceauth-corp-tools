@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from . import views
-from corptools.audit_views.character import assets, wallet, pub_data, skills, clones
+from corptools.audit_views.character import assets, wallet, pub_data, skills, clones, assets_lists
 app_name = 'corptools'
 
 urlpatterns = [
@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^run_tasks/$', views.admin_run_tasks, name='run_tasks'),
     url(r'^assets/$', assets, name='assets'),
     url(r'^assets/(?P<character_id>(\d)*)/$', assets, name='assets'),
+    url(r'^assets_lists/(?P<character_id>(\d)*)/(?P<location_id>(\d)*)/$', assets_lists, name='assets_lists'),
     url(r'^wallet/$', wallet, name='wallet'),
     url(r'^wallet/(?P<character_id>(\d)*)/$', wallet, name='wallet'),
     url(r'^overview/$', pub_data, name='overview'),

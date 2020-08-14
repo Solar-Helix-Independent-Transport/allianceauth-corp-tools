@@ -56,8 +56,29 @@ def get_alts(request, character_id):
 
 @login_required
 def assets(request, character_id=None):
-    # get available models
+    main_char, characters, net_worth = get_alts(request, character_id)
+    asset_locations = {0:"Everywhere"}
 
+    asset_locs = CharacterAsset.objects.filter(character__character__character_id__in=characters.values_list('character_id', flat=True), 
+                                            location_name__isnull=False).values_list('location_name').distinct()
+    asset_locs = EveLocation.objects.filter(location_id__in=asset_locs).order_by('location_name')
+
+    for loc in asset_locs:
+        asset_locations[loc.location_id] = loc.location_name
+        
+
+    context = {
+        "main_char": main_char,
+        "alts": characters,
+        "net_worth": net_worth,
+        "asset_locations": asset_locations
+    }
+
+    return render(request, 'corptools/character/assets.html', context=context)
+
+@login_required
+def assets_lists(request, character_id=None, location_id=None):
+    # get available models
     main_char, characters, net_worth = get_alts(request, character_id)
 
     capital_groups = [30, 547, 659, 1538, 485, 902, 513, 883]
@@ -68,13 +89,18 @@ def assets(request, character_id=None):
 
     assets = CharacterAsset.objects\
                 .filter((Q(blueprint_copy=None) | Q(blueprint_copy=False)), character__character__character_id__in=characters.values_list('character_id', flat=True))\
-                .values('type_name__group__group_id')\
-                .annotate(grp_total=Sum('quantity'))\
-                .annotate(grp_name=F('type_name__group__name'))\
-                .annotate(grp_id=F('type_name__group_id'))\
-                .annotate(cat_id=F('type_name__group__category_id'))\
-                .order_by('-grp_total')
+                
     
+    if location_id != '0':
+        assets = assets.filter(location_name_id=int(location_id))
+
+    assets = assets.values('type_name__group__group_id')\
+                            .annotate(grp_total=Sum('quantity'))\
+                            .annotate(grp_name=F('type_name__group__name'))\
+                            .annotate(grp_id=F('type_name__group_id'))\
+                            .annotate(cat_id=F('type_name__group__category_id'))\
+                            .order_by('-grp_total')
+
     capital_asset_groups = []
     subcap_asset_groups = []
     noteable_asset_groups = []
@@ -108,7 +134,7 @@ def assets(request, character_id=None):
         "remaining_asset_groups": remaining_asset_groups
     }
 
-    return render(request, 'corptools/character/assets.html', context=context)
+    return render(request, 'corptools/character/assets_lists.html', context=context)
 
 @login_required
 def wallet(request, character_id=None):

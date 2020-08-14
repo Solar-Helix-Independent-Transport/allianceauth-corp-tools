@@ -1,78 +1,33 @@
 {% extends 'corptools/character/char_base.html' %}
 {% block ct_block %}
-<div class="row flex-container flex-wrap">
-    <div class="col-md-4 col-xs-12 col-sm-12">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center"> Capital Ships </div>
-            <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
-                <table class="table">
-                    {% for g in capital_asset_groups %}
-                    <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
-                    {% endfor %}
-                </table>
-            </div>    
-        </div>
-    </div>
-    <div class="col-md-4 col-xs-12 col-sm-12">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center "> Sub-Capital Ships </div>
-            <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
-                <table class="table">
-                    {% for g in subcap_asset_groups %}
-                    <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
-                    {% endfor %}
-                </table>
-            </div>    
-        </div>
-    </div>
-    <div class="col-md-4 col-xs-12 col-sm-12">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center"> Notable Others Assets </div>
-            <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
-                <table class="table">
-                    {% for g in noteable_asset_groups %}
-                    <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
-                    {% endfor %}
-                </table>
-            </div>    
-        </div>
-    </div>
-    <div class="col-md-4 col-xs-12 col-sm-12">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center"> BPO's </div>
-            <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
-                <table class="table">
-                    {% for g in bpo_asset_groups %}
-                    <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
-                    {% endfor %}
-                </table>
-            </div>    
-        </div>
-    </div>
-    <div class="col-md-4 col-xs-12 col-sm-12">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center"> Structures </div>
-            <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
-                <table class="table">
-                    {% for g in structure_asset_groups %}
-                    <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
-                    {% endfor %}
-                </table>
-            </div>    
-        </div>
-    </div>
-    <div class="col-md-4 col-xs-12 col-sm-12">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center"> Rest </div>
-            <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
-                <table class="table">
-                    {% for g in remaining_asset_groups %}
-                    <tr><td class="">{{g.grp_name}}</td><td class="text-right"><span class="badge">{{g.grp_total}}</span></td></tr> 
-                    {% endfor %}
-                </table>
-            </div>    
-        </div>
-    </div>
+<form class="text-center">
+    <select name="location" class="form-control asset_location">
+        {% for id, option in asset_locations.items %}<option value="{{id}}">{{option}}</option>{% endfor %}
+    </select>
+</form>
+</br>
+<div class="row flex-container flex-wrap" id="asset_content">
 </div>
 
+{% endblock %}
+{% block extra_script %}
+
+$(".asset_location").change(function() {
+    var selectedValue = $(this).val();
+    get_assets(selectedValue)
+});
+
+function get_assets(location_id){
+    var url = "{% url 'corptools:assets_lists' main_char.character_id 123456 %}";
+    url = url.replace('123456', location_id);
+    $.get(url, function(data) {
+        asset_body = $("#asset_content")[0];
+        asset_body.innerHTML = data;
+    });
+}
+
+$(document).ready(function() {
+        get_assets(0)
+    }
+)
 {% endblock %}
