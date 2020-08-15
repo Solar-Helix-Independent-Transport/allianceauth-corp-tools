@@ -1,13 +1,14 @@
 {% extends 'corptools/base.html' %}
 {% block ct_block %}
 <h2 class="text-center">Admin Info!</h2>
-<div class="col-md-6">
+<div class="col-md-4">
     <div class="panel panel-primary">
         <div class="panel-heading text-center"> DataBase </div>
         <div class="panel-body">
             <h4>EvE Models</h4>
             <table class="table">
                 <tr><td class="">Names</td><td class="text-right"><span class="badge">{{names}}</span></td></tr> 
+                <tr><td class="">Structure Names</td><td class="text-right"><span class="badge">{{location}}</span></td></tr> 
                 <tr><td class="">Categories</td><td class="text-right"><span class="badge">{{categorys}}</span></td></tr> 
                 <tr><td class="">Groups</td><td class="text-right"><span class="badge">{{groups}}</span></td></tr> 
                 <tr><td class="">Types</td><td class="text-right"><span class="badge">{{types}}</span></td></tr> 
@@ -19,6 +20,8 @@
                 <tr><td class="">Regions</td><td class="text-right"><span class="badge">{{regions}}/106</span></td></tr> 
                 <tr><td class="">Constellations</td><td class="text-right"><span class="badge">{{constellations}}/1146</span></td></tr> 
                 <tr><td class="">Systems</td><td class="text-right"><span class="badge">{{systems}}/8285</span></td></tr> 
+                <tr><td class="">Gate Links</td><td class="text-right"><span class="badge">{{gates}}/6913</span></td></tr> 
+                <tr><td class="">Jump Bridge Links</td><td class="text-right"><span class="badge">{{bridges}}</span></td></tr> 
             </table>
             <h4>Corporate</h4>
             <table class="table">
@@ -35,7 +38,7 @@
         </div>    
     </div>
 </div>
-<div class="col-md-6">
+<div class="col-md-4">
     <div class="panel panel-primary">
         <div class="panel-heading text-center">Task Helper!</div>
         <div class="panel-body text-center">
@@ -58,7 +61,7 @@
         </div>    
     </div>
 </div>
-<div class="col-md-6">
+<div class="col-md-4">
     <div class="panel panel-primary">
         <div class="panel-heading text-center">Skill Lists</div>
         <div class="panel-body text-center">

@@ -123,6 +123,9 @@ def admin(request):
     regions = MapRegion.objects.all().count()
     constellations = MapConstellation.objects.all().count()
     systems = MapSystem.objects.all().count()
+    gates = MapSystemGate.objects.all().count()
+    location = EveLocation.objects.all().count()
+    bridges = MapJumpBridge.objects.all().count()
 
     characters = CharacterAudit.objects.all().count()
     skilllists = SkillList.objects.all().count()
@@ -141,6 +144,9 @@ def admin(request):
         "regions": regions,
         "constellations": constellations,
         "systems": systems,
+        "location": location,
+        "bridges": bridges,
+        "gates": gates,
         "form": UploadForm(),
     }
 
