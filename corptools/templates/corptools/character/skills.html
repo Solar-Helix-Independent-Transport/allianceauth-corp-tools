@@ -21,7 +21,17 @@
                     <div class="tab-pane fade {% if forloop.first %}in active{% endif %} col-md-12" id="{{char|slugify}}">
                         <div class="col-md-12 text-center" style="border-bottom: 1px solid #aaa;">
                             <h4>Doctrine Checker</h4>
-                            <p><span class="label label-default">No Doctrines Loaded</span></p>
+                            <p>
+                                {% for dctrn, skills in skills_lists.doctrines.items %}
+                                    {% if skills|length > 0 %}
+                                    <span style="background-color: #AA0000" rel="tooltip" class="label label-default" data-toggle="tooltip" data-placement="top" data-html="true" title data-original-title="{% for skl, lvl in skills.items %}{{skl}} {{lvl}}<br>{% endfor %}">{{dctrn}}</span>
+                                    {% else %}
+                                    <span style="background-color: #008844" class="label label-default">{{dctrn}}</span>
+                                    {% endif %}
+                                {% empty %}
+                                <span class="label label-default">No Doctrines Loaded</span>
+                                {% endfor %}
+                            </p>
                         </div>
                         <div class="col-md-12">
                         <h4 class="text-center"><span class="label label-default">Total SP: {{skills_lists.total_sp|intcomma}}</span>
@@ -36,14 +46,12 @@
                                     <th>Group</th>
                                 </thead>
                                 <tbody>
-                                    {% for group, skills in skills_lists.skills.items %}
-                                        {% for skill, items in skills.items %}
-                                            <tr>
-                                                <td>{{ skill }}</td>
-                                                <td class="text-right">{{ items.active_level|level:items.trained_level }}</td>
-                                                <td>{{ group }}</td>
-                                            </tr>
-                                        {% endfor %}
+                                    {% for skill, items in skills_lists.skills.items %}
+                                        <tr>
+                                            <td>{{ skill }}</td>
+                                            <td class="text-right">{{ items.active_level|level:items.trained_level }}</td>
+                                            <td>{{ items.grp }}</td>
+                                        </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -80,6 +88,7 @@
         </div>
     </div>
 </div>
+
 {% endblock %}
 {% block extra_javascript %}
     {% include 'bundles/datatables-js.html' %}
@@ -133,6 +142,8 @@ function sort_table(table_input) {
 } 
 
 $(document).ready(function() {
+    $("[rel='tooltip']").tooltip();
+
     {% for char in skill_tables %}
     var table_{{forloop.counter}} = $('#skill-table-{{forloop.counter}}').DataTable(config);
     $('#skill-table-{{forloop.counter}} tbody').on('click', 'tr.group', function () {

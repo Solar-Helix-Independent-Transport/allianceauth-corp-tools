@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^add_char/$', views.add_char, name='add_char'),
     url(r'^add_corp/$', views.add_corp, name='add_corp'),
     url(r'^admin/$', views.admin, name='admin'),
+    url(r'^admin_add_pyfa_xml/$', views.admin_add_pyfa_xml, name='admin_add_pyfa_xml'),
     url(r'^run_tasks/$', views.admin_run_tasks, name='run_tasks'),
     url(r'^assets/$', assets, name='assets'),
     url(r'^assets/(?P<character_id>(\d)*)/$', assets, name='assets'),

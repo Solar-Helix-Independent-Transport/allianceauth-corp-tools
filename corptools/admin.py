@@ -3,6 +3,7 @@ from django.contrib import admin
 from . import models
 
 admin.site.register(models.CharacterAudit)
+admin.site.register(models.SkillList)
 
 @admin.register(models.MapSystem)
 class SystemAdmin(admin.ModelAdmin):

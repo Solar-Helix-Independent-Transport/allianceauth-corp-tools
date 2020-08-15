@@ -11,12 +11,14 @@ from django.utils.translation import ugettext_lazy as _
 from esi.decorators import token_required
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 from django.http import HttpResponse
+import xml.etree.ElementTree as ET
 import csv
 import re
+import json
 from itertools import chain
 from .models import * 
-from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi
-
+from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi, update_all_corps
+from .forms import UploadForm
 CHAR_REQUIRED_SCOPES = [
     'esi-calendar.read_calendar_events.v1',
     'esi-universe.read_structures.v1',
@@ -117,13 +119,14 @@ def admin(request):
     dogma = EveItemDogmaAttribute.objects.all().count()
     groups = EveItemGroup.objects.all().count()
     categorys = EveItemCategory.objects.all().count()
-    characters = CharacterAudit.objects.all().count()
-    
-    corpations = CorporationAudit.objects.all().count()
     type_mets = InvTypeMaterials.objects.count()
     regions = MapRegion.objects.all().count()
     constellations = MapConstellation.objects.all().count()
     systems = MapSystem.objects.all().count()
+
+    characters = CharacterAudit.objects.all().count()
+    skilllists = SkillList.objects.all().count()
+    corpations = CorporationAudit.objects.all().count()
 
     context = {
         "names": names,
@@ -132,12 +135,15 @@ def admin(request):
         "groups": groups,
         "categorys": categorys,
         "characters": characters,
+        "skilllists": skilllists,
         "corpations": corpations,
         "type_mets": type_mets,
         "regions": regions,
         "constellations": constellations,
         "systems": systems,
+        "form": UploadForm(),
     }
+
     return render(request, 'corptools/admin.html', context=context)
 
 @login_required
@@ -152,5 +158,49 @@ def admin_run_tasks(request):
             update_ore_comp_table.apply_async(priority=6)
             process_ores_from_esi.apply_async(priority=6)
         if request.POST.get('run_corp_updates'):
-            pass  # no task yet
+            update_all_corps.apply_async(priority=6)
     return redirect('corptools:admin')
+
+@login_required
+@permission_required('corptools.admin')
+def admin_add_pyfa_xml(request):
+    if request.method == 'POST':
+        form = UploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            xml_file = form.files.get('file')
+            if xml_file.content_type == 'text/xml':
+                skills = {}
+                tree = ET.parse(xml_file)
+                root = tree.getroot()
+                if root.tag == "plan":
+                    for child in root:
+                        if child.tag == "entry":
+                            skill = child.attrib.get('skill')
+                            level = child.attrib.get('level')
+                            if skill in skills:
+                                if level > skills[skill]:
+                                    skills[skill] = level
+                            else:
+                                skills[skill] = level
+                sl, created = SkillList.objects.update_or_create(name=request.POST["name"],
+                                                                    defaults={
+                                                                        "skill_list":json.dumps(skills)
+                                                                    })
+
+                messages.success(request, "File Uploaded and Processed! {}: {}".format(
+                                                                                    ("Created" if created else "Updated"),
+                                                                                    request.POST["name"]
+                                                                                    ))
+            else:
+                messages.error(request, "File Upload Failed! Must be XML Exported from PYFA!")
+        else:
+            messages.error(request, "File Upload Failed! Invalid Form")
+    else:
+        messages.error(request, "File Upload Failed! What are you doing your not meant to be here?")
+
+    return redirect('corptools:admin')
+
+@login_required
+@permission_required('corptools.admin')
+def skill_list_editor(request):
+    pass

@@ -5,19 +5,33 @@
     <div class="panel panel-primary">
         <div class="panel-heading text-center"> DataBase </div>
         <div class="panel-body">
+            <h4>EvE Models</h4>
             <table class="table">
-                <tr><td class="">Character Audits</td><td class="text-right"><span class="badge">{{characters}}</span></td></tr> 
-                <tr><td class="">Corporation Audits</td><td class="text-right"><span class="badge">{{corpations}}</span></td></tr> 
                 <tr><td class="">Names</td><td class="text-right"><span class="badge">{{names}}</span></td></tr> 
+                <tr><td class="">Categories</td><td class="text-right"><span class="badge">{{categorys}}</span></td></tr> 
+                <tr><td class="">Groups</td><td class="text-right"><span class="badge">{{groups}}</span></td></tr> 
                 <tr><td class="">Types</td><td class="text-right"><span class="badge">{{types}}</span></td></tr> 
                 <tr><td class="">Dogma Attributes</td><td class="text-right"><span class="badge">{{dogma}}</span></td></tr> 
-                <tr><td class="">Groups</td><td class="text-right"><span class="badge">{{groups}}</span></td></tr> 
-                <tr><td class="">Categories</td><td class="text-right"><span class="badge">{{categorys}}</span></td></tr> 
                 <tr><td class="">Type Material Outputs</td><td class="text-right"><span class="badge">{{type_mets}}</span></td></tr> 
-                <tr><td class="">Regions</td><td class="text-right"><span class="badge">{{regions}}</span></td></tr> 
-                <tr><td class="">Constellations</td><td class="text-right"><span class="badge">{{constellations}}</span></td></tr> 
-                <tr><td class="">Systems</td><td class="text-right"><span class="badge">{{systems}}</span></td></tr> 
             </table>
+            <h4>EvE Map</h4>
+            <table class="table">
+                <tr><td class="">Regions</td><td class="text-right"><span class="badge">{{regions}}/106</span></td></tr> 
+                <tr><td class="">Constellations</td><td class="text-right"><span class="badge">{{constellations}}/1146</span></td></tr> 
+                <tr><td class="">Systems</td><td class="text-right"><span class="badge">{{systems}}/8285</span></td></tr> 
+            </table>
+            <h4>Corporate</h4>
+            <table class="table">
+                <tr><td class="">Corporation Audits</td><td class="text-right"><span class="badge">{{corpations}}</span></td></tr> 
+            </table>
+            <h4>Character</h4>
+            <table class="table">
+                <tr><td class="">Character Audits</td><td class="text-right"><span class="badge">{{characters}}</span></td></tr>
+                <tr><td class="">Skill Lists</td><td class="text-right"><span class="badge">{{skilllists}}</span></td></tr>
+            </table>
+
+
+
         </div>    
     </div>
 </div>
@@ -37,13 +51,42 @@
                     <input type="checkbox" name="run_update_eve_models" class="form-check" id="run_update_eve_models">
                 </span><br><br>
                 <span class="label label-info"><label for="run_corp_updates">Update Corp Updates:</label>
-                    <input type="checkbox" name="run_corp_updates" class="form-check" id="run_corp_updates" disabled>
+                    <input type="checkbox" name="run_corp_updates" class="form-check" id="run_corp_updates">
                 </span><br><br>
                 <input type="submit" value="Submit" class="btn col-md-12 btn-primary">
             </form>
         </div>    
     </div>
 </div>
+<div class="col-md-6">
+    <div class="panel panel-primary">
+        <div class="panel-heading text-center">Skill Lists</div>
+        <div class="panel-body text-center">
+            <form method="post" action="{% url 'corptools:admin_add_pyfa_xml' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">Skill List Description</label>
+                    <input type="text" class="form-control" name="name" placeholder="Enter Description">
+                    <small id="nameHelp" class="form-text text-muted">This will show as the name of the Skill List.</small>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class='form-control' id="upload-file-info" >
+                        </span>
+                        <span class="input-group-btn">
+                            <label class="btn btn-default" for="file">
+                                <input id="file" name="file" type="file" style="display:none" 
+                                onchange="$('#upload-file-info').html(this.files[0].name)">
+                                Browse
+                            </label>
+                      </div>
+                      <small id="descriptionHelp" class="form-text text-muted">PYFA XML Skills required list.</small>
 
+                </div>
+                <input type="submit" class="btn col-md-12 btn-primary">
+        </form>
+        </div>    
+    </div>
+</div>
 
 {% endblock %}

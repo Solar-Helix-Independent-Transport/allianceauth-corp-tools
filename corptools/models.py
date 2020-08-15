@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 
 from allianceauth.authentication.models import CharacterOwnership, UserProfile
 from bravado.exception import HTTPForbidden
@@ -339,9 +340,16 @@ class CharacterWalletJournalEntry(WalletJournalEntry):
 # ************************ Fit Models
 class SkillList(models.Model):
     last_update = models.DateTimeField(auto_now=True)
-    Name = models.CharField(max_length=500, null=True, default=None)
+    name = models.CharField(max_length=500, null=True, default=None)
     skill_list = models.TextField(null=True, default="")
     eft = models.TextField(null=True, default="")
+    show_on_audit = models.BooleanField(default=True)
+
+    def get_skills(self):
+        return json.loads(self.skill_list)     
+
+    def __str__(self):
+        return "{} (Updated: {})".format(self.name, self.last_update.strftime("%Y-%m-%d %H:%M:%S"))
 
 # ************************ Corp Models
 # Structure models 
