@@ -1,6 +1,6 @@
 import logging
 from celery import shared_task
-from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, SkillTotals, Implant, JumpClone, Clone, EveLocation
+from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, SkillTotals, Implant, JumpClone, Clone, EveLocation, CharacterMarketOrder
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 
@@ -285,3 +285,24 @@ def update_character_clones(character_id):
 
     EveItemType.objects.create_bulk_from_esi(type_ids)
     Implant.objects.bulk_create(implants)
+
+
+def update_character_orders(character_id):
+    audit_char = CharacterAudit.objects.get(character__character_id=character_id)
+    logger.debug("Updating Market Orders for: {}".format(audit_char.character.character_name))
+
+    req_scopes = ['esi-markets.read_character_orders.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+    
+    open_orders = providers.esi.client.Market.get_characters_character_id_orders(character_id=character_id,
+                                        token=token.valid_access_token()).result()
+
+    order_history = providers.esi.client.Market.get_characters_character_id_orders_history(character_id=character_id,
+                                        token=token.valid_access_token()).result()
+
+    all_ids = CharacterMarketOrder.objects.filter(character=audit_char).values_list("order_id")
+

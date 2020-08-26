@@ -90,9 +90,9 @@ def assets_lists(request, character_id=None, location_id=None):
     assets = CharacterAsset.objects\
                 .filter((Q(blueprint_copy=None) | Q(blueprint_copy=False)), character__character__character_id__in=characters.values_list('character_id', flat=True))\
                 
-    
     if location_id != '0':
-        assets = assets.filter(location_name_id=int(location_id))
+        asset_locations = assets.filter(location_name_id=int(location_id)).values_list('item_id')
+        assets = assets.filter(Q(location_name_id=int(location_id)) | Q(location_id__in=asset_locations))
 
     assets = assets.values('type_name__group__group_id')\
                             .annotate(grp_total=Sum('quantity'))\
