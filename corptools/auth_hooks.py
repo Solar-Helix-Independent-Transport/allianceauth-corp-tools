@@ -58,4 +58,4 @@ def register_menu():
 
 @hooks.register('url_hook')
 def register_url():
-    return UrlHook(urls, 'corptools', r'^corptools/')
+    return UrlHook(urls, 'corptools', r'^audit/')

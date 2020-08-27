@@ -302,7 +302,8 @@ def update_character_orders(character_id):
                                         token=token.valid_access_token()).result()
 
     order_history = providers.esi.client.Market.get_characters_character_id_orders_history(character_id=character_id,
-                                        token=token.valid_access_token()).result()
+                                        token=token.valid_access_token()).results()
 
     all_ids = CharacterMarketOrder.objects.filter(character=audit_char).values_list("order_id")
 
+    
