@@ -192,19 +192,36 @@ def update_location(self, location_id):
 
 @shared_task(bind=True, base=QueueOnce)
 def update_all_locations(self):
-    location_flags = ['AssetSafety',
-                      'Deliveries',
+    location_flags = ['Deliveries',
                       'Hangar',
                       'HangarAll']
 
     expire = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=7)  # 1 week refresh
 
-    queryset1 = list(CharacterAsset.objects.filter(location_flag__in=location_flags, location_name=None).distinct().values_list('location_id', flat=True))
-    queryset2 = list(EveLocation.objects.filter(last_update__lte=expire).values_list('location_id', flat=True))
-    queryset3 = list(Clone.objects.filter(location_id__isnull=False, location_name_id__isnull=True).values_list('location_id', flat=True))
-    queryset4 = list(JumpClone.objects.filter(location_id__isnull=False, location_name_id__isnull=True).values_list('location_id', flat=True))
+    asset_tops = CharacterAsset.objects.all().values_list("item_id", flat=True)  
     
-    for location in set(queryset1 + queryset2 + queryset3 + queryset4):
+    queryset1 = list(CharacterAsset.objects.filter(location_flag__in=location_flags, 
+                        location_name=None).exclude(item_id__in=asset_tops).values_list('location_id', flat=True))
+
+    queryset5 = list(CharacterAsset.objects.filter(location_flag='AssetSafety', 
+                        location_name=None).values_list('location_id', flat=True))
+
+    queryset3 = list(Clone.objects.filter(location_id__isnull=False, 
+                        location_name_id__isnull=True).values_list('location_id', flat=True))
+                        
+    queryset4 = list(JumpClone.objects.filter(location_id__isnull=False, 
+                        location_name_id__isnull=True).values_list('location_id', flat=True))
+    
+    clones_all = list(Clone.objects.all().values_list('location_id', flat=True))
+    jump_clones_all = list(Clone.objects.all().values_list('location_id', flat=True))
+    asset_all = list(CharacterAsset.objects.all().values_list('location_id', flat=True))
+
+    queryset2 = list(EveLocation.objects.filter(last_update__lte=expire, 
+                location_id__in=set(clones_all + jump_clones_all + asset_all)).values_list('location_id', flat=True))
+
+    all_locations = set(queryset1 + queryset2 + queryset3 + queryset4 + queryset5)
+    print(all_locations)
+    for location in all_locations:
         update_location.apply_async(args=[location], priority=6)
 
 @shared_task(bind=True, base=QueueOnce)

@@ -88,7 +88,8 @@ def assets_lists(request, character_id=None, location_id=None):
     bpo_cats = [9]
 
     assets = CharacterAsset.objects\
-                .filter((Q(blueprint_copy=None) | Q(blueprint_copy=False)), character__character__character_id__in=characters.values_list('character_id', flat=True))\
+                .filter((Q(blueprint_copy=None) | Q(blueprint_copy=False)), 
+                character__character__character_id__in=characters.values_list('character_id', flat=True))
                 
     if location_id != '0':
         asset_locations = assets.filter(location_name_id=int(location_id)).values_list('item_id')

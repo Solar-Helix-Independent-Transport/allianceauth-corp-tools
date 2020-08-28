@@ -35,12 +35,18 @@ def update_corp_history(character_id):
                                                             'corporation_name': corp_name,
                                                             'is_deleted': corp.get('is_deleted', False),
                                                             'start_date': corp.get('start_date')})
+
+    audit_char.last_update_pub_data = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
+
     return "Finished pub data for: {}".format(audit_char.character.character_name)
 
 
 def update_character_skill_list(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
-    logger.debug("Updating Skills and Queue for: {}".format(audit_char.character.character_name))
+    logger.debug("Updating Skills for: {}".format(audit_char.character.character_name))
 
     req_scopes = ['esi-skills.read_skills.v1']
 
@@ -75,12 +81,17 @@ def update_character_skill_list(character_id):
 
     EveItemType.objects.create_bulk_from_esi(_check_skills)
     Skill.objects.bulk_create(_create_skills)
+
+    audit_char.last_update_skills = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
     return "Finished skills for: {}".format(audit_char.character.character_name)
 
 
 def update_character_skill_queue(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
-    logger.debug("Updating Skills and Queue for: {}".format(audit_char.character.character_name))
+    logger.debug("Updating Skill Queue for: {}".format(audit_char.character.character_name))
 
     req_scopes = ['esi-skills.read_skillqueue.v1']
 
@@ -109,8 +120,14 @@ def update_character_skill_queue(character_id):
                                 start_date=item.get('start_date', None),
                                 training_start_sp=item.get('training_start_sp', None))
         items.append(queue_item)
+    
     EveItemType.objects.create_bulk_from_esi(_check_skills)
     SkillQueue.objects.bulk_create(items)
+
+    audit_char.last_update_skill_que = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
     return "Finished skill queue for: {}".format(audit_char.character.character_name)
 
 
@@ -153,6 +170,11 @@ def update_character_assets(character_id):
         items.append(asset_item)
     EveItemType.objects.create_bulk_from_esi(_current_type_ids)
     CharacterAsset.objects.bulk_create(items)
+
+    audit_char.last_update_assets = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
     return "Finished assets for: {}".format(audit_char.character.character_name)
 
 
@@ -216,6 +238,10 @@ def update_character_wallet(character_id):
         CharacterWalletJournalEntry.objects.bulk_create(items)
     else: 
         raise Exception("ESI Fail")
+
+    audit_char.last_update_wallet = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
 
     return "Finished wallet transactions for: {}".format(audit_char.character.character_name)
 
@@ -286,6 +312,11 @@ def update_character_clones(character_id):
     EveItemType.objects.create_bulk_from_esi(type_ids)
     Implant.objects.bulk_create(implants)
 
+    audit_char.last_update_clones = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
+    return "Finished clones for: {}".format(audit_char.character.character_name)
 
 def update_character_orders(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)

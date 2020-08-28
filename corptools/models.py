@@ -1,11 +1,13 @@
 import logging
 import os
 import json
+import datetime
 
 from allianceauth.authentication.models import CharacterOwnership, UserProfile
 from bravado.exception import HTTPForbidden
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 
 from esi.errors import TokenError
 from esi.models import Token
@@ -18,10 +20,14 @@ from model_utils import Choices
 
 logger = logging.getLogger(__name__)
 
+MAX_INACTIVE_DAYS = 3
+
 class CharacterAudit(models.Model):
 
     objects = AuditCharacterManager()
     
+    active = models.BooleanField(default=False)
+
     character = models.OneToOneField(EveCharacter, on_delete=models.CASCADE)
 
     last_update_pub_data = models.DateTimeField(null=True, default=None, blank=True)
@@ -30,11 +36,17 @@ class CharacterAudit(models.Model):
     last_update_skills = models.DateTimeField(null=True, default=None, blank=True)
     cache_expire_skills = models.DateTimeField(null=True, default=None, blank=True)
 
+    last_update_skill_que = models.DateTimeField(null=True, default=None, blank=True)
+    cache_expire_skill_que = models.DateTimeField(null=True, default=None, blank=True)
+
     last_update_clones = models.DateTimeField(null=True, default=None, blank=True)
     cache_expire_clones = models.DateTimeField(null=True, default=None, blank=True)
 
     last_update_assets = models.DateTimeField(null=True, default=None, blank=True)
     cache_expire_assets = models.DateTimeField(null=True, default=None, blank=True)
+
+    last_update_wallet = models.DateTimeField(null=True, default=None, blank=True)
+    cache_expire_wallet = models.DateTimeField(null=True, default=None, blank=True)
 
     balance = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
 
@@ -46,6 +58,26 @@ class CharacterAudit(models.Model):
                        ('alliance_hr', 'Can access other character\'s data for own alliance.'),
                        ('state_hr', 'Can access other character\'s data for own state.'),
                        ('global_hr', 'Can access other character\'s data for characters in any corp/alliance/state.'))
+
+    def is_active(self):
+        time_ref = timezone.now() - datetime.timedelta(days=MAX_INACTIVE_DAYS)
+        try:
+            assets = self.last_update_assets > time_ref
+            clones = self.last_update_clones > time_ref
+            skills = self.last_update_skills > time_ref
+            skillq = self.last_update_skill_que > time_ref
+            pubdat = self.last_update_pub_data > time_ref
+            wallet = self.last_update_wallet > time_ref
+
+            is_active = ( assets and clones and skills and skillq and pubdat and wallet )
+            
+            if self.active != is_active:
+                self.active = is_active
+                self.save()
+
+            return is_active
+        except:
+            return False
 
 class CorporationAudit(models.Model):
     corporation = models.OneToOneField(EveCorporationInfo, on_delete=models.CASCADE)
