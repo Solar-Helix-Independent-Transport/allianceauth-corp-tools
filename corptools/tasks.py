@@ -201,7 +201,7 @@ def update_all_locations(self):
     asset_tops = CharacterAsset.objects.all().values_list("item_id", flat=True)  
     
     queryset1 = list(CharacterAsset.objects.filter(location_flag__in=location_flags, 
-                        location_name=None).exclude(item_id__in=asset_tops).values_list('location_id', flat=True))
+                        location_name=None).exclude(location_id__in=asset_tops).values_list('location_id', flat=True))
 
     queryset5 = list(CharacterAsset.objects.filter(location_flag='AssetSafety', 
                         location_name=None).values_list('location_id', flat=True))
