@@ -50,7 +50,7 @@
             <td>{{alts.main.alliance_name}}</td>
             <td>
                 {% for alt in alts.audit.character.character_ownership.user.character_ownerships.all %}
-                    <span style="background-color: {% if alt.character.characteraudit %}#008844{% else %}#AA0000{% endif %}" class="label label-default"><img class="ra-avatar img-circle img-pad" src="{{ alt.character.portrait_url_32 }}"> {{ alt.character.character_name }}</span> 
+                    <span style="background-color: {% if alt.character.characteraudit.is_active %}#008844{% else %}#AA0000{% endif %}" class="label label-default"><img class="ra-avatar img-circle img-pad" src="{{ alt.character.portrait_url_32 }}"> {{ alt.character.character_name }}</span> 
                 {% endfor %}</td>
             </tr>
             {% endfor %}
