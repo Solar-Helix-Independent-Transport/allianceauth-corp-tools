@@ -385,7 +385,9 @@ class MarketOrder(models.Model):
     _range_enum = Choices('1', '10', '2', '20', '3', '30', '4', '40', '5', 'region', 'solarsystem', 'station')
     order_range = models.CharField(max_length=30, choices=_range_enum)
     region_id = models.IntegerField()
+    region_name = models.ForeignKey(MapRegion, on_delete=models.SET_NULL, null=True, default=None)
     type_id = models.IntegerField()
+    type_name = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None)
     volume_remain = models.IntegerField()
     volume_total = models.IntegerField()
 

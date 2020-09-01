@@ -332,9 +332,140 @@ def update_character_orders(character_id):
     open_orders = providers.esi.client.Market.get_characters_character_id_orders(character_id=character_id,
                                         token=token.valid_access_token()).result()
 
+    open_ids = list(CharacterMarketOrder.objects.filter(character=audit_char, state='active').values_list("order_id", flat=True))
+    all_locations = list(EveLocation.objects.all().values_list('location_id', flat=True))
+
+    updates = []
+    creates = []
+    type_ids = []
+    
+    tracked_ids = []
+
+    for order in open_orders:
+        tracked_ids.append(order.get('order_id'))
+
+        if order.get('type_id') not in type_ids:
+            type_ids.append(order.get('type_id'))   
+
+        _order = CharacterMarketOrder(
+                character = audit_char,
+                order_id = order.get('order_id'),
+                duration = order.get('duration'),
+                escrow = order.get('escrow'),
+                is_buy_order = order.get('is_buy_order'),
+                issued = order.get('issued'),
+                location_id = order.get('location_id'),
+                min_volume = order.get('min_volume'),
+                price = order.get('price'),
+                order_range = order.get('range'),
+                region_id = order.get('region_id'),
+                region_name_id = order.get('region_id'),
+                type_id = order.get('type_id'),
+                type_name_id = order.get('type_id'),
+                volume_remain = order.get('volume_remain'),
+                volume_total = order.get('volume_total'),
+                is_corporation = order.get('is_corporation'),
+                state = 'active'
+            )
+
+        if order.get('location_id') in all_locations:
+            _order.location_name_id = order.get('location_id')
+
+        if order.get('order_id') in open_ids:
+            updates.append(_order)
+        else:
+            creates.append(_order)
+    
+    EveItemType.objects.create_bulk_from_esi(type_ids)
+
+    if len(updates)>0:
+        CharacterMarketOrder.objects.bulk_update(updates, fields=['duration', 'escrow',
+                'min_volume',
+                'price',
+                'order_range',
+                'volume_remain',
+                'volume_total',
+                'state'])
+
+    if len(creates)>0:
+        CharacterMarketOrder.objects.bulk_create(creates)
+
+    CharacterMarketOrder.objects.filter(character=audit_char, state='active').exclude(order_id__in=tracked_ids).delete()
+
+    return "Finished Orders for: {}".format(audit_char.character.character_name)
+
+
+def update_character_order_history(character_id):
+    audit_char = CharacterAudit.objects.get(character__character_id=character_id)
+    logger.debug("Updating Market Order History for: {}".format(audit_char.character.character_name))
+
+    req_scopes = ['esi-markets.read_character_orders.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+
     order_history = providers.esi.client.Market.get_characters_character_id_orders_history(character_id=character_id,
                                         token=token.valid_access_token()).results()
 
-    all_ids = CharacterMarketOrder.objects.filter(character=audit_char).values_list("order_id")
+    closed_ids = list(CharacterMarketOrder.objects.filter(character=audit_char).exclude(state='active').values_list("order_id", flat=True))
+    all_locations = list(EveLocation.objects.all().values_list('location_id', flat=True))
 
+    updates = []
+    creates = []
+    type_ids = []
     
+    tracked_ids = []
+
+    for order in order_history:
+        tracked_ids.append(order.get('order_id'))
+
+        if order.get('type_id') not in type_ids:
+            type_ids.append(order.get('type_id'))   
+
+        _order = CharacterMarketOrder(
+                character = audit_char,
+                order_id = order.get('order_id'),
+                duration = order.get('duration'),
+                escrow = order.get('escrow'),
+                is_buy_order = order.get('is_buy_order'),
+                issued = order.get('issued'),
+                location_id = order.get('location_id'),
+                min_volume = order.get('min_volume'),
+                price = order.get('price'),
+                order_range = order.get('range'),
+                region_id = order.get('region_id'),
+                region_name_id = order.get('region_id'),
+                type_id = order.get('type_id'),
+                type_name_id = order.get('type_id'),
+                volume_remain = order.get('volume_remain'),
+                volume_total = order.get('volume_total'),
+                is_corporation = order.get('is_corporation'),
+                state = order.get('state')
+            )
+
+        if order.get('location_id') in all_locations:
+            _order.location_name_id = order.get('location_id')
+
+        if order.get('order_id') in closed_ids:
+            updates.append(_order)
+        else:
+            creates.append(_order)
+    
+    EveItemType.objects.create_bulk_from_esi(type_ids)
+
+    if len(updates)>0:
+        CharacterMarketOrder.objects.bulk_update(updates, fields=['duration', 
+                                                                    'escrow',
+                                                                    'min_volume',
+                                                                    'price',
+                                                                    'order_range',
+                                                                    'volume_remain',
+                                                                    'volume_total',
+                                                                    'state'])
+    
+    if len(creates)>0:
+        CharacterMarketOrder.objects.bulk_create(creates)
+
+    return "Finished Order History for: {}".format(audit_char.character.character_name)

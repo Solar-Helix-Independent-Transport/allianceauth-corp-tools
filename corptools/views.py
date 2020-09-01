@@ -131,6 +131,8 @@ def admin(request):
     skilllists = SkillList.objects.all().count()
     corpations = CorporationAudit.objects.all().count()
 
+    orders = CharacterMarketOrder.objects.all().count()
+
     context = {
         "names": names,
         "types": types,
@@ -147,6 +149,7 @@ def admin(request):
         "location": location,
         "bridges": bridges,
         "gates": gates,
+        "orders": orders,
         "form": UploadForm(),
     }
 
