@@ -19,6 +19,7 @@ from itertools import chain
 from .models import * 
 from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi, update_all_corps
 from .forms import UploadForm
+
 CHAR_REQUIRED_SCOPES = [
     'esi-calendar.read_calendar_events.v1',
     'esi-universe.read_structures.v1',
@@ -131,8 +132,6 @@ def admin(request):
     skilllists = SkillList.objects.all().count()
     corpations = CorporationAudit.objects.all().count()
 
-    orders = CharacterMarketOrder.objects.all().count()
-
     context = {
         "names": names,
         "types": types,
@@ -149,7 +148,6 @@ def admin(request):
         "location": location,
         "bridges": bridges,
         "gates": gates,
-        "orders": orders,
         "form": UploadForm(),
     }
 

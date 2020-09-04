@@ -20,8 +20,8 @@ def deslug(slugged):
 def skill_level(active, trained):
     alt_text = "Level %d" % active
     omega_dif = trained-active
-    full = '<span class="fa fa-circle"></span> '
-    alpha = '<span class="fa fa-circle text-danger"></span> '
-    empty = '<span class="fa fa-circle-o" aria-hidden="true"></span> '
+    full = '<span class="fas fa-circle"></span> '
+    alpha = '<span class="fas fa-circle text-danger"></span> '
+    empty = '<span class="far fa-circle"></span> '
 
     return mark_safe('<div role="text" aria-label="{}">{}{}{}</div>'.format(alt_text ,full*active, alpha*omega_dif, empty*(5-(active+omega_dif))))

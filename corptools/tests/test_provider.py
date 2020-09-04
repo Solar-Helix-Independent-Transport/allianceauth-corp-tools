@@ -109,5 +109,3 @@ class TestEveType(TestCase):
         self.assertEqual(item.type_id, 22)
         self.assertEqual(item.group_id, 450)
 
-
-

@@ -14,7 +14,7 @@ from django.utils import timezone
 from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, process_category_from_esi, fetch_location_name
 from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_clones, update_character_skill_queue, update_character_wallet, update_character_orders, update_character_order_history
 from .task_helpers.corp_helpers import update_corp_wallet_division
-from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone
+from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone, CharacterMarketOrder
 from . import providers
 
 logger = logging.getLogger(__name__)
@@ -174,11 +174,14 @@ def update_location(self, location_id):
     asset = CharacterAsset.objects.filter(location_id=location_id)
     clone = Clone.objects.filter(location_id=location_id)
     jumpclone = JumpClone.objects.filter(location_id=location_id)
+    marketorder = CharacterMarketOrder.objects.filter(location_id=location_id)
+
     if cached_data.get('date') is not False:
         if cached_data.get('date') > date:
             asset = asset.exclude(character__character__character_id__in=cached_data.get('characters'))
             clone = clone.exclude(character__character__character_id__in=cached_data.get('characters'))
             jumpclone = jumpclone.exclude(character__character__character_id__in=cached_data.get('characters'))
+            marketorder = marketorder.exclude(character__character__character_id__in=cached_data.get('characters'))
     
     location_flag = None
     char_id = None
@@ -193,6 +196,9 @@ def update_location(self, location_id):
     elif jumpclone.exists():
         jumpclone = jumpclone.first()
         char_id = jumpclone.character.character.character_id
+    elif marketorder.exists():
+        marketorder = marketorder.first()
+        char_id = marketorder.character.character.character_id
 
     if char_id is None:
         return "No more Characters for Location_id: {}".format(location_id)
@@ -203,6 +209,7 @@ def update_location(self, location_id):
         CharacterAsset.objects.filter(location_id=location_id).update(location_name_id=location_id)
         Clone.objects.filter(location_id=location_id).update(location_name_id=location_id)
         JumpClone.objects.filter(location_id=location_id).update(location_name_id=location_id)
+        CharacterMarketOrder.objects.filter(location_id=location_id).update(location_name_id=location_id)
     else:
         location_set(location_id, asset.character.character.character_id)
         self.retry(countdown=1)
@@ -236,7 +243,9 @@ def update_all_locations(self):
     queryset2 = list(EveLocation.objects.filter(last_update__lte=expire, 
                 location_id__in=set(clones_all + jump_clones_all + asset_all)).values_list('location_id', flat=True))
 
-    all_locations = set(queryset1 + queryset2 + queryset3 + queryset4 + queryset5)
+    queryset6 = list(CharacterMarketOrder.objects.filter(location_name_id__isnull=True).values_list('location_id', flat=True))
+
+    all_locations = set(queryset1 + queryset2 + queryset3 + queryset4 + queryset5 + queryset6)
     print(all_locations)
     for location in all_locations:
         update_location.apply_async(args=[location], priority=6)

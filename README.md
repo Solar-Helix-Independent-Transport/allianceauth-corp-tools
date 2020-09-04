@@ -1,13 +1,15 @@
 # CorpTools
-### Asorted Toolbox of Bits and bobs for todays Corp/Alliance on the go!
+### Assorted Toolbox of Bits and bobs for todays Corp/Alliance on the go!
 
 Corp Toolbox module for [AllianceAuth](https://gitlab.com/allianceauth/allianceauth) with speed and functionality in mind. 
 
 Included `Bits and Bobs`:
  * Basic Member Audit
+   * Asset location Filters
+   * Market Orders
    * Skills
      * Queue
-     * Basic planning against fittings.
+     * Basic audit against fittings.
    * Wallet
      * radar graphs of activity.
    * Assets
@@ -15,12 +17,11 @@ Included `Bits and Bobs`:
      * With Implants
  * Corp Audit
    * Wallets
+ * JB Route tool, push to AutoPilot, (API no front end)
 
 Planned `Bits and Bobs`:
  * Member Audit:
-   * Asset location Filters
    * Industry Jobs
-   * Market Orders
    * Contracts
    * Fleet Tools
      * Snapshots
@@ -38,7 +39,7 @@ Active Devs:
  * [AaronKable](https://github.com/pvyParts)
  
 ## Installation
- 1. Install the Repo from git
+ 1. Install the Repo from git `pip install -U git+https://github.com/pvyParts/allianceauth-corp-tools.git`
  2. Add `'corptools',` to your `INSTALLED_APPS` in your projects `local.py`
  3. run migrations and restart auth
  4. run the `manage.py setup_corptools_db` to initialize the DB models and fire off the initial update tasks.
