@@ -42,7 +42,7 @@ Active Devs:
  1. Install the Repo from git `pip install -U git+https://github.com/pvyParts/allianceauth-corp-tools.git`
  2. Add `'corptools',` to your `INSTALLED_APPS` in your projects `local.py`
  3. run migrations and restart auth
- 4. run the `manage.py setup_corptools_db` to initialize the DB models and fire off the initial update tasks.
+ 4. run the `myauth/manage.py setup_corptools_models` to initialize the DB models and fire off the initial update tasks.
  5. setup your perms as documented below
  6. add characters and corp tokens as required.
  7. Setup update tasks if you wish for the data to be auto updated. See Usage Below.

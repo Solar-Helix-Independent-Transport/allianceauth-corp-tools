@@ -13,7 +13,10 @@ from django.core.cache import cache
 import logging
 logger = logging.getLogger(__name__)
 
+#from celery.utils.debug import sample_mem, memdump
+
 def process_map_from_esi():
+    #sample_mem()
     _regions = providers.esi.client.Universe.get_universe_regions().result()
     _region_models_updates = []
     _region_models_creates = []
@@ -44,7 +47,7 @@ def process_map_from_esi():
 
     MapRegion.objects.bulk_update(_region_models_updates, ['name', 'description'], batch_size=1000)  # bulk update
     MapRegion.objects.bulk_create(_region_models_creates, batch_size=1000)  # bulk create
-
+    #sample_mem()
     _processes = []
     _current_constellations = MapConstellation.objects.all().values_list('constellation_id', flat=True)
     with ThreadPoolExecutor(max_workers=20) as executor:
@@ -61,7 +64,7 @@ def process_map_from_esi():
 
     MapConstellation.objects.bulk_update(_constelation_model_updates, ['name', 'region_id'], batch_size=1000)  # bulk update
     MapConstellation.objects.bulk_create(_constelation_model_creates, batch_size=1000)  # bulk create
-
+    #sample_mem()
     _processes = []
     _current_systems = MapSystem.objects.all().values_list('system_id', flat=True)
     with ThreadPoolExecutor(max_workers=50) as executor:
@@ -79,7 +82,7 @@ def process_map_from_esi():
 
     MapSystem.objects.bulk_update(_system_models_updates, ['name', 'constellation_id', 'star_id', 'security_class', 'x', 'y', 'z', 'security_status'], batch_size=1000)  # bulk update
     MapSystem.objects.bulk_create(_system_models_creates, batch_size=1000)  # bulk update
-    
+    #sample_mem()
     _processes = []
     _gate_links_array = set(_gate_links_array)
     with ThreadPoolExecutor(max_workers=50) as executor:
@@ -102,7 +105,7 @@ def process_map_from_esi():
     #print(_unique_gate_links)
     MapSystemGate.objects.all().delete()
     MapSystemGate.objects.bulk_create(gate_models)
-
+    #sample_mem()
     output = "Regions: (Updated:{}, Created:{}) " \
              "Constellations: (Updated:{}, Created:{}) " \
              "Systems: (Updated:{}, Created:{}) "\
@@ -113,7 +116,7 @@ def process_map_from_esi():
                                                       len(_system_models_updates),
                                                       len(_system_models_creates),
                                                       len(gate_models), len(_gate_links_array))
-
+    #memdump()
     return output
 
 
@@ -329,6 +332,9 @@ def fetch_location_name(location_id, location_flag, character_id):
     req_scopes = ['esi-universe.read_structures.v1']
 
     token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return None
     existing = EveLocation.objects.filter(location_id=location_id)
     accepted_location_flags = ['AssetSafety',
                                'Deliveries',
