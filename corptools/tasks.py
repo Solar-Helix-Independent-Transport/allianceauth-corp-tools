@@ -67,7 +67,7 @@ def update_character(char_id):
     que.append(update_char_wallet.si(character.character.character_id))
     que.append(update_char_orders.si(character.character.character_id))
     que.append(update_char_order_history.si(character.character.character_id))
-    
+    que.append(update_char_assets.si(character.character.character_id))
     chain(que).apply_async(priority=6)
 
 @shared_task(bind=True, base=QueueOnce)
