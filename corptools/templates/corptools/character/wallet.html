@@ -2,6 +2,7 @@
 {% block ct_block %}
 {% load colors %}
 {% load l10n %}
+{% load humanize  %}
 
 <div class="col-md-12">
     <div class="row panel panel-primary">
@@ -13,6 +14,7 @@
                     <th>From</th>
                     <th>To</th>
                     <th>Amount</th>
+                    <th>Balance</th>
                     <th>Reason</th>
                     <th>Ref Type</th>
                     <th>Character Filter</th>
@@ -23,7 +25,8 @@
                         <td class="">{{t.date|date:"Y-m-d h:i"}}</td>
                         <td class="">{{t.first_party_name.name}}</td>
                         <td class="">{{t.second_party_name.name}}</td>
-                        <td class="">{{t.amount}}</td>
+                        <td class="">{{t.amount|intcomma}}</td>
+                        <td class="">{{t.balance|intcomma}}</td>
                         <td class="">{{t.reason}}</td>
                         <td class="">{{t.ref_type|deslug|title}}</td>
                         <td class="">{{t.character.character.character_name}}</td>
@@ -69,15 +72,15 @@
         $('#wallet').DataTable({
             "filterDropDown": {
 					columns: [{
-						idx: 5
+						idx: 6
                             },
                             {
-						idx: 6
+						idx: 7
                             }],
                     bootstrap: true
             },
             "columnDefs": [
-                { "visible": false, "targets": [6] }
+                { "visible": false, "targets": [7] }
             ],
             "order": [
                 [0, "desc"]

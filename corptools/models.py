@@ -414,7 +414,7 @@ class SkillList(models.Model):
     show_on_audit = models.BooleanField(default=True)
 
     def get_skills(self):
-        return json.loads(self.skill_list)     
+        return json.loads(self.skill_list)
 
     def __str__(self):
         return "{} (Updated: {})".format(self.name, self.last_update.strftime("%Y-%m-%d %H:%M:%S"))

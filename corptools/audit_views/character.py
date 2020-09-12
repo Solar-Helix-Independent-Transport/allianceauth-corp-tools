@@ -267,6 +267,7 @@ def skills(request, character_id=None):
                         }
         if skill.alpha:
             skill_tables[char]["omega"] = False
+            
     skill_list_base = {}
     for skl in skill_lists:
         skill_list_base[skl.name] = skl.get_skills()
