@@ -250,7 +250,7 @@ def skills(request, character_id=None):
     totals = SkillTotals.objects.filter(character__character__character_id__in=character_ids)\
                 .select_related('character__character')
 
-    skill_lists = SkillList.objects.filter(show_on_audit=True)
+    skill_lists = SkillList.objects.filter(show_on_audit=True).order_by('order_weight','name')
 
     skill_tables = {}
     for skill in skills:

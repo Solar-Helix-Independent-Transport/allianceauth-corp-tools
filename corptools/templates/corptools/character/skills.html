@@ -24,7 +24,7 @@
                             <p>
                                 {% for dctrn, skills in skills_lists.doctrines.items %}
                                     {% if skills|length > 0 %}
-                                    <span style="background-color: #AA0000" rel="tooltip" class="label label-default" data-toggle="tooltip" data-placement="top" data-html="true" title data-original-title="{% for skl, lvl in skills.items %}{{skl}} {{lvl}}<br>{% endfor %}">{{dctrn}}</span>
+                                    <a style="background-color: #AA0000" rel="tooltip" class="label label-default show-skills-button" data="{% for skl, lvl in skills.items %}{{skl}} {{lvl}}<br>{% endfor %}">{{dctrn}}</a>
                                     {% else %}
                                     <span style="background-color: #008844" class="label label-default">{{dctrn}}</span>
                                     {% endif %}
@@ -84,6 +84,18 @@
                     </div>
                     {% endfor %}
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal-main" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="main-modal-title">Account Checks</h5>
+            </div>
+            <div id="main-modal-body" class="modal-body"  style="overflow-y:auto;"></div>
+            
             </div>
         </div>
     </div>
@@ -180,6 +192,15 @@ $(document).ready(function() {
     });    
 
 })
+$(".show-skills-button").on("click", function() {
+    data = this.attributes.data.nodeValue;
+    modal_body = $("#main-modal-body")[0];
+    modal_title = $("#main-modal-title")[0];
+    modal_title.innerHTML = this.innerText;
+    modal_body.innerHTML = data;
+    $("#modal-main").modal();
+});
+
 {% endblock %}
 
 

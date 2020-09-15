@@ -418,7 +418,7 @@ class SkillList(models.Model):
         return json.loads(self.skill_list)
 
     def __str__(self):
-        return "({}){} (Updated: {})".format(self.weight, self.name, self.last_update.strftime("%Y-%m-%d %H:%M:%S"))
+        return "({}){} (Updated: {})".format(self.order_weight, self.name, self.last_update.strftime("%Y-%m-%d %H:%M:%S"))
 
 # ************************ Corp Models
 # Structure models 
