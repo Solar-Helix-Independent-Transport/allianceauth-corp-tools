@@ -412,12 +412,13 @@ class SkillList(models.Model):
     skill_list = models.TextField(null=True, default="")
     eft = models.TextField(null=True, default="")
     show_on_audit = models.BooleanField(default=True)
+    order_weight = models.IntegerField(default=0)
 
     def get_skills(self):
         return json.loads(self.skill_list)
 
     def __str__(self):
-        return "{} (Updated: {})".format(self.name, self.last_update.strftime("%Y-%m-%d %H:%M:%S"))
+        return "({}){} (Updated: {})".format(self.weight, self.name, self.last_update.strftime("%Y-%m-%d %H:%M:%S"))
 
 # ************************ Corp Models
 # Structure models 
