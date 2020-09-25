@@ -7,7 +7,7 @@ from django.contrib.auth.models import Permission
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.authentication.models import CharacterOwnership
 
-class TestCorptoolsAccessPerms(TestCase):
+class TestCorptoolsAccessPerms(TestCase): 
     def setUp(cls):
         cls.user1 = AuthUtils.create_user('Main User1')
         cls.user2 = AuthUtils.create_user('Main User2')
@@ -16,7 +16,7 @@ class TestCorptoolsAccessPerms(TestCase):
         char1 = EveCharacter.objects.create(character_id=1,
             character_name='character.name1',
             corporation_id=123,
-            corporation_name='corporation.name1',            
+            corporation_name='corporation.name1',
             corporation_ticker='ABC')
         cls.ca1 = CharacterAudit.objects.create(character=char1)
 
