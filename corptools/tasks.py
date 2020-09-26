@@ -165,7 +165,7 @@ def location_set(location_id, character_id):
     
     return False
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(bind=True, base=QueueOnce, max_retries=None)
 def update_location(self, location_id):
     if get_error_count_flag():
         self.retry(countdown=60)
@@ -211,7 +211,7 @@ def update_location(self, location_id):
         JumpClone.objects.filter(location_id=location_id).update(location_name_id=location_id)
         CharacterMarketOrder.objects.filter(location_id=location_id).update(location_name_id=location_id)
     else:
-        location_set(location_id, asset.character.character.character_id)
+        location_set(location_id, char_id)
         self.retry(countdown=1)
 
 @shared_task(bind=True, base=QueueOnce)
