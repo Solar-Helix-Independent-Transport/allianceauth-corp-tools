@@ -206,10 +206,11 @@ def update_location(self, location_id):
     location = fetch_location_name(location_id, location_flag, char_id)
     if location is not None:
         location.save()
-        CharacterAsset.objects.filter(location_id=location_id).update(location_name_id=location_id)
-        Clone.objects.filter(location_id=location_id).update(location_name_id=location_id)
-        JumpClone.objects.filter(location_id=location_id).update(location_name_id=location_id)
-        CharacterMarketOrder.objects.filter(location_id=location_id).update(location_name_id=location_id)
+        count = CharacterAsset.objects.filter(location_id=location_id).update(location_name_id=location_id)
+        count += Clone.objects.filter(location_id=location_id).update(location_name_id=location_id)
+        count += JumpClone.objects.filter(location_id=location_id).update(location_name_id=location_id)
+        count += CharacterMarketOrder.objects.filter(location_id=location_id).update(location_name_id=location_id)
+        return count
     else:
         location_set(location_id, char_id)
         self.retry(countdown=1)
@@ -272,3 +273,4 @@ def update_all_corps():
 def update_clones(char_id):
     update_character_clones(char_id)
     update_all_locations.apply_async(priority=7)
+
