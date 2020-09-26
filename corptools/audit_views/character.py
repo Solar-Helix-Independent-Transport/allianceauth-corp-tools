@@ -30,8 +30,9 @@ def get_alts(request, character_id):
     #check access
     visible = CharacterAudit.objects.visible_to(request.user).values_list('character_id', flat=True)
     if main_char.id not in visible:
+        account_chars = request.user.profile.main_character.character_ownership.user.character_ownerships.all().values_list('character_id', flat=True)
         logger.warning(f"{request.user} Can See {list(visible)}, requested {main_char.id}")
-        if main_char.id in linked_characters:
+        if main_char.id in account_chars:
             pass
         else:
             raise PermissionDenied("You do not have access to view this character")
