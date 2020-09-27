@@ -149,7 +149,7 @@ def get_location_cooloff(location_id):
     return cache.get(build_location_cooloff_cache_tag(location_id), False)
 
 def set_location_cooloff(location_id):
-    return cache.set(build_location_cooloff_cache_tag(location_id), True, (60*60*24)) # timeout for 1 days
+    return cache.set(build_location_cooloff_cache_tag(location_id), True, (60*60*24*7)) # timeout for 7 days
 
 def get_error_count_flag():
     return cache.get("esi_errors_timeout", False)
@@ -273,9 +273,10 @@ def update_all_locations(self):
 
     all_locations = set(queryset1 + queryset2 + queryset3 + queryset4 + queryset5 + queryset6)
     print(all_locations)
+    print(f"{len(all_locations)} Locations to find")
     for location in all_locations:
         if not get_location_cooloff(location):
-            update_location.apply_async(args=[location], priority=6)
+            update_location.apply_async(args=[location], priority=8)
 
 @shared_task(bind=True, base=QueueOnce)
 def update_corp_wallet(self, corp_id):
