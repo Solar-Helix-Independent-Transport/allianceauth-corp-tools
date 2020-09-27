@@ -194,10 +194,10 @@ def update_location(self, location_id):
     cached_data = location_get(location_id)
 
     date = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=7)
-    asset = CharacterAsset.objects.filter(location_id=location_id).select_related('character__character')
-    clone = Clone.objects.filter(location_id=location_id).select_related('character__character')
-    jumpclone = JumpClone.objects.filter(location_id=location_id).select_related('character__character')
-    marketorder = CharacterMarketOrder.objects.filter(location_id=location_id).select_related('character__character')
+    asset = CharacterAsset.objects.filter(location_id=location_id, location_name__isnull=True).select_related('character__character')
+    clone = Clone.objects.filter(location_id=location_id, location_name__isnull=True).select_related('character__character')
+    jumpclone = JumpClone.objects.filter(location_id=location_id, location_name__isnull=True).select_related('character__character')
+    marketorder = CharacterMarketOrder.objects.filter(location_id=location_id, location_name__isnull=True).select_related('character__character')
 
     if cached_data.get('date') is not False:
         if cached_data.get('date') > date:
@@ -272,7 +272,7 @@ def update_all_locations(self):
     queryset6 = list(CharacterMarketOrder.objects.filter(location_name_id__isnull=True).values_list('location_id', flat=True))
 
     all_locations = set(queryset1 + queryset2 + queryset3 + queryset4 + queryset5 + queryset6)
-    print(all_locations)
+    #print(all_locations)
     print(f"{len(all_locations)} Locations to find")
     count = 0
     for location in all_locations:
