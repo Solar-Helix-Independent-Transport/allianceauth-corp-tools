@@ -149,7 +149,7 @@ def update_character_assets(character_id):
     if delete_query.exists():
         delete_query._raw_delete(delete_query.db) # speed and we are not caring about f-keys or signals on these models 
 
-
+    location_names = list(EveLocation.objects.all().values_list('location_id', flat=True))
     _current_type_ids = []
     items = []
     for item in assets:
@@ -167,6 +167,8 @@ def update_character_assets(character_id):
                                     type_id=item.get('type_id'),
                                     type_name_id=item.get('type_id')
                                     )
+        if item.get('location_id') in location_names:
+            asset_item.location_name_id = item.get('location_id')
         items.append(asset_item)
     EveItemType.objects.create_bulk_from_esi(_current_type_ids)
     CharacterAsset.objects.bulk_create(items)

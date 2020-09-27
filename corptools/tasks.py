@@ -142,6 +142,15 @@ def update_char_order_history(self, character_id):
 def build_location_cache_tag(location_id):
     return "loc_id_{}".format(location_id)
 
+def build_location_cooloff_cache_tag(location_id):
+    return "cooldown_loc_id_{}".format(location_id)
+
+def get_location_cooloff(location_id):
+    return cache.get(build_location_cooloff_cache_tag(location_id), False)
+
+def set_location_cooloff(location_id):
+    return cache.set(build_location_cooloff_cache_tag(location_id), True, (60*60*24)) # timeout for 1 days
+
 def get_error_count_flag():
     return cache.get("esi_errors_timeout", False)
 
@@ -178,12 +187,17 @@ def location_set(location_id, character_id):
 def update_location(self, location_id):
     if get_error_count_flag():
         self.retry(countdown=60)
+
+    if get_location_cooloff(location_id):
+        return "Cooloff on ID: {}".format(location_id)
+
     cached_data = location_get(location_id)
+
     date = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=7)
-    asset = CharacterAsset.objects.filter(location_id=location_id)
-    clone = Clone.objects.filter(location_id=location_id)
-    jumpclone = JumpClone.objects.filter(location_id=location_id)
-    marketorder = CharacterMarketOrder.objects.filter(location_id=location_id)
+    asset = CharacterAsset.objects.filter(location_id=location_id).select_related('character__character')
+    clone = Clone.objects.filter(location_id=location_id).select_related('character__character')
+    jumpclone = JumpClone.objects.filter(location_id=location_id).select_related('character__character')
+    marketorder = CharacterMarketOrder.objects.filter(location_id=location_id).select_related('character__character')
 
     if cached_data.get('date') is not False:
         if cached_data.get('date') > date:
@@ -210,15 +224,17 @@ def update_location(self, location_id):
         char_id = marketorder.character.character.character_id
 
     if char_id is None:
-        return "No more Characters for Location_id: {}".format(location_id)
+        set_location_cooloff(location_id)
+        location_set(location_id, char_id)
+        return "No more Characters for Location_id: {} cooling off for a while".format(location_id)
 
     location = fetch_location_name(location_id, location_flag, char_id)
     if location is not None:
         location.save()
-        count = CharacterAsset.objects.filter(location_id=location_id).update(location_name_id=location_id)
-        count += Clone.objects.filter(location_id=location_id).update(location_name_id=location_id)
-        count += JumpClone.objects.filter(location_id=location_id).update(location_name_id=location_id)
-        count += CharacterMarketOrder.objects.filter(location_id=location_id).update(location_name_id=location_id)
+        count = CharacterAsset.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
+        count += Clone.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
+        count += JumpClone.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
+        count += CharacterMarketOrder.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
         return count
     else:
         location_set(location_id, char_id)
@@ -258,7 +274,8 @@ def update_all_locations(self):
     all_locations = set(queryset1 + queryset2 + queryset3 + queryset4 + queryset5 + queryset6)
     print(all_locations)
     for location in all_locations:
-        update_location.apply_async(args=[location], priority=6)
+        if not get_location_cooloff(location):
+            update_location.apply_async(args=[location], priority=6)
 
 @shared_task(bind=True, base=QueueOnce)
 def update_corp_wallet(self, corp_id):
