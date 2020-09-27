@@ -274,9 +274,12 @@ def update_all_locations(self):
     all_locations = set(queryset1 + queryset2 + queryset3 + queryset4 + queryset5 + queryset6)
     print(all_locations)
     print(f"{len(all_locations)} Locations to find")
+    count = 0
     for location in all_locations:
         if not get_location_cooloff(location):
             update_location.apply_async(args=[location], priority=8)
+            count += 1
+    return f"Sent {count} location_update tasks"
 
 @shared_task(bind=True, base=QueueOnce)
 def update_corp_wallet(self, corp_id):
