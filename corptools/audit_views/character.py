@@ -146,7 +146,7 @@ def wallet(request, character_id=None):
 
     wallet_journal = CharacterWalletJournalEntry.objects\
                         .filter(character__character__character_id__in=characters.values_list('character_id', flat=True))\
-                        .select_related('first_party_name', 'second_party_name', 'character__character')
+                        .select_related('first_party_name', 'second_party_name', 'character__character').order_by('-date')[:5000]
     
     graph_data_model = {"0000":{},"0100":{},"0200":{},"0300":{},"0400":{},"0500":{},"0600":{},"0700":{},"0800":{},"0900":{},"1000":{},"1100":{},"1200":{},"1300":{},"1400":{},"1500":{},"1600":{},"1700":{},"1800":{},"1900":{},"2000":{},"2100":{},"2200":{},"2300":{}}
     # %-H	
