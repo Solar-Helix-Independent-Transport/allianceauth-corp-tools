@@ -234,6 +234,11 @@ class Asset(models.Model):
 
     class Meta:
         abstract = True
+        indexes = [
+            models.Index(fields=['location_id']),
+            models.Index(fields=['type_id']),
+            models.Index(fields=['item_id']),
+        ]
 
 class CorpAsset(Asset):
     corporation = models.ForeignKey(CorporationAudit, on_delete=models.CASCADE)
