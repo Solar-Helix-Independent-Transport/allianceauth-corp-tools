@@ -381,7 +381,7 @@ def fetch_location_name(location_id, location_flag, character_id):
         except HTTPForbidden as e:  # no access
             if  int(e.response.headers.get('x-esi-error-limit-remain')) < 50:
                 set_error_count_flag()
-            logger.error("Failed to get location:{}, Error:{}, Errors Remaining:{}, Time Remaining: {}".format(location_id, e.message, e.response.headers.get('x-esi-error-limit-remain'), e.response.headers.get('x-esi-error-limit-reset')))
+            logger.info("Failed to get location:{}, Error:{}, Errors Remaining:{}, Time Remaining: {}".format(location_id, e.message, e.response.headers.get('x-esi-error-limit-remain'), e.response.headers.get('x-esi-error-limit-reset')))
             return None
         system = MapSystem.objects.filter(system_id=structure.get('solar_system_id'))
         if not system.exists():
