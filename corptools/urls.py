@@ -7,6 +7,7 @@ app_name = 'corptools'
 urlpatterns = [
     url(r'^$', views.corptools_menu, name='view'),
     url(r'^add_char/$', views.add_char, name='add_char'),
+    url(r'^check_account/(?P<character_id>(\d)*)/$', views.update_account, name='update_account'),
     url(r'^add_corp/$', views.add_corp, name='add_corp'),
     url(r'^admin/$', views.admin, name='admin'),
     url(r'^admin_add_pyfa_xml/$', views.admin_add_pyfa_xml, name='admin_add_pyfa_xml'),

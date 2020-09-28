@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.core.cache import cache
 
 from allianceauth.services.tasks import QueueOnce
+from allianceauth.eveonline.models import EveCharacter
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
@@ -16,6 +17,8 @@ from .task_helpers.char_tasks import update_corp_history, update_character_asset
 from .task_helpers.corp_helpers import update_corp_wallet_division
 from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone, CharacterMarketOrder
 from . import providers
+from esi.models import Token
+from . import views
 
 logger = logging.getLogger(__name__)
 
@@ -65,8 +68,24 @@ def update_subset_of_characters(subset=48, min_runs=5):
         update_character.apply_async(args=[char.character.character_id])
 
 @shared_task
+def check_account(character_id):
+    char = EveCharacter.objects\
+                    .select_related('character_ownership','character_ownership__user__profile','character_ownership__user__profile__main_character', )\
+                    .get(character_id=int(character_id))\
+                    .character_ownership.user.profile.main_character
+
+    linked_characters = char.character_ownership.user.character_ownerships.all().values_list('character__character_id', flat=True)
+    for cid in linked_characters:
+        update_character.apply_async(args=[cid], priority=6)
+
+@shared_task
 def update_character(char_id):
     character = CharacterAudit.objects.filter(character__character_id=char_id).first()
+    if character is None:
+        token = Token.get_token(char_id, views.CHAR_REQUIRED_SCOPES)
+        if token:
+            CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
+
     logger.info("Starting Updates for {}".format(character.character.character_name))
     que = []
     que.append(update_char_corp_history.si(character.character.character_id))

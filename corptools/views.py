@@ -17,7 +17,7 @@ import re
 import json
 from itertools import chain
 from .models import * 
-from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi, update_all_corps
+from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi, update_all_corps, check_account
 from .forms import UploadForm
 
 CHAR_REQUIRED_SCOPES = [
@@ -211,3 +211,10 @@ def admin_add_pyfa_xml(request):
 @permission_required('corptools.admin')
 def skill_list_editor(request):
     pass
+
+@login_required
+def update_account(request, character_id):
+    check_account.apply_async(args=[character_id], priority=6)
+    messages.success(request, "Requested an update task.")
+    return redirect('corptools:view')
+
