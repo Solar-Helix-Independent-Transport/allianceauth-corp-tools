@@ -84,7 +84,7 @@ def update_character(char_id):
     if character is None:
         token = Token.get_token(char_id, views.CHAR_REQUIRED_SCOPES)
         if token:
-            CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
+            character, created = CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
 
     logger.info("Starting Updates for {}".format(character.character.character_name))
     que = []
