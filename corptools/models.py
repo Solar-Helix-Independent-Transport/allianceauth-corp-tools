@@ -379,7 +379,7 @@ class MarketOrder(models.Model):
     order_id = models.BigIntegerField(primary_key=True)
 
     duration = models.IntegerField()
-    escrow = models.IntegerField(null=True, default=None)
+    escrow = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
     is_buy_order = models.NullBooleanField(null=True, default=None)
     issued = models.DateTimeField()
     location_id = models.BigIntegerField()
