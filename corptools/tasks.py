@@ -241,7 +241,6 @@ def update_location(self, location_id):
     
     if len(char_ids) == 0:
         set_location_cooloff(location_id)
-        location_set(location_id, char_id)
         return "No more Characters for Location_id: {} cooling off for a while".format(location_id)
     
     for c_id in char_ids:
