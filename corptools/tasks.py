@@ -226,38 +226,40 @@ def update_location(self, location_id):
             marketorder = marketorder.exclude(character__character__character_id__in=cached_data.get('characters'))
     
     location_flag = None
-    char_id = None
+    char_ids = []
 
     if asset.exists():
-        asset = asset.first()
-        char_id = asset.character.character.character_id
-        location_flag = asset.location_flag
-    elif clone.exists():
-        clone = clone.first()
-        char_id = clone.character.character.character_id
-    elif jumpclone.exists():
-        jumpclone = jumpclone.first()
-        char_id = jumpclone.character.character.character_id
-    elif marketorder.exists():
-        marketorder = marketorder.first()
-        char_id = marketorder.character.character.character_id
-
-    if char_id is None:
+        char_ids += list(asset.values_list('character__character__character_id', flat=True))
+    if clone.exists():
+        char_ids += list(clone.values_list('character__character__character_id', flat=True))
+    if jumpclone.exists():
+        char_ids += list(jumpclone.values_list('character__character__character_id', flat=True))
+    if marketorder.exists():
+        char_ids += list(marketorder.values_list('character__character__character_id', flat=True))
+    
+    char_ids = set(char_ids)
+    
+    if len(char_ids) == 0:
         set_location_cooloff(location_id)
         location_set(location_id, char_id)
         return "No more Characters for Location_id: {} cooling off for a while".format(location_id)
+    
+    for c_id in char_ids:
+        location = fetch_location_name(location_id, None, c_id)
+        if location is not None:
+            location.save()
+            count = CharacterAsset.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
+            count += Clone.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
+            count += JumpClone.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
+            count += CharacterMarketOrder.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
+            return count
+        else:
+            location_set(location_id, c_id)
+            if get_error_count_flag():
+                self.retry(countdown=60)
 
-    location = fetch_location_name(location_id, location_flag, char_id)
-    if location is not None:
-        location.save()
-        count = CharacterAsset.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
-        count += Clone.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
-        count += JumpClone.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
-        count += CharacterMarketOrder.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
-        return count
-    else:
-        location_set(location_id, char_id)
-        self.retry(countdown=1)
+    set_location_cooloff(location_id)
+    return "No more Characters for Location_id: {} cooling off for a while".format(location_id)
 
 @shared_task(bind=True, base=QueueOnce)
 def update_all_locations(self):
