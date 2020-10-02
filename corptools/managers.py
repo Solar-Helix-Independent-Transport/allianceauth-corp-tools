@@ -24,17 +24,20 @@ class EveNameManager(models.Manager):
         """gets bulk names with ESI"""
         if len(eve_ids) > 0:
             from corptools.models import EveName
-            response = providers.esi.client.Universe.post_universe_names(
-                        ids=eve_ids
-                    ).results()
-            new_names = []
-            for entity in response:
-                new_names.append(EveName(
-                                eve_id=entity['id'],
-                                name=entity['name'],
-                                category=entity['category']
-                            ))
-            self.bulk_create(new_names, ignore_conflicts=True)
+            chunk_size = 500
+            id_chunks = [eve_ids[i:i + chunk_size] for i in range(0, len(eve_ids), chunk_size)]
+            for chunk in id_chunks:
+                response = providers.esi.client.Universe.post_universe_names(
+                            ids=chunk
+                        ).results()
+                new_names = []
+                for entity in response:
+                    new_names.append(EveName(
+                                    eve_id=entity['id'],
+                                    name=entity['name'],
+                                    category=entity['category']
+                                ))
+                self.bulk_create(new_names, ignore_conflicts=True)
             return True
         return True
 
