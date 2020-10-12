@@ -97,6 +97,9 @@ class CorporationAudit(models.Model):
     last_update_observers = models.DateTimeField(null=True, default=None, blank=True)
     cache_expire_observers = models.DateTimeField(null=True, default=None, blank=True)
 
+    def __str__(self):
+        return "{}'s Corporation Data".format(self.corporation.corporation_name)
+
     class Meta:
         permissions = (
                        ('alliance_corp_manager', 'Can access other corporations\'s data for own alliance.'),
@@ -369,6 +372,13 @@ class CorporationWalletJournalEntry(WalletJournalEntry):
     first_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='corp_first_party')
     second_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='corp_second_party')
 
+    def __str__(self):
+        return "{} '{}' {}: {}isk".format(
+                                        self.first_party_name.name,
+                                        self.ref_type,
+                                        self.second_party_name.name,
+                                        self.amount
+                                    )
 class CharacterWalletJournalEntry(WalletJournalEntry):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
     first_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_first_party')
