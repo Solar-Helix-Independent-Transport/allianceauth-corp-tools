@@ -151,11 +151,12 @@ def update_character_assets(character_id):
 
     location_names = list(EveLocation.objects.all().values_list('location_id', flat=True))
     _current_type_ids = []
+    item_ids = []
     items = []
     for item in assets:
         if item.get('type_id') not in _current_type_ids:
             _current_type_ids.append(item.get('type_id'))
-
+        item_ids.append(item.get('item_id'))
         asset_item = CharacterAsset(character=audit_char,
                                     blueprint_copy=item.get('is_blueprint_copy'), 
                                     singleton=item.get('is_singleton'),
@@ -170,6 +171,26 @@ def update_character_assets(character_id):
         if item.get('location_id') in location_names:
             asset_item.location_name_id = item.get('location_id')
         items.append(asset_item)
+
+    ship = get_current_ship_location(character_id)  # current ship doesn't show if in space sometimes
+    if ship:
+        if ship.get('item_id') not in item_ids:
+            if ship.get('type_id') not in _current_type_ids:
+                _current_type_ids.append(ship.get('type_id'))
+
+            asset_item = CharacterAsset(character=audit_char,
+                                    singleton=True,
+                                    item_id=ship.get('item_id'), 
+                                    location_flag=ship.get('location_flag'),
+                                    location_id=ship.get('location_id'),
+                                    location_type=ship.get('location_type'),
+                                    quantity=1,
+                                    type_id=ship.get('type_id'),
+                                    type_name_id=ship.get('type_id')
+                                    )
+            if ship.get('location_id') in location_names:
+                asset_item.location_name_id = ship.get('location_id')
+            items.append(asset_item)
     EveItemType.objects.create_bulk_from_esi(_current_type_ids)
     CharacterAsset.objects.bulk_create(items)
 
@@ -179,6 +200,41 @@ def update_character_assets(character_id):
 
     return "Finished assets for: {}".format(audit_char.character.character_name)
 
+def get_current_ship_location(character_id):
+    audit_char = CharacterAudit.objects.get(character__character_id=character_id)
+    req_scopes = ['esi-location.read_location.v1',
+                  'esi-location.read_ship_type.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return False
+
+    ship = providers.esi.client.Location.get_characters_character_id_ship(character_id=character_id,
+                                                                          token=token.valid_access_token()).result()
+    location = providers.esi.client.Location.get_characters_character_id_location(character_id=character_id,
+                                                                                  token=token.valid_access_token()).result()
+    location_id = location.get('solar_system_id') 
+    location_flag = "solar_system"
+    location_type = "unlocked"
+    if location.get('structure_id') is not None:
+        location_id = location.get('structure_id')
+        location_flag = "item"
+        location_type = "hangar"
+    elif location.get('station_id') is not None:
+        location_id = location.get('station_id')
+        location_flag = "station"
+        location_type = "hangar"
+    current_ship = {
+                    "item_id": ship.get('ship_item_id'),
+                    "type_id": ship.get('ship_type_id'),
+                    "name": ship.get('ship_name'),
+                    "system_id": location.get('solar_system_id'),
+                    "location_id": location_id,
+                    "location_flag": location_flag,
+                    "location_type": location_type,
+    }
+    return current_ship
 
 def update_character_wallet(character_id):
     audit_char = CharacterAudit.objects.get(character__character_id=character_id)
