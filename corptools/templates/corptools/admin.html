@@ -49,11 +49,27 @@
         </div>    
     </div>
 </div>
+
+<div class="col-md-4">
+    <div class="panel panel-primary">
+        <div class="panel-heading text-center">Periodic Tasks!</div>
+        <div class="panel-body text-center">            
+            <h4>Tasks</h4>
+            <table class="table">
+                <tr><td class="text-left">Character Task</td><td class="text-right"><span class="badge">{{char_tasks}}</span></td></tr> 
+                <tr><td class="text-left">Corporation Task</td><td class="text-right"><span class="badge">{{corp_tasks}}</span></td></tr> 
+            </table>
+            <a class="btn col-md-12 btn-primary" href="{% url 'corptools:admin_create_tasks' %}">Create or Update Periodic Tasks</a>
+        </div>    
+    </div>
+</div>
+
 <div class="col-md-4">
     <div class="panel panel-primary">
         <div class="panel-heading text-center">Task Helper!</div>
-        <div class="panel-body text-center">
+        <div class="panel-body text-center">            
             <form action="{% url 'corptools:run_tasks' %}" method="post">
+                <br>
                 {% csrf_token %}
                 <span class="label label-info"><label for="run_universe">Update Map Data:</label>
                     <input type="checkbox" name="run_universe" class="form-check" id="run_universe">
@@ -67,11 +83,12 @@
                 <span class="label label-info"><label for="run_corp_updates">Update Corp Updates:</label>
                     <input type="checkbox" name="run_corp_updates" class="form-check" id="run_corp_updates">
                 </span><br><br>
-                <input type="submit" value="Submit" class="btn col-md-12 btn-primary">
+                <input type="submit" value="Submit" class="btn col-md-12 btn-primary"><br>
             </form>
         </div>    
     </div>
 </div>
+
 <div class="col-md-4">
     <div class="panel panel-primary">
         <div class="panel-heading text-center">Skill Lists</div>

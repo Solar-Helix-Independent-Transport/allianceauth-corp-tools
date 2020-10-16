@@ -20,6 +20,8 @@ from .models import *
 from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi, update_all_corps, check_account
 from .forms import UploadForm
 
+from django_celery_beat.models import CrontabSchedule, PeriodicTask
+
 CHAR_REQUIRED_SCOPES = [
     'esi-calendar.read_calendar_events.v1',
     'esi-universe.read_structures.v1',
@@ -51,7 +53,7 @@ CHAR_REQUIRED_SCOPES = [
     'esi-universe.read_structures.v1',
     'esi-wallet.read_character_wallet.v1',
     'esi-characters.read_fatigue.v1',
-    ]
+]
 
 CORP_REQUIRED_SCOPES = [
     'esi-assets.read_corporation_assets.v1',
@@ -132,6 +134,9 @@ def admin(request):
     skilllists = SkillList.objects.all().count()
     corpations = CorporationAudit.objects.all().count()
 
+    char_tasks = PeriodicTask.objects.filter(task='corptools.tasks.update_subset_of_characters', enabled=True).count()
+    corp_tasks = PeriodicTask.objects.filter(task='corptools.tasks.update_all_corps', enabled=True).count()
+
     context = {
         "names": names,
         "types": types,
@@ -148,6 +153,8 @@ def admin(request):
         "location": location,
         "bridges": bridges,
         "gates": gates,
+        "char_tasks": char_tasks,
+        "corp_tasks": corp_tasks,
         "form": UploadForm(),
     }
 
@@ -167,6 +174,58 @@ def admin_run_tasks(request):
         if request.POST.get('run_corp_updates'):
             update_all_corps.apply_async(priority=6)
     return redirect('corptools:admin')
+
+@login_required
+@permission_required('corptools.admin')
+def admin_create_tasks(request):
+    schedule_char, _ = CrontabSchedule.objects.get_or_create(minute='15,45',
+                                                        hour='*',
+                                                        day_of_week='*',
+                                                        day_of_month='*',
+                                                        month_of_year='*',
+                                                        timezone='UTC'
+                                                        )
+
+    schedule_corp, _ = CrontabSchedule.objects.get_or_create(minute='30',
+                                                        hour='12',
+                                                        day_of_week='*',
+                                                        day_of_month='*',
+                                                        month_of_year='*',
+                                                        timezone='UTC'
+                                                        )
+    
+
+    task_char = PeriodicTask.objects.update_or_create(
+                                task='corptools.tasks.update_subset_of_characters',
+                                defaults={
+                                        'crontab':schedule_char,
+                                        'name':'Character Audit Rolling Update',
+                                        'enabled':True
+                                }
+                            )
+    #if created:
+    #    messages.info(request, "Created Character Task")
+    #else:
+    #    messages.info(request, "Reset Character Task to defaults")
+
+    task_corp = PeriodicTask.objects.update_or_create(
+                                task='corptools.tasks.update_all_corps',
+                                defaults={
+                                        'crontab':schedule_corp,
+                                        'name':'Corporation Audit Update',
+                                        'enabled':True
+                                }
+                            )
+    #if created:
+    #    messages.info(request, "Created Corporation Task")
+    #else:
+    #    messages.info(request, "Reset Corporation Task to defaults")
+
+    #https://github.com/celery/django-celery-beat/issues/106
+    messages.info(request, "Created/Reset Character and Corporation Task to defaults")
+
+    return redirect('corptools:admin')
+
 
 @login_required
 @permission_required('corptools.admin')

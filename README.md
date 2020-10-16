@@ -62,18 +62,15 @@ corp_hr | nill | Can access other character's data for own corp. | Corp restrict
 
 ## Usage
 ### Seting up automatic updates
-This will show how to do daily updates. If you poll faster than an endpoints cache expiry the tasks will not run until the cache expires.
+This will show how to do daily updates. 
 
-1. In Django Admin select periodic tasks
-2. Click Add New
-3. Se the name to Something meaning full "Corp Tools Update All"
-4. Pick `corptools.tasks.update_all_characters`from the task drop down
-5. Ensure Enabled is checked
-6. Click The green arrow inline with the crontab schedule to add a new cron.
-6. Set the cron to: Minutes `0`, Hours `0`, rest leave as `*` this will run the updates every day at GMT 0000 (Or set it to what ever timer you like)
-7. Click Save on the cron window.
-8. Click save on The Periodic task.
-9. repeat for `corptools.tasks.update_all_corps` task
+Currently this is:
+ * 2 times an hour ( minute 15, and 45) 1/48th of the total character updates, for at worst 1 update per character per day
+ * 1 update run on all corps daily at 12:30 
+
+1. Got Audit Admin
+2. Click `Create or Update Periodic Tasks`
+2. Job Done
 
 ## Contributing
 Make sure you have signed the [License Agreement](https://developers.eveonline.com/resource/license-agreement) by logging in at https://developers.eveonline.com before submitting any pull requests. All bug fixes or features must not include extra superfluous formatting changes.
