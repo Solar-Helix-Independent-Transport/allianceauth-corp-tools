@@ -206,6 +206,32 @@ class MapSystemGate(models.Model):
     def __str__(self):
         return (self.from_solar_system_id, self.to_solar_system_id)
 
+class MapSystemPlanet(models.Model):
+    planet_id = models.IntegerField(primary_key=True)
+    system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="planet")
+    name = models.CharField(max_length=255)
+
+    x = models.FloatField() 
+    y = models.FloatField()
+    z = models.FloatField()
+
+    eve_type = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None)
+
+    def __str__(self):
+        return (self.name)
+
+class MapSystemMoon(models.Model):
+    moon_id = models.IntegerField(primary_key=True)
+    system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="planet")
+    name = models.CharField(max_length=255)
+
+    x = models.FloatField() 
+    y = models.FloatField()
+    z = models.FloatField()
+
+    def __str__(self):
+        return (self.name)
+
 class MapJumpBridge(models.Model):
     structure_id = models.BigIntegerField(primary_key=True)
     from_solar_system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="bridge_from_system")

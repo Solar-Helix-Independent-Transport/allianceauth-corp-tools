@@ -247,6 +247,20 @@ def update_location(self, location_id):
     
     char_ids = set(char_ids)
     
+    if location_id < 64000000:
+        location = fetch_location_name(location_id, None, 0)
+        if location is not None:
+            location.save()
+            count = CharacterAsset.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
+            count += Clone.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
+            count += JumpClone.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
+            count += CharacterMarketOrder.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
+            return count
+        else:
+            location_set(location_id, 0)
+            if get_error_count_flag():
+                self.retry(countdown=60)
+
     if len(char_ids) == 0:
         set_location_cooloff(location_id)
         return "No more Characters for Location_id: {} cooling off for a while".format(location_id)
