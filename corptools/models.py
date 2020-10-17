@@ -222,7 +222,7 @@ class MapSystemPlanet(models.Model):
 
 class MapSystemMoon(models.Model):
     moon_id = models.IntegerField(primary_key=True)
-    system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="planet")
+    system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="moon")
     name = models.CharField(max_length=255)
 
     x = models.FloatField() 
