@@ -13,7 +13,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
 from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, process_category_from_esi, fetch_location_name
-from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_clones, update_character_skill_queue, update_character_wallet, update_character_orders, update_character_order_history
+from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_clones, update_character_skill_queue, update_character_wallet, update_character_orders, update_character_order_history, update_character_notifications
 from .task_helpers.corp_helpers import update_corp_wallet_division
 from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone, CharacterMarketOrder
 from . import providers
@@ -89,6 +89,7 @@ def update_character(char_id):
     logger.info("Starting Updates for {}".format(character.character.character_name))
     que = []
     que.append(update_char_corp_history.si(character.character.character_id))
+    que.append(update_char_notifications.si(character.character.character_id))
     que.append(update_char_skill_list.si(character.character.character_id))
     que.append(update_char_skill_queue.si(character.character.character_id))
     que.append(update_clones.si(character.character.character_id))
@@ -122,6 +123,13 @@ def update_char_skill_queue(self, character_id):
         logger.exception(e)
         return "Failed"
 
+@shared_task(bind=True, base=QueueOnce)
+def update_char_notifications(self, character_id):
+    try:
+        return update_character_notifications(character_id)
+    except Exception as e:
+        logger.exception(e)
+        return "Failed"
 
 @shared_task(bind=True, base=QueueOnce)
 def update_char_assets(self, character_id):

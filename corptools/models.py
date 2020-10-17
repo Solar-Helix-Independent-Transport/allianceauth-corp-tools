@@ -48,6 +48,9 @@ class CharacterAudit(models.Model):
     last_update_wallet = models.DateTimeField(null=True, default=None, blank=True)
     cache_expire_wallet = models.DateTimeField(null=True, default=None, blank=True)
 
+    last_update_notif = models.DateTimeField(null=True, default=None, blank=True)
+    cache_expire_notif = models.DateTimeField(null=True, default=None, blank=True)
+
     balance = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
 
     def __str__(self):
@@ -557,4 +560,23 @@ class MiningTax(models.Model):
         else:
             rate = "{}%".format(self.tax_rate*100)
         return "#{3}: Mining Tax {0} for {1}: {2}".format(rate, self.corp, area, self.rank)
+
+class Notification(models.Model):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+
+    notification_id = models.BigIntegerField()
+    sender_id = models.IntegerField()
+    _type_enum = Choices('character', 'corporation', 'alliance', 'faction', 'other')
+    sender_type = models.CharField(max_length=15, choices=_type_enum)
+    notification_text = models.TextField(null=True, default=None)
+    timestamp = models.DateTimeField()
+    notification_type = models.CharField(max_length=50)
+    is_read = models.NullBooleanField(null=True, default=None)
+
+    class Meta:
+        indexes = (
+            models.Index(fields=['notification_id']),
+            models.Index(fields=['timestamp']),
+            models.Index(fields=['notification_type'])
+        )
 

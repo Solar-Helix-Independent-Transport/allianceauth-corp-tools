@@ -1,6 +1,6 @@
 import logging
 from celery import shared_task
-from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, SkillTotals, Implant, JumpClone, Clone, EveLocation, CharacterMarketOrder
+from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, SkillTotals, Implant, JumpClone, Clone, EveLocation, CharacterMarketOrder, Notification
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 
@@ -527,3 +527,44 @@ def update_character_order_history(character_id):
         CharacterMarketOrder.objects.bulk_create(creates)
 
     return "Finished Order History for: {}".format(audit_char.character.character_name)
+
+@shared_task
+def update_character_notifications(character_id):
+    audit_char = CharacterAudit.objects.get(character__character_id=character_id)
+    logger.debug("Updating Notifications for: {}".format(audit_char.character.character_name))
+
+    req_scopes = ['esi-characters.read_notifications.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+
+    notifications = providers.esi.client.Character.get_characters_character_id_notifications(character_id=character_id,
+                                                    token=token.valid_access_token()).results()
+    last_five_hundred = list(
+        Notification.objects.filter(character=audit_char)
+            .order_by('-timestamp')[:500]
+            .values_list('notification_id', flat=True))
+
+    _creates = []
+    for note in notifications:
+        if not note.get('notification_id') in last_five_hundred:
+            _creates.append(Notification(character=audit_char,
+                                         notification_id=note.get('notification_id'),
+                                         sender_id=note.get('sender_id'),
+                                         sender_type=note.get('sender_type'),
+                                         notification_text=note.get('text'),
+                                         timestamp=note.get('timestamp'),
+                                         notification_type=note.get('type'),
+                                         is_read=note.get('is_read')))
+
+    Notification.objects.bulk_create(_creates, batch_size=500)
+
+    audit_char.last_update_clones = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
+    return "Finished notifications for: {0}".format(audit_char.character.character_name)
+
+
