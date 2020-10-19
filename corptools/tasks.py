@@ -246,7 +246,7 @@ def update_location(self, location_id):
         char_ids += list(marketorder.values_list('character__character__character_id', flat=True))
     
     char_ids = set(char_ids)
-    
+    print(char_ids)
     if location_id < 64000000:
         location = fetch_location_name(location_id, None, 0)
         if location is not None:

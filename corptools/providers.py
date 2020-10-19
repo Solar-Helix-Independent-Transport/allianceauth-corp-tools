@@ -115,7 +115,23 @@ class CorpToolsESIClient(EsiClientProvider):
             return system, False, gates
         else:
             return False, system, gates
-    
+
+    def _get_moon(self, moon_id, updates):
+        from corptools.models import MapSystemMoon
+
+        moon = self.client.Universe.get_universe_moons_moon_id(moon_id=moon_id).result()
+        moon = MapSystemMoon(moon_id=moon_id,
+                             name=moon.get('name'),
+                             system_id=moon.get('system_id', None),
+                             x=moon.get('position', {}).get('x'),
+                             y=moon.get('position', {}).get('y'),
+                             z=moon.get('position', {}).get('z'),
+                            )
+        if moon_id in updates:
+            return moon, False
+        else:
+            return False, moon
+
     def _get_stargate(self, gate_id):
         gate = self.client.Universe.get_universe_stargates_stargate_id(stargate_id=gate_id).result()
         return gate['system_id'], gate['destination']['system_id']

@@ -100,6 +100,54 @@ class EveNameManager(models.Manager):
         return character, created
 
 
+class EveMoonManager(models.Manager):
+    
+    def get_or_create_from_esi(self, eve_id):
+        """gets or creates with ESI"""
+        try:
+            entity = self.get(type_id=eve_id)
+            created = False
+        except ObjectDoesNotExist:
+            entity, created = self.update_or_create_from_esi(eve_id)
+        return entity, created
+
+    def create_bulk_from_esi(self, eve_ids):
+        """gets or creates with ESI"""
+        from corptools.task_helpers.update_tasks import process_bulk_types_from_esi
+        created = process_bulk_types_from_esi(eve_ids)       
+        return created
+
+    def update_or_create_from_esi(self, eve_id):
+        """updates or create with ESI"""        
+        from corptools.models import MapSystemMoon
+
+        try:
+            response, dogma = providers.esi._get_eve_type(eve_id, False)
+            group, created = EveItemGroup.objects.get_or_create_from_esi(response.group_id)
+            entity, created = self.update_or_create(
+                type_id=response.type_id,
+                defaults={
+                    'name': response.name,
+                    'group': group,
+                    'description': response.description,
+                    'mass': response.mass,
+                    'packaged_volume': response.packaged_volume,
+                    'portion_size': response.portion_size,
+                    'volume': response.volume,
+                    'published': response.published,
+                    'radius': response.radius,
+                }
+            )        
+            dogma_query = EveItemDogmaAttribute.objects.filter(eve_type_id=response.type_id)
+            if dogma_query.exists():
+                dogma_query._raw_delete(dogma_query.db) # speed and we are not caring about f-keys or signals on these models 
+
+            EveItemDogmaAttribute.objects.bulk_create(dogma, batch_size=1000, ignore_conflicts=True)  # bulk create
+        except Exception as e:
+            logger.exception('ESI Error id {} - {}'.format(eve_id, e))
+            raise e
+        return entity, created
+
 class EveItemTypeManager(models.Manager):
     
     def get_or_create_from_esi(self, eve_id):
