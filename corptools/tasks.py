@@ -193,7 +193,7 @@ def location_set(location_id, character_id):
     date = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=7)
     data = location_get(location_id)
     if data.get('date') is not False:
-        if data.get('date') < date:
+        if data.get('date') > date:
             data.get('characters').append(character_id) 
             cache.set(cache_tag, json.dumps(data, cls=DjangoJSONEncoder), None)
             return True
@@ -257,7 +257,6 @@ def update_location(self, location_id):
             count += CharacterMarketOrder.objects.filter(location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
             return count
         else:
-            location_set(location_id, 0)
             if get_error_count_flag():
                 self.retry(countdown=60)
 
