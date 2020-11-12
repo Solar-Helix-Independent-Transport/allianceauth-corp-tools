@@ -1,4 +1,6 @@
 from esi.clients import EsiClientProvider
+from .task_helpers.skill_helpers import SkillListCache
+
 import networkx as nx
 from django.utils import timezone
 import re
@@ -127,10 +129,13 @@ class CorpToolsESIClient(EsiClientProvider):
                              y=moon.get('position', {}).get('y'),
                              z=moon.get('position', {}).get('z'),
                             )
-        if moon_id in updates:
-            return moon, False
+        if updates is not False:        
+            if moon_id in updates:
+                return moon, False
+            else:
+                return False, moon
         else:
-            return False, moon
+            return moon
 
     def _get_stargate(self, gate_id):
         gate = self.client.Universe.get_universe_stargates_stargate_id(stargate_id=gate_id).result()
@@ -205,3 +210,4 @@ class EveRouter():
 
 esi = CorpToolsESIClient()
 routes = EveRouter()
+skills = SkillListCache()

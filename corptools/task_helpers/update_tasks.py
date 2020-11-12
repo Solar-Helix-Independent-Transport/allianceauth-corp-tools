@@ -348,7 +348,8 @@ def fetch_location_name(location_id, location_flag, character_id):
 
     if location_flag not in accepted_location_flags:
         if location_flag is not None:
-            return None # ship fits or in cargo holds or what ever also dont care   
+            return None # ship fits or in cargo holds or what ever also dont care
+
 
     if location_id == 2004:
         # ASSET SAFETY
@@ -391,3 +392,4 @@ def fetch_location_name(location_id, location_flag, character_id):
         return EveLocation(location_id=location_id, 
                            location_name=structure.get('name'),
                            system_id=structure.get('solar_system_id'))
+

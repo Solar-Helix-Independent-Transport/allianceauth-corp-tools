@@ -16,6 +16,7 @@ import re
 import copy
 
 from ..models import *
+from .. import providers
 
 def get_alts(request, character_id):
     if character_id is None:
@@ -240,38 +241,16 @@ def skills(request, character_id=None):
     # get available models
 
     main_char, characters, net_worth = get_alts (request, character_id)
-    character_ids = characters.values_list('character_id', flat=True)
 
-    queues = SkillQueue.objects.filter(character__character__character_id__in=character_ids)\
+    user = main_char.character_ownership.user.id
+    skills_list = providers.skills.get_and_cache_user(user)
+
+    skill_tables = skills_list.get("skills_list")
+
+    queues = SkillQueue.objects.filter(character__character__in=characters)\
                 .select_related('skill_name', 'character__character')
-    skills = Skill.objects.filter(character__character__character_id__in=character_ids)\
-                .select_related('skill_name', 'skill_name__group', 'character__character')\
-                .order_by('skill_name__name')
-
-    totals = SkillTotals.objects.filter(character__character__character_id__in=character_ids)\
+    totals = SkillTotals.objects.filter(character__character__in=characters)\
                 .select_related('character__character')
-
-    skill_lists = SkillList.objects.filter(show_on_audit=True).order_by('order_weight','name')
-
-    skill_tables = {}
-    for skill in skills:
-        char =  skill.character.character.character_name
-        grp = skill.skill_name.group.name
-        if char not in skill_tables:
-            skill_tables[char] = {"character":skill.character, "omega": True, "skills":{}, "queue":[]}
-
-        skill_tables[char]["skills"][skill.skill_name.name] = {
-                            "grp": grp,
-                            "sp_total":skill.skillpoints_in_skill,
-                            "active_level":skill.active_skill_level,
-                            "trained_level":skill.trained_skill_level,
-                        }
-        if skill.alpha:
-            skill_tables[char]["omega"] = False
-            
-    skill_list_base = {}
-    for skl in skill_lists:
-        skill_list_base[skl.name] = skl.get_skills()
 
     for que in queues:
         char = que.character.character.character_name
@@ -293,20 +272,10 @@ def skills(request, character_id=None):
         skill_tables[char]["total_sp"] = total.total_sp
         skill_tables[char]["unallocated_sp"] = total.unallocated_sp
 
-    for char in skill_tables:
-        skill_tables[char]["doctrines"] = {}
-        for d_name, d_list in skill_list_base.items():
-            skill_tables[char]["doctrines"][d_name] = {}
-            for skill, level in d_list.items():
-                level = int(level)
-                if level > skill_tables[char]["skills"].get(skill, {}).get('active_level', 0):
-                    skill_tables[char]["doctrines"][d_name][skill] = level
-
     context = {
         "main_char": main_char,
         "alts": characters,
         "net_worth": net_worth,
-
         "skill_tables": skill_tables,
     }
 

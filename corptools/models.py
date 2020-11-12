@@ -14,7 +14,7 @@ from esi.models import Token
 from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter
 from allianceauth.notifications import notify
 
-from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager, AuditCharacterManager
+from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager, AuditCharacterManager, EveMoonManager
 
 from model_utils import Choices
 
@@ -221,6 +221,9 @@ class MapSystemPlanet(models.Model):
         return (self.name)
 
 class MapSystemMoon(models.Model):
+
+    objects = EveMoonManager()
+    
     moon_id = models.IntegerField(primary_key=True)
     system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="moon")
     name = models.CharField(max_length=255)
