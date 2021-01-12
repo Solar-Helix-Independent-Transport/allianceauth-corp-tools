@@ -670,6 +670,28 @@ class FullyLoadedFilter(FilterBase):
             return False
 
 
+class TimeInCorpFilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Main's Time in Corp"
+        verbose_name_plural = verbose_name
+
+    days_in_corp = models.IntegerField(default=30)
+
+    def process_filter(self, user: User):
+        try:
+            main_character = user.profile.main_character.characteraudit
+            histories = CorporationHistory.objects.filter(character=main_character).order_by('-start_date').first()
+
+            days = timezone.now() - histories.start_date
+            if days.days >= self.days_in_corp:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False
+
+
 class AssetsFilter(FilterBase):
     class Meta:
         verbose_name = "Smart Filter: Assets in Locations"

@@ -28,4 +28,4 @@ def register_url():
 
 @hooks.register("secure_group_filters")
 def filters():
-    return [models.AssetsFilter, models.FullyLoadedFilter, models.Skillfilter]
+    return [models.AssetsFilter, models.FullyLoadedFilter, models.Skillfilter, models.TimeInCorpFilter]

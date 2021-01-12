@@ -162,8 +162,13 @@ class skillsFilterAdmin(admin.ModelAdmin):
         )
     _required_skill_lists.short_description = 'Required'
 
+class TimeInCorpFilterAdmin(admin.ModelAdmin):
+
+    list_display = ['__str__', 'days_in_corp']
+
 if 'securegroups' in settings.INSTALLED_APPS:
     admin.site.register(models.FullyLoadedFilter)
     admin.site.register(models.AssetsFilter,assetFilterAdmin)
     admin.site.register(models.Skillfilter, skillsFilterAdmin)
+    admin.site.register(models.TimeInCorpFilter, TimeInCorpFilterAdmin)
 
