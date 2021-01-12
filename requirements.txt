@@ -1,2 +1,0 @@
--e git+https://gitlab.com/allianceauth/django-esi.git@167e673d#egg=django-esi
-bravado>=10.6
