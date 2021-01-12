@@ -8,12 +8,12 @@ install_requires = [
 ]
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
     README = readme.read()
-
+from corptools import __version__
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='allianceauth-corptools',
-    version='1.0.1',
+    version=__version__,
     packages=find_packages(),
     include_package_data=True,
     install_requires=install_requires,

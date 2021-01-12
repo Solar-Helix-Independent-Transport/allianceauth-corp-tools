@@ -2,6 +2,8 @@ from allianceauth.services.hooks import MenuItemHook, UrlHook
 from django.utils.translation import ugettext_lazy as _
 from allianceauth import hooks
 from . import urls
+from . import models
+
 
 class MemberAudit(MenuItemHook):
     def __init__(self):
@@ -23,3 +25,7 @@ def register_menu():
 @hooks.register('url_hook')
 def register_url():
     return UrlHook(urls, 'corptools', r'^audit/')
+
+@hooks.register("secure_group_filters")
+def filters():
+    return [models.AssetsFilter, models.FullyLoadedFilter, models.Skillfilter]

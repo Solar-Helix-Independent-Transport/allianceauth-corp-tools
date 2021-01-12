@@ -8,6 +8,7 @@ from bravado.exception import HTTPForbidden
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 from esi.errors import TokenError
 from esi.models import Token
@@ -15,6 +16,7 @@ from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter
 from allianceauth.notifications import notify
 
 from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager, AuditCharacterManager, EveMoonManager
+from . import providers
 
 from model_utils import Choices
 
@@ -117,12 +119,20 @@ class EveItemCategory(models.Model):
     objects = EveCategoryManager()
     category_id = models.BigIntegerField(primary_key=True) 
     name = models.CharField(max_length=255) # unknown max
+  
+    def __str__(self):
+        return self.name
+
 
 class EveItemGroup(models.Model):
     objects = EveGroupManager()
     group_id = models.BigIntegerField(primary_key=True) 
     name = models.CharField(max_length=255) # unknown max
     category = models.ForeignKey(EveItemCategory, on_delete=models.SET_NULL, null=True, default=None)    
+
+    def __str__(self):
+        return self.name
+
 
 class EveItemType(models.Model):
     objects = EveItemTypeManager()
@@ -136,6 +146,10 @@ class EveItemType(models.Model):
     volume = models.FloatField(null=True, default=None)
     published = models.BooleanField()
     radius = models.FloatField(null=True, default=None)
+    
+    def __str__(self):
+        return self.name
+
 
 class EveItemDogmaAttribute(models.Model):
     eve_type = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None)
@@ -253,7 +267,7 @@ class EveLocation(models.Model):
     last_update = models.DateTimeField(auto_now=True)
 
 class Asset(models.Model):
-    blueprint_copy = models.NullBooleanField(default=None)
+    blueprint_copy = models.BooleanField(null=True, default=None)
     singleton = models.BooleanField()
     item_id = models.BigIntegerField()
     location_flag = models.CharField(max_length=50)
@@ -340,7 +354,7 @@ class CorporationHistory(models.Model):
 
     corporation_id = models.IntegerField()
     corporation_name = models.ForeignKey(EveName, on_delete=models.CASCADE)
-    is_deleted = models.NullBooleanField(null=True, default=None)
+    is_deleted = models.BooleanField(null=True, default=None)
     record_id = models.IntegerField()
     start_date = models.DateTimeField()
 
@@ -422,7 +436,7 @@ class MarketOrder(models.Model):
 
     duration = models.IntegerField()
     escrow = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
-    is_buy_order = models.NullBooleanField(null=True, default=None)
+    is_buy_order = models.BooleanField(null=True, default=None)
     issued = models.DateTimeField()
     location_id = models.BigIntegerField()
     location_name = models.ForeignKey(EveLocation, on_delete=models.SET_NULL, null=True, default=None) 
@@ -600,7 +614,7 @@ class Notification(models.Model):
     notification_text = models.TextField(null=True, default=None)
     timestamp = models.DateTimeField()
     notification_type = models.CharField(max_length=50)
-    is_read = models.NullBooleanField(null=True, default=None)
+    is_read = models.BooleanField(null=True, default=None)
 
     class Meta:
         indexes = (
@@ -608,4 +622,178 @@ class Notification(models.Model):
             models.Index(fields=['timestamp']),
             models.Index(fields=['notification_type'])
         )
+
+
+### sec group classes
+
+class FilterBase(models.Model):
+
+    name = models.CharField(max_length=500)
+    description = models.CharField(max_length=500)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f"{self.name}: {self.description}"
+
+    def process_filter(self, user: User):
+        raise NotImplementedError("Please Create a filter!")
+
+
+class FullyLoadedFilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Audit Fully Loaded"
+        verbose_name_plural = verbose_name
+
+    def process_filter(self, user: User):
+        try:
+            character_list = user.character_ownerships.all() \
+                .select_related('character', 'character__characteraudit')
+            
+            character_count = character_list.filter(character__characteraudit__isnull=True).count()
+            if character_count == 0:
+                valid_audits = 0
+                character_cnt  = 0
+                for c in character_list:
+                    if c.character.characteraudit.is_active():
+                        valid_audits += 1
+                    character_cnt += 1
+                if valid_audits == character_cnt:
+                    return True
+                else:
+                    return False
+            else:
+                return False
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False
+
+
+class AssetsFilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Assets in Locations"
+        verbose_name_plural = verbose_name
+    
+    types = models.ManyToManyField(EveItemType, blank=True,
+    help_text="Filter on Asset Types.")
+    groups = models.ManyToManyField(EveItemGroup, blank=True,
+    help_text="Filter on Asset Groups.")
+    categories= models.ManyToManyField(EveItemCategory, blank=True,
+    help_text="Filter on Asset Categories.")
+
+    systems = models.ManyToManyField(MapSystem, blank=True,
+    help_text="Limit filter to specific systems")
+    constellations = models.ManyToManyField(MapConstellation, blank=True,
+    help_text="Limit filter to specific constellations")
+    regions = models.ManyToManyField(MapRegion, blank=True,
+    help_text="Limit filter to specific regions")
+
+    def process_filter(self, user: User):
+        try:
+            character_list = user.character_ownerships.all() \
+                .select_related('character', 'character__characteraudit')
+            cnt_types = self.types.all().count()
+            cnt_groups = self.groups.all().count()
+            cnt_cats = self.categories.all().count()
+            
+            character_count = CharacterAsset.objects.filter(character__character__in=character_list.values_list('character'))
+            output = []
+
+            if cnt_types > 0:
+                output.append(models.Q(type_name__in=self.types.all()))
+
+            if cnt_groups > 0:
+                output.append(models.Q(type_name__group__in=self.groups.all()))
+
+            if cnt_cats > 0:
+                output.append(models.Q(type_name__group__category__in=self.categories.all()))
+                
+            if len(output) == 0:
+                return False
+
+            query = output.pop()
+            for _q in output:
+                query |= _q
+            character_count = character_count.filter(query)
+
+            output = []
+
+            if self.systems.all().count()>0:
+                output.append(models.Q(location_name__system__in=self.systems.all()))
+            if self.constellations.all().count()>0:
+                output.append(models.Q(location_name__system__constellation__in=self.constellations.all()))
+            if self.regions.all().count()>0:
+                output.append(models.Q(location_name__system__constellation__region__in=self.regions.all()))
+            
+            if len(output) > 0:
+                query = output.pop()
+                for _q in output:
+                    query |= _q
+                character_count = character_count.filter(query)
+
+            #print(character_count.query)
+            if character_count.count() > 0:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False
+
+
+class Skillfilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Skill list checks"
+        verbose_name_plural = verbose_name
+
+    required_skill_lists = models.ManyToManyField(SkillList, blank=True)
+    single_req_skill_lists = models.ManyToManyField(SkillList, blank=True, related_name="single_req")
+
+    def process_filter(self, user: User):
+        try: # avatar 11567
+            skills_list = providers.skills.get_and_cache_user(user.id)
+            #print(skills_list)
+            skill_lists = self.required_skill_lists.all()
+            req_one = self.single_req_skill_lists.all()
+            if skill_lists.count() == 0 and req_one.count() ==0:
+                return False
+
+            skill_list_base = {}
+            for skl in skill_lists:
+                skill_list_base[skl.name] = {}
+                skill_list_base[skl.name]['pass']  = False
+
+            if req_one.count()>0:
+                skill_list_single = {}
+                for skl in req_one:
+                    skill_list_single[skl.name] = {}
+                    skill_list_single[skl.name]['pass']  = False
+
+            skill_tables = skills_list.get("skills_list")
+
+            for char in skill_tables:
+                for d_name, d_list in skill_list_base.items():
+                    if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                        skill_list_base[d_name]['pass'] = True
+            if req_one.count()>0:
+                single_pass = False
+                for char in skill_tables:
+                    for d_name, d_list in skill_list_single.items():
+                        if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                            single_pass = True
+                            break
+
+            result = True
+            for skill_list, skills_result in skill_list_base.items():
+                result = result and skills_result['pass']
+            if req_one.count()>0:
+                return result and single_pass
+            else:
+                return result
+
+        except Exception as e:
+            print(e)
+            logger.error(e, exc_info=1)
+            return False
 

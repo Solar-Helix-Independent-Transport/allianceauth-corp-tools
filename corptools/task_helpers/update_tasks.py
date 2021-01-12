@@ -344,7 +344,8 @@ def fetch_location_name(location_id, location_flag, character_id):
     accepted_location_flags = ['AssetSafety',
                                'Deliveries',
                                'Hangar',
-                               'HangarAll']
+                               'HangarAll',
+                               'solar_system'] # 
 
     if location_flag not in accepted_location_flags:
         if location_flag is not None:

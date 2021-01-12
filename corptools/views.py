@@ -26,7 +26,6 @@ CHAR_REQUIRED_SCOPES = [
     'esi-calendar.read_calendar_events.v1',
     'esi-universe.read_structures.v1',
     'esi-fittings.read_fittings.v1',
-    'esi-mail.read_mail.v1',
     'esi-characters.read_standings.v1',
     'esi-assets.read_assets.v1',
     'esi-characters.read_contacts.v1',
@@ -53,6 +52,7 @@ CHAR_REQUIRED_SCOPES = [
     'esi-universe.read_structures.v1',
     'esi-wallet.read_character_wallet.v1',
     'esi-characters.read_fatigue.v1',
+    'publicData'
 ]
 
 CORP_REQUIRED_SCOPES = [
