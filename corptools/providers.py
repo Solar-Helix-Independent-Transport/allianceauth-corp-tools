@@ -176,9 +176,12 @@ class EveRouter():
         if not self.last_update:
             self.bulid_graph()
         else:
-            last_update = MapJumpBridge.objects.latest("updated").updated
-            if last_update > self.last_update:
-                self.bulid_graph()
+            try:
+                last_update = MapJumpBridge.objects.latest("updated").updated
+                if last_update > self.last_update:
+                    self.bulid_graph()
+            except MapJumpBridge.DoesNotExist:
+                pass
 
         path = nx.shortest_path(self.G, source_id, destination_id)
         path_length = len(path)-1

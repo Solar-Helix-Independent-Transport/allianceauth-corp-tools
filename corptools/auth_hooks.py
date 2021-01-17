@@ -29,3 +29,7 @@ def register_url():
 @hooks.register("secure_group_filters")
 def filters():
     return [models.AssetsFilter, models.FullyLoadedFilter, models.Skillfilter, models.TimeInCorpFilter]
+
+@hooks.register('discord_cogs_hook')
+def register_cogs():
+    return ["corptools.cogs.routes"]
