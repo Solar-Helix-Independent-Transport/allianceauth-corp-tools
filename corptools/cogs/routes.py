@@ -27,9 +27,6 @@ class Routes(commands.Cog):
         """
         Find route in eve with JB's
         """
-        if ctx.message.channel.id not in settings.ADMIN_DISCORD_BOT_CHANNELS:
-            return await ctx.message.add_reaction(chr(0x1F44E))
-
         input_names = ctx.message.content[7:].split(":")
         start = MapSystem.objects.get(name=input_names[0])
         end = MapSystem.objects.get(name=input_names[1])
