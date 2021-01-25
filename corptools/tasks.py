@@ -15,7 +15,7 @@ from django.utils import timezone
 from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, process_category_from_esi, fetch_location_name
 from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_clones, update_character_skill_queue, update_character_wallet, update_character_orders, update_character_order_history, update_character_notifications
 from .task_helpers.corp_helpers import update_corp_wallet_division
-from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone, CharacterMarketOrder
+from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone, CharacterMarketOrder, MapSystem, MapJumpBridge
 from . import providers
 from esi.models import Token
 from . import views
@@ -344,4 +344,5 @@ def update_all_corps():
 def update_clones(char_id):
     update_character_clones(char_id)
     update_all_locations.apply_async(priority=7)
+
 

@@ -135,5 +135,8 @@ def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
         if _division_item:
             update_corp_wallet_journal(corp_id, division.get('division'),
                                        full_update=full_update)  # inline not async
+    
+    audit_corp.last_update_wallet = timezone.now()
+    audit_corp.save()
 
     return "Finished wallet divs for: {0}".format(audit_corp.corporation.corporation_name)

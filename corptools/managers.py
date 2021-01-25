@@ -281,3 +281,48 @@ class AuditCharacterManager(models.Manager):
     def visible_to(self, user):
         return self.get_queryset().visible_to(user)
 
+
+class AuditCorporationQuerySet(models.QuerySet):
+    def visible_to(self, user):
+        # superusers get all visible
+        if user.is_superuser:
+            logger.debug('Returning all corps for superuser %s.' % user)
+            return self
+
+        if user.has_perm('corptools.global_corp_manager'):
+            logger.debug('Returning all corps for %s.' % user)
+            return self
+
+        try:
+            char = user.profile.main_character
+            assert char
+            # build all accepted queries
+            queries = []
+            if user.has_perm('corptools.alliance_corp_manager'):
+                if char.alliance_id is not None:
+                    queries.append(models.Q(corporation__alliance_id=char.alliance_id))
+                else:
+                    queries.append(models.Q(corporation__corporation_id=char.corporation_id))
+            if user.has_perm('corptools.state_corp_manager'):
+                if user.has_perm('corptools.alliance_corp_manager'):
+                    pass
+                else:
+                    queries.append(models.Q(corporation__corporation_id=char.corporation_id))
+            logger.debug('%s queries for user %s visible chracters.' % (len(queries), user))
+            # filter based on queries
+            query = queries.pop()
+            for q in queries:
+                query |= q
+            return self.filter(query)
+        except AssertionError:
+            logger.debug('User %s has no main character. Nothing visible.' % user)
+            return self.none()        
+
+
+class AuditCorporationManager(models.Manager):
+    def get_queryset(self):
+        return AuditCorporationQuerySet(self.model, using=self._db)
+
+    def visible_to(self, user):
+        return self.get_queryset().visible_to(user)
+

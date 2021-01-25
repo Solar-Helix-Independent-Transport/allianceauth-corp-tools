@@ -86,8 +86,8 @@ def add_char(request, token):
 def add_corp(request, token):
     corp, created = EveCorporationInfo.objects.get_or_create(corporation_id=EveCharacter.objects.get_character_by_id(token.character_id).corporation_id)
     CorporationAudit.objects.update_or_create(corporation=corp)
-    
-    return redirect('corptools:view')
+    update_all_corps.apply_async(priority=6)
+    return redirect('corptools:corp_menu')
 
 @login_required
 @permission_required('corptools.view_characteraudit')

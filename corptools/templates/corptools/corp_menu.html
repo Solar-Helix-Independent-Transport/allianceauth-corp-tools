@@ -1,4 +1,5 @@
 {% extends 'corptools/base.html' %}
+{% load humanize %}
 <!-- TODO Make this nicer in some way... -->
 {% block ct_block %}
 <br>
@@ -18,14 +19,7 @@
             <ul class="nav navbar-nav">
                 {% if perms.corptools.admin %}
                  <li><a class="" href="{% url 'corptools:admin' %}">DB Admin</a></li>
-                 
                 {% endif %}
-                {% if perms.corptools.alliance_corp_manager or perms.corptools.global_corp_manager or perms.corptools.state_corp_manager %}
-                    <li class=>
-                        <a href="{% url 'corptools:corp_menu' %}">Corporations</a>
-                    <li>
-                {% endif %}
-
             </ul>
             <ul class="nav navbar-nav pull-right">
                 <li class=>
@@ -36,6 +30,9 @@
                         <a href="{% url 'corptools:add_corp' %}">Add Corporate Token</a>
                     <li>
                 {% endif %}
+                <li class=>
+                    <a href="{% url 'corptools:view' %}">Characters</a>
+                <li>
 
             </ul>
         </div>
@@ -46,22 +43,18 @@
     <table class="table table-hover dateTable" id="characters">
         <thead>
             <th></th>
-            <th>Main Character</th>
             <th>Corporation</th>
             <th>Alliance</th>
-            <th>Alts</th>
+            <th>Wallet Updates</th>
         </thead>
         <tbody>
-            {% for char,alts in characters.items %}
+            {% for corp in corporations %}
             <tr>
-            <td><a href="{% url 'corptools:overview' char %}"><img class="ra-avatar img-circle" src="{{alts.main.portrait_url_64}}"></img></a></td>
-            <td><a href="{% url 'corptools:overview' char %}">{{alts.main.character_name}}</a></td>
-            <td>{{alts.main.corporation_name}}</td>
-            <td>{{alts.main.alliance_name}}</td>
-            <td>
-                {% for alt in alts.audit.character.character_ownership.user.character_ownerships.all %}
-                    <span style="background-color: {% if alt.character.characteraudit.is_active %}#008844{% else %}#AA0000{% endif %}" class="label label-default"><img class="ra-avatar img-circle img-pad" src="{{ alt.character.portrait_url_32 }}"> {{ alt.character.character_name }}</span> 
-                {% endfor %}</td>
+            <td><a href="{% url 'corptools:overview' 1 %}"><img class="ra-avatar img-circle" src="{{corp.corporation.logo_url_64}}"></img></a></td>
+            <td>{{corp.corporation.corporation_name}}</td>
+            <td>{{corp.corporation.alliance.alliance_name}}</td>
+            <td>{{corp.last_update_wallet|naturaltime}}</td>
+
             </tr>
             {% endfor %}
         </tbody>
@@ -79,9 +72,6 @@
             "filterDropDown": {
 					columns: [{
 						idx: 2
-                            },
-                            {
-						idx: 3
                             }],
                     bootstrap: true
             },

@@ -15,7 +15,7 @@ from esi.models import Token
 from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter
 from allianceauth.notifications import notify
 
-from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager, AuditCharacterManager, EveMoonManager
+from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager, AuditCharacterManager, EveMoonManager, AuditCorporationManager
 from . import providers
 
 from model_utils import Choices
@@ -84,7 +84,11 @@ class CharacterAudit(models.Model):
         except:
             return False
 
+
 class CorporationAudit(models.Model):
+
+    objects = AuditCorporationManager()
+
     corporation = models.OneToOneField(EveCorporationInfo, on_delete=models.CASCADE)
 
     last_update_pub_data = models.DateTimeField(null=True, default=None, blank=True)
@@ -101,6 +105,9 @@ class CorporationAudit(models.Model):
 
     last_update_observers = models.DateTimeField(null=True, default=None, blank=True)
     cache_expire_observers = models.DateTimeField(null=True, default=None, blank=True)
+
+    last_update_wallet = models.DateTimeField(null=True, default=None, blank=True)
+    cache_expire_wallet = models.DateTimeField(null=True, default=None, blank=True)
 
     def __str__(self):
         return "{}'s Corporation Data".format(self.corporation.corporation_name)
