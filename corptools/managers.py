@@ -300,7 +300,7 @@ class AuditCorporationQuerySet(models.QuerySet):
             queries = []
             if user.has_perm('corptools.alliance_corp_manager'):
                 if char.alliance_id is not None:
-                    queries.append(models.Q(corporation__alliance_id=char.alliance_id))
+                    queries.append(models.Q(corporation__alliance__alliance_id=char.alliance_id))
                 else:
                     queries.append(models.Q(corporation__corporation_id=char.corporation_id))
             if user.has_perm('corptools.state_corp_manager'):
@@ -310,6 +310,9 @@ class AuditCorporationQuerySet(models.QuerySet):
                     queries.append(models.Q(corporation__corporation_id=char.corporation_id))
             logger.debug('%s queries for user %s visible chracters.' % (len(queries), user))
             # filter based on queries
+            if len(queries) == 0:
+                return self.none()
+
             query = queries.pop()
             for q in queries:
                 query |= q
