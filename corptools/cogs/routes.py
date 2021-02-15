@@ -32,12 +32,11 @@ class Routes(commands.Cog):
         end = MapSystem.objects.get(name=input_names[1])
 
         message = routes.route(start.system_id, end.system_id)
-        path_str = " > ".join(message.get('path').values())
             
         dotlan_url = "https://evemaps.dotlan.net/route/{}".format(message.get("dotlan"))
         embed = Embed(title=f"{start.name} to {end.name}")
         embed.colour = Color.blue()
-        embed.description = "Shortest Route is: {} Jumps\n\n{}".format(message.get("length"), path_str)
+        embed.description = "Shortest Route is: {} Jumps\n\n{}".format(message.get("length"), message.get("path_message"))
         embed.add_field(
             name="Dotlan", value=f"[Route Link]({dotlan_url})"
         )

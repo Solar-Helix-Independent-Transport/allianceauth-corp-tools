@@ -178,7 +178,7 @@ class EveRouter():
         else:
             try:
                 last_update = MapJumpBridge.objects.latest("updated").updated
-                if last_update > self.last_update:
+                if last_update > self.last_update: 
                     self.bulid_graph()
             except MapJumpBridge.DoesNotExist:
                 pass
@@ -196,18 +196,21 @@ class EveRouter():
             output[i] = system_map[p]
 
         dotlan_path = output[0].replace(" ", "_")
+        message_path = "`" + output[0].replace(" ", "_") + "`"
         esi_points = []
         for i in range(len(path)-1):
             if self.G.get_edge_data(path[i], path[i+1])['type'] == 'bridge':
+                message_path += "  >B>  `" + output[i+1] + "`"
                 bridged_path = '::' + output[i+1].replace(" ", "_")
                 dotlan_path += bridged_path
                 esi_points.append(self.bridges[path[i]])
             else:
+                message_path += "  >G>  `" + output[i+1] + "`"
                 gated_path = ':' + output[i+1].replace(" ", "_")
                 dotlan_path += gated_path
         dotlan_path = re.sub(r'(?<!:)(:[^:\s]+)(?=:)(?!::)', '', dotlan_path)
         esi_points.append(path[len(path)-1])
-        result = {'path': output, 'esi':esi_points, 'dotlan': dotlan_path, 'length': path_length}
+        result = {'path': output, 'esi':esi_points, 'path_message': message_path, 'dotlan': dotlan_path, 'length': path_length}
 
         return result
 
