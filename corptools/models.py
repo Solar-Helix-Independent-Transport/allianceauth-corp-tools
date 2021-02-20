@@ -677,6 +677,30 @@ class FullyLoadedFilter(FilterBase):
             logger.error(e, exc_info=1)
             return False
 
+    def filter_audit(self, users):
+        co = CharacterOwnership.objects.filter(user__in=users).select_related('user', 'character__characteraudit')
+        chars = {}
+        for c in co:
+            if c.user.id not in chars:
+                chars[c.user.id] = []
+            if c.character.characteraudit is None:
+                chars[c.user.id].append(c.character.character_name)
+            elif not c.character.characteraudit.is_active():
+                chars[c.user.id].append(c.character.character_name)
+
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for u in users:
+            c = chars.get(u.id, False)
+            if c is not False:
+                if len(c)>0:
+                    output[u.id] = {"message": ", ".join(c), "check": False}
+                    continue
+                else:
+                    output[u.id] = {"message": "", "check": True}
+                    continue
+            output[u.id] = {"message": "", "check": False}
+        return output
+
 
 class TimeInCorpFilter(FilterBase):
     class Meta:
@@ -715,7 +739,7 @@ class TimeInCorpFilter(FilterBase):
             else:
                 check = False
 
-            output[c] = {"message": str(char_list.days + "Days", "check": check}
+            output[c] = {"message": str(char_list.days) + "Days", "check": check}
         return output
 
 
@@ -738,54 +762,58 @@ class AssetsFilter(FilterBase):
     regions = models.ManyToManyField(MapRegion, blank=True,
     help_text="Limit filter to specific regions")
 
-    def process_filter(self, user: User):
-        try:
-            character_list = user.character_ownerships.all() \
-                .select_related('character', 'character__characteraudit')
-            cnt_types = self.types.all().count()
-            cnt_groups = self.groups.all().count()
-            cnt_cats = self.categories.all().count()
+    def filter_query(self, users):
+        character_list = CharacterOwnership.objects.filter(user__in=users) \
+            .select_related('character', 'character__characteraudit')
+        cnt_types = self.types.all().count()
+        cnt_groups = self.groups.all().count()
+        cnt_cats = self.categories.all().count()
+        
+        character_count = CharacterAsset.objects.filter(character__character__in=character_list.values_list('character'))
+        output = []
+
+        if cnt_types > 0:
+            output.append(models.Q(type_name__in=self.types.all()))
+
+        if cnt_groups > 0:
+            output.append(models.Q(type_name__group__in=self.groups.all()))
+
+        if cnt_cats > 0:
+            output.append(models.Q(type_name__group__category__in=self.categories.all()))
             
-            character_count = CharacterAsset.objects.filter(character__character__in=character_list.values_list('character'))
-            output = []
+        if len(output) == 0:
+            return False
 
-            if cnt_types > 0:
-                output.append(models.Q(type_name__in=self.types.all()))
+        query = output.pop()
+        for _q in output:
+            query |= _q
+        character_count = character_count.filter(query)
 
-            if cnt_groups > 0:
-                output.append(models.Q(type_name__group__in=self.groups.all()))
+        output = []
 
-            if cnt_cats > 0:
-                output.append(models.Q(type_name__group__category__in=self.categories.all()))
-                
-            if len(output) == 0:
-                return False
-
+        if self.systems.all().count()>0:
+            output.append(models.Q(location_name__system__in=self.systems.all()))
+            output.append(models.Q(location_id__in=self.systems.all().values_list('system_id', flat=True)))                
+        if self.constellations.all().count()>0:
+            output.append(models.Q(location_name__system__constellation__in=self.constellations.all()))
+            output.append(models.Q(location_id__in=MapSystem.objects.filter(constellation__in=self.constellations.all()).values_list('system_id', flat=True)))
+        if self.regions.all().count()>0:
+            output.append(models.Q(location_name__system__constellation__region__in=self.regions.all()))
+            output.append(models.Q(location_id__in=MapSystem.objects.filter(constellation__region__in=self.regions.all()).values_list('system_id', flat=True)))
+        
+        if len(output) > 0:
             query = output.pop()
             for _q in output:
                 query |= _q
             character_count = character_count.filter(query)
+        return character_count
 
-            output = []
 
-            if self.systems.all().count()>0:
-                output.append(models.Q(location_name__system__in=self.systems.all()))
-                output.append(models.Q(location_id__in=self.systems.all().values_list('system_id', flat=True)))                
-            if self.constellations.all().count()>0:
-                output.append(models.Q(location_name__system__constellation__in=self.constellations.all()))
-                output.append(models.Q(location_id__in=MapSystem.objects.filter(constellation__in=self.constellations.all()).values_list('system_id', flat=True)))
-            if self.regions.all().count()>0:
-                output.append(models.Q(location_name__system__constellation__region__in=self.regions.all()))
-                output.append(models.Q(location_id__in=MapSystem.objects.filter(constellation__region__in=self.regions.all()).values_list('system_id', flat=True)))
-            
-            if len(output) > 0:
-                query = output.pop()
-                for _q in output:
-                    query |= _q
-                character_count = character_count.filter(query)
-
+    def process_filter(self, user: User):
+        try:
+            co = self.filter_query([user])
             #print(character_count.query)
-            if character_count.count() > 0:
+            if co.count() > 0:
                 return True
             else:
                 return False
@@ -793,6 +821,29 @@ class AssetsFilter(FilterBase):
             logger.error(e, exc_info=1)
             return False
 
+    def filter_audit(self, users):
+        co = self.filter_query(users).values("character__character__character_ownership__user", "type_name__name", "character__character__character_name")
+        chars = defaultdict(dict)
+        for c in co:
+            uid = c["character__character__character_ownership__user"] 
+            char_name = c["character__character__character_name"]
+            asset_type = c['type_name__name']
+            if char_name not in chars[uid]:
+                chars[uid][char_name] = []
+            if asset_type not in chars[uid][char_name]:
+                chars[uid][char_name].append(asset_type)
+
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for u in users:
+
+            if len(chars[u.id])>0:
+                out_message = []
+                for char, char_items in chars[u.id].items():
+                    out_message.append(f"{char}: {', '.join(char_items)}")
+                output[u.id] = {"message": "<br>".join(out_message), "check": True}
+            else:
+                output[u.id] = {"message": "", "check": False}
+        return output
 
 class Skillfilter(FilterBase):
     class Meta:
