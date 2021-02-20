@@ -677,7 +677,7 @@ class FullyLoadedFilter(FilterBase):
             logger.error(e, exc_info=1)
             return False
 
-    def filter_audit(self, users):
+    def audit_filter(self, users):
         co = CharacterOwnership.objects.filter(user__in=users).select_related('user', 'character__characteraudit')
         chars = {}
         for c in co:
@@ -724,7 +724,7 @@ class TimeInCorpFilter(FilterBase):
             logger.error(e, exc_info=1)
             return False
 
-    def filter_audit(self, users):
+    def audit_filter(self, users):
         co = users.annotate(
                         max_timestamp=Max('profile__main_character__characteraudit__corporationhistory__start_date')
                     ).values("id", "max_timestamp")
@@ -829,7 +829,7 @@ class AssetsFilter(FilterBase):
             logger.error(e, exc_info=1)
             return False
 
-    def filter_audit(self, users):
+    def audit_filter(self, users):
         co = self.filter_query(users).values("character__character__character_ownership__user", "type_name__name", "character__character__character_name")
         chars = defaultdict(dict)
         for c in co:
