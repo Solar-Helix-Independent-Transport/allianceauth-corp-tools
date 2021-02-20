@@ -9,6 +9,8 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.db.models import Count, Max
+from collections import defaultdict
 
 from esi.errors import TokenError
 from esi.models import Token
@@ -696,6 +698,25 @@ class TimeInCorpFilter(FilterBase):
         except Exception as e:
             logger.error(e, exc_info=1)
             return False
+
+    def filter_audit(self, users):
+        co = users.annotate(
+                        max_timestamp=Max('profile__main_character__characteraudit__corporationhistory__start_date')
+                    ).values("id", "max_timestamp")
+        chars = defaultdict(lambda: None)
+        for c in co:
+            days = timezone.now() - c['max_timestamp']
+            chars[c['id']] = days
+            
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for c, char_list in chars.items():
+            if char_list.days >= self.days_in_corp:
+                check = True
+            else:
+                check = False
+
+            output[c] = {"message": str(char_list.days + "Days", "check": check}
+        return output
 
 
 class AssetsFilter(FilterBase):
