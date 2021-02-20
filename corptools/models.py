@@ -683,9 +683,10 @@ class FullyLoadedFilter(FilterBase):
         for c in co:
             if c.user.id not in chars:
                 chars[c.user.id] = []
-            if c.character.characteraudit is None:
-                chars[c.user.id].append(c.character.character_name)
-            elif not c.character.characteraudit.is_active():
+            try:
+                if not c.character.characteraudit.is_active():
+                    chars[c.user.id].append(c.character.character_name)
+            except ObjectDoesNotExist:
                 chars[c.user.id].append(c.character.character_name)
 
         output = defaultdict(lambda: {"message": "", "check": False})
@@ -729,17 +730,24 @@ class TimeInCorpFilter(FilterBase):
                     ).values("id", "max_timestamp")
         chars = defaultdict(lambda: None)
         for c in co:
-            days = timezone.now() - c['max_timestamp']
+            if c['max_timestamp']:
+                days = timezone.now() - c['max_timestamp']
+                days = days.days
+            else:
+                days = -1
             chars[c['id']] = days
             
         output = defaultdict(lambda: {"message": "", "check": False})
         for c, char_list in chars.items():
-            if char_list.days >= self.days_in_corp:
+            if char_list >= self.days_in_corp:
                 check = True
             else:
                 check = False
-
-            output[c] = {"message": str(char_list.days) + "Days", "check": check}
+            if char_list < 0:
+                msg = "No Audit"
+            else:
+                msg = str(char_list) + "Days"
+            output[c] = {"message": msg, "check": check}
         return output
 
 
