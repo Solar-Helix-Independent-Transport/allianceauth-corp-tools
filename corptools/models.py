@@ -746,7 +746,7 @@ class TimeInCorpFilter(FilterBase):
             if char_list < 0:
                 msg = "No Audit"
             else:
-                msg = str(char_list) + "Days"
+                msg = str(char_list) + " Days"
             output[c] = {"message": msg, "check": check}
         return output
 
