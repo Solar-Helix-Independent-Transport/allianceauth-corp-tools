@@ -21,6 +21,17 @@ class SkillListCache():
     def _get_skill_list_hash(self, skills):
         return md5(",".join(str(x) for x in sorted(skills)).encode()).hexdigest()
 
+    def get_and_cache_users(self, users):
+        from ..models import Skill, SkillList  #TODO fix the recursive import
+        linked_characters = users.character_ownerships.all().values('user_id', 'character__character_id', 'character__character_id')
+        skill_lists = SkillList.objects.all().order_by('order_weight','name')
+        skill_list_hash = self._get_skill_list_hash(skill_lists.values_list('name'))
+        user_chars = {}
+        for u in linked_characters:
+            if u['user_id'] not in users:
+                user_chars[u['user_id']] = {'chars':[]}
+            #user_chars[u['user_id']]['chars'].append([[u['character__character_id'],u['character__character_name']])
+        
     def get_and_cache_user(self, user_id):
         from ..models import Skill, SkillList  #TODO fix the recursive import
 

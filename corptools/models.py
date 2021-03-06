@@ -908,3 +908,46 @@ class Skillfilter(FilterBase):
             logger.error(e, exc_info=1)
             return False
 
+    def audit_filter(self, users):
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for user in users:
+            skills_list = providers.skills.get_and_cache_user(user.id)
+            #print(skills_list)
+            skill_lists = self.required_skill_lists.all()
+            req_one = self.single_req_skill_lists.all()
+            if skill_lists.count() == 0 and req_one.count() ==0:
+                return False
+
+            skill_list_base = {}
+            for skl in skill_lists:
+                skill_list_base[skl.name] = {}
+                skill_list_base[skl.name]['pass']  = False
+
+            if req_one.count()>0:
+                skill_list_single = {}
+                for skl in req_one:
+                    skill_list_single[skl.name] = {}
+                    skill_list_single[skl.name]['pass']  = False
+
+            skill_tables = skills_list.get("skills_list")
+
+            for char in skill_tables:
+                for d_name, d_list in skill_list_base.items():
+                    if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                        skill_list_base[d_name]['pass'] = True
+            if req_one.count()>0:
+                single_pass = False
+                for char in skill_tables:
+                    for d_name, d_list in skill_list_single.items():
+                        if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                            single_pass = True
+                            break
+
+            result = True
+            for skill_list, skills_result in skill_list_base.items():
+                result = result and skills_result['pass']
+            if req_one.count()>0:
+                return result and single_pass
+            else:
+                return result
+        
