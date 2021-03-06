@@ -6,32 +6,35 @@
 {% block extra_css %}
 {% include 'bundles/datatables-css.html' %}
 
- <style>
+<style>
 .noheader thead {
   display: none;
 }
 
 .flex-container {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
 }
+
 .flex-wrap {
-    display: -webkit-flex; /* Safari */
-    -webkit-flex-wrap: wrap; /* Safari 6.1+ */
-    display: flex;
-    flex-wrap: wrap;
+  display: -webkit-flex;
+  /* Safari */
+  -webkit-flex-wrap: wrap;
+  /* Safari 6.1+ */
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .form-control {
-    margin: 2px;
+  margin: 2px;
 }
 
 .flex-middle {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
 
@@ -48,8 +51,7 @@
 }
 
 .scroll-bar-narrow::-webkit-scrollbar-track {
-    border-radius: 5px;
-
+  border-radius: 5px;
 }
 
 .scroll-bar-narrow::-webkit-scrollbar-track-piece {
@@ -58,27 +60,23 @@
   border-width: 7px;
   border-style: solid;
   background-clip: padding-box;
-
 }
 
-.scroll-bar-narrow::-webkit-scrollbar
-{
-	width: 15px;
-    border-width: 5px;
-    background-color: transparent;
+.scroll-bar-narrow::-webkit-scrollbar {
+  width: 15px;
+  border-width: 5px;
+  background-color: transparent;
 }
 
-.scroll-bar-narrow::-webkit-scrollbar-thumb
-{
-    background-color: #375a7f;
-    border-radius: 10px;
-    border: 4px solid transparent;
-    background-clip: padding-box;
+.scroll-bar-narrow::-webkit-scrollbar-thumb {
+  background-color: #375a7f;
+  border-radius: 10px;
+  border: 4px solid transparent;
+  background-clip: padding-box;
 }
 
-.img-pad
-{
-    padding: 5px;
+.img-pad {
+  padding: 5px;
 }
 
 table.dataTable tbody td {
@@ -86,94 +84,108 @@ table.dataTable tbody td {
 }
 
 #chartdiv {
-  width	: 100%;
-  height	: 500px;
-}								
+  width: 100%;
+  height: 500px;
+}
 
 tr.group,
-        tr.group:hover {
-            background-color: #3498DB !important;
-        }
+tr.group:hover {
+  background-color: #3498DB !important;
+}
 
 .lds-spinner {
-    color: official;
-    display: inline-block;
-    position: relative;
-    width: 20px;
-    height: 20px;
-    }
-    .lds-spinner div {
-    transform-origin: 10px 10px;
-    animation: lds-spinner 1.2s linear infinite;
-    }
-    .lds-spinner div:after {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 3px;
-    height: 6px;
-    border-radius: 50%;
-    background: #5cb85c;
-    }
-    .lds-spinner div:nth-child(1) {
-    transform: rotate(0deg);
-    animation-delay: -1.1s;
-    }
-    .lds-spinner div:nth-child(2) {
-    transform: rotate(30deg);
-    animation-delay: -1s;
-    }
-    .lds-spinner div:nth-child(3) {
-    transform: rotate(60deg);
-    animation-delay: -0.9s;
-    }
-    .lds-spinner div:nth-child(4) {
-    transform: rotate(90deg);
-    animation-delay: -0.8s;
-    }
-    .lds-spinner div:nth-child(5) {
-    transform: rotate(120deg);
-    animation-delay: -0.7s;
-    }
-    .lds-spinner div:nth-child(6) {
-    transform: rotate(150deg);
-    animation-delay: -0.6s;
-    }
-    .lds-spinner div:nth-child(7) {
-    transform: rotate(180deg);
-    animation-delay: -0.5s;
-    }
-    .lds-spinner div:nth-child(8) {
-    transform: rotate(210deg);
-    animation-delay: -0.4s;
-    }
-    .lds-spinner div:nth-child(9) {
-    transform: rotate(240deg);
-    animation-delay: -0.3s;
-    }
-    .lds-spinner div:nth-child(10) {
-    transform: rotate(270deg);
-    animation-delay: -0.2s;
-    }
-    .lds-spinner div:nth-child(11) {
-    transform: rotate(300deg);
-    animation-delay: -0.1s;
-    }
-    .lds-spinner div:nth-child(12) {
-    transform: rotate(330deg);
-    animation-delay: 0s;
-    }
-    @keyframes lds-spinner {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-    }
+  color: official;
+  display: inline-block;
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
 
+.lds-spinner div {
+  transform-origin: 10px 10px;
+  animation: lds-spinner 1.2s linear infinite;
+}
+
+.lds-spinner div:after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 3px;
+  height: 6px;
+  border-radius: 50%;
+  background: #5cb85c;
+}
+
+.lds-spinner div:nth-child(1) {
+  transform: rotate(0deg);
+  animation-delay: -1.1s;
+}
+
+.lds-spinner div:nth-child(2) {
+  transform: rotate(30deg);
+  animation-delay: -1s;
+}
+
+.lds-spinner div:nth-child(3) {
+  transform: rotate(60deg);
+  animation-delay: -0.9s;
+}
+
+.lds-spinner div:nth-child(4) {
+  transform: rotate(90deg);
+  animation-delay: -0.8s;
+}
+
+.lds-spinner div:nth-child(5) {
+  transform: rotate(120deg);
+  animation-delay: -0.7s;
+}
+
+.lds-spinner div:nth-child(6) {
+  transform: rotate(150deg);
+  animation-delay: -0.6s;
+}
+
+.lds-spinner div:nth-child(7) {
+  transform: rotate(180deg);
+  animation-delay: -0.5s;
+}
+
+.lds-spinner div:nth-child(8) {
+  transform: rotate(210deg);
+  animation-delay: -0.4s;
+}
+
+.lds-spinner div:nth-child(9) {
+  transform: rotate(240deg);
+  animation-delay: -0.3s;
+}
+
+.lds-spinner div:nth-child(10) {
+  transform: rotate(270deg);
+  animation-delay: -0.2s;
+}
+
+.lds-spinner div:nth-child(11) {
+  transform: rotate(300deg);
+  animation-delay: -0.1s;
+}
+
+.lds-spinner div:nth-child(12) {
+  transform: rotate(330deg);
+  animation-delay: 0s;
+}
+
+@keyframes lds-spinner {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 </style>
 {% endblock extra_css %}
 {% block content %}
@@ -212,20 +224,19 @@ tr.group,
                                 </li>
                             </ul>
                             <ul class="nav navbar-nav pull-right">
-                                <li class=>
+                                <li class>
                                     <a href="{% url 'corptools:update_account' main_char.character_id%}"><i class="fas fa-sync"></i></a>
                                 </li>
-                                <li class=>
+                                <li class>
                                     <a href="{% url 'corptools:add_char' %}">Add Character Token</a>
                                 </li>
                                 {% if perms.corptools.alliance_corp_manager or perms.corptools.global_corp_manager or perms.corptools.state_corp_manager %}
-                                    <li class=>
+                                    <li class>
                                         <a href="{% url 'corptools:add_corp' %}">Add Corporate Token</a>
                                     <li>
-                                    <li class=>
+                                    <li class>
                                         <a href="{% url 'corptools:corp_menu' %}">Corporations</a>
                                     <li>
-
                                 {% endif %}
 
                             </ul>
