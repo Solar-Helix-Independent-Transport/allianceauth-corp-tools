@@ -5,6 +5,8 @@ from django.core.cache import cache
 from django.utils import timezone
 from hashlib import md5
 
+from allianceauth.authentication.models import CharacterOwnership
+
 SKILL_CACHE_TIMEOUT_SECONDS = 60*60*48 #24h
 SKILL_CACHE_HEADERS_KEY = "CT_SKILL_HEADER"
 SKILL_CACHE_USER_KEY = "SKILL_LISTS_{}"
@@ -23,14 +25,36 @@ class SkillListCache():
 
     def get_and_cache_users(self, users):
         from ..models import Skill, SkillList  #TODO fix the recursive import
-        linked_characters = users.character_ownerships.all().values('user_id', 'character__character_id', 'character__character_id')
+        from ..tasks import cache_user_skill_list
+        linked_characters = CharacterOwnership.objects.filter(user__in=users).values('user_id', 'character__character_name', 'character__character_id')
         skill_lists = SkillList.objects.all().order_by('order_weight','name')
         skill_list_hash = self._get_skill_list_hash(skill_lists.values_list('name'))
+        cached_header = cache.get(SKILL_CACHE_HEADERS_KEY, False)
+        skill_lists_up_to_date = cached_header == skill_list_hash
+
         user_chars = {}
         for u in linked_characters:
-            if u['user_id'] not in users:
+            if u['user_id'] not in user_chars:
                 user_chars[u['user_id']] = {'chars':[]}
-            #user_chars[u['user_id']]['chars'].append([[u['character__character_id'],u['character__character_name']])
+            user_chars[u['user_id']]['chars'].append(u['character__character_id'])
+        
+        for u, c in user_chars.items():
+            if skill_lists_up_to_date:
+                cache_key = self._build_account_cache_key(c['chars'])
+                cached_skills = cache.get(cache_key, False)
+
+                if cached_skills is not False: ## check if cached at all?
+                    cached_skills = json.loads(cached_skills)
+                    if cached_skills.get("doctrines", False) != skill_list_hash:  
+                        c['data']=self.get_and_cache_user(u)
+                    else:
+                        c['data']=cached_skills
+            else:
+                c['data']=self.get_and_cache_user(u)
+
+        
+        return user_chars
+        
         
     def get_and_cache_user(self, user_id):
         from ..models import Skill, SkillList  #TODO fix the recursive import
@@ -97,3 +121,6 @@ class SkillListCache():
         cache.set(account_key, out, SKILL_CACHE_TIMEOUT_SECONDS)
         cache.set(SKILL_CACHE_HEADERS_KEY, skill_list_hash)
         return output_array
+
+
+        

@@ -84,7 +84,8 @@ def update_character(char_id):
     if character is None:
         token = Token.get_token(char_id, views.CHAR_REQUIRED_SCOPES)
         if token:
-            character, created = CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
+            if token.is_valid():
+                character, created = CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
 
     logger.info("Starting Updates for {}".format(character.character.character_name))
     que = []
@@ -111,6 +112,14 @@ def update_char_corp_history(self, character_id):
 def update_char_skill_list(self, character_id):
     try:
         return update_character_skill_list(character_id)
+    except Exception as e:
+        logger.exception(e)
+        return "Failed"
+
+@shared_task(bind=True, base=QueueOnce)
+def cache_user_skill_list(self, user_id):
+    try:
+        providers.skills.get_and_cache_user(user_id)
     except Exception as e:
         logger.exception(e)
         return "Failed"
