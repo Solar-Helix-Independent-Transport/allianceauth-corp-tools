@@ -1,6 +1,6 @@
 import logging
 from celery import shared_task
-from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, SkillTotals, Implant, JumpClone, Clone, EveLocation, CharacterMarketOrder, Notification
+from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, SkillTotals, Implant, JumpClone, Clone, EveLocation, CharacterMarketOrder, Notification, CharacterRoles
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 
@@ -571,3 +571,42 @@ def update_character_notifications(character_id):
     return "Finished notifications for: {0}".format(audit_char.character.character_name)
 
 
+def update_character_roles(character_id):
+    audit_char = CharacterAudit.objects.get(character__character_id=character_id)
+    req_scopes = ['esi-characters.read_corporation_roles.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return False
+
+    roles = providers.esi.client.Character.get_characters_character_id_roles(character_id=character_id,
+                                                        token=token.valid_access_token()).result()
+    director = False
+    accountant = False
+    station_manager = False
+    personnel_manager = False
+
+    if "Director" in roles.get('roles', []):
+        director = True
+    
+    if "Accountant" in roles.get('roles', []):
+        accountant = True
+
+    if "Station_Manager" in roles.get('roles', []):
+        station_manager = True
+
+    if "Personnel_Manager" in roles.get('roles', []):
+        personnel_manager = True
+
+    role_model, create = CharacterRoles.objects.update_or_create(character=audit_char,
+                                                                 director=director,
+                                                                 accountant=accountant,
+                                                                 station_manager=station_manager,
+                                                                 personnel_manager=personnel_manager)
+
+    audit_char.last_update_roles = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
+    return "Finished roles for: {0}".format(audit_char.character.character_name)

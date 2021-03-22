@@ -1,0 +1,67 @@
+{% extends 'corptools/character/char_base.html' %}
+{% load humanize  %}
+{% load helpers %}
+{% block ct_block %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-primary"style="border-radius: 0 0 4px 4px; border-top-width: 0;">
+            <div class="panel-heading text-center">Roles</div>
+            <div class="panel-body">
+                    <div class="col-md-12">
+                        <h4 class="text-center">Character Roles</h5>
+                        <table class="table table-hover scroll-bar-narrow" width="100%">
+                            <thead>
+                                <th>Character</th>
+                                <th class="text-center">Director</th>
+                                <th class="text-center">Accountant</th>
+                                <th class="text-center">Station Manager</th>
+                                <th class="text-center">Personnel Manager</th>
+                            </thead>
+                            <tbody>
+                                {% for char_roles in char_data %}
+                                    <tr>
+                                        <td>{{ char_roles.character.character.character_name }}</td>
+                                        <td class="text-center">{% if char_roles.director %}
+                                            <a class="label label-success" type="button"><i class="fas fa-check-circle"></i></a>
+                                            {% else %}
+                                            <a class="label label-default" type="button"><i class="fas fa-times-circle"></i></a>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">{% if char_roles.accountant %}
+                                            <a class="label label-success" type="button"><i class="fas fa-check-circle"></i></a>
+                                            {% else %}
+                                            <a class="label label-default" type="button"><i class="fas fa-times-circle"></i></a>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">{% if char_roles.station_manager %}
+                                            <a class="label label-success" type="button"><i class="fas fa-check-circle"></i></a>
+                                            {% else %}
+                                            <a class="label label-default" type="button"><i class="fas fa-times-circle"></i></a>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">{% if char_roles.personnel_manager %}
+                                            <a class="label label-success" type="button"><i class="fas fa-check-circle"></i></a>
+                                            {% else %}
+                                            <a class="label label-default" type="button"><i class="fas fa-times-circle"></i></a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_javascript %}
+    {% include 'bundles/datatables-js.html' %}
+    <script>!function(t){function e(t){var e={columns:[],columnsIdxList:[],bootstrap:!1,autoSize:!0,label:"Filter "};if("bootstrap"in t&&"boolean"==typeof t.bootstrap&&(e.bootstrap=t.bootstrap),"autoSize"in t&&"boolean"==typeof t.autoSize&&(e.autoSize=t.autoSize),"label"in t&&"string"==typeof t.label&&(e.label=t.label),"columns"in t)for(var i=0;i<t.columns.length;i++){var n=t.columns[i];if("idx"in n&&"number"==typeof n.idx){var o=n.idx;e.columns[o]={title:null,maxWidth:null,autoSize:!0},e.columnsIdxList.push(o),"title"in n&&"string"==typeof n.title&&(e.columns[o].title=n.title),"maxWidth"in n&&"string"==typeof n.maxWidth&&(e.columns[o].maxWidth=n.maxWidth),"autoSize"in n&&"boolean"==typeof n.autoSize&&(e.columns[o].autoSize=n.autoSize)}}return e}t(document).on("preInit.dt",function(i,n){if("dt"===i.namespace){var o=new t.fn.dataTable.Api(n),a=o.table().node().id,l=o.init();if("filterDropDown"in l){var r=e(l.filterDropDown);if(0!=r.columns.length){var u=o.table().container(),s=a+"_filterWrapper",c=s+" "+(r.bootstrap?"form-inline":"");t(u).prepend('<div id="'+s+'" class="'+c+'">'+r.label+"</div>"),o.columns(r.columnsIdxList).every(function(){var e=this.index(),i=null!==r.columns[e].title?r.columns[e].title:t(this.header()).html();""==i&&(i="column "+(e+1));var n="form-control "+a+"_filterSelect",o=a+"_filterSelect"+e;t("#"+s).append('<select id="'+o+'" class="'+n+'"></select>');var l=t("#"+o).empty().append('<option value="">('+i+")</option>");})}}}}),t(document).on("init.dt",function(i,n){if("dt"===i.namespace){var o=new t.fn.dataTable.Api(n),a=o.table().node().id,l=o.init();if("filterDropDown"in l){var r=e(l.filterDropDown);o.table().container();o.columns(r.columnsIdxList).every(function(){var e=this,i=e.index(),n=t("#"+(a+"_filterSelect"+i));n.on("change",function(){var i=t.fn.dataTable.util.escapeRegex(t(this).val());e.search(i?"^"+i+"$":"",!0,!1).draw()}),e.data().unique().sort().each(function(t,e){""!=t&&n.append('<option value="'+t+'">'+t+"</option>")})})}}})}(jQuery);</script>
+
+{% endblock %}
+{% block ct_extra_script %}
+
+{% endblock %}
+
+

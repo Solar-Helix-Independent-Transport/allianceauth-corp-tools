@@ -55,6 +55,9 @@ class CharacterAudit(models.Model):
     last_update_notif = models.DateTimeField(null=True, default=None, blank=True)
     cache_expire_notif = models.DateTimeField(null=True, default=None, blank=True)
 
+    last_update_roles = models.DateTimeField(null=True, default=None, blank=True)
+    cache_expire_roles = models.DateTimeField(null=True, default=None, blank=True)
+
     balance = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
 
     def __str__(self):
@@ -631,6 +634,20 @@ class Notification(models.Model):
             models.Index(fields=['notification_type'])
         )
 
+
+class CharacterTitle(models.Model):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+    title_id = models.IntegerField()
+    title = models.CharField(max_length=500)
+
+
+class CharacterRoles(models.Model):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+
+    director = models.BooleanField(default=False)
+    accountant = models.BooleanField(default=False)
+    station_manager = models.BooleanField(default=False)
+    personnel_manager = models.BooleanField(default=False)
 
 ### sec group classes
 
