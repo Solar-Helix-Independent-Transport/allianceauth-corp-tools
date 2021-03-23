@@ -279,6 +279,7 @@ class EveLocation(models.Model):
     last_update = models.DateTimeField(auto_now=True)
 
 class Asset(models.Model):
+    id = models.BigAutoField(primary_key=True)
     blueprint_copy = models.BooleanField(null=True, default=None)
     singleton = models.BooleanField()
     item_id = models.BigIntegerField()
