@@ -606,6 +606,45 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[9])
         self.assertFalse(tests[10])
 
+    def test_user_skill_lists_audit_req_one(self):   
+        _filter = ct_models.Skillfilter.objects.create(name="Skills Test",
+                                                       description="Something to tell user")
+        _filter.single_req_skill_lists.add(ct_models.SkillList.objects.get(name="Test Skills 2"))
+        _filter.required_skill_lists.add(ct_models.SkillList.objects.get(name="Test Skills 1"))
+
+        users = []
+        for user in ct_models.CharacterAudit.objects.all():
+            users.append(user.character.character_ownership.user.id)
+        
+        tests = _filter.audit_filter(User.objects.filter(id__in=users))
+        #print("**********")
+        #print(tests)
+        self.assertTrue(tests[1]['check'])
+        self.assertFalse(tests[2]['check'])
+        self.assertFalse(tests[3]['check'])
+        self.assertFalse(tests[4]['check'])
+        self.assertFalse(tests[5]['check'])
+        self.assertFalse(tests[6]['check'])
+        self.assertFalse(tests[7]['check'])
+        self.assertFalse(tests[8]['check'])
+        self.assertFalse(tests[9]['check'])
+        self.assertFalse(tests[10]['check'])
+
+        # run again and confirm cache
+        tests = _filter.audit_filter(User.objects.filter(id__in=users))
+        #print("**********")
+        #print(tests)
+        self.assertTrue(tests[1]['check'])
+        self.assertFalse(tests[2]['check'])
+        self.assertFalse(tests[3]['check'])
+        self.assertFalse(tests[4]['check'])
+        self.assertFalse(tests[5]['check'])
+        self.assertFalse(tests[6]['check'])
+        self.assertFalse(tests[7]['check'])
+        self.assertFalse(tests[8]['check'])
+        self.assertFalse(tests[9]['check'])
+        self.assertFalse(tests[10]['check'])
+
 
     def test_user_skill_lists_omega(self):
         _filter = ct_models.Skillfilter.objects.create(name="Skills Test",
@@ -631,5 +670,44 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[8])
         self.assertFalse(tests[9])
         self.assertTrue(tests[10])
+
+
+    def test_user_skill_lists_audit_omega(self):
+        _filter = ct_models.Skillfilter.objects.create(name="Skills Test",
+                                                       description="Something to tell user")
+        _filter.required_skill_lists.add(ct_models.SkillList.objects.get(name="Test Skills 1"))
+
+        users = []
+        for user in ct_models.CharacterAudit.objects.all():
+            users.append(user.character.character_ownership.user.id)
+        
+        tests = _filter.audit_filter(User.objects.filter(id__in=users))
+        #print("**********")
+        #print(tests)
+        self.assertTrue(tests[1]['check'])
+        self.assertFalse(tests[2]['check'])
+        self.assertFalse(tests[3]['check'])
+        self.assertFalse(tests[4]['check'])
+        self.assertFalse(tests[5]['check'])
+        self.assertFalse(tests[6]['check'])
+        self.assertFalse(tests[7]['check'])
+        self.assertFalse(tests[8]['check'])
+        self.assertFalse(tests[9]['check'])
+        self.assertTrue(tests[10]['check'])
+
+        # run again and confirm cache
+        tests = _filter.audit_filter(User.objects.filter(id__in=users))
+        #print("**********")
+        #print(tests)
+        self.assertTrue(tests[1]['check'])
+        self.assertFalse(tests[2]['check'])
+        self.assertFalse(tests[3]['check'])
+        self.assertFalse(tests[4]['check'])
+        self.assertFalse(tests[5]['check'])
+        self.assertFalse(tests[6]['check'])
+        self.assertFalse(tests[7]['check'])
+        self.assertFalse(tests[8]['check'])
+        self.assertFalse(tests[9]['check'])
+        self.assertTrue(tests[10]['check'])
 
 
