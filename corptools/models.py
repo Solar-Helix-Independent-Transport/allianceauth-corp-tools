@@ -9,6 +9,8 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.db.models import Count, Max
+from collections import defaultdict
 
 from esi.errors import TokenError
 from esi.models import Token
@@ -52,6 +54,9 @@ class CharacterAudit(models.Model):
 
     last_update_notif = models.DateTimeField(null=True, default=None, blank=True)
     cache_expire_notif = models.DateTimeField(null=True, default=None, blank=True)
+
+    last_update_roles = models.DateTimeField(null=True, default=None, blank=True)
+    cache_expire_roles = models.DateTimeField(null=True, default=None, blank=True)
 
     balance = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
 
@@ -274,6 +279,7 @@ class EveLocation(models.Model):
     last_update = models.DateTimeField(auto_now=True)
 
 class Asset(models.Model):
+    id = models.BigAutoField(primary_key=True)
     blueprint_copy = models.BooleanField(null=True, default=None)
     singleton = models.BooleanField()
     item_id = models.BigIntegerField()
@@ -630,6 +636,20 @@ class Notification(models.Model):
         )
 
 
+class CharacterTitle(models.Model):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+    title_id = models.IntegerField()
+    title = models.CharField(max_length=500)
+
+
+class CharacterRoles(models.Model):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+
+    director = models.BooleanField(default=False)
+    accountant = models.BooleanField(default=False)
+    station_manager = models.BooleanField(default=False)
+    personnel_manager = models.BooleanField(default=False)
+
 ### sec group classes
 
 class FilterBase(models.Model):
@@ -675,6 +695,31 @@ class FullyLoadedFilter(FilterBase):
             logger.error(e, exc_info=1)
             return False
 
+    def audit_filter(self, users):
+        co = CharacterOwnership.objects.filter(user__in=users).select_related('user', 'character__characteraudit')
+        chars = {}
+        for c in co:
+            if c.user.id not in chars:
+                chars[c.user.id] = []
+            try:
+                if not c.character.characteraudit.is_active():
+                    chars[c.user.id].append(c.character.character_name)
+            except ObjectDoesNotExist:
+                chars[c.user.id].append(c.character.character_name)
+
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for u in users:
+            c = chars.get(u.id, False)
+            if c is not False:
+                if len(c)>0:
+                    output[u.id] = {"message": ", ".join(c), "check": False}
+                    continue
+                else:
+                    output[u.id] = {"message": "", "check": True}
+                    continue
+            output[u.id] = {"message": "", "check": False}
+        return output
+
 
 class TimeInCorpFilter(FilterBase):
     class Meta:
@@ -697,6 +742,32 @@ class TimeInCorpFilter(FilterBase):
             logger.error(e, exc_info=1)
             return False
 
+    def audit_filter(self, users):
+        co = users.annotate(
+                        max_timestamp=Max('profile__main_character__characteraudit__corporationhistory__start_date')
+                    ).values("id", "max_timestamp")
+        chars = defaultdict(lambda: None)
+        for c in co:
+            if c['max_timestamp']:
+                days = timezone.now() - c['max_timestamp']
+                days = days.days
+            else:
+                days = -1
+            chars[c['id']] = days
+            
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for c, char_list in chars.items():
+            if char_list >= self.days_in_corp:
+                check = True
+            else:
+                check = False
+            if char_list < 0:
+                msg = "No Audit"
+            else:
+                msg = str(char_list) + " Days"
+            output[c] = {"message": msg, "check": check}
+        return output
+
 
 class AssetsFilter(FilterBase):
     class Meta:
@@ -717,54 +788,58 @@ class AssetsFilter(FilterBase):
     regions = models.ManyToManyField(MapRegion, blank=True,
     help_text="Limit filter to specific regions")
 
-    def process_filter(self, user: User):
-        try:
-            character_list = user.character_ownerships.all() \
-                .select_related('character', 'character__characteraudit')
-            cnt_types = self.types.all().count()
-            cnt_groups = self.groups.all().count()
-            cnt_cats = self.categories.all().count()
+    def filter_query(self, users):
+        character_list = CharacterOwnership.objects.filter(user__in=users) \
+            .select_related('character', 'character__characteraudit')
+        cnt_types = self.types.all().count()
+        cnt_groups = self.groups.all().count()
+        cnt_cats = self.categories.all().count()
+        
+        character_count = CharacterAsset.objects.filter(character__character__in=character_list.values_list('character'))
+        output = []
+
+        if cnt_types > 0:
+            output.append(models.Q(type_name__in=self.types.all()))
+
+        if cnt_groups > 0:
+            output.append(models.Q(type_name__group__in=self.groups.all()))
+
+        if cnt_cats > 0:
+            output.append(models.Q(type_name__group__category__in=self.categories.all()))
             
-            character_count = CharacterAsset.objects.filter(character__character__in=character_list.values_list('character'))
-            output = []
+        if len(output) == 0:
+            return False
 
-            if cnt_types > 0:
-                output.append(models.Q(type_name__in=self.types.all()))
+        query = output.pop()
+        for _q in output:
+            query |= _q
+        character_count = character_count.filter(query)
 
-            if cnt_groups > 0:
-                output.append(models.Q(type_name__group__in=self.groups.all()))
+        output = []
 
-            if cnt_cats > 0:
-                output.append(models.Q(type_name__group__category__in=self.categories.all()))
-                
-            if len(output) == 0:
-                return False
-
+        if self.systems.all().count()>0:
+            output.append(models.Q(location_name__system__in=self.systems.all()))
+            output.append(models.Q(location_id__in=self.systems.all().values_list('system_id', flat=True)))                
+        if self.constellations.all().count()>0:
+            output.append(models.Q(location_name__system__constellation__in=self.constellations.all()))
+            output.append(models.Q(location_id__in=MapSystem.objects.filter(constellation__in=self.constellations.all()).values_list('system_id', flat=True)))
+        if self.regions.all().count()>0:
+            output.append(models.Q(location_name__system__constellation__region__in=self.regions.all()))
+            output.append(models.Q(location_id__in=MapSystem.objects.filter(constellation__region__in=self.regions.all()).values_list('system_id', flat=True)))
+        
+        if len(output) > 0:
             query = output.pop()
             for _q in output:
                 query |= _q
             character_count = character_count.filter(query)
+        return character_count
 
-            output = []
 
-            if self.systems.all().count()>0:
-                output.append(models.Q(location_name__system__in=self.systems.all()))
-                output.append(models.Q(location_id__in=self.systems.all().values_list('system_id', flat=True)))                
-            if self.constellations.all().count()>0:
-                output.append(models.Q(location_name__system__constellation__in=self.constellations.all()))
-                output.append(models.Q(location_id__in=MapSystem.objects.filter(constellation__in=self.constellations.all()).values_list('system_id', flat=True)))
-            if self.regions.all().count()>0:
-                output.append(models.Q(location_name__system__constellation__region__in=self.regions.all()))
-                output.append(models.Q(location_id__in=MapSystem.objects.filter(constellation__region__in=self.regions.all()).values_list('system_id', flat=True)))
-            
-            if len(output) > 0:
-                query = output.pop()
-                for _q in output:
-                    query |= _q
-                character_count = character_count.filter(query)
-
+    def process_filter(self, user: User):
+        try:
+            co = self.filter_query([user])
             #print(character_count.query)
-            if character_count.count() > 0:
+            if co.count() > 0:
                 return True
             else:
                 return False
@@ -772,6 +847,29 @@ class AssetsFilter(FilterBase):
             logger.error(e, exc_info=1)
             return False
 
+    def audit_filter(self, users):
+        co = self.filter_query(users).values("character__character__character_ownership__user", "type_name__name", "character__character__character_name")
+        chars = defaultdict(dict)
+        for c in co:
+            uid = c["character__character__character_ownership__user"] 
+            char_name = c["character__character__character_name"]
+            asset_type = c['type_name__name']
+            if char_name not in chars[uid]:
+                chars[uid][char_name] = []
+            if asset_type not in chars[uid][char_name]:
+                chars[uid][char_name].append(asset_type)
+
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for u in users:
+
+            if len(chars[u.id])>0:
+                out_message = []
+                for char, char_items in chars[u.id].items():
+                    out_message.append(f"{char}: {', '.join(char_items)}")
+                output[u.id] = {"message": "<br>".join(out_message), "check": True}
+            else:
+                output[u.id] = {"message": "", "check": False}
+        return output
 
 class Skillfilter(FilterBase):
     class Meta:
@@ -828,3 +926,55 @@ class Skillfilter(FilterBase):
             logger.error(e, exc_info=1)
             return False
 
+    def audit_filter(self, users):
+        output = defaultdict(lambda: {"message": "No Data", "check": False})
+        accounts = providers.skills.get_and_cache_users(users)
+        for uid, u in accounts.items():
+            message=[]
+            #print(skills_list)
+            skill_lists = self.required_skill_lists.all()
+            req_one = self.single_req_skill_lists.all()
+            if skill_lists.count() == 0 and req_one.count() ==0:
+                return False
+
+            skill_list_base = {}
+            for skl in skill_lists:
+                skill_list_base[skl.name] = {}
+                skill_list_base[skl.name]['pass']  = False
+
+            if req_one.count()>0:
+                skill_list_single = {}
+                for skl in req_one:
+                    skill_list_single[skl.name] = {}
+                    skill_list_single[skl.name]['pass']  = False
+
+            try:
+                skill_tables = u['data'].get("skills_list")
+
+                for char in skill_tables:
+                    for d_name, d_list in skill_list_base.items():
+                        if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                            skill_list_base[d_name]['pass'] = True
+                            message.append("{}:{}".format(char, d_name))
+
+                if req_one.count()>0:
+                    single_pass = False
+                    for char in skill_tables:
+                        for d_name, d_list in skill_list_single.items():
+                            if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                                single_pass = True
+                                message.append("{}:{}".format(char, d_name))
+                                break
+
+                result = True
+                for skill_list, skills_result in skill_list_base.items():
+                    result = result and skills_result['pass']
+                if req_one.count()>0:
+                    output[uid] = {'check': result and single_pass, 'message':"<br>".join(message)}
+                else:
+                    output[uid] = {'check': result, 'message':"<br>".join(message)}
+            except KeyError:
+                pass
+
+        return output
+        

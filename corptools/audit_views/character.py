@@ -313,3 +313,22 @@ def clones(request, character_id=None):
     }
 
     return render(request, 'corptools/character/clones.html', context=context)
+
+@login_required
+def roles(request, character_id=None):
+    # get available models
+
+    main_char, characters, net_worth = get_alts (request, character_id)
+    character_ids = characters.values_list('character_id', flat=True)
+    roles_data = CharacterRoles.objects\
+                        .filter(character__character__character_id__in=character_ids)\
+                        .select_related('character__character')
+
+    context = {
+        "main_char": main_char,
+        "alts": characters,
+        "net_worth": net_worth,
+        "char_data": roles_data,
+    }
+
+    return render(request, 'corptools/character/roles.html', context=context)

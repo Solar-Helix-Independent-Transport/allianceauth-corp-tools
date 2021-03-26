@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from allianceauth import hooks
 from . import urls
 from . import models
-
+from . import app_settings
 
 class MemberAudit(MenuItemHook):
     def __init__(self):
@@ -32,4 +32,4 @@ def filters():
 
 @hooks.register('discord_cogs_hook')
 def register_cogs():
-    return ["corptools.cogs.routes"]
+    return app_settings.CORPTOOLS_DISCORD_BOT_COGS
