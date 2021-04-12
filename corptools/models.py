@@ -14,7 +14,7 @@ from collections import defaultdict
 
 from esi.errors import TokenError
 from esi.models import Token
-from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter
+from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter, EveAllianceInfo
 from allianceauth.notifications import notify
 
 from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager, AuditCharacterManager, EveMoonManager, AuditCorporationManager
@@ -57,6 +57,9 @@ class CharacterAudit(models.Model):
 
     last_update_notif = models.DateTimeField(null=True, default=None, blank=True)
     cache_expire_notif = models.DateTimeField(null=True, default=None, blank=True)
+
+    last_update_roles = models.DateTimeField(null=True, default=None, blank=True)
+    cache_expire_roles = models.DateTimeField(null=True, default=None, blank=True)
 
     balance = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
 
@@ -279,6 +282,7 @@ class EveLocation(models.Model):
     last_update = models.DateTimeField(auto_now=True)
 
 class Asset(models.Model):
+    id = models.BigAutoField(primary_key=True)
     blueprint_copy = models.BooleanField(null=True, default=None)
     singleton = models.BooleanField()
     item_id = models.BigIntegerField()
@@ -635,6 +639,20 @@ class Notification(models.Model):
         )
 
 
+class CharacterTitle(models.Model):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+    title_id = models.IntegerField()
+    title = models.CharField(max_length=500)
+
+
+class CharacterRoles(models.Model):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+
+    director = models.BooleanField(default=False)
+    accountant = models.BooleanField(default=False)
+    station_manager = models.BooleanField(default=False)
+    personnel_manager = models.BooleanField(default=False)
+
 ### sec group classes
 
 class FilterBase(models.Model):
@@ -912,9 +930,10 @@ class Skillfilter(FilterBase):
             return False
 
     def audit_filter(self, users):
-        output = defaultdict(lambda: {"message": "", "check": False})
-        for user in users:
-            skills_list = providers.skills.get_and_cache_user(user.id)
+        output = defaultdict(lambda: {"message": "No Data", "check": False})
+        accounts = providers.skills.get_and_cache_users(users)
+        for uid, u in accounts.items():
+            message=[]
             #print(skills_list)
             skill_lists = self.required_skill_lists.all()
             req_one = self.single_req_skill_lists.all()
@@ -932,25 +951,86 @@ class Skillfilter(FilterBase):
                     skill_list_single[skl.name] = {}
                     skill_list_single[skl.name]['pass']  = False
 
-            skill_tables = skills_list.get("skills_list")
+            try:
+                skill_tables = u['data'].get("skills_list")
 
-            for char in skill_tables:
-                for d_name, d_list in skill_list_base.items():
-                    if len(skill_tables[char]["doctrines"][d_name]) == 0:
-                        skill_list_base[d_name]['pass'] = True
-            if req_one.count()>0:
-                single_pass = False
                 for char in skill_tables:
-                    for d_name, d_list in skill_list_single.items():
+                    for d_name, d_list in skill_list_base.items():
                         if len(skill_tables[char]["doctrines"][d_name]) == 0:
-                            single_pass = True
-                            break
+                            skill_list_base[d_name]['pass'] = True
+                            message.append("{}:{}".format(char, d_name))
 
-            result = True
-            for skill_list, skills_result in skill_list_base.items():
-                result = result and skills_result['pass']
-            if req_one.count()>0:
-                return result and single_pass
+                if req_one.count()>0:
+                    single_pass = False
+                    for char in skill_tables:
+                        for d_name, d_list in skill_list_single.items():
+                            if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                                single_pass = True
+                                message.append("{}:{}".format(char, d_name))
+                                break
+
+                result = True
+                for skill_list, skills_result in skill_list_base.items():
+                    result = result and skills_result['pass']
+                if req_one.count()>0:
+                    output[uid] = {'check': result and single_pass, 'message':"<br>".join(message)}
+                else:
+                    output[uid] = {'check': result, 'message':"<br>".join(message)}
+            except KeyError:
+                pass
+
+        return output
+
+class Rolefilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Corporate Role checks"
+        verbose_name_plural = verbose_name
+
+    has_director = models.BooleanField(default=False)
+    has_accountant = models.BooleanField(default=False)
+    has_station_manager = models.BooleanField(default=False)
+    has_personnel_manager = models.BooleanField(default=False)
+
+    corp_filter = models.ForeignKey(EveCorporationInfo, on_delete=models.CASCADE, related_name='audit_role_filter')
+    alliance_filter = models.ForeignKey(EveAllianceInfo, on_delete=models.CASCADE, related_name='audit_role_filter')
+
+    def process_filter(self, user: User):
+        try:
+            characters = user.character_ownerships.all()
+            
+            histories = CorporationHistory.objects.filter(character=main_character).order_by('-start_date').first()
+
+            days = timezone.now() - histories.start_date
+            if days.days >= self.days_in_corp:
+                return True
             else:
-                return result
-        
+                return False
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False
+
+    def audit_filter(self, users):
+        co = users.annotate(
+                        max_timestamp=Max('profile__main_character__characteraudit__corporationhistory__start_date')
+                    ).values("id", "max_timestamp")
+        chars = defaultdict(lambda: None)
+        for c in co:
+            if c['max_timestamp']:
+                days = timezone.now() - c['max_timestamp']
+                days = days.days
+            else:
+                days = -1
+            chars[c['id']] = days
+            
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for c, char_list in chars.items():
+            if char_list >= self.days_in_corp:
+                check = True
+            else:
+                check = False
+            if char_list < 0:
+                msg = "No Audit"
+            else:
+                msg = str(char_list) + " Days"
+            output[c] = {"message": msg, "check": check}
+        return output
