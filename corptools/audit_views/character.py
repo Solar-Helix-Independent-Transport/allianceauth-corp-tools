@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
-from django.db.models import Count, F, Sum, Max, Q
+from django.db.models import Count, F, Sum, Max, Q, FloatField
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from esi.decorators import token_required
@@ -332,3 +332,34 @@ def roles(request, character_id=None):
     }
 
     return render(request, 'corptools/character/roles.html', context=context)
+
+@login_required
+def market(request, character_id=None):
+    # get available models
+
+    main_char, characters, net_worth = get_alts (request, character_id)
+    character_ids = characters.values_list('character_id', flat=True)
+
+    market_data_current = CharacterMarketOrder.objects\
+                                .filter(character__character__character_id__in=character_ids, state="active")\
+                                .select_related('character__character', 'type_name', 'location_name')
+
+    market_data_old = CharacterMarketOrder.objects\
+                                .filter(character__character__character_id__in=character_ids, duration__gt=0)\
+                                .select_related('character__character', 'type_name', 'location_name')\
+                                .exclude(state="active")
+
+    total_buy = market_data_current.filter(is_buy_order=True).aggregate(total_buy=Sum(F('price')*F('volume_remain'), output_field=FloatField()))
+    total_sell = market_data_current.filter(is_buy_order=None).aggregate(total_sell=Sum(F('price')*F('volume_remain'), output_field=FloatField()))
+
+    context = {
+        "main_char": main_char,
+        "alts": characters,
+        "net_worth": net_worth,
+        "char_data": market_data_current,
+        "old_data": market_data_old,
+        "total_sell": total_sell['total_sell'],
+        "total_buy": total_buy['total_buy'],
+    }
+
+    return render(request, 'corptools/character/market.html', context=context)

@@ -14,7 +14,7 @@ from collections import defaultdict
 
 from esi.errors import TokenError
 from esi.models import Token
-from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter
+from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter, EveAllianceInfo
 from allianceauth.notifications import notify
 
 from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager, AuditCharacterManager, EveMoonManager, AuditCorporationManager
@@ -977,4 +977,57 @@ class Skillfilter(FilterBase):
                 pass
 
         return output
-        
+
+class Rolefilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Corporate Role checks"
+        verbose_name_plural = verbose_name
+
+    has_director = models.BooleanField(default=False)
+    has_accountant = models.BooleanField(default=False)
+    has_station_manager = models.BooleanField(default=False)
+    has_personnel_manager = models.BooleanField(default=False)
+
+    corp_filter = models.ForeignKey(EveCorporationInfo, on_delete=models.CASCADE, related_name='audit_role_filter')
+    alliance_filter = models.ForeignKey(EveAllianceInfo, on_delete=models.CASCADE, related_name='audit_role_filter')
+
+    def process_filter(self, user: User):
+        try:
+            characters = user.character_ownerships.all()
+            
+            histories = CorporationHistory.objects.filter(character=main_character).order_by('-start_date').first()
+
+            days = timezone.now() - histories.start_date
+            if days.days >= self.days_in_corp:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False
+
+    def audit_filter(self, users):
+        co = users.annotate(
+                        max_timestamp=Max('profile__main_character__characteraudit__corporationhistory__start_date')
+                    ).values("id", "max_timestamp")
+        chars = defaultdict(lambda: None)
+        for c in co:
+            if c['max_timestamp']:
+                days = timezone.now() - c['max_timestamp']
+                days = days.days
+            else:
+                days = -1
+            chars[c['id']] = days
+            
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for c, char_list in chars.items():
+            if char_list >= self.days_in_corp:
+                check = True
+            else:
+                check = False
+            if char_list < 0:
+                msg = "No Audit"
+            else:
+                msg = str(char_list) + " Days"
+            output[c] = {"message": msg, "check": check}
+        return output

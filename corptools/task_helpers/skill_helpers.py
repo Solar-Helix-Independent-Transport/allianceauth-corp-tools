@@ -49,6 +49,8 @@ class SkillListCache():
                         c['data']=self.get_and_cache_user(u)
                     else:
                         c['data']=cached_skills
+                else:
+                    c['data']=self.get_and_cache_user(u)
             else:
                 c['data']=self.get_and_cache_user(u)
 

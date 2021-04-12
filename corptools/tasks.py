@@ -12,6 +12,8 @@ from allianceauth.eveonline.models import EveCharacter
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
+from esi.errors import TokenExpiredError
+
 from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, process_category_from_esi, fetch_location_name
 from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_clones, update_character_skill_queue, update_character_wallet, update_character_orders, update_character_order_history, update_character_notifications, update_character_roles
 from .task_helpers.corp_helpers import update_corp_wallet_division
@@ -84,8 +86,11 @@ def update_character(char_id):
     if character is None:
         token = Token.get_token(char_id, views.CHAR_REQUIRED_SCOPES)
         if token:
-            if token.is_valid():
-                character, created = CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
+            try:
+                if token.valid_access_token():
+                    character, created = CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
+            except TokenExpiredError:
+                return False
 
     logger.info("Starting Updates for {}".format(character.character.character_name))
     que = []
