@@ -52,6 +52,9 @@ class CharacterAudit(models.Model):
     last_update_wallet = models.DateTimeField(null=True, default=None, blank=True)
     cache_expire_wallet = models.DateTimeField(null=True, default=None, blank=True)
 
+    last_update_orders = models.DateTimeField(null=True, default=None, blank=True)
+    cache_expire_orders = models.DateTimeField(null=True, default=None, blank=True)
+
     last_update_notif = models.DateTimeField(null=True, default=None, blank=True)
     cache_expire_notif = models.DateTimeField(null=True, default=None, blank=True)
 

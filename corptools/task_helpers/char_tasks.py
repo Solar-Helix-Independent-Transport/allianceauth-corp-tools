@@ -388,7 +388,9 @@ def update_character_orders(character_id):
         return "No Tokens"
     
     open_orders = providers.esi.client.Market.get_characters_character_id_orders(character_id=character_id,
-                                        token=token.valid_access_token()).result()
+                                        token=token.valid_access_token())
+    open_orders.request_config.also_return_response = True
+    open_orders, result = open_orders.result()
 
     open_ids = list(CharacterMarketOrder.objects.filter(character=audit_char, state='active').values_list("order_id", flat=True))
     all_locations = list(EveLocation.objects.all().values_list('location_id', flat=True))
@@ -449,6 +451,11 @@ def update_character_orders(character_id):
         CharacterMarketOrder.objects.bulk_create(creates)
 
     CharacterMarketOrder.objects.filter(character=audit_char, state='active').exclude(order_id__in=tracked_ids).delete()
+
+    audit_char.last_update_orders = timezone.now()
+    audit_char.cache_expire_orders = datetime.datetime.strptime(str(result.headers['expires']), '%a, %d %b %Y %H:%M:%S %Z')
+    audit_char.save()
+    audit_char.is_active()
 
     return "Finished Orders for: {}".format(audit_char.character.character_name)
 

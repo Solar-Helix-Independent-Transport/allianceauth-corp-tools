@@ -29,5 +29,4 @@ urlpatterns = [
          url(r'^menu/', corp_list, name='corp_menu'),
 
     ])),
-
     ]
