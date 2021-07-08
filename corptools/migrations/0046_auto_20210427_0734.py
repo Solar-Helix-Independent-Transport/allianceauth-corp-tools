@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('eveonline', '0014_auto_20210105_1413'),
+        ('eveonline', '0012_index_additions'),
         ('corptools', '0045_bigkey_assets_fix'),
     ]
 
