@@ -7,6 +7,7 @@ from . import app_settings
 
 class MemberAudit(MenuItemHook):
     def __init__(self):
+        
         MenuItemHook.__init__(self,
                               _('Audit'),
                               'far fa-eye fa-fw',

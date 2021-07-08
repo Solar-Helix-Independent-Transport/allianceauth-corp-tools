@@ -1,7 +1,7 @@
 from django.conf.urls import url, include
 
 from . import views
-from corptools.audit_views.character import assets, wallet, pub_data, skills, clones, assets_lists, roles, market
+from corptools.audit_views.character import assets, wallet, pub_data, skills, clones, assets_lists, roles, market, status
 from corptools.audit_views.corporation import corp_list
 app_name = 'corptools'
 
@@ -23,8 +23,10 @@ urlpatterns = [
     url(r'^assets_lists/(?P<character_id>(\d)*)/(?P<location_id>(\d)*)/$', assets_lists, name='assets_lists'),
     url(r'^wallet/$', wallet, name='wallet'),
     url(r'^wallet/(?P<character_id>(\d)*)/$', wallet, name='wallet'),
-    url(r'^overview/$', pub_data, name='overview'),
-    url(r'^overview/(?P<character_id>(\d)*)/$', pub_data, name='overview'),
+    url(r'^pub_data/$', pub_data, name='public_data'),
+    url(r'^pub_data/(?P<character_id>(\d)*)/$', pub_data, name='public_data'),
+    url(r'^overview/$', status, name='overview'),
+    url(r'^overview/(?P<character_id>(\d)*)/$', status, name='overview'),
     url(r'^skills/$', skills, name='skills'),
     url(r'^skills/(?P<character_id>(\d)*)/$', skills, name='skills'),
     url(r'^clones/$', clones, name='clones'),

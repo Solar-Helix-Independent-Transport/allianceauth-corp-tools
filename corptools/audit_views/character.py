@@ -201,6 +201,36 @@ def wallet(request, character_id=None):
     return render(request, 'corptools/character/wallet.html', context=context)
 
 @login_required
+def status(request, character_id=None):
+    # get available models
+
+    main_char, characters, net_worth = get_alts (request, character_id)
+    character_ids = characters.values_list('character_id', flat=True)
+    char_skill_total = Skill.objects\
+                        .filter(character__character__character_id__in=character_ids)\
+                        .values('character')\
+                        .annotate(char=F('character__character__character_name'))\
+                        .annotate(total_sp=Sum('skillpoints_in_skill'))
+
+    bios = None
+
+    table_data = {}
+    for char in characters:
+        table_data[char.character_name] = {"character":char,"history":{},"bio":"Nothing of value is here"}
+
+    for c in char_skill_total:
+        table_data[c.get('char')]["total_sp"] = c.get('total_sp')
+
+    context = {
+        "main_char": main_char,
+        "alts": characters,
+        "net_worth": net_worth,
+        "table_data": table_data,
+    }
+
+    return render(request, 'corptools/character/status.html', context=context)
+
+@login_required
 def pub_data(request, character_id=None):
     # get available models
 

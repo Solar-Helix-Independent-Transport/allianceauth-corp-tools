@@ -1,0 +1,71 @@
+{% extends 'corptools/character/char_base.html' %}
+{% load humanize  %}
+{% load evelinks %}
+{% block ct_block %}
+<div class="row flex-container flex-wrap">
+    {% for name, data in table_data.items %}
+        <div class="col-md-6 col-xs-12 col-sm-12">
+            <div class="panel {% if data.character.characteraudit.is_active %}panel-primary{% else %}panel-danger{% endif %}">
+                <div class="panel-heading  text-center"> {{name}} </div>
+                <div class="panel-body flex-middle ">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <img class="ra-avatar img-circle" src="{{ data.character.portrait_url_128 }}">
+                            <h4>{{ data.character.character_name }}</h4>
+                            <span class="badge badge-success">Total SP: {{ data.total_sp|intcomma }}</span>
+                            <span class="badge badge-success">Isk: {{ data.character.characteraudit.balance|intcomma }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-8 col-lg-8 pannel-hieght-locked scroll-bar-narrow">
+                        <table class="table datatable table-hover">
+                            <thead>
+                                <th>Dataset</th>
+                                <th>Last Update</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Public Data</td><td>{{ data.character.characteraudit.last_update_pub_data|timesince}} ago</td>
+                                </tr>
+                                <tr>
+                                    <td>Skills</td><td>{{ data.character.characteraudit.last_update_skills|timesince}} ago</td>
+                                </tr>
+                                <tr>
+                                    <td>Skill Que</td><td>{{ data.character.characteraudit.last_update_skill_que|timesince}} ago</td>
+                                </tr>
+                                <tr>
+                                    <td>Clones</td><td>{{ data.character.characteraudit.last_update_clones|timesince}} ago</td>
+                                </tr>
+                                <tr>
+                                    <td>Assets</td><td>{{ data.character.characteraudit.last_update_assets|timesince}} ago</td>
+                                </tr>
+                                <tr>
+                                    <td>Wallets</td><td>{{ data.character.characteraudit.last_update_wallet|timesince}} ago</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>    
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+{% block extra_javascript %}
+    {% include 'bundles/datatables-js.html' %}
+{% endblock %}
+{% block ct_extra_script %}
+$(document).ready(function() {
+    $('table.datatable').DataTable({
+        "paging":   false,
+        "searching":  false,
+        "ordering":  false,
+        "info":     false,
+        "columnDefs": [
+            { "sortable": false, "targets": [0] }
+        ]
+    });
+    } );
+{% endblock %}
+
+

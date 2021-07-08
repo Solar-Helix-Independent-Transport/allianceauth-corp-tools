@@ -208,7 +208,7 @@ tr.group:hover {
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul class="nav navbar-nav">
                                 <li class="">
-                                    <a href="{% url 'corptools:overview' main_char.character_id %}">Overview</a>
+                                    <a href="{% url 'corptools:overview' main_char.character_id%}">Overview</a>
                                 </li>
                                 <li class="">
                                     <a href="{% url 'corptools:assets' main_char.character_id%}">Assets</a>
@@ -218,6 +218,9 @@ tr.group:hover {
                                 </li>
                                 <li class="">
                                   <a href="{% url 'corptools:market' main_char.character_id%}">Market</a>
+                                </li>
+                                <li class="">
+                                    <a href="{% url 'corptools:public_data' main_char.character_id %}">Public Data</a>
                                 </li>
                                 <li class="">
                                   <a href="{% url 'corptools:roles' main_char.character_id%}">Roles</a>
@@ -270,10 +273,10 @@ tr.group:hover {
                         <div class="col-xs-12 hidden-md hidden-lg"><hr></div>
                         <div class="text-center col-md-6"  rowspan="2">
                             <h4>Linked characters</h4> 
-                            {% for alt in alts|slice:":15" %}
-                        <span rel="tooltip" style="background-color: {% if alt.characteraudit.is_active %}#008844{% else %}#AA0000{% endif %}" class="label label-default" data-toggle="tooltip" data-placement="top" data-html="true" title data-original-title="Public Data: {{ alt.characteraudit.last_update_pub_data|timesince}} ago<br>Skills: {{ alt.characteraudit.last_update_skills|timesince}} ago<br>Skill Que: {{ alt.characteraudit.last_update_skill_que|timesince}} ago<br>Clones: {{ alt.characteraudit.last_update_clones|timesince}} ago<br>Assets: {{ alt.characteraudit.last_update_assets|timesince}} ago<br>Wallets: {{ alt.characteraudit.last_update_wallet|timesince}} ago"><img class="ra-avatar img-circle img-pad" src="{{ alt.portrait_url_32 }}"> {{ alt.character_name }}</span>
+                            {% for alt in alts|slice:":30" %}
+                        <span rel="tooltip" style="background-color: {% if alt.characteraudit.is_active %}#008844{% else %}#AA0000{% endif %}" class="label label-default" data-toggle="tooltip" data-placement="top" data-html="true" title data-original-title="Public Data: {{ alt.characteraudit.last_update_pub_data|timesince}} ago<br>Skills: {{ alt.characteraudit.last_update_skills|timesince}} ago<br>Skill Que: {{ alt.characteraudit.last_update_skill_que|timesince}} ago<br>Clones: {{ alt.characteraudit.last_update_clones|timesince}} ago<br>Assets: {{ alt.characteraudit.last_update_assets|timesince}} ago<br>Wallets: {{ alt.characteraudit.last_update_wallet|timesince}} ago">{{ alt.character_name }}</span>
                             {% endfor %}
-                            {% if alts.count > 15 %}<span class="label label-default">{{ alts.count|subtract:15 }} More... </span>{% endif %}
+                            {% if alts.count > 30 %}<span class="label label-default">{{ alts.count|subtract:30 }} More... </span>{% endif %}
                             <br>
                             <span class="label label-default">Total Account ISK: {{ net_worth|intcomma }}</span>
                         </div>

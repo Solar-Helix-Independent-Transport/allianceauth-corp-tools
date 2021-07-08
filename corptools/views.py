@@ -84,7 +84,12 @@ def add_char(request, token):
 @login_required
 @token_required(scopes=CORP_REQUIRED_SCOPES)
 def add_corp(request, token):
-    corp, created = EveCorporationInfo.objects.get_or_create(corporation_id=EveCharacter.objects.get_character_by_id(token.character_id).corporation_id)
+    char = EveCharacter.objects.get_character_by_id(token.character_id)
+    corp, created = EveCorporationInfo.objects.get_or_create(corporation_id=char.corporation_id,
+                                                             defaults={'member_count': 0,
+                                                                       'corporation_ticker': char.corporation_ticker,
+                                                                       'corporation_name': char.corporation_name
+                                                             })
     CorporationAudit.objects.update_or_create(corporation=corp)
     update_all_corps.apply_async(priority=6)
     return redirect('corptools:corp_menu')

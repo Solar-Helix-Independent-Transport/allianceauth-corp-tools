@@ -19,6 +19,7 @@ from allianceauth.notifications import notify
 
 from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager, AuditCharacterManager, EveMoonManager, AuditCorporationManager
 from . import providers
+from . import validators
 
 from model_utils import Choices
 
@@ -486,7 +487,7 @@ class CharacterMarketOrder(MarketOrder):
 class SkillList(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=500, null=True, default=None)
-    skill_list = models.TextField(null=True, default="")
+    skill_list = models.TextField(null=True, default="", validators=[validators.valid_json])
     show_on_audit = models.BooleanField(default=True)
     order_weight = models.IntegerField(default=0)
 
