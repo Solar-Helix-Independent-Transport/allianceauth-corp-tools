@@ -98,7 +98,13 @@ def add_corp(request, token):
 @permission_required('corptools.view_characteraudit')
 def corptools_menu(request):
     # get available models
-    cas = CharacterAudit.objects.visible_to(request.user).select_related('character__character_ownership__user__profile__main_character').prefetch_related('character__character_ownership__user__character_ownerships').prefetch_related('character__character_ownership__user__character_ownerships__character')
+    cas = CharacterAudit.objects.visible_to(request.user)\
+        .select_related('character__character_ownership__user__profile__main_character',
+                        'character__characteraudit')\
+        .prefetch_related('character__character_ownership__user__character_ownerships')\
+        .prefetch_related('character__character_ownership__user__character_ownerships__character')\
+        .prefetch_related('character__character_ownership__user__character_ownerships__character__characteraudit')\
+
 
     chars = {}
     orphans = []
@@ -107,7 +113,8 @@ def corptools_menu(request):
             main = char.character.character_ownership.user.profile.main_character
             if main:
                 if main.character_name not in chars:
-                    chars[str(main.character_id)] = {'main':main, 'audit':char}
+                    chars[str(main.character_id)] = {'main': main, 
+                                                     'audit': char}
             else:
                 orphans.append(char)
         except ObjectDoesNotExist:
