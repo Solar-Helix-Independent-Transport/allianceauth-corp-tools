@@ -207,30 +207,7 @@ tr.group:hover {
                 
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul class="nav navbar-nav">
-                                <li class="">
-                                    <a href="{% url 'corptools:overview' main_char.character_id%}">Overview</a>
-                                </li>
-                                <li class="">
-                                    <a href="{% url 'corptools:assets' main_char.character_id%}">Assets</a>
-                                </li>
-                                <li class="">
-                                  <a href="{% url 'corptools:clones' main_char.character_id%}">Clones</a>
-                                </li>
-                                <li class="">
-                                  <a href="{% url 'corptools:market' main_char.character_id%}">Market</a>
-                                </li>
-                                <li class="">
-                                    <a href="{% url 'corptools:public_data' main_char.character_id %}">Public Data</a>
-                                </li>
-                                <li class="">
-                                  <a href="{% url 'corptools:roles' main_char.character_id%}">Roles</a>
-                                </li>
-                                <li class="">
-                                  <a href="{% url 'corptools:skills' main_char.character_id%}">Skills</a>
-                                </li>
-                                <li class="">
-                                    <a href="{% url 'corptools:wallet' main_char.character_id %}">Wallet</a>
-                                </li>
+                                {% include 'corptools/character/char_menu.html' %}
                             </ul>
                             <ul class="nav navbar-nav pull-right">
                                 <li class>

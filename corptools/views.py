@@ -19,41 +19,8 @@ from itertools import chain
 from .models import * 
 from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi, update_all_corps, check_account
 from .forms import UploadForm
-
+from . import app_settings
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
-
-CHAR_REQUIRED_SCOPES = [
-    'esi-calendar.read_calendar_events.v1',
-    'esi-universe.read_structures.v1',
-    'esi-fittings.read_fittings.v1',
-    'esi-characters.read_standings.v1',
-    'esi-assets.read_assets.v1',
-    'esi-characters.read_contacts.v1',
-    'esi-characters.read_corporation_roles.v1',
-    'esi-characters.read_notifications.v1',
-    'esi-characters.read_opportunities.v1',
-    'esi-characters.read_titles.v1',
-    'esi-clones.read_clones.v1',
-    'esi-clones.read_implants.v1',
-    'esi-contracts.read_character_contracts.v1',
-    'esi-fleets.read_fleet.v1',
-    'esi-industry.read_character_jobs.v1',
-    'esi-industry.read_character_mining.v1',
-    'esi-killmails.read_killmails.v1',
-    'esi-location.read_location.v1',
-    'esi-location.read_online.v1',
-    'esi-location.read_ship_type.v1',
-    'esi-markets.read_character_orders.v1',
-    'esi-search.search_structures.v1',
-    'esi-skills.read_skillqueue.v1',
-    'esi-skills.read_skills.v1',
-    'esi-ui.open_window.v1',
-    'esi-ui.write_waypoint.v1',
-    'esi-universe.read_structures.v1',
-    'esi-wallet.read_character_wallet.v1',
-    'esi-characters.read_fatigue.v1',
-    'publicData'
-]
 
 CORP_REQUIRED_SCOPES = [
     'esi-assets.read_corporation_assets.v1',
@@ -75,7 +42,7 @@ CORP_REQUIRED_SCOPES = [
 ]
 
 @login_required
-@token_required(scopes=CHAR_REQUIRED_SCOPES)
+@token_required(scopes=app_settings.get_character_scopes())
 def add_char(request, token):
     CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
     update_character.apply_async(args=[token.character_id], priority=6)

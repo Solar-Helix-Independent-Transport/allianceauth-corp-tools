@@ -1,5 +1,6 @@
 from django.utils.safestring import mark_safe
 from django.template.defaulttags import register
+from .. import app_settings as app_sett
 
 @register.filter(name='addclass')
 def addclass(value, arg):
@@ -15,6 +16,10 @@ def deslug(slugged):
         return slugged.replace('_', ' ')
     except:
         return slugged
+
+@register.simple_tag()
+def app_setting():
+    return app_sett
 
 @register.filter(name='level')
 def skill_level(active, trained):

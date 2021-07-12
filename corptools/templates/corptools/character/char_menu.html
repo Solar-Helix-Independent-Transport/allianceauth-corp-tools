@@ -1,0 +1,43 @@
+{% load helpers  %}
+{% app_setting as appset %}
+<li class="">
+    <a href="{% url 'corptools:overview' main_char.character_id%}">Overview</a>
+</li>
+{% if appset.CT_CHAR_ASSETS_MODULE %}
+<li class="">
+    <a href="{% url 'corptools:assets' main_char.character_id%}">Assets</a>
+</li>
+{% endif %}
+{% if appset.CT_CHAR_CLONES_MODULE %}
+<li class="">
+    <a href="{% url 'corptools:clones' main_char.character_id%}">Clones</a>
+</li>
+{% endif %}
+{% if appset.CT_CHAR_MAIL_MODULE %}
+<li class="">
+    <a href="">Mail</a>
+</li>
+{% endif %}
+{% if appset.CT_CHAR_WALLET_MODULE %}
+<li class="">
+    <a href="{% url 'corptools:market' main_char.character_id%}">Market</a>
+</li>
+{% endif %}
+<li class="">
+    <a href="{% url 'corptools:public_data' main_char.character_id %}">Public Data</a>
+</li>
+{% if appset.CT_CHAR_ROLES_MODULE %}
+<li class="">
+    <a href="{% url 'corptools:roles' main_char.character_id%}">Roles</a>
+</li>
+{% endif %}
+{% if appset.CT_CHAR_SKILLS_MODULE %}
+<li class="">
+    <a href="{% url 'corptools:skills' main_char.character_id%}">Skills</a>
+</li>
+{% endif %}
+{% if appset.CT_CHAR_WALLET_MODULE %}
+<li class="">
+    <a href="{% url 'corptools:wallet' main_char.character_id %}">Wallet</a>
+</li>
+{% endif %}
