@@ -18,4 +18,123 @@ CT_CHAR_SKILLS_MODULE = getattr(settings, 'CT_CHAR_SKILLS_MODULE', True)
 CT_CHAR_CLONES_MODULE = getattr(settings, 'CT_CHAR_CLONES_MODULE', True)
 CT_CHAR_LOCATIONS_MODULE = getattr(settings, 'CT_CHAR_LOCATIONS_MODULE', True)
 CT_CHAR_MAIL_MODULE = getattr(settings, 'CT_CHAR_MAIL_MODULE', False)
+CT_CHAR_HELPER_MODULE = getattr(settings, 'CT_CHAR_HELPER_MODULE', True)
+
+
+def get_character_scopes():
+    _scopes = [
+                # Base
+                'publicData',
+                'esi-universe.read_structures.v1',
+                'esi-search.search_structures.v1',
+                'esi-characters.read_opportunities.v1',
+              ]
+
+    if CT_CHAR_HELPER_MODULE:
+        _scopes += [
+                    # Helpers
+                    'esi-ui.open_window.v1',
+                    'esi-ui.write_waypoint.v1',
+                    ]
+
+    if CT_CHAR_STANDINGS_MODULE:
+        _scopes += [
+                    # Standings
+                    'esi-characters.read_standings.v1',
+                    ]
+
+    if CT_CHAR_KILLMAILS_MODULE:
+        _scopes += [
+                    # Killmails
+                    'esi-killmails.read_killmails.v1',
+                    ]
+
+    if CT_CHAR_FITTINGS_MODULE:
+        _scopes += [
+                    # Fittings
+                    'esi-fittings.read_fittings.v1',
+                    ]
+
+    if CT_CHAR_CALLENDAR_MODULE:
+        _scopes += [
+                    # Callendar
+                    'esi-calendar.read_calendar_events.v1',
+                    ]
+                    
+    if CT_CHAR_CONTACTS_MODULE:
+        _scopes += [
+                    # Contacts
+                    'esi-characters.read_contacts.v1',
+                    ]
+
+    if CT_CHAR_NOTIFICATIONS_MODULE:
+        _scopes += [
+                    # Notifications
+                    'esi-characters.read_notifications.v1',
+                    ]
+
+    if CT_CHAR_ROLES_MODULE:
+        _scopes += [
+                    # Roles 
+                    'esi-characters.read_titles.v1',
+                    'esi-characters.read_corporation_roles.v1',
+                    ]
+
+    if CT_CHAR_INDUSTRY_MODULE:
+        _scopes += [
+                    # Industry
+                    'esi-industry.read_character_jobs.v1',
+                    ]
+
+    if CT_CHAR_MINING_MODULE:
+        _scopes += [
+                    # Mining
+                    'esi-industry.read_character_mining.v1',
+                    ]
+
+    if CT_CHAR_WALLET_MODULE:
+        _scopes += [
+                    # Wallet / Market /  Contracts
+                    'esi-markets.read_character_orders.v1',
+                    'esi-wallet.read_character_wallet.v1',
+                    'esi-contracts.read_character_contracts.v1',
+                    ]
+
+    if CT_CHAR_ASSETS_MODULE:
+        _scopes += [
+                    # Assets
+                    'esi-assets.read_assets.v1',
+                    ]
+
+    if CT_CHAR_SKILLS_MODULE:
+        _scopes += [
+                    # Skills
+                    'esi-skills.read_skillqueue.v1',
+                    'esi-skills.read_skills.v1',
+                    ]
+
+    if CT_CHAR_CLONES_MODULE:
+        _scopes += [
+                    # Clones
+                    'esi-clones.read_implants.v1',
+                    'esi-clones.read_clones.v1',
+                    ]
+
+    if CT_CHAR_LOCATIONS_MODULE:
+        _scopes += [
+                    # Locations
+                    'esi-location.read_location.v1',
+                    'esi-location.read_online.v1',
+                    'esi-location.read_ship_type.v1',
+                    'esi-characters.read_fatigue.v1',
+                    'esi-fleets.read_fleet.v1',
+                    ]
+
+    if CT_CHAR_MAIL_MODULE:
+        _scopes += [
+                    # Mail
+                    'esi-mail.read_mail.v1',
+                    ]
+
+    return list(set(_scopes))
 

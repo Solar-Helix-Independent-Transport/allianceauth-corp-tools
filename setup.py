@@ -1,7 +1,7 @@
 import os
 from setuptools import find_packages, setup
 install_requires = [
-    'allianceauth',
+    'allianceauth>=2.8.0',
     'django-esi>=2.0.0',
     'django-model-utils',
     'networkx'
