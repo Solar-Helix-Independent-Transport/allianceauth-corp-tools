@@ -19,27 +19,36 @@
                     <div class="col-md-8 col-lg-8 pannel-hieght-locked scroll-bar-narrow">
                         <table class="table datatable table-hover">
                             <thead>
-                                <th>Dataset</th>
+                                <th class="text-right">Dataset</th>
                                 <th>Last Update</th>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Public Data</td><td>{{ data.character.characteraudit.last_update_pub_data|timesince}} ago</td>
+                                    <td class="text-right">Public Data</td><td>{{ data.character.characteraudit.last_update_pub_data|timesince}} ago</td>
                                 </tr>
                                 <tr>
-                                    <td>Skills</td><td>{{ data.character.characteraudit.last_update_skills|timesince}} ago</td>
+                                    <td class="text-right">Assets</td><td>{{ data.character.characteraudit.last_update_assets|timesince}} ago</td>
                                 </tr>
                                 <tr>
-                                    <td>Skill Que</td><td>{{ data.character.characteraudit.last_update_skill_que|timesince}} ago</td>
+                                    <td class="text-right">Clones</td><td>{{ data.character.characteraudit.last_update_clones|timesince}} ago</td>
                                 </tr>
                                 <tr>
-                                    <td>Clones</td><td>{{ data.character.characteraudit.last_update_clones|timesince}} ago</td>
+                                    <td class="text-right">Orders</td><td>{{ data.character.characteraudit.last_update_orders|timesince}} ago</td>
                                 </tr>
                                 <tr>
-                                    <td>Assets</td><td>{{ data.character.characteraudit.last_update_assets|timesince}} ago</td>
+                                    <td class="text-right">Notifications</td><td>{{ data.character.characteraudit.last_update_notif|timesince}} ago</td>
                                 </tr>
                                 <tr>
-                                    <td>Wallets</td><td>{{ data.character.characteraudit.last_update_wallet|timesince}} ago</td>
+                                    <td class="text-right">Roles</td><td>{{ data.character.characteraudit.last_update_roles|timesince}} ago</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right">Skills</td><td>{{ data.character.characteraudit.last_update_skills|timesince}} ago</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right">Skill Que</td><td>{{ data.character.characteraudit.last_update_skill_que|timesince}} ago</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right">Wallet</td><td>{{ data.character.characteraudit.last_update_wallet|timesince}} ago</td>
                                 </tr>
                             </tbody>
                         </table>

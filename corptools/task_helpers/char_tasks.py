@@ -574,7 +574,7 @@ def update_character_notifications(character_id):
 
     Notification.objects.bulk_create(_creates, batch_size=500)
 
-    audit_char.last_update_clones = timezone.now()
+    audit_char.last_update_notif = timezone.now()
     audit_char.save()
     audit_char.is_active()
 
