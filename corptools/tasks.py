@@ -1,6 +1,5 @@
 import datetime
 import logging
-import os
 import json
 
 from celery import shared_task, chain
@@ -18,10 +17,11 @@ from requests.adapters import MaxRetryError
 from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, process_category_from_esi, fetch_location_name
 from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_clones, update_character_skill_queue, update_character_wallet, update_character_orders, update_character_order_history, update_character_notifications, update_character_roles, update_character_mail, process_mail_list
 from .task_helpers.corp_helpers import update_corp_wallet_division
-from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone, CharacterMarketOrder, MapSystem, MapJumpBridge
+from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone, CharacterMarketOrder
 from . import providers
+from . import app_settings
+
 from esi.models import Token
-from . import views
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,7 @@ def check_account(character_id):
 def update_character(char_id):
     character = CharacterAudit.objects.filter(character__character_id=char_id).first()
     if character is None:
-        token = Token.get_token(char_id, views.CHAR_REQUIRED_SCOPES)
+        token = Token.get_token(char_id, app_settings.get_character_scopes())
         if token:
             try:
                 if token.valid_access_token():
