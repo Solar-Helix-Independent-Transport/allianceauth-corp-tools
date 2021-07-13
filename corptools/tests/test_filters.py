@@ -120,12 +120,16 @@ class TestSecGroupBotFilters(TestCase):
         audits = []
         for uid in range(0,17): #4,5,6,7
             audits.append(ct_models.CharacterAudit.objects.create(character=characters[uid],
-                                                    last_update_assets=timezone.now(),
-                                                    last_update_clones=timezone.now(),
-                                                    last_update_pub_data=timezone.now(),
-                                                    last_update_skill_que=timezone.now(),
-                                                    last_update_skills=timezone.now(),
-                                                    last_update_wallet=timezone.now()))
+                                                                    last_update_assets=timezone.now(),
+                                                                    last_update_clones=timezone.now(),
+                                                                    last_update_pub_data=timezone.now(),
+                                                                    last_update_skill_que=timezone.now(),
+                                                                    last_update_skills=timezone.now(),
+                                                                    last_update_wallet=timezone.now(),
+                                                                    last_update_orders=timezone.now(),
+                                                                    last_update_notif=timezone.now(),
+                                                                    last_update_roles=timezone.now(),
+                                                                    last_update_mails=timezone.now(),))
         audits.append(ct_models.CharacterAudit.objects.create(character=characters[17]))
 
         skg1 = ct_models.EveItemGroup.objects.create(group_id=1,
