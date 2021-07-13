@@ -20,6 +20,7 @@ from allianceauth.notifications import notify
 from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager, AuditCharacterManager, EveMoonManager, AuditCorporationManager
 from . import providers
 from . import validators
+from . import app_settings
 
 from model_utils import Choices
 
@@ -69,14 +70,25 @@ class CharacterAudit(models.Model):
     def is_active(self):
         time_ref = timezone.now() - datetime.timedelta(days=MAX_INACTIVE_DAYS)
         try:
-            assets = self.last_update_assets > time_ref
-            clones = self.last_update_clones > time_ref
-            skills = self.last_update_skills > time_ref
-            skillq = self.last_update_skill_que > time_ref
-            pubdat = self.last_update_pub_data > time_ref
-            wallet = self.last_update_wallet > time_ref
+            is_active = (self.last_update_pub_data > time_ref)
 
-            is_active = ( assets and clones and skills and skillq and pubdat and wallet )
+            if app_settings.CT_CHAR_ASSETS_MODULE:
+                is_active = is_active and (self.last_update_assets > time_ref)
+            if app_settings.CT_CHAR_CLONES_MODULE:
+                is_active = is_active and (self.last_update_clones > time_ref)
+            if app_settings.CT_CHAR_SKILLS_MODULE:
+                is_active = is_active and (self.last_update_skills > time_ref)
+                is_active = is_active and (self.last_update_skill_que > time_ref)
+            if app_settings.CT_CHAR_WALLET_MODULE:
+                is_active = is_active and (self.last_update_wallet > time_ref)
+                is_active = is_active and (self.last_update_orders > time_ref)
+            if app_settings.CT_CHAR_NOTIFICATIONS_MODULE:
+                is_active = is_active and (self.last_update_notif > time_ref)
+            if app_settings.CT_CHAR_ROLES_MODULE:
+                is_active = is_active and (self.last_update_roles > time_ref)
+            if app_settings.CT_CHAR_MAIL_MODULE:
+                is_active = is_active and (self.last_update_mails > time_ref)
+
             
             if self.active != is_active:
                 self.active = is_active

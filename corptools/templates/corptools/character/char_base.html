@@ -251,7 +251,7 @@ tr.group:hover {
                         <div class="text-center col-md-6"  rowspan="2">
                             <h4>Linked characters</h4> 
                             {% for alt in alts|slice:":30" %}
-                        <span rel="tooltip" style="background-color: {% if alt.characteraudit.is_active %}#008844{% else %}#AA0000{% endif %}" class="label label-default" data-toggle="tooltip" data-placement="top" data-html="true" title data-original-title="Public Data: {{ alt.characteraudit.last_update_pub_data|timesince}} ago<br>Skills: {{ alt.characteraudit.last_update_skills|timesince}} ago<br>Skill Que: {{ alt.characteraudit.last_update_skill_que|timesince}} ago<br>Clones: {{ alt.characteraudit.last_update_clones|timesince}} ago<br>Assets: {{ alt.characteraudit.last_update_assets|timesince}} ago<br>Wallets: {{ alt.characteraudit.last_update_wallet|timesince}} ago">{{ alt.character_name }}</span>
+                        <span rel="tooltip" style="background-color: {% if alt.characteraudit.is_active %}#008844{% else %}#AA0000{% endif %}" class="label label-default">{{ alt.character_name }}</span>
                             {% endfor %}
                             {% if alts.count > 30 %}<span class="label label-default">{{ alts.count|subtract:30 }} More... </span>{% endif %}
                             <br>
@@ -266,7 +266,6 @@ tr.group:hover {
 
 {% block extra_script %}
     $(document).ready(function() {
-        $("[rel='tooltip']").tooltip();
         }
     )
     {% block ct_extra_script %}{% endblock %}

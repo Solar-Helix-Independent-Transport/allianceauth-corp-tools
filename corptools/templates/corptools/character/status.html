@@ -14,7 +14,9 @@
                             <img class="ra-avatar img-circle" src="{{ data.character.portrait_url_128 }}">
                             <h4>{{ data.character.character_name }}</h4>
                             <span class="badge badge-default">{{ data.character.corporation_name }}</span>
-                            <span class="badge badge-default">{{ data.character.alliance_name }}</span><br><br>
+                            {% if data.character.alliance_name %}
+                                <br><span class="badge badge-default">{{ data.character.alliance_name }}</span>
+                            {% endif %}<br><br>
                             <span class="badge badge-default">Total SP: {{ data.total_sp|intcomma }}</span>
                             <span class="badge badge-default">Isk: {{ data.character.characteraudit.balance|intcomma }}</span>
                         </div>
