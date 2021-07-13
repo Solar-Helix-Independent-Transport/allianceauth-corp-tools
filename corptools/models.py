@@ -649,6 +649,7 @@ class MailLabel(models.Model):
 
 class MailRecipient(models.Model):
     recipient_id = models.BigIntegerField(primary_key=True, unique=True)
+    recipient_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None)
     _recipient_enum = Choices('alliance', 'character', 'corporation', 'mailing_list')
     recipient_type = models.CharField(max_length=15, choices=_recipient_enum)
 
@@ -660,6 +661,8 @@ class MailMessage(models.Model):
     # headers
     mail_id = models.IntegerField(null=True, default=None)
     from_id = models.IntegerField(null=True, default=None)
+    from_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None)
+
     recipients = models.ManyToManyField(MailRecipient)
     labels = models.ManyToManyField(MailLabel)
     is_read = models.BooleanField(null=True, default=False)

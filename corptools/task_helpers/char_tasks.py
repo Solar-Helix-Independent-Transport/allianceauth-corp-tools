@@ -637,21 +637,29 @@ def process_mail_list(character_id: int, ids: list):
     if not token:
         return False
 
+    _current_eve_ids = list(EveName.objects.all().values_list('eve_id', flat=True))
+    _current_mail_rec = list(MailRecipient.objects.all().values_list('recipient_id', flat=True))
+
     messages = []
     m_l_map = {}
     m_r_map = {}
     for id in ids:
+
         msg = providers.esi.client.Mail.get_characters_character_id_mail_mail_id(character_id=character_id, mail_id=id,
                                                             token=token.valid_access_token()).result()
         id_k = int(str(audit_char.character.character_id)+str(id))
+        if msg.get('from', 0) not in _current_eve_ids:
+            EveName.objects.get_or_create_from_esi(msg.get('from'))
+            _current_eve_ids.append(msg.get('from', 0))
         msg_obj = MailMessage(character=audit_char, id_key=id_k, mail_id=id, from_id=msg.get('from', None),
+                              from_name_id=msg.get('from', None),
                               is_read=msg.get('read', None), timestamp=msg.get('timestamp'),
                               subject=msg.get('subject', None), body=msg.get('body', None))
         messages.append(msg_obj)
         if msg.get('labels'):
             labels = msg.get('labels')
             m_l_map[id] = labels
-        m_r_map[id] = [r.get('recipient_id') for r in msg.get('recipients')]
+        m_r_map[id] = [(r.get('recipient_id'),r.get('recipient_type')) for r in msg.get('recipients')]
 
     msgs = MailMessage.objects.bulk_create(messages)
     logger.debug("Message Objects for {} to {} created".format(ids[0], ids[-1]))
@@ -670,8 +678,21 @@ def process_mail_list(character_id: int, ids: list):
     RecipThroughModel = MailMessage.recipients.through
     rms = []
     for msg in msgs:
-        if str(msg.mail_id) in m_r_map:
-            for recip in m_r_map[str(msg.mail_id)]:
+        if msg.mail_id in m_r_map:
+
+            for recip,r_type in m_r_map[msg.mail_id]:
+                recip_name = None
+                if r_type != "mailing_list":
+                    if recip not in _current_eve_ids:
+                        EveName.objects.get_or_create_from_esi(recip)
+                        _current_eve_ids.append(recip)
+                        recip_name = recip
+                if recip not in _current_mail_rec:
+                    MailRecipient.objects.get_or_create(recipient_id=recip,
+                                                        recipient_name_id=recip_name,
+                                                        recipient_type=r_type)
+                    _current_mail_rec.append(recip)
+
                 rm = RecipThroughModel(mailmessage_id=msg.id_key, mailrecipient_id=recip)
                 rms.append(rm)
 
@@ -689,6 +710,8 @@ def update_character_mail(character_id):
 
     if not token:
         return False
+
+    _current_eve_ids = list(EveName.objects.all().values_list('eve_id', flat=True))
 
     # Mail Labels
     labels = providers.esi.client.Mail.get_characters_character_id_mail_labels(character_id=character_id,
@@ -735,9 +758,6 @@ def update_character_mail(character_id):
                 break
 
             mail_ids.append(msg.get('mail_id'))
-            for recip in msg.get('recipients'):
-                MailRecipient.objects.get_or_create(recipient_id=recip.get('recipient_id'),
-                                                    recipient_type=recip.get('recipient_type'))
             last_id = msg.get('mail_id')
 
         if stop is True:

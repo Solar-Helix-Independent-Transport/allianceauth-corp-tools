@@ -414,3 +414,23 @@ def notifications(request, character_id=None):
     }
 
     return render(request, 'corptools/character/notifications.html', context=context)
+
+@login_required
+def mail_menu(request, character_id=None):
+    # get available models
+
+    main_char, characters, net_worth = get_alts (request, character_id)
+    character_ids = characters.values_list('character_id', flat=True)
+    notifications = Notification.objects\
+                        .filter(character__character__character_id__in=character_ids)\
+                        .select_related('character__character')
+
+
+    context = {
+        "main_char": main_char,
+        "alts": characters,
+        "net_worth": net_worth,
+        "table_data": notifications,
+    }
+
+    return render(request, 'corptools/character/mail_menu.html', context=context)
