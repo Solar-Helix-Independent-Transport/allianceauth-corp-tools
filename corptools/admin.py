@@ -1,7 +1,9 @@
+from celery import app
 from django.contrib import admin
 
 from . import models
 from django.conf import settings
+from . import app_settings
 
 admin.site.register(models.CharacterAudit)
 admin.site.register(models.CorporationAudit)
@@ -168,7 +170,9 @@ class TimeInCorpFilterAdmin(admin.ModelAdmin):
 
 if 'securegroups' in settings.INSTALLED_APPS:
     admin.site.register(models.FullyLoadedFilter)
-    admin.site.register(models.AssetsFilter,assetFilterAdmin)
-    admin.site.register(models.Skillfilter, skillsFilterAdmin)
     admin.site.register(models.TimeInCorpFilter, TimeInCorpFilterAdmin)
+    if app_settings.CT_CHAR_ASSETS_MODULE:
+        admin.site.register(models.AssetsFilter, assetFilterAdmin)
+    if app_settings.CT_CHAR_SKILLS_MODULE:
+        admin.site.register(models.Skillfilter, skillsFilterAdmin)
 
