@@ -639,6 +639,36 @@ class Notification(models.Model):
             models.Index(fields=['notification_type'])
         )
 
+class MailLabel(models.Model):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+    label_id = models.IntegerField(default=None)
+    label_name = models.CharField(max_length=255, null=True, default=None)
+    label_color = models.CharField(max_length=7, null=True, default=None)
+    unread_count = models.IntegerField(null=True, default=None)
+
+
+class MailRecipient(models.Model):
+    recipient_id = models.BigIntegerField(primary_key=True, unique=True)
+    _recipient_enum = Choices('alliance', 'character', 'corporation', 'mailing_list')
+    recipient_type = models.CharField(max_length=15, choices=_recipient_enum)
+
+
+class MailMessage(models.Model):
+    id_key = models.BigIntegerField(primary_key=True, unique=True)
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+
+    # headers
+    mail_id = models.IntegerField(null=True, default=None)
+    from_id = models.IntegerField(null=True, default=None)
+    recipients = models.ManyToManyField(MailRecipient)
+    labels = models.ManyToManyField(MailLabel)
+    is_read = models.BooleanField(null=True, default=False)
+    timestamp = models.DateTimeField(null=True, default=None)
+
+    # message
+    subject = models.CharField(max_length=255, null=True, default=None)
+    body = models.CharField(max_length=12000, null=True, default=None)
+
 
 class CharacterTitle(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
@@ -1035,3 +1065,4 @@ class Rolefilter(FilterBase):
                 msg = str(char_list) + " Days"
             output[c] = {"message": msg, "check": check}
         return output
+

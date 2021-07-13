@@ -36,6 +36,12 @@
     <a href="{% url 'corptools:skills' main_char.character_id%}">Skills</a>
 </li>
 {% endif %}
+{% if appset.CT_CHAR_SKILLS_MODULE %}
+<li class="">
+    <a href="">Standings</a>
+</li>
+{% endif %}
+
 {% if appset.CT_CHAR_WALLET_MODULE %}
 <li class="">
     <a href="{% url 'corptools:wallet' main_char.character_id %}">Wallet</a>

@@ -1,6 +1,9 @@
 import logging
 from celery import shared_task
-from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, SkillTotals, Implant, JumpClone, Clone, EveLocation, CharacterMarketOrder, Notification, CharacterRoles
+from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, \
+                    Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, \
+                    SkillTotals, Implant, JumpClone, Clone, EveLocation, CharacterMarketOrder, \
+                    Notification, CharacterRoles, MailLabel, MailMessage, MailRecipient
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 
@@ -617,3 +620,131 @@ def update_character_roles(character_id):
     audit_char.is_active()
 
     return "Finished roles for: {0}".format(audit_char.character.character_name)
+
+
+def process_mail_list(character_id: int, ids: list):
+    """
+    Takes list of mail ids to process
+    :param character_id: int
+    :param ids: list of ids to process
+    :return: Nothing
+    """
+    audit_char = CharacterAudit.objects.get(character__character_id=character_id)
+    req_scopes = ['esi-mail.read_mail.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return False
+
+    messages = []
+    m_l_map = {}
+    m_r_map = {}
+    for id in ids:
+        msg = providers.esi.client.Mail.get_characters_character_id_mail_mail_id(character_id=character_id, mail_id=id,
+                                                            token=token.valid_access_token()).result()
+        id_k = int(str(audit_char.character.character_id)+str(id))
+        msg_obj = MailMessage(character=audit_char, id_key=id_k, mail_id=id, from_id=msg.get('from', None),
+                              is_read=msg.get('read', None), timestamp=msg.get('timestamp'),
+                              subject=msg.get('subject', None), body=msg.get('body', None))
+        messages.append(msg_obj)
+        if msg.get('labels'):
+            labels = msg.get('labels')
+            m_l_map[id] = labels
+        m_r_map[id] = [r.get('recipient_id') for r in msg.get('recipients')]
+
+    msgs = MailMessage.objects.bulk_create(messages)
+    logger.debug("Message Objects for {} to {} created".format(ids[0], ids[-1]))
+
+    LabelThroughModel = MailMessage.labels.through
+    lms = []
+    for msg in msgs:
+        if msg.mail_id in m_l_map:
+            for label in m_l_map[msg.mail_id]:
+                lm = LabelThroughModel(mailmessage_id=msg.id_key,
+                                       maillabel_id=MailLabel.objects.get(character=audit_char, label_id=label).pk)
+                lms.append(lm)
+                
+    LabelThroughModel.objects.bulk_create(lms)
+
+    RecipThroughModel = MailMessage.recipients.through
+    rms = []
+    for msg in msgs:
+        if str(msg.mail_id) in m_r_map:
+            for recip in m_r_map[str(msg.mail_id)]:
+                rm = RecipThroughModel(mailmessage_id=msg.id_key, mailrecipient_id=recip)
+                rms.append(rm)
+
+    RecipThroughModel.objects.bulk_create(rms)
+
+    return "Completed mail fetch for: %s" % str(character_id)
+
+
+def update_character_mail(character_id):
+    #  This function will deal with ALL mail related updates
+    audit_char = CharacterAudit.objects.get(character__character_id=character_id)
+    req_scopes = ['esi-mail.read_mail.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return False
+
+    # Mail Labels
+    labels = providers.esi.client.Mail.get_characters_character_id_mail_labels(character_id=character_id,
+                                                            token=token.valid_access_token()).result()
+
+    for label in labels.get('labels'):
+        MailLabel.objects.update_or_create(character=audit_char,
+                                           label_id=label.get('label_id'),
+                                           defaults={
+                                                'label_name': label.get('name', None),
+                                                'label_color': label.get('color', None),
+                                                'unread_count': label.get('unread_count', None)
+                                           })
+
+    # Get all mail ids and make sure that recipients exist
+    mail_ids = []
+    try:
+        last_id_db = MailMessage.objects.filter(character=audit_char).order_by('-mail_id')[0].mail_id
+    except IndexError:
+        last_id_db = None
+
+    last_id = None
+    fp = True
+    while True:
+        if last_id is None:
+            mail = providers.esi.client.Mail.get_characters_character_id_mail(character_id=character_id,
+                                                            token=token.valid_access_token()).result()
+        else:
+            fp = False
+            mail = providers.esi.client.Mail.get_characters_character_id_mail(character_id=character_id,
+                                                            last_mail_id=last_id,
+                                                            token=token.valid_access_token()).result()
+        if len(mail) == 0 and fp is False:
+            # If there are 0 and this is not the first page, then we have reached the
+            # end of retrievable mail.
+            break
+
+        stop = False
+        for msg in mail:
+            if msg.get('mail_id') == last_id_db:
+                # Break both loops if we have reached the most recent mail in the db.
+                print("Found {} in database for user {}.".format(msg.get('mail_id'), character_id))
+                stop = True
+                break
+
+            mail_ids.append(msg.get('mail_id'))
+            for recip in msg.get('recipients'):
+                MailRecipient.objects.get_or_create(recipient_id=recip.get('recipient_id'),
+                                                    recipient_type=recip.get('recipient_type'))
+            last_id = msg.get('mail_id')
+
+        if stop is True:
+            # Break the while loop if we reach the last mail message that is in the db.
+            break
+
+    if len(mail_ids) is 0:
+        logger.debug("No new mails for {}".format(character_id))
+        return
+    return mail_ids

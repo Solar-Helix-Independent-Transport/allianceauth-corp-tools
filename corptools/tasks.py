@@ -13,9 +13,10 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
 from esi.errors import TokenExpiredError
+from requests.adapters import MaxRetryError
 
 from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, process_category_from_esi, fetch_location_name
-from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_clones, update_character_skill_queue, update_character_wallet, update_character_orders, update_character_order_history, update_character_notifications, update_character_roles
+from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, update_character_clones, update_character_skill_queue, update_character_wallet, update_character_orders, update_character_order_history, update_character_notifications, update_character_roles, update_character_mail, process_mail_list
 from .task_helpers.corp_helpers import update_corp_wallet_division
 from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone, CharacterMarketOrder, MapSystem, MapJumpBridge
 from . import providers
@@ -104,6 +105,7 @@ def update_character(char_id):
     que.append(update_char_orders.si(character.character.character_id))
     que.append(update_char_order_history.si(character.character.character_id))
     que.append(update_char_assets.si(character.character.character_id))
+    que.append(update_char_mail.si(character.character.character_id))
     chain(que).apply_async(priority=6)
 
 @shared_task(bind=True, base=QueueOnce)
@@ -179,6 +181,30 @@ def update_char_orders(self, character_id):
         return update_character_orders(character_id)
     except Exception as e:
         logger.exception(e)
+        return "Failed"
+
+@shared_task(bind=True, base=QueueOnce)
+def update_char_mail(self, character_id):
+    try:
+        mail_ids = update_character_mail(character_id)
+            # Get and Create messages
+        if mail_ids:
+            chunks = [mail_ids[i:i + 50] for i in range(0, len(mail_ids), 50)]
+            for chunk in chunks:
+                # Process mails in chunks of 500
+                process_char_mail.apply_async(priority=9, args=[character_id, chunk])
+        return "Completed mail pre-fetch for: %s" % str(character_id)
+    except Exception as e:
+        logger.exception(e)
+        return "Failed"
+
+@shared_task(bind=True)
+def process_char_mail(self, character_id, ids):
+    try:
+        return process_mail_list(character_id, ids)
+    except Exception as e:
+        logger.exception(e)
+        self.retry(exc=e, max_retries=5)
         return "Failed"
 
 @shared_task(bind=True, base=QueueOnce)
