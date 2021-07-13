@@ -726,7 +726,7 @@ def update_character_mail(character_id):
                                                 'unread_count': label.get('unread_count', None)
                                            })
 
-    # Get all mail ids and make sure that recipients exist
+    # Get all mail ids
     mail_ids = []
     try:
         last_id_db = MailMessage.objects.filter(character=audit_char).order_by('-mail_id')[0].mail_id
@@ -761,8 +761,13 @@ def update_character_mail(character_id):
         if stop is True:
             # Break the while loop if we reach the last mail message that is in the db.
             break
+    
+    audit_char.last_update_mails = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
 
     if len(mail_ids) is 0:
         logger.debug("No new mails for {}".format(character_id))
         return
+
     return mail_ids

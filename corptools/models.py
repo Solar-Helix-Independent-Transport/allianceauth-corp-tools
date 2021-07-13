@@ -36,31 +36,24 @@ class CharacterAudit(models.Model):
     character = models.OneToOneField(EveCharacter, on_delete=models.CASCADE)
 
     last_update_pub_data = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_pub_data = models.DateTimeField(null=True, default=None, blank=True)
 
     last_update_skills = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_skills = models.DateTimeField(null=True, default=None, blank=True)
 
     last_update_skill_que = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_skill_que = models.DateTimeField(null=True, default=None, blank=True)
 
     last_update_clones = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_clones = models.DateTimeField(null=True, default=None, blank=True)
 
     last_update_assets = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_assets = models.DateTimeField(null=True, default=None, blank=True)
 
     last_update_wallet = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_wallet = models.DateTimeField(null=True, default=None, blank=True)
 
     last_update_orders = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_orders = models.DateTimeField(null=True, default=None, blank=True)
 
     last_update_notif = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_notif = models.DateTimeField(null=True, default=None, blank=True)
 
     last_update_roles = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_roles = models.DateTimeField(null=True, default=None, blank=True)
+
+    last_update_mails = models.DateTimeField(null=True, default=None, blank=True)
 
     balance = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
 

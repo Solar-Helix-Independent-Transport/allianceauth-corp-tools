@@ -13,8 +13,10 @@
                         <div class="text-center">
                             <img class="ra-avatar img-circle" src="{{ data.character.portrait_url_128 }}">
                             <h4>{{ data.character.character_name }}</h4>
-                            <span class="badge badge-success">Total SP: {{ data.total_sp|intcomma }}</span>
-                            <span class="badge badge-success">Isk: {{ data.character.characteraudit.balance|intcomma }}</span>
+                            <span class="badge badge-default">{{ data.character.corporation_name }}</span>
+                            <span class="badge badge-default">{{ data.character.alliance_name }}</span><br><br>
+                            <span class="badge badge-default">Total SP: {{ data.total_sp|intcomma }}</span>
+                            <span class="badge badge-default">Isk: {{ data.character.characteraudit.balance|intcomma }}</span>
                         </div>
                     </div>
                     <div class="col-md-8 col-lg-8 pannel-hieght-locked scroll-bar-narrow">
@@ -47,6 +49,11 @@
                                 {% if appset.CT_CHAR_NOTIFICATIONS_MODULE %}
                                     <tr>
                                         <td class="text-right">Notifications</td><td>{{ data.character.characteraudit.last_update_notif|timesince}} ago</td>
+                                    </tr>
+                                {% endif %}
+                                {% if appset.CT_CHAR_MAIL_MODULE %}
+                                    <tr>
+                                        <td class="text-right">Mails</td><td>{{ data.character.characteraudit.last_update_mails|timesince}} ago</td>
                                     </tr>
                                 {% endif %}
                                 {% if appset.CT_CHAR_ROLES_MODULE %}
