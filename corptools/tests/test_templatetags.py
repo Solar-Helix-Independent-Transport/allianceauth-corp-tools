@@ -19,6 +19,9 @@ class TestHelpers(TestCase):
         self.assertTrue(helpers.subtract(10, 5) == 5)
         self.assertTrue(helpers.subtract(5, 10) == -5)
 
+    def test_app_settings(self):
+        self.assertIsNotNone(helpers.app_setting().get_character_scopes())
+
     def test_deslug(self):
         self.assertEqual(helpers.deslug("abcd_efgh"), "abcd efgh")
         self.assertEqual(helpers.deslug(15), 15)
@@ -50,6 +53,3 @@ class TestColours(TestCase):
         self.assertTrue(0 <= int(colors.random_bright_colour()[1:3], 16) < 256 )
         self.assertTrue(0 <= int(colors.random_bright_colour()[3:5], 16) < 256 )
         self.assertTrue(0 <= int(colors.random_bright_colour()[5:], 16) < 256 )
-
-
-

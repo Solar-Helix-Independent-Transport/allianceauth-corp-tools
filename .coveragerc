@@ -5,6 +5,8 @@ source =
 
 omit =
     */corptools/migrations/*
+    */corptools/audit_views/*
+    */corptools/task_helpers/*
     */tests/*
     */.tox/*
     */bin/*

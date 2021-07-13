@@ -1,64 +1,61 @@
 version: 2
+
+shared: &shared
+  steps:
+    - checkout
+    - run:
+        name: install dependencies
+        command: |
+          make dev
+    - run:
+        name: Run Tests
+        command: |
+          make test
+    - store_artifacts:
+        path: htmlcov/
+
 jobs:
-  BuildAndTest:
+  py39:
+    <<: *shared
+    docker:
+      - image: circleci/python:3.9
+
+  py38:
+    <<: *shared
+    docker:
+      - image: circleci/python:3.8
+
+  py37:
+    <<: *shared
     docker:
       - image: circleci/python:3.7
-    steps:
-      - checkout
-      - restore_cache:
-          key: v1-dependency-cache-{{ checksum "setup.py" }}-{{ checksum "Makefile" }}
-      - run:
-          name: install dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            make dev
-      - run:
-          name: Run Tests
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            make test
-      - store_artifacts:
-          path: htmlcov/
-      - save_cache:
-          key: v1-dependency-cache-{{ checksum "setup.py" }}-{{ checksum "Makefile" }}
-          paths:
-            - "venv"
-            - ".tox"
+
   Deploy:
     docker:
       - image: circleci/python:3.8
     steps:
       - checkout
-      - restore_cache:
-          key: v1-dependency-cache-{{ checksum "setup.py" }}-{{ checksum "Makefile" }}
       - run:
           name: install python dependencies
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
             make dev
             make deploy
       - run:
           name: create packages
           command: |
             make package
-      - save_cache:
-          key: v1-dependency-cache-{{ checksum "setup.py" }}-{{ checksum "Makefile" }}
-          paths:
-            - "venv"
-            - ".tox"
       - run:
           name: upload to pypi
           command: |
-            . venv/bin/activate
             twine upload dist/*
+
 workflows:
   version: 2
-  CorpTools:
+  BuildAndTest:
     jobs:
-      - BuildAndTest
+      - py39
+      - py38
+      - py37
       - Deploy:
           filters:
             tags:
