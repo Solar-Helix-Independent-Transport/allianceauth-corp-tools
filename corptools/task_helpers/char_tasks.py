@@ -734,17 +734,15 @@ def update_character_mail(character_id):
         last_id_db = None
 
     last_id = None
-    fp = True
     while True:
         if last_id is None:
             mail = providers.esi.client.Mail.get_characters_character_id_mail(character_id=character_id,
                                                             token=token.valid_access_token()).result()
         else:
-            fp = False
             mail = providers.esi.client.Mail.get_characters_character_id_mail(character_id=character_id,
                                                             last_mail_id=last_id,
                                                             token=token.valid_access_token()).result()
-        if len(mail) == 0 and fp is False:
+        if len(mail) == 0:
             # If there are 0 and this is not the first page, then we have reached the
             # end of retrievable mail.
             break
