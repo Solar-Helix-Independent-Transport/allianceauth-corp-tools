@@ -23,6 +23,8 @@ from . import app_settings
 
 from esi.models import Token
 
+TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
+
 logger = logging.getLogger(__name__)
 
 ###### Bulk Updates
@@ -234,12 +236,12 @@ def location_get(location_id):
     cache_tag = build_location_cache_tag(location_id)
     data = json.loads(cache.get(cache_tag,'{"date":false, "characters":[]}'))
     if data.get('date') is not False:
-        data['date'] = datetime.datetime.strptime(data.get('date'), "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
+        data['date'] = datetime.datetime.strptime(data.get('date'), TZ_STRING).replace(tzinfo=timezone.utc)
     return data
 
 def location_set(location_id, character_id):
     cache_tag = build_location_cache_tag(location_id)
-    date = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=7)
+    date = timezone.now() - datetime.timedelta(days=7)
     data = location_get(location_id)
     if data.get('date') is not False:
         if data.get('date') > date:
@@ -247,13 +249,13 @@ def location_set(location_id, character_id):
             cache.set(cache_tag, json.dumps(data, cls=DjangoJSONEncoder), None)
             return True
         else:
-            data['date'] = datetime.datetime.utcnow().replace(tzinfo=timezone.utc)
+            data['date'] = timezone.now().strftime(TZ_STRING)
             data['characters'] = [character_id]
             cache.set(cache_tag, json.dumps(data, cls=DjangoJSONEncoder), None)
 
     if character_id not in data.get('characters'):
         data.get('characters').append(character_id) 
-        data['date'] = datetime.datetime.utcnow().replace(tzinfo=timezone.utc)
+        data['date'] = timezone.now().strftime(TZ_STRING)
         cache.set(cache_tag, json.dumps(data, cls=DjangoJSONEncoder), None)
         return True
     
@@ -269,7 +271,7 @@ def update_location(self, location_id):
 
     cached_data = location_get(location_id)
 
-    date = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=7)
+    date = timezone.now() - datetime.timedelta(days=7)
     asset = CharacterAsset.objects.filter(location_id=location_id, location_name__isnull=True).select_related('character__character')
     clone = Clone.objects.filter(location_id=location_id, location_name__isnull=True).select_related('character__character')
     jumpclone = JumpClone.objects.filter(location_id=location_id, location_name__isnull=True).select_related('character__character')
@@ -336,7 +338,7 @@ def update_all_locations(self):
                       'Hangar',
                       'HangarAll']
 
-    expire = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) - datetime.timedelta(days=7)  # 1 week refresh
+    expire = timezone.now() - datetime.timedelta(days=7)  # 1 week refresh
 
     asset_tops = CharacterAsset.objects.all().values_list("item_id", flat=True)  
     
