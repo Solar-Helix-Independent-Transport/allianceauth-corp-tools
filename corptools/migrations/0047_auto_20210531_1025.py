@@ -14,6 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='skilllist',
             name='skill_list',
-            field=models.TextField(default='', null=True, validators=[corptools.validators.valid_json]),
+            field=models.TextField(default='', null=True, validators=[
+                                   corptools.validators.valid_json]),
         ),
     ]

@@ -14,30 +14,36 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='characterasset',
             name='type_name',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemType'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemType'),
         ),
         migrations.AlterField(
             model_name='corpasset',
             name='type_name',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemType'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemType'),
         ),
         migrations.CreateModel(
             name='EveLocation',
             fields=[
-                ('location_id', models.BigIntegerField(primary_key=True, serialize=False)),
+                ('location_id', models.BigIntegerField(
+                    primary_key=True, serialize=False)),
                 ('location_name', models.CharField(max_length=255)),
                 ('last_update', models.DateTimeField(auto_now=True)),
-                ('system', models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.MapSystem')),
+                ('system', models.ForeignKey(default=None, null=True,
+                                             on_delete=django.db.models.deletion.SET_NULL, to='corptools.MapSystem')),
             ],
         ),
         migrations.AddField(
             model_name='characterasset',
             name='location_name',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveLocation'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveLocation'),
         ),
         migrations.AddField(
             model_name='corpasset',
             name='location_name',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveLocation'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveLocation'),
         ),
     ]

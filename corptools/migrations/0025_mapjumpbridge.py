@@ -14,11 +14,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='MapJumpBridge',
             fields=[
-                ('structure_id', models.IntegerField(primary_key=True, serialize=False)),
+                ('structure_id', models.IntegerField(
+                    primary_key=True, serialize=False)),
                 ('updated', models.DateTimeField(auto_now=True)),
-                ('from_solar_system', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='bridge_from_system', to='corptools.MapSystem')),
-                ('owner', models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveName')),
-                ('to_solar_system', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='bridge_to_system', to='corptools.MapSystem')),
+                ('from_solar_system', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                                        related_name='bridge_from_system', to='corptools.MapSystem')),
+                ('owner', models.ForeignKey(default=None, null=True,
+                                            on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveName')),
+                ('to_solar_system', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                                      related_name='bridge_to_system', to='corptools.MapSystem')),
             ],
         ),
     ]

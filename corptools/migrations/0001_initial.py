@@ -16,16 +16,26 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CharacterAudit',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('last_update_pub_data', models.DateTimeField(blank=True, default=None, null=True)),
-                ('cache_expire_pub_data', models.DateTimeField(blank=True, default=None, null=True)),
-                ('last_update_skills', models.DateTimeField(blank=True, default=None, null=True)),
-                ('cache_expire_skills', models.DateTimeField(blank=True, default=None, null=True)),
-                ('last_update_clones', models.DateTimeField(blank=True, default=None, null=True)),
-                ('cache_expire_clones', models.DateTimeField(blank=True, default=None, null=True)),
-                ('last_update_assets', models.DateTimeField(blank=True, default=None, null=True)),
-                ('cache_expire_assets', models.DateTimeField(blank=True, default=None, null=True)),
-                ('character', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='eveonline.EveCharacter')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
+                ('last_update_pub_data', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('cache_expire_pub_data', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('last_update_skills', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('cache_expire_skills', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('last_update_clones', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('cache_expire_clones', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('last_update_assets', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('cache_expire_assets', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('character', models.OneToOneField(
+                    on_delete=django.db.models.deletion.CASCADE, to='eveonline.EveCharacter')),
             ],
             options={
                 'permissions': (('corp_hr', "Can access other character's data for own corp."), ('alliance_hr', "Can access other character's data for own alliance."), ('state_hr', "Can access other character's data for own state."), ('global_hr', "Can access other character's data for characters in any corp/alliance/state.")),
@@ -34,18 +44,30 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CorporationAudit',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('last_update_pub_data', models.DateTimeField(blank=True, default=None, null=True)),
-                ('cache_expire_pub_data', models.DateTimeField(blank=True, default=None, null=True)),
-                ('last_update_assets', models.DateTimeField(blank=True, default=None, null=True)),
-                ('cache_expire_assets', models.DateTimeField(blank=True, default=None, null=True)),
-                ('last_update_structures', models.DateTimeField(blank=True, default=None, null=True)),
-                ('cache_expire_structures', models.DateTimeField(blank=True, default=None, null=True)),
-                ('last_update_moons', models.DateTimeField(blank=True, default=None, null=True)),
-                ('cache_expire_moons', models.DateTimeField(blank=True, default=None, null=True)),
-                ('last_update_observers', models.DateTimeField(blank=True, default=None, null=True)),
-                ('cache_expire_observers', models.DateTimeField(blank=True, default=None, null=True)),
-                ('corporation', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='eveonline.EveCorporationInfo')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
+                ('last_update_pub_data', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('cache_expire_pub_data', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('last_update_assets', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('cache_expire_assets', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('last_update_structures', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('cache_expire_structures', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('last_update_moons', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('cache_expire_moons', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('last_update_observers', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('cache_expire_observers', models.DateTimeField(
+                    blank=True, default=None, null=True)),
+                ('corporation', models.OneToOneField(
+                    on_delete=django.db.models.deletion.CASCADE, to='eveonline.EveCorporationInfo')),
             ],
             options={
                 'permissions': (('alliance_corp_manager', "Can access other corporations's data for own alliance."), ('state_corp_manager', "Can access other corporations's data for own state."), ('global_corp_manager', "Can access all corporations's data.")),
@@ -54,28 +76,32 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='EveItemGroup',
             fields=[
-                ('group_id', models.BigIntegerField(primary_key=True, serialize=False)),
+                ('group_id', models.BigIntegerField(
+                    primary_key=True, serialize=False)),
                 ('group_name', models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
             name='EveItemType',
             fields=[
-                ('type_id', models.BigIntegerField(primary_key=True, serialize=False)),
+                ('type_id', models.BigIntegerField(
+                    primary_key=True, serialize=False)),
                 ('type_name', models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
             name='MapConstellation',
             fields=[
-                ('constellation_id', models.BigIntegerField(primary_key=True, serialize=False)),
+                ('constellation_id', models.BigIntegerField(
+                    primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
             name='MapRegion',
             fields=[
-                ('region_id', models.BigIntegerField(primary_key=True, serialize=False)),
+                ('region_id', models.BigIntegerField(
+                    primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=255)),
                 ('description', models.CharField(max_length=255)),
             ],
@@ -83,7 +109,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='MapSystem',
             fields=[
-                ('system_id', models.BigIntegerField(primary_key=True, serialize=False)),
+                ('system_id', models.BigIntegerField(
+                    primary_key=True, serialize=False)),
                 ('security_status', models.FloatField()),
                 ('name', models.CharField(max_length=255)),
                 ('x', models.FloatField()),
@@ -91,21 +118,26 @@ class Migration(migrations.Migration):
                 ('z', models.FloatField()),
                 ('security_class', models.CharField(max_length=255)),
                 ('star_id', models.IntegerField()),
-                ('constellation', models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.MapConstellation')),
+                ('constellation', models.ForeignKey(default=None, null=True,
+                                                    on_delete=django.db.models.deletion.SET_NULL, to='corptools.MapConstellation')),
             ],
         ),
         migrations.CreateModel(
             name='Structure',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('fuel_expires', models.DateTimeField(default=None, null=True)),
-                ('next_reinforce_apply', models.DateTimeField(default=None, null=True)),
+                ('next_reinforce_apply', models.DateTimeField(
+                    default=None, null=True)),
                 ('next_reinforce_hour', models.IntegerField(default=None, null=True)),
-                ('next_reinforce_weekday', models.IntegerField(default=None, null=True)),
+                ('next_reinforce_weekday', models.IntegerField(
+                    default=None, null=True)),
                 ('profile_id', models.IntegerField()),
                 ('reinforce_hour', models.IntegerField()),
                 ('reinforce_weekday', models.IntegerField(default=None, null=True)),
-                ('state', models.CharField(choices=[('anchor_vulnerable', 'anchor_vulnerable'), ('anchoring', 'anchoring'), ('armor_reinforce', 'armor_reinforce'), ('armor_vulnerable', 'armor_vulnerable'), ('deploy_vulnerable', 'deploy_vulnerable'), ('fitting_invulnerable', 'fitting_invulnerable'), ('hull_reinforce', 'hull_reinforce'), ('hull_vulnerable', 'hull_vulnerable'), ('online_deprecated', 'online_deprecated'), ('onlining_vulnerable', 'onlining_vulnerable'), ('shield_vulnerable', 'shield_vulnerable'), ('unanchored', 'unanchored'), ('unknown', 'unknown')], max_length=25)),
+                ('state', models.CharField(choices=[('anchor_vulnerable', 'anchor_vulnerable'), ('anchoring', 'anchoring'), ('armor_reinforce', 'armor_reinforce'), ('armor_vulnerable', 'armor_vulnerable'), ('deploy_vulnerable', 'deploy_vulnerable'), ('fitting_invulnerable', 'fitting_invulnerable'), (
+                    'hull_reinforce', 'hull_reinforce'), ('hull_vulnerable', 'hull_vulnerable'), ('online_deprecated', 'online_deprecated'), ('onlining_vulnerable', 'onlining_vulnerable'), ('shield_vulnerable', 'shield_vulnerable'), ('unanchored', 'unanchored'), ('unknown', 'unknown')], max_length=25)),
                 ('state_timer_end', models.DateTimeField(default=None, null=True)),
                 ('state_timer_start', models.DateTimeField(default=None, null=True)),
                 ('structure_id', models.BigIntegerField()),
@@ -118,44 +150,54 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='StructureCelestial',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('structure_id', models.BigIntegerField()),
-                ('celestial_name', models.CharField(default=None, max_length=500, null=True)),
+                ('celestial_name', models.CharField(
+                    default=None, max_length=500, null=True)),
             ],
         ),
         migrations.CreateModel(
             name='StructureService',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100)),
-                ('state', models.CharField(choices=[('online', 'online'), ('offline', 'offline'), ('cleanup', 'cleanup')], max_length=8)),
-                ('structure', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='corptools.Structure')),
+                ('state', models.CharField(choices=[
+                 ('online', 'online'), ('offline', 'offline'), ('cleanup', 'cleanup')], max_length=8)),
+                ('structure', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='corptools.Structure')),
             ],
         ),
         migrations.AddField(
             model_name='structure',
             name='closest_celestial',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.StructureCelestial'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.StructureCelestial'),
         ),
         migrations.AddField(
             model_name='structure',
             name='corporation',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='ct_structure', to='corptools.CorporationAudit'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='ct_structure', to='corptools.CorporationAudit'),
         ),
         migrations.AddField(
             model_name='structure',
             name='system_name',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.MapSystem'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.MapSystem'),
         ),
         migrations.AddField(
             model_name='structure',
             name='type_name',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemType'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemType'),
         ),
         migrations.CreateModel(
             name='SkillQueue',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('finish_level', models.IntegerField()),
                 ('queue_position', models.IntegerField()),
                 ('skill_id', models.IntegerField()),
@@ -164,53 +206,65 @@ class Migration(migrations.Migration):
                 ('level_start_sp', models.IntegerField(default=None, null=True)),
                 ('start_date', models.DateTimeField(default=None, null=True)),
                 ('training_start_sp', models.IntegerField(default=None, null=True)),
-                ('character', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='corptools.CharacterAudit')),
-                ('skill_name', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='corptools.EveItemType')),
+                ('character', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='corptools.CharacterAudit')),
+                ('skill_name', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='corptools.EveItemType')),
             ],
         ),
         migrations.CreateModel(
             name='Skill',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('skill_id', models.IntegerField()),
                 ('active_skill_level', models.IntegerField()),
                 ('skillpoints_in_skill', models.BigIntegerField()),
                 ('trained_skill_level', models.IntegerField()),
-                ('character', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='corptools.CharacterAudit')),
+                ('character', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='corptools.CharacterAudit')),
             ],
         ),
         migrations.AddField(
             model_name='mapconstellation',
             name='region',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.MapRegion'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.MapRegion'),
         ),
         migrations.CreateModel(
             name='EveName',
             fields=[
-                ('eve_id', models.BigIntegerField(primary_key=True, serialize=False)),
+                ('eve_id', models.BigIntegerField(
+                    primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=255)),
                 ('category', models.CharField(max_length=50)),
                 ('last_update', models.DateTimeField(auto_now=True)),
-                ('alliance', models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='alli', to='corptools.EveName')),
-                ('corporation', models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='corp', to='corptools.EveName')),
+                ('alliance', models.ForeignKey(default=None, null=True,
+                                               on_delete=django.db.models.deletion.SET_NULL, related_name='alli', to='corptools.EveName')),
+                ('corporation', models.ForeignKey(default=None, null=True,
+                                                  on_delete=django.db.models.deletion.SET_NULL, related_name='corp', to='corptools.EveName')),
             ],
         ),
         migrations.CreateModel(
             name='CorporationHistory',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('corporation_id', models.IntegerField()),
                 ('is_deleted', models.NullBooleanField(default=None)),
                 ('record_id', models.IntegerField()),
                 ('start_date', models.DateTimeField()),
-                ('character', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='corptools.CharacterAudit')),
-                ('corporation_name', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='corptools.EveName')),
+                ('character', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='corptools.CharacterAudit')),
+                ('corporation_name', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='corptools.EveName')),
             ],
         ),
         migrations.CreateModel(
             name='CorpAsset',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('blueprint_copy', models.NullBooleanField(default=None)),
                 ('singleton', models.BooleanField()),
                 ('item_id', models.BigIntegerField(unique=True)),
@@ -220,7 +274,8 @@ class Migration(migrations.Migration):
                 ('quantity', models.IntegerField()),
                 ('type_id', models.IntegerField()),
                 ('name', models.CharField(default=None, max_length=255, null=True)),
-                ('corporation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='corptools.CorporationAudit')),
+                ('corporation', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='corptools.CorporationAudit')),
             ],
             options={
                 'abstract': False,
@@ -229,7 +284,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CharacterAsset',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('blueprint_copy', models.NullBooleanField(default=None)),
                 ('singleton', models.BooleanField()),
                 ('item_id', models.BigIntegerField(unique=True)),
@@ -239,7 +295,8 @@ class Migration(migrations.Migration):
                 ('quantity', models.IntegerField()),
                 ('type_id', models.IntegerField()),
                 ('name', models.CharField(default=None, max_length=255, null=True)),
-                ('character', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='corptools.CharacterAudit')),
+                ('character', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='corptools.CharacterAudit')),
             ],
             options={
                 'abstract': False,

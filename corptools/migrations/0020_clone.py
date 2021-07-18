@@ -14,13 +14,19 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Clone',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('last_clone_jump_date', models.DateTimeField(default=None, null=True)),
-                ('last_station_change_date', models.DateTimeField(default=None, null=True)),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
+                ('last_clone_jump_date', models.DateTimeField(
+                    default=None, null=True)),
+                ('last_station_change_date',
+                 models.DateTimeField(default=None, null=True)),
                 ('location_id', models.BigIntegerField()),
-                ('location_type', models.CharField(choices=[('station', 'station'), ('structure', 'structure')], max_length=9)),
-                ('character', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='corptools.CharacterAudit')),
-                ('location_name', models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveLocation')),
+                ('location_type', models.CharField(choices=[
+                 ('station', 'station'), ('structure', 'structure')], max_length=9)),
+                ('character', models.OneToOneField(
+                    on_delete=django.db.models.deletion.CASCADE, to='corptools.CharacterAudit')),
+                ('location_name', models.ForeignKey(default=None, null=True,
+                                                    on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveLocation')),
             ],
         ),
     ]

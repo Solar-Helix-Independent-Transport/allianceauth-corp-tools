@@ -16,7 +16,7 @@ import csv
 import re
 import json
 from itertools import chain
-from .models import * 
+from .models import *
 from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi, update_all_corps, check_account
 from .forms import UploadForm
 from . import app_settings
@@ -41,12 +41,15 @@ CORP_REQUIRED_SCOPES = [
     'esi-wallet.read_corporation_wallets.v1'
 ]
 
+
 @login_required
 @token_required(scopes=app_settings.get_character_scopes())
 def add_char(request, token):
-    CharacterAudit.objects.update_or_create(character=EveCharacter.objects.get_character_by_id(token.character_id))
+    CharacterAudit.objects.update_or_create(
+        character=EveCharacter.objects.get_character_by_id(token.character_id))
     update_character.apply_async(args=[token.character_id], priority=6)
     return redirect('corptools:view')
+
 
 @login_required
 @token_required(scopes=CORP_REQUIRED_SCOPES)
@@ -56,10 +59,11 @@ def add_corp(request, token):
                                                              defaults={'member_count': 0,
                                                                        'corporation_ticker': char.corporation_ticker,
                                                                        'corporation_name': char.corporation_name
-                                                             })
+                                                                       })
     CorporationAudit.objects.update_or_create(corporation=corp)
     update_all_corps.apply_async(priority=6)
     return redirect('corptools:corp_menu')
+
 
 @login_required
 @permission_required('corptools.view_characteraudit')
@@ -80,7 +84,7 @@ def corptools_menu(request):
             main = char.character.character_ownership.user.profile.main_character
             if main:
                 if main.character_name not in chars:
-                    chars[str(main.character_id)] = {'main': main, 
+                    chars[str(main.character_id)] = {'main': main,
                                                      'audit': char}
             else:
                 orphans.append(char)
@@ -90,7 +94,8 @@ def corptools_menu(request):
     if len(chars) == 1:
         return redirect('corptools:overview', chars[list(chars.keys())[0]]['main'].character_id)
 
-    return render(request, 'corptools/menu.html', context={'characters':chars, 'orphans':orphans})
+    return render(request, 'corptools/menu.html', context={'characters': chars, 'orphans': orphans})
+
 
 @login_required
 @permission_required('corptools.admin')
@@ -113,8 +118,10 @@ def admin(request):
     skilllists = SkillList.objects.all().count()
     corpations = CorporationAudit.objects.all().count()
 
-    char_tasks = PeriodicTask.objects.filter(task='corptools.tasks.update_subset_of_characters', enabled=True).count()
-    corp_tasks = PeriodicTask.objects.filter(task='corptools.tasks.update_all_corps', enabled=True).count()
+    char_tasks = PeriodicTask.objects.filter(
+        task='corptools.tasks.update_subset_of_characters', enabled=True).count()
+    corp_tasks = PeriodicTask.objects.filter(
+        task='corptools.tasks.update_all_corps', enabled=True).count()
 
     context = {
         "names": names,
@@ -139,6 +146,7 @@ def admin(request):
 
     return render(request, 'corptools/admin.html', context=context)
 
+
 @login_required
 @permission_required('corptools.admin')
 def admin_run_tasks(request):
@@ -154,54 +162,55 @@ def admin_run_tasks(request):
             update_all_corps.apply_async(priority=6)
     return redirect('corptools:admin')
 
+
 @login_required
 @permission_required('corptools.admin')
 def admin_create_tasks(request):
     schedule_char, _ = CrontabSchedule.objects.get_or_create(minute='15,45',
-                                                        hour='*',
-                                                        day_of_week='*',
-                                                        day_of_month='*',
-                                                        month_of_year='*',
-                                                        timezone='UTC'
-                                                        )
+                                                             hour='*',
+                                                             day_of_week='*',
+                                                             day_of_month='*',
+                                                             month_of_year='*',
+                                                             timezone='UTC'
+                                                             )
 
     schedule_corp, _ = CrontabSchedule.objects.get_or_create(minute='30',
-                                                        hour='12',
-                                                        day_of_week='*',
-                                                        day_of_month='*',
-                                                        month_of_year='*',
-                                                        timezone='UTC'
-                                                        )
-    
+                                                             hour='12',
+                                                             day_of_week='*',
+                                                             day_of_month='*',
+                                                             month_of_year='*',
+                                                             timezone='UTC'
+                                                             )
 
     task_char = PeriodicTask.objects.update_or_create(
-                                task='corptools.tasks.update_subset_of_characters',
-                                defaults={
-                                        'crontab':schedule_char,
-                                        'name':'Character Audit Rolling Update',
-                                        'enabled':True
-                                }
-                            )
-    #if created:
+        task='corptools.tasks.update_subset_of_characters',
+        defaults={
+            'crontab': schedule_char,
+            'name': 'Character Audit Rolling Update',
+            'enabled': True
+        }
+    )
+    # if created:
     #    messages.info(request, "Created Character Task")
-    #else:
+    # else:
     #    messages.info(request, "Reset Character Task to defaults")
 
     task_corp = PeriodicTask.objects.update_or_create(
-                                task='corptools.tasks.update_all_corps',
-                                defaults={
-                                        'crontab':schedule_corp,
-                                        'name':'Corporation Audit Update',
-                                        'enabled':True
-                                }
-                            )
-    #if created:
+        task='corptools.tasks.update_all_corps',
+        defaults={
+            'crontab': schedule_corp,
+            'name': 'Corporation Audit Update',
+            'enabled': True
+        }
+    )
+    # if created:
     #    messages.info(request, "Created Corporation Task")
-    #else:
+    # else:
     #    messages.info(request, "Reset Corporation Task to defaults")
 
-    #https://github.com/celery/django-celery-beat/issues/106
-    messages.info(request, "Created/Reset Character and Corporation Task to defaults")
+    # https://github.com/celery/django-celery-beat/issues/106
+    messages.info(
+        request, "Created/Reset Character and Corporation Task to defaults")
 
     return redirect('corptools:admin')
 
@@ -228,31 +237,34 @@ def admin_add_pyfa_xml(request):
                             else:
                                 skills[skill] = level
                 sl, created = SkillList.objects.update_or_create(name=request.POST["name"],
-                                                                    defaults={
-                                                                        "skill_list":json.dumps(skills)
-                                                                    })
+                                                                 defaults={
+                    "skill_list": json.dumps(skills)
+                })
 
                 messages.success(request, "File Uploaded and Processed! {}: {}".format(
-                                                                                    ("Created" if created else "Updated"),
-                                                                                    request.POST["name"]
-                                                                                    ))
+                    ("Created" if created else "Updated"),
+                    request.POST["name"]
+                ))
             else:
-                messages.error(request, "File Upload Failed! Must be XML Exported from PYFA!")
+                messages.error(
+                    request, "File Upload Failed! Must be XML Exported from PYFA!")
         else:
             messages.error(request, "File Upload Failed! Invalid Form")
     else:
-        messages.error(request, "File Upload Failed! What are you doing your not meant to be here?")
+        messages.error(
+            request, "File Upload Failed! What are you doing your not meant to be here?")
 
     return redirect('corptools:admin')
+
 
 @login_required
 @permission_required('corptools.admin')
 def skill_list_editor(request):
     pass
 
+
 @login_required
 def update_account(request, character_id):
     check_account.apply_async(args=[character_id], priority=6)
     messages.success(request, "Requested an update task.")
     return redirect('corptools:view')
-

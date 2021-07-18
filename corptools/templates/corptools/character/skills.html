@@ -95,7 +95,7 @@
                 <h5 class="modal-title" id="main-modal-title">Account Checks</h5>
             </div>
             <div id="main-modal-body" class="modal-body"  style="overflow-y:auto;"></div>
-            
+
             </div>
         </div>
     </div>
@@ -125,7 +125,7 @@ var config = {
     "columnDefs": [
     { "sortable": false, "targets": [0,1] },
     { "visible": false, "targets": groupColumn }
-    ], 
+    ],
     "fnDrawCallback": function ( settings ) {
 
         var api = this.api();
@@ -151,7 +151,7 @@ function sort_table(table_input) {
     else {
         table_input.order( [ groupColumn, 'asc' ] ).draw();
     }
-} 
+}
 
 $(document).ready(function() {
 
@@ -189,7 +189,7 @@ $(document).ready(function() {
     $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
         $($.fn.dataTable.tables(true)).DataTable()
            .columns.adjust()
-    });    
+    });
 
 })
 $(".show-skills-button").on("click", function() {
@@ -202,5 +202,3 @@ $(".show-skills-button").on("click", function() {
 });
 
 {% endblock %}
-
-

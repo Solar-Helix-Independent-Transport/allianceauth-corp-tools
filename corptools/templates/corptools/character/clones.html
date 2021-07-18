@@ -72,7 +72,7 @@ var config = {
     "columnDefs": [
     { "sortable": false, "targets": [0,1] },
     { "visible": false, "targets": groupColumn }
-    ], 
+    ],
     "fnDrawCallback": function ( settings ) {
 
         var api = this.api();
@@ -98,7 +98,7 @@ function sort_table(table_input) {
     else {
         table_input.order( [ groupColumn, 'asc' ] ).draw();
     }
-} 
+}
 
 $(document).ready(function() {
     {% for char in table_data %}
@@ -108,7 +108,7 @@ $(document).ready(function() {
         "searching":  false,
         "columnDefs": [
         { "visible": false, "targets": [0] }
-        ],     
+        ],
         "order": [
         [0, "asc"]
         ]
@@ -117,9 +117,7 @@ $(document).ready(function() {
     $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
         $($.fn.dataTable.tables(true)).DataTable()
            .columns.adjust()
-    });    
+    });
 
 })
 {% endblock %}
-
-

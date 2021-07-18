@@ -1,3 +1,4 @@
+from corptools import __version__
 import os
 from setuptools import find_packages, setup
 install_requires = [
@@ -8,7 +9,6 @@ install_requires = [
 ]
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
     README = readme.read()
-from corptools import __version__
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
@@ -36,4 +36,3 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
 )
-

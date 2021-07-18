@@ -4,6 +4,7 @@ import json
 from corptools import providers
 from ..models import EveItemCategory, EveItemGroup, EveItemType, EveItemDogmaAttribute
 
+
 class TestEveCategory(TestCase):
     def setUp(self):
         self.category_json = '{"category_id":25,"groups":[450,451,452],"name":"Asteroid","published":true}'
@@ -11,15 +12,18 @@ class TestEveCategory(TestCase):
 
     @mock.patch('esi.clients.SwaggerClient')
     def test_get_category(self, SwaggerClient):
-        SwaggerClient.return_value.Universe.get_universe_categories_category_id.return_value.result.return_value = json.loads(self.category_json)
+        SwaggerClient.return_value.Universe.get_universe_categories_category_id.return_value.result.return_value = json.loads(
+            self.category_json)
         category = providers.esi._get_category(25)
         self.assertIsInstance(category, EveItemCategory)
         self.assertEqual(category.category_id, 25)
 
     @mock.patch('esi.clients.SwaggerClient')
     def test_get_category_update_avail(self, SwaggerClient):
-        SwaggerClient.return_value.Universe.get_universe_categories_category_id.return_value.result.return_value = json.loads(self.category_json)
-        category, created, groups = providers.esi._get_category(25, updates=[25])
+        SwaggerClient.return_value.Universe.get_universe_categories_category_id.return_value.result.return_value = json.loads(
+            self.category_json)
+        category, created, groups = providers.esi._get_category(25, updates=[
+                                                                25])
         self.assertIsInstance(category, EveItemCategory)
         self.assertIsInstance(groups, list)
         self.assertFalse(created)
@@ -27,12 +31,15 @@ class TestEveCategory(TestCase):
 
     @mock.patch('esi.clients.SwaggerClient')
     def test_get_category_new(self, SwaggerClient):
-        SwaggerClient.return_value.Universe.get_universe_categories_category_id.return_value.result.return_value = json.loads(self.category_json)
-        category, created, groups = providers.esi._get_category(25, updates=[50])
+        SwaggerClient.return_value.Universe.get_universe_categories_category_id.return_value.result.return_value = json.loads(
+            self.category_json)
+        category, created, groups = providers.esi._get_category(25, updates=[
+                                                                50])
         self.assertIsInstance(category, EveItemCategory)
         self.assertIsInstance(groups, list)
         self.assertTrue(created)
         self.assertEqual(category.category_id, 25)
+
 
 class TestEveGroup(TestCase):
     def setUp(self):
@@ -41,7 +48,8 @@ class TestEveGroup(TestCase):
 
     @mock.patch('esi.clients.SwaggerClient')
     def test_get_group(self, SwaggerClient):
-        SwaggerClient.return_value.Universe.get_universe_groups_group_id.return_value.result.return_value = json.loads(self.group_json)
+        SwaggerClient.return_value.Universe.get_universe_groups_group_id.return_value.result.return_value = json.loads(
+            self.group_json)
 
         group = providers.esi._get_group(450)
         self.assertIsInstance(group, EveItemGroup)
@@ -50,7 +58,8 @@ class TestEveGroup(TestCase):
 
     @mock.patch('esi.clients.SwaggerClient')
     def test_get_group_update_avail(self, SwaggerClient):
-        SwaggerClient.return_value.Universe.get_universe_groups_group_id.return_value.result.return_value = json.loads(self.group_json)
+        SwaggerClient.return_value.Universe.get_universe_groups_group_id.return_value.result.return_value = json.loads(
+            self.group_json)
         group, created, items = providers.esi._get_group(450, updates=[450])
         self.assertIsInstance(group, EveItemGroup)
         self.assertIsInstance(items, list)
@@ -60,7 +69,8 @@ class TestEveGroup(TestCase):
 
     @mock.patch('esi.clients.SwaggerClient')
     def test_get_group_new(self, SwaggerClient):
-        SwaggerClient.return_value.Universe.get_universe_groups_group_id.return_value.result.return_value = json.loads(self.group_json)
+        SwaggerClient.return_value.Universe.get_universe_groups_group_id.return_value.result.return_value = json.loads(
+            self.group_json)
         group, created, groups = providers.esi._get_group(450, updates=[900])
         self.assertIsInstance(group, EveItemGroup)
         self.assertIsInstance(groups, list)
@@ -76,7 +86,8 @@ class TestEveType(TestCase):
 
     @mock.patch('esi.clients.SwaggerClient')
     def test_get_type(self, SwaggerClient):
-        SwaggerClient.return_value.Universe.get_universe_types_type_id.return_value.result.return_value = json.loads(self.type_json)
+        SwaggerClient.return_value.Universe.get_universe_types_type_id.return_value.result.return_value = json.loads(
+            self.type_json)
         item, dogma = providers.esi._get_eve_type(22)
         self.assertIsInstance(item, EveItemType)
         self.assertIsInstance(dogma, list)
@@ -87,7 +98,8 @@ class TestEveType(TestCase):
 
     @mock.patch('esi.clients.SwaggerClient')
     def test_get_type_update_avail(self, SwaggerClient):
-        SwaggerClient.return_value.Universe.get_universe_types_type_id.return_value.result.return_value = json.loads(self.type_json)
+        SwaggerClient.return_value.Universe.get_universe_types_type_id.return_value.result.return_value = json.loads(
+            self.type_json)
         item, created, dogma = providers.esi._get_eve_type(22, updates=[22])
         self.assertIsInstance(item, EveItemType)
         self.assertIsInstance(dogma, list)
@@ -99,7 +111,8 @@ class TestEveType(TestCase):
 
     @mock.patch('esi.clients.SwaggerClient')
     def test_get_type_new(self, SwaggerClient):
-        SwaggerClient.return_value.Universe.get_universe_types_type_id.return_value.result.return_value = json.loads(self.type_json)
+        SwaggerClient.return_value.Universe.get_universe_types_type_id.return_value.result.return_value = json.loads(
+            self.type_json)
         item, created, dogma = providers.esi._get_eve_type(22, updates=[44])
         self.assertIsInstance(item, EveItemType)
         self.assertIsInstance(dogma, list)
@@ -108,4 +121,3 @@ class TestEveType(TestCase):
         self.assertTrue(created)
         self.assertEqual(item.type_id, 22)
         self.assertEqual(item.group_id, 450)
-

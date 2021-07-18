@@ -1,7 +1,7 @@
 # CorpTools
 ### Assorted Toolbox of Bits and bobs for todays Corp/Alliance on the go!
 
-Corp Toolbox module for [AllianceAuth](https://gitlab.com/allianceauth/allianceauth) with speed and functionality in mind. 
+Corp Toolbox module for [AllianceAuth](https://gitlab.com/allianceauth/allianceauth) with speed and functionality in mind.
 
 Included `Bits and Bobs`:
  * Basic Member Audit
@@ -37,7 +37,7 @@ Planned `Bits and Bobs`:
 
 Active Devs:
  * [AaronKable](https://github.com/pvyParts)
- 
+
 ## Installation
  1. Install the Repo from git `pip install -U git+https://github.com/pvyParts/allianceauth-corp-tools.git`
  2. Add `'corptools',` to your `INSTALLED_APPS` in your projects `local.py`
@@ -62,11 +62,11 @@ corp_hr | nill | Can access other character's data for own corp. | Corp restrict
 
 ## Usage
 ### Seting up automatic updates
-This will show how to do daily updates. 
+This will show how to do daily updates.
 
 Currently this is:
  * 2 times an hour ( minute 15, and 45) 1/48th of the total character updates, for at worst 1 update per character per day
- * 1 update run on all corps daily at 12:30 
+ * 1 update run on all corps daily at 12:30
 
 1. Got Audit Admin
 2. Click `Create or Update Periodic Tasks`

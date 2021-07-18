@@ -13,7 +13,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TimeInCorpFilter',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=500)),
                 ('description', models.CharField(max_length=500)),
                 ('days_in_corp', models.IntegerField(default=30)),
@@ -25,7 +26,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='assetsfilter',
-            options={'verbose_name': 'Smart Filter: Assets in Locations', 'verbose_name_plural': 'Smart Filter: Assets in Locations'},
+            options={'verbose_name': 'Smart Filter: Assets in Locations',
+                     'verbose_name_plural': 'Smart Filter: Assets in Locations'},
         ),
         migrations.AlterField(
             model_name='skillfilter',

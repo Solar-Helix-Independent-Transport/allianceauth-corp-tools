@@ -21,7 +21,7 @@ from .. import providers
 
 @login_required
 def corp_list(request, character_id=None):
-    
+
     corps = CorporationAudit.objects.visible_to(request.user)
 
     context = {

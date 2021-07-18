@@ -25,15 +25,18 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Rolefilter',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=500)),
                 ('description', models.CharField(max_length=500)),
                 ('has_director', models.BooleanField(default=False)),
                 ('has_accountant', models.BooleanField(default=False)),
                 ('has_station_manager', models.BooleanField(default=False)),
                 ('has_personnel_manager', models.BooleanField(default=False)),
-                ('alliance_filter', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='audit_role_filter', to='eveonline.eveallianceinfo')),
-                ('corp_filter', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='audit_role_filter', to='eveonline.evecorporationinfo')),
+                ('alliance_filter', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                                      related_name='audit_role_filter', to='eveonline.eveallianceinfo')),
+                ('corp_filter', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                                  related_name='audit_role_filter', to='eveonline.evecorporationinfo')),
             ],
             options={
                 'verbose_name': 'Smart Filter: Corporate Role checks',

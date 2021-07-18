@@ -13,11 +13,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='charactermarketorder',
             name='escrow',
-            field=models.DecimalField(decimal_places=2, default=None, max_digits=20, null=True),
+            field=models.DecimalField(
+                decimal_places=2, default=None, max_digits=20, null=True),
         ),
         migrations.AlterField(
             model_name='corporationmarketorder',
             name='escrow',
-            field=models.DecimalField(decimal_places=2, default=None, max_digits=20, null=True),
+            field=models.DecimalField(
+                decimal_places=2, default=None, max_digits=20, null=True),
         ),
     ]

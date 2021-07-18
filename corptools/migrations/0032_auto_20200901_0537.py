@@ -14,21 +14,25 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='charactermarketorder',
             name='region_name',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.MapRegion'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.MapRegion'),
         ),
         migrations.AddField(
             model_name='charactermarketorder',
             name='type_name',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemType'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemType'),
         ),
         migrations.AddField(
             model_name='corporationmarketorder',
             name='region_name',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.MapRegion'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.MapRegion'),
         ),
         migrations.AddField(
             model_name='corporationmarketorder',
             name='type_name',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemType'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemType'),
         ),
     ]

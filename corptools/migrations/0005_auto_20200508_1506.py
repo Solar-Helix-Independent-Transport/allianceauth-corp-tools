@@ -15,16 +15,19 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='EveItemCategory',
             fields=[
-                ('category_id', models.BigIntegerField(primary_key=True, serialize=False)),
+                ('category_id', models.BigIntegerField(
+                    primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
             name='OreTaxRates',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('tag', models.CharField(default='', max_length=500)),
-                ('refine_rate', models.DecimalField(decimal_places=2, default=87.5, max_digits=5)),
+                ('refine_rate', models.DecimalField(
+                    decimal_places=2, default=87.5, max_digits=5)),
                 ('r0', models.DecimalField(decimal_places=2, max_digits=5)),
                 ('r4', models.DecimalField(decimal_places=2, max_digits=5)),
                 ('r8', models.DecimalField(decimal_places=2, max_digits=5)),
@@ -51,7 +54,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='eveitemtype',
             name='group',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemGroup'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemGroup'),
         ),
         migrations.AddField(
             model_name='eveitemtype',
@@ -87,54 +91,70 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='OreTax',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('price', models.DecimalField(decimal_places=2, max_digits=20)),
                 ('last_update', models.DateTimeField(auto_now=True)),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='corptools.EveItemType')),
+                ('item', models.ForeignKey(
+                    on_delete=django.db.models.deletion.DO_NOTHING, to='corptools.EveItemType')),
             ],
         ),
         migrations.CreateModel(
             name='OrePrice',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('price', models.DecimalField(decimal_places=2, max_digits=20)),
                 ('last_update', models.DateTimeField(auto_now=True)),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='corptools.EveItemType')),
+                ('item', models.ForeignKey(
+                    on_delete=django.db.models.deletion.DO_NOTHING, to='corptools.EveItemType')),
             ],
         ),
         migrations.CreateModel(
             name='MiningTaxPaymentCorp',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('corp', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payment_corp_mining_tax', to='eveonline.EveCorporationInfo')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
+                ('corp', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                           related_name='payment_corp_mining_tax', to='eveonline.EveCorporationInfo')),
             ],
         ),
         migrations.CreateModel(
             name='MiningTax',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('region', models.CharField(blank=True, default=None, max_length=50, null=True)),
-                ('constellation', models.CharField(blank=True, default=None, max_length=50, null=True)),
-                ('system', models.CharField(blank=True, default=None, max_length=50, null=True)),
-                ('moon', models.CharField(blank=True, default=None, max_length=50, null=True)),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
+                ('region', models.CharField(blank=True,
+                                            default=None, max_length=50, null=True)),
+                ('constellation', models.CharField(
+                    blank=True, default=None, max_length=50, null=True)),
+                ('system', models.CharField(blank=True,
+                                            default=None, max_length=50, null=True)),
+                ('moon', models.CharField(blank=True,
+                                          default=None, max_length=50, null=True)),
                 ('rank', models.IntegerField(blank=True, default=0, null=True)),
                 ('use_variable_tax', models.BooleanField(default=False)),
-                ('corp', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='corp_mining_tax', to='eveonline.EveCorporationInfo')),
-                ('tax_rate', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='corptools.OreTaxRates')),
+                ('corp', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                           related_name='corp_mining_tax', to='eveonline.EveCorporationInfo')),
+                ('tax_rate', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='corptools.OreTaxRates')),
             ],
         ),
         migrations.CreateModel(
             name='InvTypeMaterials',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('qty', models.IntegerField()),
                 ('material_type_id', models.IntegerField()),
-                ('eve_type', models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemType')),
+                ('eve_type', models.ForeignKey(default=None, null=True,
+                                               on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemType')),
             ],
         ),
         migrations.AddField(
             model_name='eveitemgroup',
             name='category',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemCategory'),
+            field=models.ForeignKey(
+                default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveItemCategory'),
         ),
     ]

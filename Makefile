@@ -4,12 +4,12 @@ help:
 	@echo "This project assumes that an active Python virtualenv is present."
 	@echo "The following make targets are available:"
 	@echo "	 dev 	 install all deps for dev environment
-	@echo "  clean   remove all old packages 
+	@echo "  clean   remove all old packages
 	@echo "  package create pypi package zip
 
 clean:
 	rm -rf dist/*
-	rm -rf 
+	rm -rf
 
 dev:
 	pip install --upgrade pip
@@ -17,7 +17,7 @@ dev:
 	pip install tox
 	pip install -e .
 
-test: 
+test:
 	tox
 
 deploy:

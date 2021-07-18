@@ -5,9 +5,10 @@ from . import urls
 from . import models
 from . import app_settings
 
+
 class MemberAudit(MenuItemHook):
     def __init__(self):
-        
+
         MenuItemHook.__init__(self,
                               _('Audit'),
                               'far fa-eye fa-fw',
@@ -19,17 +20,21 @@ class MemberAudit(MenuItemHook):
             return MenuItemHook.render(self, request)
         return ''
 
+
 @hooks.register('menu_item_hook')
 def register_menu():
     return MemberAudit()
+
 
 @hooks.register('url_hook')
 def register_url():
     return UrlHook(urls, 'corptools', r'^audit/')
 
+
 @hooks.register("secure_group_filters")
 def filters():
     return [models.AssetsFilter, models.FullyLoadedFilter, models.Skillfilter, models.TimeInCorpFilter, ]
+
 
 @hooks.register('discord_cogs_hook')
 def register_cogs():

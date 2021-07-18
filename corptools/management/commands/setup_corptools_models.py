@@ -2,11 +2,14 @@ from django.core.management.base import BaseCommand, CommandError
 
 from corptools.tasks import update_or_create_map, process_ores_from_esi, update_ore_comp_table
 from corptools.models import OreTaxRates
+
+
 class Command(BaseCommand):
     help = 'Update or Populate base EVE Models'
 
     def add_arguments(self, parser):
-        parser.add_argument('--inline', action='store_true', help='Run update in this Console not via Celery')
+        parser.add_argument('--inline', action='store_true',
+                            help='Run update in this Console not via Celery')
 
     def handle(self, *args, **options):
         self.stdout.write("Confirming DB models!")

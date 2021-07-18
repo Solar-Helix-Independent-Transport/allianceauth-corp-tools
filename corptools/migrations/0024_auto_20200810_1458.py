@@ -14,11 +14,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='mapsystemgate',
             name='from_solar_system',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='from_system', to='corptools.MapSystem'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='from_system', to='corptools.MapSystem'),
         ),
         migrations.AlterField(
             model_name='mapsystemgate',
             name='to_solar_system',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='to_system', to='corptools.MapSystem'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='to_system', to='corptools.MapSystem'),
         ),
     ]

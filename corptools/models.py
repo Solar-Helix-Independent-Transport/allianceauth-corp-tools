@@ -17,7 +17,8 @@ from esi.models import Token
 from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter, EveAllianceInfo
 from allianceauth.notifications import notify
 
-from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, EveCategoryManager, AuditCharacterManager, EveMoonManager, AuditCorporationManager
+from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, \
+    EveCategoryManager, AuditCharacterManager, EveMoonManager, AuditCorporationManager
 from . import providers
 from . import validators
 from . import app_settings
@@ -28,42 +29,55 @@ logger = logging.getLogger(__name__)
 
 MAX_INACTIVE_DAYS = 3
 
+
 class CharacterAudit(models.Model):
 
     objects = AuditCharacterManager()
-    
+
     active = models.BooleanField(default=False)
 
     character = models.OneToOneField(EveCharacter, on_delete=models.CASCADE)
 
-    last_update_pub_data = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_pub_data = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_skills = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_skills = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_skill_que = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_skill_que = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_clones = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_clones = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_assets = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_assets = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_wallet = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_wallet = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_orders = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_orders = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_notif = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_notif = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_roles = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_roles = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_mails = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_mails = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    balance = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
+    balance = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, default=None)
 
     def __str__(self):
         return "{}'s Character Data".format(self.character.character_name)
 
     class Meta:
         permissions = (('corp_hr', 'Can access other character\'s data for own corp.'),
-                       ('alliance_hr', 'Can access other character\'s data for own alliance.'),
+                       ('alliance_hr',
+                        'Can access other character\'s data for own alliance.'),
                        ('state_hr', 'Can access other character\'s data for own state.'),
                        ('global_hr', 'Can access other character\'s data for characters in any corp/alliance/state.'))
 
@@ -78,7 +92,8 @@ class CharacterAudit(models.Model):
                 is_active = is_active and (self.last_update_clones > time_ref)
             if app_settings.CT_CHAR_SKILLS_MODULE:
                 is_active = is_active and (self.last_update_skills > time_ref)
-                is_active = is_active and (self.last_update_skill_que > time_ref)
+                is_active = is_active and (
+                    self.last_update_skill_que > time_ref)
             if app_settings.CT_CHAR_WALLET_MODULE:
                 is_active = is_active and (self.last_update_wallet > time_ref)
                 is_active = is_active and (self.last_update_orders > time_ref)
@@ -89,7 +104,6 @@ class CharacterAudit(models.Model):
             if app_settings.CT_CHAR_MAIL_MODULE:
                 is_active = is_active and (self.last_update_mails > time_ref)
 
-            
             if self.active != is_active:
                 self.active = is_active
                 self.save()
@@ -103,34 +117,49 @@ class CorporationAudit(models.Model):
 
     objects = AuditCorporationManager()
 
-    corporation = models.OneToOneField(EveCorporationInfo, on_delete=models.CASCADE)
+    corporation = models.OneToOneField(
+        EveCorporationInfo, on_delete=models.CASCADE)
 
-    last_update_pub_data = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_pub_data = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_pub_data = models.DateTimeField(
+        null=True, default=None, blank=True)
+    cache_expire_pub_data = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_assets = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_assets = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_assets = models.DateTimeField(
+        null=True, default=None, blank=True)
+    cache_expire_assets = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_structures = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_structures = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_structures = models.DateTimeField(
+        null=True, default=None, blank=True)
+    cache_expire_structures = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_moons = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_moons = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_moons = models.DateTimeField(
+        null=True, default=None, blank=True)
+    cache_expire_moons = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_observers = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_observers = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_observers = models.DateTimeField(
+        null=True, default=None, blank=True)
+    cache_expire_observers = models.DateTimeField(
+        null=True, default=None, blank=True)
 
-    last_update_wallet = models.DateTimeField(null=True, default=None, blank=True)
-    cache_expire_wallet = models.DateTimeField(null=True, default=None, blank=True)
+    last_update_wallet = models.DateTimeField(
+        null=True, default=None, blank=True)
+    cache_expire_wallet = models.DateTimeField(
+        null=True, default=None, blank=True)
 
     def __str__(self):
         return "{}'s Corporation Data".format(self.corporation.corporation_name)
 
     class Meta:
         permissions = (
-                       ('alliance_corp_manager', 'Can access other corporations\'s data for own alliance.'),
-                       ('state_corp_manager', 'Can access other corporations\'s data for own state.'),
-                       ('global_corp_manager', 'Can access all corporations\'s data.'))
+            ('alliance_corp_manager',
+             'Can access other corporations\'s data for own alliance.'),
+            ('state_corp_manager',
+             'Can access other corporations\'s data for own state.'),
+            ('global_corp_manager', 'Can access all corporations\'s data.'))
 
 # ************************ Helper Models
 # Eve Item Type
@@ -138,18 +167,19 @@ class CorporationAudit(models.Model):
 
 class EveItemCategory(models.Model):
     objects = EveCategoryManager()
-    category_id = models.BigIntegerField(primary_key=True) 
-    name = models.CharField(max_length=255) # unknown max
-  
+    category_id = models.BigIntegerField(primary_key=True)
+    name = models.CharField(max_length=255)  # unknown max
+
     def __str__(self):
         return self.name
 
 
 class EveItemGroup(models.Model):
     objects = EveGroupManager()
-    group_id = models.BigIntegerField(primary_key=True) 
-    name = models.CharField(max_length=255) # unknown max
-    category = models.ForeignKey(EveItemCategory, on_delete=models.SET_NULL, null=True, default=None)    
+    group_id = models.BigIntegerField(primary_key=True)
+    name = models.CharField(max_length=255)  # unknown max
+    category = models.ForeignKey(
+        EveItemCategory, on_delete=models.SET_NULL, null=True, default=None)
 
     def __str__(self):
         return self.name
@@ -157,9 +187,10 @@ class EveItemGroup(models.Model):
 
 class EveItemType(models.Model):
     objects = EveItemTypeManager()
-    type_id = models.BigIntegerField(primary_key=True) 
-    name = models.CharField(max_length=255) # unknown max
-    group = models.ForeignKey(EveItemGroup, on_delete=models.SET_NULL, null=True, default=None)    
+    type_id = models.BigIntegerField(primary_key=True)
+    name = models.CharField(max_length=255)  # unknown max
+    group = models.ForeignKey(
+        EveItemGroup, on_delete=models.SET_NULL, null=True, default=None)
     description = models.TextField(null=True, default=None)
     mass = models.FloatField(null=True, default=None)
     packaged_volume = models.FloatField(null=True, default=None)
@@ -167,19 +198,22 @@ class EveItemType(models.Model):
     volume = models.FloatField(null=True, default=None)
     published = models.BooleanField()
     radius = models.FloatField(null=True, default=None)
-    
+
     def __str__(self):
         return self.name
 
 
 class EveItemDogmaAttribute(models.Model):
-    eve_type = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None)
-    attribute_id = models.BigIntegerField(null=True, default=None) 
+    eve_type = models.ForeignKey(
+        EveItemType, on_delete=models.SET_NULL, null=True, default=None)
+    attribute_id = models.BigIntegerField(null=True, default=None)
     value = models.FloatField(null=True, default=None)
+
 
 class InvTypeMaterials(models.Model):
     qty = models.IntegerField()
-    eve_type = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None)
+    eve_type = models.ForeignKey(
+        EveItemType, on_delete=models.SET_NULL, null=True, default=None)
     type_id = models.IntegerField()
     material_type_id = models.IntegerField()
 
@@ -187,14 +221,16 @@ class InvTypeMaterials(models.Model):
 # Name Class
 class EveName(models.Model):
     objects = EveNameManager()
-    
+
     eve_id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     category = models.CharField(max_length=50)
 
-    #optionals for character/corp
-    corporation = models.ForeignKey('EveName', on_delete=models.SET_NULL, null=True, default=None, related_name="corp")
-    alliance = models.ForeignKey('EveName', on_delete=models.SET_NULL, null=True, default=None, related_name="alli")
+    # optionals for character/corp
+    corporation = models.ForeignKey(
+        'EveName', on_delete=models.SET_NULL, null=True, default=None, related_name="corp")
+    alliance = models.ForeignKey(
+        'EveName', on_delete=models.SET_NULL, null=True, default=None, related_name="alli")
     last_update = models.DateTimeField(auto_now=True)
 
     CHARACTER = "character"
@@ -204,6 +240,7 @@ class EveName(models.Model):
     def __str__(self):
         return self.name
 
+
 class MapRegion(models.Model):
     region_id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -212,80 +249,100 @@ class MapRegion(models.Model):
     def __str__(self):
         return self.name
 
+
 class MapConstellation(models.Model):
     constellation_id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255)
-    region = models.ForeignKey(MapRegion, on_delete=models.SET_NULL, null=True, default=None)
+    region = models.ForeignKey(
+        MapRegion, on_delete=models.SET_NULL, null=True, default=None)
 
     def __str__(self):
         return self.name
+
 
 class MapSystem(models.Model):
     system_id = models.BigIntegerField(primary_key=True)
     security_status = models.FloatField()
     name = models.CharField(max_length=255)
-    x = models.FloatField() 
+    x = models.FloatField()
     y = models.FloatField()
     z = models.FloatField()
     security_class = models.CharField(max_length=255, null=True, default=None)
     star_id = models.IntegerField(null=True, default=None)
-    constellation = models.ForeignKey(MapConstellation, on_delete=models.SET_NULL, null=True, default=None)
+    constellation = models.ForeignKey(
+        MapConstellation, on_delete=models.SET_NULL, null=True, default=None)
 
     def __str__(self):
         return self.name
 
+
 class MapSystemGate(models.Model):
-    from_solar_system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="from_system")
-    to_solar_system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="to_system")
+    from_solar_system = models.ForeignKey(
+        MapSystem, on_delete=models.CASCADE, related_name="from_system")
+    to_solar_system = models.ForeignKey(
+        MapSystem, on_delete=models.CASCADE, related_name="to_system")
 
     def __str__(self):
         return (self.from_solar_system_id, self.to_solar_system_id)
 
+
 class MapSystemPlanet(models.Model):
     planet_id = models.IntegerField(primary_key=True)
-    system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="planet")
+    system = models.ForeignKey(
+        MapSystem, on_delete=models.CASCADE, related_name="planet")
     name = models.CharField(max_length=255)
 
-    x = models.FloatField() 
+    x = models.FloatField()
     y = models.FloatField()
     z = models.FloatField()
 
-    eve_type = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None)
+    eve_type = models.ForeignKey(
+        EveItemType, on_delete=models.SET_NULL, null=True, default=None)
 
     def __str__(self):
         return (self.name)
+
 
 class MapSystemMoon(models.Model):
 
     objects = EveMoonManager()
-    
+
     moon_id = models.IntegerField(primary_key=True)
-    system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="moon")
+    system = models.ForeignKey(
+        MapSystem, on_delete=models.CASCADE, related_name="moon")
     name = models.CharField(max_length=255)
 
-    x = models.FloatField() 
+    x = models.FloatField()
     y = models.FloatField()
     z = models.FloatField()
 
     def __str__(self):
         return (self.name)
 
+
 class MapJumpBridge(models.Model):
     structure_id = models.BigIntegerField(primary_key=True)
-    from_solar_system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="bridge_from_system")
-    to_solar_system = models.ForeignKey(MapSystem, on_delete=models.CASCADE, related_name="bridge_to_system")
-    owner = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None)
+    from_solar_system = models.ForeignKey(
+        MapSystem, on_delete=models.CASCADE, related_name="bridge_from_system")
+    to_solar_system = models.ForeignKey(
+        MapSystem, on_delete=models.CASCADE, related_name="bridge_to_system")
+    owner = models.ForeignKey(
+        EveName, on_delete=models.SET_NULL, null=True, default=None)
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.from_solar_system.name} >> {self.to_solar_system.name} ({self.structure_id})"
-        
+
 # ************************ Asset Models
+
+
 class EveLocation(models.Model):
     location_id = models.BigIntegerField(primary_key=True)
     location_name = models.CharField(max_length=255)
-    system = models.ForeignKey(MapSystem, on_delete=models.SET_NULL, null=True, default=None)
+    system = models.ForeignKey(
+        MapSystem, on_delete=models.SET_NULL, null=True, default=None)
     last_update = models.DateTimeField(auto_now=True)
+
 
 class Asset(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -297,10 +354,12 @@ class Asset(models.Model):
     location_type = models.CharField(max_length=25)
     quantity = models.IntegerField()
     type_id = models.IntegerField()
-    type_name = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None) 
-    location_name = models.ForeignKey(EveLocation, on_delete=models.SET_NULL, null=True, default=None) 
+    type_name = models.ForeignKey(
+        EveItemType, on_delete=models.SET_NULL, null=True, default=None)
+    location_name = models.ForeignKey(
+        EveLocation, on_delete=models.SET_NULL, null=True, default=None)
 
-    #extra's
+    # extra's
     name = models.CharField(max_length=255, null=True, default=None)
 
     class Meta:
@@ -311,12 +370,14 @@ class Asset(models.Model):
             models.Index(fields=['item_id']),
         ]
 
+
 class CorpAsset(Asset):
     corporation = models.ForeignKey(CorporationAudit, on_delete=models.CASCADE)
 
     def __str__(self):
         return '{2} {0}x{1} ({3} / {4})'.format(self.type_id, self.quantity, self.corporation,
                                                 self.location_id, self.location_type)
+
 
 class CharacterAsset(Asset):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
@@ -327,16 +388,20 @@ class CharacterAsset(Asset):
 
 # ************************ Character Models
 # Character Skill
+
+
 class SkillTotals(models.Model):
     character = models.OneToOneField(CharacterAudit, on_delete=models.CASCADE)
 
     total_sp = models.BigIntegerField()
     unallocated_sp = models.IntegerField(null=True, default=None)
 
+
 class Skill(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
     skill_id = models.IntegerField()
-    skill_name = models.ForeignKey(EveItemType, on_delete=models.CASCADE, null=True, default=None) 
+    skill_name = models.ForeignKey(
+        EveItemType, on_delete=models.CASCADE, null=True, default=None)
     active_skill_level = models.IntegerField()
     skillpoints_in_skill = models.BigIntegerField()
     trained_skill_level = models.IntegerField()
@@ -345,19 +410,22 @@ class Skill(models.Model):
     def alpha(self):
         if self.trained_skill_level == self.active_skill_level:
             return False
-        return True  # is alpha clone 
+        return True  # is alpha clone
 
     class Meta:
         unique_together = (("character", "skill_id"),)
 
 # Skill Queue Model
+
+
 class SkillQueue(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
     # Required Fields / Fields Always Present
     finish_level = models.IntegerField()
     queue_position = models.IntegerField()
     skill_id = models.IntegerField()
-    skill_name = models.ForeignKey(EveItemType, on_delete=models.CASCADE, null=True, default=None) 
+    skill_name = models.ForeignKey(
+        EveItemType, on_delete=models.CASCADE, null=True, default=None)
 
     # Fields that may or may not be present
     finish_date = models.DateTimeField(null=True, default=None)
@@ -368,9 +436,11 @@ class SkillQueue(models.Model):
 
     @property
     def sp_hour(self):
-        return -1 # do some math
+        return -1  # do some math
 
 # Corporation history
+
+
 class CorporationHistory(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
 
@@ -381,41 +451,56 @@ class CorporationHistory(models.Model):
     start_date = models.DateTimeField()
 
 # Clone Models
+
+
 class Clone(models.Model):
     character = models.OneToOneField(CharacterAudit, on_delete=models.CASCADE)
 
     last_clone_jump_date = models.DateTimeField(null=True, default=None)
     last_station_change_date = models.DateTimeField(null=True, default=None)
     location_id = models.BigIntegerField()
-    location_name = models.ForeignKey(EveLocation, on_delete=models.SET_NULL, null=True, default=None) 
+    location_name = models.ForeignKey(
+        EveLocation, on_delete=models.SET_NULL, null=True, default=None)
     _type_enum = Choices('station', 'structure')
     location_type = models.CharField(max_length=9, choices=_type_enum)
 
 # Clone Models
+
+
 class JumpClone(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
 
     jump_clone_id = models.IntegerField(null=True, default=None)
     location_id = models.BigIntegerField(null=True, default=None)
-    location_name = models.ForeignKey(EveLocation, on_delete=models.SET_NULL, null=True, default=None) 
+    location_name = models.ForeignKey(
+        EveLocation, on_delete=models.SET_NULL, null=True, default=None)
     _type_enum = Choices('station', 'structure')
-    location_type = models.CharField(max_length=9, choices=_type_enum, null=True, default=None)
+    location_type = models.CharField(
+        max_length=9, choices=_type_enum, null=True, default=None)
     name = models.CharField(max_length=255, null=True, default=None)
 
 # Implant Model
+
+
 class Implant(models.Model):
     clone = models.ForeignKey(JumpClone, on_delete=models.CASCADE)
-    type_name = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None) 
+    type_name = models.ForeignKey(
+        EveItemType, on_delete=models.SET_NULL, null=True, default=None)
 
-# ************************ Wallet Models 
+# ************************ Wallet Models
+
+
 class WalletJournalEntry(models.Model):
-    amount = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
-    balance = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
+    amount = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, default=None)
+    balance = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, default=None)
     context_id = models.BigIntegerField(null=True, default=None)
     _context_type_enum = Choices('structure_id', 'station_id', 'market_transaction_id', 'character_id',
                                  'corporation_id', 'alliance_id', 'eve_system', 'industry_job_id',
                                  'contract_id', 'planet_id', 'system_id', 'type_id')
-    context_id_type = models.CharField(max_length=30, choices=_context_type_enum, null=True, default=None)
+    context_id_type = models.CharField(
+        max_length=30, choices=_context_type_enum, null=True, default=None)
     date = models.DateTimeField()
     description = models.CharField(max_length=500)
     first_party_id = models.IntegerField(null=True, default=None)
@@ -423,54 +508,73 @@ class WalletJournalEntry(models.Model):
     reason = models.CharField(max_length=500, null=True, default=None)
     ref_type = models.CharField(max_length=72)
     second_party_id = models.IntegerField(null=True, default=None)
-    tax = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
+    tax = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, default=None)
     tax_receiver_id = models.IntegerField(null=True, default=None)
 
     class Meta:
         abstract = True
 
+
 class CorporationWalletDivision(models.Model):
-    corporation = models.ForeignKey(CorporationAudit, on_delete=models.CASCADE, related_name='corporation_division')
+    corporation = models.ForeignKey(
+        CorporationAudit, on_delete=models.CASCADE, related_name='corporation_division')
     name = models.CharField(max_length=100, null=True, default=None)
     balance = models.DecimalField(max_digits=20, decimal_places=2)
     division = models.IntegerField()
 
+
 class CorporationWalletJournalEntry(WalletJournalEntry):
-    division = models.ForeignKey(CorporationWalletDivision, on_delete=models.CASCADE)
-    first_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='corp_first_party')
-    second_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='corp_second_party')
+    division = models.ForeignKey(
+        CorporationWalletDivision, on_delete=models.CASCADE)
+    first_party_name = models.ForeignKey(
+        EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='corp_first_party')
+    second_party_name = models.ForeignKey(
+        EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='corp_second_party')
 
     def __str__(self):
         return "{} '{}' {}: {}isk".format(
-                                        self.first_party_name.name,
-                                        self.ref_type,
-                                        self.second_party_name.name,
-                                        self.amount
-                                    )
+            self.first_party_name.name,
+            self.ref_type,
+            self.second_party_name.name,
+            self.amount
+        )
+
+
 class CharacterWalletJournalEntry(WalletJournalEntry):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
-    first_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_first_party')
-    second_party_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_second_party')
+    first_party_name = models.ForeignKey(
+        EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_first_party')
+    second_party_name = models.ForeignKey(
+        EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_second_party')
 
 # Market Models
+
+
 class MarketOrder(models.Model):
     order_id = models.BigIntegerField(primary_key=True)
 
     duration = models.IntegerField()
-    escrow = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
+    escrow = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, default=None)
     is_buy_order = models.BooleanField(null=True, default=None)
     issued = models.DateTimeField()
     location_id = models.BigIntegerField()
-    location_name = models.ForeignKey(EveLocation, on_delete=models.SET_NULL, null=True, default=None) 
+    location_name = models.ForeignKey(
+        EveLocation, on_delete=models.SET_NULL, null=True, default=None)
 
     min_volume = models.IntegerField(null=True, default=None)
-    price = models.DecimalField(max_digits=20, decimal_places=2, null=True, default=None)
-    _range_enum = Choices('1', '10', '2', '20', '3', '30', '4', '40', '5', 'region', 'solarsystem', 'station')
+    price = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, default=None)
+    _range_enum = Choices('1', '10', '2', '20', '3', '30',
+                          '4', '40', '5', 'region', 'solarsystem', 'station')
     order_range = models.CharField(max_length=30, choices=_range_enum)
     region_id = models.IntegerField()
-    region_name = models.ForeignKey(MapRegion, on_delete=models.SET_NULL, null=True, default=None)
+    region_name = models.ForeignKey(
+        MapRegion, on_delete=models.SET_NULL, null=True, default=None)
     type_id = models.IntegerField()
-    type_name = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None)
+    type_name = models.ForeignKey(
+        EveItemType, on_delete=models.SET_NULL, null=True, default=None)
     volume_remain = models.IntegerField()
     volume_total = models.IntegerField()
 
@@ -480,19 +584,25 @@ class MarketOrder(models.Model):
     class Meta:
         abstract = True
 
+
 class CorporationMarketOrder(MarketOrder):
-    wallet_division = models.ForeignKey(CorporationWalletDivision, on_delete=models.CASCADE)
+    wallet_division = models.ForeignKey(
+        CorporationWalletDivision, on_delete=models.CASCADE)
     issued_by = models.IntegerField()
+
 
 class CharacterMarketOrder(MarketOrder):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
     is_corporation = models.BooleanField()
 
 # ************************ Fit Models
+
+
 class SkillList(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=500, null=True, default=None)
-    skill_list = models.TextField(null=True, default="", validators=[validators.valid_json])
+    skill_list = models.TextField(
+        null=True, default="", validators=[validators.valid_json])
     show_on_audit = models.BooleanField(default=True)
     order_weight = models.IntegerField(default=0)
 
@@ -503,14 +613,17 @@ class SkillList(models.Model):
         return "({}){} (Updated: {})".format(self.order_weight, self.name, self.last_update.strftime("%Y-%m-%d %H:%M:%S"))
 
 # ************************ Corp Models
-# Structure models 
+# Structure models
+
+
 class StructureCelestial(models.Model):
     structure_id = models.BigIntegerField()
     celestial_name = models.CharField(max_length=500, null=True, default=None)
 
 
 class Structure(models.Model):
-    corporation = models.ForeignKey(CorporationAudit, on_delete=models.CASCADE, related_name='ct_structure')
+    corporation = models.ForeignKey(
+        CorporationAudit, on_delete=models.CASCADE, related_name='ct_structure')
 
     fuel_expires = models.DateTimeField(null=True, default=None)
     next_reinforce_apply = models.DateTimeField(null=True, default=None)
@@ -530,11 +643,14 @@ class Structure(models.Model):
     type_id = models.IntegerField()
     unanchors_at = models.DateTimeField(null=True, default=None)
 
-    #extra
+    # extra
     name = models.CharField(max_length=150)
-    system_name = models.ForeignKey(MapSystem, on_delete=models.SET_NULL, null=True, default=None)
-    type_name = models.ForeignKey(EveItemType, on_delete=models.SET_NULL, null=True, default=None)
-    closest_celestial = models.ForeignKey(StructureCelestial, on_delete=models.SET_NULL, null=True, default=None)
+    system_name = models.ForeignKey(
+        MapSystem, on_delete=models.SET_NULL, null=True, default=None)
+    type_name = models.ForeignKey(
+        EveItemType, on_delete=models.SET_NULL, null=True, default=None)
+    closest_celestial = models.ForeignKey(
+        StructureCelestial, on_delete=models.SET_NULL, null=True, default=None)
     last_online_time = models.DateTimeField(null=True, default=None)
 
     @property
@@ -544,7 +660,8 @@ class Structure(models.Model):
     @property
     def ozone_level(self):
         try:
-            last_ozone = BridgeOzoneLevel.objects.filter(station_id=self.structure_id).order_by('-date')[:1][0].quantity
+            last_ozone = BridgeOzoneLevel.objects.filter(
+                station_id=self.structure_id).order_by('-date')[:1][0].quantity
             return last_ozone
         except:
             return False
@@ -557,8 +674,9 @@ class Structure(models.Model):
                 return True
             else:
                 return False
-        return True # Fallback to abandonded. wosrt case its 7 days early
-        
+        return True  # Fallback to abandonded. wosrt case its 7 days early
+
+
 class StructureService(models.Model):
     structure = models.ForeignKey(Structure, on_delete=models.CASCADE)
 
@@ -568,42 +686,60 @@ class StructureService(models.Model):
 
 # Moon Models
 
+
 class MiningTaxPaymentCorp(models.Model):
-    corp = models.ForeignKey(EveCorporationInfo, on_delete=models.CASCADE, related_name='payment_corp_mining_tax')
+    corp = models.ForeignKey(
+        EveCorporationInfo, on_delete=models.CASCADE, related_name='payment_corp_mining_tax')
 
     def __str__(self):
         return "Moon Payments Processed From: {0}".format(self.corp.corporation_name)
 
 # Market History ( GMetrics )
+
+
 class OrePrice(models.Model):
     item = models.ForeignKey(EveItemType, on_delete=models.DO_NOTHING)
     price = models.DecimalField(max_digits=20, decimal_places=2)
     last_update = models.DateTimeField(auto_now=True)
 
 # tax rates History
+
+
 class OreTax(models.Model):
     item = models.ForeignKey(EveItemType, on_delete=models.DO_NOTHING)
     price = models.DecimalField(max_digits=20, decimal_places=2)
     last_update = models.DateTimeField(auto_now=True)
 
+
 class OreTaxRates(models.Model):
     tag = models.CharField(max_length=500, default="Mining Tax")
-    refine_rate = models.DecimalField(max_digits=5, decimal_places=2, default=87.5)
+    refine_rate = models.DecimalField(
+        max_digits=5, decimal_places=2, default=87.5)
     ore_rate = models.DecimalField(max_digits=5, decimal_places=2)  # normal
-    ubiquitous_rate = models.DecimalField(max_digits=5, decimal_places=2)  # ubiq
+    ubiquitous_rate = models.DecimalField(
+        max_digits=5, decimal_places=2)  # ubiq
     common_rate = models.DecimalField(max_digits=5, decimal_places=2)  # comon
-    uncommon_rate = models.DecimalField(max_digits=5, decimal_places=2) # uncom
-    rare_rate = models.DecimalField(max_digits=5, decimal_places=2) # rare  
-    excptional_rate = models.DecimalField(max_digits=5, decimal_places=2) # best
+    uncommon_rate = models.DecimalField(
+        max_digits=5, decimal_places=2)  # uncom
+    rare_rate = models.DecimalField(max_digits=5, decimal_places=2)  # rare
+    excptional_rate = models.DecimalField(
+        max_digits=5, decimal_places=2)  # best
+
 
 class MiningTax(models.Model):
-    corp = models.ForeignKey(EveCorporationInfo, on_delete=models.CASCADE, related_name='corp_mining_tax')
-    tax_rate = models.ForeignKey(OreTaxRates, on_delete=models.CASCADE, null=True, default=None, blank=True)
+    corp = models.ForeignKey(
+        EveCorporationInfo, on_delete=models.CASCADE, related_name='corp_mining_tax')
+    tax_rate = models.ForeignKey(
+        OreTaxRates, on_delete=models.CASCADE, null=True, default=None, blank=True)
     use_variable_tax = models.BooleanField(default=False)
-    flat_tax_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=None, blank=True) # best
-    region = models.CharField(max_length=50, null=True, default=None, blank=True)
-    constellation = models.CharField(max_length=50, null=True, default=None, blank=True)
-    system = models.CharField(max_length=50, null=True, default=None, blank=True)
+    flat_tax_rate = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, default=None, blank=True)  # best
+    region = models.CharField(max_length=50, null=True,
+                              default=None, blank=True)
+    constellation = models.CharField(
+        max_length=50, null=True, default=None, blank=True)
+    system = models.CharField(max_length=50, null=True,
+                              default=None, blank=True)
     moon = models.CharField(max_length=50, null=True, default=None, blank=True)
     rank = models.IntegerField(default=0, null=True, blank=True)
 
@@ -617,7 +753,7 @@ class MiningTax(models.Model):
             area = self.system
         elif self.moon:
             area = self.moon
-        #return 
+        # return
         rate = ""
         if self.use_variable_tax:
             rate = " Variable ({})".format(self.tax_rate.tag)
@@ -625,12 +761,14 @@ class MiningTax(models.Model):
             rate = "{}%".format(self.tax_rate*100)
         return "#{3}: Mining Tax {0} for {1}: {2}".format(rate, self.corp, area, self.rank)
 
+
 class Notification(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
 
     notification_id = models.BigIntegerField()
     sender_id = models.IntegerField()
-    _type_enum = Choices('character', 'corporation', 'alliance', 'faction', 'other')
+    _type_enum = Choices('character', 'corporation',
+                         'alliance', 'faction', 'other')
     sender_type = models.CharField(max_length=15, choices=_type_enum)
     notification_text = models.TextField(null=True, default=None)
     timestamp = models.DateTimeField()
@@ -644,6 +782,7 @@ class Notification(models.Model):
             models.Index(fields=['notification_type'])
         )
 
+
 class MailLabel(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
     label_id = models.IntegerField(default=None)
@@ -654,8 +793,10 @@ class MailLabel(models.Model):
 
 class MailRecipient(models.Model):
     recipient_id = models.BigIntegerField(primary_key=True, unique=True)
-    recipient_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None)
-    _recipient_enum = Choices('alliance', 'character', 'corporation', 'mailing_list')
+    recipient_name = models.ForeignKey(
+        EveName, on_delete=models.SET_NULL, null=True, default=None)
+    _recipient_enum = Choices('alliance', 'character',
+                              'corporation', 'mailing_list')
     recipient_type = models.CharField(max_length=15, choices=_recipient_enum)
 
 
@@ -666,7 +807,8 @@ class MailMessage(models.Model):
     # headers
     mail_id = models.IntegerField(null=True, default=None)
     from_id = models.IntegerField(null=True, default=None)
-    from_name = models.ForeignKey(EveName, on_delete=models.SET_NULL, null=True, default=None)
+    from_name = models.ForeignKey(
+        EveName, on_delete=models.SET_NULL, null=True, default=None)
 
     recipients = models.ManyToManyField(MailRecipient)
     labels = models.ManyToManyField(MailLabel)
@@ -692,7 +834,8 @@ class CharacterRoles(models.Model):
     station_manager = models.BooleanField(default=False)
     personnel_manager = models.BooleanField(default=False)
 
-### sec group classes
+# sec group classes
+
 
 class FilterBase(models.Model):
 
@@ -718,11 +861,12 @@ class FullyLoadedFilter(FilterBase):
         try:
             character_list = user.character_ownerships.all() \
                 .select_related('character', 'character__characteraudit')
-            
-            character_count = character_list.filter(character__characteraudit__isnull=True).count()
+
+            character_count = character_list.filter(
+                character__characteraudit__isnull=True).count()
             if character_count == 0:
                 valid_audits = 0
-                character_cnt  = 0
+                character_cnt = 0
                 for c in character_list:
                     if c.character.characteraudit.is_active():
                         valid_audits += 1
@@ -738,7 +882,8 @@ class FullyLoadedFilter(FilterBase):
             return False
 
     def audit_filter(self, users):
-        co = CharacterOwnership.objects.filter(user__in=users).select_related('user', 'character__characteraudit')
+        co = CharacterOwnership.objects.filter(user__in=users).select_related(
+            'user', 'character__characteraudit')
         chars = {}
         for c in co:
             if c.user.id not in chars:
@@ -753,7 +898,7 @@ class FullyLoadedFilter(FilterBase):
         for u in users:
             c = chars.get(u.id, False)
             if c is not False:
-                if len(c)>0:
+                if len(c) > 0:
                     output[u.id] = {"message": ", ".join(c), "check": False}
                     continue
                 else:
@@ -773,7 +918,8 @@ class TimeInCorpFilter(FilterBase):
     def process_filter(self, user: User):
         try:
             main_character = user.profile.main_character.characteraudit
-            histories = CorporationHistory.objects.filter(character=main_character).order_by('-start_date').first()
+            histories = CorporationHistory.objects.filter(
+                character=main_character).order_by('-start_date').first()
 
             days = timezone.now() - histories.start_date
             if days.days >= self.days_in_corp:
@@ -786,8 +932,9 @@ class TimeInCorpFilter(FilterBase):
 
     def audit_filter(self, users):
         co = users.annotate(
-                        max_timestamp=Max('profile__main_character__characteraudit__corporationhistory__start_date')
-                    ).values("id", "max_timestamp")
+            max_timestamp=Max(
+                'profile__main_character__characteraudit__corporationhistory__start_date')
+        ).values("id", "max_timestamp")
         chars = defaultdict(lambda: None)
         for c in co:
             if c['max_timestamp']:
@@ -796,7 +943,7 @@ class TimeInCorpFilter(FilterBase):
             else:
                 days = -1
             chars[c['id']] = days
-            
+
         output = defaultdict(lambda: {"message": "", "check": False})
         for c, char_list in chars.items():
             if char_list >= self.days_in_corp:
@@ -815,20 +962,20 @@ class AssetsFilter(FilterBase):
     class Meta:
         verbose_name = "Smart Filter: Assets in Locations"
         verbose_name_plural = verbose_name
-    
+
     types = models.ManyToManyField(EveItemType, blank=True,
-    help_text="Filter on Asset Types.")
+                                   help_text="Filter on Asset Types.")
     groups = models.ManyToManyField(EveItemGroup, blank=True,
-    help_text="Filter on Asset Groups.")
-    categories= models.ManyToManyField(EveItemCategory, blank=True,
-    help_text="Filter on Asset Categories.")
+                                    help_text="Filter on Asset Groups.")
+    categories = models.ManyToManyField(EveItemCategory, blank=True,
+                                        help_text="Filter on Asset Categories.")
 
     systems = models.ManyToManyField(MapSystem, blank=True,
-    help_text="Limit filter to specific systems")
+                                     help_text="Limit filter to specific systems")
     constellations = models.ManyToManyField(MapConstellation, blank=True,
-    help_text="Limit filter to specific constellations")
+                                            help_text="Limit filter to specific constellations")
     regions = models.ManyToManyField(MapRegion, blank=True,
-    help_text="Limit filter to specific regions")
+                                     help_text="Limit filter to specific regions")
 
     def filter_query(self, users):
         character_list = CharacterOwnership.objects.filter(user__in=users) \
@@ -836,8 +983,9 @@ class AssetsFilter(FilterBase):
         cnt_types = self.types.all().count()
         cnt_groups = self.groups.all().count()
         cnt_cats = self.categories.all().count()
-        
-        character_count = CharacterAsset.objects.filter(character__character__in=character_list.values_list('character'))
+
+        character_count = CharacterAsset.objects.filter(
+            character__character__in=character_list.values_list('character'))
         output = []
 
         if cnt_types > 0:
@@ -847,8 +995,9 @@ class AssetsFilter(FilterBase):
             output.append(models.Q(type_name__group__in=self.groups.all()))
 
         if cnt_cats > 0:
-            output.append(models.Q(type_name__group__category__in=self.categories.all()))
-            
+            output.append(
+                models.Q(type_name__group__category__in=self.categories.all()))
+
         if len(output) == 0:
             return False
 
@@ -859,16 +1008,22 @@ class AssetsFilter(FilterBase):
 
         output = []
 
-        if self.systems.all().count()>0:
-            output.append(models.Q(location_name__system__in=self.systems.all()))
-            output.append(models.Q(location_id__in=self.systems.all().values_list('system_id', flat=True)))                
-        if self.constellations.all().count()>0:
-            output.append(models.Q(location_name__system__constellation__in=self.constellations.all()))
-            output.append(models.Q(location_id__in=MapSystem.objects.filter(constellation__in=self.constellations.all()).values_list('system_id', flat=True)))
-        if self.regions.all().count()>0:
-            output.append(models.Q(location_name__system__constellation__region__in=self.regions.all()))
-            output.append(models.Q(location_id__in=MapSystem.objects.filter(constellation__region__in=self.regions.all()).values_list('system_id', flat=True)))
-        
+        if self.systems.all().count() > 0:
+            output.append(
+                models.Q(location_name__system__in=self.systems.all()))
+            output.append(models.Q(
+                location_id__in=self.systems.all().values_list('system_id', flat=True)))
+        if self.constellations.all().count() > 0:
+            output.append(
+                models.Q(location_name__system__constellation__in=self.constellations.all()))
+            output.append(models.Q(location_id__in=MapSystem.objects.filter(
+                constellation__in=self.constellations.all()).values_list('system_id', flat=True)))
+        if self.regions.all().count() > 0:
+            output.append(
+                models.Q(location_name__system__constellation__region__in=self.regions.all()))
+            output.append(models.Q(location_id__in=MapSystem.objects.filter(
+                constellation__region__in=self.regions.all()).values_list('system_id', flat=True)))
+
         if len(output) > 0:
             query = output.pop()
             for _q in output:
@@ -876,11 +1031,10 @@ class AssetsFilter(FilterBase):
             character_count = character_count.filter(query)
         return character_count
 
-
     def process_filter(self, user: User):
         try:
             co = self.filter_query([user])
-            #print(character_count.query)
+            # print(character_count.query)
             if co.count() > 0:
                 return True
             else:
@@ -890,10 +1044,11 @@ class AssetsFilter(FilterBase):
             return False
 
     def audit_filter(self, users):
-        co = self.filter_query(users).values("character__character__character_ownership__user", "type_name__name", "character__character__character_name")
+        co = self.filter_query(users).values("character__character__character_ownership__user",
+                                             "type_name__name", "character__character__character_name")
         chars = defaultdict(dict)
         for c in co:
-            uid = c["character__character__character_ownership__user"] 
+            uid = c["character__character__character_ownership__user"]
             char_name = c["character__character__character_name"]
             asset_type = c['type_name__name']
             if char_name not in chars[uid]:
@@ -904,14 +1059,16 @@ class AssetsFilter(FilterBase):
         output = defaultdict(lambda: {"message": "", "check": False})
         for u in users:
 
-            if len(chars[u.id])>0:
+            if len(chars[u.id]) > 0:
                 out_message = []
                 for char, char_items in chars[u.id].items():
                     out_message.append(f"{char}: {', '.join(char_items)}")
-                output[u.id] = {"message": "<br>".join(out_message), "check": True}
+                output[u.id] = {"message": "<br>".join(
+                    out_message), "check": True}
             else:
                 output[u.id] = {"message": "", "check": False}
         return output
+
 
 class Skillfilter(FilterBase):
     class Meta:
@@ -919,27 +1076,28 @@ class Skillfilter(FilterBase):
         verbose_name_plural = verbose_name
 
     required_skill_lists = models.ManyToManyField(SkillList, blank=True)
-    single_req_skill_lists = models.ManyToManyField(SkillList, blank=True, related_name="single_req")
+    single_req_skill_lists = models.ManyToManyField(
+        SkillList, blank=True, related_name="single_req")
 
     def process_filter(self, user: User):
-        try: # avatar 11567
+        try:  # avatar 11567
             skills_list = providers.skills.get_and_cache_user(user.id)
-            #print(skills_list)
+            # print(skills_list)
             skill_lists = self.required_skill_lists.all()
             req_one = self.single_req_skill_lists.all()
-            if skill_lists.count() == 0 and req_one.count() ==0:
+            if skill_lists.count() == 0 and req_one.count() == 0:
                 return False
 
             skill_list_base = {}
             for skl in skill_lists:
                 skill_list_base[skl.name] = {}
-                skill_list_base[skl.name]['pass']  = False
+                skill_list_base[skl.name]['pass'] = False
 
-            if req_one.count()>0:
+            if req_one.count() > 0:
                 skill_list_single = {}
                 for skl in req_one:
                     skill_list_single[skl.name] = {}
-                    skill_list_single[skl.name]['pass']  = False
+                    skill_list_single[skl.name]['pass'] = False
 
             skill_tables = skills_list.get("skills_list")
 
@@ -947,7 +1105,7 @@ class Skillfilter(FilterBase):
                 for d_name, d_list in skill_list_base.items():
                     if len(skill_tables[char]["doctrines"][d_name]) == 0:
                         skill_list_base[d_name]['pass'] = True
-            if req_one.count()>0:
+            if req_one.count() > 0:
                 single_pass = False
                 for char in skill_tables:
                     for d_name, d_list in skill_list_single.items():
@@ -958,7 +1116,7 @@ class Skillfilter(FilterBase):
             result = True
             for skill_list, skills_result in skill_list_base.items():
                 result = result and skills_result['pass']
-            if req_one.count()>0:
+            if req_one.count() > 0:
                 return result and single_pass
             else:
                 return result
@@ -972,23 +1130,23 @@ class Skillfilter(FilterBase):
         output = defaultdict(lambda: {"message": "No Data", "check": False})
         accounts = providers.skills.get_and_cache_users(users)
         for uid, u in accounts.items():
-            message=[]
-            #print(skills_list)
+            message = []
+            # print(skills_list)
             skill_lists = self.required_skill_lists.all()
             req_one = self.single_req_skill_lists.all()
-            if skill_lists.count() == 0 and req_one.count() ==0:
+            if skill_lists.count() == 0 and req_one.count() == 0:
                 return False
 
             skill_list_base = {}
             for skl in skill_lists:
                 skill_list_base[skl.name] = {}
-                skill_list_base[skl.name]['pass']  = False
+                skill_list_base[skl.name]['pass'] = False
 
-            if req_one.count()>0:
+            if req_one.count() > 0:
                 skill_list_single = {}
                 for skl in req_one:
                     skill_list_single[skl.name] = {}
-                    skill_list_single[skl.name]['pass']  = False
+                    skill_list_single[skl.name]['pass'] = False
 
             try:
                 skill_tables = u['data'].get("skills_list")
@@ -999,7 +1157,7 @@ class Skillfilter(FilterBase):
                             skill_list_base[d_name]['pass'] = True
                             message.append("{}:{}".format(char, d_name))
 
-                if req_one.count()>0:
+                if req_one.count() > 0:
                     single_pass = False
                     for char in skill_tables:
                         for d_name, d_list in skill_list_single.items():
@@ -1011,14 +1169,17 @@ class Skillfilter(FilterBase):
                 result = True
                 for skill_list, skills_result in skill_list_base.items():
                     result = result and skills_result['pass']
-                if req_one.count()>0:
-                    output[uid] = {'check': result and single_pass, 'message':"<br>".join(message)}
+                if req_one.count() > 0:
+                    output[uid] = {'check': result and single_pass,
+                                   'message': "<br>".join(message)}
                 else:
-                    output[uid] = {'check': result, 'message':"<br>".join(message)}
+                    output[uid] = {'check': result,
+                                   'message': "<br>".join(message)}
             except KeyError:
                 pass
 
         return output
+
 
 class Rolefilter(FilterBase):
     class Meta:
@@ -1030,14 +1191,17 @@ class Rolefilter(FilterBase):
     has_station_manager = models.BooleanField(default=False)
     has_personnel_manager = models.BooleanField(default=False)
 
-    corp_filter = models.ForeignKey(EveCorporationInfo, on_delete=models.CASCADE, related_name='audit_role_filter')
-    alliance_filter = models.ForeignKey(EveAllianceInfo, on_delete=models.CASCADE, related_name='audit_role_filter')
+    corp_filter = models.ForeignKey(
+        EveCorporationInfo, on_delete=models.CASCADE, related_name='audit_role_filter')
+    alliance_filter = models.ForeignKey(
+        EveAllianceInfo, on_delete=models.CASCADE, related_name='audit_role_filter')
 
     def process_filter(self, user: User):
         try:
             characters = user.character_ownerships.all()
-            
-            histories = CorporationHistory.objects.filter(character=main_character).order_by('-start_date').first()
+
+            histories = CorporationHistory.objects.filter(
+                character=main_character).order_by('-start_date').first()
 
             days = timezone.now() - histories.start_date
             if days.days >= self.days_in_corp:
@@ -1050,8 +1214,9 @@ class Rolefilter(FilterBase):
 
     def audit_filter(self, users):
         co = users.annotate(
-                        max_timestamp=Max('profile__main_character__characteraudit__corporationhistory__start_date')
-                    ).values("id", "max_timestamp")
+            max_timestamp=Max(
+                'profile__main_character__characteraudit__corporationhistory__start_date')
+        ).values("id", "max_timestamp")
         chars = defaultdict(lambda: None)
         for c in co:
             if c['max_timestamp']:
@@ -1060,7 +1225,7 @@ class Rolefilter(FilterBase):
             else:
                 days = -1
             chars[c['id']] = days
-            
+
         output = defaultdict(lambda: {"message": "", "check": False})
         for c, char_list in chars.items():
             if char_list >= self.days_in_corp:
@@ -1073,4 +1238,3 @@ class Rolefilter(FilterBase):
                 msg = str(char_list) + " Days"
             output[c] = {"message": msg, "check": check}
         return output
-

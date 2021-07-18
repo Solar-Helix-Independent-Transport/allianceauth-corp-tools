@@ -34,7 +34,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>    
+        </div>
     </div>
     <div class="row panel panel-primary">
         <div class="panel-heading text-center">Wallet Activity</div>
@@ -46,7 +46,7 @@
     <div class="row panel panel-primary">
         <div class="panel-heading text-center">Interaction Map</div>
         <div class="panel-body">
-            
+
             <div  id="chartdiv" style="min-height: 600px;"></div>
             <div class="pull-right"><button id="toggle-interaction" class="btn btn-info">Toggle to <span id="toggle-text">Isk Amount</span></button></div>
     </div>
@@ -68,7 +68,7 @@
 {% block ct_extra_script %}
 
     $(document).ready(function() {
-       
+
         $('#wallet').DataTable({
             "filterDropDown": {
 					columns: [{
@@ -88,7 +88,7 @@
             "pageLength": 25
         });
     });
-    
+
 
     $("#toggle-interaction").on("click", function() {
         if (show_count){
@@ -106,14 +106,14 @@
     var show_count = true;
     var count_data = [
     {% for fp, data in chords.items %}
-        {% for sp, am in data.items %} 
+        {% for sp, am in data.items %}
             {"from":"{{fp}}", "to":"{{sp}}", "value":{{am.c}}},
         {% endfor %}
     {% endfor %}
     ]
     var amount_data = [
     {% for fp, data in chords.items %}
-        {% for sp, am in data.items %} 
+        {% for sp, am in data.items %}
             {"from":"{{fp}}", "to":"{{sp}}", "value":{{am.a}}},
         {% endfor %}
     {% endfor %}
@@ -133,14 +133,14 @@
                 "{{fp}}":chart.colors.next(),
             {% endfor %}
         }
-        
+
         9
         chart.data = count_data;
 
         chart.dataFields.fromName = "from";
         chart.dataFields.toName = "to";
         chart.dataFields.value = "value";
-        
+
         chart.nodePadding = 1;
         chart.minNodeSize = 0.1;
         chart.startAngle = 80;
@@ -155,9 +155,9 @@
         nodeTemplate.showSystemTooltip = true;
         nodeTemplate.propertyFields.fill = "color";
         nodeTemplate.tooltipText = "{name}'s Transferred: ${total}";
-        
+
         // when rolled over the node, make all the links rolled-over
-        nodeTemplate.events.on("over", function(event) {    
+        nodeTemplate.events.on("over", function(event) {
             var node = event.target;
             node.outgoingDataItems.each(function(dataItem) {
                 if(dataItem.toNode){
@@ -170,17 +170,17 @@
                     dataItem.link.isHover = true;
                     dataItem.fromNode.label.isHover = true;
                 }
-            }) 
-        
-            node.label.isHover = true;   
+            })
+
+            node.label.isHover = true;
         })
-        
+
         // when rolled out from the node, make all the links rolled-out
         nodeTemplate.events.on("out", function(event) {
             var node = event.target;
-            node.outgoingDataItems.each(function(dataItem) {        
+            node.outgoingDataItems.each(function(dataItem) {
                 if(dataItem.toNode){
-                    dataItem.link.isHover = false;                
+                    dataItem.link.isHover = false;
                     dataItem.toNode.label.isHover = false;
                 }
             })
@@ -190,10 +190,10 @@
                    dataItem.fromNode.label.isHover = false;
                 }
             })
-        
+
             node.label.isHover = false;
         })
-        
+
         var label = nodeTemplate.label;
         label.relativeRotation = 90;
         {% if NIGHT_MODE %}
@@ -203,7 +203,7 @@
 
         let labelHS = label.states.create("hover");
         labelHS.properties.fillOpacity = 1;
-        
+
         nodeTemplate.cursorOverStyle = am4core.MouseCursorStyle.pointer;
         // this adapter makes non-main character nodes to be filled with color of the main character
         nodeTemplate.adapter.add("fill", function(fill, target) {
@@ -214,7 +214,7 @@
                 if(colors[dataItem.toName]){
                     mainChar = true;
                 }
-        
+
                 if(isNaN(counters[dataItem.fromName])){
                     counters[dataItem.fromName] = dataItem.value;
                 }
@@ -225,31 +225,31 @@
             if(mainChar){
                 return fill;
             }
-        
+
             let count = 0;
             let color;
             let biggest = 0;
             let biggestName;
-        
+
             for(var name in counters){
                 if(counters[name] > biggest){
                     biggestName = name;
-                    biggest = counters[name]; 
-                }        
+                    biggest = counters[name];
+                }
             }
             if(colors[biggestName]){
                 fill = colors[biggestName];
             }
-          
+
             return fill;
         })
-        
+
         // link template
         var linkTemplate = chart.links.template;
         linkTemplate.strokeOpacity = 0;
         linkTemplate.fillOpacity = 0.15;
         linkTemplate.tooltipText = "{fromName} > {toName}:{value.value}";
-        
+
         var hoverState = linkTemplate.states.create("hover");
         hoverState.properties.fillOpacity = 0.7;
         hoverState.properties.strokeOpacity = 0.7;
@@ -264,7 +264,7 @@
                 {% for k, v in data.items %}
                 "{{k}}": {{v}},{% endfor %}
             },
-            {% endfor %}    
+            {% endfor %}
         ]
 
         chart_polar.data = data;

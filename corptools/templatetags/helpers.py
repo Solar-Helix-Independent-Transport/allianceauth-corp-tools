@@ -2,13 +2,16 @@ from django.utils.safestring import mark_safe
 from django.template.defaulttags import register
 from .. import app_settings as app_sett
 
+
 @register.filter(name='addclass')
 def addclass(value, arg):
     return value.as_widget(attrs={'class': arg})
 
+
 @register.filter(name='subtract')
 def subtract(value, arg):
     return value - arg
+
 
 @register.filter(name='deslug')
 def deslug(slugged):
@@ -17,9 +20,11 @@ def deslug(slugged):
     except:
         return slugged
 
+
 @register.simple_tag()
 def app_setting():
     return app_sett
+
 
 @register.filter(name='level')
 def skill_level(active, trained):
@@ -29,4 +34,4 @@ def skill_level(active, trained):
     alpha = '<span class="fas fa-circle text-danger"></span> '
     empty = '<span class="far fa-circle"></span> '
 
-    return mark_safe('<div role="text" aria-label="{}">{}{}{}</div>'.format(alt_text ,full*active, alpha*omega_dif, empty*(5-(active+omega_dif))))
+    return mark_safe('<div role="text" aria-label="{}">{}{}{}</div>'.format(alt_text, full*active, alpha*omega_dif, empty*(5-(active+omega_dif))))

@@ -14,23 +14,29 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CorporationMarketOrder',
             fields=[
-                ('order_id', models.BigIntegerField(primary_key=True, serialize=False)),
+                ('order_id', models.BigIntegerField(
+                    primary_key=True, serialize=False)),
                 ('duration', models.IntegerField()),
                 ('escrow', models.IntegerField(default=None, null=True)),
                 ('is_buy_order', models.NullBooleanField(default=None)),
                 ('issued', models.DateTimeField()),
                 ('location_id', models.BigIntegerField()),
                 ('min_volume', models.IntegerField(default=None, null=True)),
-                ('price', models.DecimalField(decimal_places=2, default=None, max_digits=20, null=True)),
-                ('order_range', models.CharField(choices=[('1', '1'), ('10', '10'), ('2', '2'), ('20', '20'), ('3', '3'), ('30', '30'), ('4', '4'), ('40', '40'), ('5', '5'), ('region', 'region'), ('solarsystem', 'solarsystem'), ('station', 'station')], max_length=30)),
+                ('price', models.DecimalField(decimal_places=2,
+                                              default=None, max_digits=20, null=True)),
+                ('order_range', models.CharField(choices=[('1', '1'), ('10', '10'), ('2', '2'), ('20', '20'), ('3', '3'), ('30', '30'), ('4', '4'), (
+                    '40', '40'), ('5', '5'), ('region', 'region'), ('solarsystem', 'solarsystem'), ('station', 'station')], max_length=30)),
                 ('region_id', models.IntegerField()),
                 ('type_id', models.IntegerField()),
                 ('volume_remain', models.IntegerField()),
                 ('volume_total', models.IntegerField()),
-                ('state', models.CharField(choices=[('cancelled', 'cancelled'), ('expired', 'expired'), ('active', 'active')], max_length=30)),
+                ('state', models.CharField(choices=[
+                 ('cancelled', 'cancelled'), ('expired', 'expired'), ('active', 'active')], max_length=30)),
                 ('issued_by', models.IntegerField()),
-                ('location_name', models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveLocation')),
-                ('wallet_division', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='corptools.CorporationWalletDivision')),
+                ('location_name', models.ForeignKey(default=None, null=True,
+                                                    on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveLocation')),
+                ('wallet_division', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='corptools.CorporationWalletDivision')),
             ],
             options={
                 'abstract': False,
@@ -39,23 +45,29 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CharacterMarketOrder',
             fields=[
-                ('order_id', models.BigIntegerField(primary_key=True, serialize=False)),
+                ('order_id', models.BigIntegerField(
+                    primary_key=True, serialize=False)),
                 ('duration', models.IntegerField()),
                 ('escrow', models.IntegerField(default=None, null=True)),
                 ('is_buy_order', models.NullBooleanField(default=None)),
                 ('issued', models.DateTimeField()),
                 ('location_id', models.BigIntegerField()),
                 ('min_volume', models.IntegerField(default=None, null=True)),
-                ('price', models.DecimalField(decimal_places=2, default=None, max_digits=20, null=True)),
-                ('order_range', models.CharField(choices=[('1', '1'), ('10', '10'), ('2', '2'), ('20', '20'), ('3', '3'), ('30', '30'), ('4', '4'), ('40', '40'), ('5', '5'), ('region', 'region'), ('solarsystem', 'solarsystem'), ('station', 'station')], max_length=30)),
+                ('price', models.DecimalField(decimal_places=2,
+                                              default=None, max_digits=20, null=True)),
+                ('order_range', models.CharField(choices=[('1', '1'), ('10', '10'), ('2', '2'), ('20', '20'), ('3', '3'), ('30', '30'), ('4', '4'), (
+                    '40', '40'), ('5', '5'), ('region', 'region'), ('solarsystem', 'solarsystem'), ('station', 'station')], max_length=30)),
                 ('region_id', models.IntegerField()),
                 ('type_id', models.IntegerField()),
                 ('volume_remain', models.IntegerField()),
                 ('volume_total', models.IntegerField()),
-                ('state', models.CharField(choices=[('cancelled', 'cancelled'), ('expired', 'expired'), ('active', 'active')], max_length=30)),
+                ('state', models.CharField(choices=[
+                 ('cancelled', 'cancelled'), ('expired', 'expired'), ('active', 'active')], max_length=30)),
                 ('is_corporation', models.BooleanField()),
-                ('character', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='corptools.CharacterAudit')),
-                ('location_name', models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveLocation')),
+                ('character', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='corptools.CharacterAudit')),
+                ('location_name', models.ForeignKey(default=None, null=True,
+                                                    on_delete=django.db.models.deletion.SET_NULL, to='corptools.EveLocation')),
             ],
             options={
                 'abstract': False,

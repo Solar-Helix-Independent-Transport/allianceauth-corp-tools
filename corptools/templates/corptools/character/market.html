@@ -11,7 +11,7 @@
                 <div class="panel-heading text-center">Sell Order Total</div>
                 <div class="panel-body">
                     <h3 class="text-center">$ {{total_sell|intcomma}}</h3>
-                </div>    
+                </div>
             </div>
         </div>
         <div class="col-md-6">
@@ -19,7 +19,7 @@
                 <div class="panel-heading text-center">Buy Order Total</div>
                 <div class="panel-body">
                     <h3 class="text-center"> {{total_buy|intcomma}}</h3>
-                </div>    
+                </div>
             </div>
         </div>
     </div>
@@ -50,7 +50,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>    
+        </div>
     </div>
     <div class="row panel panel-primary">
         <div class="panel-heading text-center">Completed Orders</div>
@@ -81,7 +81,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>    
+        </div>
     </div>
 </div>
 
@@ -93,7 +93,7 @@
 {% block ct_extra_script %}
 
     $(document).ready(function() {
-       
+
         $('#market').DataTable({
             "filterDropDown": {
 					columns: [{
@@ -130,5 +130,5 @@
             "pageLength": 50
         });
     });
-    
+
 {% endblock %}

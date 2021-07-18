@@ -14,7 +14,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='SkillList',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('last_update', models.DateTimeField(auto_now=True)),
                 ('Name', models.CharField(default=None, max_length=500, null=True)),
                 ('skill_list', models.TextField(default='', null=True)),
@@ -24,9 +25,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='MapSystemGate',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('from_solar_system', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='from_system', to='corptools.MapSystem')),
-                ('to_solar_system', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='to_system', to='corptools.MapSystem')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
+                ('from_solar_system', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                                        related_name='from_system', to='corptools.MapSystem')),
+                ('to_solar_system', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                                      related_name='to_system', to='corptools.MapSystem')),
             ],
         ),
     ]

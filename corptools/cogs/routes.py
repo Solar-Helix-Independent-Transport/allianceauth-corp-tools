@@ -32,11 +32,13 @@ class Routes(commands.Cog):
         end = MapSystem.objects.get(name=input_names[1])
 
         message = routes.route(start.system_id, end.system_id)
-            
-        dotlan_url = "https://evemaps.dotlan.net/route/{}".format(message.get("dotlan"))
+
+        dotlan_url = "https://evemaps.dotlan.net/route/{}".format(
+            message.get("dotlan"))
         embed = Embed(title=f"{start.name} to {end.name}")
         embed.colour = Color.blue()
-        embed.description = "Shortest Route is: {} Jumps\n\n{}".format(message.get("length"), message.get("path_message"))
+        embed.description = "Shortest Route is: {} Jumps\n\n{}".format(
+            message.get("length"), message.get("path_message"))
         embed.add_field(
             name="Dotlan", value=f"[Route Link]({dotlan_url})"
         )
@@ -48,15 +50,17 @@ class Routes(commands.Cog):
         """
         List all known Jumpbridges's
         """
-        
+
         embed = Embed(title=f"Known Jump Bridges")
         embed.colour = Color.blue()
         embed.description = "These do not auto populate. Please advise admins of ommisions/errors!\n\n"
 
-        jbs = MapJumpBridge.objects.all().select_related('from_solar_system', 'to_solar_system', 'owner')
+        jbs = MapJumpBridge.objects.all().select_related(
+            'from_solar_system', 'to_solar_system', 'owner')
         for jb in jbs:
             embed.description += f"`{jb.from_solar_system.name}` > `{jb.to_solar_system}` [{jb.owner.name}]\n"
         return await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Routes(bot))

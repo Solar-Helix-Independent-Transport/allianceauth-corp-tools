@@ -4,79 +4,88 @@ from .task_helpers.skill_helpers import SkillListCache
 import networkx as nx
 from django.utils import timezone
 import re
+
+
 class CorpToolsESIClient(EsiClientProvider):
 
-    # TODO create provider dummy classes for use here to not have to deal with ORM model bullshit and maybe be more async?. 
-    
+    # TODO create provider dummy classes for use here to not have to deal with ORM model bullshit and maybe be more async?.
+
     def _get_category(self, category_id, updates=False):
         from corptools.models import EveItemCategory
 
-        _category = self.client.Universe.get_universe_categories_category_id(category_id=category_id).result()
+        _category = self.client.Universe.get_universe_categories_category_id(
+            category_id=category_id).result()
         groups = _category.get('groups', [])
-        category = EveItemCategory(category_id=category_id,name=_category.get('name'))
+        category = EveItemCategory(
+            category_id=category_id, name=_category.get('name'))
 
         if updates is not False:
             if category_id in updates:
                 return category, False, groups
             else:
                 return category, True, groups
-        #category.save()
+        # category.save()
         return category
 
     def _get_group(self, group_id, updates=False):
         from corptools.models import EveItemGroup
 
-        _group = self.client.Universe.get_universe_groups_group_id(group_id=group_id).result()
+        _group = self.client.Universe.get_universe_groups_group_id(
+            group_id=group_id).result()
         eve_types = _group.get('types', [])
-        group = EveItemGroup(group_id=group_id, category_id=_group.get('category_id'), name=_group.get('name'))
+        group = EveItemGroup(group_id=group_id, category_id=_group.get(
+            'category_id'), name=_group.get('name'))
 
         if updates is not False:
             if group_id in updates:
                 return group, False, eve_types
             else:
                 return group, True, eve_types
-        #group.save()
+        # group.save()
         return group
 
     def _get_eve_type(self, type_id, updates=False):
         from corptools.models import EveItemType, EveItemDogmaAttribute
 
-        eve_type = self.client.Universe.get_universe_types_type_id(type_id=type_id).result()
+        eve_type = self.client.Universe.get_universe_types_type_id(
+            type_id=type_id).result()
         dogma = []
         if eve_type.get('dogma_attributes'):
             for d_at in eve_type.get('dogma_attributes', []):
                 d_at_temp = EveItemDogmaAttribute(eve_type_id=type_id,
-                                                attribute_id=d_at.get("attribute_id"),
-                                                value=d_at.get('value'))
+                                                  attribute_id=d_at.get(
+                                                      "attribute_id"),
+                                                  value=d_at.get('value'))
                 dogma.append(d_at_temp)
 
         eve_type = EveItemType(type_id=type_id,
-                                group_id=eve_type.get('group_id'),
-                                name=eve_type.get('name'),
-                                description=eve_type.get('description'),
-                                mass=eve_type.get('mass'),
-                                packaged_volume=eve_type.get('packaged_volume'),
-                                portion_size=eve_type.get('portion_size'),
-                                volume=eve_type.get('volume'),
-                                published=eve_type.get('published'),
-                                radius=eve_type.get('radius')
-                                )
+                               group_id=eve_type.get('group_id'),
+                               name=eve_type.get('name'),
+                               description=eve_type.get('description'),
+                               mass=eve_type.get('mass'),
+                               packaged_volume=eve_type.get('packaged_volume'),
+                               portion_size=eve_type.get('portion_size'),
+                               volume=eve_type.get('volume'),
+                               published=eve_type.get('published'),
+                               radius=eve_type.get('radius')
+                               )
         if updates is not False:
             if type_id in updates:
                 return eve_type, False, dogma
             else:
                 return eve_type, True, dogma
-        #eve_type.save()
+        # eve_type.save()
         return eve_type, dogma
 
     def _get_region(self, region_id, updates):
         from corptools.models import MapRegion
 
-        region = self.client.Universe.get_universe_regions_region_id(region_id=region_id).result()
+        region = self.client.Universe.get_universe_regions_region_id(
+            region_id=region_id).result()
         constelations = region.get('constellations', [])
         region = MapRegion(region_id=region_id,
-                        name=region.get('name'),
-                        description=region.get('description'))
+                           name=region.get('name'),
+                           description=region.get('description'))
 
         if region_id in updates:
             return region, False, constelations
@@ -86,12 +95,13 @@ class CorpToolsESIClient(EsiClientProvider):
     def _get_constellation(self, constellation_id, updates):
         from corptools.models import MapConstellation
 
-        constellation = self.client.Universe.get_universe_constellations_constellation_id(constellation_id=constellation_id).result()
+        constellation = self.client.Universe.get_universe_constellations_constellation_id(
+            constellation_id=constellation_id).result()
         systems = constellation.get('systems', [])
         constellation = MapConstellation(
-                        constellation_id=constellation_id,
-                        region_id=constellation.get('region_id'),
-                        name=constellation.get('name'))
+            constellation_id=constellation_id,
+            region_id=constellation.get('region_id'),
+            name=constellation.get('name'))
 
         if constellation_id in updates:
             return constellation, False, systems
@@ -101,18 +111,19 @@ class CorpToolsESIClient(EsiClientProvider):
     def _get_system(self, system_id, updates):
         from corptools.models import MapSystem
 
-        system = self.client.Universe.get_universe_systems_system_id(system_id=system_id).result()
+        system = self.client.Universe.get_universe_systems_system_id(
+            system_id=system_id).result()
         gates = system.get('stargates', None)
         system = MapSystem(system_id=system_id,
-                        constellation_id=system.get('constellation_id'),
-                        name=system.get('name'),
-                        security_class=system.get('security_class', None),
-                        security_status=system.get('security_status'),
-                        star_id=system.get('star_id', None),
-                        x=system.get('position', {}).get('x'),
-                        y=system.get('position', {}).get('y'),
-                        z=system.get('position', {}).get('z'),
-                        )
+                           constellation_id=system.get('constellation_id'),
+                           name=system.get('name'),
+                           security_class=system.get('security_class', None),
+                           security_status=system.get('security_status'),
+                           star_id=system.get('star_id', None),
+                           x=system.get('position', {}).get('x'),
+                           y=system.get('position', {}).get('y'),
+                           z=system.get('position', {}).get('z'),
+                           )
         if system_id in updates:
             return system, False, gates
         else:
@@ -121,15 +132,16 @@ class CorpToolsESIClient(EsiClientProvider):
     def _get_moon(self, moon_id, updates):
         from corptools.models import MapSystemMoon
 
-        moon = self.client.Universe.get_universe_moons_moon_id(moon_id=moon_id).result()
+        moon = self.client.Universe.get_universe_moons_moon_id(
+            moon_id=moon_id).result()
         moon = MapSystemMoon(moon_id=moon_id,
                              name=moon.get('name'),
                              system_id=moon.get('system_id', None),
                              x=moon.get('position', {}).get('x'),
                              y=moon.get('position', {}).get('y'),
                              z=moon.get('position', {}).get('z'),
-                            )
-        if updates is not False:        
+                             )
+        if updates is not False:
             if moon_id in updates:
                 return moon, False
             else:
@@ -138,15 +150,18 @@ class CorpToolsESIClient(EsiClientProvider):
             return moon
 
     def _get_stargate(self, gate_id):
-        gate = self.client.Universe.get_universe_stargates_stargate_id(stargate_id=gate_id).result()
+        gate = self.client.Universe.get_universe_stargates_stargate_id(
+            stargate_id=gate_id).result()
         return gate['system_id'], gate['destination']['system_id']
+
 
 class EveRouter():
     def __init__(self):
         self.G = nx.Graph()
         self.last_update = None
         self.bridges = {}
-    def bulid_graph(self):        
+
+    def bulid_graph(self):
         self.G.clear()
         #logger.debug("Graph cleared.")
         from .models import MapSystemGate, MapSystem, MapJumpBridge
@@ -169,7 +184,7 @@ class EveRouter():
 
     def route(self, source_id, destination_id):
         from .models import MapSystem, MapJumpBridge
-        #logger.debug("----------")
+        # logger.debug("----------")
         #logger.debug(f"Source: {source_id}")
         #logger.debug(f"Destination: {destination_id}")
 
@@ -178,7 +193,7 @@ class EveRouter():
         else:
             try:
                 last_update = MapJumpBridge.objects.latest("updated").updated
-                if last_update > self.last_update: 
+                if last_update > self.last_update:
                     self.bulid_graph()
             except MapJumpBridge.DoesNotExist:
                 pass
@@ -192,7 +207,7 @@ class EveRouter():
             system_map[a.system_id] = a.name
 
         output = {}
-        for i,p in enumerate(path):
+        for i, p in enumerate(path):
             output[i] = system_map[p]
 
         dotlan_path = output[0].replace(" ", "_")
@@ -210,9 +225,11 @@ class EveRouter():
                 dotlan_path += gated_path
         dotlan_path = re.sub(r'(?<!:)(:[^:\s]+)(?=:)(?!::)', '', dotlan_path)
         esi_points.append(path[len(path)-1])
-        result = {'path': output, 'esi':esi_points, 'path_message': message_path, 'dotlan': dotlan_path, 'length': path_length}
+        result = {'path': output, 'esi': esi_points, 'path_message': message_path,
+                  'dotlan': dotlan_path, 'length': path_length}
 
         return result
+
 
 esi = CorpToolsESIClient()
 routes = EveRouter()

@@ -21,31 +21,37 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='assetsfilter',
             name='categories',
-            field=models.ManyToManyField(blank=True, help_text='Filter on Asset Categories.', to='corptools.EveItemCategory'),
+            field=models.ManyToManyField(
+                blank=True, help_text='Filter on Asset Categories.', to='corptools.EveItemCategory'),
         ),
         migrations.AddField(
             model_name='assetsfilter',
             name='constellations',
-            field=models.ManyToManyField(blank=True, help_text='Limit filter to specific constellations', to='corptools.MapConstellation'),
+            field=models.ManyToManyField(
+                blank=True, help_text='Limit filter to specific constellations', to='corptools.MapConstellation'),
         ),
         migrations.AddField(
             model_name='assetsfilter',
             name='groups',
-            field=models.ManyToManyField(blank=True, help_text='Filter on Asset Groups.', to='corptools.EveItemGroup'),
+            field=models.ManyToManyField(
+                blank=True, help_text='Filter on Asset Groups.', to='corptools.EveItemGroup'),
         ),
         migrations.AddField(
             model_name='assetsfilter',
             name='regions',
-            field=models.ManyToManyField(blank=True, help_text='Limit filter to specific regions', to='corptools.MapRegion'),
+            field=models.ManyToManyField(
+                blank=True, help_text='Limit filter to specific regions', to='corptools.MapRegion'),
         ),
         migrations.AddField(
             model_name='assetsfilter',
             name='types',
-            field=models.ManyToManyField(blank=True, help_text='Filter on Asset Types.', to='corptools.EveItemType'),
+            field=models.ManyToManyField(
+                blank=True, help_text='Filter on Asset Types.', to='corptools.EveItemType'),
         ),
         migrations.AlterField(
             model_name='assetsfilter',
             name='systems',
-            field=models.ManyToManyField(blank=True, help_text='Limit filter to specific systems', to='corptools.MapSystem'),
+            field=models.ManyToManyField(
+                blank=True, help_text='Limit filter to specific systems', to='corptools.MapSystem'),
         ),
     ]

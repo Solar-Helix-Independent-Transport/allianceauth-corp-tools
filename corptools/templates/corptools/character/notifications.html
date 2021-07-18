@@ -28,7 +28,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>    
+        </div>
     </div>
 </div>
 
@@ -41,7 +41,7 @@
 {% block ct_extra_script %}
 
     $(document).ready(function() {
-       
+
         $('#wallet').DataTable({
             "filterDropDown": {
 					columns: [{
@@ -58,6 +58,6 @@
             "pageLength": 50
         });
     });
-    
+
 
     {% endblock %}

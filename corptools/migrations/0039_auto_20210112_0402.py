@@ -13,11 +13,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='assetsfilter',
             name='eve_groups',
-            field=models.ManyToManyField(blank=True, to='corptools.EveItemGroup'),
+            field=models.ManyToManyField(
+                blank=True, to='corptools.EveItemGroup'),
         ),
         migrations.AlterField(
             model_name='assetsfilter',
             name='eve_types',
-            field=models.ManyToManyField(blank=True, to='corptools.EveItemType'),
+            field=models.ManyToManyField(
+                blank=True, to='corptools.EveItemType'),
         ),
     ]

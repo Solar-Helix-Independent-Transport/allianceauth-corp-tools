@@ -11,4 +11,3 @@ urlpatterns += [
     url(r'^main-page/sub-section/$', views.page, name='p1-s1'),
     url(r'^second-page/$', views.page, name='p1'),
 ]
-

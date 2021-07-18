@@ -13,7 +13,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FullyLoadedFilter',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=500)),
                 ('description', models.CharField(max_length=500)),
             ],
@@ -55,11 +56,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Skillfilter',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=500)),
                 ('description', models.CharField(max_length=500)),
-                ('required_skill_lists', models.ManyToManyField(to='corptools.SkillList')),
-                ('single_req_skill_lists', models.ManyToManyField(blank=True, related_name='single_req', to='corptools.SkillList')),
+                ('required_skill_lists', models.ManyToManyField(
+                    to='corptools.SkillList')),
+                ('single_req_skill_lists', models.ManyToManyField(
+                    blank=True, related_name='single_req', to='corptools.SkillList')),
             ],
             options={
                 'verbose_name': 'Smart Filter: Skill list checks',
@@ -69,11 +73,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AssetsFilter',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=500)),
                 ('description', models.CharField(max_length=500)),
                 ('eve_types', models.ManyToManyField(to='corptools.EveItemType')),
-                ('systems', models.ManyToManyField(blank=True, to='corptools.MapSystem')),
+                ('systems', models.ManyToManyField(
+                    blank=True, to='corptools.MapSystem')),
             ],
             options={
                 'verbose_name': 'Smart Filter: Assets and Locations',

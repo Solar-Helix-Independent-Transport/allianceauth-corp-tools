@@ -204,7 +204,7 @@ tr.group:hover {
                             </button>
                             <a class="navbar-brand" href="{% url 'corptools:view' %}">Account Audit</a>
                         </div>
-                
+
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul class="nav navbar-nav">
                                 {% include 'corptools/character/char_menu.html' %}
@@ -227,10 +227,10 @@ tr.group:hover {
 
                             </ul>
                         </div>
-                        
+
                     </div>
                 </nav>
-    
+
                 <div class="panel panel-body">
                     <div class="row">
                         <div class="text-center col-md-2">
@@ -249,7 +249,7 @@ tr.group:hover {
                         {% endif %}
                         <div class="col-xs-12 hidden-md hidden-lg"><hr></div>
                         <div class="text-center col-md-6"  rowspan="2">
-                            <h4>Linked characters</h4> 
+                            <h4>Linked characters</h4>
                             {% for alt in alts|slice:":30" %}
                         <span rel="tooltip" style="background-color: {% if alt.characteraudit.is_active %}#008844{% else %}#AA0000{% endif %}" class="label label-default">{{ alt.character_name }}</span>
                             {% endfor %}

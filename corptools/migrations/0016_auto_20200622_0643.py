@@ -44,7 +44,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='miningtax',
             name='flat_tax_rate',
-            field=models.DecimalField(blank=True, decimal_places=2, default=None, max_digits=5, null=True),
+            field=models.DecimalField(
+                blank=True, decimal_places=2, default=None, max_digits=5, null=True),
         ),
         migrations.AddField(
             model_name='structure',
@@ -54,7 +55,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='miningtax',
             name='tax_rate',
-            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='corptools.OreTaxRates'),
+            field=models.ForeignKey(blank=True, default=None, null=True,
+                                    on_delete=django.db.models.deletion.CASCADE, to='corptools.OreTaxRates'),
         ),
         migrations.AlterField(
             model_name='oretaxrates',

@@ -18,6 +18,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='jumpclone',
             name='location_type',
-            field=models.CharField(choices=[('station', 'station'), ('structure', 'structure')], default=None, max_length=9, null=True),
+            field=models.CharField(choices=[(
+                'station', 'station'), ('structure', 'structure')], default=None, max_length=9, null=True),
         ),
     ]

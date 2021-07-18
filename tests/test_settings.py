@@ -16,9 +16,9 @@ INSTALLED_APPS += [
 ROOT_URLCONF = 'tests.urls'
 
 NOSE_ARGS = [
-    #'--with-coverage',
-    #'--cover-package=',
-    #'--exe',  # If your tests need this to be found/run, check they py files are not chmodded +x
+    # '--with-coverage',
+    # '--cover-package=',
+    # '--exe',  # If your tests need this to be found/run, check they py files are not chmodded +x
 ]
 
 CACHES['default'] = {'BACKEND': 'django.core.cache.backends.db.DatabaseCache'}
@@ -28,7 +28,7 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
 
-#LOGGING = None  # Comment out to enable logging for debugging
+# LOGGING = None  # Comment out to enable logging for debugging
 
 # Register an application at https://developers.eveonline.com for Authentication
 # & API Access and fill out these settings. Be sure to set the callback URL
@@ -38,5 +38,3 @@ PASSWORD_HASHERS = [
 ESI_SSO_CLIENT_ID = '123'
 ESI_SSO_CLIENT_SECRET = '123'
 ESI_SSO_CALLBACK_URL = '123'
-
-
