@@ -3,47 +3,91 @@
 <li class="">
     <a href="{% url 'corptools:overview' main_char.character_id%}">Overview</a>
 </li>
-{% if appset.CT_CHAR_ASSETS_MODULE %}
-<li class="">
-    <a href="{% url 'corptools:assets' main_char.character_id%}">Assets</a>
-</li>
-{% endif %}
-{% if appset.CT_CHAR_CLONES_MODULE %}
-<li class="">
-    <a href="{% url 'corptools:clones' main_char.character_id%}">Clones</a>
-</li>
-{% endif %}
-{% if appset.CT_CHAR_MAIL_MODULE %}
-<li class="">
-    <a href="">Mail</a>
-</li>
-{% endif %}
-{% if appset.CT_CHAR_WALLET_MODULE %}
-<li class="">
-    <a href="{% url 'corptools:market' main_char.character_id%}">Market</a>
-</li>
-{% endif %}
 <li class="">
     <a href="{% url 'corptools:public_data' main_char.character_id %}">Public Data</a>
 </li>
-{% if appset.CT_CHAR_ROLES_MODULE %}
-<li class="">
-    <a href="{% url 'corptools:roles' main_char.character_id%}">Roles</a>
+<li class="dropdown">
+    <a href="#" id="dLabel" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">Character<span class="caret"></span></a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+        {% if appset.CT_CHAR_ROLES_MODULE %}
+        <li class="">
+            <a href="{% url 'corptools:roles' main_char.character_id%}">Roles</a>
+        </li>
+        {% endif %}
+        {% if appset.CT_CHAR_SKILLS_MODULE %}
+        <li class="">
+            <a href="{% url 'corptools:skills' main_char.character_id%}">Skills</a>
+        </li>      
+        {% endif %}
+        <li class="">
+            <a href="">Fittings</a>
+        </li>
+        {% if appset.CT_CHAR_ASSETS_MODULE %}
+        <li class="">
+            <a href="{% url 'corptools:assets' main_char.character_id%}">Assets</a>
+        </li>
+        {% endif %}
+        {% if appset.CT_CHAR_CLONES_MODULE %}
+        <li class="">
+            <a href="{% url 'corptools:clones' main_char.character_id%}">Clones</a>
+        </li>
+        {% endif %}
+        {% if appset.CT_CHAR_STANDINGS_MODULE %}
+        <li class="">
+            <a href="">Standings</a>
+        </li>
+        {% endif %}
+    </ul>
 </li>
-{% endif %}
-{% if appset.CT_CHAR_SKILLS_MODULE %}
-<li class="">
-    <a href="{% url 'corptools:skills' main_char.character_id%}">Skills</a>
+<li class="dropdown">
+    <a href="#" id="dLabel" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">Finance<span class="caret"></span></a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+        {% if appset.CT_CHAR_WALLET_MODULE %}
+        <li class="">
+            <a href="{% url 'corptools:market' main_char.character_id%}">Market</a>
+        </li>
+        {% endif %}
+        {% if appset.CT_CHAR_WALLET_MODULE %}
+        <li class="">
+            <a href="{% url 'corptools:wallet' main_char.character_id %}">Wallet</a>
+        </li>
+        {% endif %}
+    </ul>
 </li>
-{% endif %}
-{% if appset.CT_CHAR_STANDINGS_MODULE %}
-<li class="">
-    <a href="">Standings</a>
+<li class="dropdown">
+    <a href="#" id="dLabel" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">Industry<span class="caret"></span></a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+        {% if appset.CT_CHAR_MINING_MODULE %}
+        <li class="">
+            <a href="">Mining</a>
+        </li>
+        {% endif %}
+    </ul>
 </li>
-{% endif %}
+<li class="dropdown">
+    <a href="#" id="dLabel" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">Interactions<span class="caret"></span></a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+        <li class="">
+            <a href="">Standings</a>
+        </li>
+        <li class="">
+            <a href="">Killmails</a>
+        </li>
+        <li class="">
+            <a href="">Contacts</a>
+        </li>
+        <li class="">
+            <a href="">Calendar</a>
+        </li>
+        <li class="">
+            <a href="{% url 'corptools:notifications' main_char.character_id %}">Notifications</a>
+        </li>
+        {% if appset.CT_CHAR_MAIL_MODULE %}
+        <li class="">
+            <a href="">Mail</a>
+        </li>
+        {% endif %}
+    </ul>
+</li>
 
-{% if appset.CT_CHAR_WALLET_MODULE %}
-<li class="">
-    <a href="{% url 'corptools:wallet' main_char.character_id %}">Wallet</a>
-</li>
-{% endif %}
+
