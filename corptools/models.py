@@ -15,6 +15,7 @@ from collections import defaultdict
 from esi.errors import TokenError
 from esi.models import Token
 from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter, EveAllianceInfo
+from allianceauth.eveonline.evelinks import eveimageserver
 from allianceauth.notifications import notify
 
 from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, \
@@ -242,6 +243,16 @@ class EveName(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_image_url(self):
+        if self.category == self.CHARACTER:
+            return eveimageserver.character_portrait_url(self.eve_id)
+        elif self.category == self.CORPORATION:
+            return eveimageserver.corporation_logo_url(self.eve_id)
+        elif self.category == self.ALLIANCE:
+            return eveimageserver.alliance_logo_url(self.eve_id)
+        elif self.category == 'faction':  # CCP...
+            return eveimageserver.corporation_logo_url(self.eve_id)
 
 
 class MapRegion(models.Model):

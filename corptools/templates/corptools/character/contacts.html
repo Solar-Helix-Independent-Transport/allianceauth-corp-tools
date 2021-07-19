@@ -16,12 +16,13 @@
                     <th class="text-center">Watched</th>
                     <th class="text-center">Blocked</th>
                     <th class="text-center">Watched</th>
+                    <th class="text-center">Owner</th>
                 </thead>
                 <tbody>
                 {% for contact in table_data %}
                     <tr>
                         <td class="text-center">
-                            <img class="ra-avatar img-circle" src="{{ contact.contact_name.eve_id|character_portrait_url }}">
+                            <img class="ra-avatar img-circle" src="{{ contact.contact_name.get_image_url }}">
                         </td>
 
                         <td class="text-center">{{ contact.contact_name.name}}</td>
@@ -58,6 +59,7 @@
                             No
                         {% endif %}
                         </td>
+                        <td class="text-center">{{ contact.character.character.character_name}}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -76,6 +78,8 @@ $(document).ready(function() {
         $('#table-contacts').DataTable({
             "filterDropDown": {
 					columns: [{
+						idx: 8
+                            },{
 						idx: 6
                             },
                             {
@@ -83,10 +87,11 @@ $(document).ready(function() {
                             }]
             },
             "columnDefs": [
-                { "visible": false, "targets": [6,7] }
+                { "visible": false, "targets": [6,7] },
+                { "sortable": false, "targets": [0,4,5] }
             ],
             "order": [
-                [0, "desc"]
+                [1, "asc"]
             ],
             "pageLength": 50
         });
