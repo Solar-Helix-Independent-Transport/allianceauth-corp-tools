@@ -50,6 +50,9 @@ class CharacterAudit(models.Model):
     last_update_clones = models.DateTimeField(
         null=True, default=None, blank=True)
 
+    last_update_contacts = models.DateTimeField(
+        null=True, default=None, blank=True)
+
     last_update_assets = models.DateTimeField(
         null=True, default=None, blank=True)
 
@@ -833,6 +836,57 @@ class CharacterRoles(models.Model):
     accountant = models.BooleanField(default=False)
     station_manager = models.BooleanField(default=False)
     personnel_manager = models.BooleanField(default=False)
+
+
+# Contacts Models
+class Contact(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    contact_id = models.BigIntegerField()
+    contact_type = models.CharField(max_length=255, null=False)
+    contact_name = models.ForeignKey(EveName, on_delete=models.CASCADE)
+    standing = models.DecimalField(max_digits=4, decimal_places=2)
+
+    class Meta:
+        abstract = True
+
+
+class ContactLabel(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    label_id = models.BigIntegerField()
+    label_name = models.CharField(max_length=255, null=False)
+
+    class Meta:
+        abstract = True
+
+
+class CharacterContactLabel(ContactLabel):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+
+    def build_id(self):
+        self.id = int(str(self.character_id)+str(self.label_id))
+        return self.id
+
+
+class CorporationContactLabel(ContactLabel):
+    corporation = models.ForeignKey(CorporationAudit, on_delete=models.CASCADE)
+
+
+class CharacterContact(Contact):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+    blocked = models.BooleanField(default=False)
+    watched = models.BooleanField(default=False)
+    labels = models.ManyToManyField(CharacterContactLabel)
+
+    def build_id(self):
+        self.id = int(str(self.character_id)+str(self.contact_id))
+        return self.id
+
+
+class CorporationContact(Contact):
+    corporation = models.ForeignKey(CorporationAudit, on_delete=models.CASCADE)
+    watched = models.BooleanField(default=False)
+    labels = models.ManyToManyField(CorporationContactLabel)
+
 
 # sec group classes
 

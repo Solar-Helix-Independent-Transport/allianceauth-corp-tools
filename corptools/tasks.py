@@ -19,7 +19,7 @@ from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_tab
 from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, \
     update_character_clones, update_character_skill_queue, update_character_wallet, \
     update_character_orders, update_character_order_history, update_character_notifications, \
-    update_character_roles, update_character_mail, process_mail_list
+    update_character_roles, update_character_mail, process_mail_list, update_character_contacts
 
 from .task_helpers.corp_helpers import update_corp_wallet_division
 from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone, CharacterMarketOrder
@@ -203,6 +203,15 @@ def update_char_assets(self, character_id):
 def update_char_wallet(self, character_id):
     try:
         return update_character_wallet(character_id)
+    except Exception as e:
+        logger.exception(e)
+        return "Failed"
+
+
+@shared_task(bind=True, base=QueueOnce)
+def update_char_contacts(self, character_id):
+    try:
+        return update_character_contacts(character_id)
     except Exception as e:
         logger.exception(e)
         return "Failed"

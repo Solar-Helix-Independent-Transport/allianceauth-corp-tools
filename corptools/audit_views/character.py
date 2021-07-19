@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import Count, F, Sum, Max, Q, FloatField
+from django.db.models.query import prefetch_related_objects
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from esi.decorators import token_required
@@ -441,6 +442,27 @@ def notifications(request, character_id=None):
     }
 
     return render(request, 'corptools/character/notifications.html', context=context)
+
+
+@login_required
+def contacts(request, character_id=None):
+    # get available models
+
+    main_char, characters, net_worth = get_alts(request, character_id)
+    character_ids = characters.values_list('character_id', flat=True)
+    contacts = CharacterContact.objects\
+        .filter(character__character__character_id__in=character_ids)\
+        .select_related('character__character', 'contact_name') \
+        .prefetch_related('labels')
+
+    context = {
+        "main_char": main_char,
+        "alts": characters,
+        "net_worth": net_worth,
+        "table_data": contacts,
+    }
+
+    return render(request, 'corptools/character/contacts.html', context=context)
 
 
 @login_required

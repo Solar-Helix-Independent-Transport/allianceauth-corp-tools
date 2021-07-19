@@ -2,7 +2,7 @@ from celery import app
 from django.conf.urls import url, include
 
 from . import views
-from corptools.audit_views.character import assets, wallet, pub_data, skills, clones, assets_lists, roles, market, status, notifications
+from corptools.audit_views.character import assets, wallet, pub_data, contacts, skills, clones, assets_lists, roles, market, status, notifications
 from corptools.audit_views.corporation import corp_list
 from . import app_settings
 app_name = 'corptools'
@@ -43,6 +43,11 @@ if app_settings.CT_CHAR_CLONES_MODULE:
 if app_settings.CT_CHAR_SKILLS_MODULE:
     _character_ulrs += [
         url(r'^skills/$', skills, name='skills'),
+    ]
+
+if app_settings.CT_CHAR_SKILLS_MODULE:
+    _character_ulrs += [
+        url(r'^contacts/$', contacts, name='contacts'),
     ]
 
 urlpatterns = [

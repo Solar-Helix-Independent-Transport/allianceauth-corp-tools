@@ -35,3 +35,19 @@ def skill_level(active, trained):
     empty = '<span class="far fa-circle"></span> '
 
     return mark_safe('<div role="text" aria-label="{}">{}{}{}</div>'.format(alt_text, full*active, alpha*omega_dif, empty*(5-(active+omega_dif))))
+
+
+@register.filter()
+def standing_span(standing):
+    if standing > 0:
+        if standing <= 5:
+            return mark_safe('<span class="label label-info">{}</span>'.format(standing))
+        else:
+            return mark_safe('<span class="label label-primary">{}</span>'.format(standing))
+    elif standing < 0:
+        if standing >= -5:
+            return mark_safe('<spam class="label label-warning">{}</span>'.format(standing))
+        else:
+            return mark_safe('<span class="label label-danger">{}</span>'.format(standing))
+    else:
+        return mark_safe('<span class="label label-default">{}</span>'.format(standing))

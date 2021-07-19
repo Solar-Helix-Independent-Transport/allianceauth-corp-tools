@@ -76,13 +76,11 @@
         </li>
         {% endif %}
 -->
-<!-- CONTACTS Not yet implelented
         {% if appset.CT_CHAR_CONTACTS_MODULE %}
         <li class="">
-            <a href="">Contacts</a>
+            <a href="{% url 'corptools:contacts' main_char.character_id %}">Contacts</a>
         </li>
         {% endif %}
--->
 <!-- KILLMAILS Not yet implelented
         {% if appset.CT_CHAR_KILLMAILS_MODULE %}
         <li class="">

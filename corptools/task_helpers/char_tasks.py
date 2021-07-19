@@ -3,7 +3,8 @@ from celery import shared_task
 from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, \
     Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, \
     SkillTotals, Implant, JumpClone, Clone, EveLocation, CharacterMarketOrder, \
-    Notification, CharacterRoles, MailLabel, MailMessage, MailRecipient
+    Notification, CharacterRoles, MailLabel, MailMessage, MailRecipient, \
+    CharacterContact, CharacterContactLabel
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 
@@ -838,3 +839,84 @@ def update_character_mail(character_id):
         return
 
     return mail_ids
+
+
+def update_character_contacts(character_id):
+    logger.debug("updating contacts for: %s" % str(character_id))
+
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+
+    req_scopes = ['esi-characters.read_contacts.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return False
+
+    _current_eve_ids = list(
+        EveName.objects.all().values_list('eve_id', flat=True))
+
+    labels = providers.esi.client.Contacts.get_characters_character_id_contacts_labels(character_id=character_id,
+                                                                                       token=token.valid_access_token()).result()
+    labels_to_create = []
+
+    for label in labels:  # update labels
+        _label_item = CharacterContactLabel(
+            character=audit_char,
+            label_id=label.get('label_id'),
+            label_name=label.get('label_name'),
+        )
+        _label_item.build_id()
+        labels_to_create.append(_label_item)
+
+    CharacterContactLabel.objects.filter(character=audit_char).delete()
+    CharacterContactLabel.objects.bulk_create(labels_to_create)
+
+    ContactLabelThrough = CharacterContact.labels.through
+
+    contacts = providers.esi.client.Contacts.get_characters_character_id_contacts(character_id=character_id,
+                                                                                  token=token.valid_access_token()).results()
+
+    _contacts_to_create = []
+    _through_to_create = []
+    for contact in contacts:  # update contacts
+        if contact.get('contact_id') not in _current_eve_ids:
+            EveName.objects.get_or_create_from_esi(contact.get('contact_id'))
+            _current_eve_ids.append(contact.get('contact_id'))
+        blocked = False if contact.get(
+            'is_blocked', False) is None else contact.get('is_blocked')
+        watched = False if contact.get(
+            'is_watched', False) is None else contact.get('is_watched')
+        _contact_item = CharacterContact(character=audit_char,
+                                         contact_id=contact.get('contact_id'),
+                                         contact_type=contact.get(
+                                             'contact_type'),
+                                         contact_name_id=contact.get(
+                                             'contact_id'),
+                                         standing=contact.get('standing'),
+                                         blocked=blocked,
+                                         watched=watched)
+
+        _id = _contact_item.build_id()
+        _contacts_to_create.append(_contact_item)
+
+        if contact.get('label_ids', False):  # add labels
+            for _label in contact.get('label_ids'):
+                _label_id = int(str(audit_char.id)+str(_label))
+                _lbl = ContactLabelThrough(
+                    charactercontact_id=_id,
+                    charactercontactlabel_id=_label_id
+                )
+                _through_to_create.append(_lbl)
+
+    CharacterContact.objects.filter(character=audit_char).delete()
+
+    CharacterContact.objects.bulk_create(_contacts_to_create)
+    ContactLabelThrough.objects.bulk_create(_through_to_create)
+
+    audit_char.last_update_contacts = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
+    return "Completed contacts for: %s" % str(character_id)
