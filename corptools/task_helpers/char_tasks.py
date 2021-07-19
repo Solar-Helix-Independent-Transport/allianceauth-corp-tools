@@ -507,8 +507,6 @@ def update_character_orders(character_id):
         character=audit_char, state='active').exclude(order_id__in=tracked_ids).delete()
 
     audit_char.last_update_orders = timezone.now()
-    audit_char.cache_expire_orders = datetime.datetime.strptime(
-        str(result.headers['expires']), '%a, %d %b %Y %H:%M:%S %Z')
     audit_char.save()
     audit_char.is_active()
 
