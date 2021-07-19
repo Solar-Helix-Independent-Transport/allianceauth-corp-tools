@@ -130,7 +130,8 @@ def update_character(char_id):
     que.append(update_char_orders.si(character.character.character_id))
     que.append(update_char_order_history.si(character.character.character_id))
     que.append(update_char_assets.si(character.character.character_id))
-    que.append(update_char_mail.si(character.character.character_id))
+    if app_settings.CT_CHAR_MAIL_MODULE:
+        que.append(update_char_mail.si(character.character.character_id))
     chain(que).apply_async(priority=6)
 
 
