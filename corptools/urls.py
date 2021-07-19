@@ -45,7 +45,7 @@ if app_settings.CT_CHAR_SKILLS_MODULE:
         url(r'^skills/$', skills, name='skills'),
     ]
 
-if app_settings.CT_CHAR_SKILLS_MODULE:
+if app_settings.CT_CHAR_CONTACTS_MODULE:
     _character_ulrs += [
         url(r'^contacts/$', contacts, name='contacts'),
     ]

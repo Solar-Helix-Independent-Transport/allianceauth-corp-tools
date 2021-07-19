@@ -122,6 +122,7 @@ def update_character(char_id):
     que.append(update_char_roles.si(character.character.character_id))
     que.append(update_char_corp_history.si(character.character.character_id))
     que.append(update_char_notifications.si(character.character.character_id))
+    que.append(update_char_contacts.si(character.character.character_id))
     que.append(update_char_skill_list.si(character.character.character_id))
     que.append(update_char_skill_queue.si(character.character.character_id))
     que.append(update_clones.si(character.character.character_id))

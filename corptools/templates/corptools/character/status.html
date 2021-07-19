@@ -43,6 +43,11 @@
                                         <td class="text-right">Clones</td><td>{{ data.character.characteraudit.last_update_clones|timesince}} ago</td>
                                     </tr>
                                 {% endif %}
+                                {% if appset.CT_CHAR_CONTACTS_MODULE %}
+                                    <tr>
+                                        <td class="text-right">Contacts</td><td>{{ data.character.characteraudit.last_update_contacts|timesince}} ago</td>
+                                    </tr>
+                                {% endif %}
                                 {% if appset.CT_CHAR_WALLET_MODULE %}
                                     <tr>
                                         <td class="text-right">Orders</td><td>{{ data.character.characteraudit.last_update_orders|timesince}} ago</td>
