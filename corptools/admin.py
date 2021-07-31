@@ -5,6 +5,8 @@ from . import models
 from django.conf import settings
 from . import app_settings
 
+from django.utils.html import format_html
+
 admin.site.register(models.CharacterAudit)
 admin.site.register(models.CorporationAudit)
 
