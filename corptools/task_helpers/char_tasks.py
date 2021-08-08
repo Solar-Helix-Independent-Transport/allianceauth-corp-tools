@@ -4,7 +4,7 @@ from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, \
     Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, \
     SkillTotals, Implant, JumpClone, Clone, EveLocation, CharacterMarketOrder, \
     Notification, CharacterRoles, MailLabel, MailMessage, MailRecipient, \
-    CharacterContact, CharacterContactLabel
+    CharacterContact, CharacterContactLabel, CharacterTitle
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 
@@ -918,3 +918,46 @@ def update_character_contacts(character_id):
     audit_char.is_active()
 
     return "Completed contacts for: %s" % str(character_id)
+
+
+def update_character_titles(character_id):
+    logger.debug("updating titles for: %s" % str(character_id))
+
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+
+    req_scopes = ['esi-characters.read_titles.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return False
+
+    titles = providers.esi.client.Character.get_characters_character_id_titles(character_id=character_id,
+                                                                               token=token.valid_access_token()).result()
+
+    title_models = []
+    for t in titles:  # update labels
+        _title_item, created = CharacterTitle.objects.update_or_create(
+            corporation_id=audit_char.character.corporation_id,
+            corporation_name=audit_char.character.corporation_name,
+            title_id=t.get('title_id'),
+            defaults={
+                "title": t.get('name')
+            }
+        )
+
+        title_models.append(_title_item.pk)
+        audit_char.characterroles.titles.add(_title_item)
+
+    if len(title_models) > 0:
+        rem_tits = audit_char.characterroles.titles.all().exclude(pk__in=title_models)
+        audit_char.characterroles.titles.remove(*rem_tits)
+    else:
+        audit_char.characterroles.titles.clear()
+
+    audit_char.last_update_titles = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
+    return "Completed titles for: %s" % str(character_id)

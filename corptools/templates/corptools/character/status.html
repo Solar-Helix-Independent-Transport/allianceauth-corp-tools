@@ -66,6 +66,8 @@
                                 {% if appset.CT_CHAR_ROLES_MODULE %}
                                     <tr>
                                         <td class="text-right">Roles</td><td>{{ data.character.characteraudit.last_update_roles|timesince}} ago</td>
+                                    <tr>
+                                        <td class="text-right">Titles</td><td>{{ data.character.characteraudit.last_update_titles|timesince}} ago</td>
                                     </tr>
                                 {% endif %}
                                 {% if appset.CT_CHAR_SKILLS_MODULE %}

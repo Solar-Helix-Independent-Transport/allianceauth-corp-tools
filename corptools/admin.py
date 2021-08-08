@@ -190,3 +190,5 @@ if 'securegroups' in settings.INSTALLED_APPS:
         admin.site.register(models.AssetsFilter, assetFilterAdmin)
     if app_settings.CT_CHAR_SKILLS_MODULE:
         admin.site.register(models.Skillfilter, skillsFilterAdmin)
+    if app_settings.CT_CHAR_ROLES_MODULE:
+        admin.site.register(models.Titlefilter)

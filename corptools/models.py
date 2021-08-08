@@ -69,6 +69,9 @@ class CharacterAudit(models.Model):
     last_update_roles = models.DateTimeField(
         null=True, default=None, blank=True)
 
+    last_update_titles = models.DateTimeField(
+        null=True, default=None, blank=True)
+
     last_update_mails = models.DateTimeField(
         null=True, default=None, blank=True)
 
@@ -835,18 +838,24 @@ class MailMessage(models.Model):
 
 
 class CharacterTitle(models.Model):
-    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
     title_id = models.IntegerField()
     title = models.CharField(max_length=500)
+    corporation_id = models.BigIntegerField()
+    corporation_name = models.CharField(max_length=500)
+
+    def __str__(self):
+        return f"({self.corporation_name}:{self.title_id}) - {self.title}"
 
 
 class CharacterRoles(models.Model):
-    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+    character = models.OneToOneField(CharacterAudit, on_delete=models.CASCADE)
 
     director = models.BooleanField(default=False)
     accountant = models.BooleanField(default=False)
     station_manager = models.BooleanField(default=False)
     personnel_manager = models.BooleanField(default=False)
+
+    titles = models.ManyToManyField(CharacterTitle)
 
 
 # Contacts Models
@@ -1302,4 +1311,48 @@ class Rolefilter(FilterBase):
             else:
                 msg = str(char_list) + " Days"
             output[c] = {"message": msg, "check": check}
+        return output
+
+
+class Titlefilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Corporate Title checks"
+        verbose_name_plural = verbose_name
+
+    titles = models.ForeignKey(
+        CharacterTitle, on_delete=models.CASCADE)
+
+    def process_filter(self, user: User):
+        try:
+            characters = user.character_ownerships.all()
+
+            if characters.filter(character__characteraudit__characterroles__titles__in=[self.titles]).exists():
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False
+
+    def audit_filter(self, users):
+        co = CharacterOwnership.objects.filter(user__in=users,
+                                               character__characteraudit__characterroles__titles__in=[self.titles])
+
+        chars = {}
+        for c in co:
+            if c.user.id not in chars:
+                chars[c.user.id] = []
+            chars[c.user.id].append(c.character.character_name)
+
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for u in users:
+            c = chars.get(u.id, False)
+            if c is not False:
+                if len(c) > 0:
+                    output[u.id] = {"message": ", ".join(c), "check": True}
+                    continue
+                else:
+                    output[u.id] = {"message": "", "check": False}
+                    continue
+            output[u.id] = {"message": "", "check": False}
         return output
