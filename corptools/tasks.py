@@ -116,6 +116,9 @@ def update_character(char_id):
                         character=EveCharacter.objects.get_character_by_id(token.character_id))
             except TokenExpiredError:
                 return False
+        else:
+            logger.info("No Tokens for {}".format(char_id))
+            return False
 
     logger.info("Starting Updates for {}".format(
         character.character.character_name))
@@ -300,8 +303,11 @@ def location_get(location_id):
     cache_tag = build_location_cache_tag(location_id)
     data = json.loads(cache.get(cache_tag, '{"date":false, "characters":[]}'))
     if data.get('date') is not False:
-        data['date'] = datetime.datetime.strptime(
-            data.get('date'), TZ_STRING).replace(tzinfo=timezone.utc)
+        try:
+            data['date'] = datetime.datetime.strptime(
+                data.get('date'), TZ_STRING).replace(tzinfo=timezone.utc)
+        except:
+            data['date'] = datetime.datetime.min
     return data
 
 

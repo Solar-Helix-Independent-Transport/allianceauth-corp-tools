@@ -183,6 +183,17 @@ class TimeInCorpFilterAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'days_in_corp']
 
 
+class rolesFilterAdmin(admin.ModelAdmin):
+
+    list_display = ['__str__', 'has_director', 'has_accountant',
+                    'has_station_manager', 'has_personnel_manager']
+
+
+class titleFilterAdmin(admin.ModelAdmin):
+
+    list_display = ['__str__', 'titles']
+
+
 if 'securegroups' in settings.INSTALLED_APPS:
     admin.site.register(models.FullyLoadedFilter)
     admin.site.register(models.TimeInCorpFilter, TimeInCorpFilterAdmin)
@@ -191,4 +202,5 @@ if 'securegroups' in settings.INSTALLED_APPS:
     if app_settings.CT_CHAR_SKILLS_MODULE:
         admin.site.register(models.Skillfilter, skillsFilterAdmin)
     if app_settings.CT_CHAR_ROLES_MODULE:
-        admin.site.register(models.Titlefilter)
+        admin.site.register(models.Titlefilter, titleFilterAdmin)
+        admin.site.register(models.Rolefilter, rolesFilterAdmin)

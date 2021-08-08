@@ -844,7 +844,7 @@ class CharacterTitle(models.Model):
     corporation_name = models.CharField(max_length=500)
 
     def __str__(self):
-        return f"({self.corporation_name}:{self.title_id}) - {self.title}"
+        return f"({self.corporation_name}) - {self.title}"
 
 
 class CharacterRoles(models.Model):
@@ -1266,19 +1266,34 @@ class Rolefilter(FilterBase):
     has_personnel_manager = models.BooleanField(default=False)
 
     corp_filter = models.ForeignKey(
-        EveCorporationInfo, on_delete=models.CASCADE, related_name='audit_role_filter')
+        EveCorporationInfo, on_delete=models.CASCADE, related_name='audit_role_filter', null=True, blank=True, default=None)
     alliance_filter = models.ForeignKey(
-        EveAllianceInfo, on_delete=models.CASCADE, related_name='audit_role_filter')
+        EveAllianceInfo, on_delete=models.CASCADE, related_name='audit_role_filter', null=True, blank=True, default=None)
 
     def process_filter(self, user: User):
         try:
             characters = user.character_ownerships.all()
-
-            histories = CorporationHistory.objects.filter(
-                character=main_character).order_by('-start_date').first()
-
-            days = timezone.now() - histories.start_date
-            if days.days >= self.days_in_corp:
+            queries = []
+            if self.has_director:
+                _q = models.Q(
+                    character__characteraudit__characterroles__director=True)
+                queries.append(_q)
+            if self.has_accountant:
+                _q = models.Q(
+                    character__characteraudit__characterroles__accountant=True)
+                queries.append(_q)
+            if self.has_station_manager:
+                _q = models.Q(
+                    character__characteraudit__characterroles__station_manager=True)
+                queries.append(_q)
+            if self.has_personnel_manager:
+                _q = models.Q(
+                    character__characteraudit__characterroles__personnel_manager=True)
+                queries.append(_q)
+            query = queries.pop()
+            for q in queries:
+                query |= q
+            if characters.filter(query).exists():
                 return True
             else:
                 return False
@@ -1287,30 +1302,48 @@ class Rolefilter(FilterBase):
             return False
 
     def audit_filter(self, users):
-        co = users.annotate(
-            max_timestamp=Max(
-                'profile__main_character__characteraudit__corporationhistory__start_date')
-        ).values("id", "max_timestamp")
-        chars = defaultdict(lambda: None)
+
+        co = CharacterOwnership.objects.filter(user__in=users)
+        queries = []
+        if self.has_director:
+            _q = models.Q(
+                character__characteraudit__characterroles__director=True)
+            queries.append(_q)
+        if self.has_accountant:
+            _q = models.Q(
+                character__characteraudit__characterroles__accountant=True)
+            queries.append(_q)
+        if self.has_station_manager:
+            _q = models.Q(
+                character__characteraudit__characterroles__station_manager=True)
+            queries.append(_q)
+        if self.has_personnel_manager:
+            _q = models.Q(
+                character__characteraudit__characterroles__personnel_manager=True)
+            queries.append(_q)
+        query = queries.pop()
+        for q in queries:
+            query |= q
+
+        co = co.filter(query)
+
+        chars = {}
         for c in co:
-            if c['max_timestamp']:
-                days = timezone.now() - c['max_timestamp']
-                days = days.days
-            else:
-                days = -1
-            chars[c['id']] = days
+            if c.user.id not in chars:
+                chars[c.user.id] = []
+            chars[c.user.id].append(c.character.character_name)
 
         output = defaultdict(lambda: {"message": "", "check": False})
-        for c, char_list in chars.items():
-            if char_list >= self.days_in_corp:
-                check = True
-            else:
-                check = False
-            if char_list < 0:
-                msg = "No Audit"
-            else:
-                msg = str(char_list) + " Days"
-            output[c] = {"message": msg, "check": check}
+        for u in users:
+            c = chars.get(u.id, False)
+            if c is not False:
+                if len(c) > 0:
+                    output[u.id] = {"message": ", ".join(c), "check": True}
+                    continue
+                else:
+                    output[u.id] = {"message": "", "check": False}
+                    continue
+            output[u.id] = {"message": "", "check": False}
         return output
 
 
