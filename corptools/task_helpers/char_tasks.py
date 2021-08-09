@@ -666,10 +666,13 @@ def update_character_roles(character_id):
         personnel_manager = True
 
     role_model, create = CharacterRoles.objects.update_or_create(character=audit_char,
-                                                                 director=director,
-                                                                 accountant=accountant,
-                                                                 station_manager=station_manager,
-                                                                 personnel_manager=personnel_manager)
+                                                                 defaults={
+                                                                     "director": director,
+                                                                     "accountant": accountant,
+                                                                     "station_manager": station_manager,
+                                                                     "personnel_manager": personnel_manager
+                                                                 }
+                                                                 )
 
     audit_char.last_update_roles = timezone.now()
     audit_char.save()
