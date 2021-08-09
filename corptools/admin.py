@@ -194,6 +194,18 @@ class titleFilterAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'titles']
 
 
+class titleAdmin(admin.ModelAdmin):
+    list_display = ['title', 'corporation_name']
+    search_fields = ['title', 'corporation_name']
+    list_filter = ['corporation_name']
+
+    def get_model_perms(self, request):
+        return {}
+
+
+admin.site.register(models.CharacterTitle, titleAdmin)
+
+
 if 'securegroups' in settings.INSTALLED_APPS:
     admin.site.register(models.FullyLoadedFilter)
     admin.site.register(models.TimeInCorpFilter, TimeInCorpFilterAdmin)
