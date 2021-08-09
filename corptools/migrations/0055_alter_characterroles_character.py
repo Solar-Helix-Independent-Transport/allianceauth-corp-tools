@@ -2,6 +2,20 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
+from django.db.models import Count
+
+
+def remove_dupes(apps, schema_editor):
+    # We can't import the Person model directly as it may be a newer
+    # version than this migration expects. We use the historical version.
+    CharacterRoles = apps.get_model('corptools', 'CharacterRoles')
+    ids = CharacterRoles.objects.values('character').annotate(
+        Count('id')).order_by().filter(id__count__gt=1)
+    for id in ids:
+        _id = CharacterRoles.objects.filter(
+            character_id=id['character']).last().pk
+        CharacterRoles.objects.filter(
+            character_id=id['character']).exclude(pk=_id).delete()
 
 
 class Migration(migrations.Migration):
@@ -11,6 +25,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(remove_dupes),
         migrations.AlterField(
             model_name='characterroles',
             name='character',
