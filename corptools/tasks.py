@@ -307,7 +307,7 @@ def location_get(location_id):
             data['date'] = datetime.datetime.strptime(
                 data.get('date'), TZ_STRING).replace(tzinfo=timezone.utc)
         except:
-            data['date'] = datetime.datetime.min
+            data['date'] = datetime.datetime.min.replace(tzinfo=timezone.utc)
     return data
 
 
