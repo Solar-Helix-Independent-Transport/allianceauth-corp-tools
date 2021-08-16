@@ -1274,6 +1274,12 @@ class Rolefilter(FilterBase):
         try:
             characters = user.character_ownerships.all()
             queries = []
+            if self.corp_filter:
+                characters = characters.filter(
+                    character__corporation_id=self.corp_filter.corporation_id)
+            if self.alliance_filter:
+                characters = characters.filter(
+                    character__alliance_id=self.alliance_filter.alliance_id)
             if self.has_director:
                 _q = models.Q(
                     character__characteraudit__characterroles__director=True)
@@ -1305,6 +1311,12 @@ class Rolefilter(FilterBase):
 
         co = CharacterOwnership.objects.filter(user__in=users)
         queries = []
+        if self.corp_filter:
+            co = co.filter(
+                character__corporation_id=self.corp_filter.corporation_id)
+        if self.alliance_filter:
+            co = co.filter(
+                character__alliance_id=self.alliance_filter.alliance_id)
         if self.has_director:
             _q = models.Q(
                 character__characteraudit__characterroles__director=True)

@@ -1,7 +1,7 @@
 from unittest import mock
 from django.test import TestCase
 from allianceauth.tests.auth_utils import AuthUtils
-from allianceauth.eveonline.models import EveCharacter
+from allianceauth.eveonline.models import EveCharacter, EveAllianceInfo, EveCorporationInfo
 from allianceauth.authentication.models import CharacterOwnership
 from django.utils import timezone
 from datetime import timedelta
@@ -44,7 +44,6 @@ class TestSecGroupBotFilters(TestCase):
 
             characters.append(main_char)
             users.append(user)
-
         cls.c1t1 = ct_models.CharacterTitle.objects.create(corporation_id=1,
                                                            corporation_name='Test Corp 1',
                                                            title="Test Title1",
@@ -90,6 +89,17 @@ class TestSecGroupBotFilters(TestCase):
                                               user=users[uid],
                                               owner_hash=f'ownalt{11+uid}')
             characters.append(character)
+
+        cls.alli = EveAllianceInfo.objects.create(alliance_id=1,
+                                                  alliance_name="Test Alliance 1",
+                                                  alliance_ticker="TSTA1",
+                                                  executor_corp_id=3)
+
+        cls.corp = EveCorporationInfo.objects.create(corporation_id=3,
+                                                     corporation_name="Test Corp 3",
+                                                     corporation_ticker="TST3",
+                                                     member_count=10,
+                                                     alliance=cls.alli,)
 
         # add some systems
         r1 = ct_models.MapRegion.objects.create(name="Test region 1",
@@ -380,12 +390,22 @@ class TestSecGroupBotFilters(TestCase):
                                        skillpoints_in_skill=500)
 
         u1 = ct_models.CharacterRoles.objects.create(
-            character=audits[0], director=True)
+            character=audits[0], director=True, personnel_manager=True)
         u1.titles.add(cls.c1t1)
 
         u15 = ct_models.CharacterRoles.objects.create(
             character=audits[15], personnel_manager=True)
         u15.titles.add(cls.c2t1)
+
+        u16 = ct_models.CharacterRoles.objects.create(
+            character=audits[17], personnel_manager=True)
+        u16.titles.add(cls.c2t1)
+
+        # print("**************************")
+        # print(u1.character.character.character_ownership.user.id)
+        # print(u15.character.character.character_ownership.user.id)
+        # print(u16.character.character.character_ownership.user.id)
+        # print("**************************")
 
         ct_models.Skill.objects.filter(
             character=audits[0]).update(active_skill_level=5)
@@ -798,6 +818,45 @@ class TestSecGroupBotFilters(TestCase):
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
         # print("**********")
         # print(tests)
+        self.assertTrue(tests[1]['check'])
+        self.assertFalse(tests[2]['check'])
+        self.assertFalse(tests[3]['check'])
+        self.assertFalse(tests[4]['check'])
+        self.assertFalse(tests[5]['check'])
+        self.assertTrue(tests[6]['check'])
+        self.assertFalse(tests[7]['check'])
+        self.assertTrue(tests[8]['check'])
+        self.assertFalse(tests[9]['check'])
+        self.assertFalse(tests[10]['check'])
+
+        # run again and confirm cache
+        tests = _filter.audit_filter(User.objects.filter(id__in=users))
+        # print("**********")
+        # print(tests)
+        self.assertTrue(tests[1]['check'])
+        self.assertFalse(tests[2]['check'])
+        self.assertFalse(tests[3]['check'])
+        self.assertFalse(tests[4]['check'])
+        self.assertFalse(tests[5]['check'])
+        self.assertTrue(tests[6]['check'])
+        self.assertFalse(tests[7]['check'])
+        self.assertTrue(tests[8]['check'])
+        self.assertFalse(tests[9]['check'])
+        self.assertFalse(tests[10]['check'])
+
+    def test_user_has_roles_personel_alli_filtered(self):
+        _filter = ct_models.Rolefilter.objects.create(name="roles Test",
+                                                      description="Something to tell user",
+                                                      alliance_filter=self.alli)
+        _filter.has_personnel_manager = True
+
+        users = []
+        for user in ct_models.CharacterAudit.objects.all():
+            users.append(user.character.character_ownership.user.id)
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=users))
+        # print("**********")
+        # print(tests)
         self.assertFalse(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -805,7 +864,7 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[5]['check'])
         self.assertTrue(tests[6]['check'])
         self.assertFalse(tests[7]['check'])
-        self.assertFalse(tests[8]['check'])
+        self.assertTrue(tests[8]['check'])
         self.assertFalse(tests[9]['check'])
         self.assertFalse(tests[10]['check'])
 
@@ -820,7 +879,46 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[5]['check'])
         self.assertTrue(tests[6]['check'])
         self.assertFalse(tests[7]['check'])
-        self.assertFalse(tests[8]['check'])
+        self.assertTrue(tests[8]['check'])
+        self.assertFalse(tests[9]['check'])
+        self.assertFalse(tests[10]['check'])
+
+    def test_user_has_roles_personel_corp_filtered(self):
+        _filter = ct_models.Rolefilter.objects.create(name="roles Test",
+                                                      description="Something to tell user",
+                                                      corp_filter=self.corp)
+        _filter.has_personnel_manager = True
+
+        users = []
+        for user in ct_models.CharacterAudit.objects.all():
+            users.append(user.character.character_ownership.user.id)
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=users))
+        print("**********")
+        print(tests)
+        self.assertFalse(tests[1]['check'])
+        self.assertFalse(tests[2]['check'])
+        self.assertFalse(tests[3]['check'])
+        self.assertFalse(tests[4]['check'])
+        self.assertFalse(tests[5]['check'])
+        self.assertTrue(tests[6]['check'])
+        self.assertFalse(tests[7]['check'])
+        self.assertTrue(tests[8]['check'])
+        self.assertFalse(tests[9]['check'])
+        self.assertFalse(tests[10]['check'])
+
+        # run again and confirm cache
+        tests = _filter.audit_filter(User.objects.filter(id__in=users))
+        # print("**********")
+        # print(tests)
+        self.assertFalse(tests[1]['check'])
+        self.assertFalse(tests[2]['check'])
+        self.assertFalse(tests[3]['check'])
+        self.assertFalse(tests[4]['check'])
+        self.assertFalse(tests[5]['check'])
+        self.assertTrue(tests[6]['check'])
+        self.assertFalse(tests[7]['check'])
+        self.assertTrue(tests[8]['check'])
         self.assertFalse(tests[9]['check'])
         self.assertFalse(tests[10]['check'])
 
@@ -881,7 +979,7 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[5]['check'])
         self.assertTrue(tests[6]['check'])
         self.assertFalse(tests[7]['check'])
-        self.assertFalse(tests[8]['check'])
+        self.assertTrue(tests[8]['check'])
         self.assertFalse(tests[9]['check'])
         self.assertFalse(tests[10]['check'])
 
@@ -896,6 +994,6 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[5]['check'])
         self.assertTrue(tests[6]['check'])
         self.assertFalse(tests[7]['check'])
-        self.assertFalse(tests[8]['check'])
+        self.assertTrue(tests[8]['check'])
         self.assertFalse(tests[9]['check'])
         self.assertFalse(tests[10]['check'])
