@@ -223,6 +223,8 @@ class InvTypeMaterials(models.Model):
         EveItemType, on_delete=models.SET_NULL, null=True, default=None)
     type_id = models.IntegerField()
     material_type_id = models.IntegerField()
+    met_type = models.ForeignKey(
+        EveItemType, on_delete=models.SET_NULL, null=True, default=None, related_name="met_type")
 
 
 # Name Class

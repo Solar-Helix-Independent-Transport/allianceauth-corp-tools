@@ -135,6 +135,8 @@ def process_map_from_esi():
 
 
 def update_ore_comp_table_from_fuzzworks():
+    # prime the provider or th ram will go bye bye
+    status = providers.esi.client.Status.get_status().result()
     InvTypeMaterials.objects.all().delete()
     # Get needed SDE file
     sysNames_url = 'https://www.fuzzwork.co.uk/dump/latest/invTypeMaterials.csv.bz2'
@@ -149,18 +151,24 @@ def update_ore_comp_table_from_fuzzworks():
 
     # Parse file(s) and Update names object(s)
     ore_details = []
+    mets = set()
     with open('invTypeMaterials.csv', 'r', encoding='UTF-8') as iN:
         csv_list = iN.read().split('\n')
         for row in csv_list[1:]:
             spl = row.split(',')
             if len(spl) > 1:
+                mets.add(spl[1])
+                mets.add(spl[0])
                 ore_details.append(InvTypeMaterials(
                     qty=spl[2],
                     type_id=spl[0],
-                    material_type_id=spl[1]
+                    eve_type_id=spl[0],
+                    material_type_id=spl[1],
+                    met_type_id=spl[1]
                 ))
-
-        InvTypeMaterials.objects.bulk_create(ore_details, batch_size=500)
+        ids = process_bulk_types_from_esi(mets)
+        InvTypeMaterials.objects.bulk_create(
+            ore_details, batch_size=500, ignore_conflicts=True)
 
 
 def process_category_from_esi(category_id):
@@ -272,6 +280,7 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
             if item not in _current_items or update_models:
                 _processes.append(executor.submit(
                     providers.esi._get_eve_type, item, updates=_current_items))
+                _current_items.append(item)
 
     for task in as_completed(_processes):
         __item, __item_new, __item_dogma = task.result()
@@ -292,6 +301,7 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
             if group not in _current_groups or update_models:
                 _processes.append(executor.submit(
                     providers.esi._get_group, group, updates=_current_groups))
+                _current_groups.append(group)
 
     for task in as_completed(_processes):
         __group, __group_new, types = task.result()
@@ -309,6 +319,7 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
             if category not in _current_categories or update_models:
                 _processes.append(executor.submit(
                     providers.esi._get_category, category, updates=_current_categories))
+                _current_categories.append(category)
 
     for task in as_completed(_processes):
         __category, __category_new, groups = task.result()
@@ -333,7 +344,7 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
 
     if len(_items_models_creates) > 0:
         EveItemType.objects.bulk_create(
-            _items_models_creates, batch_size=1000)  # bulk create
+            _items_models_creates, batch_size=1000, ignore_conflicts=True)  # bulk create
     if len(_items_models_updates) > 0:
         EveItemType.objects.bulk_update(_items_models_updates,
                                         ['name', 'group_id', 'description',
