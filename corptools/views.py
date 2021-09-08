@@ -268,3 +268,12 @@ def update_account(request, character_id):
     check_account.apply_async(args=[character_id], priority=6)
     messages.success(request, "Requested an update task.")
     return redirect('corptools:view')
+
+
+@login_required
+def reacttest(request):
+    ctx = {
+        "JS": app_settings.REACT_JS_PATH,
+        "CSS": app_settings.REACT_CSS_PATH
+    }
+    return render(request, 'corptools/character/react_base.html', context=ctx)
