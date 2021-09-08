@@ -234,11 +234,3 @@ def get_character_update_attributes():
         ]
 
     return _attribs
-
-
-with importlib.resources.open_text("corptools", "asset-manifest.json") as file:
-    data = json.load(file)
-
-REACT_CSS_PATH = data['files']['main.css'].replace('static/', '')
-REACT_JS_PATH = data['files']['main.js'].replace('static/', '')
-REACT_RUNTIME = data['files']['runtime-main.js'].replace('static/', '')

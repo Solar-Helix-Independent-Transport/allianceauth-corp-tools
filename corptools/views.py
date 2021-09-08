@@ -272,8 +272,4 @@ def update_account(request, character_id):
 
 @login_required
 def reacttest(request):
-    ctx = {
-        "JS": app_settings.REACT_JS_PATH,
-        "CSS": app_settings.REACT_CSS_PATH
-    }
-    return render(request, 'corptools/character/react_base.html', context=ctx)
+    return render(request, 'corptools/character/react_base.html')
