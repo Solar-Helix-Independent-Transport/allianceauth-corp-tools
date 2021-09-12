@@ -33,14 +33,18 @@ const CharStatus = () => {
         )
       );
       headers.sort();
-      setState({ characters: data.characters, main: data.main, headers: headers });
+      setState({
+        characters: data.characters,
+        main: data.main,
+        headers: headers,
+      });
     });
   }, []);
 
   return (
     <Panel>
       <Panel.Body>
-        <Table responsive striped >
+        <Table responsive striped>
           <thead>
             <tr>
               <th>Character</th>

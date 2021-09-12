@@ -6,18 +6,18 @@ function MyTooltip({ bad_chars }) {
 }
 
 function CharActiveBadge({ characters }) {
-  const bad_chars = characters.filter((char) => !char.active).map((char) => char.character.character_name);
+  const bad_chars = characters
+    .filter((char) => !char.active)
+    .map((char) => char.character.character_name);
 
   return (
     <>
       {bad_chars.length == 0 ? (
-        <Button className="btn-success">
-          Status
-        </Button>
+        <Button className="btn-success">Status</Button>
       ) : (
         <OverlayTrigger placement="top" overlay={MyTooltip({ bad_chars })}>
-          <Button className="btn-danger">
-            { bad_chars.length } Characters Require Attention
+          <Button className="btn-danger" href={`#/character/status`}>
+            {bad_chars.length} Characters Require Attention
           </Button>
         </OverlayTrigger>
       )}

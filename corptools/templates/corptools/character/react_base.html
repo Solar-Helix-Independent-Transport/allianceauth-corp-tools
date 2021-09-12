@@ -1,23 +1,15 @@
-{% extends 'allianceauth/base.html' %}
-{% load static %}
+{% extends 'allianceauth/base.html' %} {% load static %} {% block page_title
+%}Audit!{% endblock %} {% block extra_css %}
 
-{% block page_title %}Audit!{% endblock %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}" />
 
-{% block extra_css %}
+{% endblock %} {% block content %}
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<br />
+<div id="app"></div>
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
-
-{% endblock %}
-
-{% block content %}
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <br>
-    <div id="app"></div>
-
-{% endblock %}
-
-{% block extra_javascript %}
-    <!-- Load React. -->
-    <script src="{% static 'corptools/main.js' %}"></script>
+{% endblock %} {% block extra_javascript %}
+<!-- Load React. -->
+<script src="{% static 'corptools/main.js' %}"></script>
 
 {% endblock %}

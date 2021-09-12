@@ -6,11 +6,11 @@
 .flex {
   display: flex;
   height: 80px;
-  align-items:center;
+  align-items: center;
 }
 
 .child {
-    margin-right: 20px;
+  margin-right: 20px;
 }
 
 .child-end {

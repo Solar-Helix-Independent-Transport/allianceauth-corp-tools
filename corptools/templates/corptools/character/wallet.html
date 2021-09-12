@@ -1,335 +1,273 @@
-{% extends 'corptools/character/char_base.html' %}
-{% block ct_block %}
-{% load colors %}
-{% load l10n %}
-{% load humanize  %}
+{% extends 'corptools/character/char_base.html' %} {% block ct_block %} {% load
+colors %} {% load l10n %} {% load humanize %}
 
 <div class="col-md-12">
-    <div class="row panel panel-primary">
-        <div class="panel-heading text-center">Wallets</div>
-        <div class="panel-body">
-            <table id="wallet" class="table table-responsive">
-                <thead>
-                    <th>Date</th>
-                    <th>From</th>
-                    <th>To</th>
-                    <th>Amount</th>
-                    <th>Balance</th>
-                    <th>Reason</th>
-                    <th>Ref Type</th>
-                    <th>Character Filter</th>
-                </thead>
-                <tbody>
-                    {% for t in wallet %}
-                    <tr>
-                        <td class="">{{t.date|date:"Y-m-d h:i"}}</td>
-                        <td class="">{{t.first_party_name.name}}</td>
-                        <td class="">{{t.second_party_name.name}}</td>
-                        <td class="">{{t.amount|intcomma}}</td>
-                        <td class="">{{t.balance|intcomma}}</td>
-                        <td class="">{{t.reason}}</td>
-                        <td class="">{{t.ref_type|deslug|title}}</td>
-                        <td class="">{{t.character.character.character_name}}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+  <div class="row panel panel-primary">
+    <div class="panel-heading text-center">Wallets</div>
+    <div class="panel-body">
+      <table id="wallet" class="table table-responsive">
+        <thead>
+          <th>Date</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Amount</th>
+          <th>Balance</th>
+          <th>Reason</th>
+          <th>Ref Type</th>
+          <th>Character Filter</th>
+        </thead>
+        <tbody>
+          {% for t in wallet %}
+          <tr>
+            <td class="">{{t.date|date:"Y-m-d h:i"}}</td>
+            <td class="">{{t.first_party_name.name}}</td>
+            <td class="">{{t.second_party_name.name}}</td>
+            <td class="">{{t.amount|intcomma}}</td>
+            <td class="">{{t.balance|intcomma}}</td>
+            <td class="">{{t.reason}}</td>
+            <td class="">{{t.ref_type|deslug|title}}</td>
+            <td class="">{{t.character.character.character_name}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    <div class="row panel panel-primary">
-        <div class="panel-heading text-center">Wallet Activity</div>
-        <div class="panel-body">
-            <div  id="chartdiv-polar" style="min-height: 600px;"></div>
-        </div>
+  </div>
+  <div class="row panel panel-primary">
+    <div class="panel-heading text-center">Wallet Activity</div>
+    <div class="panel-body">
+      <div id="chartdiv-polar" style="min-height: 600px"></div>
     </div>
-    {% if manager_perms %}
-    <div class="row panel panel-primary">
-        <div class="panel-heading text-center">Interaction Map</div>
-        <div class="panel-body">
-
-            <div  id="chartdiv" style="min-height: 600px;"></div>
-            <div class="pull-right"><button id="toggle-interaction" class="btn btn-info">Toggle to <span id="toggle-text">Isk Amount</span></button></div>
+  </div>
+  {% if manager_perms %}
+  <div class="row panel panel-primary">
+    <div class="panel-heading text-center">Interaction Map</div>
+    <div class="panel-body">
+      <div id="chartdiv" style="min-height: 600px"></div>
+      <div class="pull-right">
+        <button id="toggle-interaction" class="btn btn-info">
+          Toggle to <span id="toggle-text">Isk Amount</span>
+        </button>
+      </div>
     </div>
     {% endif %}
-</div>
+  </div>
 
-{% endblock %}
-{% block extra_javascript %}
-    {% include 'bundles/datatables-js.html' %}
+  {% endblock %} {% block extra_javascript %} {% include
+  'bundles/datatables-js.html' %}
 
-    <script src="https://www.amcharts.com/lib/4/core.js"></script>
-    <script src="https://www.amcharts.com/lib/4/charts.js"></script>
-    <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+  <script src="https://www.amcharts.com/lib/4/core.js"></script>
+  <script src="https://www.amcharts.com/lib/4/charts.js"></script>
+  <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
 
-	<script>!function(t){function e(t){var e={columns:[],columnsIdxList:[],bootstrap:!1,autoSize:!0,label:"Filter "};if("bootstrap"in t&&"boolean"==typeof t.bootstrap&&(e.bootstrap=t.bootstrap),"autoSize"in t&&"boolean"==typeof t.autoSize&&(e.autoSize=t.autoSize),"label"in t&&"string"==typeof t.label&&(e.label=t.label),"columns"in t)for(var i=0;i<t.columns.length;i++){var n=t.columns[i];if("idx"in n&&"number"==typeof n.idx){var o=n.idx;e.columns[o]={title:null,maxWidth:null,autoSize:!0},e.columnsIdxList.push(o),"title"in n&&"string"==typeof n.title&&(e.columns[o].title=n.title),"maxWidth"in n&&"string"==typeof n.maxWidth&&(e.columns[o].maxWidth=n.maxWidth),"autoSize"in n&&"boolean"==typeof n.autoSize&&(e.columns[o].autoSize=n.autoSize)}}return e}t(document).on("preInit.dt",function(i,n){if("dt"===i.namespace){var o=new t.fn.dataTable.Api(n),a=o.table().node().id,l=o.init();if("filterDropDown"in l){var r=e(l.filterDropDown);if(0!=r.columns.length){var u=o.table().container(),s=a+"_filterWrapper",c=s+" "+(r.bootstrap?"form-inline":"");t(u).prepend('<div id="'+s+'" class="'+c+'">'+r.label+"</div>"),o.columns(r.columnsIdxList).every(function(){var e=this.index(),i=null!==r.columns[e].title?r.columns[e].title:t(this.header()).html();""==i&&(i="column "+(e+1));var n="form-control "+a+"_filterSelect",o=a+"_filterSelect"+e;t("#"+s).append('<select id="'+o+'" class="'+n+'"></select>');var l=t("#"+o).empty().append('<option value="">('+i+")</option>");})}}}}),t(document).on("init.dt",function(i,n){if("dt"===i.namespace){var o=new t.fn.dataTable.Api(n),a=o.table().node().id,l=o.init();if("filterDropDown"in l){var r=e(l.filterDropDown);o.table().container();o.columns(r.columnsIdxList).every(function(){var e=this,i=e.index(),n=t("#"+(a+"_filterSelect"+i));n.on("change",function(){var i=t.fn.dataTable.util.escapeRegex(t(this).val());e.search(i?"^"+i+"$":"",!0,!1).draw()}),e.data().unique().sort().each(function(t,e){""!=t&&n.append('<option value="'+t+'">'+t+"</option>")})})}}})}(jQuery);</script>
-{% endblock %}
-{% block ct_extra_script %}
-
-    $(document).ready(function() {
-
-        $('#wallet').DataTable({
-            "filterDropDown": {
-					columns: [{
-						idx: 6
-                            },
-                            {
-						idx: 7
-                            }],
-                    bootstrap: true
-            },
-            "columnDefs": [
-                { "visible": false, "targets": [7] }
-            ],
-            "order": [
-                [0, "desc"]
-            ],
-            "pageLength": 25
+  <script>
+    !(function (t) {
+      function e(t) {
+        var e = {
+          columns: [],
+          columnsIdxList: [],
+          bootstrap: !1,
+          autoSize: !0,
+          label: "Filter ",
+        };
+        if (
+          ("bootstrap" in t &&
+            "boolean" == typeof t.bootstrap &&
+            (e.bootstrap = t.bootstrap),
+          "autoSize" in t &&
+            "boolean" == typeof t.autoSize &&
+            (e.autoSize = t.autoSize),
+          "label" in t && "string" == typeof t.label && (e.label = t.label),
+          "columns" in t)
+        )
+          for (var i = 0; i < t.columns.length; i++) {
+            var n = t.columns[i];
+            if ("idx" in n && "number" == typeof n.idx) {
+              var o = n.idx;
+              (e.columns[o] = { title: null, maxWidth: null, autoSize: !0 }),
+                e.columnsIdxList.push(o),
+                "title" in n &&
+                  "string" == typeof n.title &&
+                  (e.columns[o].title = n.title),
+                "maxWidth" in n &&
+                  "string" == typeof n.maxWidth &&
+                  (e.columns[o].maxWidth = n.maxWidth),
+                "autoSize" in n &&
+                  "boolean" == typeof n.autoSize &&
+                  (e.columns[o].autoSize = n.autoSize);
+            }
+          }
+        return e;
+      }
+      t(document).on("preInit.dt", function (i, n) {
+        if ("dt" === i.namespace) {
+          var o = new t.fn.dataTable.Api(n),
+            a = o.table().node().id,
+            l = o.init();
+          if ("filterDropDown" in l) {
+            var r = e(l.filterDropDown);
+            if (0 != r.columns.length) {
+              var u = o.table().container(),
+                s = a + "_filterWrapper",
+                c = s + " " + (r.bootstrap ? "form-inline" : "");
+              t(u).prepend(
+                '<div id="' + s + '" class="' + c + '">' + r.label + "</div>"
+              ),
+                o.columns(r.columnsIdxList).every(function () {
+                  var e = this.index(),
+                    i =
+                      null !== r.columns[e].title
+                        ? r.columns[e].title
+                        : t(this.header()).html();
+                  "" == i && (i = "column " + (e + 1));
+                  var n = "form-control " + a + "_filterSelect",
+                    o = a + "_filterSelect" + e;
+                  t("#" + s).append(
+                    '<select id="' + o + '" class="' + n + '"></select>'
+                  );
+                  var l = t("#" + o)
+                    .empty()
+                    .append('<option value="">(' + i + ")</option>");
+                });
+            }
+          }
+        }
+      }),
+        t(document).on("init.dt", function (i, n) {
+          if ("dt" === i.namespace) {
+            var o = new t.fn.dataTable.Api(n),
+              a = o.table().node().id,
+              l = o.init();
+            if ("filterDropDown" in l) {
+              var r = e(l.filterDropDown);
+              o.table().container();
+              o.columns(r.columnsIdxList).every(function () {
+                var e = this,
+                  i = e.index(),
+                  n = t("#" + (a + "_filterSelect" + i));
+                n.on("change", function () {
+                  var i = t.fn.dataTable.util.escapeRegex(t(this).val());
+                  e.search(i ? "^" + i + "$" : "", !0, !1).draw();
+                }),
+                  e
+                    .data()
+                    .unique()
+                    .sort()
+                    .each(function (t, e) {
+                      "" != t &&
+                        n.append(
+                          '<option value="' + t + '">' + t + "</option>"
+                        );
+                    });
+              });
+            }
+          }
         });
-    });
-
-
-    $("#toggle-interaction").on("click", function() {
-        if (show_count){
-            chart.data = amount_data;
-            show_count = false;
-            $('#toggle-text').text('Interaction Count');
-        } else {
-            chart.data = count_data;
-            show_count = true;
-            $('#toggle-text').text('Isk Amount');
-        }
-
-    });
-    var chart = null;
-    var show_count = true;
-    var count_data = [
-    {% for fp, data in chords.items %}
-        {% for sp, am in data.items %}
-            {"from":"{{fp}}", "to":"{{sp}}", "value":{{am.c}}},
-        {% endfor %}
-    {% endfor %}
-    ]
-    var amount_data = [
-    {% for fp, data in chords.items %}
-        {% for sp, am in data.items %}
-            {"from":"{{fp}}", "to":"{{sp}}", "value":{{am.a}}},
-        {% endfor %}
-    {% endfor %}
-    ]
-
-    am4core.ready(function() {
-        {% if manager_perms %}
-
-        chart = am4core.create("chartdiv", am4charts.ChordDiagram);
-        chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
-
-        // colors of main characters
-        chart.colors.saturation = 0.45;
-        chart.colors.step = 3;
-        var colors = {
-            {% for fp in chords.keys %}
-                "{{fp}}":chart.colors.next(),
-            {% endfor %}
-        }
-
-        9
-        chart.data = count_data;
-
-        chart.dataFields.fromName = "from";
-        chart.dataFields.toName = "to";
-        chart.dataFields.value = "value";
-
-        chart.nodePadding = 1;
-        chart.minNodeSize = 0.1;
-        chart.startAngle = 80;
-        chart.endAngle = chart.startAngle + 360;
-        chart.sortBy = "value";
-        chart.fontSize = 10;
-        //chart.nonRibbon = true;
-        //chart.nonScaling = false;
-
-        var nodeTemplate = chart.nodes.template;
-        nodeTemplate.readerTitle = "Click to show/hide or drag to rearrange";
-        nodeTemplate.showSystemTooltip = true;
-        nodeTemplate.propertyFields.fill = "color";
-        nodeTemplate.tooltipText = "{name}'s Transferred: ${total}";
-
-        // when rolled over the node, make all the links rolled-over
-        nodeTemplate.events.on("over", function(event) {
-            var node = event.target;
-            node.outgoingDataItems.each(function(dataItem) {
-                if(dataItem.toNode){
-                    dataItem.link.isHover = true;
-                    dataItem.toNode.label.isHover = true;
-                }
-            })
-            node.incomingDataItems.each(function(dataItem) {
-                if(dataItem.fromNode){
-                    dataItem.link.isHover = true;
-                    dataItem.fromNode.label.isHover = true;
-                }
-            })
-
-            node.label.isHover = true;
-        })
-
-        // when rolled out from the node, make all the links rolled-out
-        nodeTemplate.events.on("out", function(event) {
-            var node = event.target;
-            node.outgoingDataItems.each(function(dataItem) {
-                if(dataItem.toNode){
-                    dataItem.link.isHover = false;
-                    dataItem.toNode.label.isHover = false;
-                }
-            })
-            node.incomingDataItems.each(function(dataItem) {
-                if(dataItem.fromNode){
-                    dataItem.link.isHover = false;
-                   dataItem.fromNode.label.isHover = false;
-                }
-            })
-
-            node.label.isHover = false;
-        })
-
-        var label = nodeTemplate.label;
-        label.relativeRotation = 90;
-        {% if NIGHT_MODE %}
-        label.fill = am4core.color("white");
-        {% endif %}
-        label.fillOpacity = 0.8;
-
-        let labelHS = label.states.create("hover");
-        labelHS.properties.fillOpacity = 1;
-
-        nodeTemplate.cursorOverStyle = am4core.MouseCursorStyle.pointer;
-        // this adapter makes non-main character nodes to be filled with color of the main character
-        nodeTemplate.adapter.add("fill", function(fill, target) {
-            let node = target;
-            let counters = {};
-            let mainChar = false;
-            node.incomingDataItems.each(function(dataItem) {
-                if(colors[dataItem.toName]){
-                    mainChar = true;
-                }
-
-                if(isNaN(counters[dataItem.fromName])){
-                    counters[dataItem.fromName] = dataItem.value;
-                }
-                else{
-                    counters[dataItem.fromName] += dataItem.value;
-                }
-            })
-            if(mainChar){
-                return fill;
-            }
-
-            let count = 0;
-            let color;
-            let biggest = 0;
-            let biggestName;
-
-            for(var name in counters){
-                if(counters[name] > biggest){
-                    biggestName = name;
-                    biggest = counters[name];
-                }
-            }
-            if(colors[biggestName]){
-                fill = colors[biggestName];
-            }
-
-            return fill;
-        })
-
-        // link template
-        var linkTemplate = chart.links.template;
-        linkTemplate.strokeOpacity = 0;
-        linkTemplate.fillOpacity = 0.15;
-        linkTemplate.tooltipText = "{fromName} > {toName}:{value.value}";
-
-        var hoverState = linkTemplate.states.create("hover");
-        hoverState.properties.fillOpacity = 0.7;
-        hoverState.properties.strokeOpacity = 0.7;
-        {% endif %}
-
-        var chart_polar = am4core.create("chartdiv-polar", am4charts.RadarChart);
-        chart_polar.hiddenState.properties.opacity = 0; // this creates initial fade-in
-
-        let data = [
-            {% for gd, data in graphs.items %}{
-                category: "{{gd}}",
-                {% for k, v in data.items %}
-                "{{k}}": {{v}},{% endfor %}
-            },
-            {% endfor %}
-        ]
-
-        chart_polar.data = data;
-        chart_polar.radius = am4core.percent(90);
-        chart_polar.numberFormatter.numberFormat = "#"
-
-        var categoryAxis = chart_polar.xAxes.push(new am4charts.CategoryAxis());
-        categoryAxis.dataFields.category = "category";
-        categoryAxis.renderer.labels.template.location = 0.5;
-        categoryAxis.renderer.tooltipLocation = 0.5;
-
-        var valueAxis = chart_polar.yAxes.push(new am4charts.ValueAxis());
-        valueAxis.tooltip.disabled = true;
-        valueAxis.renderer.labels.template.horizontalCenter = "left";
-
-        {% if NIGHT_MODE %}
-        valueAxis.renderer.labels.template.fill = am4core.color("white");
-        categoryAxis.renderer.labels.template.fill = am4core.color("white");
-        {% endif %}
-
-        {% for series in graph_people %}
-            var series{{ forloop.count }} = chart_polar.series.push(new am4charts.RadarColumnSeries());
-            series{{ forloop.count }}.name = "{{series}}";
-            series{{ forloop.count }}.dataFields.categoryX = "category";
-            series{{ forloop.count }}.dataFields.valueY = "{{series}}";
-            series{{ forloop.count }}.stroke = am4core.color("#ffffff");
-            series{{ forloop.count }}.fill = chart_polar.colors.next();
-            series{{ forloop.count }}.columns.template.strokeOpacity = 0.2;
-            series{{ forloop.count }}.stacked = true;
-            series{{ forloop.count }}.sequencedInterpolation = true;
-            series{{ forloop.count }}.columns.template.width = am4core.percent(100);
-            series{{ forloop.count }}.columns.template.tooltipText = "{name}: {valueY.value}";
-        {% endfor %}
-        chart_polar.seriesContainer.zIndex = -1;
-
-        chart_polar.scrollbarY = new am4core.Scrollbar();
-        chart_polar.scrollbarY.exportable = false;
-
-        var range1 = categoryAxis.axisRanges.create();
-        range1.category = "0000";
-        range1.endCategory = "0500";
-        range1.axisFill.fill = am4core.color("#0066CC");
-        range1.axisFill.fillOpacity = 0.2;
-        var range2 = categoryAxis.axisRanges.create();
-        range2.category = "2100";
-        range2.endCategory = "2300";
-        range2.axisFill.fill = am4core.color("#0066CC");
-        range2.axisFill.fillOpacity = 0.2;
-
-        var range3 = categoryAxis.axisRanges.create();
-        range3.category = "1400";
-        range3.endCategory = "2000";
-        range3.axisFill.fill = am4core.color("#CC3333");
-        range3.axisFill.fillOpacity = 0.2;
-        var range2 = categoryAxis.axisRanges.create();
-        range2.category = "0700";
-        range2.endCategory = "1200";
-        range2.axisFill.fill = am4core.color("#55AB55");
-        range2.axisFill.fillOpacity = 0.2;
-
-        chart_polar.cursor = new am4charts.RadarCursor();
-        chart_polar.cursor.xAxis = categoryAxis;
-        chart_polar.cursor.fullWidthXLine = true;
-        chart_polar.cursor.lineX.strokeOpacity = 0;
-        chart_polar.cursor.lineX.fillOpacity = 0.1;
-        chart_polar.cursor.lineX.fill = am4core.color("#000000");
-    }); // end am4core.ready()
-        {% endblock %}
+    })(jQuery);
+  </script>
+  {% endblock %} {% block ct_extra_script %} $(document).ready(function() {
+  $('#wallet').DataTable({ "filterDropDown": { columns: [{ idx: 6 }, { idx: 7
+  }], bootstrap: true }, "columnDefs": [ { "visible": false, "targets": [7] } ],
+  "order": [ [0, "desc"] ], "pageLength": 25 }); });
+  $("#toggle-interaction").on("click", function() { if (show_count){ chart.data
+  = amount_data; show_count = false; $('#toggle-text').text('Interaction
+  Count'); } else { chart.data = count_data; show_count = true;
+  $('#toggle-text').text('Isk Amount'); } }); var chart = null; var show_count =
+  true; var count_data = [ {% for fp, data in chords.items %} {% for sp, am in
+  data.items %} {"from":"{{fp}}", "to":"{{sp}}", "value":{{am.c}}}, {% endfor %}
+  {% endfor %} ] var amount_data = [ {% for fp, data in chords.items %} {% for
+  sp, am in data.items %} {"from":"{{fp}}", "to":"{{sp}}", "value":{{am.a}}}, {%
+  endfor %} {% endfor %} ] am4core.ready(function() { {% if manager_perms %}
+  chart = am4core.create("chartdiv", am4charts.ChordDiagram);
+  chart.hiddenState.properties.opacity = 0; // this creates initial fade-in //
+  colors of main characters chart.colors.saturation = 0.45; chart.colors.step =
+  3; var colors = { {% for fp in chords.keys %} "{{fp}}":chart.colors.next(), {%
+  endfor %} } 9 chart.data = count_data; chart.dataFields.fromName = "from";
+  chart.dataFields.toName = "to"; chart.dataFields.value = "value";
+  chart.nodePadding = 1; chart.minNodeSize = 0.1; chart.startAngle = 80;
+  chart.endAngle = chart.startAngle + 360; chart.sortBy = "value";
+  chart.fontSize = 10; //chart.nonRibbon = true; //chart.nonScaling = false; var
+  nodeTemplate = chart.nodes.template; nodeTemplate.readerTitle = "Click to
+  show/hide or drag to rearrange"; nodeTemplate.showSystemTooltip = true;
+  nodeTemplate.propertyFields.fill = "color"; nodeTemplate.tooltipText =
+  "{name}'s Transferred: ${total}"; // when rolled over the node, make all the
+  links rolled-over nodeTemplate.events.on("over", function(event) { var node =
+  event.target; node.outgoingDataItems.each(function(dataItem) {
+  if(dataItem.toNode){ dataItem.link.isHover = true;
+  dataItem.toNode.label.isHover = true; } })
+  node.incomingDataItems.each(function(dataItem) { if(dataItem.fromNode){
+  dataItem.link.isHover = true; dataItem.fromNode.label.isHover = true; } })
+  node.label.isHover = true; }) // when rolled out from the node, make all the
+  links rolled-out nodeTemplate.events.on("out", function(event) { var node =
+  event.target; node.outgoingDataItems.each(function(dataItem) {
+  if(dataItem.toNode){ dataItem.link.isHover = false;
+  dataItem.toNode.label.isHover = false; } })
+  node.incomingDataItems.each(function(dataItem) { if(dataItem.fromNode){
+  dataItem.link.isHover = false; dataItem.fromNode.label.isHover = false; } })
+  node.label.isHover = false; }) var label = nodeTemplate.label;
+  label.relativeRotation = 90; {% if NIGHT_MODE %} label.fill =
+  am4core.color("white"); {% endif %} label.fillOpacity = 0.8; let labelHS =
+  label.states.create("hover"); labelHS.properties.fillOpacity = 1;
+  nodeTemplate.cursorOverStyle = am4core.MouseCursorStyle.pointer; // this
+  adapter makes non-main character nodes to be filled with color of the main
+  character nodeTemplate.adapter.add("fill", function(fill, target) { let node =
+  target; let counters = {}; let mainChar = false;
+  node.incomingDataItems.each(function(dataItem) { if(colors[dataItem.toName]){
+  mainChar = true; } if(isNaN(counters[dataItem.fromName])){
+  counters[dataItem.fromName] = dataItem.value; } else{
+  counters[dataItem.fromName] += dataItem.value; } }) if(mainChar){ return fill;
+  } let count = 0; let color; let biggest = 0; let biggestName; for(var name in
+  counters){ if(counters[name] > biggest){ biggestName = name; biggest =
+  counters[name]; } } if(colors[biggestName]){ fill = colors[biggestName]; }
+  return fill; }) // link template var linkTemplate = chart.links.template;
+  linkTemplate.strokeOpacity = 0; linkTemplate.fillOpacity = 0.15;
+  linkTemplate.tooltipText = "{fromName} > {toName}:{value.value}"; var
+  hoverState = linkTemplate.states.create("hover");
+  hoverState.properties.fillOpacity = 0.7; hoverState.properties.strokeOpacity =
+  0.7; {% endif %} var chart_polar = am4core.create("chartdiv-polar",
+  am4charts.RadarChart); chart_polar.hiddenState.properties.opacity = 0; // this
+  creates initial fade-in let data = [ {% for gd, data in graphs.items %}{
+  category: "{{gd}}", {% for k, v in data.items %} "{{k}}": {{v}},{% endfor %}
+  }, {% endfor %} ] chart_polar.data = data; chart_polar.radius =
+  am4core.percent(90); chart_polar.numberFormatter.numberFormat = "#" var
+  categoryAxis = chart_polar.xAxes.push(new am4charts.CategoryAxis());
+  categoryAxis.dataFields.category = "category";
+  categoryAxis.renderer.labels.template.location = 0.5;
+  categoryAxis.renderer.tooltipLocation = 0.5; var valueAxis =
+  chart_polar.yAxes.push(new am4charts.ValueAxis()); valueAxis.tooltip.disabled
+  = true; valueAxis.renderer.labels.template.horizontalCenter = "left"; {% if
+  NIGHT_MODE %} valueAxis.renderer.labels.template.fill =
+  am4core.color("white"); categoryAxis.renderer.labels.template.fill =
+  am4core.color("white"); {% endif %} {% for series in graph_people %} var
+  series{{ forloop.count }} = chart_polar.series.push(new
+  am4charts.RadarColumnSeries()); series{{ forloop.count }}.name = "{{series}}";
+  series{{ forloop.count }}.dataFields.categoryX = "category"; series{{
+  forloop.count }}.dataFields.valueY = "{{series}}"; series{{ forloop.count
+  }}.stroke = am4core.color("#ffffff"); series{{ forloop.count }}.fill =
+  chart_polar.colors.next(); series{{ forloop.count
+  }}.columns.template.strokeOpacity = 0.2; series{{ forloop.count }}.stacked =
+  true; series{{ forloop.count }}.sequencedInterpolation = true; series{{
+  forloop.count }}.columns.template.width = am4core.percent(100); series{{
+  forloop.count }}.columns.template.tooltipText = "{name}: {valueY.value}"; {%
+  endfor %} chart_polar.seriesContainer.zIndex = -1; chart_polar.scrollbarY =
+  new am4core.Scrollbar(); chart_polar.scrollbarY.exportable = false; var range1
+  = categoryAxis.axisRanges.create(); range1.category = "0000";
+  range1.endCategory = "0500"; range1.axisFill.fill = am4core.color("#0066CC");
+  range1.axisFill.fillOpacity = 0.2; var range2 =
+  categoryAxis.axisRanges.create(); range2.category = "2100"; range2.endCategory
+  = "2300"; range2.axisFill.fill = am4core.color("#0066CC");
+  range2.axisFill.fillOpacity = 0.2; var range3 =
+  categoryAxis.axisRanges.create(); range3.category = "1400"; range3.endCategory
+  = "2000"; range3.axisFill.fill = am4core.color("#CC3333");
+  range3.axisFill.fillOpacity = 0.2; var range2 =
+  categoryAxis.axisRanges.create(); range2.category = "0700"; range2.endCategory
+  = "1200"; range2.axisFill.fill = am4core.color("#55AB55");
+  range2.axisFill.fillOpacity = 0.2; chart_polar.cursor = new
+  am4charts.RadarCursor(); chart_polar.cursor.xAxis = categoryAxis;
+  chart_polar.cursor.fullWidthXLine = true;
+  chart_polar.cursor.lineX.strokeOpacity = 0;
+  chart_polar.cursor.lineX.fillOpacity = 0.1; chart_polar.cursor.lineX.fill =
+  am4core.color("#000000"); }); // end am4core.ready() {% endblock %}
+</div>

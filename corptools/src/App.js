@@ -6,9 +6,8 @@ import { Col } from "react-bootstrap";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import CharStatus from "./pages/Status";
 const CorptoolsCharacterView = () => {
-
-  const character_id = window.location.pathname.split("/")[3]
-  console.log(character_id)
+  const character_id = window.location.pathname.split("/")[3];
+  console.log(character_id);
   return (
     <Router>
       <CharHeader char={character_id}></CharHeader>

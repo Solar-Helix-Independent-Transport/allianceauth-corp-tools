@@ -63,23 +63,30 @@ const CharHeader = ({ char }) => {
                 <h4>{data.main.alliance_name}</h4>
               </div>
               <div>
-              <Badge >Total SP:{' '}
-                  {data.characters.reduce((p, c) => {
-                    try {
-                      return p + c.sp;
-                    } catch (err) {
-                      return p;
-                    }
-                  }, 0).toLocaleString()}
-                </Badge><br/>
-                <Badge >Total Isk:{' '}
-                  {data.characters.reduce((p, c) => {
-                    try {
-                      return p + c.isk;
-                    } catch (err) {
-                      return p;
-                    }
-                  }, 0).toLocaleString()}
+                <Badge>
+                  Total SP:{" "}
+                  {data.characters
+                    .reduce((p, c) => {
+                      try {
+                        return p + c.sp;
+                      } catch (err) {
+                        return p;
+                      }
+                    }, 0)
+                    .toLocaleString()}
+                </Badge>
+                <br />
+                <Badge>
+                  Total Isk:{" "}
+                  {data.characters
+                    .reduce((p, c) => {
+                      try {
+                        return p + c.isk;
+                      } catch (err) {
+                        return p;
+                      }
+                    }, 0)
+                    .toLocaleString()}
                 </Badge>
               </div>
             </>
