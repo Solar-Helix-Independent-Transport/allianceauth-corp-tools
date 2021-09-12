@@ -280,7 +280,7 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
             if item not in _current_items or update_models:
                 _processes.append(executor.submit(
                     providers.esi._get_eve_type, item, updates=_current_items))
-                _current_items.append(item)
+                # _current_items.append(item)
 
     for task in as_completed(_processes):
         __item, __item_new, __item_dogma = task.result()
