@@ -165,12 +165,6 @@ def update_character_assets(character_id):
     assets = providers.esi.client.Assets.get_characters_character_id_assets(character_id=character_id,
                                                                             token=token.valid_access_token()).results()
 
-    delete_query = CharacterAsset.objects.filter(
-        character=audit_char)  # Flush Assets
-    if delete_query.exists():
-        # speed and we are not caring about f-keys or signals on these models
-        delete_query._raw_delete(delete_query.db)
-
     location_names = list(
         EveLocation.objects.all().values_list('location_id', flat=True))
     _current_type_ids = []
@@ -218,7 +212,15 @@ def update_character_assets(character_id):
             if ship.get('location_id') in location_names:
                 asset_item.location_name_id = ship.get('location_id')
             items.append(asset_item)
+
     EveItemType.objects.create_bulk_from_esi(_current_type_ids)
+
+    delete_query = CharacterAsset.objects.filter(
+        character=audit_char)  # Flush Assets
+    if delete_query.exists():
+        # speed and we are not caring about f-keys or signals on these models
+        delete_query._raw_delete(delete_query.db)
+
     CharacterAsset.objects.bulk_create(items)
 
     audit_char.last_update_assets = timezone.now()

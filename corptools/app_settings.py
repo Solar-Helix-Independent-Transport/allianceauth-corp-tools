@@ -198,7 +198,7 @@ def get_character_update_attributes():
         _attribs += [
             # Roles
             ("Roles", 'last_update_roles'),
-            ("titles", 'last_update_titles'),
+            ("Titles", 'last_update_titles'),
         ]
 
     if CT_CHAR_WALLET_MODULE:

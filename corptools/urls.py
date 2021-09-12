@@ -58,7 +58,8 @@ if app_settings.CT_CHAR_CONTACTS_MODULE:
 urlpatterns = [
     url(r'^$', views.corptools_menu, name='view'),
     url(r'^api/', api.urls),
-    url(r'^r/', views.reacttest, name='react'),
+    url(r'^r/$', views.react_menu, name='react'),
+    url(r'^r/(?P<character_id>(\d)*)/', views.react_main, name='reactmain'),
     url(r'^check_account/(?P<character_id>(\d)*)/$',
         views.update_account, name='update_account'),
     url(r'^admin/$', views.admin, name='admin'),

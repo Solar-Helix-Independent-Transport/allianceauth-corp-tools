@@ -5,23 +5,19 @@
 
 {% block extra_css %}
 
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
 
 {% endblock %}
 
 {% block content %}
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <br>
     <div id="app"></div>
 
 {% endblock %}
 
 {% block extra_javascript %}
-  <!-- Load React. -->
-  <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <!-- Load React. -->
     <script src="{% static 'corptools/main.js' %}"></script>
 
 {% endblock %}

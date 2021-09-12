@@ -1,6 +1,6 @@
 from datetime import datetime
-from ninja import Schema
-from typing import Optional, List
+from ninja import Schema, schema
+from typing import Optional, List, Dict
 
 
 class Message(Schema):
@@ -12,13 +12,33 @@ class CharacterUpdate(Schema):
     updated: datetime
 
 
-class CharacterStatus(Schema):
+class Character(Schema):
     character_name: str
     character_id: int
     corporation_id: int
     corporation_name: str
     alliance_id: Optional[int]
     alliance_name: Optional[str]
+
+
+class CharacterStatus(Schema):
+    character: Character
     isk: float
+    sp: int
     active: bool
-    last_updates: List[CharacterUpdate] = None
+    last_updates: Dict = None
+
+
+class AccountStatus(Schema):
+    characters: List[CharacterStatus]
+    main: Character
+
+
+class MenuLink(Schema):
+    name: str
+    link: str
+
+
+class MenuCategory(Schema):
+    name: str
+    links: List[MenuLink]

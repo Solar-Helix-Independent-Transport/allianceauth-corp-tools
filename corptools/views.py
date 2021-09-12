@@ -271,5 +271,13 @@ def update_account(request, character_id):
 
 
 @login_required
-def reacttest(request):
+def react_menu(request):
+    # get available models
+    return redirect('corptools:reactmain', request.user.profile.main_character.character_id)
+
+
+@login_required
+def react_main(request, character_id):
+    # get available models
+
     return render(request, 'corptools/character/react_base.html')

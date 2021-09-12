@@ -280,7 +280,6 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
             if item not in _current_items or update_models:
                 _processes.append(executor.submit(
                     providers.esi._get_eve_type, item, updates=_current_items))
-                _current_items.append(item)
 
     for task in as_completed(_processes):
         __item, __item_new, __item_dogma = task.result()
@@ -330,21 +329,21 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
 
     if len(_categories_model_creates) > 0:
         EveItemCategory.objects.bulk_create(
-            _categories_model_creates, batch_size=1000, ignore_conflicts=True)  # bulk create
+            _categories_model_creates, batch_size=1000)  # , ignore_conflicts=True)  # bulk create
     if len(_categories_model_updates) > 0:
         EveItemCategory.objects.bulk_update(
             _categories_model_updates, ['name'])  # bulk update
 
     if len(_groups_model_creates) > 0:
         EveItemGroup.objects.bulk_create(
-            _groups_model_creates, batch_size=1000, ignore_conflicts=True)  # bulk create
+            _groups_model_creates, batch_size=1000)  # , ignore_conflicts=True)  # bulk create
     if len(_groups_model_updates) > 0:
         EveItemGroup.objects.bulk_update(
             _groups_model_updates, ['name', 'category_id'], batch_size=1000)  # bulk update
 
     if len(_items_models_creates) > 0:
         EveItemType.objects.bulk_create(
-            _items_models_creates, batch_size=1000, ignore_conflicts=True)  # bulk create
+            _items_models_creates, batch_size=1000)  # , ignore_conflicts=True)  # bulk create
     if len(_items_models_updates) > 0:
         EveItemType.objects.bulk_update(_items_models_updates,
                                         ['name', 'group_id', 'description',
