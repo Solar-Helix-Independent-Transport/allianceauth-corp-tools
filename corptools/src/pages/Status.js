@@ -40,12 +40,12 @@ const CharStatus = () => {
   return (
     <Panel>
       <Panel.Body>
-        <Table>
+        <Table responsive striped >
           <thead>
             <tr>
               <th>Character</th>
               {data.headers.map((h) => (
-                <th>{h}</th>
+                <th class="text-center">{h}</th>
               ))}
             </tr>
           </thead>
@@ -56,7 +56,7 @@ const CharStatus = () => {
                 {data.headers.map((h) => {
                   try {
                     return (
-                      <td>
+                      <td class="text-center">
                         <ReactTimeAgo date={Date.parse(char.last_updates[h])} />
                       </td>
                     );

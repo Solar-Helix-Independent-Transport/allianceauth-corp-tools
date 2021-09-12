@@ -13,7 +13,7 @@ const CorptoolsCharacterView = () => {
     <Router>
       <CharHeader char={character_id}></CharHeader>
       <CharMenu char={character_id}></CharMenu>
-      <Col xs={12}>
+      <Col>
         <Switch>
           <Route path="/character/status" component={CharStatus} />
           <Route path="/character/assets" component={Assets} />

@@ -122,6 +122,74 @@ def get_character_status(request, character_id: int):
 
 
 @api.get(
+    "characters/{character_id}/pubdata",
+    response={200: List[schema.CharacterHistory], 403: schema.Message},
+)
+def get_character_pubdata(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    corp_histories = models.CorporationHistory.objects\
+        .filter(character__character__in=characters)\
+        .select_related('character__character', 'corporation_name')
+
+    histories = {}
+    for h in corp_histories:
+        if h.character.character_id not in histories:
+            histories[h.character.character_id] = []
+        histories[h.character.character_id].append({
+            "corporation": {
+                "corporation_name": h.corporation_name.name,
+                "corporation_id": h.corporation_name.eve_id,
+            },
+            "start": h.start_date
+        })
+        if h.corporation_name.alliance:
+            histories[h.character.character_id]['corporation'].update({
+                "alliance_id": h.corporation_name.alliance.eve_id,
+                "alliance_name": h.corporation_name.alliance.alliance_name,
+            })
+
+    char_skill_total = models.Skill.objects\
+        .filter(character__character__in=characters)\
+        .values('character')\
+        .annotate(char=F('character__character__character_id'))\
+        .annotate(total_sp=Sum('skillpoints_in_skill'))
+
+    skills = {}
+
+    for c in char_skill_total:
+        skills[c.get('char')] = c.get('total_sp')
+
+    characters = characters.select_related('characteraudit')
+    output = []
+
+    for character in characters:
+        _o = {
+            "character": {  # Todo map model to fields
+                "character_name": character.character_name,
+                "character_id": character.character_id,
+                "corporation_id": character.corporation_id,
+                "corporation_name": character.corporation_name,
+                "alliance_id": character.alliance_id,
+                "alliance_name": character.alliance_name,
+            },
+        }
+        try:
+            _o.update({
+                "history": histories[character.id],
+            })
+        except KeyError:
+            pass
+        output.append(_o)
+    return 200, output
+
+
+@api.get(
     "characters/menu",
     response=List[schema.MenuCategory],
 )
