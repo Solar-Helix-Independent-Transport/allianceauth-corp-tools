@@ -1,77 +1,77 @@
-import React, { useState, useEffect } from "react";
-import { Label, Table } from "react-bootstrap";
+import React, { useState } from "react";
+import { Table } from "react-bootstrap";
 import { Panel } from "react-bootstrap";
-import axios from "axios";
 import ReactTimeAgo from "react-time-ago";
+import CharacterPortrait from "../components/CharacterPortrait";
+import { useQuery } from "react-query";
+import loadStatus from "../apis/Character";
 
 const CharStatus = () => {
-  const [data, setState] = useState({
-    characters: [],
-    main: {
-      character_id: 1,
-      character_name: "",
-      corporation_id: 0,
-      corporation_name: "",
-      alliance_id: 0,
-      alliance_name: "",
-    },
-    headers: [],
-  });
   const character_id = window.location.pathname.split("/")[3];
-  useEffect(() => {
-    axios.get(`/audit/api/characters/${character_id}/status`).then((res) => {
-      const data = res.data;
-      const headers = Array.from(
-        new Set(
-          data.characters.reduce((p, c) => {
-            try {
-              return p.concat(Object.keys(c.last_updates));
-            } catch (err) {
-              return p;
-            }
-          }, [])
-        )
-      );
-      headers.sort();
-      setState({
-        characters: data.characters,
-        main: data.main,
-        headers: headers,
-      });
-    });
-  }, []);
+
+  const { isLoading, error, data } = useQuery(["status", character_id], () =>
+    loadStatus(character_id)
+  );
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (error) return <p>API ERROR!!!</p>;
 
   return (
     <Panel>
-      <Panel.Body>
-        <Table responsive striped>
-          <thead>
-            <tr>
-              <th>Character</th>
-              {data.headers.map((h) => (
-                <th class="text-center">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.characters.map((char) => (
-              <tr class={char.active ? "success" : "warning"}>
-                <td>{char.character.character_name}</td>
-                {data.headers.map((h) => {
-                  try {
-                    return (
-                      <td class="text-center">
-                        <ReactTimeAgo date={Date.parse(char.last_updates[h])} />
-                      </td>
-                    );
-                  } catch (err) {
-                    return <td></td>;
-                  }
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+      <Panel.Body className={"flex-container"}>
+        {data.characters.map((char) => {
+          let char_status = char.active
+            ? { bsStyle: "success" }
+            : { bsStyle: "warning" };
+          return (
+            <Panel {...char_status} className={"flex-child"}>
+              <Panel.Heading>
+                <h3 className={"text-center"}>
+                  {char.character.character_name}
+                </h3>
+              </Panel.Heading>
+              <Panel.Body className="flex-body">
+                <CharacterPortrait character={char.character} />
+                <h3 className={"text-center"}>Update Status</h3>
+                <Table striped style={{ marginBottom: 0 }}>
+                  <thead>
+                    <tr>
+                      <th>Update</th>
+                      <th className="text-right">Last Run</th>
+                    </tr>
+                  </thead>
+                </Table>
+                <div className={"table-div"}>
+                  <Table striped>
+                    <tbody>
+                      {data.headers.map((h) => {
+                        try {
+                          return (
+                            <tr>
+                              <td>{h}</td>
+                              <td class="text-right">
+                                <ReactTimeAgo
+                                  date={Date.parse(char.last_updates[h])}
+                                />
+                              </td>
+                            </tr>
+                          );
+                        } catch (e) {
+                          return (
+                            <tr>
+                              <td colSpan={2}>No Data</td>
+                            </tr>
+                          );
+                        }
+                      })}
+                    </tbody>
+                  </Table>
+                </div>
+              </Panel.Body>
+            </Panel>
+          );
+        })}
       </Panel.Body>
     </Panel>
   );

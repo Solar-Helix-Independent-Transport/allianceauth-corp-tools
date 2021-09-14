@@ -16,3 +16,64 @@
 .child-end {
   margin-left: auto;
 }
+
+.flex-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.flex-child {
+  /*width: 33%;*/
+  margin: 30px;
+}
+
+.char-portrait {
+  /*width: 512px;
+    height: 512px;*/
+  position: relative;
+  margin: auto;
+}
+
+.corp-logo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 5px;
+}
+
+.alli-logo {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: 5px;
+}
+
+.flex-body {
+  align-items: center;
+}
+
+.table-div {
+  height: 250px;
+  width: 400px;
+  overflow-y: overlay;
+}
+
+.table-div::-webkit-scrollbar {
+  width: 5; /* Remove scrollbar space */
+  background: transparent; /* Optional: just make scrollbar invisible */
+}
+/* Optional: show position indicator in red */
+.table-div::-webkit-scrollbar-thumb {
+  background-color: #375a7f4b;
+  border-radius: 10px;
+  border: 4px solid transparent;
+  background-clip: padding-box;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}

@@ -5,7 +5,7 @@ import { Navbar } from "react-bootstrap";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const CharMenu = () => {
+const CharMenu = ({ character_id }) => {
   const [menus, setState] = useState({
     cats: [],
   });
@@ -20,13 +20,21 @@ const CharMenu = () => {
   return (
     <Navbar fluid collapseOnSelect>
       <Nav>
-        <NavItem href={`#/character/status`}>Overview</NavItem>
-        <NavItem href={`#/character/pubdata`}>Public Data</NavItem>
+        <NavItem key="Overview" href={`#/character/status`}>
+          Overview
+        </NavItem>
+        <NavItem key="Public Data" href={`#/character/pubdata`}>
+          Public Data
+        </NavItem>
         {menus.cats.map((cat) => {
           return (
-            <NavDropdown title={cat.name} key={cat.name}>
+            <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
               {cat.links.map((link) => {
-                return <NavItem href={`#${link.link}`}>{link.name}</NavItem>;
+                return (
+                  <NavItem key={link.name} href={`#${link.link}`}>
+                    {link.name}
+                  </NavItem>
+                );
               })}
             </NavDropdown>
           );

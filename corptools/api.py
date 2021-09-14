@@ -60,6 +60,7 @@ def get_alts_queryset(main_char):
 @api.get(
     "characters/{character_id}/status",
     response={200: schema.AccountStatus, 403: schema.Message},
+    tags=["Character"]
 )
 def get_character_status(request, character_id: int):
     response, main = get_main_character(request, character_id)
@@ -124,6 +125,7 @@ def get_character_status(request, character_id: int):
 @api.get(
     "characters/{character_id}/pubdata",
     response={200: List[schema.CharacterHistory], 403: schema.Message},
+    tags=["Character"]
 )
 def get_character_pubdata(request, character_id: int):
     response, main = get_main_character(request, character_id)
@@ -192,6 +194,8 @@ def get_character_pubdata(request, character_id: int):
 @api.get(
     "characters/menu",
     response=List[schema.MenuCategory],
+    tags=["Helpers"]
+
 )
 def get_character_menu(request):
     _inter = {
