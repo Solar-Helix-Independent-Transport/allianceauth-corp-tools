@@ -20,10 +20,10 @@ const CharMenu = ({ character_id }) => {
   return (
     <Navbar fluid collapseOnSelect>
       <Nav>
-        <NavItem key="Overview" href={`#/character/status`}>
+        <NavItem key="Overview" href={`#/account/status`}>
           Overview
         </NavItem>
-        <NavItem key="Public Data" href={`#/character/pubdata`}>
+        <NavItem key="Public Data" href={`#/account/pubdata`}>
           Public Data
         </NavItem>
         {menus.cats.map((cat) => {

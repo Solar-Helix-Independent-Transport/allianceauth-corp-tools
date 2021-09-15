@@ -16,7 +16,7 @@ function CharActiveBadge({ characters }) {
         <Button className="btn-success">Status</Button>
       ) : (
         <OverlayTrigger placement="top" overlay={MyTooltip({ bad_chars })}>
-          <Button className="btn-danger" href={`#/character/status`}>
+          <Button className="btn-danger" href={`#/account/status`}>
             {bad_chars.length} Characters Require Attention
           </Button>
         </OverlayTrigger>

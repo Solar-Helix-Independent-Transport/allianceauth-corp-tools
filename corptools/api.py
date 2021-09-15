@@ -424,15 +424,15 @@ def get_character_roles(request, character_id: int):
 
     roles_data = models.CharacterRoles.objects\
         .filter(character__character__in=characters)\
-        .select_related('character__character').prefetch_related('titles_set')
+        .select_related('character__character').prefetch_related('titles')
 
     output = []
     for r in roles_data:
         titles = []
-        for t in r.titles_set.all():
+        for t in r.titles.all():
             titles.append({
-                "id": t.id,
-                "name": t.name
+                "id": t.title_id,
+                "name": t.title
             })
         output.append({
             "character": r.character.character,

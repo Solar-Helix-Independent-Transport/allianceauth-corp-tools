@@ -24,7 +24,8 @@ const CorptoolsCharacterView = () => {
         <Col>
           <Switch>
             <Route
-              path="/account/status"
+              exact
+              path={["", "/account/status"]}
               component={() => CharStatus({ character_id })}
             />
             <Route
