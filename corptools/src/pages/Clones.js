@@ -6,7 +6,8 @@ import { useQuery } from "react-query";
 import { loadClones } from "../apis/Character";
 import { Bars } from "@agney/react-loading";
 import { Image } from "react-bootstrap";
-import { Col } from "react-bootstrap";
+import { TypeIcon } from "../components/EveImages";
+
 const Clones = ({ character_id }) => {
   const { isLoading, error, data } = useQuery(["clones", character_id], () =>
     loadClones(character_id)
@@ -58,13 +59,7 @@ const Clones = ({ character_id }) => {
                               </td>
                               <td class="text-right no-wrap">
                                 {c.implants.map((i) => {
-                                  return (
-                                    <Image
-                                      className=""
-                                      alt={i.name}
-                                      src={`https://images.evetech.net/types/${i.id}/icon?size=32`}
-                                    />
-                                  );
+                                  return <TypeIcon type_id={i.id} />;
                                 })}
                               </td>
                             </tr>
