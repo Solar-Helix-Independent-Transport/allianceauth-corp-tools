@@ -4,22 +4,28 @@ import { Panel } from "react-bootstrap";
 import ReactTimeAgo from "react-time-ago";
 import CharacterPortrait from "../components/CharacterPortrait";
 import { useQuery } from "react-query";
-import loadStatus from "../apis/Character";
+import { loadStatus } from "../apis/Character";
+import { Bars } from "@agney/react-loading";
 
-const CharStatus = () => {
-  const character_id = window.location.pathname.split("/")[3];
-
+const CharStatus = ({ character_id }) => {
   const { isLoading, error, data } = useQuery(["status", character_id], () =>
     loadStatus(character_id)
   );
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <Panel>
+        <Panel.Body className="flex-container">
+          <Bars className="spinner-size" />
+        </Panel.Body>
+      </Panel>
+    );
 
-  if (error) return <p>API ERROR!!!</p>;
+  if (error) return <div></div>;
 
   return (
     <Panel>
-      <Panel.Body className={"flex-container"}>
+      <Panel.Body className="flex-container">
         {data.characters.map((char) => {
           let char_status = char.active
             ? { bsStyle: "success" }
@@ -27,13 +33,13 @@ const CharStatus = () => {
           return (
             <Panel {...char_status} className={"flex-child"}>
               <Panel.Heading>
-                <h3 className={"text-center"}>
+                <h4 className={"text-center"}>
                   {char.character.character_name}
-                </h3>
+                </h4>
               </Panel.Heading>
               <Panel.Body className="flex-body">
                 <CharacterPortrait character={char.character} />
-                <h3 className={"text-center"}>Update Status</h3>
+                <h4 className={"text-center"}>Update Status</h4>
                 <Table striped style={{ marginBottom: 0 }}>
                   <thead>
                     <tr>

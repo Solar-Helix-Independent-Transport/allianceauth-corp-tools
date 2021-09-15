@@ -1,9 +1,7 @@
 from datetime import datetime
-from corptools.models import CorporationAudit
-from ninja import Schema, schema
-from typing import Optional, List, Dict
+from ninja import Schema
 
-from pydantic.errors import DateError
+from typing import Optional, List, Dict
 
 
 class Message(Schema):
@@ -62,3 +60,55 @@ class CorpHistory(Schema):
 class CharacterHistory(Schema):
     character: Character
     history: List[CorpHistory] = None
+
+
+class EveName(Schema):
+    id: int
+    name: str
+
+
+class ValueLabel(Schema):
+    value: str
+    label: str
+
+
+class CharacterAssetGroups(Schema):
+    name: str
+    items: List[ValueLabel]
+
+
+class CharacterClone(Schema):
+    name: Optional[str]
+    location: Optional[EveName]
+    implants: List[EveName] = None
+
+
+class CharacterClones(Schema):
+    character: Character
+    clones: List[CharacterClone] = None
+    home: EveName = None
+    last_station_change: Optional[datetime]
+    last_clone_jump: Optional[datetime]
+
+
+class CharacterSkill(Schema):
+    character: Character
+    group: str
+    skill: EveName
+    level: int
+
+
+class CharacterQueueItem(Schema):
+    character: Character
+    skill: EveName
+    level: int
+    end: datetime
+
+
+class CharacterRoles(Schema):
+    character: Character
+    director: bool
+    station_manager: bool
+    personnel_manager: bool
+    accountant: bool
+    titles: List[EveName]

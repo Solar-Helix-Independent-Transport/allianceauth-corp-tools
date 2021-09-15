@@ -1,34 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { Label, Table } from "react-bootstrap";
 import { Panel } from "react-bootstrap";
-import axios from "axios";
 import CharacterPortrait from "../components/CharacterPortrait";
 import { useQuery } from "react-query";
-const PubData = () => {
-  const [data, setState] = useState({
-    characters: [],
-    main: {
-      character_id: 1,
-      character_name: "",
-      corporation_id: 0,
-      corporation_name: "",
-      alliance_id: 0,
-      alliance_name: "",
-    },
-    headers: [],
-  });
-  const character_id = window.location.pathname.split("/")[3];
-  async function loadHeader() {
-    const api = await axios.get(
-      `/audit/api/characters/${character_id}/pubdata`
-    );
-    console.log("set state in pubdata");
-    setState({
-      characters: api.data,
-    });
-  }
+import { loadPubData } from "../apis/Character";
+import { Bars } from "@agney/react-loading";
 
-  const { isLoading, error } = useQuery(["pubdata", character_id], loadHeader);
+const PubData = ({ character_id }) => {
+  const { isLoading, error, data } = useQuery(["pubdata", character_id], () =>
+    loadPubData(character_id)
+  );
+
+  if (isLoading)
+    return (
+      <Panel>
+        <Panel.Body className="flex-container">
+          <Bars className="spinner-size" />
+        </Panel.Body>
+      </Panel>
+    );
+
+  if (error) return <div></div>;
 
   return (
     <Panel>
@@ -37,13 +29,13 @@ const PubData = () => {
           return (
             <Panel className="flex-child">
               <Panel.Heading>
-                <h3 className={"text-center"}>
+                <h4 className={"text-center"}>
                   {char.character.character_name}
-                </h3>
+                </h4>
               </Panel.Heading>
               <Panel.Body className="flex-body">
                 <CharacterPortrait character={char.character} />
-                <h3 className={"text-center"}>Corporation history</h3>
+                <h4 className={"text-center"}>Corporation history</h4>
                 <Table striped style={{ marginBottom: 0 }}>
                   <thead>
                     <tr>

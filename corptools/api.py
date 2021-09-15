@@ -6,7 +6,7 @@ from ninja.security import django_auth
 from ninja.responses import codes_4xx
 
 from django.core.exceptions import PermissionDenied
-from django.db.models import F, Sum
+from django.db.models import F, Sum, Q
 from allianceauth.eveonline.models import EveCharacter
 
 from . import models
@@ -58,9 +58,9 @@ def get_alts_queryset(main_char):
 
 
 @api.get(
-    "characters/{character_id}/status",
+    "account/{character_id}/status",
     response={200: schema.AccountStatus, 403: schema.Message},
-    tags=["Character"]
+    tags=["Account"]
 )
 def get_character_status(request, character_id: int):
     response, main = get_main_character(request, character_id)
@@ -83,24 +83,11 @@ def get_character_status(request, character_id: int):
 
     characters = characters.select_related('characteraudit')
     output = {"characters": [],
-              "main": {  # Todo map model to fields
-        "character_name": main.character_name,
-        "character_id": main.character_id,
-        "corporation_id": main.corporation_id,
-        "corporation_name": main.corporation_name,
-        "alliance_id": main.alliance_id,
-        "alliance_name": main.alliance_name,
-    }}
+              "main": main
+              }
     for character in characters:
         _o = {
-            "character": {  # Todo map model to fields
-                "character_name": character.character_name,
-                "character_id": character.character_id,
-                "corporation_id": character.corporation_id,
-                "corporation_name": character.corporation_name,
-                "alliance_id": character.alliance_id,
-                "alliance_name": character.alliance_name,
-            },
+            "character": character,
             "isk": 0,
             "sp": skills.get(character.character_id, 0),
             "active": False,
@@ -123,9 +110,9 @@ def get_character_status(request, character_id: int):
 
 
 @api.get(
-    "characters/{character_id}/pubdata",
+    "account/{character_id}/pubdata",
     response={200: List[schema.CharacterHistory], 403: schema.Message},
-    tags=["Character"]
+    tags=["Account"]
 )
 def get_character_pubdata(request, character_id: int):
     response, main = get_main_character(request, character_id)
@@ -172,14 +159,7 @@ def get_character_pubdata(request, character_id: int):
 
     for character in characters:
         _o = {
-            "character": {  # Todo map model to fields
-                "character_name": character.character_name,
-                "character_id": character.character_id,
-                "corporation_id": character.corporation_id,
-                "corporation_name": character.corporation_name,
-                "alliance_id": character.alliance_id,
-                "alliance_name": character.alliance_name,
-            },
+            "character": character,
         }
         try:
             _o.update({
@@ -192,7 +172,7 @@ def get_character_pubdata(request, character_id: int):
 
 
 @api.get(
-    "characters/menu",
+    "account/menu",
     response=List[schema.MenuCategory],
     tags=["Helpers"]
 
@@ -214,52 +194,280 @@ def get_character_menu(request):
     if app_settings.CT_CHAR_CONTACTS_MODULE:
         _inter["links"].append({
             "name": "Contact",
-            "link": "/character/contact"
+            "link": "/account/contact"
         })
 
     if app_settings.CT_CHAR_STANDINGS_MODULE:
         _inter["links"].append({
             "name": "Standings",
-            "link": "/character/standings"
+            "link": "/account/standings"
         })
 
     if app_settings.CT_CHAR_WALLET_MODULE:
         _finance["links"].append({
             "name": "Wallet",
-            "link": "/character/wallet"
+            "link": "/account/wallet"
         })
         _finance["links"].append({
             "name": "Market",
-            "link": "/character/market"
+            "link": "/account/market"
         })
     if app_settings.CT_CHAR_ASSETS_MODULE:
         _char["links"].append({
             "name": "Assets",
-            "link": "/character/assets"
+            "link": "/account/assets"
         })
 
     if app_settings.CT_CHAR_CLONES_MODULE:
         _char["links"].append({
             "name": "Clones",
-            "link": "/character/clones"
+            "link": "/account/clones"
         })
 
     if app_settings.CT_CHAR_ROLES_MODULE:
         _char["links"].append({
             "name": "Roles",
-            "link": "/character/roles"
+            "link": "/account/roles"
         })
 
     if app_settings.CT_CHAR_MAIL_MODULE:
         _char["links"].append({
             "name": "Mail",
-            "link": "/character/mail"
+            "link": "/account/mail"
         })
 
     if app_settings.CT_CHAR_SKILLS_MODULE:
         _char["links"].append({
             "name": "Skills",
-            "link": "/character/skills"
+            "link": "/account/skills"
         })
 
     return [_char, _finance, _inter]
+
+
+@api.get(
+    "account/{character_id}/asset/locations",
+    response={200: List[schema.ValueLabel], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_asset_locations(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    asset_locs = models.CharacterAsset.objects.filter(character__character__in=characters,
+                                                      location_name__isnull=False).values_list('location_name').distinct()
+    asset_locs = models.EveLocation.objects.filter(
+        location_id__in=asset_locs).order_by('location_name')
+
+    asset_locations = [{"label": "Everywhere", "value": 0}]
+    for loc in asset_locs:
+        asset_locations.append({
+            "label": loc.location_name,
+            "value": loc.location_id
+        })
+
+    return asset_locations
+
+
+@api.get(
+    "account/{character_id}/asset/{location_id}/groups",
+    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_asset_groups(request, character_id: int, location_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    capital_groups = [30, 547, 659, 1538, 485, 902, 513, 883]
+    subcap_cat = [6]
+    noteable_cats = [4, 20, 23, 25, 34, 35, 87, 91]
+    structure_cats = [22, 24, 40, 41, 46, 65, 66, ]
+    bpo_cats = [9]
+
+    assets = models.CharacterAsset.objects\
+        .filter((Q(blueprint_copy=None) | Q(blueprint_copy=False)),
+                character__character__in=characters)
+
+    if location_id != 0:
+        asset_locations = assets.filter(
+            location_name_id=int(location_id)).values_list('item_id')
+        assets = assets.filter(Q(location_name_id=int(location_id)) | Q(
+            location_id__in=asset_locations))
+
+    assets = assets.values('type_name__group__group_id')\
+        .annotate(grp_total=Sum('quantity'))\
+        .annotate(grp_name=F('type_name__group__name'))\
+        .annotate(grp_id=F('type_name__group_id'))\
+        .annotate(cat_id=F('type_name__group__category_id'))\
+        .order_by('-grp_total')
+
+    capital_asset_groups = []
+    subcap_asset_groups = []
+    noteable_asset_groups = []
+    structure_asset_groups = []
+    bpo_asset_groups = []
+    remaining_asset_groups = []
+
+    for grp in assets:
+        _grp = {
+            "label": grp['grp_name'],
+            "value": grp['grp_total'],
+        }
+        if grp['grp_id'] in capital_groups:
+            capital_asset_groups.append(_grp)
+        elif grp['cat_id'] in subcap_cat:
+            subcap_asset_groups.append(_grp)
+        elif grp['cat_id'] in noteable_cats:
+            noteable_asset_groups.append(_grp)
+        elif grp['cat_id'] in structure_cats:
+            structure_asset_groups.append(_grp)
+        elif grp['cat_id'] in bpo_cats:
+            bpo_asset_groups.append(_grp)
+        else:
+            remaining_asset_groups.append(_grp)
+
+    return [
+        {"name": "Capital Ships",
+         "items": capital_asset_groups},
+        {"name": "Subcaps Ships",
+         "items": subcap_asset_groups},
+        {"name": "Noteable Assets",
+         "items": noteable_asset_groups},
+        {"name": "Structures",
+         "items": structure_asset_groups},
+        {"name": "BPO",
+         "items": bpo_asset_groups},
+        {"name": "Remaining",
+         "items": remaining_asset_groups},
+    ]
+
+
+@api.get(
+    "account/{character_id}/clones",
+    response={200: List[schema.CharacterClones], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_clones(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    jump_clones = models.JumpClone.objects\
+        .filter(character__character__in=characters)\
+        .select_related('character__character', 'location_name').prefetch_related('implant_set', 'implant_set__type_name')
+    clones = models.Clone.objects\
+        .filter(character__character__in=characters)\
+        .select_related('character__character', 'location_name')
+
+    table_data = {}
+    for char in characters:
+        table_data[char.character_name] = {
+            "character": char,
+            "clones": [],
+            "home": None,
+            "last_station_change": None,
+            "last_clone_jump": None
+        }
+
+    for j in jump_clones:
+        implants = []
+        for i in j.implant_set.all():
+            implants.append({
+                "id": i.type_name_id,
+                "name": i.type_name.name
+            })
+        loc = None
+        if j.location_name:
+            loc = {"id": j.location_name_id,
+                   "name": j.location_name.location_name}
+        table_data[j.character.character.character_name]["clones"].append({
+            "name": j.name,
+            "location": loc,
+            "implants": implants
+        }
+        )
+
+    for c in clones:
+        table_data[c.character.character.character_name]["home"] = {
+            "id": c.location_id,
+            "name": c.location_name.location_name
+        }
+        table_data[c.character.character.character_name]["last_station_change"] = c.last_station_change_date
+        table_data[c.character.character.character_name]["last_clone_jump"] = c.last_clone_jump_date
+
+    return list(table_data.values())
+
+
+@api.get(
+    "account/{character_id}/roles",
+    response={200: List[schema.CharacterRoles], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_roles(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    roles_data = models.CharacterRoles.objects\
+        .filter(character__character__in=characters)\
+        .select_related('character__character').prefetch_related('titles_set')
+
+    output = []
+    for r in roles_data:
+        titles = []
+        for t in r.titles_set.all():
+            titles.append({
+                "id": t.id,
+                "name": t.name
+            })
+        output.append({
+            "character": r.character.character,
+            "director": r.director,
+            "station_manager": r.station_manager,
+            "personnel_manager": r.personnel_manager,
+            "accountant": r.accountant,
+            "titles": titles
+        })
+    return output
+
+
+@api.get(
+    "account/{character_id}/wallet",
+    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_wallet(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+
+@api.get(
+    "account/{character_id}/orders",
+    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_orders(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)

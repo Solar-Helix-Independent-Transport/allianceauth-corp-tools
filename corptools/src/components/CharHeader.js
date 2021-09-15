@@ -5,7 +5,8 @@ import { Image } from "react-bootstrap";
 import { Panel } from "react-bootstrap";
 import { Badge } from "react-bootstrap";
 import CharActiveBadge from "./CharActiveBadge";
-import loadStatus from "../apis/Character";
+import { loadStatus } from "../apis/Character";
+import { Bars } from "@agney/react-loading";
 
 const CharHeader = ({ character_id }) => {
   const { isLoading, error, data } = useQuery(["status", character_id], () =>
@@ -84,7 +85,9 @@ const CharHeader = ({ character_id }) => {
               </div>
             </>
           ) : (
-            <div>Loading...</div>
+            <div class="child">
+              <Bars className="spinner-size" />
+            </div>
           )}
         </Col>
       </Panel.Body>

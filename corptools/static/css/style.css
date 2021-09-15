@@ -16,7 +16,12 @@
 .child-end {
   margin-left: auto;
 }
-
+.fill-width {
+  overflow: auto;
+}
+.float-left {
+  float: left; /* [1] */
+}
 .flex-container {
   display: flex;
   align-items: center;
@@ -26,9 +31,31 @@
   flex-direction: row;
 }
 
+.flex-container-pull-right {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  align-content: center;
+  flex-direction: row;
+}
+
+.flex-container-vert-fill {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  align-content: stretch;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
 .flex-child {
   /*width: 33%;*/
-  margin: 30px;
+  margin: 10px;
+}
+
+.spinner-size {
+  height: 30px;
+  width: 30px;
 }
 
 .char-portrait {
@@ -63,14 +90,14 @@
 }
 
 .table-div::-webkit-scrollbar {
-  width: 5; /* Remove scrollbar space */
+  width: 3; /* Remove scrollbar space */
   background: transparent; /* Optional: just make scrollbar invisible */
 }
+
 /* Optional: show position indicator in red */
 .table-div::-webkit-scrollbar-thumb {
   background-color: #375a7f4b;
-  border-radius: 10px;
-  border: 4px solid transparent;
+  border-left: 15px solid transparent;
   background-clip: padding-box;
 }
 

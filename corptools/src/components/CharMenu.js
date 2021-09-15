@@ -11,7 +11,7 @@ const CharMenu = ({ character_id }) => {
   });
 
   useEffect(() => {
-    axios.get(`/audit/api/characters/menu`).then((res) => {
+    axios.get(`/audit/api/account/menu`).then((res) => {
       const cats = res.data;
       setState({ cats });
     });

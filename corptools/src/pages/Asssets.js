@@ -1,44 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { Nav, NavItem } from "react-bootstrap";
-import { NavDropdown } from "react-bootstrap";
-import { Navbar } from "react-bootstrap";
-import axios from "axios";
-import { Link } from "react-router-dom";
-
-const CharMenu = () => {
-  const [menus, setState] = useState({
-    cats: [],
-  });
-
-  useEffect(() => {
-    axios.get(`/audit/api/characters/menu`).then((res) => {
-      const cats = res.data;
-      setState({ cats });
-    });
-  }, []);
+import React, { useState } from "react";
+import { Panel } from "react-bootstrap";
+import { useQuery } from "react-query";
+import { loadAssetLocations } from "../apis/Character";
+import CharAssetLocSelect from "../components/CharAssetLocSelect";
+import CharAssetGroups from "../components/CharAssetGroups";
+const CharAssets = ({ character_id }) => {
+  const [assets, setAssets] = useState([]);
+  const [location, setLocation] = useState(0);
+  const { isLoading, error, data } = useQuery(["asset_loc", character_id], () =>
+    loadAssetLocations(character_id)
+  );
 
   return (
-    <Navbar fluid collapseOnSelect>
-      <Navbar.Header>
-        <Navbar.Brand>
-          <a href="/corptools/r/">Corptools Reactive</a>
-        </Navbar.Brand>
-      </Navbar.Header>
-      <Nav>
-        <NavItem href={`#/character/status`}>Overview</NavItem>
-        <NavItem href={`#/character/pubdata`}>Public Data</NavItem>
-        {menus.cats.map((cat) => {
-          return (
-            <NavDropdown title={cat.name} key={cat.name}>
-              {cat.links.map((link) => {
-                return <NavItem href={`#${link.link}`}>{link.name}</NavItem>;
-              })}
-            </NavDropdown>
-          );
-        })}
-      </Nav>
-    </Navbar>
+    <Panel>
+      <Panel.Body className="flex-container-vert-fill">
+        <CharAssetLocSelect
+          character_id={character_id}
+          setLocation={setLocation}
+        />
+        <CharAssetGroups character_id={character_id} location_id={location} />
+      </Panel.Body>
+    </Panel>
   );
 };
 
-export default CharMenu;
+export default CharAssets;
