@@ -88,6 +88,9 @@ class CorporationWalletJournalEntryAdmin(admin.ModelAdmin):
     search_fields = ['description', 'entry_id', 'reason',
                      'first_party_name__name', 'second_party_name__name', ]
     list_filter = ['ref_type']
+    list_select_related = (
+        'first_party_name', 'second_party_name',
+    )
 
 
 @admin.register(models.SkillList)
