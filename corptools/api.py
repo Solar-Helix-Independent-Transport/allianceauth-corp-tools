@@ -1,4 +1,5 @@
 from typing import List
+from aastatistics.tasks import output_stats
 from corptools import app_settings
 
 from ninja import NinjaAPI
@@ -274,6 +275,20 @@ def get_character_asset_locations(request, character_id: int):
 
 
 @api.get(
+    "account/{character_id}/asset/{location_id}/list",
+    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_asset_list(request, character_id: int, location_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+
+@api.get(
     "account/{character_id}/asset/{location_id}/groups",
     response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
     tags=["Account"]
@@ -447,7 +462,7 @@ def get_character_roles(request, character_id: int):
 
 @api.get(
     "account/{character_id}/wallet",
-    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    response={200: List[schema.CharacterWalletEvent], 403: schema.Message},
     tags=["Account"]
 )
 def get_character_wallet(request, character_id: int):
@@ -458,6 +473,35 @@ def get_character_wallet(request, character_id: int):
 
     characters = get_alts_queryset(main)
 
+    wallet_journal = models.CharacterWalletJournalEntry.objects\
+        .filter(character__character__in=characters)\
+        .select_related('first_party_name', 'second_party_name', 'character__character').order_by('-date')
+
+    output = []
+    for w in wallet_journal:
+        output.append(
+            {
+                "character": w.character.character,
+                "id": w.entry_id,
+                "date": w.date,
+                "first_party": {
+                    "id": w.first_party_id,
+                    "name": w.first_party_name.name,
+                    "cat": w.first_party_name.category,
+                },
+                "second_party":  {
+                    "id": w.second_party_id,
+                    "name": w.second_party_name.name,
+                    "cat": w.second_party_name.category,
+                },
+                "ref_type": w.ref_type,
+                "amount": w.amount,
+                "balance": w.balance,
+                "reason": w.reason,
+            })
+
+    return output
+
 
 @api.get(
     "account/{character_id}/orders",
@@ -465,6 +509,117 @@ def get_character_wallet(request, character_id: int):
     tags=["Account"]
 )
 def get_character_orders(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+
+@api.get(
+    "account/{character_id}/contacts",
+    response={200: List[schema.Contact], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_contacts(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    contacts = models.CharacterContact.objects\
+        .filter(character__character__in=characters)\
+        .select_related('character__character', 'contact_name') \
+        .prefetch_related('labels')
+
+    output = []
+
+    for c in contacts:
+        labels = []
+        for l in c.labels.all():
+            labels.append({
+                "value": l.label_id,
+                "label": l.label_name
+            })
+        output.append({
+            "character": c.character.character,
+            "contact": {
+                "id": c.contact_id,
+                "name": c.contact_name.name,
+                "cat": c.contact_type
+            },
+            "standing": c.standing,
+            "labels": labels
+        })
+
+    return output
+
+
+@api.get(
+    "account/{character_id}/contracts",
+    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_contracts(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+
+@api.get(
+    "account/{character_id}/standings",
+    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_standings(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+
+@api.get(
+    "account/{character_id}/notifications",
+    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_notifications(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+
+@api.get(
+    "account/{character_id}/skills",
+    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_skills(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+
+@api.get(
+    "account/{character_id}/skillqueues",
+    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_skillqueues(request, character_id: int):
     response, main = get_main_character(request, character_id)
 
     if not response:

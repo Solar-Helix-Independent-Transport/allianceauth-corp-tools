@@ -202,6 +202,7 @@ def wallet(request, character_id=None):
     has_perms = request.user.has_perm('corptools.global_hr') or \
         request.user.has_perm('corptools.alliance_hr') or \
         request.user.has_perm('corptools.corp_hr')
+
     context = {
         "manager_perms": has_perms,
         "main_char": main_char,

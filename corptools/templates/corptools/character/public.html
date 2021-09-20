@@ -1,71 +1,72 @@
-{% extends 'corptools/character/char_base.html' %} {% load humanize %} {% load
-evelinks %} {% block ct_block %}
+{% extends 'corptools/character/char_base.html' %}
+{% load humanize  %}
+{% load evelinks %}
+{% block ct_block %}
 <div class="row flex-container flex-wrap">
-  {% for name, data in table_data.items %}
-  <div class="col-md-6 col-xs-12 col-sm-12">
-    <div class="panel panel-primary">
-      <div class="panel-heading text-center">{{name}}</div>
-      <div class="panel-body flex-middle">
-        <div class="col-md-4">
-          <div class="text-center">
-            <img
-              class="ra-avatar img-circle"
-              src="{{ data.character.portrait_url_128 }}"
-            />
-            <h4>{{ data.character.character_name }}</h4>
-            <span class="badge badge-success"
-              >Total SP: {{ data.total_sp|intcomma }}</span
-            ><br />
-            <span class="badge badge-success"
-              >Isk: {{ data.character.characteraudit.balance|intcomma }}</span
-            >
-          </div>
+    {% for name, data in table_data.items %}
+        <div class="col-md-6 col-xs-12 col-sm-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading  text-center"> {{name}} </div>
+                <div class="panel-body flex-middle ">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <img class="ra-avatar img-circle" src="{{ data.character.portrait_url_128 }}">
+                            <h4>{{ data.character.character_name }}</h4>
+                            <span class="badge badge-success">Total SP: {{ data.total_sp|intcomma }}</span><br>
+                            <span class="badge badge-success">Isk: {{ data.character.characteraudit.balance|intcomma }}</span>
+                        </div>
+                    </div>
+                    {% if data.history|length > 0 %}
+                        <div class="col-md-8 col-lg-8 pannel-hieght-locked scroll-bar-narrow">
+                                <table class="table datatable table-hover">
+                                    <thead>
+                                        <th></th>
+                                        <th>Corporations</th>
+                                        <th>Joined</th>
+                                        <th></th>
+                                    </thead>
+                                    <tbody>
+                                    {% for k, c in data.history.items %}
+                                        <tr>
+                                            <td><img class="ra-avatar img-circle" src="{{ c.id|corporation_logo_url:32 }}"></td>
+                                            <td>{{c.name}}</td>
+                                            <td>{{c.started|date:"Y/m/d"}}</td>
+                                            <td>{{k}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                        </div>
+                    {% else %}
+                    <div class="col-md-8 flex-middle text-center pannel-hieght-locked">
+                        <div class="alert alert-warning"><h4 class="alert-heading">No Data</h4>
+                        <p>You probably need to load a token, or wait for an update to run!</p></div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        {% if data.history|length > 0 %}
-        <div class="col-md-8 col-lg-8 pannel-hieght-locked scroll-bar-narrow">
-          <table class="table datatable table-hover">
-            <thead>
-              <th></th>
-              <th>Corporations</th>
-              <th>Joined</th>
-              <th></th>
-            </thead>
-            <tbody>
-              {% for k, c in data.history.items %}
-              <tr>
-                <td>
-                  <img
-                    class="ra-avatar img-circle"
-                    src="{{ c.id|corporation_logo_url:32 }}"
-                  />
-                </td>
-                <td>{{c.name}}</td>
-                <td>{{c.started|date:"Y/m/d"}}</td>
-                <td>{{k}}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <div class="col-md-8 flex-middle text-center pannel-hieght-locked">
-          <div class="alert alert-warning">
-            <h4 class="alert-heading">No Data</h4>
-            <p>
-              You probably need to load a token, or wait for an update to run!
-            </p>
-          </div>
-        </div>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-  {% endfor %}
+    {% endfor %}
 </div>
 
-{% endblock %} {% block extra_javascript %} {% include
-'bundles/datatables-js.html' %} {% endblock %} {% block ct_extra_script %}
-$(document).ready(function() { $('table.datatable').DataTable({ "paging": false,
-"ordering": true, "searching": false, "info": false, "columnDefs": [ {
-"sortable": false, "targets": [0] }, { "visible": false, "targets": [3] } ],
-"order": [ [2, "desc"] ] }); } ); {% endblock %}
+{% endblock %}
+{% block extra_javascript %}
+    {% include 'bundles/datatables-js.html' %}
+{% endblock %}
+{% block ct_extra_script %}
+$(document).ready(function() {
+    $('table.datatable').DataTable({
+        "paging":   false,
+        "ordering": true,
+        "searching":  false,
+        "info":     false,
+        "columnDefs": [
+        { "sortable": false, "targets": [0] },
+        { "visible": false, "targets": [3] }
+    ],
+    "order": [
+            [2, "desc"]
+        ]
+    });
+    } );
+{% endblock %}

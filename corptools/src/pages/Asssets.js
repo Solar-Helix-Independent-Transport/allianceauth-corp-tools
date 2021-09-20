@@ -12,15 +12,13 @@ const CharAssets = ({ character_id }) => {
   );
 
   return (
-    <Panel>
-      <Panel.Body className="flex-container-vert-fill">
-        <CharAssetLocSelect
-          character_id={character_id}
-          setLocation={setLocation}
-        />
-        <CharAssetGroups character_id={character_id} location_id={location} />
-      </Panel.Body>
-    </Panel>
+    <Panel.Body className="flex-container-vert-fill">
+      <CharAssetLocSelect
+        character_id={character_id}
+        setLocation={setLocation}
+      />
+      <CharAssetGroups character_id={character_id} location_id={location} />
+    </Panel.Body>
   );
 };
 

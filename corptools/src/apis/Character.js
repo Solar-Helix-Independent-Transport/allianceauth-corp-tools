@@ -48,8 +48,21 @@ export async function loadAssetGroups(character_id, location_id) {
   console.log(`get asset locations in api ${character_id} ${location_id}`);
   return api.data;
 }
+
 export async function loadClones(character_id, location_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/clones`);
   console.log(`get clones in api ${character_id}`);
+  return api.data;
+}
+
+export async function loadRoles(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/roles`);
+  console.log(`get roles in api ${character_id}`);
+  return api.data;
+}
+
+export async function loadWallet(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/wallet`);
+  console.log(`get wallet in api ${character_id}`);
   return api.data;
 }

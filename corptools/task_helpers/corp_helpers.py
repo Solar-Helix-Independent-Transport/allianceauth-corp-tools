@@ -135,18 +135,25 @@ def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
         corporation__corporation_id=corp_id)
 
     req_scopes = ['esi-wallet.read_corporation_wallets.v1',
-                  'esi-characters.read_corporation_roles.v1', 'esi-corporations.read_divisions.v1']
+                  'esi-characters.read_corporation_roles.v1',
+                  'esi-corporations.read_divisions.v1']
     req_roles = ['CEO', 'Director']
+
+    token = get_corp_token(corp_id, req_scopes, req_roles)
+    names = {}
+
+    if token:
+        division_names = providers.esi.client.Corporation.get_corporations_corporation_id_divisions(corporation_id=audit_corp.corporation.corporation_id,
+                                                                                                    token=token.valid_access_token()).result()
+        for division in division_names.get('wallet'):
+            names[division.get('division')] = division.get('name')
+
+    req_roles = ['CEO', 'Director', 'Accountant', 'Junior_Accountant']
 
     token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
         return "No Tokens"
-    division_names = providers.esi.client.Corporation.get_corporations_corporation_id_divisions(corporation_id=audit_corp.corporation.corporation_id,
-                                                                                                token=token.valid_access_token()).result()
-    names = {}
-    for division in division_names.get('wallet'):
-        names[division.get('division')] = division.get('name')
 
     divisions = providers.esi.client.Wallet.get_corporations_corporation_id_wallets(corporation_id=audit_corp.corporation.corporation_id,
                                                                                     token=token.valid_access_token()).result()
@@ -155,7 +162,7 @@ def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
         _division_item, _created = CorporationWalletDivision.objects \
             .update_or_create(corporation=audit_corp, division=division.get('division'),
                               defaults={'balance': division.get('balance'),
-                                        'name': names[division.get('division')]})
+                                        'name': names.get(division.get('division'), "Unknown")})
 
         if _division_item:
             update_corp_wallet_journal(corp_id, division.get('division'),

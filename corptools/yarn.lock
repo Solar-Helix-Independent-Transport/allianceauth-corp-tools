@@ -2315,6 +2315,11 @@ react-select@^4.3.1:
     react-input-autosize "^3.0.0"
     react-transition-group "^4.3.0"
 
+react-table@^7.7.0:
+  version "7.7.0"
+  resolved "https://registry.yarnpkg.com/react-table/-/react-table-7.7.0.tgz#e2ce14d7fe3a559f7444e9ecfe8231ea8373f912"
+  integrity sha512-jBlj70iBwOTvvImsU9t01LjFjy4sXEtclBovl3mTiqjz23Reu0DKnRza4zlLtOPACx6j2/7MrQIthIK1Wi+LIA==
+
 react-time-ago@^7.1.1:
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/react-time-ago/-/react-time-ago-7.1.1.tgz#7915bad99a6e4de6d7dd07389de2d7e77cb3fd65"

@@ -65,6 +65,7 @@ class CharacterHistory(Schema):
 class EveName(Schema):
     id: int
     name: str
+    cat: Optional[str]
 
 
 class ValueLabel(Schema):
@@ -112,3 +113,22 @@ class CharacterRoles(Schema):
     personnel_manager: bool
     accountant: bool
     titles: List[EveName]
+
+
+class CharacterWalletEvent(Schema):
+    character: Character
+    id: int
+    date: datetime
+    first_party: EveName
+    second_party: EveName
+    ref_type: str
+    amount: float
+    balance: float
+    reason: str
+
+
+class Contact(Schema):
+    character: Character
+    contact: EveName
+    standing: float
+    labels: List[ValueLabel] = None
