@@ -1,5 +1,4 @@
 import React from "react";
-
 import { Panel } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { loadWallet } from "../apis/Character";
@@ -25,6 +24,7 @@ const CharWallet = ({ character_id }) => {
       {
         Header: "Date",
         accessor: "date",
+        Cell: (props) => <div> {new Date(props.value).toLocaleString()} </div>,
       },
       {
         Header: "Type",
@@ -47,10 +47,12 @@ const CharWallet = ({ character_id }) => {
       {
         Header: "Amount",
         accessor: "amount",
+        Cell: (props) => <div> {props.value.toLocaleString()} </div>,
       },
       {
         Header: "Ballance",
         accessor: "balance",
+        Cell: (props) => <div> {props.value.toLocaleString()} </div>,
       },
       {
         Header: "Reason",

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Label, Table } from "react-bootstrap";
+import React from "react";
+import { Table } from "react-bootstrap";
 import { Panel } from "react-bootstrap";
 import CharacterPortrait from "../components/CharacterPortrait";
 import { useQuery } from "react-query";
 import { loadPubData } from "../apis/Character";
-import { Bars } from "@agney/react-loading";
 import { PanelLoader } from "../components/PanelLoader";
 
 const PubData = ({ character_id }) => {
@@ -51,7 +50,9 @@ const PubData = ({ character_id }) => {
                       })
                     ) : (
                       <tr>
-                        <td colSpan={2}>No Data</td>
+                        <td className={"text-center"} colSpan={2}>
+                          No Data
+                        </td>
                       </tr>
                     )}
                   </tbody>

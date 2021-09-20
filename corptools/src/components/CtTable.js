@@ -123,16 +123,29 @@ export const CtTable = ({ character_id, isLoading, data, error, columns }) => {
       <div className="pagination pull-right">
         <ButtonToolbar>
           <ButtonGroup>
-            <Button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+            <Button
+              bsStyle="success"
+              onClick={() => gotoPage(0)}
+              disabled={!canPreviousPage}
+            >
               <Glyphicon glyph="step-backward" />
             </Button>{" "}
-            <Button onClick={() => previousPage()} disabled={!canPreviousPage}>
+            <Button
+              bsStyle="success"
+              onClick={() => previousPage()}
+              disabled={!canPreviousPage}
+            >
               <Glyphicon glyph="triangle-left" />
             </Button>{" "}
-            <Button onClick={() => nextPage()} disabled={!canNextPage}>
+            <Button
+              bsStyle="success"
+              onClick={() => nextPage()}
+              disabled={!canNextPage}
+            >
               <Glyphicon glyph="triangle-right" />
             </Button>{" "}
             <Button
+              bsStyle="success"
               onClick={() => gotoPage(pageCount - 1)}
               disabled={!canNextPage}
             >
@@ -140,8 +153,11 @@ export const CtTable = ({ character_id, isLoading, data, error, columns }) => {
             </Button>
           </ButtonGroup>
           <ButtonGroup>
-            <Button>{"Page Size:"}</Button>{" "}
+            <Button active bsStyle="success">
+              {"Page Size:"}
+            </Button>{" "}
             <SplitButton
+              bsStyle="success"
               title={pageSize}
               onSelect={(e) => {
                 console.log(e);
@@ -156,7 +172,7 @@ export const CtTable = ({ character_id, isLoading, data, error, columns }) => {
             </SplitButton>
           </ButtonGroup>
           <ButtonGroup>
-            <Button>
+            <Button active bsStyle="info">
               {
                 <>
                   Page{" "}

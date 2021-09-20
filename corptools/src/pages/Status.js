@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { Table } from "react-bootstrap";
 import { Panel } from "react-bootstrap";
 import ReactTimeAgo from "react-time-ago";
 import CharacterPortrait from "../components/CharacterPortrait";
 import { useQuery } from "react-query";
 import { loadStatus } from "../apis/Character";
-import { Bars } from "@agney/react-loading";
 import { PanelLoader } from "../components/PanelLoader";
 
 const CharStatus = ({ character_id }) => {
@@ -47,7 +46,7 @@ const CharStatus = ({ character_id }) => {
                         return (
                           <tr>
                             <td>{h}</td>
-                            <td class="text-right">
+                            <td className="text-right">
                               <ReactTimeAgo
                                 date={Date.parse(char.last_updates[h])}
                               />
@@ -57,7 +56,8 @@ const CharStatus = ({ character_id }) => {
                       } catch (e) {
                         return (
                           <tr>
-                            <td colSpan={2}>No Data</td>
+                            <td>{h}</td>
+                            <td className="text-right">Never</td>
                           </tr>
                         );
                       }

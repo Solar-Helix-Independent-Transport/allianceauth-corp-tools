@@ -3,7 +3,6 @@ import { Nav, NavItem } from "react-bootstrap";
 import { NavDropdown } from "react-bootstrap";
 import { Navbar } from "react-bootstrap";
 import axios from "axios";
-import { Link } from "react-router-dom";
 
 const CharMenu = ({ character_id }) => {
   const [menus, setState] = useState({

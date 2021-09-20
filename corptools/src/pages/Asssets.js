@@ -4,6 +4,7 @@ import { useQuery } from "react-query";
 import { loadAssetLocations } from "../apis/Character";
 import CharAssetLocSelect from "../components/CharAssetLocSelect";
 import CharAssetGroups from "../components/CharAssetGroups";
+
 const CharAssets = ({ character_id }) => {
   const [assets, setAssets] = useState([]);
   const [location, setLocation] = useState(0);

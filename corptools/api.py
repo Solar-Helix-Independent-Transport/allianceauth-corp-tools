@@ -9,6 +9,7 @@ from ninja.responses import codes_4xx
 from django.core.exceptions import PermissionDenied
 from django.db.models import F, Sum, Q
 from allianceauth.eveonline.models import EveCharacter
+from django.conf import settings
 
 from . import models
 from . import schema
@@ -19,7 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 api = NinjaAPI(title="CorpTools API", version="0.0.1",
-               urls_namespace='corptools:api', auth=django_auth, csrf=True)
+               urls_namespace='corptools:api', auth=django_auth, csrf=True,
+               openapi_url=settings.DEBUG and "/openapi.json" or "")
 
 
 def get_main_character(request, character_id):

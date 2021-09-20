@@ -5,7 +5,8 @@ install_requires = [
     'allianceauth>=2.8.0',
     'django-esi>=2.0.0',
     'django-model-utils',
-    'networkx'
+    'networkx',
+    'django-ninja'
 ]
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
     README = readme.read()

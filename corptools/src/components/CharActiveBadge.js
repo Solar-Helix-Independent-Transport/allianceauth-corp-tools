@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Glyphicon, Button, Tooltip, OverlayTrigger } from "react-bootstrap";
+import React from "react";
+import { Button, Tooltip, OverlayTrigger } from "react-bootstrap";
 
 function MyTooltip({ bad_chars }) {
   return <Tooltip id="character_tooltip">{bad_chars.join(", ")}</Tooltip>;
