@@ -1,5 +1,4 @@
 from typing import List
-from aastatistics.tasks import output_stats
 from corptools import app_settings
 
 from ninja import NinjaAPI

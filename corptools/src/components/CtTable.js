@@ -50,7 +50,7 @@ export function SelectColumnFilter({
   );
 }
 
-export const CtTable = ({ character_id, isLoading, data, error, columns }) => {
+export const CtTable = ({ isLoading, data, error, columns }) => {
   const defaultColumn = React.useMemo(
     () => ({
       // Let's set up our default Filter UI
