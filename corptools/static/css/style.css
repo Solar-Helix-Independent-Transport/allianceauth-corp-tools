@@ -105,3 +105,21 @@
 .no-wrap {
   white-space: nowrap;
 }
+
+.info-hide {
+}
+
+@media only screen and (max-width: 1600px) {
+  .info-hide {
+    display: none;
+  }
+}
+
+.association-hide {
+}
+
+@media only screen and (max-width: 1400px) {
+  .association-hide {
+    display: none;
+  }
+}

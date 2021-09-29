@@ -1,5 +1,6 @@
 import axios from "axios";
-
+axios.defaults.xsrfHeaderName = "X-CSRFToken";
+import cookies from "js-cookies";
 export async function loadStatus(character_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/status`);
   console.log(`get status in api ${character_id}`);
@@ -61,8 +62,34 @@ export async function loadRoles(character_id) {
   return api.data;
 }
 
+export async function loadNotifications(character_id) {
+  const api = await axios.get(
+    `/audit/api/account/${character_id}/notifications`
+  );
+  console.log(`get notifications in api ${character_id}`);
+  return api.data;
+}
+
 export async function loadWallet(character_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/wallet`);
   console.log(`get wallet in api ${character_id}`);
+  return api.data;
+}
+
+export async function postRefresh(character_id) {
+  const api = await axios.post(`/audit/api/characters/refresh`, {
+    character_id: character_id,
+  });
+  console.log(`sent character refresh ${character_id}`);
+  return api.data;
+}
+
+export async function postAccountRefresh(character_id) {
+  console.log(`sent account refresh ${character_id}`);
+  const api = await axios.post(
+    `/audit/api/account/refresh?character_id=${character_id}`,
+    { character_id: character_id },
+    { headers: { "X-CSRFToken": cookies.getItem("csrftoken") } }
+  );
   return api.data;
 }

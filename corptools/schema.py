@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from ninja import Schema
 
 from typing import Optional, List, Dict
@@ -31,10 +31,10 @@ class Corporation(Schema):
 
 class CharacterStatus(Schema):
     character: Character
-    isk: float
-    sp: int
+    isk: Optional[float]
+    sp: Optional[int]
     active: bool
-    last_updates: Dict = None
+    last_updates: Optional[Dict]
 
 
 class AccountStatus(Schema):
@@ -78,6 +78,12 @@ class CharacterAssetGroups(Schema):
     items: List[ValueLabel]
 
 
+class CharacterAssetItem(Schema):
+    character: Character
+    item: EveName
+    location: EveName = None
+
+
 class CharacterClone(Schema):
     name: Optional[str]
     location: Optional[EveName]
@@ -92,18 +98,53 @@ class CharacterClones(Schema):
     last_clone_jump: Optional[datetime]
 
 
-class CharacterSkill(Schema):
-    character: Character
+class Skill(Schema):
     group: str
-    skill: EveName
+    skill: str
+    sp: int
     level: int
+    active: int
 
 
 class CharacterQueueItem(Schema):
+    skill: str
+    group: str
+    end_level: int
+    start_sp: int
+    end_sp: int
+    start: datetime = None
+    end: datetime = None
+
+
+class DoctrineCheck(Schema):
+    name: str
+    achieved: str
+    achieved: bool
+
+
+class CharacterSkills(Schema):
     character: Character
-    skill: EveName
-    level: int
-    end: datetime
+    skills: List[Skill]
+    total_sp: int
+    unallocated_sp: int
+
+
+class CharacterQueue(Schema):
+    character: Character
+    queue: List[CharacterQueueItem]
+
+
+class CharacterDoctrines(Schema):
+    character: Character
+    queue: List[DoctrineCheck]
+
+
+class CharacterNotification(Schema):
+    character: Character
+    notification_text: str
+    notification_type: str
+    timestamp: datetime
+    is_read: bool = None
 
 
 class CharacterRoles(Schema):
@@ -123,8 +164,22 @@ class CharacterWalletEvent(Schema):
     second_party: EveName
     ref_type: str
     amount: float
-    balance: float
+    escrow: float
     reason: str
+
+
+class CharacterOrder(Schema):
+    character: Character
+    date: datetime
+    duration: int
+    volume_min: int = None
+    volume_remain: int
+    volume_total: int
+    item: EveName
+    price: float
+    escrow: float = None
+    buy_order: bool = None
+    location: EveName
 
 
 class Contact(Schema):

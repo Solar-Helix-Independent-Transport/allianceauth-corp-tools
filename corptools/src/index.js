@@ -17,6 +17,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { Panel } from "react-bootstrap";
 import CharRoles from "./pages/Roles";
 import CharWallet from "./pages/Wallet";
+import CharNotifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -59,23 +60,23 @@ const CorptoolsCharacterView = () => {
               />
               <Route
                 path="/account/skills"
-                component={() => CharWallet({ character_id })}
+                component={() => CharSkills({ character_id })}
               />
               <Route
                 path="/account/notifications"
-                component={() => CharWallet({ character_id })}
+                component={() => CharNotifications({ character_id })}
               />
               <Route
                 path="/account/market"
-                component={() => CharWallet({ character_id })}
+                component={() => CharOrders({ character_id })}
               />
               <Route
                 path="/account/contacts"
-                component={() => CharWallet({ character_id })}
+                component={() => CharContacts({ character_id })}
               />
               <Route
                 path="/account/contracts"
-                component={() => CharWallet({ character_id })}
+                component={() => CharContracts({ character_id })}
               />
             </Switch>
           </Panel>

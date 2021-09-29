@@ -3,6 +3,8 @@ import { Nav, NavItem } from "react-bootstrap";
 import { NavDropdown } from "react-bootstrap";
 import { Navbar } from "react-bootstrap";
 import axios from "axios";
+import { useMutation } from "react-query";
+import { postAccountRefresh } from "../apis/Character";
 
 const CharMenu = ({ character_id }) => {
   const [menus, setState] = useState({
@@ -15,6 +17,11 @@ const CharMenu = ({ character_id }) => {
       setState({ cats });
     });
   }, []);
+
+  const handleClick = () => {
+    // manually refetch
+    refetch();
+  };
 
   return (
     <Navbar fluid collapseOnSelect>

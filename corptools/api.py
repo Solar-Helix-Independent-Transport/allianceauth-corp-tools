@@ -1,7 +1,9 @@
 from typing import List
+from allianceauth import notifications
 from corptools import app_settings
+from django.utils.timezone import activate
 
-from ninja import NinjaAPI
+from ninja import NinjaAPI, Form, main
 from ninja.security import django_auth
 from ninja.responses import codes_4xx
 
@@ -11,7 +13,9 @@ from allianceauth.eveonline.models import EveCharacter
 from django.conf import settings
 
 from . import models
+from . import tasks
 from . import schema
+from . import providers
 
 import logging
 
@@ -199,6 +203,12 @@ def get_character_menu(request):
             "link": "/account/contact"
         })
 
+    if app_settings.CT_CHAR_NOTIFICATIONS_MODULE:
+        _inter["links"].append({
+            "name": "Notifications",
+            "link": "/account/notifications"
+        })
+
     if app_settings.CT_CHAR_STANDINGS_MODULE:
         _inter["links"].append({
             "name": "Standings",
@@ -275,6 +285,7 @@ def get_character_asset_locations(request, character_id: int):
     return asset_locations
 
 
+"""
 @api.get(
     "account/{character_id}/asset/{location_id}/list",
     response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
@@ -287,6 +298,7 @@ def get_character_asset_list(request, character_id: int, location_id: int):
         return 403, {"message": "Permission Denied"}
 
     characters = get_alts_queryset(main)
+"""
 
 
 @api.get(
@@ -506,7 +518,7 @@ def get_character_wallet(request, character_id: int):
 
 @api.get(
     "account/{character_id}/orders",
-    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    response={200: List[schema.CharacterOrder], 403: schema.Message},
     tags=["Account"]
 )
 def get_character_orders(request, character_id: int):
@@ -516,6 +528,36 @@ def get_character_orders(request, character_id: int):
         return 403, {"message": "Permission Denied"}
 
     characters = get_alts_queryset(main)
+
+    orders = models.CharacterMarketOrder.objects\
+        .filter(character__character__in=characters)\
+        .select_related('type_name', 'location_name', 'character__character')
+
+    output = []
+    for w in orders:
+        output.append(
+            {
+                "character": w.character.character,
+                "date": w.issued,
+                "duration": w.duration,
+                "volume_min": w.min_volume,
+                "volume_remain": w.volume_remain,
+                "volume_total": w.volume_total,
+                "item": {
+                    "id": w.type_id,
+                    "name": w.type_name.name
+                },
+                "price": w.price,
+                "escrow": w.escrow,
+                "buy_order": w.is_buy_order,
+                "location": {
+                    "id": w.location_id,
+                    "name": w.location_name.location_name
+                }
+            }
+        )
+
+    return output
 
 
 @api.get(
@@ -559,6 +601,7 @@ def get_character_contacts(request, character_id: int):
     return output
 
 
+"""
 @api.get(
     "account/{character_id}/contracts",
     response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
@@ -571,8 +614,8 @@ def get_character_contracts(request, character_id: int):
         return 403, {"message": "Permission Denied"}
 
     characters = get_alts_queryset(main)
-
-
+"""
+"""
 @api.get(
     "account/{character_id}/standings",
     response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
@@ -586,10 +629,38 @@ def get_character_standings(request, character_id: int):
 
     characters = get_alts_queryset(main)
 
+    contacts = models.CharacterStandings.objects\
+        .filter(character__character__in=characters)\
+        .select_related('character__character', 'contact_name') \
+        .prefetch_related('labels')
+
+    output = []
+
+    for c in contacts:
+        labels = []
+        for l in c.labels.all():
+            labels.append({
+                "value": l.label_id,
+                "label": l.label_name
+            })
+        output.append({
+            "character": c.character.character,
+            "contact": {
+                "id": c.contact_id,
+                "name": c.contact_name.name,
+                "cat": c.contact_type
+            },
+            "standing": c.standing,
+            "labels": labels
+        })
+
+    return output
+"""
+
 
 @api.get(
     "account/{character_id}/notifications",
-    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    response={200: List[schema.CharacterNotification], 403: schema.Message},
     tags=["Account"]
 )
 def get_character_notifications(request, character_id: int):
@@ -600,10 +671,27 @@ def get_character_notifications(request, character_id: int):
 
     characters = get_alts_queryset(main)
 
+    notes = models.Notification.objects\
+        .filter(character__character__in=characters)\
+        .select_related('character__character')[:1000]
+
+    output = []
+
+    for n in notes:
+        output.append({
+            "character": n.character.character,
+            "notification_text": n.notification_text,
+            "notification_type": n.notification_type,
+            "timestamp": n.timestamp,
+            "is_read": n.is_read,
+        })
+
+    return output
+
 
 @api.get(
     "account/{character_id}/skills",
-    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    response={200: List[schema.CharacterSkills], 403: schema.Message},
     tags=["Account"]
 )
 def get_character_skills(request, character_id: int):
@@ -614,10 +702,43 @@ def get_character_skills(request, character_id: int):
 
     characters = get_alts_queryset(main)
 
+    skills = models.Skill.objects.filter(character__character__in=characters)\
+        .select_related('character__character', 'skill_name', "skill_name__group")
+
+    totals = models.SkillTotals.objects.filter(character__character__in=characters)\
+        .select_related('character__character')
+
+    output = {}
+
+    for s in skills:
+        if s.character_id not in output:
+            output[s.character_id] = {
+                "character": s.character.character,
+                "skills": [],
+                "total_sp": 0,
+                "unallocated_sp": 0
+            }
+        output[s.character_id]["skills"].append(
+            {
+                "group": s.skill_name.group.name,
+                "skill": s.skill_name.name,
+                "sp": s.skillpoints_in_skill,
+                "level": s.trained_skill_level,
+                "active": s.active_skill_level,
+            }
+        )
+
+    for t in totals:
+        if t.character_id in output:
+            output[t.character_id]["unallocated_sp"] = t.unallocated_sp
+            output[t.character_id]["total_sp"] = t.total_sp
+
+    return list(output.values())
+
 
 @api.get(
     "account/{character_id}/skillqueues",
-    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    response={200: List[schema.CharacterQueue], 403: schema.Message},
     tags=["Account"]
 )
 def get_character_skillqueues(request, character_id: int):
@@ -627,3 +748,88 @@ def get_character_skillqueues(request, character_id: int):
         return 403, {"message": "Permission Denied"}
 
     characters = get_alts_queryset(main)
+
+    skills = models.SkillQueue.objects.filter(character__character__in=characters)\
+        .select_related('character__character', 'skill_name', "skill_name__group")
+
+    output = {}
+
+    for s in skills:
+        if s.character_id not in output:
+            output[s.character_id] = {
+                "character": s.character.character,
+                "queue": [],
+            }
+        output[s.character_id]["queue"].append(
+            {
+                "skill": s.skill_name.group.name,
+                "group": s.skill_name.name,
+                "end_level": s.finish_level,
+                "start_sp": s.level_start_sp,
+                "end_sp": s.level_end_sp,
+                "start": s.start_date,
+                "end": s.finish_date,
+            }
+        )
+
+    return list(output.values())
+
+
+@api.post(
+    "characters/refresh",
+    response={200: schema.Message, 403: schema.Message},
+    tags=["Characters"]
+)
+def post_characters_refresh(request, character_id: int):
+    audits_visible = models.CharacterAudit.objects.visible_to(
+        request.user).values_list('character_id', flat=True)
+    if character_id in audits_visible:
+        tasks.update_character.apply_async(args=[character_id], priority=4)
+    return 200, {"message": "Requested Update!"}
+
+
+@api.post(
+    "account/refresh",
+    response={200: schema.Message, 403: schema.Message},
+    tags=["Characters"]
+)
+def post_acccount_refresh(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    for cid in characters.values_list('character_id', flat=True):
+        tasks.update_character.apply_async(args=[cid], priority=4)
+    return 200, {"message": "Requested Update!"}
+
+
+@api.get(
+    "account/list",
+    response={200: List[schema.AccountStatus], 403: schema.Message},
+    tags=["Account"]
+)
+def get_account_list(request):
+    characters = models.CharacterAudit.objects.visible_to(
+        request.user).select_related('character__character_ownership',
+                                     'character__character_ownership__user__profile',
+                                     'character__character_ownership__user__profile__main_character', )
+
+    output = {}
+    for c in characters:
+        m_cid = c.character.character_ownership.user.profile.main_character.character_id
+        if m_cid not in output:
+            output[m_cid] = {
+                "main": c.character.character_ownership.user.profile.main_character,
+                "characters": []
+            }
+        output[m_cid]["characters"].append(
+            {
+                "character": c.character,
+                "active": c.is_active()
+            }
+        )
+
+    return list(output.values())

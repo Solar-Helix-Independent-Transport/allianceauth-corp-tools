@@ -31,27 +31,27 @@ const CharHeader = ({ character_id }) => {
               <div class="child">
                 <h4>{data.main.character_name}</h4>
               </div>
-              <div class="child">
+              <div class="child association-hide">
                 <Image
                   className="ra-avatar img-circle"
                   src={`https://images.evetech.net/corporations/${data.main.corporation_id}/logo?size=32`}
                 ></Image>
               </div>
-              <div class="child">
+              <div class="child association-hide">
                 <h4>{data.main.corporation_name}</h4>
               </div>
               {data.main.alliance_id != null && (
                 <>
-                  <div class="child">
+                  <div class="child association-hide">
                     <Image
                       className="ra-avatar img-circle"
                       src={`https://images.evetech.net/alliances/${data.main.alliance_id}/logo?size=32`}
                     ></Image>
                   </div>
-                  <div class="child">
+                  <div class="child association-hide">
                     <h4>{data.main.alliance_name}</h4>
                   </div>
-                  <div>
+                  <div class="info-hide">
                     <Badge>
                       Total SP:{" "}
                       {data.characters
@@ -81,7 +81,10 @@ const CharHeader = ({ character_id }) => {
                 </>
               )}
               <div class="child-end">
-                <CharActiveBadge characters={data.characters} />
+                <CharActiveBadge
+                  characters={data.characters}
+                  character_id={character_id}
+                />
               </div>
             </>
           ) : (
