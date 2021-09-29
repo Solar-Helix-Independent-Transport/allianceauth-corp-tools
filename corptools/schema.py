@@ -164,7 +164,6 @@ class CharacterWalletEvent(Schema):
     second_party: EveName
     ref_type: str
     amount: float
-    escrow: float
     reason: str
 
 
