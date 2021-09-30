@@ -31,8 +31,13 @@ const CharClones = ({ character_id }) => {
                   char.home != null ? char.home.name : "No Data"
                 }`}</p>
                 <p>
-                  <Label>{`Last Clone Jump: ${char.last_clone_jump}`}</Label>
-                  <Label>{`Last Station Change: ${char.last_station_change}`}</Label>
+                  <Label>{`Last Clone Jump: ${Date(
+                    char.last_clone_jump
+                  ).toLocaleString()}`}</Label>
+                  <br />
+                  <Label>{`Last Station Change: ${Date(
+                    char.last_station_change
+                  ).toLocaleString()}`}</Label>
                 </p>
                 <h5>Clones</h5>
                 <Table striped>
