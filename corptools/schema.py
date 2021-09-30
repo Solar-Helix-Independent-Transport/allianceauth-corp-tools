@@ -163,6 +163,7 @@ class CharacterWalletEvent(Schema):
     first_party: EveName
     second_party: EveName
     ref_type: str
+    balance: float
     amount: float
     reason: str
 
