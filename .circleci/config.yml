@@ -57,6 +57,8 @@ workflows:
       - py38
       - py37
       - Deploy:
+          context:
+            - pypi
           filters:
             tags:
               only: /.*/
