@@ -301,7 +301,7 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
             if group not in _current_groups or update_models:
                 _processes.append(executor.submit(
                     providers.esi._get_group, group, updates=_current_groups))
-                _current_groups.append(group)
+                # _current_groups.append(group)
 
     for task in as_completed(_processes):
         __group, __group_new, types = task.result()
@@ -319,7 +319,7 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
             if category not in _current_categories or update_models:
                 _processes.append(executor.submit(
                     providers.esi._get_category, category, updates=_current_categories))
-                _current_categories.append(category)
+                # _current_categories.append(category)
 
     for task in as_completed(_processes):
         __category, __category_new, groups = task.result()
