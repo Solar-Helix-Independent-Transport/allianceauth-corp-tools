@@ -1,6 +1,8 @@
 # CorpTools
 ### Assorted Toolbox of Bits and bobs for todays Corp/Alliance on the go!
 
+[![CI](https://github.com/pvyParts/allianceauth-corp-tools/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/pvyParts/allianceauth-corp-tools/actions/workflows/main.yml) [![PyPI version](https://badge.fury.io/py/allianceauth-corptools.svg)](https://badge.fury.io/py/allianceauth-corptools) ![Discord](https://img.shields.io/discord/399006117012832262?label=Support%20Server)
+
 Corp Toolbox module for [AllianceAuth](https://gitlab.com/allianceauth/allianceauth) with speed and functionality in mind.
 
 Included `Bits and Bobs`:
