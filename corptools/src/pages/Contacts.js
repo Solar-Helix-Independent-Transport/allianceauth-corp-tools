@@ -23,10 +23,10 @@ const Checkbox = ({ active }) => {
   );
 };
 
-const CharWallet = ({ character_id }) => {
+const CharContacts = ({ character_id }) => {
   const { isLoading, error, data } = useQuery(
     ["wallet", character_id],
-    () => loadWallet(character_id),
+    () => loadContacts(character_id),
     {
       initialData: [],
     }
@@ -174,4 +174,4 @@ const CharWallet = ({ character_id }) => {
   );
 };
 
-export default CharWallet;
+export default CharContacts;

@@ -18,6 +18,7 @@ import { Panel } from "react-bootstrap";
 import CharRoles from "./pages/Roles";
 import CharWallet from "./pages/Wallet";
 import CharNotifications from "./pages/Notifications";
+import CharContacts from "./pages/Contacts";
 
 const queryClient = new QueryClient();
 

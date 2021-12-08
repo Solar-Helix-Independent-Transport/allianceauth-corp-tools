@@ -223,10 +223,11 @@ tr.group:hover {
                                     <li class>
                                         <a href="{% url 'corptools:corp_menu' %}">Corporations</a>
                                     <li>
+                                {% endif %}
+                                {% if request.user.is_staff %}
                                     <li class>
                                         <a href="{% url 'corptools:reactmain' main_char.character_id%}">React</a>
                                     </li>
-
                                 {% endif %}
 
                             </ul>

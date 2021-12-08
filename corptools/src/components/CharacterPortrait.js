@@ -7,6 +7,7 @@ const CharacterPortrait = ({ character }) => {
       <Image
         className=""
         height={400}
+        width={400}
         alt={character.character_name}
         src={`https://images.evetech.net/characters/${character.character_id}/portrait?size=512`}
       />
