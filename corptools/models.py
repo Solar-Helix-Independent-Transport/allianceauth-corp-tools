@@ -1267,7 +1267,7 @@ class Rolefilter(FilterBase):
     has_station_manager = models.BooleanField(default=False)
     has_personnel_manager = models.BooleanField(default=False)
 
-    main_only = models.BooleanField(default=False)
+    #main_only = models.BooleanField(default=False)
 
     corp_filter = models.ForeignKey(
         EveCorporationInfo, on_delete=models.CASCADE, related_name='audit_role_filter', null=True, blank=True, default=None)
