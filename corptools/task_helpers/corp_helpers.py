@@ -38,8 +38,8 @@ def get_corp_token(corp_id, scopes, req_roles):
         .require_scopes(scopes)
 
     for token in tokens:
-        role_op = providers.esi.client.Character.get_characters_character_id_roles(character_id=token.character_id,
-                                                                                   token=token.valid_access_token()).result()
+        roles = providers.esi.client.Character.get_characters_character_id_roles(character_id=token.character_id,
+                                                                                 token=token.valid_access_token()).result()
         has_roles = False
         for role in roles.get('roles', []):
             if role in req_roles:
