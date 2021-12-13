@@ -1,5 +1,4 @@
 import os
-
 from bravado.exception import HTTPError
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
@@ -21,7 +20,6 @@ from .tasks import update_character, update_all_characters, update_ore_comp_tabl
 from .forms import UploadForm
 from . import app_settings
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
-
 CORP_REQUIRED_SCOPES = [
     'esi-assets.read_corporation_assets.v1',
     'esi-characters.read_corporation_roles.v1',

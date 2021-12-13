@@ -28,6 +28,9 @@ def get_corp_token(corp_id, scopes, req_roles):
     :param req_roles: roles required on the character.
     :return: :class:esi.models.Token or False
     """
+    if 'esi-characters.read_corporation_roles.v1' not in scopes:
+        scopes.append("esi-characters.read_corporation_roles.v1")
+
     char_ids = EveCharacter.objects.filter(
         corporation_id=corp_id).values('character_id')
     tokens = Token.objects \

@@ -50,7 +50,7 @@
         <tbody>
             {% for corp in corporations %}
             <tr>
-            <td><a href="{% url 'corptools:overview' 1 %}"><img class="ra-avatar img-circle" src="{{corp.corporation.logo_url_64}}"></img></a></td>
+            <td><img class="ra-avatar img-circle" src="{{corp.corporation.logo_url_64}}"></img></td>
             <td>{{corp.corporation.corporation_name}}</td>
             <td>{{corp.corporation.alliance.alliance_name}}</td>
             <td>{{corp.last_update_wallet|naturaltime}}</td>
