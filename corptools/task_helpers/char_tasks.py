@@ -1,6 +1,7 @@
 import logging
+from bravado import exception
 from celery import shared_task
-from esi.errors import NotModifiedError
+from django.core.cache import cache
 from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, \
     Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, \
     SkillTotals, Implant, JumpClone, Clone, EveLocation, CharacterMarketOrder, \
@@ -11,7 +12,7 @@ from esi.models import Token
 from django.utils import timezone
 
 from .. import providers
-
+from .etag_helpers import etag_results, NotModifiedError
 
 logger = logging.getLogger(__name__)
 
@@ -22,16 +23,17 @@ def update_corp_history(character_id):
     logger.debug("updating corp history for: {}".format(
         audit_char.character.character_name))
     try:
-        corp_history = providers.esi.client.Character.get_characters_character_id_corporationhistory(
-            character_id=character_id).result(cache_on_not_modified=False)
+        corp_history_op = providers.esi.client.Character.get_characters_character_id_corporationhistory(
+            character_id=character_id)
+
+        corp_history = etag_results(corp_history_op, None)
 
         for corp in corp_history:
             corp_name, created = EveName.objects.get_or_create_from_esi(
                 corp.get('corporation_id'))
             history_item, created = CorporationHistory.objects \
                 .update_or_create(character=audit_char,
-                                  record_id=corp.get(
-                                      'record_id'),
+                                  record_id=corp.get('record_id'),
                                   defaults={'corporation_id': corp.get('corporation_id'),
                                             'corporation_name': corp_name,
                                             'is_deleted': corp.get('is_deleted', False),
@@ -63,8 +65,10 @@ def update_character_skill_list(character_id):
     if not token:
         return "No Tokens"
     try:
-        skills = providers.esi.client.Skills.get_characters_character_id_skills(character_id=character_id,
-                                                                                token=token.valid_access_token()).result(cache_on_not_modified=False)
+        skills_op = providers.esi.client.Skills.get_characters_character_id_skills(
+            character_id=character_id)
+
+        skills = etag_results(skills_op, token)
 
         # Delete current SkillList
         Skill.objects.filter(character=audit_char).delete()
@@ -117,8 +121,10 @@ def update_character_skill_queue(character_id):
     if not token:
         return "No Tokens"
     try:
-        queue = providers.esi.client.Skills.get_characters_character_id_skillqueue(character_id=character_id,
-                                                                                   token=token.valid_access_token()).result(cache_on_not_modified=False)
+        queue_op = providers.esi.client.Skills.get_characters_character_id_skillqueue(
+            character_id=character_id)
+
+        queue = etag_results(queue_op, token)
 
         # Delete current SkillList
         SkillQueue.objects.filter(character=audit_char).delete()
@@ -168,8 +174,10 @@ def update_character_assets(character_id):
     if not token:
         return "No Tokens"
     try:
-        assets = providers.esi.client.Assets.get_characters_character_id_assets(character_id=character_id,
-                                                                                token=token.valid_access_token()).results(cache_on_not_modified=False)
+        assets_op = providers.esi.client.Assets.get_characters_character_id_assets(
+            character_id=character_id)
+
+        assets = etag_results(assets_op, token)
 
         location_names = list(
             EveLocation.objects.all().values_list('location_id', flat=True))
@@ -294,67 +302,77 @@ def update_character_wallet(character_id):
     if not token:
         return "No Tokens"
 
-    journal_items = providers.esi.client.Wallet.get_characters_character_id_wallet_journal(character_id=character_id,
-                                                                                           token=token.valid_access_token()).results()
+    try:
+        journal_items_ob = providers.esi.client.Wallet.get_characters_character_id_wallet_journal(
+            character_id=character_id)
 
-    _current_journal = CharacterWalletJournalEntry.objects.filter(
-        character=audit_char).values_list('entry_id', flat=True)  # TODO add time filter
-    _current_eve_ids = list(
-        EveName.objects.all().values_list('eve_id', flat=True))
+        journal_items = etag_results(journal_items_ob, token)
 
-    _new_names = []
+        _current_journal = CharacterWalletJournalEntry.objects.filter(
+            character=audit_char).values_list('entry_id', flat=True)  # TODO add time filter
+        _current_eve_ids = list(
+            EveName.objects.all().values_list('eve_id', flat=True))
 
-    items = []
-    for item in journal_items:
-        if item.get('id') not in _current_journal:
-            if item.get('second_party_id') not in _current_eve_ids:
-                _new_names.append(item.get('second_party_id'))
-                _current_eve_ids.append(item.get('second_party_id'))
-            if item.get('first_party_id') not in _current_eve_ids:
-                _new_names.append(item.get('first_party_id'))
-                _current_eve_ids.append(item.get('first_party_id'))
+        _new_names = []
 
-            asset_item = CharacterWalletJournalEntry(character=audit_char,
-                                                     amount=item.get('amount'),
-                                                     balance=item.get(
-                                                         'balance'),
-                                                     context_id=item.get(
-                                                         'context_id'),
-                                                     context_id_type=item.get(
-                                                         'context_id_type'),
-                                                     date=item.get('date'),
-                                                     description=item.get(
-                                                         'description'),
-                                                     first_party_id=item.get(
-                                                         'first_party_id'),
-                                                     first_party_name_id=item.get(
-                                                         'first_party_id'),
-                                                     entry_id=item.get('id'),
-                                                     reason=item.get('reason'),
-                                                     ref_type=item.get(
-                                                         'ref_type'),
-                                                     second_party_id=item.get(
-                                                         'second_party_id'),
-                                                     second_party_name_id=item.get(
-                                                         'second_party_id'),
-                                                     tax=item.get('tax'),
-                                                     tax_receiver_id=item.get(
-                                                         'tax_receiver_id'),
-                                                     )
-            items.append(asset_item)
+        items = []
+        for item in journal_items:
+            if item.get('id') not in _current_journal:
+                if item.get('second_party_id') not in _current_eve_ids:
+                    _new_names.append(item.get('second_party_id'))
+                    _current_eve_ids.append(item.get('second_party_id'))
+                if item.get('first_party_id') not in _current_eve_ids:
+                    _new_names.append(item.get('first_party_id'))
+                    _current_eve_ids.append(item.get('first_party_id'))
 
-    created_names = EveName.objects.create_bulk_from_esi(_new_names)
+                asset_item = CharacterWalletJournalEntry(character=audit_char,
+                                                         amount=item.get(
+                                                             'amount'),
+                                                         balance=item.get(
+                                                             'balance'),
+                                                         context_id=item.get(
+                                                             'context_id'),
+                                                         context_id_type=item.get(
+                                                             'context_id_type'),
+                                                         date=item.get('date'),
+                                                         description=item.get(
+                                                             'description'),
+                                                         first_party_id=item.get(
+                                                             'first_party_id'),
+                                                         first_party_name_id=item.get(
+                                                             'first_party_id'),
+                                                         entry_id=item.get(
+                                                             'id'),
+                                                         reason=item.get(
+                                                             'reason'),
+                                                         ref_type=item.get(
+                                                             'ref_type'),
+                                                         second_party_id=item.get(
+                                                             'second_party_id'),
+                                                         second_party_name_id=item.get(
+                                                             'second_party_id'),
+                                                         tax=item.get('tax'),
+                                                         tax_receiver_id=item.get(
+                                                             'tax_receiver_id'),
+                                                         )
+                items.append(asset_item)
 
-    wallet_ballance = providers.esi.client.Wallet.get_characters_character_id_wallet(character_id=character_id,
-                                                                                     token=token.valid_access_token()).result()
+        created_names = EveName.objects.create_bulk_from_esi(_new_names)
 
-    audit_char.balance = wallet_ballance
-    audit_char.save()
+        wallet_ballance = providers.esi.client.Wallet.get_characters_character_id_wallet(character_id=character_id,
+                                                                                         token=token.valid_access_token()).result()
 
-    if created_names:
-        CharacterWalletJournalEntry.objects.bulk_create(items)
-    else:
-        raise Exception("ESI Fail")
+        audit_char.balance = wallet_ballance
+        audit_char.save()
+
+        if created_names:
+            CharacterWalletJournalEntry.objects.bulk_create(items)
+        else:
+            raise Exception("ESI Fail")
+    except NotModifiedError:
+        logger.info("CT: No New wallet data for: {}".format(
+            audit_char.character.character_name))
+        pass
 
     audit_char.last_update_wallet = timezone.now()
     audit_char.save()
@@ -453,73 +471,77 @@ def update_character_orders(character_id):
     if not token:
         return "No Tokens"
 
-    open_orders = providers.esi.client.Market.get_characters_character_id_orders(character_id=character_id,
-                                                                                 token=token.valid_access_token())
-    open_orders.request_config.also_return_response = True
-    open_orders, result = open_orders.result()
+    open_orders_op = providers.esi.client.Market.get_characters_character_id_orders(
+        character_id=character_id)
+    try:
+        open_orders = etag_results(open_orders_op, token)
 
-    open_ids = list(CharacterMarketOrder.objects.filter(
-        character=audit_char, state='active').values_list("order_id", flat=True))
-    all_locations = list(EveLocation.objects.all(
-    ).values_list('location_id', flat=True))
+        open_ids = list(CharacterMarketOrder.objects.filter(
+            character=audit_char, state='active').values_list("order_id", flat=True))
+        all_locations = list(EveLocation.objects.all(
+        ).values_list('location_id', flat=True))
 
-    updates = []
-    creates = []
-    type_ids = []
+        updates = []
+        creates = []
+        type_ids = []
 
-    tracked_ids = []
+        tracked_ids = []
 
-    for order in open_orders:
-        tracked_ids.append(order.get('order_id'))
+        for order in open_orders:
+            tracked_ids.append(order.get('order_id'))
 
-        if order.get('type_id') not in type_ids:
-            type_ids.append(order.get('type_id'))
+            if order.get('type_id') not in type_ids:
+                type_ids.append(order.get('type_id'))
 
-        _order = CharacterMarketOrder(
-            character=audit_char,
-            order_id=order.get('order_id'),
-            duration=order.get('duration'),
-            escrow=order.get('escrow'),
-            is_buy_order=order.get('is_buy_order'),
-            issued=order.get('issued'),
-            location_id=order.get('location_id'),
-            min_volume=order.get('min_volume'),
-            price=order.get('price'),
-            order_range=order.get('range'),
-            region_id=order.get('region_id'),
-            region_name_id=order.get('region_id'),
-            type_id=order.get('type_id'),
-            type_name_id=order.get('type_id'),
-            volume_remain=order.get('volume_remain'),
-            volume_total=order.get('volume_total'),
-            is_corporation=order.get('is_corporation'),
-            state='active'
-        )
+            _order = CharacterMarketOrder(
+                character=audit_char,
+                order_id=order.get('order_id'),
+                duration=order.get('duration'),
+                escrow=order.get('escrow'),
+                is_buy_order=order.get('is_buy_order'),
+                issued=order.get('issued'),
+                location_id=order.get('location_id'),
+                min_volume=order.get('min_volume'),
+                price=order.get('price'),
+                order_range=order.get('range'),
+                region_id=order.get('region_id'),
+                region_name_id=order.get('region_id'),
+                type_id=order.get('type_id'),
+                type_name_id=order.get('type_id'),
+                volume_remain=order.get('volume_remain'),
+                volume_total=order.get('volume_total'),
+                is_corporation=order.get('is_corporation'),
+                state='active'
+            )
 
-        if order.get('location_id') in all_locations:
-            _order.location_name_id = order.get('location_id')
+            if order.get('location_id') in all_locations:
+                _order.location_name_id = order.get('location_id')
 
-        if order.get('order_id') in open_ids:
-            updates.append(_order)
-        else:
-            creates.append(_order)
+            if order.get('order_id') in open_ids:
+                updates.append(_order)
+            else:
+                creates.append(_order)
 
-    EveItemType.objects.create_bulk_from_esi(type_ids)
+        EveItemType.objects.create_bulk_from_esi(type_ids)
 
-    if len(updates) > 0:
-        CharacterMarketOrder.objects.bulk_update(updates, fields=['duration', 'escrow',
-                                                                  'min_volume',
-                                                                  'price',
-                                                                  'order_range',
-                                                                  'volume_remain',
-                                                                  'volume_total',
-                                                                  'state'])
+        if len(updates) > 0:
+            CharacterMarketOrder.objects.bulk_update(updates, fields=['duration', 'escrow',
+                                                                      'min_volume',
+                                                                      'price',
+                                                                      'order_range',
+                                                                      'volume_remain',
+                                                                      'volume_total',
+                                                                      'state'])
 
-    if len(creates) > 0:
-        CharacterMarketOrder.objects.bulk_create(creates)
+        if len(creates) > 0:
+            CharacterMarketOrder.objects.bulk_create(creates)
 
-    CharacterMarketOrder.objects.filter(
-        character=audit_char, state='active').exclude(order_id__in=tracked_ids).delete()
+        CharacterMarketOrder.objects.filter(
+            character=audit_char, state='active').exclude(order_id__in=tracked_ids).delete()
+    except NotModifiedError:
+        logger.info("CT: No New orders data for: {}".format(
+            audit_char.character.character_name))
+        pass
 
     audit_char.last_update_orders = timezone.now()
     audit_char.save()
@@ -541,69 +563,76 @@ def update_character_order_history(character_id):
     if not token:
         return "No Tokens"
 
-    order_history = providers.esi.client.Market.get_characters_character_id_orders_history(character_id=character_id,
-                                                                                           token=token.valid_access_token()).results()
+    order_history_op = providers.esi.client.Market.get_characters_character_id_orders_history(
+        character_id=character_id)
 
-    closed_ids = list(CharacterMarketOrder.objects.filter(
-        character=audit_char).exclude(state='active').values_list("order_id", flat=True))
-    all_locations = list(EveLocation.objects.all(
-    ).values_list('location_id', flat=True))
+    try:
+        order_history = etag_results(order_history_op, token)
 
-    updates = []
-    creates = []
-    type_ids = []
+        closed_ids = list(CharacterMarketOrder.objects.filter(
+            character=audit_char).exclude(state='active').values_list("order_id", flat=True))
+        all_locations = list(EveLocation.objects.all(
+        ).values_list('location_id', flat=True))
 
-    tracked_ids = []
+        updates = []
+        creates = []
+        type_ids = []
 
-    for order in order_history:
-        tracked_ids.append(order.get('order_id'))
+        tracked_ids = []
 
-        if order.get('type_id') not in type_ids:
-            type_ids.append(order.get('type_id'))
+        for order in order_history:
+            tracked_ids.append(order.get('order_id'))
 
-        _order = CharacterMarketOrder(
-            character=audit_char,
-            order_id=order.get('order_id'),
-            duration=order.get('duration'),
-            escrow=order.get('escrow'),
-            is_buy_order=order.get('is_buy_order'),
-            issued=order.get('issued'),
-            location_id=order.get('location_id'),
-            min_volume=order.get('min_volume'),
-            price=order.get('price'),
-            order_range=order.get('range'),
-            region_id=order.get('region_id'),
-            region_name_id=order.get('region_id'),
-            type_id=order.get('type_id'),
-            type_name_id=order.get('type_id'),
-            volume_remain=order.get('volume_remain'),
-            volume_total=order.get('volume_total'),
-            is_corporation=order.get('is_corporation'),
-            state=order.get('state')
-        )
+            if order.get('type_id') not in type_ids:
+                type_ids.append(order.get('type_id'))
 
-        if order.get('location_id') in all_locations:
-            _order.location_name_id = order.get('location_id')
+            _order = CharacterMarketOrder(
+                character=audit_char,
+                order_id=order.get('order_id'),
+                duration=order.get('duration'),
+                escrow=order.get('escrow'),
+                is_buy_order=order.get('is_buy_order'),
+                issued=order.get('issued'),
+                location_id=order.get('location_id'),
+                min_volume=order.get('min_volume'),
+                price=order.get('price'),
+                order_range=order.get('range'),
+                region_id=order.get('region_id'),
+                region_name_id=order.get('region_id'),
+                type_id=order.get('type_id'),
+                type_name_id=order.get('type_id'),
+                volume_remain=order.get('volume_remain'),
+                volume_total=order.get('volume_total'),
+                is_corporation=order.get('is_corporation'),
+                state=order.get('state')
+            )
 
-        if order.get('order_id') in closed_ids:
-            updates.append(_order)
-        else:
-            creates.append(_order)
+            if order.get('location_id') in all_locations:
+                _order.location_name_id = order.get('location_id')
 
-    EveItemType.objects.create_bulk_from_esi(type_ids)
+            if order.get('order_id') in closed_ids:
+                updates.append(_order)
+            else:
+                creates.append(_order)
 
-    if len(updates) > 0:
-        CharacterMarketOrder.objects.bulk_update(updates, fields=['duration',
-                                                                  'escrow',
-                                                                  'min_volume',
-                                                                  'price',
-                                                                  'order_range',
-                                                                  'volume_remain',
-                                                                  'volume_total',
-                                                                  'state'])
+        EveItemType.objects.create_bulk_from_esi(type_ids)
 
-    if len(creates) > 0:
-        CharacterMarketOrder.objects.bulk_create(creates)
+        if len(updates) > 0:
+            CharacterMarketOrder.objects.bulk_update(updates, fields=['duration',
+                                                                      'escrow',
+                                                                      'min_volume',
+                                                                      'price',
+                                                                      'order_range',
+                                                                      'volume_remain',
+                                                                      'volume_total',
+                                                                      'state'])
+
+        if len(creates) > 0:
+            CharacterMarketOrder.objects.bulk_create(creates)
+    except NotModifiedError:
+        logger.info("CT: No New old orders data for: {}".format(
+            audit_char.character.character_name))
+        pass
 
     return "Finished Order History for: {}".format(audit_char.character.character_name)
 
@@ -623,8 +652,10 @@ def update_character_notifications(character_id):
         return "No Tokens"
 
     try:
-        notifications = providers.esi.client.Character.get_characters_character_id_notifications(character_id=character_id,
-                                                                                                 token=token.valid_access_token()).results(cache_on_not_modified=False)
+        notifications_op = providers.esi.client.Character.get_characters_character_id_notifications(
+            character_id=character_id)
+
+        notifications = etag_results(notifications_op, token)
 
         last_five_hundred = list(
             Notification.objects.filter(character=audit_char)
@@ -670,8 +701,11 @@ def update_character_roles(character_id):
     if not token:
         return False
     try:
-        roles = providers.esi.client.Character.get_characters_character_id_roles(character_id=character_id,
-                                                                                 token=token.valid_access_token()).result(cache_on_not_modified=False)
+        roles_op = providers.esi.client.Character.get_characters_character_id_roles(
+            character_id=character_id)
+
+        roles = etag_results(roles_op, token)
+
         director = False
         accountant = False
         station_manager = False
@@ -863,7 +897,7 @@ def update_character_mail(character_id):
     audit_char.save()
     audit_char.is_active()
 
-    if len(mail_ids) is 0:
+    if len(mail_ids) == 0:
         logger.debug("No new mails for {}".format(character_id))
         return
 
@@ -887,8 +921,11 @@ def update_character_contacts(character_id):
         EveName.objects.all().values_list('eve_id', flat=True))
 
     try:
-        labels = providers.esi.client.Contacts.get_characters_character_id_contacts_labels(character_id=character_id,
-                                                                                           token=token.valid_access_token()).result(cache_on_not_modified=False)
+        labels_op = providers.esi.client.Contacts.get_characters_character_id_contacts_labels(
+            character_id=character_id)
+
+        labels = etag_results(labels_op, token)
+
         labels_to_create = []
 
         for label in labels:  # update labels
@@ -909,8 +946,10 @@ def update_character_contacts(character_id):
         pass
 
     try:
-        contacts = providers.esi.client.Contacts.get_characters_character_id_contacts(character_id=character_id,
-                                                                                      token=token.valid_access_token()).results(cache_on_not_modified=False)
+        contacts_op = providers.esi.client.Contacts.get_characters_character_id_contacts(
+            character_id=character_id)
+
+        contacts = etag_results(contacts_op, token)
 
         ContactLabelThrough = CharacterContact.labels.through
         _contacts_to_create = []
@@ -976,8 +1015,10 @@ def update_character_titles(character_id):
     if not token:
         return False
     try:
-        titles = providers.esi.client.Character.get_characters_character_id_titles(character_id=character_id,
-                                                                                   token=token.valid_access_token()).result(cache_on_not_modified=False)
+        titles_op = providers.esi.client.Character.get_characters_character_id_titles(
+            character_id=character_id)
+
+        titles = etag_results(titles_op, token)
 
         title_models = []
         for t in titles:  # update labels

@@ -17,6 +17,7 @@ function CharActiveBadge({ characters, character_id }) {
     .filter((char) => !char.active)
     .map((char) => char.character.character_name);
   const { mutate } = useMutation(postAccountRefresh);
+
   return (
     <ButtonGroup>
       <OverlayTrigger

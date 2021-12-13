@@ -35,8 +35,8 @@ def get_corp_token(corp_id, scopes, req_roles):
         .require_scopes(scopes)
 
     for token in tokens:
-        roles = providers.esi.client.Character.get_characters_character_id_roles(character_id=token.character_id,
-                                                                                 token=token.valid_access_token()).result()
+        role_op = providers.esi.client.Character.get_characters_character_id_roles(character_id=token.character_id,
+                                                                                   token=token.valid_access_token()).result()
         has_roles = False
         for role in roles.get('roles', []):
             if role in req_roles:
@@ -78,7 +78,7 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
         EveName.objects.all().values_list('eve_id', flat=True))
 
     _new_names = []
-
+    _min_time = timezone.now()
     items = []
     for item in journal_items:
         if item.get('id') not in _current_journal:
@@ -88,7 +88,8 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
             if item.get('first_party_id') not in _current_eve_ids:
                 _new_names.append(item.get('first_party_id'))
                 _current_eve_ids.append(item.get('first_party_id'))
-
+            if _min_time > item.get('date'):
+                _min_time = item.get('date')
             wallet_item = CorporationWalletJournalEntry(division=division,
                                                         amount=item.get(
                                                             'amount'),
@@ -122,7 +123,7 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
             items.append(wallet_item)
 
     created_names = EveName.objects.create_bulk_from_esi(_new_names)
-
+    logger.info(f"OLDEST DATA! {audit_corp} {_min_time}")
     if created_names:
         CorporationWalletJournalEntry.objects.bulk_create(items)
     else:
