@@ -11,8 +11,12 @@ class NotModifiedError(Exception):
     pass
 
 
+def get_etag_key(operation):
+    return "etag-" + operation._cache_key()
+
+
 def get_etag_header(operation):
-    return cache.get("etag-" + operation._cache_key(), False)
+    return cache.get(get_etag_key(operation), False)
 
 
 def inject_etag_header(operation):
@@ -23,7 +27,7 @@ def inject_etag_header(operation):
 
 
 def set_etag_header(operation, headers):
-    etag_key = get_etag_header(operation)
+    etag_key = get_etag_key(operation)
     etag = headers.headers.get('ETag', None)
     if etag is not None:
         result = cache.set(etag_key, etag, MAX_ETAG_LIFE)
