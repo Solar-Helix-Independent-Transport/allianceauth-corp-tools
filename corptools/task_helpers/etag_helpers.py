@@ -24,13 +24,13 @@ def inject_etag_header(operation):
 
 def set_etag_header(operation, headers):
     etag_key = get_etag_header(operation)
-    logger.debug(f"ETag: set_etag {operation}, {headers.headers.get('ETag')}")
-    if headers.headers.get('ETag') is not None:
-        cache.set(etag_key, headers.headers.get('ETag'), MAX_ETAG_LIFE)
+    etag = headers.headers.get('ETag', None)
+    if etag is not None:
+        logger.debug(f"ETag: set_etag {operation}, {etag}")
+        cache.set(etag_key, etag, MAX_ETAG_LIFE)
 
 
 def etag_results(operation, token):
-
     results = list()
     # override to always get the raw response for expiry header
     operation.request_config.also_return_response = True
