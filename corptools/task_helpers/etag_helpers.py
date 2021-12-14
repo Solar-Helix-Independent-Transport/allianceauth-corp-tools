@@ -25,7 +25,7 @@ def inject_etag_header(operation):
 def set_etag_header(operation, headers):
     etag_key = get_etag_header(operation)
     logger.debug(f"ETag: set_etag {operation}, {headers.headers.get('ETag')}")
-    if headers.headers.get('ETag'):
+    if headers.headers.get('ETag') is not None:
         cache.set(etag_key, headers.headers.get('ETag'), MAX_ETAG_LIFE)
 
 
