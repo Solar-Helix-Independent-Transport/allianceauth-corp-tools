@@ -1,8 +1,10 @@
 from bravado.exception import HTTPNotModified
 from django.core.cache import cache
-
+import logging
 
 MAX_ETAG_LIFE = 60*60*24*7  # 7 Days
+
+logger = logging.getLogger(__name__)
 
 
 class NotModifiedError(Exception):
@@ -15,12 +17,14 @@ def get_etag_header(operation):
 
 def inject_etag_header(operation):
     etag = get_etag_header(operation)
+    logger.debug(f"ETag: get_etag {operation}, {etag}")
     if etag:
         operation.future.request.headers["If-None-Match"] = etag
 
 
 def set_etag_header(operation, headers):
     etag_key = get_etag_header(operation)
+    logger.debug(f"ETag: set_etag {operation}, {headers.headers.get('ETag')}")
     if headers.headers.get('ETag'):
         cache.set(etag_key, headers.headers.get('ETag'), MAX_ETAG_LIFE)
 
@@ -59,8 +63,11 @@ def etag_results(operation, token):
                 results += result
                 current_page += 1
                 etags_incomplete = True
+                logger.debug(
+                    f"ETag: results_loop bad invalid ETag {operation}")
 
             except (HTTPNotModified, NotModifiedError):  # etag is wrong data has changed
+                logger.debug(f"ETag: results_loop Hit ETag {operation}")
                 if not etags_incomplete:
                     current_page += 1  # reset to page 1 and fetch everyhting
                 else:
@@ -74,6 +81,7 @@ def etag_results(operation, token):
         try:
             results, headers = operation.result()
         except HTTPNotModified:
+            logger.debug(f"ETag: result Cache Hit ETag {operation}")
             raise NotModifiedError()
         set_etag_header(operation, headers)
 
