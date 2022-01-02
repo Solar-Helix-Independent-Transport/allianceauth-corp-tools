@@ -275,7 +275,8 @@ def get_character_asset_locations(request, character_id: int):
     asset_locs = models.EveLocation.objects.filter(
         location_id__in=asset_locs).order_by('location_name')
 
-    asset_locations = [{"label": "Everywhere", "value": 0}]
+    asset_locations = [{"label": "Everywhere", "value": 0},
+                       {"label": "AssetSafety", "value": 2004}, ]
     for loc in asset_locs:
         asset_locations.append({
             "label": loc.location_name,
@@ -324,11 +325,15 @@ def get_character_asset_groups(request, character_id: int, location_id: int):
         .filter((Q(blueprint_copy=None) | Q(blueprint_copy=False)),
                 character__character__in=characters)
 
-    if location_id != 0:
+    if location_id == 2004:
+        asset_locations = assets.filter(
+            location_flag="AssetSafety").values_list('item_id')
+        assets = assets.filter(location_id__in=asset_locations)
+    elif location_id != 0:
         asset_locations = assets.filter(
             location_name_id=int(location_id)).values_list('item_id')
         assets = assets.filter(Q(location_name_id=int(location_id)) | Q(
-            location_id__in=asset_locations))
+            location_id__in=asset_locations) | Q(location_id=int(location_id)))
 
     assets = assets.values('type_name__group__group_id')\
         .annotate(grp_total=Sum('quantity'))\

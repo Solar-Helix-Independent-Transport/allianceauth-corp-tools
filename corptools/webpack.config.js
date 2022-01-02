@@ -1,6 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
-
+console.log(process.env.NODE_ENV);
+console.log(process.env);
 module.exports = {
   entry: "./src/index.js",
   output: {
