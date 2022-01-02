@@ -4,7 +4,7 @@ import json
 import re
 
 CORPTOOLS_DISCORD_BOT_COGS = getattr(
-    settings, 'CORPTOOLS_DISCORD_BOT_COGS', ["corptools.cogs.routes"])
+    settings, 'CORPTOOLS_DISCORD_BOT_COGS', ["corptools.cogs.routes", "corptools.cogs.locate"])
 
 CT_CHAR_ASSETS_MODULE = getattr(settings, 'CT_CHAR_ASSETS_MODULE', True)
 CT_CHAR_STANDINGS_MODULE = getattr(settings, 'CT_CHAR_STANDINGS_MODULE', True)
