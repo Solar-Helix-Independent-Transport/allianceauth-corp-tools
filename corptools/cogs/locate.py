@@ -69,7 +69,8 @@ class Locator(commands.Cog):
                         "last_online": DateTime.min,
                         "online": False,
                         "ship": "",
-                        "system": None
+                        "system": None,
+                        "lookup": False
                     }
                     scopes = [
                         # Locations
@@ -102,16 +103,24 @@ class Locator(commands.Cog):
                         shp, _ = EveItemType.objects.get_or_create_from_esi(
                             ship['ship_type_id'])
                         _alt['ship'] = shp
+                        _alt['lookup'] = True
                     alt_list.append(_alt)
                 for alt_grp in [alt_list[i:i + 10] for i in range(0, len(alt_list), 10)]:
                     altstr = []
                     for a in alt_grp:
-                        altstr.append(f"[{a['cnm']}](https://evewho.com/character/{a['cid']}) "
-                                      f"*[ [{a['crpnm']}](https://evewho.com/corporation/{a['crpid']}) ]*: "
-                                      f"{a['online']}"
-                                      f" in [{a['system']}](https://evemaps.dotlan.net/system/{a['system'].replace(' ', '_')})"
-                                      f"\n ```Currently in a {a['ship']}"
-                                      f" Last Online: {a['last_online'].strftime('%Y-%m-%d %H:%M')}```")
+                        if a['lookup']:
+                            altstr.append(f"[{a['cnm']}](https://evewho.com/character/{a['cid']}) "
+                                          f"*[ [{a['crpnm']}](https://evewho.com/corporation/{a['crpid']}) ]*: "
+                                          f"{a['online']}"
+                                          f" in [{a['system']}](https://evemaps.dotlan.net/system/{a['system'].replace(' ', '_')})"
+                                          f"\n ```Currently in a {a['ship']}"
+                                          f" Last Online: {a['last_online'].strftime('%Y-%m-%d %H:%M')}```")
+                        else:
+                            altstr.append(f"[{a['cnm']}](https://evewho.com/character/{a['cid']}) "
+                                          f"*[ [{a['crpnm']}](https://evewho.com/corporation/{a['crpid']}) ]*: "
+                                          f"Unknown No Tokens"
+                                          f"")
+
                     e = Embed()
                     e.description = "\n".join(altstr)
                     await ctx.message.reply(embed=e)
