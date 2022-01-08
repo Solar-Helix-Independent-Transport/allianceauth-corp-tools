@@ -635,6 +635,14 @@ class SkillList(models.Model):
 # Structure models
 
 
+class BridgeOzoneLevel(models.Model):
+    id = models.AutoField(primary_key=True)
+    station_id = models.CharField(max_length=500)
+    quantity = models.BigIntegerField()
+    used = models.BigIntegerField(default=0)
+    date = models.DateTimeField(auto_now=True)
+
+
 class StructureCelestial(models.Model):
     structure_id = models.BigIntegerField()
     celestial_name = models.CharField(max_length=500, null=True, default=None)

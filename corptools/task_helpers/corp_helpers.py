@@ -1,6 +1,10 @@
 import logging
 from celery import shared_task
-from ..models import CorporationWalletJournalEntry, CorporationAudit, CorporationWalletDivision, EveName
+from corptools.task_helpers.etag_helpers import NotModifiedError, etag_results
+from corptools.task_helpers.update_tasks import fetch_location_name
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.db.models.aggregates import Sum
+from ..models import BridgeOzoneLevel, CorpAsset, CorporationWalletJournalEntry, CorporationAudit, CorporationWalletDivision, EveItemType, EveLocation, EveName, Structure, StructureCelestial, StructureService
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 
@@ -176,3 +180,259 @@ def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
     audit_corp.save()
 
     return "Finished wallet divs for: {0}".format(audit_corp.corporation.corporation_name)
+
+
+def update_corp_structures(corp_id):  # pagnated results
+    # logger.debug("Started structures for: %s" % (str(character_id)))
+
+    def _structures_db_update(_corporation, _structure, _name):
+        str_type, _ = EveItemType.objects.get_or_create_from_esi(
+            _structure.get('type_id'))
+        _structure_ob, _created = Structure.objects.update_or_create(
+            structure_id=_structure.get('structure_id'),
+            corporation=_corporation,
+            defaults={
+                'fuel_expires': _structure.get('fuel_expires', None),
+                'next_reinforce_apply': _structure.get('next_reinforce_apply', None),
+                'next_reinforce_weekday': _structure.get('next_reinforce_weekday', None),
+                'profile_id': _structure.get('profile_id', None),
+                'reinforce_hour': _structure.get('reinforce_hour', None),
+                'reinforce_weekday': _structure.get('reinforce_weekday', None),
+                'state': _structure.get('state', None),
+                'state_timer_end': _structure.get('state_timer_end', None),
+                'state_timer_start': _structure.get('state_timer_start', None),
+                'system_id': _structure.get('system_id', None),
+                'type_id': _structure.get('type_id', None),
+                'unanchors_at': _structure.get('unanchors_at', None),
+                'name': _name,
+                'system_name_id': _structure.get('system_id', None),
+                'type_name': str_type
+            })
+
+        if _structure_ob:
+            _asset = None
+            _location = None
+            celestial = StructureCelestial.objects.filter(
+                structure_id=_structure.get('structure_id'))
+
+            if not celestial.exists():
+                try:
+                    _asset = CorpAsset.objects.get(
+                        item_id=_structure.get('structure_id'), corp=_corporation)
+                    _req_scopes = ['esi-assets.read_corporation_assets.v1']
+                    _req_roles = ['Director']
+                    _token = get_corp_token(
+                        _corporation.corporation.corporation_id, _req_scopes, _req_roles)
+                    if _token:
+                        locations = providers.esi.client.Assets.post_corporations_corporation_id_assets_locations(
+                            corporation_id=_corporation.corporation.corporation_id,
+                            item_ids=[_structure.get('structure_id')],
+                            token=token.valid_access_token()).result()
+
+                        _location = locations[0]
+
+                        url = "https://www.fuzzwork.co.uk/api/nearestCelestial.php?x=%s&y=%s&z=%s&solarsystemid=%s" \
+                            % ((str(_location['position'].get('x'))),
+                               (str(_location['position'].get('y'))),
+                                (str(_location['position'].get('z'))),
+                                (str(_structure.get('system_id')))
+                               )
+
+                        r = requests.get(url)
+                        fuzz_result = r.json()
+
+                        celestial = StructureCelestial.objects.create(
+                            structure_id=_structure.get('structure_id'),
+                            celestial_name=fuzz_result.get('itemName')
+                        )
+                except ObjectDoesNotExist as e:
+                    celestial = None
+                except:
+                    # logging.exception("Messsage")
+                    celestial = None
+            else:
+                celestial = celestial[0]
+
+            if celestial is not None:
+                _structure_ob.closest_celestial = celestial
+                _structure_ob.save()
+
+            if _structure.get('services'):
+                db_services = StructureService.objects.filter(
+                    structure=_structure_ob)
+                current_services = []
+                for service in _structure.get('services'):
+                    db_service = db_services.filter(name=service['name'])
+                    if db_service.exists():
+                        if db_service.count() == 1:
+                            if db_service[0].state == service['state']:
+                                current_services.append(db_service[0].id)
+                                pass
+                            else:
+                                db_service.update(state=service['state'])
+                                current_services.append(db_service[0].id)
+                        else:
+                            StructureService.objects.filter(structure=_structure_ob,
+                                                            name=service['name']).delete()
+                            new_service = StructureService.objects.create(structure=_structure_ob,
+                                                                          state=service['state'],
+                                                                          name=service['name'])
+                            current_services.append(new_service.id)
+
+                    else:
+                        new_service = StructureService.objects.create(structure=_structure_ob,
+                                                                      state=service['state'],
+                                                                      name=service['name'])
+                        current_services.append(new_service.id)
+                db_services.exclude(id__in=current_services).delete()
+
+        return _structure_ob, _created
+
+    req_scopes = ['esi-corporations.read_structures.v1', 'esi-universe.read_structures.v1',
+                  'esi-characters.read_corporation_roles.v1']
+
+    req_roles = ['Director', 'Station_Manager']
+
+    token = get_corp_token(corp_id, req_scopes, req_roles)
+
+    if not token:
+        return "No Tokens"
+
+    _corporation = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+
+    structure_ids = []
+    operation = providers.esi.client.Corporation.get_corporations_corporation_id_structures(
+        corporation_id=_corporation.corporation.corporation_id)
+    try:
+        structures = etag_results(operation, token)
+    except NotModifiedError:
+        return "No New structure data for: {0}".format(_corporation)
+
+    for structure in structures:
+        try:
+            structure_info = fetch_location_name(structure.get(
+                'structure_id'), 'solar_system', token.character_id)
+        except:  # if bad screw it...
+            structure_info = False
+
+        try:
+            structure_ob, created = _structures_db_update(_corporation,
+                                                          structure,
+                                                          structure_info.location_name if structure_info else str(
+                                                              structure.get('structure_id')))
+        except MultipleObjectsReturned:
+            id_of_first = Structure.objects.filter(
+                structure_id=structure.get('structure_id')).order_by("id")[0].id
+            Structure.objects.filter(structure_id=structure.get(
+                'structure_id')).exclude(id=id_of_first).delete()
+            structure_ob, created = _structures_db_update(_corporation,
+                                                          structure,
+                                                          structure_info.location_name if structure_info else str(
+                                                              structure.get('structure_id')))
+
+        structure_ids.append(structure_ob.structure_id)
+
+    Structure.objects.filter(corporation=_corporation).exclude(
+        structure_id__in=structure_ids).delete()  # structures die/leave
+
+    _corporation.last_update_structs = timezone.now()
+    _corporation.save()
+
+    return "Updated structures for: {0}".format(_corporation)
+
+
+def update_corp_assets(corp_id):
+    audit_corp = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+    logger.debug("Updating Assets for: {}".format(
+        audit_corp.corporation))
+
+    req_scopes = ['esi-assets.read_corporation_assets.v1',
+                  'esi-characters.read_corporation_roles.v1']
+    req_roles = ['Director']
+
+    token = get_corp_token(corp_id, req_scopes, req_roles)
+
+    if not token:
+        return "No Tokens"
+    try:
+        assets_op = providers.esi.client.Assets.get_corporations_corporation_id_assets(
+            corporation_id=corp_id)
+        assets = etag_results(assets_op, token)
+
+        location_names = list(
+            EveLocation.objects.all().values_list('location_id', flat=True))
+        _current_type_ids = []
+        item_ids = []
+        items = []
+        for item in assets:
+            if item.get('type_id') not in _current_type_ids:
+                _current_type_ids.append(item.get('type_id'))
+            item_ids.append(item.get('item_id'))
+            asset_item = CorpAsset(corporation=audit_corp,
+                                   blueprint_copy=item.get(
+                                       'is_blueprint_copy'),
+                                   singleton=item.get('is_singleton'),
+                                   item_id=item.get('item_id'),
+                                   location_flag=item.get(
+                                       'location_flag'),
+                                   location_id=item.get('location_id'),
+                                   location_type=item.get(
+                                       'location_type'),
+                                   quantity=item.get('quantity'),
+                                   type_id=item.get('type_id'),
+                                   type_name_id=item.get('type_id')
+                                   )
+            if item.get('location_id') in location_names:
+                asset_item.location_name_id = item.get('location_id')
+            items.append(asset_item)
+
+        EveItemType.objects.create_bulk_from_esi(_current_type_ids)
+
+        delete_query = CorpAsset.objects.filter(
+            corporation=audit_corp)  # Flush Assets
+        if delete_query.exists():
+            # speed and we are not caring about f-keys or signals on these models
+            delete_query._raw_delete(delete_query.db)
+
+        CorpAsset.objects.bulk_create(items)
+        run_ozone_levels.apply_async(args=[corp_id], priority=7)
+    except NotModifiedError:
+        logger.info("CT: No New assets for: {}".format(
+            audit_corp.corporation))
+        pass
+
+    audit_corp.last_update_assets = timezone.now()
+    audit_corp.save()
+
+    return "Finished assets for: {}".format(audit_corp.corporation)
+
+
+@shared_task(bind=True, base=QueueOnce)
+def run_ozone_levels(self, corp_id):
+    _corporation = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+    logger.debug("Updating Ozone for: %s" % (_corporation.corporation))
+    _structures = Structure.objects.filter(
+        type_id=35841, corporation=_corporation)
+
+    for structure in _structures:
+        _quantity = \
+            CorpAsset.objects.filter(corp=_corporation, location_id=structure.structure_id,
+                                     type_id=16273).aggregate(ozone=Sum('quantity'))['ozone']
+        _used = 0
+
+        try:
+            last_ozone = BridgeOzoneLevel.objects.filter(
+                station_id=structure.structure_id).order_by('-date')[:1][0].quantity
+            delta = last_ozone - _quantity
+            _used = (delta if _quantity < last_ozone else 0)
+        except:
+            pass
+        try:
+            BridgeOzoneLevel.objects.create(
+                station_id=structure.structure_id, quantity=_quantity, used=_used)
+        except:
+            pass  # dont fail for now
+    return "Finished Ozone for: {}".format(_corporation.corporation)
