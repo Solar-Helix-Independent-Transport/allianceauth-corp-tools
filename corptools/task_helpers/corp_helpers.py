@@ -438,7 +438,7 @@ def run_ozone_levels(self, corp_id):
 
     for structure in _structures:
         _quantity = \
-            CorpAsset.objects.filter(corp=_corporation, location_id=structure.structure_id,
+            CorpAsset.objects.filter(corporation=_corporation, location_id=structure.structure_id,
                                      type_id=16273).aggregate(ozone=Sum('quantity'))['ozone']
         _used = 0
 
