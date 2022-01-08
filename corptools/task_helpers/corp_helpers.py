@@ -94,7 +94,7 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
         journal_items, headers = journal_items.result()
         total_pages = int(headers.headers['X-Pages'])
         logger.debug(
-            f"CT: Corp {corp_id} Div {wallet_division}, Pages:{total_pages}")
+            f"CT: Corp {corp_id} Div {wallet_division}, Page:{current_page}/{total_pages}")
         _new_names = []
         _min_time = timezone.now()
         items = []
