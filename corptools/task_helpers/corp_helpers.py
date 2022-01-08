@@ -102,10 +102,10 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
             if item.get('id') not in _current_journal:
                 if item.get('second_party_id') not in _current_eve_ids:
                     _new_names.append(item.get('second_party_id'))
-                    _current_eve_ids.append(item.get('second_party_id'))
+                    _current_eve_ids.add(item.get('second_party_id'))
                 if item.get('first_party_id') not in _current_eve_ids:
                     _new_names.append(item.get('first_party_id'))
-                    _current_eve_ids.append(item.get('first_party_id'))
+                    _current_eve_ids.add(item.get('first_party_id'))
                 if _min_time > item.get('date'):
                     _min_time = item.get('date')
                 wallet_item = CorporationWalletJournalEntry(division=division,
