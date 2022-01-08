@@ -336,7 +336,7 @@ def update_corp_structures(corp_id):  # pagnated results
     Structure.objects.filter(corporation=_corporation).exclude(
         structure_id__in=structure_ids).delete()  # structures die/leave
 
-    _corporation.last_update_structs = timezone.now()
+    _corporation.last_update_structures = timezone.now()
     _corporation.save()
 
     return "Updated structures for: {0}".format(_corporation)
