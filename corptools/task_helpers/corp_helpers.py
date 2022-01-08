@@ -79,7 +79,7 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
         return "No Tokens"
 
     _current_journal = set(list(CorporationWalletJournalEntry.objects.filter(
-        division=division).values_list('entry_id', flat=True)[:10000]))  # TODO add time filter
+        division=division).order_by('-date').values_list('entry_id', flat=True)[:10000]))  # TODO add time filter
     _current_eve_ids = set(list(
         EveName.objects.all().values_list('eve_id', flat=True)))
 
