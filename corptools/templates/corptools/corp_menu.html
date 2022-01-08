@@ -46,6 +46,8 @@
             <th>Corporation</th>
             <th>Alliance</th>
             <th>Wallet Updates</th>
+            <th>Asset Updates</th>
+            <th>Structure Updates</th>
         </thead>
         <tbody>
             {% for corp in corporations %}
@@ -54,7 +56,8 @@
             <td>{{corp.corporation.corporation_name}}</td>
             <td>{{corp.corporation.alliance.alliance_name}}</td>
             <td>{{corp.last_update_wallet|naturaltime}}</td>
-
+            <td>{{corp.last_update_assets|naturaltime}}</td>
+            <td>{{corp.last_update_structs|naturaltime}}</td>
             </tr>
             {% endfor %}
         </tbody>
