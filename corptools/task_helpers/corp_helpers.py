@@ -61,19 +61,27 @@ def get_corp_token(corp_id, scopes, req_roles):
 def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
     audit_corp = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
+
     division = CorporationWalletDivision.objects.get(
         corporation=audit_corp, division=wallet_division)
+
     logger.debug("Updating wallet transactions for: {} (Div: {})".format(
         audit_corp.corporation.corporation_name, division))
 
     req_scopes = ['esi-wallet.read_corporation_wallets.v1',
                   'esi-characters.read_corporation_roles.v1']
+
     req_roles = ['CEO', 'Director', 'Accountant', 'Junior_Accountant']
 
     token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
         return "No Tokens"
+
+    _current_journal = set(list(CorporationWalletJournalEntry.objects.filter(
+        division=division).values_list('entry_id', flat=True)[:10000]))  # TODO add time filter
+    _current_eve_ids = set(list(
+        EveName.objects.all().values_list('eve_id', flat=True)))
 
     current_page = 1
     total_pages = 1
@@ -85,12 +93,8 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
         journal_items.request_config.also_return_response = True
         journal_items, headers = journal_items.result()
         total_pages = int(headers.headers['X-Pages'])
-
-        _current_journal = set(list(CorporationWalletJournalEntry.objects.filter(
-            division=division).values_list('entry_id', flat=True)[:10000]))  # TODO add time filter
-        _current_eve_ids = set(list(
-            EveName.objects.all().values_list('eve_id', flat=True)))
-
+        logger.debug(
+            f"CT: Corp {corp_id} Div {wallet_division}, Pages:{total_pages}")
         _new_names = []
         _min_time = timezone.now()
         items = []
