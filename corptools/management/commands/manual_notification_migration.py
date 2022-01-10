@@ -2,6 +2,7 @@ from allianceauth import notifications
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import F
 from corptools.models import Notification, NotificationText
+from django.db.migrations.recorder import MigrationRecorder
 
 
 class Command(BaseCommand):
@@ -20,10 +21,13 @@ class Command(BaseCommand):
             start = 0
             step = 1000
             while start <= note_cnt:
-                nids = list(Notification.objects.filter(id__in=note_ids).values(
-                    'notification_id').distinct().order_by('id').values_list('id', flat=True)[start:start+step])
-                n = Notification.objects.filter(id__in=nids).values('notification_id').distinct(
-                ).values('notification_id', 'notification_text', 'notification_type')
+                nids = list(Notification.objects.filter(
+                    id__in=note_ids).values(
+                        'notification_id').distinct().order_by('id').values_list(
+                            'id', flat=True)[start:start+step])
+                n = Notification.objects.filter(
+                    id__in=nids).values('notification_id').distinct().values(
+                    'notification_id', 'notification_text')
                 n.count()
                 obs = []
                 for i in n:
@@ -32,8 +36,15 @@ class Command(BaseCommand):
                 NotificationText.objects.bulk_create(
                     obs, ignore_conflicts=True)
                 start += step
-                self.stdout.write(
-                    f"Migrated {start} of {note_cnt} Starting database sync")
-                Notification.objects.all().update(note_text=F("notification_id"))
+                migration_68 = MigrationRecorder.Migration.objects.filter(
+                    app="corptools", name="0068_rename_note_text_notification_notification_text"
+                ).exists()
+                if migration_68:
+                    self.stdout.write(
+                        f"Migrated, Starting database sync")
+                    Notification.objects.all().update(notification_text=F("notification_id"))
+                else:
+                    self.stdout.write(
+                        f"Completed Tidy up, Please continue with the migrations.")
         else:
             self.stdout.write(f"Found no unlinked notifications")
