@@ -15,18 +15,19 @@ def migrate_notifications(apps, schema_editor):
     note_cnt = note_ids.count()
     start = 0
     step = 100000
-    while start <= note_cnt:
-        n = Notification.objects.all().values('notification_id').exclude(
-            notification_id__in=existing_notes).distinct().order_by(
-            'notification_id').values('notification_id', 'notification_text')[start:start+step]
-        obs = []
-        for i in n:
-            obs.append(NotificationText(notification_id=i['notification_id'],
-                                        notification_text=i['notification_text']))
-        c = NotificationText.objects.bulk_create(
-            obs, batch_size=20000, ignore_conflicts=True)
-        start += step
-        print(f"Migrated {start}({len(c)}) of {note_cnt}")
+    if note_cnt > 0:
+        while start <= note_cnt:
+            n = Notification.objects.all().values('notification_id').exclude(
+                notification_id__in=existing_notes).distinct().order_by(
+                'notification_id').values('notification_id', 'notification_text')[start:start+step]
+            obs = []
+            for i in n:
+                obs.append(NotificationText(notification_id=i['notification_id'],
+                                            notification_text=i['notification_text']))
+            c = NotificationText.objects.bulk_create(
+                obs, batch_size=20000, ignore_conflicts=True)
+            start += step
+            print(f"Migrated {start}({len(c)}) of {note_cnt}")
 
 
 class Migration(migrations.Migration):
