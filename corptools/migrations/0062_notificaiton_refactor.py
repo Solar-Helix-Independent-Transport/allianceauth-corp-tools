@@ -7,8 +7,7 @@ def migrate_notifications(apps, schema_editor):
     Notification = apps.get_model('corptools', 'Notification')
     NotificationText = apps.get_model('corptools', 'NotificationText')
     print("Starting Migration:")
-    note_ids = Notification.objects.all().values(
-        'notification_id').distinct()
+    note_ids = Notification.objects.all().values('notification_id').distinct()
     note_cnt = note_ids.count()
     start = 0
     step = 1000
