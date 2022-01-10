@@ -6,15 +6,15 @@ from django.db import migrations
 def migrate_notifications(apps, schema_editor):
     Notification = apps.get_model('corptools', 'Notification')
     NotificationText = apps.get_model('corptools', 'NotificationText')
-    print("Starting Migration:")
+    print("Starting Migration: if this hangs for more than 5 min please cancel and restart.")
+
     existing_notes = NotificationText.objects.all().values('notification_id')
     note_ids = Notification.objects.all().values(
         'notification_id').exclude(
             notification_id__in=existing_notes).distinct()
-
     note_cnt = note_ids.count()
     start = 0
-    step = 5000
+    step = 100000
     while start <= note_cnt:
         n = Notification.objects.all().values('notification_id').exclude(
             notification_id__in=existing_notes).distinct().order_by(
@@ -23,9 +23,10 @@ def migrate_notifications(apps, schema_editor):
         for i in n:
             obs.append(NotificationText(notification_id=i['notification_id'],
                                         notification_text=i['notification_text']))
-        NotificationText.objects.bulk_create(obs, ignore_conflicts=True)
+        c = NotificationText.objects.bulk_create(
+            obs, batch_size=20000, ignore_conflicts=True)
         start += step
-        print(f"Migrated {start} of {note_cnt}")
+        print(f"Migrated {start}({len(c)}) of {note_cnt}")
 
 
 class Migration(migrations.Migration):
@@ -37,3 +38,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(migrate_notifications)
     ]
+
+
+575322473

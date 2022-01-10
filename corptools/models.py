@@ -803,10 +803,9 @@ class Notification(models.Model):
                          'alliance', 'faction', 'other')
     sender_type = models.CharField(max_length=15, choices=_type_enum)
     timestamp = models.DateTimeField()
-    notification_text = models.TextField()
     notification_type = models.CharField(max_length=50)
     is_read = models.BooleanField(null=True, default=None)
-    note_text = models.ForeignKey(
+    notification_text = models.ForeignKey(
         NotificationText, on_delete=models.CASCADE, blank=True, null=True, default=None)
 
     class Meta:
