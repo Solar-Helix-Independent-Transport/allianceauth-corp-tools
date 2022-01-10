@@ -433,7 +433,7 @@ def notifications(request, character_id=None):
     character_ids = characters.values_list('character_id', flat=True)
     notifications = Notification.objects\
         .filter(character__character__character_id__in=character_ids)\
-        .select_related('character__character')
+        .select_related('character__character', 'notification_text')
 
     context = {
         "main_char": main_char,

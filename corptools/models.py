@@ -789,6 +789,11 @@ class MiningTax(models.Model):
         return "#{3}: Mining Tax {0} for {1}: {2}".format(rate, self.corp, area, self.rank)
 
 
+class NotificationText(models.Model):
+    notification_id = models.BigIntegerField(primary_key=True)
+    notification_text = models.TextField(null=True, default=None)
+
+
 class Notification(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
 
@@ -797,10 +802,11 @@ class Notification(models.Model):
     _type_enum = Choices('character', 'corporation',
                          'alliance', 'faction', 'other')
     sender_type = models.CharField(max_length=15, choices=_type_enum)
-    notification_text = models.TextField(null=True, default=None)
     timestamp = models.DateTimeField()
     notification_type = models.CharField(max_length=50)
     is_read = models.BooleanField(null=True, default=None)
+    notification_text = models.ForeignKey(
+        NotificationText, on_delete=models.CASCADE, blank=True, null=True, default=None)
 
     class Meta:
         indexes = (

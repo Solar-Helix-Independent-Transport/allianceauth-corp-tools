@@ -2,7 +2,7 @@ import logging
 from bravado import exception
 from celery import shared_task
 from django.core.cache import cache
-from ..models import CharacterAudit, CorporationHistory, EveName, SkillQueue, \
+from ..models import CharacterAudit, CorporationHistory, EveName, NotificationText, SkillQueue, \
     Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, \
     SkillTotals, Implant, JumpClone, Clone, EveLocation, CharacterMarketOrder, \
     Notification, CharacterRoles, MailLabel, MailMessage, MailRecipient, \
@@ -663,6 +663,7 @@ def update_character_notifications(character_id):
             .values_list('notification_id', flat=True))
 
         _creates = []
+        _create_notifs = []
         for note in notifications:
             if not note.get('notification_id') in last_five_hundred:
                 _creates.append(Notification(character=audit_char,
@@ -671,14 +672,21 @@ def update_character_notifications(character_id):
                                              sender_id=note.get('sender_id'),
                                              sender_type=note.get(
                                                  'sender_type'),
-                                             notification_text=note.get(
-                                                 'text'),
+                                             notification_text_id=note.get(
+                                                 'notification_id'),
                                              timestamp=note.get('timestamp'),
                                              notification_type=note.get(
                                                  'type'),
                                              is_read=note.get('is_read')))
-
+                _create_notifs.append(NotificationText(
+                    notification_id=note.get('notification_id'),
+                    notification_text=note.get('text')
+                )
+                )
+        NotificationText.objects.bulk_create(
+            _create_notifs, ignore_conflicts=True, batch_size=500)
         Notification.objects.bulk_create(_creates, batch_size=500)
+
     except NotModifiedError:
         logger.info("CT: No New notifications for: {}".format(
             audit_char.character.character_name))

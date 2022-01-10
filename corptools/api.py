@@ -678,14 +678,14 @@ def get_character_notifications(request, character_id: int):
 
     notes = models.Notification.objects\
         .filter(character__character__in=characters)\
-        .select_related('character__character').order_by('-timestamp')[:1000]
+        .select_related('character__character', 'notification_text').order_by('-timestamp')[:1000]
 
     output = []
 
     for n in notes:
         output.append({
             "character": n.character.character,
-            "notification_text": n.notification_text,
+            "notification_text": n.notification_text.notification_text,
             "notification_type": n.notification_type,
             "timestamp": n.timestamp,
             "is_read": n.is_read,
