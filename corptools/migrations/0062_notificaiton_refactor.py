@@ -8,16 +8,13 @@ def migrate_notifications(apps, schema_editor):
     NotificationText = apps.get_model('corptools', 'NotificationText')
     print("Starting Migration:")
     note_ids = Notification.objects.all().values(
-        'notification_id').distinct().values('id')
+        'notification_id').distinct()
     note_cnt = note_ids.count()
     start = 0
     step = 1000
     while start <= note_cnt:
-        nids = list(Notification.objects.all().values('notification_id').distinct(
-        ).order_by('id').values_list('id', flat=True)[start:start+step])
-        n = Notification.objects.filter(id__in=nids).values('notification_id').distinct(
-        ).values('notification_id', 'notification_text', 'notification_type')
-        n.count()
+        n = Notification.objects.all().values('notification_id').distinct().order_by(
+            'notification_id').values('notification_id', 'notification_text')[start:start+step]
         obs = []
         for i in n:
             obs.append(NotificationText(notification_id=i['notification_id'],
