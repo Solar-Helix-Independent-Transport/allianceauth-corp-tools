@@ -16,7 +16,8 @@ def migrate_notifications(apps, schema_editor):
     start = 0
     step = 5000
     while start <= note_cnt:
-        n = Notification.objects.all().values('notification_id').distinct().order_by(
+        n = Notification.objects.all().values('notification_id').exclude(
+            notification_id__in=existing_notes).distinct().order_by(
             'notification_id').values('notification_id', 'notification_text')[start:start+step]
         obs = []
         for i in n:
