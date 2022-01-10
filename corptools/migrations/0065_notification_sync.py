@@ -7,7 +7,7 @@ from django.db.models import F
 
 def migrate_notifications(apps, schema_editor):
     Notification = apps.get_model('corptools', 'Notification')
-    Notification.objects.all().update(note_text=F("notification_id"))
+    Notification.objects.all().update(note_text_id=F("notification_id"))
 
 
 class Migration(migrations.Migration):
