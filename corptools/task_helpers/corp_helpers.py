@@ -143,8 +143,9 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
                 items.append(wallet_item)
             else:
                 # short cct
-                total_pages = 0
-                break
+                if not full_update:
+                    total_pages = 0
+                    break
 
         current_page += 1
 
