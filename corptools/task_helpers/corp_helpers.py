@@ -79,12 +79,13 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
         return "No Tokens"
 
     _current_journal = set(list(CorporationWalletJournalEntry.objects.filter(
-        division=division).order_by('-date').values_list('entry_id', flat=True)[:10000]))  # TODO add time filter
+        division=division).order_by('-date').values_list('entry_id', flat=True)[:20000]))
     _current_eve_ids = set(list(
         EveName.objects.all().values_list('eve_id', flat=True)))
 
     current_page = 1
     total_pages = 1
+    _new_names = []
     while current_page <= total_pages:
         journal_items = providers.esi.client.Wallet.get_corporations_corporation_id_wallets_division_journal(corporation_id=audit_corp.corporation.corporation_id,
                                                                                                              division=wallet_division,
@@ -95,7 +96,6 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
         total_pages = int(headers.headers['X-Pages'])
         logger.debug(
             f"CT: Corp {corp_id} Div {wallet_division}, Page:{current_page}/{total_pages} ({len(journal_items)})")
-        _new_names = []
         _min_time = timezone.now()
         items = []
         for item in journal_items:
