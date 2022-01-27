@@ -49,6 +49,15 @@ Active Devs:
  6. add characters and corp tokens as required.
  7. Setup update tasks if you wish for the data to be auto updated. See Usage Below.
 
+ ## Set Corp Tools Name
+Add the below lines to your `local.py` settings file, Changing the contexts to yours.
+
+You can optionally se the name of the app in the ui by setting this setting
+ ```python
+## name for Corp Tools
+CORPTOOLS_APP_NAME = "Character Audit"
+ ```
+
 ## Permissions
 There are some basic access perms
 
