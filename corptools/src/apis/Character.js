@@ -1,6 +1,7 @@
 import axios from "axios";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 import cookies from "js-cookies";
+
 export async function loadStatus(character_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/status`);
   console.log(`get status in api ${character_id}`);

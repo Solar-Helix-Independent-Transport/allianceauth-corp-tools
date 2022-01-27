@@ -482,8 +482,8 @@ def update_all_locations(self):
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_corp_wallet(self, corp_id):
-    return corp_helpers.update_corp_wallet_division(corp_id)
+def update_corp_wallet(self, corp_id, full_update=False):
+    return corp_helpers.update_corp_wallet_division(corp_id, full_update=full_update)
 
 
 @shared_task(bind=True, base=QueueOnce)
