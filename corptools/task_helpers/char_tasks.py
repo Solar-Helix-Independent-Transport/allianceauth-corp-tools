@@ -536,8 +536,6 @@ def update_character_orders(character_id):
         if len(creates) > 0:
             CharacterMarketOrder.objects.bulk_create(creates)
 
-        CharacterMarketOrder.objects.filter(
-            character=audit_char, state='active').exclude(order_id__in=tracked_ids).delete()
     except NotModifiedError:
         logger.info("CT: No New orders data for: {}".format(
             audit_char.character.character_name))
@@ -570,7 +568,7 @@ def update_character_order_history(character_id):
         order_history = etag_results(order_history_op, token)
 
         closed_ids = list(CharacterMarketOrder.objects.filter(
-            character=audit_char).exclude(state='active').values_list("order_id", flat=True))
+            character=audit_char).values_list("order_id", flat=True))
         all_locations = list(EveLocation.objects.all(
         ).values_list('location_id', flat=True))
 
@@ -625,10 +623,10 @@ def update_character_order_history(character_id):
                                                                       'order_range',
                                                                       'volume_remain',
                                                                       'volume_total',
-                                                                      'state'])
+                                                                      'state'], batch_size=1000)
 
         if len(creates) > 0:
-            CharacterMarketOrder.objects.bulk_create(creates)
+            CharacterMarketOrder.objects.bulk_create(creates, batch_size=1000)
     except NotModifiedError:
         logger.info("CT: No New old orders data for: {}".format(
             audit_char.character.character_name))
