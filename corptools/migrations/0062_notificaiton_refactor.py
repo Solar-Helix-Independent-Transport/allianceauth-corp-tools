@@ -29,6 +29,13 @@ def migrate_notifications(apps, schema_editor):
             start += step
             print(f"Migrated {start}({len(c)}) of {note_cnt}")
 
+    newids = NotificationText.objects.all().values('notification_id')
+    cnt = Notification.objects.all().exclude(notification_id__in=newids).count()
+
+    if cnt > 0:
+        raise AssertionError(
+            f"Notifications have not been migrated fully, {cnt} missing notifications, please retry migrates. If Problem persists please contact the developers")
+
 
 class Migration(migrations.Migration):
 
