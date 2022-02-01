@@ -7,3 +7,4 @@ coverage
 
 # ingnore assembled files
 corptools/static/*
+frontend/build/*
