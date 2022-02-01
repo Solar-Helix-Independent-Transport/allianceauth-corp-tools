@@ -37,7 +37,7 @@ def migrate_notifications(apps, schema_editor):
 
     if cnt > 0:
         print(
-            f"Notifications have not been migrated fully, {cnt} missing notifications, please run `manage.py migrate --fake corptools 0061_notificationtext` then retry migrations. If Problem persists please contact the developers")
+            f"Notifications have not been migrated fully, {cnt} missing notifications, please retry migrations. If Problem persists please contact the developers")
 
 
 class Migration(migrations.Migration):
