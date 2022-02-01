@@ -1,0 +1,125 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.flex {
+  display: flex;
+  height: 80px;
+  align-items: center;
+}
+
+.child {
+  margin-right: 20px;
+}
+
+.child-end {
+  margin-left: auto;
+}
+.fill-width {
+  overflow: auto;
+}
+.float-left {
+  float: left; /* [1] */
+}
+.flex-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.flex-container-pull-right {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  align-content: center;
+  flex-direction: row;
+}
+
+.flex-container-vert-fill {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  align-content: stretch;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.flex-child {
+  /*width: 33%;*/
+  margin: 10px;
+}
+
+.spinner-size {
+  height: 30px;
+  width: 30px;
+  margin: 200px;
+}
+
+.char-portrait {
+  /*width: 512px;
+    height: 512px;*/
+  position: relative;
+  margin: auto;
+}
+
+.corp-logo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 5px;
+}
+
+.alli-logo {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: 5px;
+}
+
+.flex-body {
+  align-items: center;
+}
+
+.table-div {
+  height: 250px;
+  width: 400px;
+  overflow-y: overlay;
+}
+
+.table-div::-webkit-scrollbar {
+  width: 3; /* Remove scrollbar space */
+  background: transparent; /* Optional: just make scrollbar invisible */
+}
+
+/* Optional: show position indicator in red */
+.table-div::-webkit-scrollbar-thumb {
+  background-color: #375a7f4b;
+  border-left: 15px solid transparent;
+  background-clip: padding-box;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.info-hide {
+}
+
+@media only screen and (max-width: 1600px) {
+  .info-hide {
+    display: none;
+  }
+}
+
+.association-hide {
+}
+
+@media only screen and (max-width: 1400px) {
+  .association-hide {
+    display: none;
+  }
+}

@@ -69,6 +69,8 @@ def get_alts_queryset(main_char):
     tags=["Account"]
 )
 def get_character_status(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:
@@ -121,6 +123,9 @@ def get_character_status(request, character_id: int):
     tags=["Account"]
 )
 def get_character_pubdata(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+
     response, main = get_main_character(request, character_id)
 
     if not response:
@@ -263,6 +268,8 @@ def get_character_menu(request):
     tags=["Account"]
 )
 def get_character_asset_locations(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:
@@ -308,6 +315,8 @@ def get_character_asset_list(request, character_id: int, location_id: int):
     tags=["Account"]
 )
 def get_character_asset_groups(request, character_id: int, location_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:
@@ -389,6 +398,8 @@ def get_character_asset_groups(request, character_id: int, location_id: int):
     tags=["Account"]
 )
 def get_character_clones(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:
@@ -448,6 +459,8 @@ def get_character_clones(request, character_id: int):
     tags=["Account"]
 )
 def get_character_roles(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:
@@ -484,6 +497,8 @@ def get_character_roles(request, character_id: int):
     tags=["Account"]
 )
 def get_character_wallet(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:
@@ -527,6 +542,8 @@ def get_character_wallet(request, character_id: int):
     tags=["Account"]
 )
 def get_character_orders(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:
@@ -571,6 +588,8 @@ def get_character_orders(request, character_id: int):
     tags=["Account"]
 )
 def get_character_contacts(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:
@@ -669,6 +688,8 @@ def get_character_standings(request, character_id: int):
     tags=["Account"]
 )
 def get_character_notifications(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:
@@ -700,6 +721,8 @@ def get_character_notifications(request, character_id: int):
     tags=["Account"]
 )
 def get_character_skills(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:
@@ -747,6 +770,8 @@ def get_character_skills(request, character_id: int):
     tags=["Account"]
 )
 def get_character_skillqueues(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:
@@ -786,6 +811,8 @@ def get_character_skillqueues(request, character_id: int):
     tags=["Characters"]
 )
 def post_characters_refresh(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     audits_visible = models.CharacterAudit.objects.visible_to(
         request.user).values_list('character_id', flat=True)
     if character_id in audits_visible:

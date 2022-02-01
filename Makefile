@@ -27,5 +27,8 @@ deploy:
 	echo "password=${pypi-api-token}" >> ~/.pypirc
 	cut -c-20 ~/.pypirc
 
-package:
+packagejs:
+	cd frontend;yarn install;yarn build
+
+packagepy:
 	python setup.py sdist
