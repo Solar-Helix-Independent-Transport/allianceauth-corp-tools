@@ -38,7 +38,7 @@ def migrate_notifications(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
+    atomic = False
     dependencies = [
         ('corptools', '0061_notificationtext'),
     ]
