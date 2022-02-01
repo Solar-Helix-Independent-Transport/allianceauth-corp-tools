@@ -13,7 +13,7 @@ def migrate_notifications(apps, schema_editor):
 
     if cnt > 0:
         raise AssertionError(
-            "Notifications have not been migrated fully, Please run 'manage.py manual_notification_migration' before migrating again. If Problem persists please contact the developers")
+            f"Notifications have not been migrated fully, {cnt} missing notifications, please run `manage.py migrate --fake corptools 0061_notificationtext`  then retry migrations. If Problem persists please contact the developers")
 
 
 class Migration(migrations.Migration):
