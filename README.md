@@ -20,7 +20,11 @@ Included `Bits and Bobs`:
   - Clones
     - With Implants
 - Corp Audit
+
   - Wallets
+  - Structures and fits
+  - Assets
+
 - JB Route tool, push to AutoPilot, (API no front end)
 
 Planned `Bits and Bobs`:
@@ -28,17 +32,6 @@ Planned `Bits and Bobs`:
 - Member Audit:
   - Industry Jobs
   - Contracts
-  - Fleet Tools
-    - Snapshots
-    - Fatigue bot integration
-- Corp Audit
-  - Structures and fits
-  - Assets
-- Smart Groups
-  - eg:
-    - Director Groups require director role in game
-    - Super group requires hull and fit as well as skill set
-- JB Route tool, push to AutoPilot
 
 Active Devs:
 
@@ -48,7 +41,7 @@ Active Devs:
 
 1.  Install the Repo from git `pip install -U git+https://github.com/pvyParts/allianceauth-corp-tools.git`
 2.  Add `'corptools',` to your `INSTALLED_APPS` in your projects `local.py`
-3.  run migrations and restart auth
+3.  run migrations, collectstatic and restart auth
 4.  setup your perms as documented below
 5.  add characters and corp tokens as required.
 6.  Setup update tasks if you wish for the data to be auto updated. See Usage Below.
