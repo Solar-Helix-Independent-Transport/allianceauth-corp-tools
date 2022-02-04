@@ -10,7 +10,7 @@ class MemberAudit(MenuItemHook):
     def __init__(self):
 
         MenuItemHook.__init__(self,
-                              _('Audit'),
+                              app_settings.CORPTOOLS_APP_NAME,
                               'far fa-eye fa-fw',
                               'corptools:view',
                               navactive=['corptools:'])

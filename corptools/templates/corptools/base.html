@@ -1,7 +1,7 @@
 {% extends 'allianceauth/base.html' %}
 {% load i18n %}
-{% block page_title %}
-{% trans "Audit Admin!" %}{% endblock %}
+{% load helpers %}
+{% block page_title %}{% app_name %}{% endblock %}
 {% block extra_css %}
 {% include 'bundles/datatables-css.html' %}
 

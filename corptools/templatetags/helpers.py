@@ -26,6 +26,11 @@ def app_setting():
     return app_sett
 
 
+@register.simple_tag()
+def app_name():
+    return app_sett.CORPTOOLS_APP_NAME
+
+
 @register.filter(name='level')
 def skill_level(active, trained):
     alt_text = "Level %d" % active
