@@ -3,13 +3,16 @@
 help:
 	@echo "This project assumes that an active Python virtualenv is present."
 	@echo "The following make targets are available:"
-	@echo "	 dev 	 install all deps for dev environment
-	@echo "  clean   remove all old packages
-	@echo "  package create pypi package zip
+	@echo "  dev        install all deps for dev environment"
+	@echo "  clean      remove all old packages"
+	@echo "  test       run tests"
+	@echo "  deploy     Configure the PyPi config file in CI"
+	@echo "  packagejs  Build the React Project"
+	@echo "  packagepy  Build the PyPi package"
 
 clean:
 	rm -rf dist/*
-	rm -rf
+	rm -rf frontend/build/*
 
 dev:
 	pip install --upgrade pip
