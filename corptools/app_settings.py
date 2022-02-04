@@ -1,10 +1,11 @@
 from django.conf import settings
-import re
+
+CORPTOOLS_APP_NAME = getattr(settings, "CORPTOOLS_APP_NAME", "Audit")
 
 CORPTOOLS_APP_NAME = getattr(settings, "CORPTOOLS_APP_NAME", "Audit")  
 
 CORPTOOLS_DISCORD_BOT_COGS = getattr(
-    settings, 'CORPTOOLS_DISCORD_BOT_COGS', ["corptools.cogs.routes"])
+    settings, 'CORPTOOLS_DISCORD_BOT_COGS', ["corptools.cogs.routes", "corptools.cogs.locate"])
 
 CT_CHAR_ASSETS_MODULE = getattr(settings, 'CT_CHAR_ASSETS_MODULE', True)
 CT_CHAR_STANDINGS_MODULE = getattr(settings, 'CT_CHAR_STANDINGS_MODULE', True)
@@ -174,3 +175,63 @@ def get_character_scopes():
         ]
 
     return list(set(_scopes))
+
+
+def get_character_update_attributes():
+    _attribs = [
+        # Base
+        ("Public Data", 'last_update_pub_data'),
+    ]
+
+    if CT_CHAR_CONTACTS_MODULE:
+        _attribs += [
+            # Contacts
+            ("Contacts", 'last_update_contacts'),
+        ]
+
+    if CT_CHAR_NOTIFICATIONS_MODULE:
+        _attribs += [
+            # Notifications
+            ("Notifications", 'last_update_notif'),
+        ]
+
+    if CT_CHAR_ROLES_MODULE:
+        _attribs += [
+            # Roles
+            ("Roles", 'last_update_roles'),
+            ("Titles", 'last_update_titles'),
+        ]
+
+    if CT_CHAR_WALLET_MODULE:
+        _attribs += [
+            # Wallet / Market /  Contracts
+            ("Wallet", 'last_update_wallet'),
+            ("Orders", 'last_update_orders'),
+        ]
+
+    if CT_CHAR_ASSETS_MODULE:
+        _attribs += [
+            # Assets
+            ("Assets", 'last_update_assets'),
+        ]
+
+    if CT_CHAR_SKILLS_MODULE:
+        _attribs += [
+            # Skills
+            ("Skills", 'last_update_skills'),
+            ("Skill Queue", 'last_update_skill_que')
+        ]
+
+    if CT_CHAR_CLONES_MODULE:
+        _attribs += [
+            # Clones
+            ("Clones", 'last_update_clones'),
+        ]
+
+    if CT_CHAR_MAIL_MODULE:
+        _attribs += [
+            # Mail
+            ("Mail", 'last_update_mails'),
+        ]
+
+    return _attribs

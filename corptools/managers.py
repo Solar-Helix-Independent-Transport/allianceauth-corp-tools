@@ -32,6 +32,8 @@ class EveNameManager(models.Manager):
                     ids=chunk
                 ).results()
                 new_names = []
+                logger.debug(
+                    f"CT MAMANGER EveName: count in {len(chunk)} count out {len(response)}")
                 for entity in response:
                     new_names.append(EveName(
                         eve_id=entity['id'],

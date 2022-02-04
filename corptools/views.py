@@ -266,3 +266,16 @@ def update_account(request, character_id):
     check_account.apply_async(args=[character_id], priority=6)
     messages.success(request, "Requested an update task.")
     return redirect('corptools:view')
+
+
+@login_required
+def react_menu(request):
+    # get available models
+    return redirect('corptools:reactmain', request.user.profile.main_character.character_id)
+
+
+@login_required
+def react_main(request, character_id):
+    # get available models
+
+    return render(request, 'corptools/character/react_base.html')

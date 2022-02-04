@@ -1,10 +1,15 @@
 from celery import app
-from django.conf.urls import url, include
+
+from django.conf.urls import url
+from django.urls import path, include
 
 from . import views
 from corptools.audit_views.character import assets, wallet, pub_data, contacts, skills, clones, assets_lists, roles, market, status, notifications
 from corptools.audit_views.corporation import corp_list
 from . import app_settings
+
+from .api import api
+
 app_name = 'corptools'
 
 _character_ulrs = [
@@ -52,6 +57,9 @@ if app_settings.CT_CHAR_CONTACTS_MODULE:
 
 urlpatterns = [
     url(r'^$', views.corptools_menu, name='view'),
+    url(r'^api/', api.urls),
+    url(r'^r/$', views.react_menu, name='react'),
+    url(r'^r/(?P<character_id>(\d)*)/', views.react_main, name='reactmain'),
     url(r'^check_account/(?P<character_id>(\d)*)/$',
         views.update_account, name='update_account'),
     url(r'^admin/$', views.admin, name='admin'),

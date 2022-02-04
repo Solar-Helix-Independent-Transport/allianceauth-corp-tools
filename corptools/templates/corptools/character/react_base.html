@@ -1,0 +1,66 @@
+{% extends 'allianceauth/base.html' %}
+{% load i18n %}
+{% block page_title %}{% trans "Moons!" %}{% endblock %}
+{% block extra_javascript %}
+<script type="text/javascript">
+    var BASE_URL = '/static/corptools/';
+
+    function loadCss (cssFiles) {
+        cssFiles.forEach(function (css) {
+            $('<link>')
+                .appendTo('body')
+                .attr({
+                    type: 'text/css',
+                    rel: 'stylesheet',
+                    href: css,
+                });
+        });
+    }
+
+    function loadNextScript (scripts) {
+        if (!scripts.length) { return; }
+
+        var script = scripts.shift();
+        $.ajax(script, {
+            dataType: 'script',
+            success: function () { loadNextScript(scripts) },
+        })
+    }
+
+    $.ajax(BASE_URL + 'asset-manifest.json', {
+        dataType: "json",
+        success : function (data, textStatus, jqXHR) {
+
+            if (data && data.entrypoints && data.entrypoints.length > 0) {
+                var scripts =
+                    data.entrypoints
+                        .filter(function (resource) {
+                            return resource.match(/.+\.js$/)
+                        })
+                        .map(function (script) {
+                            return BASE_URL + script;
+                        });
+                var cssFiles =
+                    data.entrypoints
+                        .filter(function (ressource) {
+                            return ressource.match(/.+\.css$/)
+                        })
+                        .map(function (file) {
+                            return BASE_URL + file;
+                        });
+
+                loadCss(cssFiles);
+                loadNextScript(scripts);
+            }
+        },
+        error: function () {
+            console.log('unable to load react app, manifest file not accessible or corrupted');
+        }
+    })
+
+</script>
+{% endblock extra_javascript %}
+
+{% block content %}
+<div id="root"></div>
+{% endblock content %}

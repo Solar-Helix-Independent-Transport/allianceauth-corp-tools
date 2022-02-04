@@ -1,7 +1,7 @@
 {% extends 'allianceauth/base.html' %}
 {% load i18n %}
-{% load humanize  %}
-
+{% load humanize %}
+{% load helpers %}
 {% block page_title %}{% app_name %}{% endblock %}
 {% block extra_css %}
 {% include 'bundles/datatables-css.html' %}
@@ -224,10 +224,11 @@ tr.group:hover {
                                         <a href="{% url 'corptools:corp_menu' %}">Corporations</a>
                                     <li>
                                 {% endif %}
-
+                                <li class>
+                                    <a href="{% url 'corptools:reactmain' main_char.character_id%}">UI Beta</a>
+                                </li>
                             </ul>
                         </div>
-
                     </div>
                 </nav>
 

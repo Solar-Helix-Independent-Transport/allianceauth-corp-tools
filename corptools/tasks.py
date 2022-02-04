@@ -22,7 +22,7 @@ from .task_helpers.char_tasks import update_corp_history, update_character_asset
     update_character_roles, update_character_mail, process_mail_list, update_character_contacts, \
     update_character_titles
 
-from .task_helpers.corp_helpers import update_corp_wallet_division
+from .task_helpers import corp_helpers
 from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone, CharacterMarketOrder
 from . import providers
 from . import app_settings
@@ -127,14 +127,14 @@ def update_character(char_id):
     que.append(update_char_titles.si(character.character.character_id))
     que.append(update_char_corp_history.si(character.character.character_id))
     que.append(update_char_notifications.si(character.character.character_id))
-    que.append(update_char_contacts.si(character.character.character_id))
+    que.append(update_char_assets.si(character.character.character_id))
     que.append(update_char_skill_list.si(character.character.character_id))
     que.append(update_char_skill_queue.si(character.character.character_id))
     que.append(update_clones.si(character.character.character_id))
     que.append(update_char_wallet.si(character.character.character_id))
     que.append(update_char_orders.si(character.character.character_id))
+    que.append(update_char_contacts.si(character.character.character_id))
     que.append(update_char_order_history.si(character.character.character_id))
-    que.append(update_char_assets.si(character.character.character_id))
     if app_settings.CT_CHAR_MAIL_MODULE:
         que.append(update_char_mail.si(character.character.character_id))
     chain(que).apply_async(priority=6)
@@ -273,6 +273,16 @@ def process_char_mail(self, character_id, ids):
 def update_char_order_history(self, character_id):
     try:
         return update_character_order_history(character_id)
+    except Exception as e:
+        logger.exception(e)
+        return "Failed"
+
+
+@shared_task
+def update_clones(char_id):
+    try:
+        update_character_clones(char_id)
+        update_all_locations.apply_async(priority=7)
     except Exception as e:
         logger.exception(e)
         return "Failed"
@@ -472,8 +482,18 @@ def update_all_locations(self):
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_corp_wallet(self, corp_id):
-    update_corp_wallet_division(corp_id)
+def update_corp_wallet(self, corp_id, full_update=False):
+    return corp_helpers.update_corp_wallet_division(corp_id, full_update=full_update)
+
+
+@shared_task(bind=True, base=QueueOnce)
+def update_corp_structures(self, corp_id):
+    return corp_helpers.update_corp_structures(corp_id)
+
+
+@shared_task(bind=True, base=QueueOnce)
+def update_corp_assets(self, corp_id):
+    return corp_helpers.update_corp_assets(corp_id)
 
 
 @shared_task
@@ -483,6 +503,8 @@ def update_corp(corp_id):
         corp.corporation.corporation_name))
     que = []
     que.append(update_corp_wallet.si(corp_id))
+    que.append(update_corp_structures.si(corp_id))
+    que.append(update_corp_assets.si(corp_id))
     chain(que).apply_async(priority=6)
 
 
@@ -491,9 +513,3 @@ def update_all_corps():
     corps = CorporationAudit.objects.all().select_related('corporation')
     for corp in corps:
         update_corp.apply_async(args=[corp.corporation.corporation_id])
-
-
-@shared_task
-def update_clones(char_id):
-    update_character_clones(char_id)
-    update_all_locations.apply_async(priority=7)
