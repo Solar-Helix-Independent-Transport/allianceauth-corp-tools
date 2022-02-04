@@ -1,8 +1,8 @@
 {% extends 'allianceauth/base.html' %}
 {% load i18n %}
 {% load humanize  %}
-
-{% block page_title %}{% app_name %} - Corporation{% endblock %}
+{% app_setting as appset %}
+{% block page_title %}{{ appset.app_name }} - Corporation{% endblock %}
 {% block extra_css %}
 {% include 'bundles/datatables-css.html' %}
 
