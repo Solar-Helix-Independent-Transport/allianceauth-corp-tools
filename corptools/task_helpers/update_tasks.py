@@ -379,12 +379,16 @@ def set_error_count_flag():
     return cache.set("esi_errors_timeout", 1, 60)
 
 
-def fetch_location_name(location_id, location_flag, character_id):
+def fetch_location_name(location_id, location_flag, character_id, update=False):
     """Takes a location_id and character_id and returns a location model for items in a station/structure or in space"""
 
     existing = EveLocation.objects.filter(location_id=location_id)
-    if existing.exists():
+    current_loc = existing.exists()
+
+    if current_loc and location_id < 64000000:
         return existing.first()
+    else:
+        existing = existing.first()
 
     req_scopes = ['esi-universe.read_structures.v1']
 
@@ -444,6 +448,10 @@ def fetch_location_name(location_id, location_flag, character_id):
             logger.error("Unknown System, Have you populated the map?")
             # TODO Do i fire the map population task here?
             return None
-        return EveLocation(location_id=location_id,
-                           location_name=structure.get('name'),
-                           system_id=structure.get('solar_system_id'))
+        if current_loc:
+            existing.location_name = structure.get('name')
+            return existing
+        else:
+            return EveLocation(location_id=location_id,
+                               location_name=structure.get('name'),
+                               system_id=structure.get('solar_system_id'))
