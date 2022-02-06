@@ -345,24 +345,38 @@ def location_set(location_id, character_id):
 
 
 @shared_task(bind=True, base=QueueOnce, max_retries=None)
-def update_location(self, location_id):
+def update_citadel_names(self):
+    citadels = EveLocation.objects.filter(location_id__gte=64000000)
+    for c in citadels:
+        update_location.apply_async(
+            args=[c.location_id],
+            kwargs={"force_citadel": True},
+            priority=7
+        )
+
+
+@shared_task(bind=True, base=QueueOnce, max_retries=None)
+def update_location(self, location_id, force_citadel=False):
     if get_error_count_flag():
         self.retry(countdown=60)
 
     if get_location_cooloff(location_id):
-        return "Cooloff on ID: {}".format(location_id)
+        if force_citadel and location_id > 64000000:
+            pass
+        else:
+            return "Cooloff on ID: {}".format(location_id)
 
     cached_data = location_get(location_id)
 
     date = timezone.now() - datetime.timedelta(days=7)
     asset = CharacterAsset.objects.filter(
-        location_id=location_id, location_name__isnull=True).select_related('character__character')
+        location_id=location_id).select_related('character__character')
     clone = Clone.objects.filter(
-        location_id=location_id, location_name__isnull=True).select_related('character__character')
+        location_id=location_id).select_related('character__character')
     jumpclone = JumpClone.objects.filter(
-        location_id=location_id, location_name__isnull=True).select_related('character__character')
+        location_id=location_id).select_related('character__character')
     marketorder = CharacterMarketOrder.objects.filter(
-        location_id=location_id, location_name__isnull=True).select_related('character__character')
+        location_id=location_id).select_related('character__character')
 
     if cached_data.get('date') is not False:
         if cached_data.get('date') > date:
@@ -390,9 +404,9 @@ def update_location(self, location_id):
             'character__character__character_id', flat=True))
 
     char_ids = set(char_ids)
-    print(char_ids)
+
     if location_id < 64000000:
-        location = fetch_location_name(location_id, None, 0)
+        location = fetch_location_name(location_id, None, 0, update=True)
         if location is not None:
             location.save()
             count = CharacterAsset.objects.filter(
@@ -435,7 +449,7 @@ def update_location(self, location_id):
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_all_locations(self):
+def update_all_locations(self, force_citadels=False):
     location_flags = ['Deliveries',
                       'Hangar',
                       'HangarAll']
