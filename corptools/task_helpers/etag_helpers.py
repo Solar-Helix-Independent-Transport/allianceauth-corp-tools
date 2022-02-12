@@ -21,19 +21,21 @@ def get_etag_header(operation):
     return cache.get(get_etag_key(operation), False)
 
 
-def rem_etag_header(operation):
+def del_etag_header(operation):
     return cache.delete(get_etag_key(operation), False)
 
 
 def inject_etag_header(operation):
     etag = get_etag_header(operation)
-    logger.debug(f"ETag: get_etag {operation}, {etag}")
+    logger.debug(
+        f"ETag: get_etag {operation.operation.operation_id} - {stringify_params(operation)} - etag:{etag}")
     if etag:
         operation.future.request.headers["If-None-Match"] = etag
 
 
 def rem_etag_header(operation):
-    logger.debug(f"ETag: rem_etag {operation}")
+    logger.debug(
+        f"ETag: rem_etag {operation.operation.operation_id} - {stringify_params(operation)}")
     if "If-None-Match" in operation.future.request.headers:
         del operation.future.request.headers["If-None-Match"]
 
@@ -43,7 +45,15 @@ def set_etag_header(operation, headers):
     etag = headers.headers.get('ETag', None)
     if etag is not None:
         result = cache.set(etag_key, etag, MAX_ETAG_LIFE)
-        logger.debug(f"ETag: set_etag {operation}, {etag}, {result}")
+        logger.debug(
+            f"ETag: set_etag {operation.operation.operation_id} - {stringify_params(operation)} - etag:{etag} - stored:{result}")
+
+
+def stringify_params(operation):
+    out = []
+    for p, v in operation.future.request.params.items():
+        out.append(f"{p}: {v}")
+    return ", ".join(out)
 
 
 def etag_results(operation, token, force_refresh=False):
@@ -54,6 +64,8 @@ def etag_results(operation, token, force_refresh=False):
         operation.future.request.headers["Authorization"] = "Bearer " + \
             token.valid_access_token()
     if "page" in operation.operation.params:
+        logger.debug(
+            f"ETag: Pages Start {operation.operation.operation_id} - {stringify_params(operation)}")
         current_page = 1
         total_pages = 1
         etags_incomplete = False
@@ -63,8 +75,12 @@ def etag_results(operation, token, force_refresh=False):
             # will use cache if applicable
             try:
                 if not etags_incomplete and not force_refresh:
+                    logger.debug(
+                        f"ETag: Injecting Header {operation.operation.operation_id} - {stringify_params(operation)}")
                     inject_etag_header(operation)
                 else:
+                    logger.debug(
+                        f"ETag: Removing Header {operation.operation.operation_id} F:{force_refresh} Ei:{etags_incomplete} - {stringify_params(operation)}")
                     rem_etag_header(operation)
                 result, headers = operation.result()
                 total_pages = int(headers.headers['X-Pages'])
@@ -72,17 +88,22 @@ def etag_results(operation, token, force_refresh=False):
                     # if django esi is returning our cache check it manualy.
                     raise NotModifiedError()
                 if force_refresh:
-                    rem_etag_header(operation)
+                    logger.debug(
+                        f"ETag: Removing Etag {operation.operation.operation_id} F:{force_refresh} - {stringify_params(operation)}")
+                    del_etag_header(operation)
                 else:
+                    logger.debug(
+                        f"ETag: Saving Etag {operation.operation.operation_id} F:{force_refresh} - {stringify_params(operation)}")
                     set_etag_header(operation, headers)
                 # append to results list to be seamless to the client
                 results += result
                 current_page += 1
                 etags_incomplete = True
                 logger.debug(
-                    f"ETag: results_loop bad invalid ETag {operation}")
+                    f"ETag: No Etag {operation.operation.operation_id} - {stringify_params(operation)}")
             except (HTTPNotModified) as e:
-                logger.debug(f"ETag: HTTPNotModified Hit ETag {operation}")
+                logger.debug(
+                    f"ETag: HTTPNotModified Hit ETag {operation.operation.operation_id} Ei:{etags_incomplete} - {stringify_params(operation)}")
                 total_pages = int(e.response.headers['X-Pages'])
 
                 if not etags_incomplete:
@@ -92,7 +113,8 @@ def etag_results(operation, token, force_refresh=False):
                     results = list()
 
             except (NotModifiedError) as e:  # etag is wrong data has changed
-                logger.debug(f"ETag: NotModifiedError Hit ETag {operation}")
+                logger.debug(
+                    f"ETag: NotModifiedError Hit ETag {operation.operation.operation_id} - {stringify_params(operation)}")
                 total_pages = int(headers.headers['X-Pages'])
 
                 if not etags_incomplete:
@@ -109,7 +131,8 @@ def etag_results(operation, token, force_refresh=False):
         try:
             results, headers = operation.result()
         except HTTPNotModified:
-            logger.debug(f"ETag: result Cache Hit ETag {operation}")
+            logger.debug(
+                f"ETag: result Cache Hit ETag {operation.operation.operation_id} - {stringify_params(operation)}")
             raise NotModifiedError()
         set_etag_header(operation, headers)
     return results
