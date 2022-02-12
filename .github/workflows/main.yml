@@ -42,7 +42,5 @@ jobs:
           name: Python${{ matrix.python-version }} Test Coverage
           # A file, directory or wildcard pattern that describes what to upload
           path: htmlcov/
-      - name: Build Node
-        run: make packagejs
-      - name: Build Python
-        run: make packagepy
+      - name: Build Projects
+        run: make package
