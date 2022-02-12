@@ -1,8 +1,10 @@
 from bravado.exception import HTTPNotModified
 from django.core.cache import cache
+import random
+
 import logging
 
-MAX_ETAG_LIFE = 60*60*24*7  # 7 Days
+MAX_ETAG_LIFE = 60*60*24*7  # 4 Days
 
 logger = logging.getLogger(__name__)
 
@@ -19,11 +21,21 @@ def get_etag_header(operation):
     return cache.get(get_etag_key(operation), False)
 
 
+def rem_etag_header(operation):
+    return cache.delete(get_etag_key(operation), False)
+
+
 def inject_etag_header(operation):
     etag = get_etag_header(operation)
     logger.debug(f"ETag: get_etag {operation}, {etag}")
     if etag:
         operation.future.request.headers["If-None-Match"] = etag
+
+
+def rem_etag_header(operation):
+    logger.debug(f"ETag: rem_etag {operation}")
+    if "If-None-Match" in operation.future.request.headers:
+        del operation.future.request.headers["If-None-Match"]
 
 
 def set_etag_header(operation, headers):
@@ -34,7 +46,7 @@ def set_etag_header(operation, headers):
         logger.debug(f"ETag: set_etag {operation}, {etag}, {result}")
 
 
-def etag_results(operation, token):
+def etag_results(operation, token, force_refresh=False):
     results = list()
     # override to always get the raw response for expiry header
     operation.request_config.also_return_response = True
@@ -49,44 +61,55 @@ def etag_results(operation, token):
         while current_page <= total_pages:
             operation.future.request.params["page"] = current_page
             # will use cache if applicable
-
             try:
-                if not etags_incomplete:
+                if not etags_incomplete and not force_refresh:
                     inject_etag_header(operation)
-
+                else:
+                    rem_etag_header(operation)
                 result, headers = operation.result()
-
-                if get_etag_header(operation) == headers.headers.get('ETag'):
+                total_pages = int(headers.headers['X-Pages'])
+                if get_etag_header(operation) == headers.headers.get('ETag') and not force_refresh:
                     # if django esi is returning our cache check it manualy.
                     raise NotModifiedError()
-
-                set_etag_header(operation, headers)
-
-                total_pages = int(headers.headers['X-Pages'])
+                if force_refresh:
+                    rem_etag_header(operation)
+                else:
+                    set_etag_header(operation, headers)
                 # append to results list to be seamless to the client
                 results += result
                 current_page += 1
                 etags_incomplete = True
                 logger.debug(
                     f"ETag: results_loop bad invalid ETag {operation}")
+            except (HTTPNotModified) as e:
+                logger.debug(f"ETag: HTTPNotModified Hit ETag {operation}")
+                total_pages = int(e.response.headers['X-Pages'])
 
-            except (HTTPNotModified, NotModifiedError):  # etag is wrong data has changed
-                logger.debug(f"ETag: results_loop Hit ETag {operation}")
                 if not etags_incomplete:
-                    current_page += 1  # reset to page 1 and fetch everyhting
+                    current_page += 1
                 else:
-                    break
-                continue
+                    current_page = 1  # reset to page 1 and fetch everyhting
+                    results = list()
+
+            except (NotModifiedError) as e:  # etag is wrong data has changed
+                logger.debug(f"ETag: NotModifiedError Hit ETag {operation}")
+                total_pages = int(headers.headers['X-Pages'])
+
+                if not etags_incomplete:
+                    current_page += 1
+                else:
+                    current_page = 1  # reset to page 1 and fetch everyhting
+                    results = list()
+
         if not etags_incomplete:
             raise NotModifiedError()
-
     else:  # it doesn't so just return
-        inject_etag_header(operation)
+        if not force_refresh:
+            inject_etag_header(operation)
         try:
             results, headers = operation.result()
         except HTTPNotModified:
             logger.debug(f"ETag: result Cache Hit ETag {operation}")
             raise NotModifiedError()
         set_etag_header(operation, headers)
-
     return results

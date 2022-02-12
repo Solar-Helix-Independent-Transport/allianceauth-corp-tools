@@ -6,20 +6,15 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db.models.aggregates import Sum
 from ..models import BridgeOzoneLevel, CorpAsset, CorporationWalletJournalEntry, CorporationAudit, CorporationWalletDivision, EveItemType, EveLocation, EveName, Structure, StructureCelestial, StructureService
 
-from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
+from allianceauth.eveonline.models import EveCharacter
 
 from esi.models import Token
 from django.utils import timezone
-from django.db.models import Q
 from allianceauth.services.tasks import QueueOnce
-from bravado.exception import HTTPForbidden
 
 from .. import providers
 
-import bz2
-import re
 import requests
-import datetime
 
 logger = logging.getLogger(__name__)
 

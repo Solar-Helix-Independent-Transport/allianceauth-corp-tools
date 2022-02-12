@@ -1,4 +1,5 @@
-from datetime import date, datetime
+from datetime import datetime
+from corptools.audit_views import corporation
 from ninja import Schema
 
 from typing import Optional, List, Dict
@@ -187,3 +188,33 @@ class Contact(Schema):
     contact: EveName
     standing: float
     labels: List[ValueLabel] = None
+
+
+class StructureService(Schema):
+    name: str
+    state: str
+
+
+class Structure(Schema):
+    id: int
+    owner: Corporation
+    name: str
+    type: EveName
+    services: Optional[List[StructureService]]
+    location: EveName
+    celestial: Optional[str]
+    fuel_expiry: Optional[datetime]
+    state: str = None
+    state_expiry: Optional[datetime]
+
+
+class FittingItem(Schema):
+    type: EveName
+    location: str
+
+
+class CorpStatus(Schema):
+    corporation: Corporation
+    characters: int
+    active: bool
+    last_updates: Optional[Dict]

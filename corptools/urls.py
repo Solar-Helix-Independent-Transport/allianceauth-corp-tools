@@ -5,7 +5,7 @@ from django.urls import path, include
 
 from . import views
 from corptools.audit_views.character import assets, wallet, pub_data, contacts, skills, clones, assets_lists, roles, market, status, notifications
-from corptools.audit_views.corporation import corp_list
+from corptools.audit_views.corporation import corp_list, re
 from . import app_settings
 
 from .api import api
@@ -72,6 +72,7 @@ urlpatterns = [
     url(r'^char/(?P<character_id>(\d)*)/', include(_character_ulrs)),
     url(r'^corp/', include([
         url(r'^menu/', corp_list, name='corp_menu'),
+        url(r'^r/$', views.react_corp, name='corp_react'),
         url(r'^add/$', views.add_corp, name='add_corp'),
     ])),
 ]

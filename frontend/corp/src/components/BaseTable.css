@@ -1,0 +1,12 @@
+.flex-image-text {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-evenly;
+  align-items: center;
+  align-content: center;
+}
+
+.padded-label {
+  margin: 5px;
+}

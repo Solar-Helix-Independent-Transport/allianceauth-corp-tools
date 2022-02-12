@@ -104,7 +104,7 @@ def check_account(character_id):
 
 
 @shared_task
-def update_character(char_id):
+def update_character(char_id, force_refresh=False):
     character = CharacterAudit.objects.filter(
         character__character_id=char_id).first()
     if character is None:
@@ -123,81 +123,95 @@ def update_character(char_id):
     logger.info("Starting Updates for {}".format(
         character.character.character_name))
     que = []
-    que.append(update_char_roles.si(character.character.character_id))
-    que.append(update_char_titles.si(character.character.character_id))
-    que.append(update_char_corp_history.si(character.character.character_id))
-    que.append(update_char_notifications.si(character.character.character_id))
-    que.append(update_char_assets.si(character.character.character_id))
-    que.append(update_char_skill_list.si(character.character.character_id))
-    que.append(update_char_skill_queue.si(character.character.character_id))
-    que.append(update_clones.si(character.character.character_id))
-    que.append(update_char_wallet.si(character.character.character_id))
-    que.append(update_char_orders.si(character.character.character_id))
-    que.append(update_char_contacts.si(character.character.character_id))
-    que.append(update_char_order_history.si(character.character.character_id))
+    que.append(update_char_roles.si(
+        character.character.character_id, force_refresh=force_refresh))
+    que.append(update_char_titles.si(
+        character.character.character_id, force_refresh=force_refresh))
+    que.append(update_char_corp_history.si(
+        character.character.character_id, force_refresh=force_refresh))
+    que.append(update_char_notifications.si(
+        character.character.character_id, force_refresh=force_refresh))
+    que.append(update_char_assets.si(
+        character.character.character_id, force_refresh=force_refresh))
+    que.append(update_char_skill_list.si(
+        character.character.character_id, force_refresh=force_refresh))
+    que.append(update_char_skill_queue.si(
+        character.character.character_id, force_refresh=force_refresh))
+    que.append(update_clones.si(
+        character.character.character_id, force_refresh=force_refresh))
+    que.append(update_char_wallet.si(
+        character.character.character_id, force_refresh=force_refresh))
+    que.append(update_char_orders.si(
+        character.character.character_id, force_refresh=force_refresh))
+    que.append(update_char_contacts.si(
+        character.character.character_id, force_refresh=force_refresh))
+    que.append(update_char_order_history.si(
+        character.character.character_id, force_refresh=force_refresh))
     if app_settings.CT_CHAR_MAIL_MODULE:
-        que.append(update_char_mail.si(character.character.character_id))
+        que.append(update_char_mail.si(
+            character.character.character_id, force_refresh=force_refresh))
     chain(que).apply_async(priority=6)
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_char_corp_history(self, character_id):
+def update_char_corp_history(self, character_id, force_refresh=False):
     try:
-        return update_corp_history(character_id)
+        return update_corp_history(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_char_roles(self, character_id):
+def update_char_roles(self, character_id, force_refresh=False):
     try:
-        return update_character_roles(character_id)
+        return update_character_roles(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_char_skill_list(self, character_id):
+def update_char_skill_list(self, character_id, force_refresh=False):
     try:
-        return update_character_skill_list(character_id)
+        return update_character_skill_list(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"
 
 
 @shared_task(bind=True, base=QueueOnce)
-def cache_user_skill_list(self, user_id):
+def cache_user_skill_list(self, character_id, force_refresh=False):
     try:
-        providers.skills.get_and_cache_user(user_id)
+        providers.skills.get_and_cache_user(character_id)
     except Exception as e:
         logger.exception(e)
         return "Failed"
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_char_skill_queue(self, character_id):
+def update_char_skill_queue(self, character_id, force_refresh=False):
     try:
-        return update_character_skill_queue(character_id)
+        return update_character_skill_queue(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_char_notifications(self, character_id):
+def update_char_notifications(self, character_id, force_refresh=False):
     try:
-        return update_character_notifications(character_id)
+        return update_character_notifications(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_char_assets(self, character_id):
+def update_char_assets(self, character_id, force_refresh=False):
     try:
-        results = update_character_assets(character_id)
+        results = update_character_assets(
+            character_id, force_refresh=force_refresh)
         update_all_locations.apply_async(priority=7)
         return results
 
@@ -207,45 +221,46 @@ def update_char_assets(self, character_id):
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_char_wallet(self, character_id):
+def update_char_wallet(self, character_id, force_refresh=False):
     try:
-        return update_character_wallet(character_id)
+        return update_character_wallet(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_char_contacts(self, character_id):
+def update_char_contacts(self, character_id, force_refresh=False):
     try:
-        return update_character_contacts(character_id)
+        return update_character_contacts(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_char_orders(self, character_id):
+def update_char_orders(self, character_id, force_refresh=False):
     try:
-        return update_character_orders(character_id)
+        return update_character_orders(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_char_titles(self, character_id):
+def update_char_titles(self, character_id, force_refresh=False):
     try:
-        return update_character_titles(character_id)
+        return update_character_titles(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_char_mail(self, character_id):
+def update_char_mail(self, character_id, force_refresh=False):
     try:
-        mail_ids = update_character_mail(character_id)
+        mail_ids = update_character_mail(
+            character_id, force_refresh=force_refresh)
         # Get and Create messages
         if mail_ids:
             chunks = [mail_ids[i:i + 50] for i in range(0, len(mail_ids), 50)]
@@ -270,18 +285,18 @@ def process_char_mail(self, character_id, ids):
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_char_order_history(self, character_id):
+def update_char_order_history(self, character_id, force_refresh=False):
     try:
-        return update_character_order_history(character_id)
+        return update_character_order_history(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"
 
 
 @shared_task
-def update_clones(char_id):
+def update_clones(character_id, force_refresh=False):
     try:
-        update_character_clones(char_id)
+        update_character_clones(character_id, force_refresh=force_refresh)
         update_all_locations.apply_async(priority=7)
     except Exception as e:
         logger.exception(e)
@@ -358,7 +373,7 @@ def update_citadel_names(self):
 @shared_task(bind=True, base=QueueOnce, max_retries=None)
 def update_location(self, location_id, force_citadel=False):
     if get_error_count_flag():
-        self.retry(countdown=60)
+        self.retry(countdown=300)
 
     if get_location_cooloff(location_id):
         if force_citadel and location_id > 64000000:
@@ -420,7 +435,7 @@ def update_location(self, location_id, force_citadel=False):
             return count
         else:
             if get_error_count_flag():
-                self.retry(countdown=60)
+                self.retry(countdown=300)
 
     if len(char_ids) == 0:
         set_location_cooloff(location_id)
@@ -442,7 +457,7 @@ def update_location(self, location_id, force_citadel=False):
         else:
             location_set(location_id, c_id)
             if get_error_count_flag():
-                self.retry(countdown=60)
+                self.retry(countdown=300)
 
     set_location_cooloff(location_id)
     return "No more Characters for Location_id: {} cooling off for a while".format(location_id)

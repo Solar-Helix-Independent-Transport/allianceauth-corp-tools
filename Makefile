@@ -12,7 +12,8 @@ help:
 
 clean:
 	rm -rf dist/*
-	rm -rf frontend/build/*
+	rm -rf frontend/corp/build/*
+	rm -rf frontend/char/build/*
 
 dev:
 	pip install --upgrade pip
@@ -30,8 +31,17 @@ deploy:
 	echo "password=${pypi-api-token}" >> ~/.pypirc
 	cut -c-20 ~/.pypirc
 
-packagejs:
-	cd frontend;yarn install;yarn build
+buildjs:
+	cd frontend/corp;yarn install;yarn build
+	cd frontend/char;yarn install;yarn build
 
-packagepy:
+package:
+	cd frontend/corp;yarn install;yarn build
+	cd frontend/char;yarn install;yarn build
 	python setup.py sdist
+
+devcorp:
+	cd frontend/corp;yarn install;yarn start
+
+devchar:
+	cd frontend/char;yarn install;yarn start

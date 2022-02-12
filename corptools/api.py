@@ -816,7 +816,8 @@ def post_characters_refresh(request, character_id: int):
     audits_visible = models.CharacterAudit.objects.visible_to(
         request.user).values_list('character_id', flat=True)
     if character_id in audits_visible:
-        tasks.update_character.apply_async(args=[character_id], priority=4)
+        tasks.update_character.apply_async(args=[character_id], kwargs={
+                                           "force_refresh": True}, priority=4)
     return 200, {"message": "Requested Update!"}
 
 
@@ -834,7 +835,8 @@ def post_acccount_refresh(request, character_id: int):
     characters = get_alts_queryset(main)
 
     for cid in characters.values_list('character_id', flat=True):
-        tasks.update_character.apply_async(args=[cid], priority=4)
+        tasks.update_character.apply_async(
+            args=[cid], kwargs={"force_refresh": True}, priority=4)
     return 200, {"message": "Requested Update!"}
 
 
@@ -865,3 +867,82 @@ def get_account_list(request):
         )
 
     return list(output.values())
+
+
+@api.get(
+    "corp/structures",
+    response={200: List[schema.Structure], 403: schema.Message},
+    tags=["Account"]
+)
+def get_visible_structures(request):
+    if not request.user.has_perm('corptools.corp_hr'):
+        logging.error(
+            f"Permission Denied for {request.user} to view structures!")
+        return 403, "Permission Denied!"
+
+    output = []
+    corps = models.CorporationAudit.objects.visible_to(request.user)
+    for s in models.Structure.objects.filter(corporation__in=corps
+                                             ).select_related('type_name', "corporation__corporation", "system_name"
+                                                              ).prefetch_related('structureservice_set'):
+        _ss = list()
+        for __s in s.structureservice_set.all():
+            _ss.append({
+                "name": __s.name,
+                "state": __s.state
+            })
+        _s = {
+            "id": s.structure_id,
+            "owner": s.corporation.corporation,
+            "name": s.name,
+            "type": {"id": s.type_id,
+                     "name": s.type_name.name},
+            "services": _ss,
+            "location": {"id": s.system_name.system_id,
+                         "name": s.system_name.name},
+            "fuel_expiry": s.fuel_expires,
+            "state": s.state,
+            "state_expiry": s.state_timer_end
+        }
+        output.append(_s)
+    return list(output)
+
+
+@api.get(
+    "corp/structures/{structure_id}",
+    response={200: List[schema.FittingItem], 403: schema.Message},
+    tags=["Corporation"]
+)
+def get_corporation_structure_fitting(request, corporation_id, structure_id):
+    output = []
+    return output
+
+
+@api.get(
+    "corp/status",
+    response={200: List[schema.CorpStatus], 403: schema.Message},
+    tags=["Corporation"]
+)
+def get_visible_corporation_status(request):
+    corps = models.CorporationAudit.objects.visible_to(request.user)
+    output = []
+    for c in corps:
+        _updates = {}
+        for grp in app_settings.get_corp_update_attributes():
+            _updates[grp[0]] = getattr(c, grp[1])
+        all_id = None
+        all_nm = None
+        if c.corporation.alliance:
+            all_id = c.corporation.alliance.alliance_id
+            all_nm = c.corporation.alliance.alliance_name
+
+        _out = {"corporation": {"corporation_id": c.corporation.corporation_id,
+                                "corporation_name": c.corporation.corporation_name,
+                                "alliance_id": all_id,
+                                "alliance_name": all_nm},
+                "characters": c.corporation.member_count,
+                "active": True,
+                "last_updates": _updates}
+        output.append(_out)
+    print(output)
+    return output

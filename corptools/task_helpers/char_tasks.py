@@ -17,7 +17,7 @@ from .etag_helpers import etag_results, NotModifiedError
 logger = logging.getLogger(__name__)
 
 
-def update_corp_history(character_id):
+def update_corp_history(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("updating corp history for: {}".format(
@@ -26,7 +26,8 @@ def update_corp_history(character_id):
         corp_history_op = providers.esi.client.Character.get_characters_character_id_corporationhistory(
             character_id=character_id)
 
-        corp_history = etag_results(corp_history_op, None)
+        corp_history = etag_results(
+            corp_history_op, None, force_refresh=force_refresh)
 
         for corp in corp_history:
             corp_name, created = EveName.objects.get_or_create_from_esi(
@@ -50,7 +51,7 @@ def update_corp_history(character_id):
     return "Finished pub data for: {}".format(audit_char.character.character_name)
 
 
-def update_character_skill_list(character_id):
+def update_character_skill_list(character_id, force_refresh=False):
     from ..tasks import cache_user_skill_list
 
     audit_char = CharacterAudit.objects.get(
@@ -68,7 +69,7 @@ def update_character_skill_list(character_id):
         skills_op = providers.esi.client.Skills.get_characters_character_id_skills(
             character_id=character_id)
 
-        skills = etag_results(skills_op, token)
+        skills = etag_results(skills_op, token, force_refresh=force_refresh)
 
         # Delete current SkillList
         Skill.objects.filter(character=audit_char).delete()
@@ -108,7 +109,7 @@ def update_character_skill_list(character_id):
     return "Finished skills for: {}".format(audit_char.character.character_name)
 
 
-def update_character_skill_queue(character_id):
+def update_character_skill_queue(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating Skill Queue for: {}".format(
@@ -124,7 +125,7 @@ def update_character_skill_queue(character_id):
         queue_op = providers.esi.client.Skills.get_characters_character_id_skillqueue(
             character_id=character_id)
 
-        queue = etag_results(queue_op, token)
+        queue = etag_results(queue_op, token, force_refresh=force_refresh)
 
         # Delete current SkillList
         SkillQueue.objects.filter(character=audit_char).delete()
@@ -161,7 +162,7 @@ def update_character_skill_queue(character_id):
     return "Finished skill queue for: {}".format(audit_char.character.character_name)
 
 
-def update_character_assets(character_id):
+def update_character_assets(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating Assets for: {}".format(
@@ -177,7 +178,7 @@ def update_character_assets(character_id):
         assets_op = providers.esi.client.Assets.get_characters_character_id_assets(
             character_id=character_id)
 
-        assets = etag_results(assets_op, token)
+        assets = etag_results(assets_op, token, force_refresh=force_refresh)
 
         location_names = list(
             EveLocation.objects.all().values_list('location_id', flat=True))
@@ -251,7 +252,7 @@ def update_character_assets(character_id):
     return "Finished assets for: {}".format(audit_char.character.character_name)
 
 
-def get_current_ship_location(character_id):
+def get_current_ship_location(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     req_scopes = ['esi-location.read_location.v1',
@@ -289,7 +290,7 @@ def get_current_ship_location(character_id):
     return current_ship
 
 
-def update_character_wallet(character_id):
+def update_character_wallet(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating wallet transactions for: {}".format(
@@ -306,7 +307,8 @@ def update_character_wallet(character_id):
         journal_items_ob = providers.esi.client.Wallet.get_characters_character_id_wallet_journal(
             character_id=character_id)
 
-        journal_items = etag_results(journal_items_ob, token)
+        journal_items = etag_results(
+            journal_items_ob, token, force_refresh=force_refresh)
 
         _current_journal = CharacterWalletJournalEntry.objects.filter(
             character=audit_char).values_list('entry_id', flat=True)  # TODO add time filter
@@ -381,7 +383,7 @@ def update_character_wallet(character_id):
     return "Finished wallet transactions for: {}".format(audit_char.character.character_name)
 
 
-def update_character_clones(character_id):
+def update_character_clones(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating Clones and Implants for: {}".format(
@@ -458,7 +460,7 @@ def update_character_clones(character_id):
     return "Finished clones for: {}".format(audit_char.character.character_name)
 
 
-def update_character_orders(character_id):
+def update_character_orders(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating Market Orders for: {}".format(
@@ -474,7 +476,8 @@ def update_character_orders(character_id):
     open_orders_op = providers.esi.client.Market.get_characters_character_id_orders(
         character_id=character_id)
     try:
-        open_orders = etag_results(open_orders_op, token)
+        open_orders = etag_results(
+            open_orders_op, token, force_refresh=force_refresh)
 
         open_ids = list(CharacterMarketOrder.objects.filter(
             character=audit_char, state='active').values_list("order_id", flat=True))
@@ -548,7 +551,7 @@ def update_character_orders(character_id):
     return "Finished Orders for: {}".format(audit_char.character.character_name)
 
 
-def update_character_order_history(character_id):
+def update_character_order_history(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating Market Order History for: {}".format(
@@ -565,7 +568,8 @@ def update_character_order_history(character_id):
         character_id=character_id)
 
     try:
-        order_history = etag_results(order_history_op, token)
+        order_history = etag_results(
+            order_history_op, token, force_refresh=force_refresh)
 
         closed_ids = list(CharacterMarketOrder.objects.filter(
             character=audit_char).values_list("order_id", flat=True))
@@ -636,7 +640,7 @@ def update_character_order_history(character_id):
 
 
 @shared_task
-def update_character_notifications(character_id):
+def update_character_notifications(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating Notifications for: {}".format(
@@ -653,7 +657,8 @@ def update_character_notifications(character_id):
         notifications_op = providers.esi.client.Character.get_characters_character_id_notifications(
             character_id=character_id)
 
-        notifications = etag_results(notifications_op, token)
+        notifications = etag_results(
+            notifications_op, token, force_refresh=force_refresh)
 
         last_five_hundred = list(
             Notification.objects.filter(character=audit_char)
@@ -697,7 +702,7 @@ def update_character_notifications(character_id):
     return "Finished notifications for: {0}".format(audit_char.character.character_name)
 
 
-def update_character_roles(character_id):
+def update_character_roles(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     req_scopes = ['esi-characters.read_corporation_roles.v1']
@@ -710,7 +715,7 @@ def update_character_roles(character_id):
         roles_op = providers.esi.client.Character.get_characters_character_id_roles(
             character_id=character_id)
 
-        roles = etag_results(roles_op, token)
+        roles = etag_results(roles_op, token, force_refresh=force_refresh)
 
         director = False
         accountant = False
@@ -834,7 +839,7 @@ def process_mail_list(character_id: int, ids: list):
     return "Completed mail fetch for: %s" % str(character_id)
 
 
-def update_character_mail(character_id):
+def update_character_mail(character_id, force_refresh=False):
     #  This function will deal with ALL mail related updates
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
@@ -910,7 +915,7 @@ def update_character_mail(character_id):
     return mail_ids
 
 
-def update_character_contacts(character_id):
+def update_character_contacts(character_id, force_refresh=False):
     logger.debug("updating contacts for: %s" % str(character_id))
 
     audit_char = CharacterAudit.objects.get(
@@ -930,7 +935,7 @@ def update_character_contacts(character_id):
         labels_op = providers.esi.client.Contacts.get_characters_character_id_contacts_labels(
             character_id=character_id)
 
-        labels = etag_results(labels_op, token)
+        labels = etag_results(labels_op, token, force_refresh=force_refresh)
 
         labels_to_create = []
 
@@ -955,7 +960,8 @@ def update_character_contacts(character_id):
         contacts_op = providers.esi.client.Contacts.get_characters_character_id_contacts(
             character_id=character_id)
 
-        contacts = etag_results(contacts_op, token)
+        contacts = etag_results(
+            contacts_op, token, force_refresh=force_refresh)
 
         ContactLabelThrough = CharacterContact.labels.through
         _contacts_to_create = []
@@ -1008,7 +1014,7 @@ def update_character_contacts(character_id):
     return "Completed contacts for: %s" % str(character_id)
 
 
-def update_character_titles(character_id):
+def update_character_titles(character_id, force_refresh=False):
     logger.debug("updating titles for: %s" % str(character_id))
 
     audit_char = CharacterAudit.objects.get(
@@ -1024,7 +1030,7 @@ def update_character_titles(character_id):
         titles_op = providers.esi.client.Character.get_characters_character_id_titles(
             character_id=character_id)
 
-        titles = etag_results(titles_op, token)
+        titles = etag_results(titles_op, token, force_refresh=force_refresh)
 
         title_models = []
         for t in titles:  # update labels

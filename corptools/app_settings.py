@@ -2,7 +2,7 @@ from django.conf import settings
 
 CORPTOOLS_APP_NAME = getattr(settings, "CORPTOOLS_APP_NAME", "Audit")
 
-CORPTOOLS_APP_NAME = getattr(settings, "CORPTOOLS_APP_NAME", "Audit")  
+CORPTOOLS_APP_NAME = getattr(settings, "CORPTOOLS_APP_NAME", "Audit")
 
 CORPTOOLS_DISCORD_BOT_COGS = getattr(
     settings, 'CORPTOOLS_DISCORD_BOT_COGS', ["corptools.cogs.routes", "corptools.cogs.locate"])
@@ -233,5 +233,19 @@ def get_character_update_attributes():
             # Mail
             ("Mail", 'last_update_mails'),
         ]
+
+    return _attribs
+
+
+def get_corp_update_attributes():
+    _attribs = [
+        # Base
+        ("Public Data", 'last_update_pub_data'),
+        ("Assets", 'last_update_assets'),
+        ("Structures", 'last_update_structures'),
+        ("Wallet", 'last_update_wallet'),
+        ("Moons", 'last_update_moons'),
+
+    ]
 
     return _attribs

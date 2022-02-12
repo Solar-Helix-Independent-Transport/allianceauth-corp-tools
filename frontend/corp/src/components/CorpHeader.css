@@ -1,0 +1,26 @@
+.flex {
+  display: flex;
+  height: 80px;
+  align-items: center;
+}
+.child {
+  margin-right: 20px;
+}
+
+.child-end {
+  margin-left: auto;
+}
+.association-hide {
+}
+
+@media only screen and (max-width: 1400px) {
+  .association-hide {
+    display: none;
+  }
+}
+
+.spinner-size {
+  height: 30px;
+  width: 30px;
+  margin: 200px;
+}
