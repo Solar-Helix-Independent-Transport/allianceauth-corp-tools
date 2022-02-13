@@ -11,7 +11,8 @@ import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import CharStatus from "./pages/Status";
 import CharClones from "./pages/Clones";
 import PubData from "./pages/PubData";
-import CharAssets from "./pages/Asssets";
+import CharAssets from "./pages/Assets";
+import CharAssetList from "./pages/AssetList";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Panel } from "react-bootstrap";
 import CharRoles from "./pages/Roles";
@@ -29,6 +30,7 @@ const character_id = window.location.pathname.split("/")[3]
 
 const CorptoolsCharacterView = () => {
   console.log(character_id);
+
   return (
     <QueryClientProvider client={queryClient}>
       <CharHeader character_id={character_id}></CharHeader>
@@ -45,6 +47,10 @@ const CorptoolsCharacterView = () => {
               <Route
                 path="/account/assets"
                 component={() => CharAssets({ character_id })}
+              />
+              <Route
+                path="/account/listassets"
+                component={() => CharAssetList({ character_id })}
               />
               <Route
                 path="/account/pubdata"

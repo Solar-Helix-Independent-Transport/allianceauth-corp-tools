@@ -47,7 +47,15 @@ export async function loadAssetGroups(character_id, location_id) {
   const api = await axios.get(
     `/audit/api/account/${character_id}/asset/${location_id}/groups`
   );
-  console.log(`get asset locations in api ${character_id} ${location_id}`);
+  console.log(`get asset groups in api ${character_id} ${location_id}`);
+  return api.data;
+}
+
+export async function loadAssetList(character_id, location_id) {
+  const api = await axios.get(
+    `/audit/api/account/${character_id}/asset/${location_id}/list`
+  );
+  console.log(`get asset list in api ${character_id} ${location_id}`);
   return api.data;
 }
 

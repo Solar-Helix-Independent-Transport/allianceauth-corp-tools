@@ -1,4 +1,6 @@
+from tokenize import group
 from typing import List
+from unicodedata import category
 from allianceauth import notifications
 from corptools import app_settings
 from django.utils.timezone import activate
@@ -231,8 +233,12 @@ def get_character_menu(request):
         })
     if app_settings.CT_CHAR_ASSETS_MODULE:
         _char["links"].append({
-            "name": "Assets",
+            "name": "Asset Groups",
             "link": "/account/assets"
+        })
+        _char["links"].append({
+            "name": "Asset List",
+            "link": "/account/listassets"
         })
 
     if app_settings.CT_CHAR_CLONES_MODULE:
@@ -293,20 +299,63 @@ def get_character_asset_locations(request, character_id: int):
     return asset_locations
 
 
-"""
 @api.get(
     "account/{character_id}/asset/{location_id}/list",
-    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    response={200: List[schema.CharacterAssetItem], 403: schema.Message},
     tags=["Account"]
 )
 def get_character_asset_list(request, character_id: int, location_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:
         return 403, {"message": "Permission Denied"}
 
     characters = get_alts_queryset(main)
-"""
+
+    assets = models.CharacterAsset.objects\
+        .filter((Q(blueprint_copy=None) | Q(blueprint_copy=False)),
+                character__character__in=characters).select_related(
+                    "character", "character__character",
+                    "type_name", "location_name", "type_name__group__category"
+        )
+
+    if location_id == 2004:
+        asset_locations = assets.filter(
+            location_flag="AssetSafety").values_list('item_id')
+        assets = assets.filter(location_id__in=asset_locations)
+    elif location_id != 0:
+        assets = assets.filter(Q(location_name_id=int(
+            location_id)) | Q(location_id=int(location_id)))
+
+    item_ids = assets.values_list('item_id', flat=True)
+    output = []
+
+    for a in assets:
+        if a.location_name:
+            output.append({
+                "character": {
+                    "character_id": a.character.character.character_id,
+                    "character_name": a.character.character.character_name,
+                    "corporation_id": a.character.character.corporation_id,
+                    "corporation_name": a.character.character.corporation_name,
+                    "alliance_id": a.character.character.alliance_id,
+                    "alliance_name": a.character.character.alliance_name
+                },
+                "item": {
+                    "id": a.type_name.type_id,
+                    "name": a.type_name.name,
+                    "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}"
+                },
+                "quantity": a.quantity,
+                "location": {
+                    "id": a.location_name.location_id,
+                    "name": a.location_name.location_name
+                }
+            })
+
+    return output
 
 
 @api.get(

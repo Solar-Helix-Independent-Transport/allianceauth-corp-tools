@@ -82,6 +82,7 @@ class CharacterAssetGroups(Schema):
 class CharacterAssetItem(Schema):
     character: Character
     item: EveName
+    quantity: int = 0
     location: EveName = None
 
 

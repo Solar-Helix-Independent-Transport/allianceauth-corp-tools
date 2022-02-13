@@ -10,6 +10,7 @@ const CharAssetGroups = ({ character_id, location_id = 0 }) => {
     ["assetGroups", character_id, location_id],
     () => loadAssetGroups(character_id, location_id)
   );
+  console.log("ASSET GROUP");
   if (isLoading)
     return (
       <div className="flex-container">
