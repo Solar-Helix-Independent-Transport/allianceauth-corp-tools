@@ -48,7 +48,7 @@ def update_corp_history(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "Finished pub data for: {}".format(audit_char.character.character_name)
+    return "CT: Finished pub data for: {}".format(audit_char.character.character_name)
 
 
 def update_character_skill_list(character_id, force_refresh=False):
@@ -106,7 +106,7 @@ def update_character_skill_list(character_id, force_refresh=False):
     audit_char.is_active()
     cache_user_skill_list.s(token.user_id).apply_async(priority=7)
 
-    return "Finished skills for: {}".format(audit_char.character.character_name)
+    return "CT: Finished skills for: {}".format(audit_char.character.character_name)
 
 
 def update_character_skill_queue(character_id, force_refresh=False):
@@ -159,7 +159,7 @@ def update_character_skill_queue(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "Finished skill queue for: {}".format(audit_char.character.character_name)
+    return "CT: Finished skill queue for: {}".format(audit_char.character.character_name)
 
 
 def update_character_assets(character_id, force_refresh=False):
@@ -249,7 +249,7 @@ def update_character_assets(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "Finished assets for: {}".format(audit_char.character.character_name)
+    return "CT: Finished assets for: {}".format(audit_char.character.character_name)
 
 
 def get_current_ship_location(character_id, force_refresh=False):
@@ -380,7 +380,7 @@ def update_character_wallet(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "Finished wallet transactions for: {}".format(audit_char.character.character_name)
+    return "CT: Finished wallet transactions for: {}".format(audit_char.character.character_name)
 
 
 def update_character_clones(character_id, force_refresh=False):
@@ -457,7 +457,7 @@ def update_character_clones(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "Finished clones for: {}".format(audit_char.character.character_name)
+    return "CT: Finished clones for: {}".format(audit_char.character.character_name)
 
 
 def update_character_orders(character_id, force_refresh=False):
@@ -548,7 +548,7 @@ def update_character_orders(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "Finished Orders for: {}".format(audit_char.character.character_name)
+    return "CT: Finished Orders for: {}".format(audit_char.character.character_name)
 
 
 def update_character_order_history(character_id, force_refresh=False):
@@ -636,7 +636,7 @@ def update_character_order_history(character_id, force_refresh=False):
             audit_char.character.character_name))
         pass
 
-    return "Finished Order History for: {}".format(audit_char.character.character_name)
+    return "CT: Finished Order History for: {}".format(audit_char.character.character_name)
 
 
 @shared_task
@@ -699,7 +699,7 @@ def update_character_notifications(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "Finished notifications for: {0}".format(audit_char.character.character_name)
+    return "CT: Finished notifications for: {0}".format(audit_char.character.character_name)
 
 
 def update_character_roles(character_id, force_refresh=False):
@@ -751,7 +751,7 @@ def update_character_roles(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "Finished roles for: {0}".format(audit_char.character.character_name)
+    return "CT: Finished roles for: {0}".format(audit_char.character.character_name)
 
 
 def process_mail_list(character_id: int, ids: list):
@@ -836,7 +836,7 @@ def process_mail_list(character_id: int, ids: list):
 
     RecipThroughModel.objects.bulk_create(rms)
 
-    return "Completed mail fetch for: %s" % str(character_id)
+    return "CT: Completed mail fetch for: %s" % str(character_id)
 
 
 def update_character_mail(character_id, force_refresh=False):
@@ -1011,7 +1011,7 @@ def update_character_contacts(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "Completed contacts for: %s" % str(character_id)
+    return "CT: Completed contacts for: %s" % str(character_id)
 
 
 def update_character_titles(character_id, force_refresh=False):
@@ -1060,4 +1060,4 @@ def update_character_titles(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "Completed titles for: %s" % str(character_id)
+    return "CT: Completed titles for: %s" % str(character_id)
