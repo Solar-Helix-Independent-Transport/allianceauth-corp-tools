@@ -69,6 +69,7 @@ def etag_results(operation, token, force_refresh=False):
         current_page = 1
         total_pages = 1
         etags_incomplete = False
+        reset = False
         # loop all pages and add data to output array
         while current_page <= total_pages:
             operation.future.request.params["page"] = current_page
@@ -84,7 +85,7 @@ def etag_results(operation, token, force_refresh=False):
                     rem_etag_header(operation)
                 result, headers = operation.result()
                 total_pages = int(headers.headers['X-Pages'])
-                if get_etag_header(operation) == headers.headers.get('ETag') and not force_refresh:
+                if get_etag_header(operation) == headers.headers.get('ETag') and not force_refresh and not etags_incomplete:
                     # if django esi is returning our cache check it manualy.
                     raise NotModifiedError()
                 if force_refresh:
