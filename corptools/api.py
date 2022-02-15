@@ -924,7 +924,15 @@ def get_account_list(request):
     tags=["Corporation"]
 )
 def get_visible_structures(request):
-    if not request.user.has_perm('corptools.corp_hr'):
+    perms = (
+        request.user.has_perm('corptools.corp_hr') |
+        request.user.has_perm('corptools.alliance_hr') |
+        request.user.has_perm('corptools.state_hr') |
+        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.holding_corp_structures')
+    )
+
+    if not perms:
         logging.error(
             f"Permission Denied for {request.user} to view structures!")
         return 403, "Permission Denied!"
