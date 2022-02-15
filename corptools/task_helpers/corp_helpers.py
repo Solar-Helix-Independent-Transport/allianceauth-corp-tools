@@ -144,22 +144,17 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
                 # break
         logger.info(
             f"CT: Corp {corp_id} Div {wallet_division}, Page: {current_page}, New Transactions! {len(items)}, New Names {_new_names}")
-        logger.info(
-            f"CT: Corp {corp_id} Div {wallet_division}, Page: {current_page}, OLDEST DATA! {audit_corp} {_min_time}")
+        created_names = EveName.objects.create_bulk_from_esi(_new_names)
+
+        if created_names:
+            CorporationWalletJournalEntry.objects.bulk_create(items)
+        else:
+            raise Exception("DB Fail")
 
         current_page += 1
 
     logger.info(
-        f"CT: Corp {corp_id} Div {wallet_division}, New Transactions! {len(items)}, New Names {_new_names}")
-    logger.info(
         f"CT: Corp {corp_id} Div {wallet_division}, OLDEST DATA! {audit_corp} {_min_time}")
-
-    created_names = EveName.objects.create_bulk_from_esi(_new_names)
-
-    if created_names:
-        CorporationWalletJournalEntry.objects.bulk_create(items)
-    else:
-        raise Exception("DB Fail")
 
 
 def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
