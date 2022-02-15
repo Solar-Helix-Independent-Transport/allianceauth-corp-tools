@@ -7,6 +7,7 @@ from . import app_settings
 
 from django.utils.html import format_html
 
+admin.site.register(models.CorptoolsConfiguration)
 admin.site.register(models.CharacterAudit)
 admin.site.register(models.CorporationAudit)
 

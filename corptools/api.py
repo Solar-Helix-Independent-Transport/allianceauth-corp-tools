@@ -921,7 +921,7 @@ def get_account_list(request):
 @api.get(
     "corp/structures",
     response={200: List[schema.Structure], 403: schema.Message},
-    tags=["Account"]
+    tags=["Corporation"]
 )
 def get_visible_structures(request):
     if not request.user.has_perm('corptools.corp_hr'):
@@ -930,10 +930,9 @@ def get_visible_structures(request):
         return 403, "Permission Denied!"
 
     output = []
-    corps = models.CorporationAudit.objects.visible_to(request.user)
-    for s in models.Structure.objects.filter(corporation__in=corps
-                                             ).select_related('type_name', "corporation__corporation", "system_name"
-                                                              ).prefetch_related('structureservice_set'):
+    for s in models.Structure.get_visible(request.user).select_related(
+        'type_name', "corporation__corporation", "system_name"
+    ).prefetch_related('structureservice_set'):
         _ss = list()
         for __s in s.structureservice_set.all():
             _ss.append({

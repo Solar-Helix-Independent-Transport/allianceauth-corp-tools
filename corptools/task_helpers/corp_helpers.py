@@ -94,6 +94,9 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
         _min_time = timezone.now()
         items = []
         for item in journal_items:
+            if _min_time > item.get('date'):
+                _min_time = item.get('date')
+
             if item.get('id') not in _current_journal:
                 if item.get('second_party_id') not in _current_eve_ids:
                     _new_names.append(item.get('second_party_id'))
@@ -101,8 +104,6 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
                 if item.get('first_party_id') not in _current_eve_ids:
                     _new_names.append(item.get('first_party_id'))
                     _current_eve_ids.add(item.get('first_party_id'))
-                if _min_time > item.get('date'):
-                    _min_time = item.get('date')
                 wallet_item = CorporationWalletJournalEntry(division=division,
                                                             amount=item.get(
                                                                 'amount'),
@@ -136,16 +137,25 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
                                                                 'tax_receiver_id'),
                                                             )
                 items.append(wallet_item)
-            else:
+            # else:
                 # short cct
-                if not full_update:
-                    total_pages = 0
-                    break
+                # if not full_update:
+                #total_pages = 0
+                # break
+        logger.info(
+            f"CT: Corp {corp_id} Div {wallet_division}, Page: {current_page}, New Transactions! {len(items)}, New Names {_new_names}")
+        logger.info(
+            f"CT: Corp {corp_id} Div {wallet_division}, Page: {current_page}, OLDEST DATA! {audit_corp} {_min_time}")
 
         current_page += 1
 
+    logger.info(
+        f"CT: Corp {corp_id} Div {wallet_division}, New Transactions! {len(items)}, New Names {_new_names}")
+    logger.info(
+        f"CT: Corp {corp_id} Div {wallet_division}, OLDEST DATA! {audit_corp} {_min_time}")
+
     created_names = EveName.objects.create_bulk_from_esi(_new_names)
-    logger.info(f"OLDEST DATA! {audit_corp} {_min_time}")
+
     if created_names:
         CorporationWalletJournalEntry.objects.bulk_create(items)
     else:

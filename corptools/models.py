@@ -5,12 +5,14 @@ import datetime
 
 from allianceauth.authentication.models import CharacterOwnership, UserProfile
 from bravado.exception import HTTPForbidden
+from discord import permission
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db.models import Count, Max
 from collections import defaultdict
+from django.core.exceptions import ValidationError
 
 from esi.errors import TokenError
 from esi.models import Token
@@ -29,6 +31,31 @@ from model_utils import Choices
 logger = logging.getLogger(__name__)
 
 MAX_INACTIVE_DAYS = 3
+
+
+class CorptoolsConfiguration(models.Model):
+    holding_corps = models.ManyToManyField(EveCorporationInfo)
+
+    class Meta:
+        permissions = (
+            ('holding_corp_structures',
+             'Can access configured holding corp structure data.'),
+            ('holding_corp_wallets', 'Can access configured holding corp wallet data.'),
+            ('holding_corp_asset', 'Can access configured holding corp wallet data.')
+        )
+
+        default_permissions = []
+
+    def holding_corp_qs(self):
+        return CorporationAudit.objects.filter(corporation__in=self.holding_corps.all())
+
+    def save(self, *args, **kwargs):
+        if not self.pk and CorptoolsConfiguration.objects.exists():
+            # Force a single object
+            raise ValidationError(
+                'Only one Settings Model can there be at a time! No Sith Lords there are here!')
+        self.pk = self.id = 1  # If this happens to be deleted and recreated, force it to be 1
+        return super().save(*args, **kwargs)
 
 
 class CharacterAudit(models.Model):
@@ -166,7 +193,8 @@ class CorporationAudit(models.Model):
              'Can access other corporations\'s data for own alliance.'),
             ('state_corp_manager',
              'Can access other corporations\'s data for own state.'),
-            ('global_corp_manager', 'Can access all corporations\'s data.'))
+            ('global_corp_manager', 'Can access all corporations\'s data.'),
+        )
 
 # ************************ Helper Models
 # Eve Item Type
@@ -702,6 +730,16 @@ class Structure(models.Model):
             else:
                 return False
         return True  # Fallback to abandonded. wosrt case its 7 days early
+
+    @classmethod
+    def get_visible(cls, user):
+        corps_vis = CorporationAudit.objects.visible_to(user)
+        if user.has_perm("corptools.holding_corp_structures"):
+            corps_holding = CorptoolsConfiguration.objects.get(
+                id=1).holding_corp_qs()
+            corps_vis = corps_vis | corps_holding
+
+        return Structure.objects.filter(corporation__in=corps_vis)
 
 
 class StructureService(models.Model):

@@ -13,7 +13,7 @@ class MemberAudit(MenuItemHook):
                               app_settings.CORPTOOLS_APP_NAME,
                               'far fa-eye fa-fw',
                               'corptools:view',
-                              navactive=['corptools:'])
+                              navactive=['corptools:view'])
 
     def render(self, request):
         if request.user.has_perm('corptools.view_characteraudit'):
@@ -21,9 +21,29 @@ class MemberAudit(MenuItemHook):
         return ''
 
 
+class Structures(MenuItemHook):
+    def __init__(self):
+
+        MenuItemHook.__init__(self,
+                              "Structures",
+                              'far fa-building fa-fw',
+                              'corptools:corp_react',
+                              navactive=['corptools:corp_react'])
+
+    def render(self, request):
+        if models.Structure.get_visible(request.user).exists():
+            return MenuItemHook.render(self, request)
+        return ''
+
+
 @hooks.register('menu_item_hook')
 def register_menu():
     return MemberAudit()
+
+
+@hooks.register('menu_item_hook')
+def register_corp():
+    return Structures()
 
 
 @hooks.register('url_hook')
