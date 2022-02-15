@@ -4,8 +4,6 @@ import json
 import datetime
 
 from allianceauth.authentication.models import CharacterOwnership, UserProfile
-from bravado.exception import HTTPForbidden
-from discord import permission
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
