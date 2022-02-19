@@ -129,7 +129,7 @@ def etag_results(operation, token, force_refresh=False):
                     current_page = 1  # reset to page 1 and fetch everything, we should not get here
                     results = list()
 
-        if not etags_incomplete:
+        if not etags_incomplete and not force_refresh:
             raise NotModifiedError()
 
     else:  # it doesn't so just return as usual
