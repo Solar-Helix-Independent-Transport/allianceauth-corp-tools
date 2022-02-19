@@ -109,7 +109,7 @@ def etag_results(operation, token, force_refresh=False):
 
             except (HTTPNotModified) as e:  # etag is match from ESI
                 logger.debug(
-                    f"ETag: HTTPNotModified Hit ETag {operation.operation.operation_id} Ei:{etags_incomplete} - {stringify_params(operation)}")
+                    f"ETag: HTTPNotModified Hit ETag {operation.operation.operation_id} Ei:{etags_incomplete} - {stringify_params(operation)} - P:{e.response.headers['X-Pages']}")
                 total_pages = int(e.response.headers['X-Pages'])
 
                 if not etags_incomplete:
@@ -120,7 +120,7 @@ def etag_results(operation, token, force_refresh=False):
 
             except (NotModifiedError) as e:  # etag is match in cache
                 logger.debug(
-                    f"ETag: NotModifiedError Hit ETag {operation.operation.operation_id} - {stringify_params(operation)}")
+                    f"ETag: HTTPNotModified Hit ETag {operation.operation.operation_id} Ei:{etags_incomplete} - {stringify_params(operation)} - P:{headers.headers['X-Pages']}")
                 total_pages = int(headers.headers['X-Pages'])
 
                 if not etags_incomplete:
