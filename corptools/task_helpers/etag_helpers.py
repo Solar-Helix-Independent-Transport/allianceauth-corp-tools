@@ -4,7 +4,7 @@ import random
 
 import logging
 
-MAX_ETAG_LIFE = 60*60*24*7  # 4 Days
+MAX_ETAG_LIFE = 60*60*24*7  # 7 Days
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +69,7 @@ def etag_results(operation, token, force_refresh=False):
         current_page = 1
         total_pages = 1
         etags_incomplete = False
-        reset = False
+
         # loop all pages and add data to output array
         while current_page <= total_pages:
             operation.future.request.params["page"] = current_page
@@ -99,10 +99,15 @@ def etag_results(operation, token, force_refresh=False):
                 # append to results list to be seamless to the client
                 results += result
                 current_page += 1
-                etags_incomplete = True
-                logger.debug(
-                    f"ETag: No Etag {operation.operation.operation_id} - {stringify_params(operation)}")
-            except (HTTPNotModified) as e:
+
+                if not etags_incomplete and not force_refresh:
+                    logger.debug(
+                        f"ETag: No Etag {operation.operation.operation_id} - {stringify_params(operation)}")
+                    current_page = 1  # reset to page 1 and fetch everything
+                    results = list()
+                    etags_incomplete = True
+
+            except (HTTPNotModified) as e:  # etag is match from ESI
                 logger.debug(
                     f"ETag: HTTPNotModified Hit ETag {operation.operation.operation_id} Ei:{etags_incomplete} - {stringify_params(operation)}")
                 total_pages = int(e.response.headers['X-Pages'])
@@ -110,10 +115,10 @@ def etag_results(operation, token, force_refresh=False):
                 if not etags_incomplete:
                     current_page += 1
                 else:
-                    current_page = 1  # reset to page 1 and fetch everyhting
+                    current_page = 1  # reset to page 1 and fetch everything, we should not get here
                     results = list()
 
-            except (NotModifiedError) as e:  # etag is wrong data has changed
+            except (NotModifiedError) as e:  # etag is match in cache
                 logger.debug(
                     f"ETag: NotModifiedError Hit ETag {operation.operation.operation_id} - {stringify_params(operation)}")
                 total_pages = int(headers.headers['X-Pages'])
@@ -121,12 +126,13 @@ def etag_results(operation, token, force_refresh=False):
                 if not etags_incomplete:
                     current_page += 1
                 else:
-                    current_page = 1  # reset to page 1 and fetch everyhting
+                    current_page = 1  # reset to page 1 and fetch everything, we should not get here
                     results = list()
 
         if not etags_incomplete:
             raise NotModifiedError()
-    else:  # it doesn't so just return
+
+    else:  # it doesn't so just return as usual
         if not force_refresh:
             inject_etag_header(operation)
         try:
@@ -136,4 +142,8 @@ def etag_results(operation, token, force_refresh=False):
                 f"ETag: result Cache Hit ETag {operation.operation.operation_id} - {stringify_params(operation)}")
             raise NotModifiedError()
         set_etag_header(operation, headers)
+        if get_etag_header(operation) == headers.headers.get('ETag') and not force_refresh:
+            # etag is match in cache
+            raise NotModifiedError()
+
     return results
