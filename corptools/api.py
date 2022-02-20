@@ -902,18 +902,21 @@ def get_account_list(request):
 
     output = {}
     for c in characters:
-        m_cid = c.character.character_ownership.user.profile.main_character.character_id
-        if m_cid not in output:
-            output[m_cid] = {
-                "main": c.character.character_ownership.user.profile.main_character,
-                "characters": []
-            }
-        output[m_cid]["characters"].append(
-            {
-                "character": c.character,
-                "active": c.is_active()
-            }
-        )
+        try:
+            m_cid = c.character.character_ownership.user.profile.main_character.character_id
+            if m_cid not in output:
+                output[m_cid] = {
+                    "main": c.character.character_ownership.user.profile.main_character,
+                    "characters": []
+                }
+            output[m_cid]["characters"].append(
+                {
+                    "character": c.character,
+                    "active": c.is_active()
+                }
+            )
+        except AttributeError:
+            pass  # No main or invalid audit
 
     return list(output.values())
 
