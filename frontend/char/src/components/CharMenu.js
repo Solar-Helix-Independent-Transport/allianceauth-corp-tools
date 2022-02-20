@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Nav, NavItem } from "react-bootstrap";
+import { Nav } from "react-bootstrap";
 import { NavDropdown } from "react-bootstrap";
 import { Navbar } from "react-bootstrap";
+import NavLink from "./NavLinkActive";
 import axios from "axios";
 
 const CharMenu = ({ character_id }) => {
@@ -19,28 +20,34 @@ const CharMenu = ({ character_id }) => {
   return (
     <Navbar fluid collapseOnSelect>
       <Nav>
-        <NavItem key="Overview" href={`#/account/status`}>
+        <NavLink key="Overview" href={`#/account/status`}>
           Overview
-        </NavItem>
-        <NavItem key="Public Data" href={`#/account/pubdata`}>
+        </NavLink>
+        <NavLink key="Public Data" href={`#/account/pubdata`}>
           Public Data
-        </NavItem>
+        </NavLink>
         {menus.cats.map((cat) => {
           return (
             <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
               {cat.links.map((link) => {
                 return (
-                  <NavItem key={link.name} href={`#${link.link}`}>
+                  <NavLink
+                    id={link.name}
+                    key={link.name}
+                    href={`#${link.link}`}
+                  >
                     {link.name}
-                  </NavItem>
+                  </NavLink>
                 );
               })}
             </NavDropdown>
           );
         })}
-        <NavItem key="Public Data" href={`#/account/list`}>
+      </Nav>
+      <Nav className="pull-right">
+        <NavLink key="Public Data" href={`#/account/list`}>
           Account List
-        </NavItem>
+        </NavLink>
       </Nav>
     </Navbar>
   );

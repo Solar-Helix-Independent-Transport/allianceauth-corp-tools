@@ -34,9 +34,10 @@ const CorptoolsCharacterView = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CharHeader character_id={character_id}></CharHeader>
-      <CharMenu character_id={character_id}></CharMenu>
       <Router>
+        <br />
+        <CharHeader character_id={character_id}></CharHeader>
+        <CharMenu character_id={character_id}></CharMenu>
         <Col>
           <Panel>
             <Switch>
@@ -74,7 +75,7 @@ const CorptoolsCharacterView = () => {
                 component={() => CharNotifications({ character_id })}
               />
               <Route
-                path="/account/contacts"
+                path="/account/contact"
                 component={() => CharContacts({ character_id })}
               />
               <Route path="/account/list" component={() => AccountList()} />

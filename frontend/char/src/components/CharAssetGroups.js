@@ -1,22 +1,17 @@
 import React from "react";
-import { Panel } from "react-bootstrap";
+import { Panel, Glyphicon } from "react-bootstrap";
 import { useQuery } from "react-query";
-import { Bars } from "@agney/react-loading";
 import { loadAssetGroups } from "../apis/Character";
 import { Table } from "react-bootstrap";
+import { PanelLoader } from "./PanelLoader";
 
 const CharAssetGroups = ({ character_id, location_id = 0 }) => {
-  const { isLoading, error, data } = useQuery(
+  const { isLoading, isFetching, error, data } = useQuery(
     ["assetGroups", character_id, location_id],
     () => loadAssetGroups(character_id, location_id)
   );
-  console.log("ASSET GROUP");
-  if (isLoading)
-    return (
-      <div className="flex-container">
-        <Bars className="flex-child spinner-size" />
-      </div>
-    );
+
+  if (isLoading) return <PanelLoader />;
 
   if (error) return <div></div>;
 
@@ -24,14 +19,24 @@ const CharAssetGroups = ({ character_id, location_id = 0 }) => {
     <div className="flex-container">
       {data.map((group) => {
         return (
-          <Panel className="flex-child">
+          <Panel key={group.name} className="flex-child">
             <Panel.Heading>
-              <h4 className={"text-center"}>{group.name}</h4>
+              <h4 className={"text-center"}>
+                {group.name}
+                {isFetching ? (
+                  <Glyphicon
+                    className="glyphicon-refresh-animate pull-right"
+                    glyph="refresh"
+                  />
+                ) : (
+                  <></>
+                )}
+              </h4>
             </Panel.Heading>
             <Panel.Body className="flex-body">
               <Table striped style={{ marginBottom: 0 }}>
                 <thead>
-                  <tr>
+                  <tr key={"head " + group.name}>
                     <th>Group</th>
                     <th className="text-right">Count</th>
                   </tr>
@@ -42,9 +47,9 @@ const CharAssetGroups = ({ character_id, location_id = 0 }) => {
                   <tbody>
                     {group.items.map((h) => {
                       return (
-                        <tr>
+                        <tr key={group.name + " " + h.label + " " + h.value}>
                           <td>{h.label}</td>
-                          <td class="text-right no-wrap">
+                          <td className="text-right no-wrap">
                             {h.value.toLocaleString()}
                           </td>
                         </tr>

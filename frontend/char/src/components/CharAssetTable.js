@@ -9,11 +9,11 @@ import {
 } from "../components/BaseTable";
 
 const CharAssetTable = ({ character_id, location_id = 0 }) => {
-  const { isLoading, error, data } = useQuery(
+  const { isLoading, isFetching, error, data } = useQuery(
     ["assetList", character_id, location_id],
-    () => loadAssetList(character_id, location_id)
+    () => loadAssetList(character_id, location_id),
+    { initialData: [] }
   );
-  console.log("WE ARE HERE");
   const columns = React.useMemo(
     () => [
       {
@@ -50,11 +50,7 @@ const CharAssetTable = ({ character_id, location_id = 0 }) => {
 
   return (
     <Panel.Body>
-      {isLoading ? (
-        <></>
-      ) : (
-        <BaseTable {...{ isLoading, data, columns, error }} />
-      )}
+      <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
     </Panel.Body>
   );
 };

@@ -5,7 +5,7 @@ import { loadNotifications } from "../apis/Character";
 import { BaseTable, SelectColumnFilter } from "../components/BaseTable";
 
 const CharNotifications = ({ character_id }) => {
-  const { isLoading, error, data } = useQuery(
+  const { isLoading, isFetching, error, data } = useQuery(
     ["notifications", character_id],
     () => loadNotifications(character_id),
     {
@@ -42,7 +42,7 @@ const CharNotifications = ({ character_id }) => {
 
   return (
     <Panel.Body>
-      <BaseTable {...{ isLoading, data, columns, error }} />
+      <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
     </Panel.Body>
   );
 };

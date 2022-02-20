@@ -36,7 +36,7 @@
 
 .flex-container-pull-right {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   justify-content: center;
   align-content: center;
   flex-direction: row;

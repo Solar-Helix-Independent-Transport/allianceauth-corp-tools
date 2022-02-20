@@ -17,41 +17,41 @@ const CharHeader = ({ character_id }) => {
     <Panel>
       <Panel.Body>
         <Col xs={12} className="flex">
-          <div class="child">
+          <div className="child">
             <h1 style={{ margin: 0 }}>Account Audit</h1>
           </div>
           {!isLoading ? (
             <>
-              <div class="child">
+              <div className="child">
                 <Image
                   className="ra-avatar img-circle"
                   src={`https://images.evetech.net/characters/${data.main.character_id}/portrait?size=64`}
                 ></Image>
               </div>
-              <div class="child">
+              <div className="child">
                 <h4>{data.main.character_name}</h4>
               </div>
-              <div class="child association-hide">
+              <div className="child association-hide">
                 <Image
                   className="ra-avatar img-circle"
                   src={`https://images.evetech.net/corporations/${data.main.corporation_id}/logo?size=32`}
                 ></Image>
               </div>
-              <div class="child association-hide">
+              <div className="child association-hide">
                 <h4>{data.main.corporation_name}</h4>
               </div>
               {data.main.alliance_id != null && (
                 <>
-                  <div class="child association-hide">
+                  <div className="child association-hide">
                     <Image
                       className="ra-avatar img-circle"
                       src={`https://images.evetech.net/alliances/${data.main.alliance_id}/logo?size=32`}
                     ></Image>
                   </div>
-                  <div class="child association-hide">
+                  <div className="child association-hide">
                     <h4>{data.main.alliance_name}</h4>
                   </div>
-                  <div class="info-hide">
+                  <div className="info-hide">
                     <Badge>
                       Total SP:{" "}
                       {data.characters
@@ -80,7 +80,7 @@ const CharHeader = ({ character_id }) => {
                   </div>
                 </>
               )}
-              <div class="child-end">
+              <div className="child-end">
                 <CharActiveBadge
                   characters={data.characters}
                   character_id={character_id}
@@ -88,7 +88,7 @@ const CharHeader = ({ character_id }) => {
               </div>
             </>
           ) : (
-            <div class="child">
+            <div className="child">
               <Bars className="spinner-size" />
             </div>
           )}

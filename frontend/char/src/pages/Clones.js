@@ -8,8 +8,10 @@ import { TypeIcon } from "../components/EveImages";
 import { PanelLoader } from "../components/PanelLoader";
 
 const CharClones = ({ character_id }) => {
-  const { isLoading, error, data } = useQuery(["clones", character_id], () =>
-    loadClones(character_id)
+  const { isLoading, error, data } = useQuery(
+    ["clones", character_id],
+    () => loadClones(character_id),
+    { initialData: [] }
   );
 
   if (isLoading) return <PanelLoader />;
@@ -53,7 +55,7 @@ const CharClones = ({ character_id }) => {
                                 <>{`Location: ${c.location.name}`}</>
                               )}
                             </td>
-                            <td class="text-right no-wrap">
+                            <td className="text-right no-wrap">
                               {c.implants.map((i) => {
                                 return <TypeIcon type_id={i.id} />;
                               })}

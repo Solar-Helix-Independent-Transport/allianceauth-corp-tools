@@ -1,4 +1,5 @@
 import React from "react";
+
 import {
   Button,
   ButtonGroup,
@@ -30,12 +31,21 @@ function CharActiveBadge({ characters, character_id }) {
       </OverlayTrigger>
       <OverlayTrigger
         placement="top"
+        overlay={MyTooltip({ message: "Search For Account" })}
+      >
+        <Button className="btn-info" href="#/account/list">
+          <Glyphicon glyph="search" />
+        </Button>
+      </OverlayTrigger>
+      <OverlayTrigger
+        placement="top"
         overlay={MyTooltip({ message: "Refresh Account" })}
       >
         <Button className="btn-success" onClick={() => mutate(character_id)}>
           <Glyphicon glyph="refresh" />
         </Button>
       </OverlayTrigger>
+
       {bad_chars.length === 0 ? (
         <OverlayTrigger
           placement="bottom"

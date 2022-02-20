@@ -5,7 +5,7 @@ import { loadWallet } from "../apis/Character";
 import { BaseTable, SelectColumnFilter } from "../components/BaseTable";
 
 const CharWallet = ({ character_id }) => {
-  const { isLoading, error, data } = useQuery(
+  const { isLoading, isFetching, error, data } = useQuery(
     ["wallet", character_id],
     () => loadWallet(character_id),
     {
@@ -64,7 +64,7 @@ const CharWallet = ({ character_id }) => {
 
   return (
     <Panel.Body>
-      <BaseTable {...{ isLoading, data, columns, error }} />
+      <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
     </Panel.Body>
   );
 };

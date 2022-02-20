@@ -2,10 +2,14 @@ import React from "react";
 import { Panel, Label } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { loadAccountList } from "../apis/Character";
-import { BaseTable, textColumnFilter } from "../components/BaseTable";
+import {
+  BaseTable,
+  textColumnFilter,
+  SelectColumnFilter,
+} from "../components/BaseTable";
 
 const AccountList = () => {
-  const { isLoading, error, data } = useQuery(
+  const { isLoading, isFetching, error, data } = useQuery(
     ["account-list"],
     () => loadAccountList(),
     {
@@ -20,8 +24,21 @@ const AccountList = () => {
         accessor: "main.character_name",
       },
       {
+        Header: "Corporation",
+        accessor: "main.corporation_name",
+        Filter: SelectColumnFilter,
+        filter: "text",
+      },
+      {
+        Header: "Alliance",
+        accessor: "main.alliance_name",
+        Filter: SelectColumnFilter,
+        filter: "text",
+      },
+      {
         Header: "Characters",
         accessor: "characters",
+        disableSortBy: true,
         Cell: (props) =>
           props.value ? (
             <div className="text-center">
@@ -63,7 +80,7 @@ const AccountList = () => {
 
   return (
     <Panel.Body>
-      <BaseTable {...{ isLoading, data, columns, error }} />
+      <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
     </Panel.Body>
   );
 };

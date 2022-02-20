@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "react-bootstrap";
+import { Button, Tooltip, OverlayTrigger } from "react-bootstrap";
 import { useTable, useFilters, usePagination, useSortBy } from "react-table";
 import Select from "react-select";
 import { Bars } from "@agney/react-loading";
@@ -21,6 +21,10 @@ export const colourStyles = {
     };
   },
 };
+
+function MyTooltip({ message }) {
+  return <Tooltip id="character_tooltip">{message}</Tooltip>;
+}
 
 // Define a default UI for filtering
 function DefaultColumnFilter({
@@ -92,6 +96,7 @@ const defaultPropGetter = () => ({});
 
 export const BaseTable = ({
   isLoading,
+  isFetching,
   data,
   error,
   columns,
@@ -149,7 +154,7 @@ export const BaseTable = ({
       data,
       defaultColumn,
       filterTypes,
-      initialState: { pageSize: 25 },
+      initialState: { pageSize: 20 },
     },
     useFilters,
     useSortBy,
@@ -261,14 +266,20 @@ export const BaseTable = ({
               {"Page Size:"}
             </Button>{" "}
             <SplitButton
+              id="pageSizeDropdown"
               bsStyle="success"
               title={pageSize}
               onSelect={(e) => {
                 setPageSize(Number(e));
               }}
             >
-              {[25, 50, 100, 1000].map((pageSize) => (
-                <MenuItem eventKey={pageSize} value={pageSize}>
+              {[20, 50, 100, 1000000].map((pageSize) => (
+                <MenuItem
+                  id={pageSize}
+                  key={pageSize}
+                  eventKey={pageSize}
+                  value={pageSize}
+                >
                   Show {pageSize}
                 </MenuItem>
               ))}
@@ -281,13 +292,45 @@ export const BaseTable = ({
           <Button active bsStyle="info">
             {
               <>
-                Page{" "}
-                <strong>
-                  {pageIndex + 1} of {pageOptions.length}
-                </strong>
+                {pageOptions.length > 0 ? (
+                  <>
+                    Page{" "}
+                    <strong>
+                      {pageIndex + 1} of {pageOptions.length}
+                    </strong>
+                  </>
+                ) : (
+                  <>
+                    Page <strong>- of -</strong>
+                  </>
+                )}
               </>
             }
           </Button>{" "}
+          {isFetching ? (
+            <OverlayTrigger
+              placement="bottom"
+              overlay={MyTooltip({ message: "Refreshing Data" })}
+            >
+              <Button bsStyle="info">
+                <Glyphicon
+                  className="glyphicon-refresh-animate"
+                  glyph="refresh"
+                />
+              </Button>
+            </OverlayTrigger>
+          ) : (
+            <OverlayTrigger
+              placement="bottom"
+              overlay={MyTooltip({
+                message: "Page Loaded: " + new Date().toLocaleString(),
+              })}
+            >
+              <Button bsStyle="info">
+                <Glyphicon glyph="ok" />
+              </Button>
+            </OverlayTrigger>
+          )}
         </ButtonGroup>
       </div>
     </>

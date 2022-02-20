@@ -1,6 +1,6 @@
 import React from "react";
 import { Table } from "react-bootstrap";
-import { Panel } from "react-bootstrap";
+import { Panel, Glyphicon } from "react-bootstrap";
 import ReactTimeAgo from "react-time-ago";
 import CharacterPortrait from "../components/CharacterPortrait";
 import { useQuery } from "react-query";
@@ -8,8 +8,9 @@ import { loadStatus } from "../apis/Character";
 import { PanelLoader } from "../components/PanelLoader";
 
 const CharStatus = ({ character_id }) => {
-  const { isLoading, error, data } = useQuery(["status", character_id], () =>
-    loadStatus(character_id)
+  const { isLoading, isFetching, error, data } = useQuery(
+    ["status", character_id],
+    () => loadStatus(character_id)
   );
 
   if (isLoading) return <PanelLoader />;
@@ -23,16 +24,30 @@ const CharStatus = ({ character_id }) => {
           ? { bsStyle: "success" }
           : { bsStyle: "warning" };
         return (
-          <Panel {...char_status} className={"flex-child"}>
+          <Panel
+            key={"panel " + char.character.character_name}
+            {...char_status}
+            className={"flex-child"}
+          >
             <Panel.Heading>
-              <h4 className={"text-center"}>{char.character.character_name}</h4>
+              <h4 className={"text-center"}>
+                {char.character.character_name}
+                {isFetching ? (
+                  <Glyphicon
+                    className="glyphicon-refresh-animate pull-right"
+                    glyph="refresh"
+                  />
+                ) : (
+                  <></>
+                )}
+              </h4>
             </Panel.Heading>
             <Panel.Body className="flex-body">
               <CharacterPortrait character={char.character} />
               <h4 className={"text-center"}>Update Status</h4>
               <Table striped style={{ marginBottom: 0 }}>
                 <thead>
-                  <tr>
+                  <tr key="head">
                     <th>Update</th>
                     <th className="text-right">Last Run</th>
                   </tr>
@@ -44,7 +59,7 @@ const CharStatus = ({ character_id }) => {
                     {data.headers.map((h) => {
                       try {
                         return (
-                          <tr>
+                          <tr key={h}>
                             <td>{h}</td>
                             <td className="text-right">
                               <ReactTimeAgo
@@ -55,7 +70,7 @@ const CharStatus = ({ character_id }) => {
                         );
                       } catch (e) {
                         return (
-                          <tr>
+                          <tr key={h}>
                             <td>{h}</td>
                             <td className="text-right">Never</td>
                           </tr>

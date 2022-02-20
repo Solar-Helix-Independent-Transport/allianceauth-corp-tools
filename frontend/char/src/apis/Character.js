@@ -85,9 +85,21 @@ export async function loadWallet(character_id) {
   return api.data;
 }
 
-export async function loadContacts(character_id) {
-  const api = await axios.get(`/audit/api/account/${character_id}/wallet`);
+export async function loadMarket(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/orders`);
   console.log(`get wallet in api ${character_id}`);
+  return api.data;
+}
+
+export async function loadContacts(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/contacts`);
+  console.log(`get contacts in api ${character_id}`);
+  return api.data;
+}
+
+export async function loadAccountList(character_id) {
+  const api = await axios.get(`/audit/api/account/list`);
+  console.log(`get account list in api`);
   return api.data;
 }
 
@@ -106,11 +118,5 @@ export async function postAccountRefresh(character_id) {
     { character_id: character_id },
     { headers: { "X-CSRFToken": cookies.getItem("csrftoken") } }
   );
-  return api.data;
-}
-
-export async function loadAccountList(character_id) {
-  const api = await axios.get(`/audit/api/account/list`);
-  console.log(`get account list in api`);
   return api.data;
 }
