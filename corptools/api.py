@@ -912,7 +912,7 @@ def get_account_list(request):
             output[m_cid]["characters"].append(
                 {
                     "character": c.character,
-                    "active": c.is_active()
+                    "active": c.active
                 }
             )
         except AttributeError:
