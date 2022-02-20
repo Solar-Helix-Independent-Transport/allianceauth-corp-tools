@@ -46,7 +46,7 @@ def add_char(request, token):
     CharacterAudit.objects.update_or_create(
         character=EveCharacter.objects.get_character_by_id(token.character_id))
     update_character.apply_async(args=[token.character_id], priority=6)
-    return redirect('corptools:reactmain')
+    return redirect('corptools:reactmain', character_id=token.character_id)
 
 
 @login_required
