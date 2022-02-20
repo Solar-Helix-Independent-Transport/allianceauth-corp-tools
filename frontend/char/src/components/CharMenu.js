@@ -38,6 +38,9 @@ const CharMenu = ({ character_id }) => {
             </NavDropdown>
           );
         })}
+        <NavItem key="Public Data" href={`#/account/list`}>
+          Account List
+        </NavItem>
       </Nav>
     </Navbar>
   );

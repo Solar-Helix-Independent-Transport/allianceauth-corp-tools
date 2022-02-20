@@ -896,27 +896,34 @@ def post_acccount_refresh(request, character_id: int):
 )
 def get_account_list(request):
     characters = models.CharacterAudit.objects.visible_to(
-        request.user).select_related('character__character_ownership',
-                                     'character__character_ownership__user__profile',
-                                     'character__character_ownership__user__profile__main_character', )
+        request.user).filter(character=F("character__character_ownership__user__profile__main_character"))\
+        .select_related('character__character_ownership',
+                        'character__character_ownership__user__profile',
+                        'character__character_ownership__user__profile__main_character',
+                        'character__characteraudit')\
+        .prefetch_related('character__character_ownership__user__character_ownerships')\
+        .prefetch_related('character__character_ownership__user__character_ownerships__character')\
+        .prefetch_related('character__character_ownership__user__character_ownerships__character__characteraudit')\
 
     output = {}
-    for c in characters:
-        try:
-            m_cid = c.character.character_ownership.user.profile.main_character.character_id
-            if m_cid not in output:
-                output[m_cid] = {
+    for char in characters:
+        for c in char.character.character_ownership.user.character_ownerships.all():
+            if char.character.character_id not in output:
+                output[char.character.character_id] = {
                     "main": c.character.character_ownership.user.profile.main_character,
                     "characters": []
                 }
-            output[m_cid]["characters"].append(
+            active = False
+            try:
+                active = c.character.characteraudit.is_active()
+            except models.CharacterAudit.DoesNotExist:
+                pass
+            output[char.character.character_id]["characters"].append(
                 {
                     "character": c.character,
-                    "active": c.active
+                    "active": active
                 }
             )
-        except AttributeError:
-            pass  # No main or invalid audit
 
     return list(output.values())
 

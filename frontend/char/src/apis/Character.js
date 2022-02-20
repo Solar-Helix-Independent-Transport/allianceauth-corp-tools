@@ -108,3 +108,9 @@ export async function postAccountRefresh(character_id) {
   );
   return api.data;
 }
+
+export async function loadAccountList(character_id) {
+  const api = await axios.get(`/audit/api/account/list`);
+  console.log(`get account list in api`);
+  return api.data;
+}

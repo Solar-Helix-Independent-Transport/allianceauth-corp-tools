@@ -19,6 +19,7 @@ import CharRoles from "./pages/Roles";
 import CharWallet from "./pages/Wallet";
 import CharNotifications from "./pages/Notifications";
 import CharContacts from "./pages/Contacts";
+import AccountList from "./pages/AccountList";
 import "./style.css";
 TimeAgo.addDefaultLocale(en);
 
@@ -76,6 +77,7 @@ const CorptoolsCharacterView = () => {
                 path="/account/contacts"
                 component={() => CharContacts({ character_id })}
               />
+              <Route path="/account/list" component={() => AccountList()} />
             </Switch>
           </Panel>
         </Col>
