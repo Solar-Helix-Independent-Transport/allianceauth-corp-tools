@@ -22,7 +22,7 @@ const CharHeader = ({ character_id }) => {
           </div>
           {!isLoading ? (
             <>
-              <div className="child">
+              <div className="child association-hide">
                 <Image
                   className="ra-avatar img-circle"
                   src={`https://images.evetech.net/characters/${data.main.character_id}/portrait?size=64`}
