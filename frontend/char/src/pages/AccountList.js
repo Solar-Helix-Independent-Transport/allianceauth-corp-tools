@@ -1,5 +1,5 @@
 import React from "react";
-import { Panel, Label } from "react-bootstrap";
+import { Panel, Label, Button, Glyphicon } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { loadAccountList } from "../apis/Character";
 import {
@@ -21,9 +21,22 @@ const AccountList = () => {
     () => [
       {
         Header: "Main",
-        accessor: "main.character_name",
+        accessor: "main",
         Cell: (props) =>
-          props.value ? <span className="no-wrap">{props.value}</span> : <></>,
+          props.value ? (
+            <>
+              <Button
+                className="flex-container flex-wide"
+                bsStyle="success"
+                href={"/audit/r/" + props.value.character_id + "/"}
+              >
+                <span>{props.value.character_name}</span>
+                <Glyphicon glyph="new-window" />
+              </Button>
+            </>
+          ) : (
+            <></>
+          ),
       },
       {
         Header: "Corporation",
