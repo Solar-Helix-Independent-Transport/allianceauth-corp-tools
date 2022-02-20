@@ -36,6 +36,7 @@
 
 .flex-wide {
   justify-content: space-between;
+  flex-wrap: nowrap;
 }
 
 .flex-container-pull-right {

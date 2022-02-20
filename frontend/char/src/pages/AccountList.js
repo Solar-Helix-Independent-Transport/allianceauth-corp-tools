@@ -31,7 +31,10 @@ const AccountList = () => {
                 href={"/audit/r/" + props.value.character_id + "/"}
               >
                 <span>{props.value.character_name}</span>
-                <Glyphicon glyph="new-window" />
+                <Glyphicon
+                  style={{ "margin-left": "15px" }}
+                  glyph="new-window"
+                />
               </Button>
             </>
           ) : (
