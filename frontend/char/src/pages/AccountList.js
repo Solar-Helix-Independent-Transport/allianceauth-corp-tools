@@ -22,26 +22,34 @@ const AccountList = () => {
       {
         Header: "Main",
         accessor: "main.character_name",
+        Cell: (props) =>
+          props.value ? <span className="no-wrap">{props.value}</span> : <></>,
       },
       {
         Header: "Corporation",
         accessor: "main.corporation_name",
         Filter: SelectColumnFilter,
         filter: "text",
+        Cell: (props) =>
+          props.value ? <span className="no-wrap">{props.value}</span> : <></>,
       },
       {
         Header: "Alliance",
         accessor: "main.alliance_name",
         Filter: SelectColumnFilter,
         filter: "text",
+        Cell: (props) =>
+          props.value ? <span className="no-wrap">{props.value}</span> : <></>,
       },
       {
         Header: "Characters",
         accessor: "characters",
+        maxWidth: "50%",
+        minWidth: "50%",
         disableSortBy: true,
         Cell: (props) =>
           props.value ? (
-            <div className="text-center">
+            <div className="flex-container text-center">
               {props.value.map((char) => {
                 return (
                   <Label
