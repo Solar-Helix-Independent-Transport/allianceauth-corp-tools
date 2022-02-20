@@ -19,36 +19,39 @@ const CharMenu = ({ character_id }) => {
 
   return (
     <Navbar fluid collapseOnSelect>
-      <Nav>
-        <NavLink key="Overview" href={`#/account/status`}>
-          Overview
-        </NavLink>
-        <NavLink key="Public Data" href={`#/account/pubdata`}>
-          Public Data
-        </NavLink>
-        {menus.cats.map((cat) => {
-          return (
-            <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
-              {cat.links.map((link) => {
-                return (
-                  <NavLink
-                    id={link.name}
-                    key={link.name}
-                    href={`#${link.link}`}
-                  >
-                    {link.name}
-                  </NavLink>
-                );
-              })}
-            </NavDropdown>
-          );
-        })}
-      </Nav>
-      <Nav className="pull-right">
-        <NavLink key="Public Data" href={`#/account/list`}>
-          Account List
-        </NavLink>
-      </Nav>
+      <Navbar.Toggle />
+      <Navbar.Collapse>
+        <Nav>
+          <NavLink key="Overview" href={`#/account/status`}>
+            Overview
+          </NavLink>
+          <NavLink key="Public Data" href={`#/account/pubdata`}>
+            Public Data
+          </NavLink>
+          {menus.cats.map((cat) => {
+            return (
+              <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
+                {cat.links.map((link) => {
+                  return (
+                    <NavLink
+                      id={link.name}
+                      key={link.name}
+                      href={`#${link.link}`}
+                    >
+                      {link.name}
+                    </NavLink>
+                  );
+                })}
+              </NavDropdown>
+            );
+          })}
+        </Nav>
+        <Nav className="pull-right">
+          <NavLink key="Public Data" href={`#/account/list`}>
+            Account List
+          </NavLink>
+        </Nav>
+      </Navbar.Collapse>
     </Navbar>
   );
 };
