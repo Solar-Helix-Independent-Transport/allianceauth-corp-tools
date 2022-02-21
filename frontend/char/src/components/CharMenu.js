@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { Nav } from "react-bootstrap";
+import React from "react";
+import { useQuery } from "react-query";
+import { Tooltip, OverlayTrigger, Nav, Glyphicon } from "react-bootstrap";
 import { NavDropdown } from "react-bootstrap";
 import { Navbar } from "react-bootstrap";
+import { NavItem } from "react-bootstrap";
+
 import NavLink from "./NavLinkActive";
-import axios from "axios";
+import { Grid } from "@agney/react-loading";
+import { loadMenu } from "../apis/Character";
+import "./CharMenu.css";
 
-const CharMenu = ({ character_id }) => {
-  const [menus, setState] = useState({
-    cats: [],
-  });
+function MyTooltip({ message }) {
+  return <Tooltip id="implant_tooltip">{message}</Tooltip>;
+}
 
-  useEffect(() => {
-    axios.get(`/audit/api/account/menu`).then((res) => {
-      const cats = res.data;
-      setState({ cats });
-    });
-  }, []);
+const CharMenu = () => {
+  const { isLoading, error, data } = useQuery(["Menu"], () => loadMenu());
 
   return (
     <Navbar fluid collapseOnSelect>
@@ -30,28 +30,51 @@ const CharMenu = ({ character_id }) => {
           <NavLink key="Public Data" href={`#/account/pubdata`}>
             Public Data
           </NavLink>
-          {menus.cats.map((cat) => {
-            return (
-              <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
-                {cat.links.map((link) => {
+
+          {!error ? (
+            isLoading ? (
+              <></>
+            ) : (
+              <>
+                {data.map((cat) => {
                   return (
-                    <NavLink
-                      id={link.name}
-                      key={link.name}
-                      href={`#${link.link}`}
-                    >
-                      {link.name}
-                    </NavLink>
+                    <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
+                      {cat.links.map((link) => {
+                        return (
+                          <NavLink
+                            id={link.name}
+                            key={link.name}
+                            href={`#${link.link}`}
+                          >
+                            {link.name}
+                          </NavLink>
+                        );
+                      })}
+                    </NavDropdown>
                   );
                 })}
-              </NavDropdown>
-            );
-          })}
+              </>
+            )
+          ) : (
+            <></>
+          )}
         </Nav>
         <Nav className="pull-right">
-          <NavLink key="Public Data" href={`#/account/list`}>
-            Account List
-          </NavLink>
+          {!error ? (
+            isLoading ? (
+              <>
+                <Grid className="menu-spinner-size" />
+              </>
+            ) : (
+              <NavLink key="Public Data" href={`#/account/list`}>
+                Account List
+              </NavLink>
+            )
+          ) : (
+            <NavItem active={false}>
+              <Glyphicon glyph={"ban-circle"} />
+            </NavItem>
+          )}
         </Nav>
       </Navbar.Collapse>
     </Navbar>

@@ -26,6 +26,12 @@ export async function loadStatus(character_id) {
   return data;
 }
 
+export async function loadMenu() {
+  const api = await axios.get(`/audit/api/account/menu`);
+  console.log(`get menu in api`);
+  return api.data;
+}
+
 export async function loadPubData(character_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/pubdata`);
   console.log(`get pubdata in api ${character_id}`);

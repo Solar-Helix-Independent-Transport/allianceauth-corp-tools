@@ -7,6 +7,7 @@ import { loadClones } from "../apis/Character";
 import { TypeIcon } from "../components/EveImages";
 import { PanelLoader } from "../components/PanelLoader";
 import ReactTimeAgo from "react-time-ago";
+import { ErrorLoader } from "../components/ErrorLoader";
 
 function MyTooltip({ message }) {
   return <Tooltip id="implant_tooltip">{message}</Tooltip>;
@@ -15,13 +16,12 @@ function MyTooltip({ message }) {
 const CharClones = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["clones", character_id],
-    () => loadClones(character_id),
-    { initialData: [] }
+    () => loadClones(character_id)
   );
 
   if (isLoading) return <PanelLoader />;
 
-  if (error) return <div></div>;
+  if (error) return <ErrorLoader />;
 
   return (
     <>

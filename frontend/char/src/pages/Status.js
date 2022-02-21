@@ -6,6 +6,7 @@ import CharacterPortrait from "../components/CharacterPortrait";
 import { useQuery } from "react-query";
 import { loadStatus } from "../apis/Character";
 import { PanelLoader } from "../components/PanelLoader";
+import { ErrorLoader } from "../components/ErrorLoader";
 
 const CharStatus = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
@@ -15,7 +16,7 @@ const CharStatus = ({ character_id }) => {
 
   if (isLoading) return <PanelLoader />;
 
-  if (error) return <div></div>;
+  if (error) return <ErrorLoader />;
 
   return (
     <Panel.Body className="flex-container">

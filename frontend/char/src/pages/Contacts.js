@@ -2,7 +2,6 @@ import React from "react";
 
 import { Panel } from "react-bootstrap";
 import { useQuery } from "react-query";
-import { PanelLoader } from "../components/PanelLoader";
 import { loadContacts } from "../apis/Character";
 import {
   BaseTable,
@@ -46,10 +45,6 @@ const CharContacts = ({ character_id }) => {
     ],
     []
   );
-
-  if (isLoading) return <PanelLoader />;
-
-  if (error) return <div></div>;
 
   return (
     <Panel.Body>

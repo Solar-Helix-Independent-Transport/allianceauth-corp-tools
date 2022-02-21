@@ -4,6 +4,7 @@ import { useQuery } from "react-query";
 import { loadAssetGroups } from "../apis/Character";
 import { Table } from "react-bootstrap";
 import { PanelLoader } from "./PanelLoader";
+import { ErrorLoader } from "../components/ErrorLoader";
 
 const CharAssetGroups = ({ character_id, location_id = 0 }) => {
   const { isLoading, isFetching, error, data } = useQuery(
@@ -13,7 +14,7 @@ const CharAssetGroups = ({ character_id, location_id = 0 }) => {
 
   if (isLoading) return <PanelLoader />;
 
-  if (error) return <div></div>;
+  if (error) return <ErrorLoader />;
 
   return (
     <div className="flex-container">

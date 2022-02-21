@@ -6,6 +6,7 @@ import { loadRoles } from "../apis/Character";
 import { PanelLoader } from "../components/PanelLoader";
 import { Badge } from "react-bootstrap";
 import { Button } from "react-bootstrap";
+import { ErrorLoader } from "../components/ErrorLoader";
 
 const Checkbox = ({ active }) => {
   return (
@@ -22,7 +23,7 @@ const CharRoles = ({ character_id }) => {
 
   if (isLoading) return <PanelLoader />;
 
-  if (error) return <div></div>;
+  if (error) return <ErrorLoader />;
 
   return (
     <Panel.Body className="flex-container">

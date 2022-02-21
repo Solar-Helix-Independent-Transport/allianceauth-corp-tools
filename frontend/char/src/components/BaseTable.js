@@ -12,6 +12,7 @@ import {
   Table,
 } from "react-bootstrap";
 import "./BaseTable.css";
+import { ErrorLoader } from "../components/ErrorLoader";
 
 export const colourStyles = {
   option: (styles) => {
@@ -168,7 +169,7 @@ export const BaseTable = ({
       </div>
     );
 
-  if (error) return <div></div>;
+  if (error) return <ErrorLoader />;
 
   return (
     <>
@@ -323,7 +324,7 @@ export const BaseTable = ({
             <OverlayTrigger
               placement="bottom"
               overlay={MyTooltip({
-                message: "Page Loaded: " + new Date().toLocaleString(),
+                message: "Data Loaded: " + new Date().toLocaleString(),
               })}
             >
               <Button bsStyle="info">

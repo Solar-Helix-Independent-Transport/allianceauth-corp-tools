@@ -264,7 +264,6 @@ def get_character_menu(request):
             "name": "Skills",
             "link": "/account/skills"
         })
-
     return [_char, _finance, _inter]
 
 

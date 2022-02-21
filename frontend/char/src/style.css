@@ -98,7 +98,7 @@
 .info-hide {
 }
 
-@media only screen and (max-width: 1600px) {
+@media only screen and (max-width: 1400px) {
   .info-hide {
     display: none;
   }
@@ -107,7 +107,7 @@
 .association-hide {
 }
 
-@media only screen and (max-width: 1400px) {
+@media only screen and (max-width: 1000px) {
   .association-hide {
     display: none;
   }

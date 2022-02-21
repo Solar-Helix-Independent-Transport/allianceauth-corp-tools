@@ -17,12 +17,12 @@ const CharHeader = ({ character_id }) => {
     <Panel>
       <Panel.Body>
         <Col xs={12} className="flex">
-          <div className="child association-hide">
+          <div className="child info-hide">
             <h1 style={{ margin: 0 }}>Account Audit</h1>
           </div>
           {!isLoading ? (
             <>
-              <div className="child association-hide">
+              <div className="child info-hide">
                 <Image
                   className="ra-avatar img-circle"
                   src={`https://images.evetech.net/characters/${data.main.character_id}/portrait?size=64`}
@@ -31,7 +31,7 @@ const CharHeader = ({ character_id }) => {
               <div className="child">
                 <h4>{data.main.character_name}</h4>
               </div>
-              <div className="child association-hide">
+              <div className="child info-hide">
                 <Image
                   className="ra-avatar img-circle"
                   src={`https://images.evetech.net/corporations/${data.main.corporation_id}/logo?size=32`}
@@ -42,7 +42,7 @@ const CharHeader = ({ character_id }) => {
               </div>
               {data.main.alliance_id != null && (
                 <>
-                  <div className="child association-hide">
+                  <div className="child info-hide">
                     <Image
                       className="ra-avatar img-circle"
                       src={`https://images.evetech.net/alliances/${data.main.alliance_id}/logo?size=32`}

@@ -1,3 +1,4 @@
+from termios import ECHOE
 from allianceauth.services.hooks import MenuItemHook, UrlHook
 from django.utils.translation import ugettext_lazy as _
 from allianceauth import hooks
@@ -17,6 +18,19 @@ class MemberAudit(MenuItemHook):
 
     def render(self, request):
         if request.user.has_perm('corptools.view_characteraudit'):
+            chars = request.user.character_ownerships.all(
+
+            ).select_related('character__characteraudit')
+
+            inactive_count = 0
+            for c in chars:
+                try:
+                    if not c.character.characteraudit.is_active():
+                        inactive_count += 1
+                except models.CharacterAudit.DoesNotExist:
+                    inactive_count += 1
+            if inactive_count:
+                self.count = inactive_count
             return MenuItemHook.render(self, request)
         return ''
 

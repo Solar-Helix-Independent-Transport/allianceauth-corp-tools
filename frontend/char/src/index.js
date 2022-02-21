@@ -21,6 +21,7 @@ import CharNotifications from "./pages/Notifications";
 import CharContacts from "./pages/Contacts";
 import AccountList from "./pages/AccountList";
 import "./style.css";
+import ErrorBoundary from "./ErrorBoundary";
 TimeAgo.addDefaultLocale(en);
 
 const queryClient = new QueryClient();
@@ -34,55 +35,57 @@ const CorptoolsCharacterView = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <br />
-        <CharHeader character_id={character_id}></CharHeader>
-        <CharMenu character_id={character_id}></CharMenu>
-        <Col>
-          <Panel>
-            <Switch>
-              <Route
-                exact
-                path={["", "/account/status"]}
-                component={() => CharStatus({ character_id })}
-              />
-              <Route
-                path="/account/assets"
-                component={() => CharAssets({ character_id })}
-              />
-              <Route
-                path="/account/listassets"
-                component={() => CharAssetList({ character_id })}
-              />
-              <Route
-                path="/account/pubdata"
-                component={() => PubData({ character_id })}
-              />
-              <Route
-                path="/account/clones"
-                component={() => CharClones({ character_id })}
-              />
-              <Route
-                path="/account/roles"
-                component={() => CharRoles({ character_id })}
-              />
-              <Route
-                path="/account/wallet"
-                component={() => CharWallet({ character_id })}
-              />
-              <Route
-                path="/account/notifications"
-                component={() => CharNotifications({ character_id })}
-              />
-              <Route
-                path="/account/contact"
-                component={() => CharContacts({ character_id })}
-              />
-              <Route path="/account/list" component={() => AccountList()} />
-            </Switch>
-          </Panel>
-        </Col>
-      </Router>
+      <ErrorBoundary>
+        <Router>
+          <br />
+          <CharHeader character_id={character_id}></CharHeader>
+          <CharMenu character_id={character_id}></CharMenu>
+          <Col>
+            <Panel>
+              <Switch>
+                <Route
+                  exact
+                  path={["", "/account/status"]}
+                  component={() => CharStatus({ character_id })}
+                />
+                <Route
+                  path="/account/assets"
+                  component={() => CharAssets({ character_id })}
+                />
+                <Route
+                  path="/account/listassets"
+                  component={() => CharAssetList({ character_id })}
+                />
+                <Route
+                  path="/account/pubdata"
+                  component={() => PubData({ character_id })}
+                />
+                <Route
+                  path="/account/clones"
+                  component={() => CharClones({ character_id })}
+                />
+                <Route
+                  path="/account/roles"
+                  component={() => CharRoles({ character_id })}
+                />
+                <Route
+                  path="/account/wallet"
+                  component={() => CharWallet({ character_id })}
+                />
+                <Route
+                  path="/account/notifications"
+                  component={() => CharNotifications({ character_id })}
+                />
+                <Route
+                  path="/account/contact"
+                  component={() => CharContacts({ character_id })}
+                />
+                <Route path="/account/list" component={() => AccountList()} />
+              </Switch>
+            </Panel>
+          </Col>
+        </Router>
+      </ErrorBoundary>
     </QueryClientProvider>
   );
 };
