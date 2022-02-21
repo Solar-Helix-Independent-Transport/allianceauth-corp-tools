@@ -76,8 +76,7 @@
 }
 
 .table-div-fill {
-  height: 250px;
-  overflow-y: overlay;
+  width: auto;
 }
 
 .table-div::-webkit-scrollbar {

@@ -89,7 +89,7 @@ const CharClones = ({ character_id }) => {
                     </tr>
                   </thead>
                 </Table>
-                <div className={"table-div-fill"}>
+                <div className={"table-div table-div-fill"}>
                   <Table striped>
                     <tbody>
                       {char.clones != null ? (
