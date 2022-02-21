@@ -19,7 +19,9 @@ const CharMenu = ({ character_id }) => {
 
   return (
     <Navbar fluid collapseOnSelect>
-      <Navbar.Toggle />
+      <Navbar.Header>
+        <Navbar.Toggle />
+      </Navbar.Header>
       <Navbar.Collapse>
         <Nav>
           <NavLink key="Overview" href={`#/account/status`}>

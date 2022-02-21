@@ -39,6 +39,10 @@
   flex-wrap: nowrap;
 }
 
+.flex-wide-child {
+  width: 800px;
+}
+
 .flex-container-pull-right {
   display: flex;
   align-items: flex-end;
@@ -68,6 +72,11 @@
 .table-div {
   height: 250px;
   width: 400px;
+  overflow-y: overlay;
+}
+
+.table-div-fill {
+  height: 250px;
   overflow-y: overlay;
 }
 

@@ -1,8 +1,7 @@
 .char-portrait {
-  /*width: 512px;
-      height: 512px;*/
+  width: 400px;
+  height: 400px;
   position: relative;
-  margin: auto;
 }
 
 .corp-logo {
