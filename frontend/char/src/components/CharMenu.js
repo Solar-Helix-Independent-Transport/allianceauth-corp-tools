@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery } from "react-query";
-import { Tooltip, OverlayTrigger, Nav, Glyphicon } from "react-bootstrap";
+import { Nav, Glyphicon } from "react-bootstrap";
 import { NavDropdown } from "react-bootstrap";
 import { Navbar } from "react-bootstrap";
 import { NavItem } from "react-bootstrap";
@@ -9,10 +9,6 @@ import NavLink from "./NavLinkActive";
 import { Grid } from "@agney/react-loading";
 import { loadMenu } from "../apis/Character";
 import "./CharMenu.css";
-
-function MyTooltip({ message }) {
-  return <Tooltip id="implant_tooltip">{message}</Tooltip>;
-}
 
 const CharMenu = () => {
   const { isLoading, error, data } = useQuery(["Menu"], () => loadMenu());
