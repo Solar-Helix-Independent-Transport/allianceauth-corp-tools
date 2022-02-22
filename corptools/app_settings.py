@@ -1,8 +1,6 @@
 from django.conf import settings
 
-CORPTOOLS_APP_NAME = getattr(settings, "CORPTOOLS_APP_NAME", "Audit")
-
-CORPTOOLS_APP_NAME = getattr(settings, "CORPTOOLS_APP_NAME", "Audit")
+CORPTOOLS_APP_NAME = getattr(settings, "CORPTOOLS_APP_NAME", "Character Audit")
 
 CORPTOOLS_DISCORD_BOT_COGS = getattr(
     settings, 'CORPTOOLS_DISCORD_BOT_COGS', ["corptools.cogs.routes", "corptools.cogs.locate"])
@@ -244,8 +242,7 @@ def get_corp_update_attributes():
         ("Assets", 'last_update_assets'),
         ("Structures", 'last_update_structures'),
         ("Wallet", 'last_update_wallet'),
-        ("Moons", 'last_update_moons'),
-
+        ("Moons", 'last_update_moons')
     ]
 
     return _attribs

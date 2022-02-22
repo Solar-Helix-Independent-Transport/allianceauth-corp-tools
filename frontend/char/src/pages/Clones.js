@@ -8,6 +8,7 @@ import { TypeIcon } from "../components/EveImages";
 import { PanelLoader } from "../components/PanelLoader";
 import ReactTimeAgo from "react-time-ago";
 import { ErrorLoader } from "../components/ErrorLoader";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 function MyTooltip({ message }) {
   return <Tooltip id="implant_tooltip">{message}</Tooltip>;
@@ -24,7 +25,7 @@ const CharClones = ({ character_id }) => {
   if (error) return <ErrorLoader />;
 
   return (
-    <>
+    <ErrorBoundary>
       <Panel.Body className={"flex-container"}>
         {data.map((char) => {
           return (
@@ -73,7 +74,7 @@ const CharClones = ({ character_id }) => {
                         : "No Data"
                     }`}</p>
                     <p className="text-center">
-                      {char.last_clone_jump ? (
+                      {char.last_station_change ? (
                         <ReactTimeAgo date={char.last_station_change} />
                       ) : (
                         ""
@@ -137,7 +138,7 @@ const CharClones = ({ character_id }) => {
           );
         })}
       </Panel.Body>
-    </>
+    </ErrorBoundary>
   );
 };
 

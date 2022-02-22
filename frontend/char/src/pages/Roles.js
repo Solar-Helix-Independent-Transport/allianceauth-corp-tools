@@ -7,6 +7,7 @@ import { PanelLoader } from "../components/PanelLoader";
 import { Badge } from "react-bootstrap";
 import { Button } from "react-bootstrap";
 import { ErrorLoader } from "../components/ErrorLoader";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const Checkbox = ({ active }) => {
   return (
@@ -26,52 +27,54 @@ const CharRoles = ({ character_id }) => {
   if (error) return <ErrorLoader />;
 
   return (
-    <Panel.Body className="flex-container">
-      <Table striped>
-        <thead>
-          <tr>
-            <th>Character</th>
-            <th>Affiliation</th>
-            <th className="text-center">Director</th>
-            <th className="text-center">Station Manager</th>
-            <th className="text-center">Personnel Manager</th>
-            <th className="text-center">Accountant</th>
-            <th className="text-center">Titles</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((char) => {
-            return (
-              <tr>
-                <td>{char.character.character_name}</td>
-                <td>
-                  {char.character.corporation_name}
-                  <br />
-                  {char.character.alliance_name}
-                </td>
-                <td className="text-center">
-                  <Checkbox active={char.director} />
-                </td>
-                <td className="text-center">
-                  <Checkbox active={char.station_manager} />
-                </td>
-                <td className="text-center">
-                  <Checkbox active={char.personnel_manager} />
-                </td>
-                <td className="text-center">
-                  <Checkbox active={char.accountant} />
-                </td>
-                <td className="text-center">
-                  {char.titles.map((t) => {
-                    return <Badge>{t.name}</Badge>;
-                  })}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </Table>
-    </Panel.Body>
+    <ErrorBoundary>
+      <Panel.Body className="flex-container">
+        <Table striped>
+          <thead>
+            <tr>
+              <th>Character</th>
+              <th>Affiliation</th>
+              <th className="text-center">Director</th>
+              <th className="text-center">Station Manager</th>
+              <th className="text-center">Personnel Manager</th>
+              <th className="text-center">Accountant</th>
+              <th className="text-center">Titles</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((char) => {
+              return (
+                <tr>
+                  <td>{char.character.character_name}</td>
+                  <td>
+                    {char.character.corporation_name}
+                    <br />
+                    {char.character.alliance_name}
+                  </td>
+                  <td className="text-center">
+                    <Checkbox active={char.director} />
+                  </td>
+                  <td className="text-center">
+                    <Checkbox active={char.station_manager} />
+                  </td>
+                  <td className="text-center">
+                    <Checkbox active={char.personnel_manager} />
+                  </td>
+                  <td className="text-center">
+                    <Checkbox active={char.accountant} />
+                  </td>
+                  <td className="text-center">
+                    {char.titles.map((t) => {
+                      return <Badge>{t.name}</Badge>;
+                    })}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+      </Panel.Body>
+    </ErrorBoundary>
   );
 };
 

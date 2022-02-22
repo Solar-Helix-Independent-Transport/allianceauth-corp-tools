@@ -1,5 +1,5 @@
 from datetime import datetime
-from corptools.audit_views import corporation
+from xmlrpc.client import boolean
 from ninja import Schema
 
 from typing import Optional, List, Dict
@@ -80,10 +80,12 @@ class CharacterAssetGroups(Schema):
 
 
 class CharacterAssetItem(Schema):
+    id: int
     character: Character
     item: EveName
     quantity: int = 0
     location: EveName = None
+    expand: boolean = None
 
 
 class CharacterClone(Schema):

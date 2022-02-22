@@ -8,7 +8,7 @@ import { NavItem } from "react-bootstrap";
 import NavLink from "./NavLinkActive";
 import { Grid } from "@agney/react-loading";
 import { loadMenu } from "../apis/Character";
-import "./CharMenu.css";
+import "./Menu.css";
 
 const CharMenu = () => {
   const { isLoading, error, data } = useQuery(["Menu"], () => loadMenu());

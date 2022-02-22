@@ -8,6 +8,7 @@ import {
   SelectColumnFilter,
   textColumnFilter,
 } from "../components/BaseTable";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const CharContacts = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
@@ -47,9 +48,11 @@ const CharContacts = ({ character_id }) => {
   );
 
   return (
-    <Panel.Body>
-      <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
-    </Panel.Body>
+    <ErrorBoundary>
+      <Panel.Body>
+        <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
+      </Panel.Body>
+    </ErrorBoundary>
   );
 };
 

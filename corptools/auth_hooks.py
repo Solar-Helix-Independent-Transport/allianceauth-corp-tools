@@ -39,13 +39,18 @@ class Structures(MenuItemHook):
     def __init__(self):
 
         MenuItemHook.__init__(self,
-                              "Structures",
+                              "Corporation Audit",
                               'far fa-building fa-fw',
                               'corptools:corp_react',
                               navactive=['corptools:corp_react'])
 
     def render(self, request):
-        if models.Structure.get_visible(request.user).exists():
+        if (request.user.has_perm('corptools.alliance_corp_manager') or
+            request.user.has_perm('corptools.state_corp_manager') or
+            request.user.has_perm('corptools.global_corp_manager') or
+            request.user.has_perm('corptools.holding_corp_structures') or
+            request.user.has_perm('corptools.holding_corp_asset') or
+                request.user.has_perm('corptools.holding_corp_wallets')):
             return MenuItemHook.render(self, request)
         return ''
 

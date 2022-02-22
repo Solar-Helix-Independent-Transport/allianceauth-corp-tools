@@ -1,46 +1,39 @@
-import React, { useState, useEffect } from "react";
-import { Nav, NavItem } from "react-bootstrap";
-import { NavDropdown } from "react-bootstrap";
+import React from "react";
+import { Nav } from "react-bootstrap";
 import { Navbar } from "react-bootstrap";
-import axios from "axios";
 
-const CharMenu = ({ character_id }) => {
-  const [menus, setState] = useState({
-    cats: [],
-  });
+import NavLink from "./NavLinkActive";
+import "./Menu.css";
+import CorpBadge from "./CorpBadge";
 
-  useEffect(() => {
-    axios.get(`/audit/api/account/menu`).then((res) => {
-      const cats = res.data;
-      setState({ cats });
-    });
-  }, []);
-
+const CorpMenu = () => {
   return (
     <Navbar fluid collapseOnSelect>
-      <Nav>
-        <NavItem key="Overview" href={`#/account/status`}>
-          Overview
-        </NavItem>
-        <NavItem key="Public Data" href={`#/account/pubdata`}>
-          Public Data
-        </NavItem>
-        {menus.cats.map((cat) => {
-          return (
-            <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
-              {cat.links.map((link) => {
-                return (
-                  <NavItem key={link.name} href={`#${link.link}`}>
-                    {link.name}
-                  </NavItem>
-                );
-              })}
-            </NavDropdown>
-          );
-        })}
-      </Nav>
+      <Navbar.Header>
+        <Navbar.Brand>Corporation Audit</Navbar.Brand>
+        <Navbar.Toggle />
+      </Navbar.Header>
+      <Navbar.Collapse>
+        <Nav>
+          <NavLink key="Structures" href={`#/structures`}>
+            Structures
+          </NavLink>
+          <NavLink key="Wallets" href={`#/wallets`}>
+            Wallets
+          </NavLink>
+          <NavLink key="Assets" href={`#/assets`}>
+            Assets
+          </NavLink>
+        </Nav>
+        <Nav className="pull-right">
+          <CorpBadge />
+          <NavLink key="Status" href={`#/status`}>
+            Corporations
+          </NavLink>
+        </Nav>
+      </Navbar.Collapse>
     </Navbar>
   );
 };
 
-export default CharMenu;
+export default CorpMenu;

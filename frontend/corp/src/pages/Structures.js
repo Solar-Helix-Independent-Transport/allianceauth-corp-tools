@@ -18,7 +18,7 @@ import { CorporationLogo } from "../components/EveImages";
 TimeAgo.addDefaultLocale(en);
 
 export const CorpStructures = () => {
-  const { isLoading, error, data } = useQuery(
+  const { isLoading, isFetching, error, data } = useQuery(
     ["stuctures"],
     () => loadStructures(),
     {
@@ -230,7 +230,7 @@ export const CorpStructures = () => {
 
   return (
     <Panel.Body>
-      <BaseTable {...{ isLoading, data, columns, error }} />
+      <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
     </Panel.Body>
   );
 };

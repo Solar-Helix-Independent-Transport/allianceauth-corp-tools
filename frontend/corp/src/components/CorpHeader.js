@@ -7,8 +7,11 @@ import CorpActiveBadge from "./CorpActiveBadge";
 import { Bars } from "@agney/react-loading";
 import { loadCorpStatus } from "../apis/Corporation";
 import "./CorpHeader.css";
-const CorpHeader = ({}) => {
-  const { isLoading, data } = useQuery(["status"], () => loadCorpStatus());
+
+const CorpHeader = ({ corporation_id }) => {
+  const { isLoading, data } = useQuery(["status"], () =>
+    loadCorpStatus(corporation_id)
+  );
 
   return (
     <Panel>

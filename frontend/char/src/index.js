@@ -21,7 +21,8 @@ import CharNotifications from "./pages/Notifications";
 import CharContacts from "./pages/Contacts";
 import AccountList from "./pages/AccountList";
 import "./style.css";
-import ErrorBoundary from "./ErrorBoundary";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { ErrorLoader } from "./components/ErrorLoader";
 TimeAgo.addDefaultLocale(en);
 
 const queryClient = new QueryClient();
@@ -79,6 +80,12 @@ const CorptoolsCharacterView = () => {
                 <Route
                   path="/account/contact"
                   component={() => CharContacts({ character_id })}
+                />
+                <Route path="/account/skills" component={() => ErrorLoader()} />
+                <Route path="/account/market" component={() => ErrorLoader()} />
+                <Route
+                  path="/account/standings"
+                  component={() => ErrorLoader()}
                 />
                 <Route path="/account/list" component={() => AccountList()} />
               </Switch>

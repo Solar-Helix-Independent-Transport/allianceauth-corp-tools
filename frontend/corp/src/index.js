@@ -4,19 +4,33 @@ import reportWebVitals from "./reportWebVitals";
 import { CorpStructures } from "./pages/Structures";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Panel } from "react-bootstrap";
-
+import { HashRouter as Router, Switch, Route } from "react-router-dom";
+import { ErrorLoader } from "./components/ErrorLoader";
+import CorpMenu from "./components/CorpMenu";
+import CorpStatus from "./pages/Status";
+import "./style.css";
 const queryClient = new QueryClient();
 
 ReactDOM.render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <h1 className="text-center">Structure Browser</h1>
-      <Panel bsStyle="default">
-        <Panel.Body>
-          <CorpStructures />
-        </Panel.Body>
-      </Panel>
-    </QueryClientProvider>
+    <Router>
+      <QueryClientProvider client={queryClient}>
+        <br />
+        <CorpMenu />
+        <Panel bsStyle="default">
+          <Switch>
+            <Route
+              exact
+              path={["", "/structures"]}
+              component={() => CorpStructures()}
+            />
+            <Route path={"/wallets"} component={() => ErrorLoader()} />
+            <Route path={"/status"} component={() => CorpStatus()} />
+            <Route path={"/assets"} component={() => ErrorLoader()} />
+          </Switch>
+        </Panel>
+      </QueryClientProvider>
+    </Router>
   </React.StrictMode>,
   document.getElementById("root")
 );

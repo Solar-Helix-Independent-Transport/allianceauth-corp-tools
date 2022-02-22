@@ -70,9 +70,7 @@
 }
 
 .table-div {
-  height: 250px;
   width: 400px;
-  overflow-y: overlay;
 }
 
 .table-div-fill {

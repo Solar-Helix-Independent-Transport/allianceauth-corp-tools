@@ -200,7 +200,7 @@ def get_character_menu(request):
         "links": []
     }
     _char = {
-        "name": "Character",
+        "name": "Characters",
         "links": []
     }
 
@@ -233,7 +233,7 @@ def get_character_menu(request):
         })
     if app_settings.CT_CHAR_ASSETS_MODULE:
         _char["links"].append({
-            "name": "Asset Groups",
+            "name": "Asset Overview",
             "link": "/account/assets"
         })
         _char["links"].append({
@@ -304,6 +304,8 @@ def get_character_asset_locations(request, character_id: int):
     tags=["Account"]
 )
 def get_character_asset_list(request, character_id: int, location_id: int):
+    expandable_cats = [2, 6]
+
     if character_id == 0:
         character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
@@ -328,7 +330,6 @@ def get_character_asset_list(request, character_id: int, location_id: int):
         assets = assets.filter(Q(location_name_id=int(
             location_id)) | Q(location_id=int(location_id)))
 
-    item_ids = assets.values_list('item_id', flat=True)
     output = []
 
     for a in assets:
@@ -348,11 +349,63 @@ def get_character_asset_list(request, character_id: int, location_id: int):
                     "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}"
                 },
                 "quantity": a.quantity,
+                "id": a.item_id,
+                "expand": True if a.type_name.group.category.category_id in expandable_cats else False,
                 "location": {
                     "id": a.location_name.location_id,
                     "name": a.location_name.location_name
                 }
             })
+
+    return output
+
+
+@api.get(
+    "account/{character_id}/asset/{item_id}/contents",
+    response={200: List[schema.CharacterAssetItem], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_asset_contents(request, character_id: int, item_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    assets = models.CharacterAsset.objects\
+        .filter(character__character__in=characters).select_related(
+            "character", "character__character",
+            "type_name", "location_name", "type_name__group__category"
+        )
+    assets = assets.filter(location_id=item_id)
+    output = []
+
+    for a in assets:
+        output.append({
+            "character": {
+                "character_id": a.character.character.character_id,
+                "character_name": a.character.character.character_name,
+                "corporation_id": a.character.character.corporation_id,
+                "corporation_name": a.character.character.corporation_name,
+                "alliance_id": a.character.character.alliance_id,
+                "alliance_name": a.character.character.alliance_name
+            },
+            "item": {
+                "id": a.type_name.type_id,
+                "name": a.type_name.name,
+                "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}"
+            },
+            "quantity": a.quantity,
+            "id": a.item_id,
+            "expand": False,
+            "location": {
+                "id": item_id,
+                "name": a.location_flag
+            }
+        })
 
     return output
 
@@ -984,7 +1037,7 @@ def get_corporation_structure_fitting(request, corporation_id, structure_id):
 
 
 @api.get(
-    "corp/status",
+    "corp/list",
     response={200: List[schema.CorpStatus], 403: schema.Message},
     tags=["Corporation"]
 )
@@ -1011,3 +1064,35 @@ def get_visible_corporation_status(request):
         output.append(_out)
     print(output)
     return output
+
+
+@api.get(
+    "corp/{corporation_id}/status",
+    response={200: schema.CorpStatus, 403: schema.Message},
+    tags=["Corporation"]
+)
+def get_corporation_status(request, corporation_id: int):
+    if not corporation_id:
+        corporation_id = request.user.profile.main_character.corporation_id
+    corp = models.CorporationAudit.objects.visible_to(
+        request.user).filter(corporation__corporation_id=corporation_id)
+    if corp.exists():
+        c = corp.first()
+        _updates = {}
+        for grp in app_settings.get_corp_update_attributes():
+            _updates[grp[0]] = getattr(c, grp[1])
+        all_id = None
+        all_nm = None
+        if c.corporation.alliance:
+            all_id = c.corporation.alliance.alliance_id
+            all_nm = c.corporation.alliance.alliance_name
+
+        _out = {"corporation": {"corporation_id": c.corporation.corporation_id,
+                                "corporation_name": c.corporation.corporation_name,
+                                "alliance_id": all_id,
+                                "alliance_name": all_nm},
+                "characters": c.corporation.member_count,
+                "active": True,
+                "last_updates": _updates}
+        return 200, _out
+    return 403, {"message": "Not Found"}

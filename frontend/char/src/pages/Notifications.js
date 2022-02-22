@@ -3,6 +3,7 @@ import { Panel } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { loadNotifications } from "../apis/Character";
 import { BaseTable, SelectColumnFilter } from "../components/BaseTable";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const CharNotifications = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
@@ -41,9 +42,11 @@ const CharNotifications = ({ character_id }) => {
   );
 
   return (
-    <Panel.Body>
-      <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
-    </Panel.Body>
+    <ErrorBoundary>
+      <Panel.Body>
+        <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
+      </Panel.Body>
+    </ErrorBoundary>
   );
 };
 

@@ -65,6 +65,14 @@ export async function loadAssetList(character_id, location_id) {
   return api.data;
 }
 
+export async function loadAssetContents(character_id, item_id) {
+  const api = await axios.get(
+    `/audit/api/account/${character_id}/asset/${item_id}/contents`
+  );
+  console.log(`get asset contents in api ${character_id} ${item_id}`);
+  return api.data;
+}
+
 export async function loadClones(character_id, location_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/clones`);
   console.log(`get clones in api ${character_id}`);

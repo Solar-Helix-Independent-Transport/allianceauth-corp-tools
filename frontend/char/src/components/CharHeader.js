@@ -18,7 +18,7 @@ const CharHeader = ({ character_id }) => {
       <Panel.Body>
         <Col xs={12} className="flex">
           <div className="child info-hide">
-            <h1 style={{ margin: 0 }}>Account Audit</h1>
+            <h1 style={{ margin: 0 }}>Character Audit</h1>
           </div>
           {!isLoading ? (
             <>

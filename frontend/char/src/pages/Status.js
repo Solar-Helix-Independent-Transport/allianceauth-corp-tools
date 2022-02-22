@@ -7,6 +7,7 @@ import { useQuery } from "react-query";
 import { loadStatus } from "../apis/Character";
 import { PanelLoader } from "../components/PanelLoader";
 import { ErrorLoader } from "../components/ErrorLoader";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const CharStatus = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
@@ -19,73 +20,75 @@ const CharStatus = ({ character_id }) => {
   if (error) return <ErrorLoader />;
 
   return (
-    <Panel.Body className="flex-container">
-      {data.characters.map((char) => {
-        let char_status = char.active
-          ? { bsStyle: "success" }
-          : { bsStyle: "warning" };
-        return (
-          <Panel
-            key={"panel " + char.character.character_name}
-            {...char_status}
-            className={"flex-child"}
-          >
-            <Panel.Heading>
-              <h4 className={"text-center"}>
-                {char.character.character_name}
-                {isFetching ? (
-                  <Glyphicon
-                    className="glyphicon-refresh-animate pull-right"
-                    glyph="refresh"
-                  />
-                ) : (
-                  <></>
-                )}
-              </h4>
-            </Panel.Heading>
-            <Panel.Body className="flex-body">
-              <CharacterPortrait character={char.character} />
-              <h4 className={"text-center"}>Update Status</h4>
-              <Table striped style={{ marginBottom: 0 }}>
-                <thead>
-                  <tr key="head">
-                    <th>Update</th>
-                    <th className="text-right">Last Run</th>
-                  </tr>
-                </thead>
-              </Table>
-              <div className={"table-div"}>
-                <Table striped>
-                  <tbody>
-                    {data.headers.map((h) => {
-                      try {
-                        return (
-                          <tr key={h}>
-                            <td>{h}</td>
-                            <td className="text-right">
-                              <ReactTimeAgo
-                                date={Date.parse(char.last_updates[h])}
-                              />
-                            </td>
-                          </tr>
-                        );
-                      } catch (e) {
-                        return (
-                          <tr key={h}>
-                            <td>{h}</td>
-                            <td className="text-right">Never</td>
-                          </tr>
-                        );
-                      }
-                    })}
-                  </tbody>
+    <ErrorBoundary>
+      <Panel.Body className="flex-container">
+        {data.characters.map((char) => {
+          let char_status = char.active
+            ? { bsStyle: "success" }
+            : { bsStyle: "warning" };
+          return (
+            <Panel
+              key={"panel " + char.character.character_name}
+              {...char_status}
+              className={"flex-child"}
+            >
+              <Panel.Heading>
+                <h4 className={"text-center"}>
+                  {char.character.character_name}
+                  {isFetching ? (
+                    <Glyphicon
+                      className="glyphicon-refresh-animate pull-right"
+                      glyph="refresh"
+                    />
+                  ) : (
+                    <></>
+                  )}
+                </h4>
+              </Panel.Heading>
+              <Panel.Body className="flex-body">
+                <CharacterPortrait character={char.character} />
+                <h4 className={"text-center"}>Update Status</h4>
+                <Table striped style={{ marginBottom: 0 }}>
+                  <thead>
+                    <tr key="head">
+                      <th>Update</th>
+                      <th className="text-right">Last Run</th>
+                    </tr>
+                  </thead>
                 </Table>
-              </div>
-            </Panel.Body>
-          </Panel>
-        );
-      })}
-    </Panel.Body>
+                <div className={"table-div"}>
+                  <Table striped>
+                    <tbody>
+                      {data.headers.map((h) => {
+                        try {
+                          return (
+                            <tr key={h}>
+                              <td>{h}</td>
+                              <td className="text-right">
+                                <ReactTimeAgo
+                                  date={Date.parse(char.last_updates[h])}
+                                />
+                              </td>
+                            </tr>
+                          );
+                        } catch (e) {
+                          return (
+                            <tr key={h}>
+                              <td>{h}</td>
+                              <td className="text-right">Never</td>
+                            </tr>
+                          );
+                        }
+                      })}
+                    </tbody>
+                  </Table>
+                </div>
+              </Panel.Body>
+            </Panel>
+          );
+        })}
+      </Panel.Body>
+    </ErrorBoundary>
   );
 };
 
