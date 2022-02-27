@@ -60,25 +60,24 @@ const CharStatus = ({ character_id }) => {
                   <Table striped>
                     <tbody>
                       {data.headers.map((h) => {
-                        try {
-                          return (
-                            <tr key={h}>
-                              <td>{h}</td>
-                              <td className="text-right">
-                                <ReactTimeAgo
-                                  date={Date.parse(char.last_updates[h])}
-                                />
-                              </td>
-                            </tr>
-                          );
-                        } catch (e) {
-                          return (
-                            <tr key={h}>
-                              <td>{h}</td>
-                              <td className="text-right">Never</td>
-                            </tr>
-                          );
-                        }
+                        return (
+                          <tr key={h}>
+                            <td>{h}</td>
+                            <td className="text-right">
+                              {char.last_updates ? (
+                                char.last_updates[h] ? (
+                                  <ReactTimeAgo
+                                    date={Date.parse(char.last_updates[h])}
+                                  />
+                                ) : (
+                                  "Never"
+                                )
+                              ) : (
+                                "Never"
+                              )}
+                            </td>
+                          </tr>
+                        );
                       })}
                     </tbody>
                   </Table>
