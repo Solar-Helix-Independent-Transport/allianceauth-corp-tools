@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import Count, F, Sum, Max, Q
 from django.shortcuts import render, redirect, get_object_or_404
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from esi.decorators import token_required
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 from django.http import HttpResponse
