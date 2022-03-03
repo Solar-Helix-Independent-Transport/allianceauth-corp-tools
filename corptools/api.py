@@ -1045,6 +1045,14 @@ def get_corporation_structure_fitting(request, corporation_id, structure_id):
 )
 def get_visible_corporation_status(request):
     corps = models.CorporationAudit.objects.visible_to(request.user)
+
+    if (request.user.has_perm("corptools.holding_corp_wallets") or
+        request.user.has_perm("corptools.holding_corp_assets") or
+            request.user.has_perm("corptools.holding_corp_structures")):
+        corps_holding = models.CorptoolsConfiguration.objects.get(
+            id=1).holding_corp_qs()
+        corps = corps | corps_holding
+
     output = []
     for c in corps:
         _updates = {}
