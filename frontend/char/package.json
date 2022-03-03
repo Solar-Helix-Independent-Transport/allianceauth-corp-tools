@@ -1,6 +1,6 @@
 {
   "name": "corptools",
-  "version": "0.1.0",
+  "version": "2.2.1",
   "private": true,
   "dependencies": {
     "@agney/react-loading": "^0.1.2",
