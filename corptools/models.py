@@ -39,7 +39,7 @@ class CorptoolsConfiguration(models.Model):
             ('holding_corp_structures',
              'Can access configured holding corp structure data.'),
             ('holding_corp_wallets', 'Can access configured holding corp wallet data.'),
-            ('holding_corp_asset', 'Can access configured holding corp wallet data.')
+            ('holding_corp_assets', 'Can access configured holding corp asset data.')
         )
 
         default_permissions = []
@@ -426,7 +426,7 @@ class CorpAsset(Asset):
     @classmethod
     def get_visible(cls, user):
         corps_vis = CorporationAudit.objects.visible_to(user)
-        if user.has_perm("corptools.holding_corp_asset"):
+        if user.has_perm("corptools.holding_corp_assets"):
             corps_holding = CorptoolsConfiguration.objects.get(
                 id=1).holding_corp_qs()
             corps_vis = corps_vis | corps_holding

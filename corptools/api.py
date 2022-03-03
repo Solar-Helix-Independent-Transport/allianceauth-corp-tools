@@ -1161,7 +1161,7 @@ def get_corporation_asset_locations(request, corporation_id: int):
         request.user.has_perm('corptools.alliance_hr') |
         request.user.has_perm('corptools.state_hr') |
         request.user.has_perm('corptools.global_hr') |
-        request.user.has_perm('corptools.holding_corp_asset')
+        request.user.has_perm('corptools.holding_corp_assets')
     )
 
     if not perms:
@@ -1196,7 +1196,7 @@ def get_corporation_asset_list(request, corporation_id: int, location_id: int):
         request.user.has_perm('corptools.alliance_hr') |
         request.user.has_perm('corptools.state_hr') |
         request.user.has_perm('corptools.global_hr') |
-        request.user.has_perm('corptools.holding_corp_asset')
+        request.user.has_perm('corptools.holding_corp_assets')
     )
 
     if not perms:
@@ -1272,7 +1272,7 @@ def get_corporation_asset_contents(request, item_id: int):
         request.user.has_perm('corptools.alliance_hr') |
         request.user.has_perm('corptools.state_hr') |
         request.user.has_perm('corptools.global_hr') |
-        request.user.has_perm('corptools.holding_corp_asset')
+        request.user.has_perm('corptools.holding_corp_assets')
     )
 
     if not perms:
@@ -1318,7 +1318,7 @@ def get_corporation_asset_groups(request, corporation_id: int, location_id: int)
         request.user.has_perm('corptools.alliance_hr') |
         request.user.has_perm('corptools.state_hr') |
         request.user.has_perm('corptools.global_hr') |
-        request.user.has_perm('corptools.holding_corp_asset')
+        request.user.has_perm('corptools.holding_corp_assets')
     )
 
     if not perms:
