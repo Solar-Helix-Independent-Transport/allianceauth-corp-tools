@@ -281,13 +281,10 @@ def react_menu(request):
 @login_required
 def react_main(request, character_id):
     # get available models
-
     return render(request, 'corptools/character/react_base.html')
 
 
 @login_required
-@permission_required('corptools.admin')
 def react_corp(request):
     # get available models
-
     return render(request, 'corptools/corporation/react_base.html')
