@@ -1121,7 +1121,7 @@ def get_corporation_wallet(request, corporation_id: int):
         .select_related('first_party_name', 'second_party_name', 'division').order_by('-date')
 
     output = []
-    for w in wallet_journal:
+    for w in wallet_journal[:20000]:
         output.append(
             {
                 "division": f"{w.division.division} {w.division.name}",
@@ -1184,6 +1184,8 @@ def get_corporation_asset_locations(request, corporation_id: int):
 )
 def get_corporation_asset_list(request, corporation_id: int, location_id: int):
     expandable_cats = [2, 6, 29]
+    everywhere_flags = ["CorpSAG1", "CorpSAG2", "CorpSAG3", "CorpSAG4",
+                        "CorpSAG5", "CorpSAG6", "CorpSAG7", "CorpDeliveries", "AssetSafety"]
 
     if corporation_id == 0:
         corporation_id = request.user.profile.main_character.corporation_id
@@ -1198,19 +1200,34 @@ def get_corporation_asset_list(request, corporation_id: int, location_id: int):
         corporation__corporation__corporation_id=corporation_id).select_related(
         "type_name", "location_name", "type_name__group__category"
     )
-
+    asset_locations = []
     if location_id == 2004:
         asset_locations = assets.filter(
-            location_flag="AssetSafety").values_list('item_id')
-        assets = assets.filter(location_id__in=asset_locations)
+            location_flag="AssetSafety")
+        assets = assets.filter(
+            location_id__in=asset_locations.values_list('item_id'))
     elif location_id != 0:
         asset_locations = assets.filter(
-            location_name_id=int(location_id)).values_list('item_id')
+            location_name_id=int(location_id))
         assets = assets.filter(Q(location_name_id=int(location_id)) | Q(
-            location_id__in=asset_locations) | Q(location_id=int(location_id)))
+            location_id__in=asset_locations.values_list('item_id')) | Q(location_id=int(location_id)))
+    else:
+        asset_locations = assets.filter(
+            location_name__isnull=False)
+        assets = assets.filter(location_flag__in=everywhere_flags)
+
     output = []
+    location_names = {}
+    for l in asset_locations:
+        if l.location_name:
+            location_names[l.item_id] = l.location_name.location_name
+
     print(assets.query)
     for a in assets:
+        loc = a.location_flag
+        if a.location_id in location_names:
+            loc = f"{location_names[a.location_id]} ({a.location_flag})"
+
         output.append({
             "item": {
                 "id": a.type_name.type_id,
@@ -1222,7 +1239,7 @@ def get_corporation_asset_list(request, corporation_id: int, location_id: int):
             "expand": True if a.type_name.group.category.category_id in expandable_cats else False,
             "location": {
                 "id": a.location_id,
-                "name": a.location_flag
+                "name": loc
             }
         })
 
