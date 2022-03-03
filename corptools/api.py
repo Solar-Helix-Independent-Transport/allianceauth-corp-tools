@@ -1121,7 +1121,7 @@ def get_corporation_wallet(request, corporation_id: int):
         .select_related('first_party_name', 'second_party_name', 'division')
 
     output = []
-    for w in wallet_journal[:20000]:
+    for w in wallet_journal[:50000]:
         output.append(
             {
                 "division": f"{w.division.division} {w.division.name}",
