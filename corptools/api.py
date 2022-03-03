@@ -1118,7 +1118,7 @@ def get_corporation_wallet(request, corporation_id: int):
     wallet_journal = models.CorporationWalletJournalEntry.objects\
         .filter(division__corporation__corporation__corporation_id=corporation_id,
                 date__gte=max_scrollback)\
-        .select_related('first_party_name', 'second_party_name', 'division').order_by('-date')
+        .select_related('first_party_name', 'second_party_name', 'division')
 
     output = []
     for w in wallet_journal[:20000]:
