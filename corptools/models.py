@@ -423,6 +423,16 @@ class CorpAsset(Asset):
         return '{2} {0}x{1} ({3} / {4})'.format(self.type_id, self.quantity, self.corporation,
                                                 self.location_id, self.location_type)
 
+    @classmethod
+    def get_visible(cls, user):
+        corps_vis = CorporationAudit.objects.visible_to(user)
+        if user.has_perm("corptools.holding_corp_asset"):
+            corps_holding = CorptoolsConfiguration.objects.get(
+                id=1).holding_corp_qs()
+            corps_vis = corps_vis | corps_holding
+
+        return cls.objects.filter(corporation__in=corps_vis)
+
 
 class CharacterAsset(Asset):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
@@ -585,6 +595,16 @@ class CorporationWalletJournalEntry(WalletJournalEntry):
             self.amount
         )
 
+    @classmethod
+    def get_visible(cls, user):
+        corps_vis = CorporationAudit.objects.visible_to(user)
+        if user.has_perm("corptools.holding_corp_wallets"):
+            corps_holding = CorptoolsConfiguration.objects.get(
+                id=1).holding_corp_qs()
+            corps_vis = corps_vis | corps_holding
+
+        return cls.objects.filter(division__corporation__in=corps_vis)
+
 
 class CharacterWalletJournalEntry(WalletJournalEntry):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
@@ -737,7 +757,7 @@ class Structure(models.Model):
                 id=1).holding_corp_qs()
             corps_vis = corps_vis | corps_holding
 
-        return Structure.objects.filter(corporation__in=corps_vis)
+        return cls.objects.filter(corporation__in=corps_vis)
 
 
 class StructureService(models.Model):

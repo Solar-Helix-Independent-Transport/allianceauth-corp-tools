@@ -1064,7 +1064,6 @@ def get_visible_corporation_status(request):
                 "active": True,
                 "last_updates": _updates}
         output.append(_out)
-    print(output)
     return output
 
 
@@ -1106,16 +1105,21 @@ def get_corporation_status(request, corporation_id: int):
     tags=["Corporation"]
 )
 def get_corporation_wallet(request, corporation_id: int):
-    if corporation_id == 0:
-        corporation_id = request.user.profile.main_character.corporation_id
+    perms = (
+        request.user.has_perm('corptools.corp_hr') |
+        request.user.has_perm('corptools.alliance_hr') |
+        request.user.has_perm('corptools.state_hr') |
+        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.holding_corp_wallets')
+    )
 
-    corp = models.CorporationAudit.objects.visible_to(
-        request.user).filter(corporation__corporation_id=corporation_id)
+    if not perms:
+        logging.error(
+            f"Permission Denied for {request.user} to view wallets!")
+        return 403, "Permission Denied!"
 
-    if not corp.exists():
-        return 403, {"message": "Permission Denied"}
-    max_scrollback = timezone.now() - timedelta(days=90)
-    wallet_journal = models.CorporationWalletJournalEntry.objects\
+    max_scrollback = timezone.now() - timedelta(days=60)
+    wallet_journal = models.CorporationWalletJournalEntry.get_visible(request.user)\
         .filter(division__corporation__corporation__corporation_id=corporation_id,
                 date__gte=max_scrollback)\
         .select_related('first_party_name', 'second_party_name', 'division')
@@ -1152,17 +1156,21 @@ def get_corporation_wallet(request, corporation_id: int):
     tags=["Corporation"]
 )
 def get_corporation_asset_locations(request, corporation_id: int):
-    if corporation_id == 0:
-        corporation_id = request.user.profile.main_character.corporation_id
+    perms = (
+        request.user.has_perm('corptools.corp_hr') |
+        request.user.has_perm('corptools.alliance_hr') |
+        request.user.has_perm('corptools.state_hr') |
+        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.holding_corp_asset')
+    )
 
-    corp = models.CorporationAudit.objects.visible_to(
-        request.user).filter(corporation__corporation_id=corporation_id)
+    if not perms:
+        logging.error(
+            f"Permission Denied for {request.user} to view wallets!")
+        return 403, "Permission Denied!"
 
-    if not corp.exists():
-        return 403, {"message": "Permission Denied"}
-
-    asset_locs = models.CorpAsset.objects.filter(corporation__corporation__corporation_id=corporation_id,
-                                                 location_name__isnull=False).values_list('location_name').distinct()
+    asset_locs = models.CorpAsset.get_visible(request.user).filter(corporation__corporation__corporation_id=corporation_id,
+                                                                   location_name__isnull=False).values_list('location_name').distinct()
     asset_locs = models.EveLocation.objects.filter(
         location_id__in=asset_locs).order_by('location_name')
 
@@ -1183,6 +1191,19 @@ def get_corporation_asset_locations(request, corporation_id: int):
     tags=["Corporation"]
 )
 def get_corporation_asset_list(request, corporation_id: int, location_id: int):
+    perms = (
+        request.user.has_perm('corptools.corp_hr') |
+        request.user.has_perm('corptools.alliance_hr') |
+        request.user.has_perm('corptools.state_hr') |
+        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.holding_corp_asset')
+    )
+
+    if not perms:
+        logging.error(
+            f"Permission Denied for {request.user} to view wallets!")
+        return 403, "Permission Denied!"
+
     expandable_cats = [2, 6, 29]
     everywhere_flags = ["CorpSAG1", "CorpSAG2", "CorpSAG3", "CorpSAG4",
                         "CorpSAG5", "CorpSAG6", "CorpSAG7", "CorpDeliveries", "AssetSafety"]
@@ -1190,16 +1211,11 @@ def get_corporation_asset_list(request, corporation_id: int, location_id: int):
     if corporation_id == 0:
         corporation_id = request.user.profile.main_character.corporation_id
 
-    corp = models.CorporationAudit.objects.visible_to(
-        request.user).filter(corporation__corporation_id=corporation_id)
-
-    if not corp.exists():
-        return 403, {"message": "Permission Denied"}
-
-    assets = models.CorpAsset.objects.filter(
+    assets = models.CorpAsset.get_visible(request.user).filter(
         corporation__corporation__corporation_id=corporation_id).select_related(
         "type_name", "location_name", "type_name__group__category"
     )
+
     asset_locations = []
     if location_id == 2004:
         asset_locations = assets.filter(
@@ -1222,7 +1238,6 @@ def get_corporation_asset_list(request, corporation_id: int, location_id: int):
         if l.location_name:
             location_names[l.item_id] = l.location_name.location_name
 
-    print(assets.query)
     for a in assets:
         loc = a.location_flag
         if a.location_id in location_names:
@@ -1252,12 +1267,23 @@ def get_corporation_asset_list(request, corporation_id: int, location_id: int):
     tags=["Corporation"]
 )
 def get_corporation_asset_contents(request, item_id: int):
-    corps = models.CorporationAudit.objects.visible_to(request.user)
+    perms = (
+        request.user.has_perm('corptools.corp_hr') |
+        request.user.has_perm('corptools.alliance_hr') |
+        request.user.has_perm('corptools.state_hr') |
+        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.holding_corp_asset')
+    )
 
-    assets = models.CorpAsset.objects\
-        .filter(corporation__in=corps).select_related(
+    if not perms:
+        logging.error(
+            f"Permission Denied for {request.user} to view wallets!")
+        return 403, "Permission Denied!"
+
+    assets = models.CorpAsset.get_visible(request.user)\
+        .select_related(
             "type_name", "location_name", "type_name__group__category"
-        )
+    )
     assets = assets.filter(location_id=item_id)
 
     output = []
@@ -1287,14 +1313,18 @@ def get_corporation_asset_contents(request, item_id: int):
     tags=["Corporation"]
 )
 def get_corporation_asset_groups(request, corporation_id: int, location_id: int):
-    if corporation_id == 0:
-        corporation_id = request.user.profile.main_character.corporation_id
+    perms = (
+        request.user.has_perm('corptools.corp_hr') |
+        request.user.has_perm('corptools.alliance_hr') |
+        request.user.has_perm('corptools.state_hr') |
+        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.holding_corp_asset')
+    )
 
-    corp = models.CorporationAudit.objects.visible_to(
-        request.user).filter(corporation__corporation_id=corporation_id)
-
-    if not corp.exists():
-        return 403, {"message": "Permission Denied"}
+    if not perms:
+        logging.error(
+            f"Permission Denied for {request.user} to view wallets!")
+        return 403, "Permission Denied!"
 
     capital_groups = [30, 547, 659, 1538, 485, 902, 513, 883]
     subcap_cat = [6]
@@ -1302,7 +1332,7 @@ def get_corporation_asset_groups(request, corporation_id: int, location_id: int)
     structure_cats = [22, 24, 40, 41, 46, 65, 66, ]
     bpo_cats = [9]
 
-    assets = models.CorpAsset.objects\
+    assets = models.CorpAsset.get_visible(request.user)\
         .filter((Q(blueprint_copy=None) | Q(blueprint_copy=False)),
                 corporation__corporation__corporation_id=corporation_id)
 
@@ -1316,16 +1346,12 @@ def get_corporation_asset_groups(request, corporation_id: int, location_id: int)
         assets = assets.filter(Q(location_name_id=int(location_id)) | Q(
             location_id__in=asset_locations) | Q(location_id=int(location_id)))
 
-    print(assets.query)
-
     assets = assets.values('type_name__group__group_id')\
         .annotate(grp_total=Sum('quantity'))\
         .annotate(grp_name=F('type_name__group__name'))\
         .annotate(grp_id=F('type_name__group_id'))\
         .annotate(cat_id=F('type_name__group__category_id'))\
         .order_by('-grp_total')
-
-    print(assets.query)
 
     capital_asset_groups = []
     subcap_asset_groups = []
@@ -1355,7 +1381,7 @@ def get_corporation_asset_groups(request, corporation_id: int, location_id: int)
     return [
         {"name": "Capital Ships",
          "items": capital_asset_groups},
-        {"name": "Subcaps Ships",
+        {"name": "Subcap Ships",
          "items": subcap_asset_groups},
         {"name": "Noteable Assets",
          "items": noteable_asset_groups},
