@@ -49,7 +49,7 @@ class Structures(MenuItemHook):
             request.user.has_perm('corptools.state_corp_manager') or
             request.user.has_perm('corptools.global_corp_manager') or
             request.user.has_perm('corptools.holding_corp_structures') or
-            request.user.has_perm('corptools.holding_corp_asset') or
+            request.user.has_perm('corptools.holding_corp_assets') or
                 request.user.has_perm('corptools.holding_corp_wallets')):
             return MenuItemHook.render(self, request)
         return ''
