@@ -70,7 +70,9 @@
 }
 
 .table-div {
+  height: 250px;
   width: 400px;
+  overflow-y: overlay;
 }
 
 .table-div-fill {
@@ -109,4 +111,21 @@
   .association-hide {
     display: none;
   }
+}
+
+.flex-label-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: stretch;
+}
+
+.flex-label {
+  margin: 2px;
+}
+.flex-select {
+  flex: 1;
+  margin: 2px;
 }

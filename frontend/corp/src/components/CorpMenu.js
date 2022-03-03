@@ -21,8 +21,11 @@ const CorpMenu = () => {
           <NavLink key="Wallets" href={`#/wallets`}>
             Wallets
           </NavLink>
-          <NavLink key="Assets" href={`#/assets`}>
-            Assets
+          <NavLink key="Assetgroups" href={`#/assetgroup`}>
+            Asset Overview
+          </NavLink>
+          <NavLink key="assetlists" href={`#/assetlist`}>
+            Asset List
           </NavLink>
         </Nav>
         <Nav className="pull-right">

@@ -1,7 +1,7 @@
 import React from "react";
 import { Panel, Glyphicon } from "react-bootstrap";
 import { useQuery } from "react-query";
-import { loadAssetList, loadAssetContents } from "../apis/Character";
+import { loadAssetList, loadAssetContents } from "../apis/Corporation";
 import {
   BaseTable,
   SubRows,
@@ -9,12 +9,12 @@ import {
   textColumnFilter,
 } from "../components/BaseTable";
 import ErrorBoundary from "./ErrorBoundary";
+import { CorpLoader } from "./NoCorp";
 
 function SubRowAsync({ row, rowProps, visibleColumns }) {
   const { isLoading, error, data } = useQuery(
     ["lazy-load", row.original.id],
-    () =>
-      loadAssetContents(row.original.character.character_id, row.original.id)
+    () => loadAssetContents(row.original.id)
   );
 
   if (!isLoading) {
@@ -33,10 +33,10 @@ function SubRowAsync({ row, rowProps, visibleColumns }) {
   );
 }
 
-const CharAssetTable = ({ character_id, location_id = 0 }) => {
+const CorpAssetTable = ({ corporation_id, location_id = 0 }) => {
   const { isLoading, isFetching, error, data } = useQuery(
-    ["assetList", character_id, location_id],
-    () => loadAssetList(character_id, location_id),
+    ["assetList", corporation_id, location_id],
+    () => loadAssetList(corporation_id, location_id),
     { initialData: [] }
   );
   const renderRowSubComponent = React.useCallback(
@@ -69,20 +69,13 @@ const CharAssetTable = ({ character_id, location_id = 0 }) => {
             <></>
           ),
         // We can override the cell renderer with a SubCell to be used with an expanded row
-        SubCell: () => null, // No expander on an expanded row
-      },
-      {
-        Header: "Character",
-        accessor: "character.character_name",
-        Filter: SelectColumnFilter,
-        filter: "includes",
-        SubCell: () => " - ",
+        SubCell: (cellProps) => <div className="text-center">|</div>,
       },
       {
         Header: "Type",
         accessor: "item.name",
         Filter: textColumnFilter,
-        filter: "includes",
+        filter: "text",
       },
       {
         Header: "Category",
@@ -104,6 +97,8 @@ const CharAssetTable = ({ character_id, location_id = 0 }) => {
     []
   );
 
+  if (corporation_id === 0) return <CorpLoader />;
+
   return (
     <ErrorBoundary>
       <Panel.Body>
@@ -116,4 +111,4 @@ const CharAssetTable = ({ character_id, location_id = 0 }) => {
   );
 };
 
-export default CharAssetTable;
+export default CorpAssetTable;

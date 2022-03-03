@@ -5,10 +5,12 @@ import { CorpStructures } from "./pages/Structures";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Panel } from "react-bootstrap";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
-import { ErrorLoader } from "./components/ErrorLoader";
 import CorpMenu from "./components/CorpMenu";
 import CorpStatus from "./pages/Status";
 import "./style.css";
+import CorpAssets from "./pages/Assets";
+import CorpAssetLists from "./pages/AssetList";
+import CorpWallet from "./pages/Wallets";
 const queryClient = new QueryClient();
 
 ReactDOM.render(
@@ -24,9 +26,10 @@ ReactDOM.render(
               path={["", "/structures"]}
               component={() => CorpStructures()}
             />
-            <Route path={"/wallets"} component={() => ErrorLoader()} />
+            <Route path={"/wallets"} component={() => CorpWallet()} />
             <Route path={"/status"} component={() => CorpStatus()} />
-            <Route path={"/assets"} component={() => ErrorLoader()} />
+            <Route path={"/assetgroup"} component={() => CorpAssets()} />
+            <Route path={"/assetlist"} component={() => CorpAssetLists()} />
           </Switch>
         </Panel>
       </QueryClientProvider>

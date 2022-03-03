@@ -38,3 +38,18 @@ PASSWORD_HASHERS = [
 ESI_SSO_CLIENT_ID = '123'
 ESI_SSO_CLIENT_SECRET = '123'
 ESI_SSO_CALLBACK_URL = '123'
+
+CACHES = {
+    "default": {
+        "BACKEND": "redis_cache.RedisCache",
+        "LOCATION": "localhost:6379",
+        "OPTIONS": {
+            "DB": 1,
+        }
+        # "BACKEND": "django_redis.cache.RedisCache",
+        # "LOCATION": "redis://localhost:6379/1",
+        # "OPTIONS": {
+        #    "COMPRESSOR": "django_redis.compressors.lzma.LzmaCompressor",
+        # }
+    }
+}

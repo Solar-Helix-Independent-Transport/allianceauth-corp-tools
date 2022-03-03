@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Panel } from "react-bootstrap";
 import CorpAssetLocSelect from "../components/CorpAssetLocSelect";
-import CorpAssetGroups from "../components/CorpAssetGroups";
 import ErrorBoundary from "../components/ErrorBoundary";
 import CorpSelect from "../components/CorpSelect";
+import CorpAssetTable from "../components/CorpAssetTable";
 
-const CorpAssets = () => {
+const CorpAssetLists = () => {
   const [location, setLocation] = useState(0);
   const [corporation_id, setCorp] = useState(0);
 
@@ -17,7 +17,7 @@ const CorpAssets = () => {
           corporation_id={corporation_id}
           setLocation={setLocation}
         />
-        <CorpAssetGroups
+        <CorpAssetTable
           corporation_id={corporation_id}
           location_id={location}
         />
@@ -26,4 +26,4 @@ const CorpAssets = () => {
   );
 };
 
-export default CorpAssets;
+export default CorpAssetLists;

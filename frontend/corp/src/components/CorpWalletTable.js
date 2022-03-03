@@ -1,18 +1,15 @@
 import React from "react";
 import { Panel } from "react-bootstrap";
 import { useQuery } from "react-query";
-import { loadWallet } from "../apis/Character";
-import {
-  BaseTable,
-  SelectColumnFilter,
-  textColumnFilter,
-} from "../components/BaseTable";
 import ErrorBoundary from "../components/ErrorBoundary";
+import { loadWallet } from "../apis/Corporation";
+import { BaseTable, SelectColumnFilter, textColumnFilter } from "./BaseTable";
+import { CorpLoader } from "./NoCorp";
 
-const CharWallet = ({ character_id }) => {
+const CorpWalletTable = ({ corporation_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
-    ["wallet", character_id],
-    () => loadWallet(character_id),
+    ["wallet", corporation_id],
+    () => loadWallet(corporation_id),
     {
       initialData: [],
     }
@@ -20,12 +17,6 @@ const CharWallet = ({ character_id }) => {
 
   const columns = React.useMemo(
     () => [
-      {
-        Header: "Character",
-        accessor: "character.character_name",
-        Filter: SelectColumnFilter,
-        filter: "includes",
-      },
       {
         Header: "Date",
         accessor: "date",
@@ -69,6 +60,8 @@ const CharWallet = ({ character_id }) => {
     []
   );
 
+  if (corporation_id === 0) return <CorpLoader />;
+
   return (
     <ErrorBoundary>
       <Panel.Body>
@@ -78,4 +71,4 @@ const CharWallet = ({ character_id }) => {
   );
 };
 
-export default CharWallet;
+export default CorpWalletTable;

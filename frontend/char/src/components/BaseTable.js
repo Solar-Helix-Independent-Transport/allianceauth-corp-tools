@@ -159,6 +159,12 @@ export function SelectColumnFilter({
 
 const defaultPropGetter = () => ({});
 
+function strToKey(keyString, ob) {
+  return keyString.split(".").reduce(function (p, prop) {
+    return p[prop];
+  }, ob);
+}
+
 export const BaseTable = ({
   isLoading,
   isFetching,
@@ -187,6 +193,11 @@ export const BaseTable = ({
               let rowValue = row.values[id];
               if (typeof rowValue === "object") {
                 rowValue = rowValue.name;
+              }
+              if (row.hasOwnProperty("originalSubRows")) {
+                rowValue += row.originalSubRows.reduce((p, r) => {
+                  return (p += " " + strToKey(id, r));
+                }, "");
               }
               return rowValue
                 ? rowValue.toLowerCase().includes(filterValue.toLowerCase())

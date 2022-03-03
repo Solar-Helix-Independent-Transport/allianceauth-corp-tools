@@ -1,6 +1,12 @@
 import React from "react";
 import { Button, Tooltip, OverlayTrigger } from "react-bootstrap";
-import { useTable, useFilters, usePagination, useSortBy } from "react-table";
+import {
+  useTable,
+  useFilters,
+  usePagination,
+  useSortBy,
+  useExpanded,
+} from "react-table";
 import Select from "react-select";
 import { Bars } from "@agney/react-loading";
 import {
@@ -12,7 +18,65 @@ import {
   Table,
 } from "react-bootstrap";
 import "./BaseTable.css";
-import { ErrorLoader } from "./ErrorLoader";
+import { ErrorLoader } from "../components/ErrorLoader";
+
+export function SubRows({
+  row,
+  rowProps,
+  visibleColumns,
+  data,
+  error,
+  isLoading,
+}) {
+  if (isLoading) {
+    return (
+      <tr>
+        <td />
+        <td colSpan={visibleColumns.length - 1}>Loading...</td>
+      </tr>
+    );
+  }
+  if (error) {
+    return (
+      <tr>
+        <td />
+        <td colSpan={visibleColumns.length - 1}>Unable to Fetch from API!</td>
+      </tr>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <tr>
+        <td />
+        <td colSpan={visibleColumns.length - 1}>Empty!</td>
+      </tr>
+    );
+  }
+
+  // error handling here :)
+
+  return (
+    <>
+      {data.map((x, i) => {
+        return (
+          <tr {...rowProps} key={`${rowProps.key}-expanded-${i}`}>
+            {row.cells.map((cell) => {
+              return (
+                <td {...cell.getCellProps()}>
+                  {cell.render(cell.column.SubCell ? "SubCell" : "Cell", {
+                    value: cell.column.accessor && cell.column.accessor(x, i),
+                    row: { ...row, original: x },
+                  })}
+                </td>
+              );
+            })}
+          </tr>
+        );
+      })}
+    </>
+  );
+}
 
 export const colourStyles = {
   option: (styles) => {
@@ -95,12 +159,19 @@ export function SelectColumnFilter({
 
 const defaultPropGetter = () => ({});
 
+function strToKey(keyString, ob) {
+  return keyString.split(".").reduce(function (p, prop) {
+    return p[prop];
+  }, ob);
+}
+
 export const BaseTable = ({
   isLoading,
   isFetching,
   data,
   error,
   columns,
+  asyncExpandFunction,
   getRowProps = defaultPropGetter,
 }) => {
   const defaultColumn = React.useMemo(
@@ -122,6 +193,11 @@ export const BaseTable = ({
               let rowValue = row.values[id];
               if (typeof rowValue === "object") {
                 rowValue = rowValue.name;
+              }
+              if (row.hasOwnProperty("originalSubRows")) {
+                rowValue += row.originalSubRows.reduce((p, r) => {
+                  return (p += " " + strToKey(id, r));
+                }, "");
               }
               return rowValue
                 ? rowValue.toLowerCase().includes(filterValue.toLowerCase())
@@ -148,6 +224,7 @@ export const BaseTable = ({
     nextPage,
     previousPage,
     setPageSize,
+    visibleColumns,
     state: { pageIndex, pageSize },
   } = useTable(
     {
@@ -159,6 +236,7 @@ export const BaseTable = ({
     },
     useFilters,
     useSortBy,
+    useExpanded,
     usePagination
   );
 
@@ -213,19 +291,24 @@ export const BaseTable = ({
         <tbody {...getTableBodyProps()}>
           {page.map((row, i) => {
             prepareRow(row);
+            const rowProps = getRowProps(row);
             return (
-              <tr {...row.getRowProps(getRowProps(row))}>
-                {row.cells.map((cell) => {
-                  return (
-                    <td
-                      style={{ verticalAlign: "middle" }}
-                      {...cell.getCellProps()}
-                    >
-                      {cell.render("Cell")}
-                    </td>
-                  );
-                })}
-              </tr>
+              <>
+                <tr {...row.getRowProps(rowProps)}>
+                  {row.cells.map((cell) => {
+                    return (
+                      <td
+                        style={{ verticalAlign: "middle" }}
+                        {...cell.getCellProps()}
+                      >
+                        {cell.render("Cell")}
+                      </td>
+                    );
+                  })}
+                </tr>
+                {row.isExpanded &&
+                  asyncExpandFunction({ row, rowProps, visibleColumns })}
+              </>
             );
           })}
         </tbody>

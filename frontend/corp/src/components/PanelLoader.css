@@ -51,3 +51,31 @@
   animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
   animation-iteration-count: infinite;
 }
+
+@keyframes updown {
+  10%,
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+
+  20%,
+  80% {
+    transform: translate3d(0, 2px, 0);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+
+  40%,
+  60% {
+    transform: translate3d(0, 4px, 0);
+  }
+}
+
+.arrow-anim {
+  animation: updown 5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  animation-iteration-count: infinite;
+}

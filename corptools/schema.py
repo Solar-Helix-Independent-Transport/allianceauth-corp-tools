@@ -1,3 +1,4 @@
+from __future__ import division
 from datetime import datetime
 from xmlrpc.client import boolean
 from ninja import Schema
@@ -88,6 +89,14 @@ class CharacterAssetItem(Schema):
     expand: boolean = None
 
 
+class CorporationAssetItem(Schema):
+    id: int
+    item: EveName
+    quantity: int = 0
+    location: EveName = None
+    expand: boolean = None
+
+
 class CharacterClone(Schema):
     name: Optional[str]
     location: Optional[EveName]
@@ -162,6 +171,17 @@ class CharacterRoles(Schema):
 
 class CharacterWalletEvent(Schema):
     character: Character
+    id: int
+    date: datetime
+    first_party: EveName
+    second_party: EveName
+    ref_type: str
+    balance: float
+    amount: float
+
+
+class CorporationWalletEvent(Schema):
+    division: str
     id: int
     date: datetime
     first_party: EveName
