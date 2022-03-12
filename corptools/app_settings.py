@@ -238,11 +238,10 @@ def get_character_update_attributes():
 def get_corp_update_attributes():
     _attribs = [
         # Base
-        ("Public Data", 'last_update_pub_data'),
         ("Assets", 'last_update_assets'),
         ("Structures", 'last_update_structures'),
         ("Wallet", 'last_update_wallet'),
-        ("Moons", 'last_update_moons')
+        ("Moons Observations", 'last_update_observers')
     ]
 
     return _attribs
