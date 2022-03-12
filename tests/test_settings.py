@@ -21,8 +21,6 @@ NOSE_ARGS = [
     # '--exe',  # If your tests need this to be found/run, check they py files are not chmodded +x
 ]
 
-CACHES['default'] = {'BACKEND': 'django.core.cache.backends.db.DatabaseCache'}
-
 
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
