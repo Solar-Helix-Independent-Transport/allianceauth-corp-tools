@@ -82,7 +82,7 @@ const CharAssetTable = ({ character_id, location_id = 0 }) => {
         Header: "Type",
         accessor: "item.name",
         Filter: textColumnFilter,
-        filter: "includes",
+        filter: "text",
       },
       {
         Header: "Category",
