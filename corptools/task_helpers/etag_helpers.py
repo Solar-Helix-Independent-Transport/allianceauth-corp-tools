@@ -83,11 +83,14 @@ def etag_results(operation, token, force_refresh=False):
                     logger.debug(
                         f"ETag: Removing Header {operation.operation.operation_id} F:{force_refresh} Ei:{etags_incomplete} - {stringify_params(operation)}")
                     rem_etag_header(operation)
+
                 result, headers = operation.result()
                 total_pages = int(headers.headers['X-Pages'])
+
                 if get_etag_header(operation) == headers.headers.get('ETag') and not force_refresh and not etags_incomplete:
                     # if django esi is returning our cache check it manualy.
                     raise NotModifiedError()
+
                 if force_refresh:
                     logger.debug(
                         f"ETag: Removing Etag {operation.operation.operation_id} F:{force_refresh} - {stringify_params(operation)}")
@@ -96,6 +99,7 @@ def etag_results(operation, token, force_refresh=False):
                     logger.debug(
                         f"ETag: Saving Etag {operation.operation.operation_id} F:{force_refresh} - {stringify_params(operation)}")
                     set_etag_header(operation, headers)
+
                 # append to results list to be seamless to the client
                 results += result
                 current_page += 1
@@ -139,11 +143,23 @@ def etag_results(operation, token, force_refresh=False):
             results, headers = operation.result()
         except HTTPNotModified:
             logger.debug(
-                f"ETag: result Cache Hit ETag {operation.operation.operation_id} - {stringify_params(operation)}")
+                f"ETag: HTTPNotModified Hit ETag {operation.operation.operation_id} - {stringify_params(operation)}")
+            set_etag_header(operation, headers)
             raise NotModifiedError()
-        set_etag_header(operation, headers)
         if get_etag_header(operation) == headers.headers.get('ETag') and not force_refresh:
             # etag is match in cache
+            logger.debug(
+                f"ETag: result Cache Hit ETag {operation.operation.operation_id} - {stringify_params(operation)}")
+            set_etag_header(operation, headers)
             raise NotModifiedError()
+
+        if force_refresh:
+            logger.debug(
+                f"ETag: Removing Etag {operation.operation.operation_id} F:{force_refresh} - {stringify_params(operation)}")
+            del_etag_header(operation)
+        else:
+            logger.debug(
+                f"ETag: Saving Etag {operation.operation.operation_id} F:{force_refresh} - {stringify_params(operation)}")
+            set_etag_header(operation, headers)
 
     return results
