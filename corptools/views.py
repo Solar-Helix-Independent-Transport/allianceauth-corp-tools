@@ -98,10 +98,6 @@ def corptools_menu(request):
 @login_required
 @permission_required('corptools.admin')
 def admin(request):
-    from allianceauth.notifications import notify
-    notify(request.user, title="Test notification",
-           message="This isa test messaage")
-
     # get available models
     names = EveName.objects.all().count()
     types = EveItemType.objects.all().count()
