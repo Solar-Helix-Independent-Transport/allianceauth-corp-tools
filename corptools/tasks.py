@@ -79,13 +79,14 @@ def update_all_characters():
 
 
 @shared_task
-def update_subset_of_characters(subset=48, min_runs=5):
+def update_subset_of_characters(subset=48, min_runs=5, force=False):
     amount_of_updates = max(
         CharacterAudit.objects.all().count()/subset, min_runs)
     characters = CharacterAudit.objects.all().order_by(
         'last_update_pub_data')[:amount_of_updates]
     for char in characters:
-        update_character.apply_async(args=[char.character.character_id])
+        update_character.apply_async(args=[char.character.character_id], kwargs={
+                                     "force_refresh": force})
 
 
 @shared_task

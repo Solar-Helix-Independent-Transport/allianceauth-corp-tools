@@ -51,7 +51,7 @@ def update_corp_history(character_id, force_refresh=False):
     return "CT: Finished pub data for: {}".format(audit_char.character.character_name)
 
 
-def update_character_skill_list(character_id, force_refresh=True):
+def update_character_skill_list(character_id, force_refresh=False):
     from ..tasks import cache_user_skill_list
 
     audit_char = CharacterAudit.objects.get(
@@ -109,7 +109,7 @@ def update_character_skill_list(character_id, force_refresh=True):
     return "CT: Finished skills for: {}".format(audit_char.character.character_name)
 
 
-def update_character_skill_queue(character_id, force_refresh=True):
+def update_character_skill_queue(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating Skill Queue for: {}".format(
