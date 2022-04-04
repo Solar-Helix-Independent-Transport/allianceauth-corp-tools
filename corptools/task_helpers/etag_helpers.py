@@ -144,7 +144,7 @@ def etag_results(operation, token, force_refresh=False):
         except HTTPNotModified as e:
             logger.debug(
                 f"ETag: HTTPNotModified Hit ETag {operation.operation.operation_id} - {stringify_params(operation)}")
-            set_etag_header(operation, e.response.headers)
+            set_etag_header(operation, e.response)
             raise NotModifiedError()
 
         if get_etag_header(operation) == headers.headers.get('ETag') and not force_refresh:
