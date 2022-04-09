@@ -297,8 +297,10 @@ def update_char_order_history(self, character_id, force_refresh=False):
 @shared_task
 def update_clones(character_id, force_refresh=False):
     try:
-        update_character_clones(character_id, force_refresh=force_refresh)
+        output = update_character_clones(
+            character_id, force_refresh=force_refresh)
         update_all_locations.apply_async(priority=7)
+        return output
     except Exception as e:
         logger.exception(e)
         return "Failed"
