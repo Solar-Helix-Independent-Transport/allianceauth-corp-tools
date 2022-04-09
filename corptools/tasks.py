@@ -88,6 +88,8 @@ def update_subset_of_characters(subset=48, min_runs=5, force=False):
         update_character.apply_async(args=[char.character.character_id], kwargs={
                                      "force_refresh": force})
 
+    return f"Queued {len(characters)} Character Updates"
+
 
 @shared_task
 def check_account(character_id):
