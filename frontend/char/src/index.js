@@ -19,6 +19,7 @@ import CharRoles from "./pages/Roles";
 import CharWallet from "./pages/Wallet";
 import CharNotifications from "./pages/Notifications";
 import CharContacts from "./pages/Contacts";
+import CharSkills from "./pages/Skills";
 import AccountList from "./pages/AccountList";
 import "./style.css";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -81,7 +82,10 @@ const CorptoolsCharacterView = () => {
                   path="/account/contact"
                   component={() => CharContacts({ character_id })}
                 />
-                <Route path="/account/skills" component={() => ErrorLoader()} />
+                <Route
+                  path="/account/skills"
+                  component={() => CharSkills({ character_id })}
+                />
                 <Route path="/account/market" component={() => ErrorLoader()} />
                 <Route
                   path="/account/standings"
