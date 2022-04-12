@@ -75,6 +75,9 @@
   overflow-y: overlay;
 }
 
+.skill-queue {
+  height: 400px;
+}
 .table-div-fill {
   width: auto;
 }
@@ -139,13 +142,23 @@
 }
 
 .flex-skill-block {
-  width: 50%;
+  width: 33%;
   padding-left: 10px;
   padding-right: 10px;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: space-between;
+}
+
+@media only screen and (max-width: 1400px) {
+  .flex-skill-block {
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
 }
 
 @media only screen and (max-width: 1000px) {
@@ -156,4 +169,12 @@
     flex-wrap: nowrap;
     justify-content: space-between;
   }
+}
+
+.no-margin {
+  margin: 0px !important;
+}
+
+.flex-space-between {
+  justify-content: space-between;
 }

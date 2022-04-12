@@ -123,6 +123,9 @@ class CharacterQueueItem(Schema):
     skill: str
     group: str
     end_level: int
+    position: int
+    current_level: int = 0
+    current_sp: int = 0
     start_sp: int
     end_sp: int
     start: datetime = None

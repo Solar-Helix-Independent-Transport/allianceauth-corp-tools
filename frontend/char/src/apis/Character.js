@@ -79,6 +79,12 @@ export async function loadSkills(character_id) {
   return api.data;
 }
 
+export async function loadSkillQueues(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/skillqueues`);
+  console.log(`get skillqueues in api ${character_id}`);
+  return api.data;
+}
+
 export async function loadClones(character_id, location_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/clones`);
   console.log(`get clones in api ${character_id}`);

@@ -24,6 +24,7 @@ import AccountList from "./pages/AccountList";
 import "./style.css";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ErrorLoader } from "./components/ErrorLoader";
+import CharSkillQueue from "./pages/SkillQueue";
 TimeAgo.addDefaultLocale(en);
 
 const queryClient = new QueryClient();
@@ -85,6 +86,10 @@ const CorptoolsCharacterView = () => {
                 <Route
                   path="/account/skills"
                   component={() => CharSkills({ character_id })}
+                />
+                <Route
+                  path="/account/skillqueue"
+                  component={() => CharSkillQueue({ character_id })}
                 />
                 <Route path="/account/market" component={() => ErrorLoader()} />
                 <Route

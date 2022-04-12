@@ -316,6 +316,9 @@ class AuditCorporationQuerySet(models.QuerySet):
             assert char
             # build all accepted queries
             queries = []
+            if user.has_perm('corptools.own_corp_manager'):
+                queries.append(
+                    models.Q(corporation__corporation_id=char.corporation_id))
             if user.has_perm('corptools.alliance_corp_manager'):
                 if char.alliance_id is not None:
                     queries.append(
@@ -323,12 +326,12 @@ class AuditCorporationQuerySet(models.QuerySet):
                 else:
                     queries.append(
                         models.Q(corporation__corporation_id=char.corporation_id))
-            if user.has_perm('corptools.state_corp_manager'):
+            """if user.has_perm('corptools.state_corp_manager'):
                 if user.has_perm('corptools.alliance_corp_manager'):
                     pass
                 else:
                     queries.append(
-                        models.Q(corporation__corporation_id=char.corporation_id))
+                        models.Q(corporation__corporation_id=char.corporation_id))"""
             logger.debug('%s queries for user %s visible chracters.' %
                          (len(queries), user))
             # filter based on queries

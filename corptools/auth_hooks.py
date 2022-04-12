@@ -45,7 +45,8 @@ class Structures(MenuItemHook):
                               navactive=['corptools:corp_react'])
 
     def render(self, request):
-        if (request.user.has_perm('corptools.alliance_corp_manager') or
+        if (request.user.has_perm('corptools.own_corp_manager') or
+            request.user.has_perm('corptools.alliance_corp_manager') or
             request.user.has_perm('corptools.state_corp_manager') or
             request.user.has_perm('corptools.global_corp_manager') or
             request.user.has_perm('corptools.holding_corp_structures') or

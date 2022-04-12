@@ -266,6 +266,10 @@ def get_character_menu(request):
             "name": "Skills",
             "link": "/account/skills"
         })
+        _char["links"].append({
+            "name": "Skill Queues",
+            "link": "/account/skillqueue"
+        })
     return [_char, _finance, _inter]
 
 
@@ -886,17 +890,23 @@ def get_character_skillqueues(request, character_id: int):
         .select_related('character__character', 'skill_name', "skill_name__group")
 
     output = {}
+    for c in characters:
+        output[c.character_id] = {
+            "character": c,
+            "queue": [],
+        }
 
     for s in skills:
-        if s.character_id not in output:
-            output[s.character_id] = {
+        if s.character.character.character_id not in output:
+            output[s.character.character.character_id] = {
                 "character": s.character.character,
                 "queue": [],
             }
-        output[s.character_id]["queue"].append(
+        output[s.character.character.character_id]["queue"].append(
             {
-                "skill": s.skill_name.group.name,
-                "group": s.skill_name.name,
+                "position": s.queue_position,
+                "group": s.skill_name.group.name,
+                "skill": s.skill_name.name,
                 "end_level": s.finish_level,
                 "start_sp": s.level_start_sp,
                 "end_sp": s.level_end_sp,
@@ -930,6 +940,8 @@ def post_characters_refresh(request, character_id: int):
     tags=["Characters"]
 )
 def post_acccount_refresh(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
 
     if not response:

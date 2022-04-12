@@ -187,6 +187,8 @@ class CorporationAudit(models.Model):
 
     class Meta:
         permissions = (
+            ('own_corp_manager',
+             'Can access own corporations\'s data.'),
             ('alliance_corp_manager',
              'Can access other corporations\'s data for own alliance.'),
             ('state_corp_manager',
