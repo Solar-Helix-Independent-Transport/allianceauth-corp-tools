@@ -127,7 +127,7 @@ const AccountList = () => {
 
   return (
     <ErrorBoundary>
-      <Panel.Body className="flex-container-vert-fill">
+      <Panel.Body>
         <SelectFilter
           setFilter={setFilterInactives}
           options={filterOptions}
