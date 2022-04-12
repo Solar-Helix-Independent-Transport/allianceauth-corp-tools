@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Panel, Label, Button, Glyphicon } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { loadAccountList } from "../apis/Character";
@@ -8,8 +8,10 @@ import {
   SelectColumnFilter,
 } from "../components/BaseTable";
 import ErrorBoundary from "../components/ErrorBoundary";
+import { SelectFilter } from "../components/SelectFilter";
 
 const AccountList = () => {
+  const [filter_inactive, setFilterInactives] = useState(false);
   const { isLoading, isFetching, error, data } = useQuery(
     ["account-list"],
     () => loadAccountList(),
@@ -103,10 +105,38 @@ const AccountList = () => {
     []
   );
 
+  const filterOptions = [
+    {
+      value: false,
+      label: "Show All",
+    },
+    {
+      value: true,
+      label: "Show Inactive Only",
+    },
+  ];
+
+  let tableData = data;
+
+  if (!isLoading && filter_inactive) {
+    tableData = tableData.filter(
+      (acct) =>
+        !acct.characters.reduce((result, char) => result && char.active, true)
+    );
+  }
+
   return (
     <ErrorBoundary>
-      <Panel.Body>
-        <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
+      <Panel.Body className="flex-container-vert-fill">
+        <SelectFilter
+          setFilter={setFilterInactives}
+          options={filterOptions}
+          labelText="Filter Missing Characters:"
+        />
+        <BaseTable
+          data={tableData}
+          {...{ isLoading, isFetching, columns, error }}
+        />
       </Panel.Body>
     </ErrorBoundary>
   );
