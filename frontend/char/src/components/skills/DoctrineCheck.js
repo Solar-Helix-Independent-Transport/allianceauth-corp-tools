@@ -6,7 +6,18 @@ import { DoctrineModal } from "./DoctrineModal";
 export const DoctrineCheck = ({ name, skill_reqs, skill_list }) => {
   const [show, setShow] = useState(false);
   let completed = Object.entries(skill_reqs).length === 0;
-  let style = completed ? { bsStyle: "success" } : { bsStyle: "warning" };
+  let style = completed ? { bsStyle: "success" } : { bsStyle: "danger" };
+
+  let alpha_check = Object.entries(skill_reqs).reduce((o, [k, v]) => {
+    let trained_level = 0;
+    if (skill_list[k]) {
+      trained_level = skill_list[k].trained_level;
+    }
+    return o && trained_level >= v;
+  }, true);
+  if (!completed && alpha_check) {
+    style = { bsStyle: "warning" };
+  }
   return (
     <>
       {completed ? (
@@ -32,11 +43,14 @@ export const DoctrineCheck = ({ name, skill_reqs, skill_list }) => {
                 {name}
                 {completed ? <></> : <></>}
               </Button>
-              <Button bsSize="small" className="flex-doctrine-btn-copy">
-                <Glyphicon glyph="copy" />
-              </Button>
+              {!alpha_check ? (
+                <Button bsSize="small" className="flex-doctrine-btn-copy">
+                  <Glyphicon glyph="copy" />
+                </Button>
+              ) : (
+                <></>
+              )}
             </ButtonGroup>
-
             <DoctrineModal
               {...{ show, setShow, name, skill_reqs, skill_list }}
             />

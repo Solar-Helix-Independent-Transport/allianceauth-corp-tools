@@ -8,19 +8,23 @@
 }
 .flex-doctrine-btn-copy {
   flex: 1;
-  border: 2px solid #f0ad4e;
+  border: 2px solid #d9534f;
 }
-@media only screen and (max-width: 1400px) {
+@media only screen and (max-width: 1900px) {
   .doctrine-button {
     width: 30%;
-    margin: 2px;
+  }
+}
+
+@media only screen and (min-width: 1900px) {
+  .doctrine-button {
+    width: 17%;
   }
 }
 
 @media only screen and (max-width: 800px) {
   .doctrine-button {
     width: 100%;
-    margin: 2px;
   }
 }
 

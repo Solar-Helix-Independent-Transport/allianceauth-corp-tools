@@ -6,6 +6,7 @@ import { PanelLoader } from "../components/PanelLoader";
 import { ErrorLoader } from "../components/ErrorLoader";
 import { useQuery } from "react-query";
 import { DoctrinePanel } from "../components/skills/DoctrinePannel";
+import { DoctrineCheck } from "../components/skills/DoctrineCheck";
 
 const CharDoctrines = ({ character_id }) => {
   const { isLoading, error, data } = useQuery(["doctrines", character_id], () =>
@@ -19,7 +20,26 @@ const CharDoctrines = ({ character_id }) => {
   return (
     <ErrorBoundary>
       <Panel.Body className="flex-container-vert-fill">
-        <div className="flex-container"></div>
+        <h5 className="text-center">Doctrine Key:</h5>
+        <div className="flex-container">
+          <DoctrineCheck name="Passed" skill_reqs={[]} skill_list={{}} />
+          <DoctrineCheck
+            name="Alpha Restricted"
+            skill_reqs={{ "Some Skill Trained But Limited": 5 }}
+            skill_list={{
+              "Some Skill Trained But Limited": {
+                active_level: 4,
+                trained_level: 5,
+              },
+            }}
+          />
+          <DoctrineCheck
+            name="Failed"
+            skill_reqs={{ "Some Skill": 5 }}
+            skill_list={{ "Some Skill": { active_level: 1, trained_level: 1 } }}
+          />
+        </div>
+        <hr />
         {data.map((char) => {
           return (
             <DoctrinePanel

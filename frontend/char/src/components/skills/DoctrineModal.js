@@ -23,7 +23,7 @@ export const DoctrineModal = ({
         {Object.entries(skill_reqs).map(([k, v]) => {
           let trained_level = 0;
           if (skill_list[k]) {
-            trained_level = skill_list[k].trained_level;
+            trained_level = skill_list[k].active_level;
           }
           return (
             <SkillBlock
