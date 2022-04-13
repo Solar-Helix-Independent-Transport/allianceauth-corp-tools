@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, ButtonGroup, Glyphicon } from "react-bootstrap";
 import "./doctrine.css";
 import { DoctrineModal } from "./DoctrineModal";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 export const DoctrineCheck = ({ name, skill_reqs, skill_list }) => {
   const [show, setShow] = useState(false);
@@ -18,6 +19,9 @@ export const DoctrineCheck = ({ name, skill_reqs, skill_list }) => {
   if (!completed && alpha_check) {
     style = { bsStyle: "warning" };
   }
+  let clipboard_text = Object.entries(skill_reqs).reduce((o, [k, v]) => {
+    return o + "" + k + " " + v + "\n";
+  }, "");
   return (
     <>
       {completed ? (
@@ -44,9 +48,11 @@ export const DoctrineCheck = ({ name, skill_reqs, skill_list }) => {
                 {completed ? <></> : <></>}
               </Button>
               {!alpha_check ? (
-                <Button bsSize="small" className="flex-doctrine-btn-copy">
-                  <Glyphicon glyph="copy" />
-                </Button>
+                <CopyToClipboard text={clipboard_text}>
+                  <Button bsSize="small" className="flex-doctrine-btn-copy">
+                    <Glyphicon glyph="copy" />
+                  </Button>
+                </CopyToClipboard>
               ) : (
                 <></>
               )}
