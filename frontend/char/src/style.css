@@ -40,7 +40,7 @@
 }
 
 .flex-wide-child {
-  width: 700px;
+  width: 750px;
 }
 
 .flex-container-pull-right {
@@ -177,4 +177,8 @@
 
 .flex-space-between {
   justify-content: space-between;
+}
+
+.full-width {
+  width: 100%;
 }

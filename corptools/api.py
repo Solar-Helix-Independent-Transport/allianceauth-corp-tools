@@ -270,6 +270,10 @@ def get_character_menu(request):
             "name": "Skill Queues",
             "link": "/account/skillqueue"
         })
+        _char["links"].append({
+            "name": "Skill List Checks",
+            "link": "/account/doctrines"
+        })
     return [_char, _finance, _inter]
 
 
@@ -914,6 +918,39 @@ def get_character_skillqueues(request, character_id: int):
                 "end": s.finish_date,
             }
         )
+
+    return list(output.values())
+
+
+@api.get(
+    "account/{character_id}/doctrines",
+    response={200: List[schema.CharacterDoctrines], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_doctrines(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    skilllists = providers.skills.get_and_cache_user(
+        main.character_ownership.user_id)
+
+    output = {}
+    for c in characters:
+        output[c.character_id] = {
+            "character": c,
+            "doctrines": {},
+            "skills": {},
+        }
+
+    for k, s in skilllists['skills_list'].items():
+        output[s['character_id']]["doctrines"] = s["doctrines"]
+        output[s['character_id']]["skills"] = s["skills"]
 
     return list(output.values())
 

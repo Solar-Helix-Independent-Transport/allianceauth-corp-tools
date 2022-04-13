@@ -2,9 +2,9 @@ import React from "react";
 import { Image } from "react-bootstrap";
 import "./CharacterPortrait.css";
 
-const CharacterPortrait = ({ character }) => {
+const CharacterPortrait = ({ character, className = "" }) => {
   return (
-    <div className={"char-portrait"}>
+    <div className={"char-portrait " + className}>
       <Image
         className=""
         height={400}

@@ -79,7 +79,7 @@ const CharSkillQueue = ({ character_id }) => {
                                   {s.end ? (
                                     <>
                                       <ReactTimeAgo date={Date.parse(s.end)} />
-                                      <p>
+                                      <p className="no-margin">
                                         {(
                                           s.end_sp - s.start_sp
                                         ).toLocaleString()}{" "}
@@ -89,7 +89,7 @@ const CharSkillQueue = ({ character_id }) => {
                                   ) : (
                                     <>
                                       <Glyphicon glyph="pause" />
-                                      <p>
+                                      <p className="no-margin">
                                         {(
                                           s.end_sp - s.start_sp
                                         ).toLocaleString()}{" "}

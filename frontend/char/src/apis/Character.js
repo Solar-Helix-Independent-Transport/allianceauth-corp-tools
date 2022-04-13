@@ -79,6 +79,12 @@ export async function loadSkills(character_id) {
   return api.data;
 }
 
+export async function loadDoctrines(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/doctrines`);
+  console.log(`get doctrines in api ${character_id}`);
+  return api.data;
+}
+
 export async function loadSkillQueues(character_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/skillqueues`);
   console.log(`get skillqueues in api ${character_id}`);

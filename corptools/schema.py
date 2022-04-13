@@ -132,12 +132,6 @@ class CharacterQueueItem(Schema):
     end: datetime = None
 
 
-class DoctrineCheck(Schema):
-    name: str
-    achieved: str
-    achieved: bool
-
-
 class CharacterSkills(Schema):
     character: Character
     skills: List[Skill]
@@ -152,7 +146,8 @@ class CharacterQueue(Schema):
 
 class CharacterDoctrines(Schema):
     character: Character
-    queue: List[DoctrineCheck]
+    doctrines: dict
+    skills: dict
 
 
 class CharacterNotification(Schema):
