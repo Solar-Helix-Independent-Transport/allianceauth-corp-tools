@@ -24,45 +24,39 @@ export const DoctrineCheck = ({ name, skill_reqs, skill_list }) => {
   }, "");
   return (
     <>
-      {completed ? (
-        <Button
-          {...style}
-          className="doctrine-button"
-          bsSize="small"
-          onClick={() => setShow(true)}
-        >
-          {name}
-          {completed ? <></> : <></>}
-        </Button>
-      ) : (
-        <>
-          <div className="doctrine-button">
-            <ButtonGroup className="flex-container " justified={true}>
-              <Button
-                {...style}
-                bsSize="small"
-                className="flex-doctrine-btn-name"
-                onClick={() => setShow(true)}
-              >
-                {name}
-                {completed ? <></> : <></>}
+      <>
+        <div className="doctrine-button">
+          <ButtonGroup className="flex-container " justified={true}>
+            <Button
+              {...style}
+              bsSize="small"
+              className="flex-doctrine-btn-name"
+              onClick={() => setShow(true)}
+            >
+              {name}
+              {completed ? <></> : <></>}
+            </Button>
+            {!alpha_check ? (
+              <CopyToClipboard text={clipboard_text}>
+                <Button bsSize="small" className="flex-doctrine-btn-copy">
+                  <Glyphicon glyph="copy" />
+                </Button>
+              </CopyToClipboard>
+            ) : (
+              <Button bsSize="small" {...style} className="flex-one">
+                <Glyphicon glyph={completed ? "check" : "alert"} />
               </Button>
-              {!alpha_check ? (
-                <CopyToClipboard text={clipboard_text}>
-                  <Button bsSize="small" className="flex-doctrine-btn-copy">
-                    <Glyphicon glyph="copy" />
-                  </Button>
-                </CopyToClipboard>
-              ) : (
-                <></>
-              )}
-            </ButtonGroup>
+            )}
+          </ButtonGroup>
+          {!completed ? (
             <DoctrineModal
               {...{ show, setShow, name, skill_reqs, skill_list }}
             />
-          </div>
-        </>
-      )}
+          ) : (
+            <></>
+          )}
+        </div>
+      </>
     </>
   );
 };
