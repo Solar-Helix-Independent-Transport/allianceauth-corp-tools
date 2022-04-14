@@ -45,7 +45,7 @@ const CharStatus = ({ character_id }) => {
                   )}
                 </h4>
               </Panel.Heading>
-              <Panel.Body className="flex-body">
+              <Panel.Body className="flex-container flex-body">
                 <CharacterPortrait character={char.character} />
                 <h4 className={"text-center"}>Update Status</h4>
                 <Table striped style={{ marginBottom: 0 }}>

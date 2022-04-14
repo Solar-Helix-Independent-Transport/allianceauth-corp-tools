@@ -40,7 +40,7 @@ const PubData = ({ character_id }) => {
                   )}
                 </h4>
               </Panel.Heading>
-              <Panel.Body className="flex-body">
+              <Panel.Body className="flex-container flex-body">
                 <CharacterPortrait character={char.character} />
                 <h4 className={"text-center"}>Corporation history</h4>
                 <Table striped style={{ marginBottom: 0 }}>

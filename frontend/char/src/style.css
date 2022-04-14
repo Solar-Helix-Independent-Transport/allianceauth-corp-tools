@@ -67,12 +67,14 @@
 
 .flex-body {
   align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .table-div {
   height: 250px;
   width: 400px;
-  overflow-y: overlay;
+  overflow-y: auto;
 }
 
 .skill-queue {

@@ -6,7 +6,7 @@ const CharacterPortrait = ({ character, className = "" }) => {
   return (
     <div className={"char-portrait " + className}>
       <Image
-        className=""
+        className="img-circle"
         height={400}
         width={400}
         alt={character.character_name}

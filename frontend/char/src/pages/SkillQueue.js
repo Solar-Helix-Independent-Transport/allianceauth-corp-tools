@@ -55,7 +55,7 @@ const CharSkillQueue = ({ character_id }) => {
                   )}
                 </h4>
               </Panel.Heading>
-              <Panel.Body className="flex-body">
+              <Panel.Body className="flex-container flex-body">
                 <CharacterPortrait character={char.character} />
                 <h4 className={"text-center"}>Skill Queue</h4>
                 <div className={"table-div skill-queue"}>
