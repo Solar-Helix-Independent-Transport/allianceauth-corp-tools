@@ -7,7 +7,7 @@ import { loadStatus } from "../apis/Character";
 import { PanelLoader } from "../components/PanelLoader";
 import { ErrorLoader } from "../components/ErrorLoader";
 import ErrorBoundary from "../components/ErrorBoundary";
-import { PortraitPanel } from "../components/PortratePannel";
+import { PortraitPanel } from "../components/PortraitPanel";
 
 const CharStatus = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(

@@ -11,21 +11,23 @@ export function PortraitPanel({
 }) {
   return (
     <Panel
-      key={"panel " + character.character_name}
+      key={`panel ${character.character_name}`}
       {...panelStyles}
       className={"flex-child"}
     >
       <Panel.Heading>
         <h4 className={"text-center"}>
-          {headerIcon ? { headerIcon } : <></>}
+          {headerIcon ? (
+            <Glyphicon className="pull-left" glyph={headerIcon} />
+          ) : (
+            <></>
+          )}
           {character.character_name}
-          {isFetching ? (
+          {isFetching && (
             <Glyphicon
               className="glyphicon-refresh-animate pull-right"
               glyph="refresh"
             />
-          ) : (
-            <></>
           )}
         </h4>
       </Panel.Heading>

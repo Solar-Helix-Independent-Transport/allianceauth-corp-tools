@@ -6,7 +6,7 @@ import { loadPubData } from "../apis/Character";
 import { PanelLoader } from "../components/PanelLoader";
 import { ErrorLoader } from "../components/ErrorLoader";
 import ErrorBoundary from "../components/ErrorBoundary";
-import { PortraitPanel } from "../components/PortratePannel";
+import { PortraitPanel } from "../components/PortraitPanel";
 const PubData = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["pubdata", character_id],
