@@ -37,6 +37,22 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
+def clear_all_etags():
+    try:
+        from django_redis import get_redis_connection
+        _client = get_redis_connection("default")
+    except (NotImplementedError, ModuleNotFoundError):
+        from django.core.cache import caches
+        default_cache = caches['default']
+        _client = default_cache.get_master_client()
+
+    keys = _client.keys(":?:etag-*")
+    deleted = _client.delete(*keys)
+
+    return f"Deleted {deleted} etag keys"
+
+
+@shared_task
 def update_or_create_map():
     return process_map_from_esi()
 
