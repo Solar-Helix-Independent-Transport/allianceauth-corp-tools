@@ -17,11 +17,7 @@ export function PortraitPanel({
     >
       <Panel.Heading>
         <h4 className={"text-center"}>
-          {headerIcon ? (
-            <Glyphicon className="pull-left" glyph={headerIcon} />
-          ) : (
-            <></>
-          )}
+          {headerIcon && <Glyphicon className="pull-left" glyph={headerIcon} />}
           {character.character_name}
           {isFetching && (
             <Glyphicon
