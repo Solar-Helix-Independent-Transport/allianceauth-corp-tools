@@ -17,6 +17,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { Panel } from "react-bootstrap";
 import CharRoles from "./pages/Roles";
 import CharWallet from "./pages/Wallet";
+import CharWalletActivity from "./pages/WalletActivity";
 import CharNotifications from "./pages/Notifications";
 import CharContacts from "./pages/Contacts";
 import CharSkills from "./pages/Skills";
@@ -75,6 +76,10 @@ const CorptoolsCharacterView = () => {
                 <Route
                   path="/account/wallet"
                   component={() => CharWallet({ character_id })}
+                />
+                <Route
+                  path="/account/walletactivity"
+                  component={() => CharWalletActivity({ character_id })}
                 />
                 <Route
                   path="/account/notifications"

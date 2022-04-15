@@ -117,6 +117,14 @@ export async function loadWallet(character_id) {
   return api.data;
 }
 
+export async function loadWalletActivity(character_id) {
+  const api = await axios.get(
+    `/audit/api/account/${character_id}/wallet/activity`
+  );
+  console.log(`get wallet activity in api ${character_id}`);
+  return api.data;
+}
+
 export async function loadMarket(character_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/orders`);
   console.log(`get wallet in api ${character_id}`);

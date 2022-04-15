@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import timedelta
 from tokenize import group
 from typing import List
@@ -11,7 +12,7 @@ from ninja.security import django_auth
 from ninja.responses import codes_4xx
 
 from django.core.exceptions import PermissionDenied
-from django.db.models import F, Sum, Q
+from django.db.models import F, Sum, Q, Count
 from allianceauth.eveonline.models import EveCharacter
 from django.conf import settings
 from django.utils import timezone
@@ -21,7 +22,13 @@ from . import tasks
 from . import schema
 from . import providers
 
+import functools
+
 import logging
+
+
+from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers
+
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +36,15 @@ logger = logging.getLogger(__name__)
 api = NinjaAPI(title="CorpTools API", version="0.0.1",
                urls_namespace='corptools:api', auth=django_auth, csrf=True,
                openapi_url=settings.DEBUG and "/openapi.json" or "")
+
+
+def cache_page_data(f):
+    def decorator(*args, **kwargs):
+        print(f)
+        out = f(*args, **kwargs)
+        print(out)
+        return out
+    return decorator
 
 
 def get_main_character(request, character_id):
@@ -67,6 +83,7 @@ def get_alts_queryset(main_char):
     return EveCharacter.objects.filter(id__in=linked_characters)
 
 
+@cache_page_data
 @api.get(
     "account/{character_id}/status",
     response={200: schema.AccountStatus, 403: schema.Message},
@@ -642,6 +659,47 @@ def get_character_wallet(request, character_id: int):
                 "amount": w.amount,
                 "balance": w.balance,
                 "reason": w.reason,
+            })
+
+    return output
+
+
+@api.get(
+    "account/{character_id}/wallet/activity",
+    tags=["Account"]
+)
+def get_character_wallet_activity(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+    ref_types = ["player_donation", "player_trading",
+                 "contract_price", "corporation_account_withdrawal"]
+    wallet_journal = models.CharacterWalletJournalEntry.objects\
+        .filter(character__character__in=characters, ref_type__in=ref_types)\
+        .select_related('first_party_name', 'second_party_name', 'character__character')\
+        .values('first_party_name__name', 'second_party_name__name')\
+        .annotate(total_isk=Sum('amount'))\
+        .annotate(interations=Count('amount'))\
+        .annotate(fpcat=F('first_party_name__category'))\
+        .annotate(spcat=F('second_party_name__category'))\
+        .annotate(fpcrp=F('first_party_name__corporation__name'))\
+        .annotate(spcrp=F('second_party_name__corporation__name'))\
+        .annotate(fpali=F('first_party_name__alliance__name'))\
+        .annotate(spali=F('second_party_name__alliance__name'))
+
+    output = []
+    for w in wallet_journal:
+        output.append(
+            {
+                "firstParty": w['first_party_name__name'],
+                "secondParty": w['second_party_name__name'],
+                "value": abs(int(w['total_isk'])),
+                # w['interations'],
             })
 
     return output
