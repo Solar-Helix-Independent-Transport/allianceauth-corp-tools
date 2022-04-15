@@ -163,7 +163,7 @@ def update_subset_of_characters(subset=48, min_runs=5, force=False):
     for char in characters:
         update_character.apply_async(args=[char.character.character_id], kwargs={
                                      "force_refresh": force})
-    update_all_eve_names.apply_async(priority=7, kwargs={"chunk": 1000})
+    update_all_eve_names.apply_async(priority=7, kwargs={"chunk": 5000})
     return f"Queued {len(characters)} Character Updates"
 
 
