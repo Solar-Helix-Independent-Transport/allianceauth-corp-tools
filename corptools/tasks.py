@@ -23,9 +23,11 @@ from .task_helpers.char_tasks import update_corp_history, update_character_asset
     update_character_titles
 
 from .task_helpers import corp_helpers
-from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, JumpClone, Clone, CharacterMarketOrder
+from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, EveName, JumpClone, Clone, CharacterMarketOrder
 from . import providers
 from . import app_settings
+
+from allianceauth.eveonline.providers import provider as eve_names
 
 from esi.models import Token
 
@@ -73,6 +75,64 @@ def process_ores_from_esi():
 
 
 @shared_task
+def update_all_eve_names(chunk=False):
+    needs_update = timezone.now() - datetime.timedelta(days=7)
+    en = EveName.objects.filter(last_update__lte=needs_update)
+    if chunk:
+        en = en[:chunk]
+    for e in en:
+        update_eve_name.apply_async(args=[e.eve_id], priority=7)
+
+
+@shared_task(bind=True, base=QueueOnce)
+def update_eve_name(self, id):
+    name = EveName.objects.get(eve_id=id)
+    if name.needs_update():
+        if name.category == EveName.CHARACTER:
+            update = eve_names.get_character(id)
+            name.name = update.name
+            if update.alliance:
+                alliance, _ = EveName.objects.update_or_create(
+                    eve_id=update.alliance.id,
+                    defaults={
+                        'name': update.alliance.name,
+                        'category': EveName.ALLIANCE,
+                    }
+                )
+                name.alliance = alliance
+            if update.corp:
+                corporation, _ = EveName.objects.update_or_create(
+                    eve_id=update.corp.id,
+                    defaults={
+                        'name': update.corp.name,
+                        'category': EveName.CORPORATION,
+                    }
+                )
+                if update.alliance:
+                    corporation.alliance_id = update.alliance.id
+                    corporation.save()
+                name.corporation = corporation
+            name.save()
+        if name.category == EveName.ALLIANCE:
+            update = eve_names.get_corp(id)
+            name.name = update.corporation_name
+            if update.alliance:
+                alliance, _ = EveName.objects.update_or_create(
+                    eve_id=update.alliance.id,
+                    defaults={
+                        'name': update.alliance.name,
+                        'category': EveName.ALLIANCE,
+                    }
+                )
+                name.alliance = alliance
+            name.save()
+        if name.category == EveName.ALLIANCE:
+            update = eve_names.get_alliance(id)
+            name.name = update.name
+        name.save()
+
+
+@shared_task
 def process_all_categories():
     categories = providers.esi.client.Universe.get_universe_categories().result()
     que = []
@@ -80,7 +140,7 @@ def process_all_categories():
     for category in categories:
         que.append(update_category.si(category))
 
-    chain(que).apply_async(priority=7)
+    chain(que).apply_async(priority=8)
 
     return "Queued {} Tasks".format(len(que))
 
@@ -103,7 +163,7 @@ def update_subset_of_characters(subset=48, min_runs=5, force=False):
     for char in characters:
         update_character.apply_async(args=[char.character.character_id], kwargs={
                                      "force_refresh": force})
-
+    update_all_eve_names.apply_async(priority=7, kwargs={"chunk": 1000})
     return f"Queued {len(characters)} Character Updates"
 
 

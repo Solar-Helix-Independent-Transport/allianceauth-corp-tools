@@ -287,6 +287,9 @@ class EveName(models.Model):
         elif self.category == 'faction':  # CCP...
             return eveimageserver.corporation_logo_url(self.eve_id)
 
+    def needs_update(self):
+        return self.last_update + datetime.timedelta(days=7) < timezone.now()
+
 
 class MapRegion(models.Model):
     region_id = models.BigIntegerField(primary_key=True)

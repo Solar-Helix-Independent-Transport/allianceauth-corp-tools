@@ -16,7 +16,7 @@ import re
 import json
 from itertools import chain
 from .models import *
-from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi, update_all_corps, check_account
+from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi, update_all_corps, check_account, update_all_eve_names
 from .forms import UploadForm
 from . import app_settings
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
@@ -150,14 +150,18 @@ def admin(request):
 def admin_run_tasks(request):
     if request.method == 'POST':
         if request.POST.get('run_universe'):
+            messages.info(request, "Queued update_or_create_map")
             update_or_create_map.apply_async(priority=6)
         if request.POST.get('run_update_all'):
+            messages.info(request, "Queued update_all_characters")
             update_all_characters.apply_async(priority=6)
         if request.POST.get('run_update_eve_models'):
-            update_ore_comp_table.apply_async(priority=6)
-            process_ores_from_esi.apply_async(priority=6)
+            messages.info(request, "Queued update_all_eve_names")
+            update_all_eve_names.apply_async(priority=6)
         if request.POST.get('run_corp_updates'):
+            messages.info(request, "Queued update_all_corps")
             update_all_corps.apply_async(priority=6)
+
     return redirect('corptools:admin')
 
 
