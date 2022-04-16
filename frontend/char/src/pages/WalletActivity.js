@@ -6,7 +6,11 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import { PanelLoader } from "../components/PanelLoader";
 import { ErrorLoader } from "../components/ErrorLoader";
 import { ActivityChord } from "../components/ActivityChord";
-import { BaseTable, SelectColumnFilter } from "../components/BaseTable";
+import {
+  BaseTable,
+  SelectColumnFilter,
+  textColumnFilter,
+} from "../components/BaseTable";
 
 const CharWalletActivity = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
@@ -22,8 +26,8 @@ const CharWalletActivity = ({ character_id }) => {
       {
         Header: "From",
         accessor: "fpn",
-        Filter: SelectColumnFilter,
-        filter: "includes",
+        Filter: textColumnFilter,
+        filter: "text",
         Cell: (props) => (
           <a href={`https://zkillboard.com/search/${props.value}`}>
             {props.value}
@@ -39,8 +43,8 @@ const CharWalletActivity = ({ character_id }) => {
       {
         Header: "To",
         accessor: "spn",
-        Filter: SelectColumnFilter,
-        filter: "includes",
+        Filter: textColumnFilter,
+        filter: "text",
         Cell: (props) => (
           <a href={`https://zkillboard.com/search/${props.value}`}>
             {props.value}
