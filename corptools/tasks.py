@@ -1,6 +1,7 @@
 import datetime
 import logging
 import json
+from urllib import response
 
 from celery import shared_task, chain
 from django.utils import timezone
@@ -14,7 +15,7 @@ from django.utils import timezone
 from esi.errors import TokenExpiredError
 from requests.adapters import MaxRetryError
 
-from .task_helpers.update_tasks import process_map_from_esi, update_ore_comp_table_from_fuzzworks, \
+from .task_helpers.update_tasks import process_map_from_esi, set_error_count_flag, update_ore_comp_table_from_fuzzworks, \
     process_category_from_esi, fetch_location_name
 from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, \
     update_character_clones, update_character_skill_queue, update_character_wallet, \
@@ -86,6 +87,9 @@ def update_all_eve_names(chunk=False):
 
 @shared_task(bind=True, base=QueueOnce)
 def update_eve_name(self, id):
+    if get_error_count_flag():
+        self.retry(countdown=60)
+
     name = EveName.objects.get(eve_id=id)
     if name.needs_update():
         try:
@@ -131,7 +135,10 @@ def update_eve_name(self, id):
                 update = eve_names.get_alliance(id)
                 name.name = update.name
             name.save()
-        except:
+        except Exception as e:  # no access
+            if hasattr(e, "response"):
+                if int(e.response.headers.get('x-esi-error-limit-remain')) < 50:
+                    set_error_count_flag()
             # cooloff for a while
             name.last_updated = timezone.now()
             name.save()
