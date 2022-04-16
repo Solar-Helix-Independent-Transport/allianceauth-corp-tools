@@ -85,7 +85,7 @@ def update_all_eve_names(chunk=False):
         update_eve_name.apply_async(args=[e.eve_id], priority=7)
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(bind=True, base=QueueOnce, max_retries=None)
 def update_eve_name(self, id):
     if get_error_count_flag():
         self.retry(countdown=60)
