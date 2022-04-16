@@ -684,22 +684,44 @@ def get_character_wallet_activity(request, character_id: int):
         .select_related('first_party_name', 'second_party_name', 'character__character')\
         .values('first_party_name__name', 'second_party_name__name')\
         .annotate(total_isk=Sum('amount'))\
-        .annotate(interations=Count('amount'))\
+        .annotate(interactions=Count('amount'))\
         .annotate(fpcat=F('first_party_name__category'))\
         .annotate(spcat=F('second_party_name__category'))\
+        .annotate(fpid=F('first_party_name__eve_id'))\
+        .annotate(spid=F('second_party_name__eve_id'))\
         .annotate(fpcrp=F('first_party_name__corporation__name'))\
         .annotate(spcrp=F('second_party_name__corporation__name'))\
+        .annotate(fpcid=F('first_party_name__corporation__eve_id'))\
+        .annotate(spcid=F('second_party_name__corporation__eve_id'))\
         .annotate(fpali=F('first_party_name__alliance__name'))\
-        .annotate(spali=F('second_party_name__alliance__name'))
+        .annotate(spali=F('second_party_name__alliance__name'))\
+        .annotate(fpaid=F('first_party_name__alliance__eve_id'))\
+        .annotate(spaid=F('second_party_name__alliance__eve_id'))
 
     output = []
     for w in wallet_journal:
         output.append(
             {
-                "firstParty": w['first_party_name__name'],
-                "secondParty": w['second_party_name__name'],
+                "fpn": w['first_party_name__name'],
+                "firstParty": {
+                    "cat": w['fpcat'],
+                    "id": w['fpid'],
+                    "cid": w['fpcid'],
+                    "cn": w['fpcrp'],
+                    "aid": w['fpali'],
+                    "an": w['fpaid']
+                },
+                "spn": w['second_party_name__name'],
+                "secondParty": {
+                    "cat": w['spcat'],
+                    "id": w['spid'],
+                    "cid": w['spcid'],
+                    "cn": w['spcrp'],
+                    "aid": w['spali'],
+                    "an": w['spaid']
+                },
                 "value": abs(int(w['total_isk'])),
-                # w['interations'],
+                "interactions": w['interactions']
             })
 
     return output

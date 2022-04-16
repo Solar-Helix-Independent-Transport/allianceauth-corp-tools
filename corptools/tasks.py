@@ -88,48 +88,53 @@ def update_all_eve_names(chunk=False):
 def update_eve_name(self, id):
     name = EveName.objects.get(eve_id=id)
     if name.needs_update():
-        if name.category == EveName.CHARACTER:
-            update = eve_names.get_character(id)
-            name.name = update.name
-            if update.alliance:
-                alliance, _ = EveName.objects.update_or_create(
-                    eve_id=update.alliance.id,
-                    defaults={
-                        'name': update.alliance.name,
-                        'category': EveName.ALLIANCE,
-                    }
-                )
-                name.alliance = alliance
-            if update.corp:
-                corporation, _ = EveName.objects.update_or_create(
-                    eve_id=update.corp.id,
-                    defaults={
-                        'name': update.corp.name,
-                        'category': EveName.CORPORATION,
-                    }
-                )
+        try:
+            if name.category == EveName.CHARACTER:
+                update = eve_names.get_character(id)
+                name.name = update.name
                 if update.alliance:
-                    corporation.alliance_id = update.alliance.id
-                    corporation.save()
-                name.corporation = corporation
+                    alliance, _ = EveName.objects.update_or_create(
+                        eve_id=update.alliance.id,
+                        defaults={
+                            'name': update.alliance.name,
+                            'category': EveName.ALLIANCE,
+                        }
+                    )
+                    name.alliance = alliance
+                if update.corp:
+                    corporation, _ = EveName.objects.update_or_create(
+                        eve_id=update.corp.id,
+                        defaults={
+                            'name': update.corp.name,
+                            'category': EveName.CORPORATION,
+                        }
+                    )
+                    if update.alliance:
+                        corporation.alliance_id = update.alliance.id
+                        corporation.save()
+                    name.corporation = corporation
+                name.save()
+            if name.category == EveName.ALLIANCE:
+                update = eve_names.get_corp(id)
+                name.name = update.corporation_name
+                if update.alliance:
+                    alliance, _ = EveName.objects.update_or_create(
+                        eve_id=update.alliance.id,
+                        defaults={
+                            'name': update.alliance.name,
+                            'category': EveName.ALLIANCE,
+                        }
+                    )
+                    name.alliance = alliance
+                name.save()
+            if name.category == EveName.ALLIANCE:
+                update = eve_names.get_alliance(id)
+                name.name = update.name
             name.save()
-        if name.category == EveName.ALLIANCE:
-            update = eve_names.get_corp(id)
-            name.name = update.corporation_name
-            if update.alliance:
-                alliance, _ = EveName.objects.update_or_create(
-                    eve_id=update.alliance.id,
-                    defaults={
-                        'name': update.alliance.name,
-                        'category': EveName.ALLIANCE,
-                    }
-                )
-                name.alliance = alliance
+        except:
+            # cooloff for a while
+            name.last_updated = timezone.now()
             name.save()
-        if name.category == EveName.ALLIANCE:
-            update = eve_names.get_alliance(id)
-            name.name = update.name
-        name.save()
 
 
 @shared_task
