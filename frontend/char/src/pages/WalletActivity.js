@@ -24,10 +24,32 @@ const CharWalletActivity = ({ character_id }) => {
         accessor: "fpn",
         Filter: SelectColumnFilter,
         filter: "includes",
+        Cell: (props) => (
+          <a href={`https://zkillboard.com/search/${props.value}`}>
+            {props.value}
+          </a>
+        ),
+      },
+      {
+        Header: "From - Category",
+        accessor: "firstParty.cat",
+        Filter: SelectColumnFilter,
+        filter: "includes",
       },
       {
         Header: "To",
         accessor: "spn",
+        Filter: SelectColumnFilter,
+        filter: "includes",
+        Cell: (props) => (
+          <a href={`https://zkillboard.com/search/${props.value}`}>
+            {props.value}
+          </a>
+        ),
+      },
+      {
+        Header: "To - Category",
+        accessor: "secondParty.cat",
         Filter: SelectColumnFilter,
         filter: "includes",
       },
