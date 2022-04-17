@@ -162,19 +162,19 @@ def get_character_pubdata(request, character_id: int):
     for h in corp_histories:
         if h.character.character_id not in histories:
             histories[h.character.character_id] = []
-        histories[h.character.character_id].append({
+        _h = {
             "corporation": {
                 "corporation_name": h.corporation_name.name,
                 "corporation_id": h.corporation_name.eve_id,
             },
             "start": h.start_date
-        })
+        }
         if h.corporation_name.alliance:
-            histories[h.character.character_id]['corporation'].update({
+            _h['corporation'].update({
                 "alliance_id": h.corporation_name.alliance.eve_id,
-                "alliance_name": h.corporation_name.alliance.alliance_name,
+                "alliance_name": h.corporation_name.alliance.name,
             })
-
+        histories[h.character.character_id].append(_h)
     char_skill_total = models.Skill.objects\
         .filter(character__character__in=characters)\
         .values('character')\
@@ -246,6 +246,15 @@ def get_character_menu(request):
             "name": "Wallet",
             "link": "/account/wallet"
         })
+        if (request.user.has_perm("corptools.global_corp_manager") or
+            request.user.has_perm("corptools.state_corp_manager") or
+            request.user.has_perm("corptools.alliance_corp_manager") or
+                request.user.has_perm("corptools.own_corp_manager")):
+            _finance["links"].append({
+                "name": "Wallet Activity",
+                "link": "/account/walletactivity"
+            })
+
         _finance["links"].append({
             "name": "Market",
             "link": "/account/market"
@@ -669,6 +678,12 @@ def get_character_wallet(request, character_id: int):
     tags=["Account"]
 )
 def get_character_wallet_activity(request, character_id: int):
+    if not (request.user.has_perm("corptools.global_corp_manager") or
+            request.user.has_perm("corptools.state_corp_manager") or
+            request.user.has_perm("corptools.alliance_corp_manager") or
+            request.user.has_perm("corptools.own_corp_manager")):
+        return []
+
     if character_id == 0:
         character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
