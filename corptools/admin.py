@@ -84,7 +84,7 @@ class EveNameAdmin(admin.ModelAdmin):
 
 @admin.register(models.CorporationWalletJournalEntry)
 class CorporationWalletJournalEntryAdmin(admin.ModelAdmin):
-    list_display = ['first_party_name', 'second_party_name',
+    list_display = ['date', 'first_party_name', 'second_party_name',
                     'entry_id', 'ref_type', 'reason', 'amount']
     search_fields = ['description', 'entry_id', 'reason',
                      'first_party_name__name', 'second_party_name__name', ]
