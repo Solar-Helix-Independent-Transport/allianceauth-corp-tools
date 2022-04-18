@@ -65,10 +65,17 @@ export async function loadAssetList(corporation_id, location_id) {
   return api.data;
 }
 
-export async function loadWallet(corporation_id) {
+export async function loadWallet(corporation_id, refType = "", page = 1) {
   const api = await axios.get(
-    `/audit/api/corporation/${corporation_id}/wallet`
+    `/audit/api/corporation/${corporation_id}/wallet`,
+    { params: { type_refs: refType, page: page } }
   );
   console.log(`get wallet in api ${corporation_id}`);
+  return api.data;
+}
+
+export async function loadRefTypes() {
+  const api = await axios.get(`/audit/api/corporation/wallettypes`);
+  console.log(`get wallet types in api`);
   return api.data;
 }

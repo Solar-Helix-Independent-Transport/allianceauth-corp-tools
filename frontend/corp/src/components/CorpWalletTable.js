@@ -4,12 +4,11 @@ import { useQuery } from "react-query";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { loadWallet } from "../apis/Corporation";
 import { BaseTable, SelectColumnFilter, textColumnFilter } from "./BaseTable";
-import { CorpLoader } from "./NoCorp";
 
-const CorpWalletTable = ({ corporation_id }) => {
+const CorpWalletTable = ({ corporation_id, refTypes = "", page = 1 }) => {
   const { isLoading, isFetching, error, data } = useQuery(
-    ["wallet", corporation_id],
-    () => loadWallet(corporation_id),
+    ["wallet", corporation_id, refTypes, page],
+    () => loadWallet(corporation_id, refTypes, page),
     {
       initialData: [],
     }
@@ -59,8 +58,6 @@ const CorpWalletTable = ({ corporation_id }) => {
     ],
     []
   );
-
-  if (corporation_id === 0) return <CorpLoader />;
 
   return (
     <ErrorBoundary>

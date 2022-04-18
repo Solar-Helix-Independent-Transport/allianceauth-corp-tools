@@ -1252,11 +1252,10 @@ def get_corporation_status(request, corporation_id: int):
 
 
 @api.get(
-    "corporation/{corporation_id}/wallet",
-    response={200: List[schema.CorporationWalletEvent], 403: schema.Message},
+    "corporation/wallettypes",
     tags=["Corporation"]
 )
-def get_corporation_wallet(request, corporation_id: int):
+def get_corporation_wallet_types(request):
     perms = (
         request.user.has_perm('corptools.corp_hr') |
         request.user.has_perm('corptools.alliance_hr') |
@@ -1270,11 +1269,46 @@ def get_corporation_wallet(request, corporation_id: int):
             f"Permission Denied for {request.user} to view wallets!")
         return 403, "Permission Denied!"
 
-    max_scrollback = timezone.now() - timedelta(days=60)
+    ref_types = models.CorporationWalletJournalEntry.objects.values_list(
+        "ref_type", flat=True).distinct()
+
+    return 200, list(ref_types)
+
+
+@api.get(
+    "corporation/{corporation_id}/wallet",
+    response={200: List[schema.CorporationWalletEvent], 403: schema.Message},
+    tags=["Corporation"]
+)
+def get_corporation_wallet(request, corporation_id: int, type_refs: str = "", page: int = 1):
+    perms = (
+        request.user.has_perm('corptools.corp_hr') |
+        request.user.has_perm('corptools.alliance_hr') |
+        request.user.has_perm('corptools.state_hr') |
+        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.holding_corp_wallets')
+    )
+
+    if not perms:
+        logging.error(
+            f"Permission Denied for {request.user} to view wallets!")
+        return 403, "Permission Denied!"
+
     wallet_journal = models.CorporationWalletJournalEntry.get_visible(request.user)\
-        .filter(division__corporation__corporation__corporation_id=corporation_id,
-                date__gte=max_scrollback)\
-        .select_related('first_party_name', 'second_party_name', 'division')
+        .filter(division__corporation__corporation__corporation_id=corporation_id)\
+        .select_related('first_party_name', 'second_party_name', 'division')\
+        .order_by("-date")
+
+    start_count = (page-1)*10000
+    end_count = page*10000
+
+    if type_refs:
+        refs = type_refs.split(",")
+        if len(refs) == 0:
+            return 200, []
+        wallet_journal = wallet_journal.filter(ref_type__in=refs)
+
+    wallet_journal = wallet_journal[start_count:end_count]
 
     output = []
     for w in wallet_journal:
