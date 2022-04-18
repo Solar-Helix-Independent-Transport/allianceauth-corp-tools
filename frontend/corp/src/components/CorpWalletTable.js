@@ -7,10 +7,11 @@ import { BaseTable, SelectColumnFilter, textColumnFilter } from "./BaseTable";
 
 const CorpWalletTable = ({ corporation_id, refTypes = "", page = 1 }) => {
   const { isLoading, isFetching, error, data } = useQuery(
-    ["wallet", corporation_id, refTypes, page],
+    ["wallet", { corporation_id, refTypes, page }],
     () => loadWallet(corporation_id, refTypes, page),
     {
       initialData: [],
+      refetchOnWindowFocus: false,
     }
   );
 
@@ -24,6 +25,12 @@ const CorpWalletTable = ({ corporation_id, refTypes = "", page = 1 }) => {
       {
         Header: "Type",
         accessor: "ref_type",
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+      {
+        Header: "Division",
+        accessor: "division",
         Filter: SelectColumnFilter,
         filter: "includes",
       },
