@@ -80,6 +80,7 @@
 .skill-queue {
   height: 400px;
 }
+
 .table-div-fill {
   width: auto;
 }
@@ -132,6 +133,7 @@
 .flex-label {
   margin: 2px;
 }
+
 .flex-select {
   flex: 1;
   margin: 2px;
