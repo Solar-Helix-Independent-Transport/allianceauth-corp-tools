@@ -1234,7 +1234,7 @@ def get_visible_corporation_status(request):
     for c in chars:
         _c[c.character.character_id] = c.character.corporation_id
         if c.characterroles.director:
-            corp_chars[c.character.corporation_id]["c"]["c"] += 1
+            corp_chars[c.character.corporation_id]["a"]["c"] += 1
             corp_chars[c.character.corporation_id]["w"]["c"] += 1
             corp_chars[c.character.corporation_id]["s"]["c"] += 1
             corp_chars[c.character.corporation_id]["m"]["c"] += 1
