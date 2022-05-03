@@ -1202,7 +1202,7 @@ def get_visible_corporation_status(request):
 
     chars = models.CharacterAudit.objects.filter(
         character__corporation_id__in=corps.values_list("corporation__corporation_id", flat=True), active=True)
-    chars = chars.filter(
+    chars = chars.select_related("characterroles", "character").filter(
         Q(characterroles__accountant=True) or
         Q(characterroles__director=True) or
         Q(characterroles__station_manager=True)
