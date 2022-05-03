@@ -34,14 +34,39 @@ const CharContacts = ({ character_id }) => {
         filter: "text",
       },
       {
-        Header: "Type",
-        accessor: "contact.cat",
-        Filter: SelectColumnFilter,
-        filter: "text",
+        Header: "Blocked",
+        accessor: "blocked",
+        Cell: (props) => (
+          <span
+            className={
+              props.value ? "fas fa-check-circle" : "far fa-times-circle"
+            }
+          />
+        ),
+        disableSortBy: true,
+      },
+      {
+        Header: "Watching",
+        accessor: "watched",
+        Cell: (props) => (
+          <span
+            className={
+              props.value ? "fas fa-check-circle" : "far fa-times-circle"
+            }
+          />
+        ),
+        disableSortBy: true,
       },
       {
         Header: "Standing",
         accessor: "standing",
+      },
+      {
+        Header: "Type",
+        accessor: "contact.cat",
+        Filter: SelectColumnFilter,
+        filter: "text",
+        disableSortBy: true,
       },
     ],
     []

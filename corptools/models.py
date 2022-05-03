@@ -772,15 +772,6 @@ class StructureService(models.Model):
     _state_enum = Choices('online', 'offline', 'cleanup')
     state = models.CharField(max_length=8, choices=_state_enum)
 
-# Moon Models
-
-
-class MiningTaxPaymentCorp(models.Model):
-    corp = models.ForeignKey(
-        EveCorporationInfo, on_delete=models.CASCADE, related_name='payment_corp_mining_tax')
-
-    def __str__(self):
-        return "Moon Payments Processed From: {0}".format(self.corp.corporation_name)
 
 # Market History ( GMetrics )
 
@@ -812,42 +803,6 @@ class OreTaxRates(models.Model):
     rare_rate = models.DecimalField(max_digits=5, decimal_places=2)  # rare
     excptional_rate = models.DecimalField(
         max_digits=5, decimal_places=2)  # best
-
-
-class MiningTax(models.Model):
-    corp = models.ForeignKey(
-        EveCorporationInfo, on_delete=models.CASCADE, related_name='corp_mining_tax')
-    tax_rate = models.ForeignKey(
-        OreTaxRates, on_delete=models.CASCADE, null=True, default=None, blank=True)
-    use_variable_tax = models.BooleanField(default=False)
-    flat_tax_rate = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, default=None, blank=True)  # best
-    region = models.CharField(max_length=50, null=True,
-                              default=None, blank=True)
-    constellation = models.CharField(
-        max_length=50, null=True, default=None, blank=True)
-    system = models.CharField(max_length=50, null=True,
-                              default=None, blank=True)
-    moon = models.CharField(max_length=50, null=True, default=None, blank=True)
-    rank = models.IntegerField(default=0, null=True, blank=True)
-
-    def __str__(self):
-        area = "Everywhere"
-        if self.region:
-            area = self.region
-        elif self.constellation:
-            area = self.constellation
-        elif self.system:
-            area = self.system
-        elif self.moon:
-            area = self.moon
-        # return
-        rate = ""
-        if self.use_variable_tax:
-            rate = " Variable ({})".format(self.tax_rate.tag)
-        else:
-            rate = "{}%".format(self.tax_rate*100)
-        return "#{3}: Mining Tax {0} for {1}: {2}".format(rate, self.corp, area, self.rank)
 
 
 class NotificationText(models.Model):

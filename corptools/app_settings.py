@@ -238,10 +238,56 @@ def get_character_update_attributes():
 def get_corp_update_attributes():
     _attribs = [
         # Base
-        ("Assets", 'last_update_assets'),
-        ("Structures", 'last_update_structures'),
-        ("Wallet", 'last_update_wallet'),
-        ("Moons Observations", 'last_update_observers')
+        ["Assets", 'last_update_assets', "a"],
+        ("Structures", 'last_update_structures', "s"),
+        ("Wallet", 'last_update_wallet', "w"),
+        ("Moons Observations", 'last_update_observers', "m")
     ]
 
     return _attribs
+
+
+_corp_scopes_base = [
+    # All...
+    'esi-search.search_structures.v1',
+    'esi-universe.read_structures.v1',
+    'esi-characters.read_corporation_roles.v1',
+]
+
+# Tracking
+_corp_scopes_tracking = [
+    'esi-corporations.track_members.v1',
+    'esi-corporations.read_titles.v1',
+    'esi-corporations.read_corporation_membership.v1',
+    'esi-killmails.read_corporation_killmails.v1',
+]
+
+# structures
+_corp_scopes_structures = [
+    'esi-planets.read_customs_offices.v1',
+    'esi-corporations.read_starbases.v1',
+    'esi-corporations.read_structures.v1',
+]
+
+# moons
+_corp_scopes_moons = [
+    'esi-industry.read_corporation_mining.v1',
+]
+
+# wallets
+_corp_scopes_wallets = [
+    'esi-wallet.read_corporation_wallets.v1',
+    'esi-markets.read_corporation_orders.v1',
+    'esi-industry.read_corporation_jobs.v1',
+    'esi-corporations.read_divisions.v1',
+]
+
+# assets
+_corp_scopes_assets = [
+    'esi-assets.read_corporation_assets.v1',
+]
+
+
+CORP_REQUIRED_SCOPES = _corp_scopes_base+_corp_scopes_tracking + \
+    _corp_scopes_structures+_corp_scopes_moons + \
+    _corp_scopes_wallets+_corp_scopes_assets

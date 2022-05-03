@@ -72,5 +72,7 @@ urlpatterns = [
         re_path(r'^menu/', corp_list, name='corp_menu'),
         re_path(r'^r/$', views.react_corp, name='corp_react'),
         re_path(r'^add/$', views.add_corp, name='add_corp'),
+        re_path(r'^add_options/$', views.add_corp_section,
+                name='add_corp_options'),
     ])),
 ]

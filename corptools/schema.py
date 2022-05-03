@@ -209,6 +209,8 @@ class Contact(Schema):
     contact: EveName
     standing: float
     labels: List[ValueLabel] = None
+    blocked: bool
+    watched: bool
 
 
 class StructureService(Schema):

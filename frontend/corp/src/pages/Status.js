@@ -1,12 +1,20 @@
 import React from "react";
-import { Table } from "react-bootstrap";
-import { Panel } from "react-bootstrap";
+import { Label, Table } from "react-bootstrap";
+import { Panel, Tooltip, OverlayTrigger } from "react-bootstrap";
 import ReactTimeAgo from "react-time-ago";
 import { useQuery } from "react-query";
 import { loadStatus } from "../apis/Corporation";
 import { PanelLoader } from "../components/PanelLoader";
 import { ErrorLoader } from "../components/ErrorLoader";
 import { CorporationLogo } from "../components/EveImages";
+
+function MyTooltip({ message }) {
+  return (
+    <Tooltip wrap id="character_tooltip">
+      {message}
+    </Tooltip>
+  );
+}
 
 const CorpStatus = () => {
   const { isLoading, error, data } = useQuery(["corp-status"], () =>
@@ -49,11 +57,29 @@ const CorpStatus = () => {
                     {data.headers.map((h) => {
                       return (
                         <tr>
-                          <td>{h}</td>
+                          <td>
+                            {h}{" "}
+                            <OverlayTrigger
+                              placement="top"
+                              overlay={MyTooltip({
+                                message:
+                                  "Characters with Roles in Audit vs Tokens Available.",
+                              })}
+                            >
+                              <Label
+                                className="pull-right"
+                                bsStyle="info"
+                                size={"small"}
+                              >
+                                Chars/Tokens: {corp.last_updates[h].chars}/
+                                {corp.last_updates[h].tokens}
+                              </Label>
+                            </OverlayTrigger>
+                          </td>
                           <td className="text-right">
-                            {corp.last_updates[h] ? (
+                            {corp.last_updates[h].update ? (
                               <ReactTimeAgo
-                                date={Date.parse(corp.last_updates[h])}
+                                date={Date.parse(corp.last_updates[h].update)}
                               />
                             ) : (
                               <>{"Never"}</>

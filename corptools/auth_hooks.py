@@ -1,4 +1,3 @@
-from termios import ECHOE
 from allianceauth.services.hooks import MenuItemHook, UrlHook
 from django.utils.translation import gettext_lazy as _
 from allianceauth import hooks

@@ -7,7 +7,7 @@ from django.db import IntegrityError
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
-from esi.decorators import token_required
+from esi.decorators import _check_callback, token_required
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 from django.http import HttpResponse
 import xml.etree.ElementTree as ET
@@ -16,27 +16,43 @@ import re
 import json
 from itertools import chain
 from .models import *
-from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi, update_all_corps, check_account, update_all_eve_names
+from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi, update_corp, update_all_corps, check_account, update_all_eve_names
 from .forms import UploadForm
 from . import app_settings
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
+from esi.views import sso_redirect
+from django.urls import reverse
+
 CORP_REQUIRED_SCOPES = [
-    'esi-assets.read_corporation_assets.v1',
-    'esi-characters.read_corporation_roles.v1',
+
+    # Tracking
+    'esi-corporations.track_members.v1',
+    'esi-corporations.read_titles.v1',
     'esi-corporations.read_corporation_membership.v1',
-    'esi-corporations.read_divisions.v1',
+    'esi-killmails.read_corporation_killmails.v1',
+
+    # Moons
+    'esi-industry.read_corporation_mining.v1',
+
+    # Structures
+    'esi-planets.read_customs_offices.v1',
     'esi-corporations.read_starbases.v1',
     'esi-corporations.read_structures.v1',
-    'esi-corporations.read_titles.v1',
-    'esi-corporations.track_members.v1',
-    'esi-industry.read_corporation_jobs.v1',
-    'esi-industry.read_corporation_mining.v1',
-    'esi-killmails.read_corporation_killmails.v1',
+
+    # Wallets
+    'esi-wallet.read_corporation_wallets.v1',
     'esi-markets.read_corporation_orders.v1',
-    'esi-planets.read_customs_offices.v1',
+    'esi-industry.read_corporation_jobs.v1',
+    'esi-corporations.read_divisions.v1',
+
+    # Assets
+    'esi-assets.read_corporation_assets.v1',
+
+    # All...
     'esi-search.search_structures.v1',
     'esi-universe.read_structures.v1',
-    'esi-wallet.read_corporation_wallets.v1'
+    'esi-characters.read_corporation_roles.v1',
+
 ]
 
 
@@ -60,7 +76,56 @@ def add_corp(request, token):
                                                                        })
     CorporationAudit.objects.update_or_create(corporation=corp)
     update_all_corps.apply_async(priority=6)
-    return redirect('corptools:corp_menu')
+    return redirect('corptools:corp_react')
+
+
+@login_required
+def add_corp_section(request, *args, **kwargs):
+
+    tracking = request.GET.get('t', False)
+    assets = request.GET.get('a', False)
+    structures = request.GET.get('s', False)
+    wallets = request.GET.get('w', False)
+    moons = request.GET.get('m', False)
+
+    # if we're coming back from SSO with a new token, return it
+    token = _check_callback(request)
+    if token:
+        logger.debug(
+            "Got new token from %s session %s. Returning to view.",
+            request.user,
+            request.session.session_key[:5]
+        )
+        char = EveCharacter.objects.get_character_by_id(token.character_id)
+        corp, created = EveCorporationInfo.objects.get_or_create(corporation_id=char.corporation_id,
+                                                                 defaults={'member_count': 0,
+                                                                           'corporation_ticker': char.corporation_ticker,
+                                                                           'corporation_name': char.corporation_name
+                                                                           })
+        CorporationAudit.objects.update_or_create(corporation=corp)
+        update_corp.apply_async(priority=6, args=[char.corporation_id])
+
+        return redirect("{}#status".format(reverse('corptools:corp_react')))
+
+    scopes = app_settings._corp_scopes_base
+
+    if tracking:
+        scopes += app_settings._corp_scopes_tracking
+
+    if structures:
+        scopes += app_settings._corp_scopes_structures
+
+    if moons:
+        scopes += app_settings._corp_scopes_moons
+
+    if wallets:
+        scopes += app_settings._corp_scopes_wallets
+
+    if assets:
+        scopes += app_settings._corp_scopes_assets
+
+    # user has selected to add a new token
+    return sso_redirect(request, scopes=scopes)
 
 
 @login_required
@@ -177,7 +242,7 @@ def admin_create_tasks(request):
                                                              )
 
     schedule_corp, _ = CrontabSchedule.objects.get_or_create(minute='30',
-                                                             hour='12',
+                                                             hour='*',
                                                              day_of_week='*',
                                                              day_of_month='*',
                                                              month_of_year='*',
