@@ -1716,4 +1716,4 @@ def get_visible_gates(request):
             output[matches[0]]["end"] = {"known": False, "active": False}
             second_systems.add(matches[1])
 
-    return output.values()
+    return list(output.values())
