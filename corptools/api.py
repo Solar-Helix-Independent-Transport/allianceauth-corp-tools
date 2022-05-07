@@ -1692,7 +1692,7 @@ def get_visible_gates(request):
         if s.fuel_expires:
             days = (s.fuel_expires - now).days
         active = False
-        for ss in s.structureservice.all():
+        for ss in s.structureservice_set.all():
             if ss.name == "Jump Gate Access" and ss.state == "online":
                 active = True
 
