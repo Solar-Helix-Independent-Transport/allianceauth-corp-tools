@@ -79,3 +79,9 @@ export async function loadRefTypes() {
   console.log(`get wallet types in api`);
   return api.data;
 }
+
+export async function loadBridges() {
+  const api = await axios.get(`/audit/api/corp/gates`);
+  console.log(`get bridges in api`);
+  return api.data;
+}

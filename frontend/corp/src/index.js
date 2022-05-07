@@ -11,6 +11,7 @@ import "./style.css";
 import CorpAssets from "./pages/Assets";
 import CorpAssetLists from "./pages/AssetList";
 import CorpWallet from "./pages/Wallets";
+import { Bridges } from "./components/Bridges";
 const queryClient = new QueryClient();
 
 ReactDOM.render(
@@ -30,6 +31,7 @@ ReactDOM.render(
             <Route path={"/status"} component={() => CorpStatus()} />
             <Route path={"/assetgroup"} component={() => CorpAssets()} />
             <Route path={"/assetlist"} component={() => CorpAssetLists()} />
+            <Route path={"/bridges"} component={() => Bridges()} />
           </Switch>
         </Panel>
       </QueryClientProvider>

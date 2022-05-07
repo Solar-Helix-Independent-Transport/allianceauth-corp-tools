@@ -1,6 +1,7 @@
 from __future__ import annotations
 from datetime import timedelta
 from lib2to3.pgen2 import token
+import re
 from typing import List
 from unicodedata import category
 from allianceauth import notifications
@@ -1654,3 +1655,65 @@ def get_corporation_asset_groups(request, corporation_id: int, location_id: int)
         {"name": "Remaining",
          "items": remaining_asset_groups},
     ]
+
+
+@api.get(
+    "corp/gates",
+    response={200: List, 403: schema.Message},
+    tags=["Corporation"]
+)
+def get_visible_gates(request):
+    perms = (
+        request.user.has_perm('corptools.corp_hr') |
+        request.user.has_perm('corptools.alliance_hr') |
+        request.user.has_perm('corptools.state_hr') |
+        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.holding_corp_structures')
+    )
+
+    if not perms:
+        logging.error(
+            f"Permission Denied for {request.user} to view structures!")
+        return 403, "Permission Denied!"
+
+    output = []
+    structures = models.Structure.objects.all().select_related(
+        "corporation__corporation", "system_name"
+    ).prefetch_related('structureservice_set').filter(type_id=35841)
+
+    second_systems = set()
+    output = {}
+    regex = r"^(.*) » ([^ - ]*) - (.*)"
+    now = timezone.now()
+    for s in structures:
+        matches = re.findall(regex, s.name)
+        matches = matches[0]
+        days = 0
+        if s.fuel_expires:
+            days = {s.fuel_expires - now}.days
+        active = False
+        for ss in s.structureservice.all():
+            if ss.name == "Jump Gate Access" and ss.state == "online":
+                active = True
+
+        if matches[0] in second_systems:
+            output[matches[1]]["end"] = {"system_name": s.system_name.name,
+                                         "system_id": s.system_name_id,
+                                         "ozone": s.ozone_level,
+                                         "known": True,
+                                         "active": active,
+                                         "expires": days,
+                                         "name": s.name}
+        else:
+            output[matches[0]] = {}
+            output[matches[0]]["start"] = {"system_name": s.system_name.name,
+                                           "system_id": s.system_name_id,
+                                           "ozone": s.ozone_level,
+                                           "known": True,
+                                           "active": active,
+                                           "expires": days,
+                                           "name": s.name}
+            output[matches[0]]["end"] = {"known": False, "active": False}
+            second_systems.add(matches[1])
+
+    return output.values()

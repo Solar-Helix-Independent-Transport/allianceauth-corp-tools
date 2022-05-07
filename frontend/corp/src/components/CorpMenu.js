@@ -18,6 +18,9 @@ const CorpMenu = () => {
           <NavLink key="Structures" href={`#/structures`}>
             Structures
           </NavLink>
+          <NavLink key="Structures" href={`#/bridges`}>
+            Bridges
+          </NavLink>
           <NavLink key="Wallets" href={`#/wallets`}>
             Wallets
           </NavLink>
