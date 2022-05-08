@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Panel, Glyphicon, Table } from "react-bootstrap";
+import { Panel, Glyphicon, Table, Label } from "react-bootstrap";
 import { useQuery } from "react-query";
 import Select from "react-select";
 import { loadSov } from "../apis/Corporation";
@@ -22,9 +22,11 @@ export const Sov = () => {
     () => loadSov() //,
     //{ initialData: [] }
   );
+  const [regionFilter, setRegion] = useState("");
+  const [constellationFilter, setConstellation] = useState("");
+  const [systemFilter, setSystem] = useState("");
 
   const [upgradesFilter, setUpgrades] = useState([]);
-  const [systemFilter, setSystem] = useState("");
   const [stateFilter, setState] = useState([]);
 
   const stateToState = (entry) => {
@@ -41,20 +43,52 @@ export const Sov = () => {
     setUpgrades(values);
   };
 
+  const regionToState = (entry) => {
+    let values = entry.map((o) => {
+      return o.value;
+    });
+    setRegion(values);
+  };
+
+  const constellationToState = (entry) => {
+    let values = entry.map((o) => {
+      return o.value;
+    });
+    setConstellation(values);
+  };
+
   if (isLoading) return <PanelLoader />;
 
   if (error) return <ErrorLoader />;
 
   let _upgrades = new Set();
   let _state = new Set();
+
+  let _region = new Set();
+  let _constellation = new Set();
+  let _system = new Set();
+
   data.map((system) => {
     system.upgrades.map((upgrade) => {
       _upgrades.add(upgrade.name);
       _state.add(upgrade.active);
     });
+    _region.add(system.system.rgn);
+    _constellation.add(system.system.const);
+    _system.add(system.system.system);
   });
 
   let viewData = data.filter((system) => {
+    if (regionFilter.length) {
+      if (!regionFilter.includes(system.system.rgn)) {
+        return false;
+      }
+    }
+    if (constellationFilter.length) {
+      if (!constellationFilter.includes(system.system.const)) {
+        return false;
+      }
+    }
     if (upgradesFilter.length) {
       let upgrades = system.upgrades.reduce((last, next) => {
         last.push(next.name);
@@ -84,14 +118,54 @@ export const Sov = () => {
     <>
       <Panel.Heading>Sov Upgrades</Panel.Heading>
       <Panel.Body className="flex-container">
-        <div className="flex-container-vert-fill col-xs-12">
+        <div className="flex-container col-xs-12">
+          <div className="flex-label-container">
+            <div className="flex-label">
+              <h5>Region Filter</h5>
+            </div>
+            <Select
+              className="flex-select flex-select-size"
+              styles={colourStyles}
+              options={Array.from(_region, (u) => {
+                return {
+                  value: u,
+                  label: u,
+                };
+              })}
+              isLoading={isFetching}
+              isMulti={true}
+              onChange={regionToState}
+            />
+          </div>
+          <div className="flex-label-container">
+            <div className="flex-label">
+              <h5>Constellation Filter</h5>
+            </div>
+            <Select
+              className="flex-select flex-select-size"
+              styles={colourStyles}
+              style={{ width: "300px" }}
+              options={Array.from(_constellation, (u) => {
+                return {
+                  value: u,
+                  label: u,
+                };
+              })}
+              isLoading={isFetching}
+              isMulti={true}
+              onChange={constellationToState}
+            />
+          </div>
+        </div>
+        <div className="flex-container col-xs-12">
           <div className="flex-label-container">
             <div className="flex-label">
               <h5>Upgrade Name Filter</h5>
             </div>
             <Select
-              className="flex-select"
+              className="flex-select flex-select-size"
               styles={colourStyles}
+              style={{ width: "300px" }}
               options={Array.from(_upgrades, (u) => {
                 return {
                   value: u,
@@ -108,8 +182,9 @@ export const Sov = () => {
               <h5>Upgrade State Filter</h5>
             </div>
             <Select
-              className="flex-select"
+              className="flex-select flex-select-size"
               styles={colourStyles}
+              style={{ width: "300px" }}
               options={Array.from(_state, (u) => {
                 return {
                   value: u,
@@ -138,6 +213,10 @@ export const Sov = () => {
                 </h4>
               </Panel.Heading>
               <Panel.Body className="flex-body">
+                <p className="text-center">
+                  <Label>Constellation: {system.system.const}</Label>{" "}
+                  <Label>Region: {system.system.rgn}</Label>
+                </p>
                 <Table striped style={{ marginBottom: 0 }}>
                   <thead>
                     <tr key="head">

@@ -133,3 +133,7 @@
   flex: 1;
   margin: 2px;
 }
+
+.flex-select-size {
+  width: 300px;
+}
