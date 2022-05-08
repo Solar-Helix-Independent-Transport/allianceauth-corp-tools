@@ -73,6 +73,6 @@ export const Sov = () => {
   ) : isFetching ? (
     <PanelLoader />
   ) : (
-    <DataMessage text="No IHubs Found." />
+    <DataMessage text="No IHubs Found" />
   );
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { Panel, Label } from "react-bootstrap";
+import { Panel, Label, Glyphicon } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { loadBridges } from "../apis/Corporation";
 import { BridgeLink } from "./BridgeLink";
@@ -72,6 +72,12 @@ export const Bridges = () => {
             Lo/Fuel Level Low
           </Label>
         </div>
+        {isFetching && (
+          <Glyphicon
+            className="glyphicon-refresh-animate pull-right"
+            glyph="refresh"
+          />
+        )}
 
         <hr className="col-xs-12" />
 
@@ -101,6 +107,6 @@ export const Bridges = () => {
   ) : isFetching ? (
     <PanelLoader />
   ) : (
-    <DataMessage text="No Bridges Found." />
+    <DataMessage text="No Bridges Found" />
   );
 };
