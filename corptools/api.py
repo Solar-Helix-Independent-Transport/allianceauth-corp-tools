@@ -1763,10 +1763,10 @@ def get_alliance_sov(request):
             }
 
     for a in asset_locations:
-        location_names[a.location_id]["upgrades"] = {
+        location_names[a.location_id]["upgrades"].append({
             "id": a.type_name.type_id,
             "name": a.type_name.name,
             "active": a.location_flag
-        }
+        })
 
     return list(location_names.values())
