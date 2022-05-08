@@ -85,3 +85,9 @@ export async function loadBridges() {
   console.log(`get bridges in api`);
   return api.data;
 }
+
+export async function loadSov() {
+  const api = await axios.get(`/audit/api/alliance/sov`);
+  console.log(`get sov in api`);
+  return api.data;
+}
