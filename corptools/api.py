@@ -1751,12 +1751,9 @@ def get_alliance_sov(request):
     location_names = {}
 
     for a in assets:
-        vars(a)
         if not a.location_name_id:
             location = fetch_location_name(a.location_id, a.location_type, 0)
-            print(location)
             a.location_name = location
-        vars(a)
         loc_id = a.item_id
         loc_nm = a.location_name.location_name
         if loc_id not in location_names:
