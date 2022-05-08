@@ -1678,7 +1678,7 @@ def get_visible_gates(request):
         return 403, "Permission Denied!"
 
     output = []
-    structures = models.Structure.objects.all().select_related(
+    structures = models.Structure.get_visible(request.user).select_related(
         "corporation__corporation", "system_name"
     ).prefetch_related('structureservice_set').filter(type_id=35841)
 
@@ -1740,12 +1740,17 @@ def get_alliance_sov(request):
     assets = models.CorpAsset.get_visible(request.user).filter(
         type_id__in=types,
         location_type="solar_system").select_related(
-        "type_name", "location_name", "type_name__group__category"
+        "type_name",
+        "location_name",
+        "location_name__system",
+        "location_name__system__constellation",
+        "location_name__system__constellation__region",
+        "type_name__group__category"
     )
 
     asset_locations = models.CorpAsset.get_visible(request.user).filter(
         location_id__in=assets.values("item_id")).select_related(
-        "type_name", "location_name"
+        "type_name"
     )
 
     location_names = {}
@@ -1755,10 +1760,13 @@ def get_alliance_sov(request):
             location = fetch_location_name(a.location_id, a.location_type, 0)
             a.location_name = location
         loc_id = a.item_id
-        loc_nm = a.location_name.location_name
         if loc_id not in location_names:
             location_names[loc_id] = {
-                "system": loc_nm,
+                "system": {
+                    "name": a.location_name.location_name,
+                    "const": a.location_name.system.contellation.name,
+                    "rgn": a.location_name.system.contellation.region.name
+                },
                 "upgrades": []
             }
 

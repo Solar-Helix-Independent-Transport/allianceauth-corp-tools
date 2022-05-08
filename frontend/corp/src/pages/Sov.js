@@ -2,6 +2,8 @@ import React from "react";
 import { Panel, Glyphicon, Table } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { loadSov } from "../apis/Corporation";
+import { ErrorLoader } from "../components/ErrorLoader";
+import { PanelLoader } from "../components/PanelLoader";
 
 export const Sov = () => {
   const { isLoading, isFetching, error, data } = useQuery(
@@ -10,16 +12,20 @@ export const Sov = () => {
     { initialData: [] }
   );
 
+  if (isLoading) return <PanelLoader />;
+
+  if (error) return <ErrorLoader />;
+
   return (
     <Panel>
       <Panel.Heading>Sov Upgrades</Panel.Heading>
       <Panel.Body className="flex-container">
         {data.map((system) => {
           return (
-            <Panel key={`panel ${system.system}`} className="flex-child">
+            <Panel key={`panel ${system.system.name}`} className="flex-child">
               <Panel.Heading>
                 <h4 className={"text-center"}>
-                  {system.system}
+                  {system.system.name}
                   {isFetching && (
                     <Glyphicon
                       className="glyphicon-refresh-animate pull-right"
