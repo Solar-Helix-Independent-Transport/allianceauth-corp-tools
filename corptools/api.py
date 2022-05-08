@@ -1737,13 +1737,13 @@ def get_alliance_sov(request):
 
     types = [32458]
 
-    assets = models.CorpAsset.objects.all().filter(
+    assets = models.CorpAsset.get_visible(request.user).filter(
         type_id__in=types,
         location_type="solar_system").select_related(
         "type_name", "location_name", "type_name__group__category"
     )
 
-    asset_locations = models.CorpAsset.objects.filter(
+    asset_locations = models.CorpAsset.get_visible(request.user).filter(
         location_id__in=assets.values("item_id")).select_related(
         "type_name", "location_name"
     )
