@@ -1764,8 +1764,8 @@ def get_alliance_sov(request):
             location_names[loc_id] = {
                 "system": {
                     "name": a.location_name.location_name,
-                    "const": a.location_name.system.contellation.name,
-                    "rgn": a.location_name.system.contellation.region.name
+                    "const": a.location_name.system.constellation.name,
+                    "rgn": a.location_name.system.constellation.region.name
                 },
                 "upgrades": []
             }
