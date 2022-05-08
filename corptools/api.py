@@ -6,6 +6,7 @@ from typing import List
 from unicodedata import category
 from allianceauth import notifications
 from corptools import app_settings
+from corptools.task_helpers.update_tasks import fetch_location_name
 from django.utils.timezone import activate
 
 from ninja import NinjaAPI, Form, main
@@ -18,10 +19,10 @@ from allianceauth.eveonline.models import EveCharacter
 from django.conf import settings
 from django.utils import timezone
 from esi.models import Token
-from . import models
-from . import tasks
-from . import schema
-from . import providers
+from corptools import models
+from corptools import tasks
+from corptools import schema
+from corptools import providers
 
 import functools
 
@@ -1717,3 +1718,58 @@ def get_visible_gates(request):
             second_systems.add(matches[1])
 
     return list(output.values())
+
+
+@api.get(
+    "alliance/sov",
+    response={200: List, 403: schema.Message},
+    tags=["Alliance"]
+)
+def get_alliance_sov(request):
+    perms = (
+        request.user.has_perm('corptools.holding_corp_assets')
+    )
+
+    if not perms:
+        logging.error(
+            f"Permission Denied for {request.user} to view Sov Structures!")
+        return 403, "Permission Denied!"
+
+    types = [32458]
+
+    assets = models.CorpAsset.objects.all().filter(
+        type_id__in=types,
+        location_type="solar_system").select_related(
+        "type_name", "location_name", "type_name__group__category"
+    )
+
+    asset_locations = models.CorpAsset.objects.filter(
+        location_id__in=assets.values("item_id")).select_related(
+        "type_name", "location_name"
+    )
+
+    location_names = {}
+
+    for a in assets:
+        vars(a)
+        if not a.location_name_id:
+            location = fetch_location_name(a.location_id, a.location_type, 0)
+            print(location)
+            a.location_name = location
+        vars(a)
+        loc_id = a.item_id
+        loc_nm = a.location_name.location_name
+        if loc_id not in location_names:
+            location_names[loc_id] = {
+                "system": loc_nm,
+                "upgrades": []
+            }
+
+    for a in asset_locations:
+        location_names[a.location_id]["upgrades"] = {
+            "id": a.type_name.type_id,
+            "name": a.type_name.name,
+            "active": a.location_flag
+        }
+
+    return list(location_names.values())
