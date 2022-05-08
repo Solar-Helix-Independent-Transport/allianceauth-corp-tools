@@ -390,22 +390,6 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
     else:
         existing = existing.first()
 
-    req_scopes = ['esi-universe.read_structures.v1']
-
-    token = Token.get_token(character_id, req_scopes)
-
-    if not token:
-        return None
-    accepted_location_flags = ['AssetSafety',
-                               'Deliveries',
-                               'Hangar',
-                               'HangarAll',
-                               'solar_system']
-
-    if location_flag not in accepted_location_flags:
-        if location_flag is not None:
-            return None  # ship fits or in cargo holds or what ever also dont care
-
     if location_id == 2004:
         # ASSET SAFETY
         return EveLocation(location_id=location_id,
@@ -432,6 +416,23 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
         return EveLocation(location_id=location_id,
                            location_name=station.get('name'),
                            system_id=station.get('system_id'))
+
+    req_scopes = ['esi-universe.read_structures.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return None
+    accepted_location_flags = ['AssetSafety',
+                               'Deliveries',
+                               'Hangar',
+                               'HangarAll',
+                               'solar_system']
+
+    if location_flag not in accepted_location_flags:
+        if location_flag is not None:
+            return None  # ship fits or in cargo holds or what ever also dont care
+
     else:  # Structure id?
         try:
             structure = providers.esi.client.Universe.get_universe_structures_structure_id(
