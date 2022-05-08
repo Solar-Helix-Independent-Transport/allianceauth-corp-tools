@@ -1,5 +1,5 @@
 import React from "react";
-import { Nav } from "react-bootstrap";
+import { Nav, NavDropdown } from "react-bootstrap";
 import { Navbar } from "react-bootstrap";
 
 import NavLink from "./NavLinkActive";
@@ -18,9 +18,6 @@ const CorpMenu = () => {
           <NavLink key="Structures" href={`#/structures`}>
             Structures
           </NavLink>
-          <NavLink key="Structures" href={`#/bridges`}>
-            Bridges
-          </NavLink>
           <NavLink key="Wallets" href={`#/wallets`}>
             Wallets
           </NavLink>
@@ -30,7 +27,16 @@ const CorpMenu = () => {
           <NavLink key="assetlists" href={`#/assetlist`}>
             Asset List
           </NavLink>
+          <NavDropdown title="Dashboards">
+            <NavLink key="bridges" href={`#/bridges`}>
+              Bridges
+            </NavLink>
+            <NavLink key="sov" href={`#/sov`}>
+              Sov Upgrades
+            </NavLink>
+          </NavDropdown>
         </Nav>
+
         <Nav className="pull-right">
           <CorpBadge />
           <NavLink key="Status" href={`#/status`}>
