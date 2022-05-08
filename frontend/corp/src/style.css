@@ -75,6 +75,10 @@
   overflow-y: overlay;
 }
 
+.table-div-no-hight {
+  height: unset;
+}
+
 .table-div-fill {
   width: auto;
 }

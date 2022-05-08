@@ -1,27 +1,129 @@
-import React from "react";
+import React, { useState } from "react";
 import { Panel, Glyphicon, Table } from "react-bootstrap";
 import { useQuery } from "react-query";
+import Select from "react-select";
 import { loadSov } from "../apis/Corporation";
 import { ErrorLoader } from "../components/ErrorLoader";
 import { DataMessage } from "../components/NoData";
 import { PanelLoader } from "../components/PanelLoader";
 
+const colourStyles = {
+  option: (styles) => {
+    return {
+      ...styles,
+      color: "black",
+    };
+  },
+};
+
 export const Sov = () => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["sov"],
-    () => loadSov(),
-    { initialData: [] }
+    () => loadSov() //,
+    //{ initialData: [] }
   );
+
+  const [upgradesFilter, setUpgrades] = useState([]);
+  const [systemFilter, setSystem] = useState("");
+  const [stateFilter, setState] = useState([]);
+
+  const stateToState = (entry) => {
+    let values = entry.map((o) => {
+      return o.value;
+    });
+    setState(values);
+  };
+
+  const upgradesToState = (entry) => {
+    let values = entry.map((o) => {
+      return o.value;
+    });
+    setUpgrades(values);
+  };
 
   if (isLoading) return <PanelLoader />;
 
   if (error) return <ErrorLoader />;
 
+  let _upgrades = new Set();
+  let _state = new Set();
+  data.map((system) => {
+    system.upgrades.map((upgrade) => {
+      _upgrades.add(upgrade.name);
+      _state.add(upgrade.active);
+    });
+  });
+
+  let viewData = data.filter((system) => {
+    if (upgradesFilter.length) {
+      let upgrades = system.upgrades.reduce((last, next) => {
+        last.push(next.name);
+        return last;
+      }, []);
+      return upgradesFilter.every((i) => upgrades.includes(i));
+    }
+    return true;
+  });
+  viewData = viewData.filter((system) => {
+    if (stateFilter.length) {
+      let states = system.upgrades.reduce((last, next) => {
+        if (upgradesFilter.length) {
+          if (upgradesFilter.includes(next.name)) {
+            last.push(next.active);
+          }
+        } else {
+          last.push(next.active);
+        }
+        return last;
+      }, []);
+      return stateFilter.reduce((i, n) => i || states.includes(n), false);
+    }
+    return true;
+  });
   return data.length > 0 ? (
     <>
       <Panel.Heading>Sov Upgrades</Panel.Heading>
       <Panel.Body className="flex-container">
-        {data.map((system) => {
+        <div className="flex-container-vert-fill col-xs-12">
+          <div className="flex-label-container">
+            <div className="flex-label">
+              <h5>Upgrade Name Filter</h5>
+            </div>
+            <Select
+              className="flex-select"
+              styles={colourStyles}
+              options={Array.from(_upgrades, (u) => {
+                return {
+                  value: u,
+                  label: u,
+                };
+              })}
+              isLoading={isFetching}
+              isMulti={true}
+              onChange={upgradesToState}
+            />
+          </div>
+          <div className="flex-label-container">
+            <div className="flex-label">
+              <h5>Upgrade State Filter</h5>
+            </div>
+            <Select
+              className="flex-select"
+              styles={colourStyles}
+              options={Array.from(_state, (u) => {
+                return {
+                  value: u,
+                  label: u,
+                };
+              })}
+              isLoading={isFetching}
+              isMulti={true}
+              onChange={stateToState}
+            />
+          </div>
+        </div>
+
+        {viewData.map((system) => {
           return (
             <Panel key={`panel ${system.system.name}`} className="flex-child">
               <Panel.Heading>
@@ -44,10 +146,25 @@ export const Sov = () => {
                     </tr>
                   </thead>
                 </Table>
-                <div className={"table-div"}>
+                <div
+                  className={`table-div ${
+                    (stateFilter.length || upgradesFilter.length) &&
+                    "table-div-no-hight"
+                  }`}
+                >
                   <Table striped>
                     <tbody>
                       {system.upgrades.map((u) => {
+                        if (upgradesFilter.length) {
+                          if (!upgradesFilter.includes(u.name)) {
+                            return <></>;
+                          }
+                        }
+                        if (stateFilter.length) {
+                          if (!stateFilter.includes(u.active)) {
+                            return <></>;
+                          }
+                        }
                         let status = "info";
                         if (u.active === "StructureInactive") {
                           status = "warning";
