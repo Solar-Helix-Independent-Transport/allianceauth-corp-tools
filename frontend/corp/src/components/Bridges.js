@@ -3,6 +3,9 @@ import { Panel, Label } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { loadBridges } from "../apis/Corporation";
 import { BridgeLink } from "./BridgeLink";
+import { ErrorLoader } from "../components/ErrorLoader";
+import { PanelLoader } from "../components/PanelLoader";
+import { DataMessage } from "./NoData";
 
 export const Bridges = () => {
   const { isLoading, isFetching, error, data } = useQuery(
@@ -11,8 +14,12 @@ export const Bridges = () => {
     { initialData: [] }
   );
 
-  return (
-    <Panel>
+  if (isLoading) return <PanelLoader />;
+
+  if (error) return <ErrorLoader />;
+
+  return data.length > 0 ? (
+    <>
       <Panel.Heading>Jump Bridge Network</Panel.Heading>
       <Panel.Body className="flex-container">
         <div className="flex-container">
@@ -90,6 +97,10 @@ export const Bridges = () => {
             return <BridgeLink start={bridgePair.start} end={bridgePair.end} />;
           })}
       </Panel.Body>
-    </Panel>
+    </>
+  ) : isFetching ? (
+    <PanelLoader />
+  ) : (
+    <DataMessage text="No Bridges Found." />
   );
 };
