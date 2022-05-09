@@ -246,30 +246,34 @@ export const Sov = () => {
                   >
                     <Table striped>
                       <tbody>
-                        {system.upgrades.map((u) => {
-                          if (upgradesFilter.length) {
-                            if (!upgradesFilter.includes(u.name)) {
-                              return <></>;
+                        {system.upgrades
+                          .sort((a, b) =>
+                            a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+                          )
+                          .map((u) => {
+                            if (upgradesFilter.length) {
+                              if (!upgradesFilter.includes(u.name)) {
+                                return <></>;
+                              }
                             }
-                          }
-                          if (stateFilter.length) {
-                            if (!stateFilter.includes(u.active)) {
-                              return <></>;
+                            if (stateFilter.length) {
+                              if (!stateFilter.includes(u.active)) {
+                                return <></>;
+                              }
                             }
-                          }
-                          let status = "info";
-                          if (u.active === "StructureInactive") {
-                            status = "warning";
-                          } else if (u.active === "StructureOffline") {
-                            status = "danger";
-                          }
-                          return (
-                            <tr className={status} key={u.name}>
-                              <td>{u.name}</td>
-                              <td className="text-right">{u.active}</td>
-                            </tr>
-                          );
-                        })}
+                            let status = "info";
+                            if (u.active === "StructureInactive") {
+                              status = "warning";
+                            } else if (u.active === "StructureOffline") {
+                              status = "danger";
+                            }
+                            return (
+                              <tr className={status} key={u.name}>
+                                <td>{u.name}</td>
+                                <td className="text-right">{u.active}</td>
+                              </tr>
+                            );
+                          })}
                       </tbody>
                     </Table>
                   </div>
