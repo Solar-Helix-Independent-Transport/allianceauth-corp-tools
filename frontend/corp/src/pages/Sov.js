@@ -202,7 +202,7 @@ export const Sov = () => {
             onChange={stateToState}
           />
         </div>
-
+        <hr className="col-xs-12" />
         {viewData
           .sort((a, b) =>
             a.system.name > b.system.name
