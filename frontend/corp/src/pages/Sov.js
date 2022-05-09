@@ -24,7 +24,6 @@ export const Sov = () => {
   );
   const [regionFilter, setRegion] = useState("");
   const [constellationFilter, setConstellation] = useState("");
-  const [systemFilter, setSystem] = useState("");
 
   const [upgradesFilter, setUpgrades] = useState([]);
   const [stateFilter, setState] = useState([]);
@@ -72,10 +71,12 @@ export const Sov = () => {
     system.upgrades.map((upgrade) => {
       _upgrades.add(upgrade.name);
       _state.add(upgrade.active);
+      return false;
     });
     _region.add(system.system.rgn);
     _constellation.add(system.system.const);
     _system.add(system.system.system);
+    return false;
   });
 
   let viewData = data.filter((system) => {
@@ -118,152 +119,164 @@ export const Sov = () => {
     <>
       <Panel.Heading>Sov Upgrades</Panel.Heading>
       <Panel.Body className="flex-container">
-        <div className="flex-container col-xs-12">
-          <div className="flex-label-container">
-            <div className="flex-label">
-              <h5>Region Filter</h5>
-            </div>
-            <Select
-              className="flex-select flex-select-size"
-              styles={colourStyles}
-              options={Array.from(_region, (u) => {
-                return {
-                  value: u,
-                  label: u,
-                };
-              })}
-              isLoading={isFetching}
-              isMulti={true}
-              onChange={regionToState}
-            />
+        <div className="flex-label-container col-lg-6 col-md-12 col-sm-12 col-xs-12">
+          <div className="flex-label">
+            <h5>Region Filter</h5>
           </div>
-          <div className="flex-label-container">
-            <div className="flex-label">
-              <h5>Constellation Filter</h5>
-            </div>
-            <Select
-              className="flex-select flex-select-size"
-              styles={colourStyles}
-              style={{ width: "300px" }}
-              options={Array.from(_constellation, (u) => {
-                return {
-                  value: u,
-                  label: u,
-                };
-              })}
-              isLoading={isFetching}
-              isMulti={true}
-              onChange={constellationToState}
-            />
-          </div>
+          <Select
+            className="flex-select"
+            styles={colourStyles}
+            options={Array.from(_region, (u) => {
+              return {
+                value: u,
+                label: u,
+              };
+            }).sort((a, b) =>
+              a.value > b.value ? 1 : b.value > a.value ? -1 : 0
+            )}
+            isLoading={isFetching}
+            isMulti={true}
+            onChange={regionToState}
+          />
         </div>
-        <div className="flex-container col-xs-12">
-          <div className="flex-label-container">
-            <div className="flex-label">
-              <h5>Upgrade Name Filter</h5>
-            </div>
-            <Select
-              className="flex-select flex-select-size"
-              styles={colourStyles}
-              style={{ width: "300px" }}
-              options={Array.from(_upgrades, (u) => {
-                return {
-                  value: u,
-                  label: u,
-                };
-              })}
-              isLoading={isFetching}
-              isMulti={true}
-              onChange={upgradesToState}
-            />
+        <div className="flex-label-container col-lg-6 col-md-12 col-sm-12 col-xs-12">
+          <div className="flex-label">
+            <h5>Constellation Filter</h5>
           </div>
-          <div className="flex-label-container">
-            <div className="flex-label">
-              <h5>Upgrade State Filter</h5>
-            </div>
-            <Select
-              className="flex-select flex-select-size"
-              styles={colourStyles}
-              style={{ width: "300px" }}
-              options={Array.from(_state, (u) => {
-                return {
-                  value: u,
-                  label: u,
-                };
-              })}
-              isLoading={isFetching}
-              isMulti={true}
-              onChange={stateToState}
-            />
+          <Select
+            className="flex-select"
+            styles={colourStyles}
+            style={{ width: "300px" }}
+            options={Array.from(_constellation, (u) => {
+              return {
+                value: u,
+                label: u,
+              };
+            }).sort((a, b) =>
+              a.value > b.value ? 1 : b.value > a.value ? -1 : 0
+            )}
+            isLoading={isFetching}
+            isMulti={true}
+            onChange={constellationToState}
+          />
+        </div>
+        <div className="flex-label-container col-lg-6 col-md-12 col-sm-12 col-xs-12">
+          <div className="flex-label">
+            <h5>Upgrade Name Filter</h5>
           </div>
+          <Select
+            className="flex-select"
+            styles={colourStyles}
+            style={{ width: "300px" }}
+            options={Array.from(_upgrades, (u) => {
+              return {
+                value: u,
+                label: u,
+              };
+            }).sort((a, b) =>
+              a.value > b.value ? 1 : b.value > a.value ? -1 : 0
+            )}
+            isLoading={isFetching}
+            isMulti={true}
+            onChange={upgradesToState}
+          />
+        </div>
+        <div className="flex-label-container col-lg-6 col-md-12 col-sm-12 col-xs-12">
+          <div className="flex-label">
+            <h5>Upgrade State Filter</h5>
+          </div>
+          <Select
+            className="flex-select"
+            styles={colourStyles}
+            style={{ width: "300px" }}
+            options={Array.from(_state, (u) => {
+              return {
+                value: u,
+                label: u,
+              };
+            }).sort((a, b) =>
+              a.value > b.value ? 1 : b.value > a.value ? -1 : 0
+            )}
+            isLoading={isFetching}
+            isMulti={true}
+            onChange={stateToState}
+          />
         </div>
 
-        {viewData.map((system) => {
-          return (
-            <Panel key={`panel ${system.system.name}`} className="flex-child">
-              <Panel.Heading>
-                <h4 className={"text-center"}>
-                  {system.system.name}
-                  {isFetching && (
-                    <Glyphicon
-                      className="glyphicon-refresh-animate pull-right"
-                      glyph="refresh"
-                    />
-                  )}
-                </h4>
-              </Panel.Heading>
-              <Panel.Body className="flex-body">
-                <p className="text-center">
-                  <Label>Constellation: {system.system.const}</Label>{" "}
-                  <Label>Region: {system.system.rgn}</Label>
-                </p>
-                <Table striped style={{ marginBottom: 0 }}>
-                  <thead>
-                    <tr key="head">
-                      <th>Upgrade</th>
-                      <th className="text-right">Active</th>
-                    </tr>
-                  </thead>
-                </Table>
-                <div
-                  className={`table-div ${
-                    (stateFilter.length || upgradesFilter.length) &&
-                    "table-div-no-hight"
-                  }`}
-                >
-                  <Table striped>
-                    <tbody>
-                      {system.upgrades.map((u) => {
-                        if (upgradesFilter.length) {
-                          if (!upgradesFilter.includes(u.name)) {
-                            return <></>;
-                          }
-                        }
-                        if (stateFilter.length) {
-                          if (!stateFilter.includes(u.active)) {
-                            return <></>;
-                          }
-                        }
-                        let status = "info";
-                        if (u.active === "StructureInactive") {
-                          status = "warning";
-                        } else if (u.active === "StructureOffline") {
-                          status = "danger";
-                        }
-                        return (
-                          <tr className={status} key={u.name}>
-                            <td>{u.name}</td>
-                            <td className="text-right">{u.active}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
+        {viewData
+          .sort((a, b) =>
+            a.system.name > b.system.name
+              ? 1
+              : b.system.name > a.system.name
+              ? -1
+              : 0
+          )
+          .map((system) => {
+            return (
+              <Panel key={`panel ${system.system.name}`} className="flex-child">
+                <Panel.Heading>
+                  <h4 className={"text-center"}>
+                    {system.system.name}
+                    {isFetching && (
+                      <Glyphicon
+                        className="glyphicon-refresh-animate pull-right"
+                        glyph="refresh"
+                      />
+                    )}
+                  </h4>
+                </Panel.Heading>
+                <Panel.Body className="flex-body">
+                  <p className="text-center">
+                    <Label>Constellation: {system.system.const}</Label>{" "}
+                    <Label>Region: {system.system.rgn}</Label>
+                  </p>
+                  <Table striped style={{ marginBottom: 0 }}>
+                    <thead>
+                      <tr key="head">
+                        <th>Upgrade</th>
+                        <th className="text-right">Active</th>
+                      </tr>
+                    </thead>
                   </Table>
-                </div>
-              </Panel.Body>
-            </Panel>
-          );
-        })}
+                  <div
+                    className={`table-div ${
+                      (stateFilter.length || upgradesFilter.length) &&
+                      "table-div-no-hight"
+                    }`}
+                  >
+                    <Table striped>
+                      <tbody>
+                        {system.upgrades.map((u) => {
+                          if (upgradesFilter.length) {
+                            if (!upgradesFilter.includes(u.name)) {
+                              return <></>;
+                            }
+                          }
+                          if (stateFilter.length) {
+                            if (!stateFilter.includes(u.active)) {
+                              return <></>;
+                            }
+                          }
+                          let status = "info";
+                          if (u.active === "StructureInactive") {
+                            status = "warning";
+                          } else if (u.active === "StructureOffline") {
+                            status = "danger";
+                          }
+                          return (
+                            <tr className={status} key={u.name}>
+                              <td>{u.name}</td>
+                              <td className="text-right">{u.active}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </Table>
+                  </div>
+                </Panel.Body>
+              </Panel>
+            );
+          })}
       </Panel.Body>
     </>
   ) : isFetching ? (
