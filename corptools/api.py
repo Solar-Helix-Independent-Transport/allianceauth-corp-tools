@@ -1148,7 +1148,7 @@ def get_visible_structures(request):
     if not perms:
         logging.error(
             f"Permission Denied for {request.user} to view structures!")
-        return 403, "Permission Denied!"
+        return 403, {"message": "Permission Denied!"}
 
     output = []
     for s in models.Structure.get_visible(request.user).select_related(
@@ -1345,7 +1345,7 @@ def get_corporation_wallet_types(request):
     if not perms:
         logging.error(
             f"Permission Denied for {request.user} to view wallets!")
-        return 403, "Permission Denied!"
+        return 403, {"message": "Permission Denied!"}
 
     ref_types = models.CorporationWalletJournalEntry.objects.values_list(
         "ref_type", flat=True).distinct()
@@ -1370,7 +1370,7 @@ def get_corporation_wallet(request, corporation_id: int, type_refs: str = "", pa
     if not perms:
         logging.error(
             f"Permission Denied for {request.user} to view wallets!")
-        return 403, "Permission Denied!"
+        return 403, {"message": "Permission Denied!"}
 
     wallet_journal = models.CorporationWalletJournalEntry.get_visible(request.user)\
         .filter(division__corporation__corporation__corporation_id=corporation_id)\
@@ -1431,7 +1431,7 @@ def get_corporation_asset_locations(request, corporation_id: int):
     if not perms:
         logging.error(
             f"Permission Denied for {request.user} to view wallets!")
-        return 403, "Permission Denied!"
+        return 403, {"message": "Permission Denied!"}
 
     asset_locs = models.CorpAsset.get_visible(request.user).filter(corporation__corporation__corporation_id=corporation_id,
                                                                    location_name__isnull=False).values_list('location_name').distinct()
@@ -1466,7 +1466,7 @@ def get_corporation_asset_list(request, corporation_id: int, location_id: int):
     if not perms:
         logging.error(
             f"Permission Denied for {request.user} to view wallets!")
-        return 403, "Permission Denied!"
+        return 403, {"message": "Permission Denied!"}
 
     expandable_cats = [2, 6, 29]
     everywhere_flags = ["CorpSAG1", "CorpSAG2", "CorpSAG3", "CorpSAG4",
@@ -1542,7 +1542,7 @@ def get_corporation_asset_contents(request, item_id: int):
     if not perms:
         logging.error(
             f"Permission Denied for {request.user} to view wallets!")
-        return 403, "Permission Denied!"
+        return 403, {"message": "Permission Denied!"}
 
     assets = models.CorpAsset.get_visible(request.user)\
         .select_related(
@@ -1588,7 +1588,7 @@ def get_corporation_asset_groups(request, corporation_id: int, location_id: int)
     if not perms:
         logging.error(
             f"Permission Denied for {request.user} to view wallets!")
-        return 403, "Permission Denied!"
+        return 403, {"message": "Permission Denied!"}
 
     capital_groups = [30, 547, 659, 1538, 485, 902, 513, 883]
     subcap_cat = [6]
@@ -1675,7 +1675,7 @@ def get_visible_gates(request):
     if not perms:
         logging.error(
             f"Permission Denied for {request.user} to view structures!")
-        return 403, "Permission Denied!"
+        return 403, {"message": "Permission Denied!"}
 
     output = []
     structures = models.Structure.get_visible(request.user).select_related(
@@ -1733,7 +1733,7 @@ def get_alliance_sov(request):
     if not perms:
         logging.error(
             f"Permission Denied for {request.user} to view Sov Structures!")
-        return 403, "Permission Denied!"
+        return 403, {"message": "Permission Denied!"}
 
     types = [32458]
 
