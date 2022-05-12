@@ -72,7 +72,7 @@
 .table-div {
   height: 250px;
   width: 400px;
-  overflow-y: overlay;
+  overflow-y: auto;
 }
 
 .table-div-no-hight {
