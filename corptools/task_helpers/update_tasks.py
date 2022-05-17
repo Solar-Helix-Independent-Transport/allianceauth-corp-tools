@@ -382,6 +382,17 @@ def set_error_count_flag():
 def fetch_location_name(location_id, location_flag, character_id, update=False):
     """Takes a location_id and character_id and returns a location model for items in a station/structure or in space"""
 
+    accepted_location_flags = ['AssetSafety',
+                               'Deliveries',
+                               'Hangar',
+                               'HangarAll',
+                               'solar_system',
+                               'OfficeFolder']
+
+    if location_flag not in accepted_location_flags:
+        if location_flag is not None:
+            return None  # ship fits or in cargo holds or what ever also dont care
+
     existing = EveLocation.objects.filter(location_id=location_id)
     current_loc = existing.exists()
 
@@ -423,16 +434,6 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
 
     if not token:
         return None
-    accepted_location_flags = ['AssetSafety',
-                               'Deliveries',
-                               'Hangar',
-                               'HangarAll',
-                               'solar_system',
-                               'OfficeFolder']
-
-    if location_flag not in accepted_location_flags:
-        if location_flag is not None:
-            return None  # ship fits or in cargo holds or what ever also dont care
 
     else:  # Structure id?
         try:
