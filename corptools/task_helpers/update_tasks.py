@@ -427,7 +427,8 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
                                'Deliveries',
                                'Hangar',
                                'HangarAll',
-                               'solar_system']
+                               'solar_system',
+                               'OfficeFolder']
 
     if location_flag not in accepted_location_flags:
         if location_flag is not None:

@@ -410,14 +410,16 @@ def update_corp_assets(corp_id):
                                    )
             if item.get('location_id') not in location_names:
                 try:
-                    new_name = fetch_location_name(
-                        item.get('location_id'), "SolarSystem", token.character_id)
-                    if new_name:
-                        new_name.save()
-                        location_names.append(item.get('location_id'))
-                        asset_item.location_name_id = item.get('location_id')
-                    else:
-                        failed_locations.append(item.get('location_id'))
+                    if item.get('location_id') not in failed_locations:
+                        new_name = fetch_location_name(
+                            item.get('location_id'), item.get('location_flag'), token.character_id)
+                        if new_name:
+                            new_name.save()
+                            location_names.append(item.get('location_id'))
+                            asset_item.location_name_id = item.get(
+                                'location_id')
+                        else:
+                            failed_locations.append(item.get('location_id'))
                 except:
                     pass  # TODO
             else:
