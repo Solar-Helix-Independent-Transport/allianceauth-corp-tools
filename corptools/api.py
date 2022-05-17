@@ -1499,7 +1499,7 @@ def get_corporation_asset_list(request, corporation_id: int, location_id: int, n
         location_names = {}
 
         for a in assets:
-            loc = a.location_id
+            loc = f"{a.location_id} ({a.location_flag})"
             if a.location_name:
                 loc = a.location_name.location_name
             output.append({
