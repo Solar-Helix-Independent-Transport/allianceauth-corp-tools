@@ -1,9 +1,11 @@
+from locale import currency
 import logging
-from celery import shared_task
+from celery import chain, shared_task
 from corptools.task_helpers.etag_helpers import NotModifiedError, etag_results
 from corptools.task_helpers.update_tasks import fetch_location_name
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db.models.aggregates import Sum
+from django.db.models import Q, F
 from ..models import BridgeOzoneLevel, CorpAsset, CorporationWalletJournalEntry, CorporationAudit, CorporationWalletDivision, EveItemType, EveLocation, EveName, Structure, StructureCelestial, StructureService
 
 from allianceauth.eveonline.models import EveCharacter
@@ -140,7 +142,7 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
             # else:
                 # short cct
                 # if not full_update:
-                #total_pages = 0
+                # total_pages = 0
                 # break
         logger.info(
             f"CT: Corp {corp_id} Div {wallet_division}, Page: {current_page}, New Transactions! {len(items)}, New Names {_new_names}")
@@ -377,6 +379,8 @@ def update_corp_assets(corp_id):
     if not token:
         return "No Tokens"
     try:
+        failed_locations = []
+
         assets_op = providers.esi.client.Assets.get_corporations_corporation_id_assets(
             corporation_id=corp_id)
         assets = etag_results(assets_op, token)
@@ -404,8 +408,21 @@ def update_corp_assets(corp_id):
                                    type_id=item.get('type_id'),
                                    type_name_id=item.get('type_id')
                                    )
-            if item.get('location_id') in location_names:
+            if item.get('location_id') not in location_names:
+                try:
+                    new_name = fetch_location_name(
+                        item.get('location_id'), "SolarSystem", token.character_id)
+                    if new_name:
+                        new_name.save()
+                        location_names.append(item.get('location_id'))
+                        asset_item.location_name_id = item.get('location_id')
+                    else:
+                        failed_locations.append(item.get('location_id'))
+                except:
+                    pass  # TODO
+            else:
                 asset_item.location_name_id = item.get('location_id')
+
             items.append(asset_item)
 
         EveItemType.objects.create_bulk_from_esi(_current_type_ids)
@@ -417,7 +434,10 @@ def update_corp_assets(corp_id):
             delete_query._raw_delete(delete_query.db)
 
         CorpAsset.objects.bulk_create(items)
-        run_ozone_levels.apply_async(args=[corp_id], priority=7)
+        que = []
+        que.append(run_ozone_levels.si(corp_id))
+        que.append(build_managed_asset_locations.si(corp_id))
+        chain(que).apply_async(priority=7)
     except NotModifiedError:
         logger.info("CT: No New assets for: {}".format(
             audit_corp.corporation))
@@ -456,3 +476,149 @@ def run_ozone_levels(self, corp_id):
         except:
             pass  # dont fail for now
     return "Finished Ozone for: {}".format(_corporation.corporation)
+
+
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
+
+@shared_task(bind=True)
+def build_managed_asset_locations(self, corp_id):
+    _corporation = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+    logger.debug("Updating Corporate Hangar Locations for: %s" %
+                 (_corporation.corporation))
+
+    req_scopes = ['esi-corporations.read_divisions.v1',
+                  'esi-characters.read_corporation_roles.v1']
+    req_roles = ['Director']
+
+    token = get_corp_token(corp_id, req_scopes, req_roles)
+
+    divisions = {}
+    if token:
+        divs = providers.esi.client.Corporation.get_corporations_corporation_id_divisions(
+            corporation_id=_corporation.corporation.corporation_id,
+            token=token.valid_access_token()
+        ).result()
+        for d in divs['hangar']:
+            divisions[f"CorpSAG{d['division']}"] = d['name']
+
+    existing_locations = set(list(EveLocation.objects.filter(
+        managed=True, managed_corp=_corporation).values_list("location_id", flat=True)))
+    current = []
+    new = []
+    updates = []
+    # get office folders and name them
+    folders = CorpAsset.objects.filter(corporation=_corporation,
+                                       location_flag="OfficeFolder"
+                                       ).select_related("location_name")
+    names = {}
+
+    grp_ids = [
+        12,
+        340,
+        448,
+        649,
+    ]
+
+    cat_ids = [
+        6
+    ]
+
+    corp_hangars = {}
+    hangar_ids = []
+    for i in folders:
+        if i.location_name:
+            names[i.item_id] = i.location_name.location_name
+        else:
+            names[i.item_id] = i.location_id
+        corp_hangars[i.item_id] = {}
+        for j in range(1, 7):
+
+            # Build the Managed Location for hangars
+            id = -int(f"{i.item_id}{j}")
+            sag = f"CorpSAG{j}"
+            name = f"{names[i.item_id]} > {divisions.get(sag, sag)}"
+            hangar_ids.append(id)
+
+            # store for later?
+            corp_hangars[i.item_id][sag] = (id, name)
+
+            # update or create the location
+            EveLocation.objects.update_or_create(
+                location_id=id,
+                defaults={
+                    "location_name": name,
+                    "managed": True,
+                    "managed_corp": _corporation
+                }
+            )
+
+            # update all the assets.
+            CorpAsset.objects.filter(
+                corporation=_corporation,
+                location_id=i.item_id,
+                location_flag=sag
+            ).update(location_name_id=id)
+    # get Containers in office folders and assign the names
+
+    containers = CorpAsset.objects.filter(
+        (Q(type_name__group_id__in=grp_ids) | Q(
+            type_name__group__category_id__in=cat_ids))
+    ).filter(
+        corporation=_corporation,
+        singleton=True,
+        location_id__in=folders.values_list(
+            "item_id", flat=True),
+    ).select_related("location_name", "type_name")
+
+    req_scopes = ['esi-assets.read_corporation_assets.v1',
+                  'esi-characters.read_corporation_roles.v1']
+
+    req_roles = ['Director']
+
+    token = get_corp_token(corp_id, req_scopes, req_roles)
+    if token:
+        ids = list(set(list(containers.values_list("item_id", flat=True))))
+        for c in chunks(ids, 250):
+            items = providers.esi.client.Assets.post_corporations_corporation_id_assets_names(
+                item_ids=c,
+                corporation_id=_corporation.corporation.corporation_id,
+                token=token.valid_access_token()
+            ).result()
+            for n in items:
+                names[n['item_id']] = n['name']
+
+    # each container gets a location name Station > Hangar > Type
+    for c in containers:
+        current.append(c.item_id)
+        name = names.get(c.item_id, c.type_name.name)
+        hangar = divisions.get(c.location_flag, c.location_flag)
+        station = names.get(c.location_id, c.location_id)
+        item_loc = f"{station} > {hangar} > {name}"
+        loc = EveLocation(
+            location_id=c.item_id,
+            location_name=item_loc,
+            managed=True,
+            managed_corp=_corporation
+        )
+        if c.item_id in existing_locations:
+            updates.append(loc)
+        else:
+            new.append(loc)
+
+    if len(new):
+        EveLocation.objects.bulk_create(new)
+
+    if len(updates):
+        EveLocation.objects.bulk_update(
+            updates, ["location_name", "managed", "managed_corp"])
+
+    EveLocation.objects.filter(managed=True, managed_corp=_corporation).exclude(
+        location_id__in=current+hangar_ids).delete()
+
+    CorpAsset.objects.filter(location_id__in=current).update(
+        location_name_id=F("location_id"))

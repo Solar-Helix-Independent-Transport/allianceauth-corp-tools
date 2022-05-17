@@ -11,7 +11,7 @@ import "./style.css";
 import CorpAssets from "./pages/Assets";
 import CorpAssetLists from "./pages/AssetList";
 import CorpWallet from "./pages/Wallets";
-import { Bridges } from "./components/Bridges";
+import { Bridges } from "./pages/Bridges";
 import { Sov } from "./pages/Sov";
 const queryClient = new QueryClient();
 

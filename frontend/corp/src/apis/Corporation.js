@@ -57,9 +57,9 @@ export async function loadAssetContents(item_id) {
   return api.data;
 }
 
-export async function loadAssetList(corporation_id, location_id) {
+export async function loadAssetList(corporation_id, location_id, new_type) {
   const api = await axios.get(
-    `/audit/api/corporation/${corporation_id}/asset/${location_id}/list`
+    `/audit/api/corporation/${corporation_id}/asset/${location_id}/list?new_asset_tree=${new_type}`
   );
   console.log(`get asset list in api ${corporation_id} ${location_id}`);
   return api.data;

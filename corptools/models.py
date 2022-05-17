@@ -2,6 +2,7 @@ import logging
 import os
 import json
 import datetime
+from pyexpat import model
 
 from allianceauth.authentication.models import CharacterOwnership, UserProfile
 from django.db import models
@@ -392,6 +393,11 @@ class EveLocation(models.Model):
     system = models.ForeignKey(
         MapSystem, on_delete=models.SET_NULL, null=True, default=None)
     last_update = models.DateTimeField(auto_now=True)
+    managed = models.BooleanField(default=False)
+    managed_corp = models.ForeignKey(
+        CorporationAudit, default=None, blank=True, null=True, on_delete=models.CASCADE)
+    managed_char = models.ForeignKey(
+        CharacterAudit, default=None, blank=True, null=True, on_delete=models.CASCADE)
 
 
 class Asset(models.Model):

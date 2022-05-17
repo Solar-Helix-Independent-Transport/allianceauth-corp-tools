@@ -137,8 +137,9 @@ def update_eve_name(self, id):
             name.save()
         except Exception as e:  # no access
             if hasattr(e, "response"):
-                if int(e.response.headers.get('x-esi-error-limit-remain')) < 50:
-                    set_error_count_flag()
+                if hasattr(e.response, "headers"):
+                    if int(e.response.headers.get('x-esi-error-limit-remain')) < 50:
+                        set_error_count_flag()
             # cooloff for a while
             name.last_updated = timezone.now()
             name.save()

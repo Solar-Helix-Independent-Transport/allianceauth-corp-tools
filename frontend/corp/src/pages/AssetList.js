@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Panel } from "react-bootstrap";
+import { Checkbox, Panel } from "react-bootstrap";
 import CorpAssetLocSelect from "../components/CorpAssetLocSelect";
 import ErrorBoundary from "../components/ErrorBoundary";
 import CorpSelect from "../components/CorpSelect";
@@ -8,11 +8,20 @@ import CorpAssetTable from "../components/CorpAssetTable";
 const CorpAssetLists = () => {
   const [location, setLocation] = useState(0);
   const [corporation_id, setCorp] = useState(0);
+  const [new_type, setAPI] = useState(true);
 
   return (
     <ErrorBoundary>
       <Panel.Body className="flex-container-vert-fill">
         <CorpSelect setCorporation={setCorp} />
+        <div class="text-center">
+          <Checkbox
+            onChange={(e) => setAPI(e.target.checked)}
+            defaultChecked={new_type}
+          >
+            Use New Location API
+          </Checkbox>
+        </div>
         <CorpAssetLocSelect
           corporation_id={corporation_id}
           setLocation={setLocation}
@@ -20,6 +29,7 @@ const CorpAssetLists = () => {
         <CorpAssetTable
           corporation_id={corporation_id}
           location_id={location}
+          new_type={new_type}
         />
       </Panel.Body>
     </ErrorBoundary>

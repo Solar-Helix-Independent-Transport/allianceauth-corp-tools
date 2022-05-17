@@ -22,6 +22,9 @@ const CorpSelect = ({ setCorporation }) => {
         label: corp.corporation.corporation_name,
       };
     });
+    if (data.corps.length === 1) {
+      setCorporation(options[0].value);
+    }
   }
   return (
     <div className="flex-label-container">

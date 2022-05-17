@@ -33,10 +33,10 @@ function SubRowAsync({ row, rowProps, visibleColumns }) {
   );
 }
 
-const CorpAssetTable = ({ corporation_id, location_id = 0 }) => {
+const CorpAssetTable = ({ corporation_id, new_type, location_id = 0 }) => {
   const { isLoading, isFetching, error, data } = useQuery(
-    ["assetList", corporation_id, location_id],
-    () => loadAssetList(corporation_id, location_id),
+    ["assetList", corporation_id, location_id, new_type],
+    () => loadAssetList(corporation_id, location_id, new_type),
     { initialData: [] }
   );
   const renderRowSubComponent = React.useCallback(

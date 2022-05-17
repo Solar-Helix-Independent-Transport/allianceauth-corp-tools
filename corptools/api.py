@@ -4,6 +4,7 @@ from lib2to3.pgen2 import token
 import re
 from typing import List
 from unicodedata import category
+from xmlrpc.client import boolean
 from allianceauth import notifications
 from corptools import app_settings
 from corptools.task_helpers.update_tasks import fetch_location_name
@@ -1454,7 +1455,7 @@ def get_corporation_asset_locations(request, corporation_id: int):
     response={200: List[schema.CorporationAssetItem], 403: schema.Message},
     tags=["Corporation"]
 )
-def get_corporation_asset_list(request, corporation_id: int, location_id: int):
+def get_corporation_asset_list(request, corporation_id: int, location_id: int, new_asset_tree: boolean = False):
     perms = (
         request.user.has_perm('corptools.corp_hr') |
         request.user.has_perm('corptools.alliance_hr') |
@@ -1467,6 +1468,56 @@ def get_corporation_asset_list(request, corporation_id: int, location_id: int):
         logging.error(
             f"Permission Denied for {request.user} to view wallets!")
         return 403, {"message": "Permission Denied!"}
+
+    if new_asset_tree:
+        expandable_cats = []
+
+        if corporation_id == 0:
+            corporation_id = request.user.profile.main_character.corporation_id
+
+        assets = models.CorpAsset.get_visible(request.user).filter(
+            corporation__corporation__corporation_id=corporation_id).select_related(
+            "type_name", "location_name", "type_name__group__category"
+        )
+
+        asset_locations = []
+        if location_id == 2004:
+            asset_locations = assets.filter(
+                location_flag="AssetSafety")
+            assets = assets.filter(
+                location_id__in=asset_locations.values_list('item_id'))
+        elif location_id != 0:
+            asset_locations = assets.filter(
+                location_name_id=int(location_id))
+            assets = assets.filter(Q(location_name_id=int(location_id)) | Q(
+                location_id__in=asset_locations.values_list('item_id')) | Q(location_id=int(location_id)))
+        else:
+            asset_locations = assets.filter(
+                location_name__isnull=False)
+
+        output = []
+        location_names = {}
+
+        for a in assets:
+            loc = a.location_id
+            if a.location_name:
+                loc = a.location_name.location_name
+            output.append({
+                "item": {
+                    "id": a.type_name.type_id,
+                    "name": a.type_name.name,
+                    "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}"
+                },
+                "quantity": a.quantity,
+                "id": a.item_id,
+                "expand": False,
+                "location": {
+                    "id": a.location_id,
+                    "name": loc
+                }
+            })
+
+        return output
 
     expandable_cats = [2, 6, 29]
     everywhere_flags = ["CorpSAG1", "CorpSAG2", "CorpSAG3", "CorpSAG4",
