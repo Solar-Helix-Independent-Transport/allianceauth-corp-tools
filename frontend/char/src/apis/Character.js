@@ -2,6 +2,34 @@ import axios from "axios";
 import cookies from "js-cookies";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
+function fetchFromObject(obj, prop) {
+  if (typeof obj === "undefined") return "Error";
+  var _index = prop.indexOf(".");
+  if (_index > -1) {
+    return fetchFromObject(
+      obj[prop.substring(0, _index)],
+      prop.substr(_index + 1)
+    );
+  }
+  return obj[prop];
+}
+
+function return_key_pair(label_key, value_key, ob) {
+  return ob.reduce((p, c) => {
+    try {
+      p.push({
+        value: fetchFromObject(c, value_key),
+        label: fetchFromObject(c, label_key),
+      });
+      return p;
+    } catch (err) {
+      console.log(`ERROR searching for key/val`);
+      console.log(err);
+      return p;
+    }
+  }, []);
+}
+
 export async function loadStatus(character_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/status`);
   console.log(`get status in api ${character_id}`);
@@ -158,5 +186,75 @@ export async function postAccountRefresh(character_id) {
     { character_id: character_id },
     { headers: { "X-CSRFToken": cookies.getItem("csrftoken") } }
   );
+  return api.data;
+}
+
+export async function searchSystem(system_id) {
+  const api = await axios.get(`/audit/api/search/system/${system_id}`);
+  console.log(`search systems in api ${system_id}`);
+  const systems = return_key_pair("name", "id", api.data);
+  systems.sort();
+  return systems;
+}
+
+export async function searchLocation(location_id) {
+  const api = await axios.get(`/audit/api/search/location/${location_id}`);
+  console.log(`search locations in api ${location_id}`);
+  const locations = return_key_pair("name", "id", api.data);
+  locations.sort();
+  return locations;
+}
+
+export async function searchItemGroup(group_id) {
+  const api = await axios.get(`/audit/api/search/item/group/${group_id}`);
+  console.log(`search item group in api ${group_id}`);
+  const groups = return_key_pair("name", "id", api.data);
+  groups.sort();
+  return groups;
+}
+
+export async function postTestPing(
+  message,
+  structures,
+  locations,
+  itemGroups,
+  filter_charges = false,
+  ships_only = false
+) {
+  console.log(`sent ping test ${message}`);
+  const api = await axios.post(`/audit/api/pingbot/assets/counts`, null, {
+    headers: { "X-CSRFToken": cookies.getItem("csrftoken") },
+    params: {
+      message: message,
+      structures: structures.join(","),
+      systems: locations.join(","),
+      itemGroups: itemGroups.join(","),
+      filter_charges: filter_charges,
+      ships_only: ships_only,
+    },
+  });
+  return api.data;
+}
+
+export async function postSendPing(
+  message,
+  structures,
+  locations,
+  itemGroups,
+  filter_charges = false,
+  ships_only = false
+) {
+  console.log(`sent ping test ${message}`);
+  const api = await axios.post(`/audit/api/pingbot/assets/send`, null, {
+    headers: { "X-CSRFToken": cookies.getItem("csrftoken") },
+    params: {
+      message: message,
+      structures: structures.join(","),
+      systems: locations.join(","),
+      itemGroups: itemGroups.join(","),
+      filter_charges: filter_charges,
+      ships_only: ships_only,
+    },
+  });
   return api.data;
 }

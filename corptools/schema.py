@@ -241,3 +241,8 @@ class CorpStatus(Schema):
     characters: int
     active: bool
     last_updates: Optional[Dict]
+
+
+class PingStats(Schema):
+    members: int
+    structures: List[str]

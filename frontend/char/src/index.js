@@ -27,6 +27,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ErrorLoader } from "./components/ErrorLoader";
 import CharSkillQueue from "./pages/SkillQueue";
 import charDoctrines from "./pages/Doctrines";
+import PingAssets from "./pages/AssetPingMenu";
 TimeAgo.addDefaultLocale(en);
 
 const queryClient = new QueryClient();
@@ -107,6 +108,7 @@ const CorptoolsCharacterView = () => {
                   component={() => ErrorLoader()}
                 />
                 <Route path="/account/list" component={() => AccountList()} />
+                <Route path="/ping/assets" component={() => PingAssets()} />
               </Switch>
             </Panel>
           </Col>
