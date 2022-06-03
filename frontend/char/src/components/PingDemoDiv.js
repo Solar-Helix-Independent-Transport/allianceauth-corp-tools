@@ -46,7 +46,20 @@ export const TestEmbed = ({
         Example Asset Alert ({data.members} Characters!)
       </Panel.Heading>
       <Panel.Body>
-        <p>{message}</p>
+        <p>
+          {message ? (
+            <>
+              {message.split("\\n").map((s) => (
+                <>
+                  {s}
+                  <br />
+                </>
+              ))}
+            </>
+          ) : (
+            ""
+          )}
+        </p>
         <h4>Characters</h4>
         <p>
           Master Chief, Obi-wan, Grogu, Katheryn Janeway, Postman Pat, Wally,
@@ -63,7 +76,7 @@ export const TestEmbed = ({
       <Panel.Footer className="text-center">
         <ButtonGroup>
           <Button
-            disabled={interlock & message}
+            disabled={interlock && message}
             bsStyle="danger"
             onClick={(e) => {
               setInterlock(!interlock);
@@ -72,7 +85,7 @@ export const TestEmbed = ({
             {!interlock ? `Confirm ${data.members} Pings!` : `Ready`}
           </Button>
           <Button
-            disabled={!interlock | !message}
+            disabled={!interlock || !message}
             bsStyle="success"
             onClick={(e) => {
               debounceSend(

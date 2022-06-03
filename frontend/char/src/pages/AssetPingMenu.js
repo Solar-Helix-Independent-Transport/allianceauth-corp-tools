@@ -18,7 +18,13 @@ const PingAssets = () => {
   return (
     <ErrorBoundary>
       <Panel.Body className="flex-container">
-        <h5>Message</h5>
+        <h5 className="text-center">
+          Message{" "}
+          <span className="small">
+            <br />
+            Use \n for line breaks and Discord markdown syntax
+          </span>
+        </h5>
         <FormControl
           id="message-text"
           type="text"

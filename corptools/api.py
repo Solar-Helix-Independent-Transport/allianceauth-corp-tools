@@ -1937,7 +1937,7 @@ def post_send_pings_assets(request, message: str, systems: str = "", structures:
 
     for id, chars in pingers.items():
         embed = Embed(title="Asset Alert!")
-        embed.description = message
+        embed.description = message.replace("\\n", "\n")
         _ = embed.add_field(name="Characters",
                             value=", ".join(list(chars['c'])),
                             inline=False)
