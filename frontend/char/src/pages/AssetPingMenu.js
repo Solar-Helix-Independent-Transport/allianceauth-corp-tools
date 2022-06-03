@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FormControl, Panel } from "react-bootstrap";
+import { Checkbox, FormControl, Panel } from "react-bootstrap";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { ApiMultiSelect } from "../components/ApiMultiSelect";
 import {
@@ -12,6 +12,8 @@ const PingAssets = () => {
   const [systems, setSystems] = useState([]);
   const [structures, setStructures] = useState([]);
   const [itemGroups, setItemGroups] = useState([]);
+  const [filterCharges, setCharges] = useState(false);
+  const [filterShipsOnly, setShipsOnly] = useState(false);
   const [message, setMessage] = useState();
   return (
     <ErrorBoundary>
@@ -30,11 +32,29 @@ const PingAssets = () => {
         <ApiMultiSelect setValue={setStructures} apiLookup={searchLocation} />
         <h5>Ignored Items Filter</h5>
         <ApiMultiSelect setValue={setItemGroups} apiLookup={searchItemGroup} />
+        <div className="flex=container">
+          <Checkbox
+            onChange={(e) => {
+              setShipsOnly(e.target.checked);
+            }}
+          >
+            Ships Only
+          </Checkbox>
+          <Checkbox
+            onChange={(e) => {
+              setCharges(e.target.checked);
+            }}
+          >
+            Filter Charges
+          </Checkbox>
+        </div>
         <TestEmbed
           message={message}
           structures={structures}
           locations={systems}
           itemGroups={itemGroups}
+          ships_only={filterShipsOnly}
+          filter_charges={filterCharges}
         />
       </Panel.Body>
     </ErrorBoundary>

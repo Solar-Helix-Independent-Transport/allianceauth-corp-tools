@@ -4,6 +4,7 @@ import { postTestPing, postSendPing } from "../apis/Character";
 import { useQuery } from "react-query";
 import { Button } from "react-bootstrap";
 import AwesomeDebouncePromise from "awesome-debounce-promise";
+import { ErrorLoader } from "./ErrorLoader";
 const debounceSend = AwesomeDebouncePromise(postSendPing, 1000);
 
 export const TestEmbed = ({
@@ -15,7 +16,7 @@ export const TestEmbed = ({
   ships_only,
 }) => {
   const [interlock, setInterlock] = useState(false);
-  const { isLoading, isFetching, error, data } = useQuery(
+  const { isFetching, error, data } = useQuery(
     ["pingTest", structures, locations, itemGroups, filter_charges, ships_only],
     () =>
       postTestPing(
@@ -35,6 +36,9 @@ export const TestEmbed = ({
   );
   if (isFetching && interlock) {
     setInterlock(false);
+  }
+  if (error) {
+    return <ErrorLoader />;
   }
   return (
     <Panel style={{ margin: "15px", width: "400px" }}>
