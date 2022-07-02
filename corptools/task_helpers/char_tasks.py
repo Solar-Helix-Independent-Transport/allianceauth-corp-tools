@@ -383,6 +383,57 @@ def update_character_wallet(character_id, force_refresh=False):
     return "CT: Finished wallet transactions for: {}".format(audit_char.character.character_name)
 
 
+def update_character_transactions(character_id, force_refresh=False):
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+    logger.debug("Updating wallet transactions for: {}".format(
+        audit_char.character.character_name))
+
+    req_scopes = ['esi-wallet.read_character_wallet.v1']
+
+    token = Token.get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+
+    try:
+        journal_items_ob = providers.esi.client.Wallet.get_characters_character_id_wallet_transactions(
+            character_id=character_id)
+
+        journal_items = etag_results(
+            journal_items_ob, token, force_refresh=force_refresh)
+
+        _current_journal = CharacterWalletJournalEntry.objects.filter(
+            character=audit_char,
+            context_id_type="market_transaction_id",
+            reason__exact="").values_list('context_id', flat=True)[:2500]  # Max items from ESI
+
+        _new_names = []
+
+        items = []
+        for item in journal_items:
+            if item.get('transaction_id') in _current_journal:
+                type_name, _ = EveItemType.objects.get_or_create_from_esi(
+                    item.get('type_id'))
+                message = f"{item.get('quantity')}x {type_name.name} @ ${item.get('unit_price'):,.2f}"
+                CharacterWalletJournalEntry.objects.filter(
+                    character=audit_char,
+                    context_id_type="market_transaction_id",
+                    reason__exact="",
+                    context_id=item.get('transaction_id')
+                ).update(
+                    reason=message
+                )
+                print(f"{audit_char.character.character_name} {message}")
+
+    except NotModifiedError:
+        logger.info("CT: No New wallet data for: {}".format(
+            audit_char.character.character_name))
+        pass
+
+    return "CT: Finished market transactions for: {}".format(audit_char.character.character_name)
+
+
 def update_character_clones(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)

@@ -17,7 +17,7 @@ from requests.adapters import MaxRetryError
 
 from .task_helpers.update_tasks import process_map_from_esi, set_error_count_flag, update_ore_comp_table_from_fuzzworks, \
     process_category_from_esi, fetch_location_name
-from .task_helpers.char_tasks import update_corp_history, update_character_assets, update_character_skill_list, \
+from .task_helpers.char_tasks import update_character_transactions, update_corp_history, update_character_assets, update_character_skill_list, \
     update_character_clones, update_character_skill_queue, update_character_wallet, \
     update_character_orders, update_character_order_history, update_character_notifications, \
     update_character_roles, update_character_mail, process_mail_list, update_character_contacts, \
@@ -239,6 +239,8 @@ def update_character(char_id, force_refresh=False):
         character.character.character_id, force_refresh=force_refresh))
     que.append(update_char_order_history.si(
         character.character.character_id, force_refresh=force_refresh))
+    que.append(update_char_transactions.si(
+        character.character.character_id, force_refresh=force_refresh))
     if app_settings.CT_CHAR_MAIL_MODULE:
         que.append(update_char_mail.si(
             character.character.character_id, force_refresh=force_refresh))
@@ -334,6 +336,15 @@ def update_char_contacts(self, character_id, force_refresh=False):
 def update_char_orders(self, character_id, force_refresh=False):
     try:
         return update_character_orders(character_id, force_refresh=force_refresh)
+    except Exception as e:
+        logger.exception(e)
+        return "Failed"
+
+
+@shared_task(bind=True, base=QueueOnce)
+def update_char_transactions(self, character_id, force_refresh=False):
+    try:
+        return update_character_transactions(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"

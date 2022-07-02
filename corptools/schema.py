@@ -176,6 +176,7 @@ class CharacterWalletEvent(Schema):
     ref_type: str
     balance: float
     amount: float
+    reason: str
 
 
 class CorporationWalletEvent(Schema):
