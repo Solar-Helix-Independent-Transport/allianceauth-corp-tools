@@ -306,7 +306,7 @@ def update_char_assets(self, character_id, force_refresh=False):
     try:
         results = update_character_assets(
             character_id, force_refresh=force_refresh)
-        update_all_locations.apply_async(priority=7)
+        # update_all_locations.apply_async(priority=7)
         return results
 
     except Exception as e:
@@ -401,7 +401,7 @@ def update_clones(character_id, force_refresh=False):
     try:
         output = update_character_clones(
             character_id, force_refresh=force_refresh)
-        update_all_locations.apply_async(priority=7)
+        # update_all_locations.apply_async(priority=7)
         return output
     except Exception as e:
         logger.exception(e)
