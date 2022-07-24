@@ -4,6 +4,7 @@ import json
 from urllib import response
 
 from celery import shared_task, chain
+from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
 from django.utils import timezone
 from django.core.cache import cache
 
@@ -647,3 +648,10 @@ def update_all_corps():
     corps = CorporationAudit.objects.all().select_related('corporation')
     for corp in corps:
         update_corp.apply_async(args=[corp.corporation.corporation_id])
+
+
+@shared_task
+def run_housekeeping():
+    notifs = remove_old_notifications()
+
+    return notifs
