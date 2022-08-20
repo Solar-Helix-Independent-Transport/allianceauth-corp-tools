@@ -61,8 +61,6 @@ def get_character_scopes():
     _scopes = [
         # Base
         'publicData',
-        'esi-universe.read_structures.v1',
-        'esi-search.search_structures.v1',
         'esi-characters.read_opportunities.v1',
     ]
 
@@ -170,6 +168,12 @@ def get_character_scopes():
         _scopes += [
             # Mail
             'esi-mail.read_mail.v1',
+        ]
+
+    if CT_CHAR_CLONES_MODULE or CT_CHAR_ASSETS_MODULE or CT_CHAR_WALLET_MODULE or CT_CHAR_MINING_MODULE:
+        _scopes += [
+            'esi-universe.read_structures.v1',
+            'esi-search.search_structures.v1',
         ]
 
     return list(set(_scopes))
