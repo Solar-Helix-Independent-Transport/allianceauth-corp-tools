@@ -419,7 +419,6 @@ class Asset(models.Model):
         abstract = True
         indexes = [
             models.Index(fields=['location_id']),
-            models.Index(fields=['type_id']),
             models.Index(fields=['item_id']),
         ]
 
