@@ -12,7 +12,24 @@ const CharHeader = ({ character_id }) => {
   const { isLoading, data } = useQuery(["status", character_id], () =>
     loadStatus(character_id)
   );
-
+  let isk = 0;
+  let sp = 0;
+  if (!isLoading) {
+    isk = data.characters.reduce((p, c) => {
+      try {
+        return p + c.isk;
+      } catch (err) {
+        return p;
+      }
+    }, 0);
+    sp = data.characters.reduce((p, c) => {
+      try {
+        return p + c.sp;
+      } catch (err) {
+        return p;
+      }
+    }, 0);
+  }
   return (
     <Panel>
       <Panel.Body>
@@ -52,31 +69,20 @@ const CharHeader = ({ character_id }) => {
                     <h4>{data.main.alliance_name}</h4>
                   </div>
                   <div className="info-hide">
-                    <Badge>
-                      Total SP:{" "}
-                      {data.characters
-                        .reduce((p, c) => {
-                          try {
-                            return p + c.sp;
-                          } catch (err) {
-                            return p;
-                          }
-                        }, 0)
-                        .toLocaleString()}
-                    </Badge>
-                    <br />
-                    <Badge>
-                      Total Isk:{" "}
-                      {data.characters
-                        .reduce((p, c) => {
-                          try {
-                            return p + c.isk;
-                          } catch (err) {
-                            return p;
-                          }
-                        }, 0)
-                        .toLocaleString()}
-                    </Badge>
+                    {sp ? (
+                      <>
+                        <Badge>Total SP: {sp.toLocaleString()}</Badge> <br />
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                    {isk ? (
+                      <>
+                        <Badge>Total Isk: {isk.toLocaleString()}</Badge>
+                      </>
+                    ) : (
+                      <></>
+                    )}
                   </div>
                 </>
               )}

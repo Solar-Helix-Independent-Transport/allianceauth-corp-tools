@@ -62,9 +62,14 @@ const CharMenu = () => {
                 <Grid className="menu-spinner-size" />
               </>
             ) : (
-              <NavLink key="Public Data" href={`#/account/list`}>
-                Account List
-              </NavLink>
+              <>
+                <NavLink key="Legacy UI" href={`/audit/`}>
+                  Legacy UI
+                </NavLink>
+                <NavLink key="Account List" href={`#/account/list`}>
+                  Account List
+                </NavLink>
+              </>
             )
           ) : (
             <NavItem active={false}>

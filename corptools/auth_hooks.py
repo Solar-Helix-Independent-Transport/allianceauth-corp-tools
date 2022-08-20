@@ -12,8 +12,8 @@ class MemberAudit(MenuItemHook):
         MenuItemHook.__init__(self,
                               app_settings.CORPTOOLS_APP_NAME,
                               'far fa-eye fa-fw',
-                              'corptools:view',
-                              navactive=['corptools:view'])
+                              'corptools:react',
+                              navactive=['corptools:react', 'corptools:view'])
 
     def render(self, request):
         if request.user.has_perm('corptools.view_characteraudit'):

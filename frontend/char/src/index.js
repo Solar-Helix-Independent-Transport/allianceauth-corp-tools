@@ -28,6 +28,7 @@ import { ErrorLoader } from "./components/ErrorLoader";
 import CharSkillQueue from "./pages/SkillQueue";
 import charDoctrines from "./pages/Doctrines";
 import PingAssets from "./pages/AssetPingMenu";
+import CharMarket from "./pages/Market";
 TimeAgo.addDefaultLocale(en);
 
 const queryClient = new QueryClient();
@@ -102,7 +103,10 @@ const CorptoolsCharacterView = () => {
                   path="/account/doctrines"
                   component={() => charDoctrines({ character_id })}
                 />
-                <Route path="/account/market" component={() => ErrorLoader()} />
+                <Route
+                  path="/account/market"
+                  component={() => CharMarket({ character_id })}
+                />
                 <Route
                   path="/account/standings"
                   component={() => ErrorLoader()}

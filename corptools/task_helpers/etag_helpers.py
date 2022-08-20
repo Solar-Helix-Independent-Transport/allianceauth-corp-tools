@@ -1,6 +1,5 @@
 from bravado.exception import HTTPNotModified
 from django.core.cache import cache
-import random
 
 import logging
 

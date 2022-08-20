@@ -832,7 +832,6 @@ class Notification(models.Model):
 
     class Meta:
         indexes = (
-            models.Index(fields=['notification_id']),
             models.Index(fields=['timestamp']),
             models.Index(fields=['notification_type'])
         )

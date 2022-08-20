@@ -306,7 +306,17 @@ def get_character_menu(request):
             "name": "Skill List Checks",
             "link": "/account/doctrines"
         })
-    return [_char, _finance, _inter]
+    out = []
+    if len(_char['links']):
+        out.append(_char)
+
+    if len(_finance['links']):
+        out.append(_finance)
+
+    if len(_inter['links']):
+        out.append(_inter)
+
+    return out
 
 
 @api.get(
@@ -675,6 +685,83 @@ def get_character_wallet(request, character_id: int):
                 "balance": w.balance,
                 "reason": w.reason,
             })
+
+    return output
+
+
+@api.get(
+    "account/{character_id}/market",
+    response={200: schema.CharacterMarket, 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_market(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    market_data_current = models.CharacterMarketOrder.objects\
+        .filter(character__character__in=characters, state="active")\
+        .select_related('character__character', 'type_name', 'location_name')
+
+    market_data_old = models.CharacterMarketOrder.objects\
+        .filter(character__character__in=characters, duration__gt=0)\
+        .select_related('character__character', 'type_name', 'location_name')\
+        .exclude(state="active")
+
+    output = {"active": [], "expired": [],
+              "total_active": 0, "total_expired": 0}
+    for w in market_data_current:
+        output['total_active'] += w.price*w.volume_remain
+        o = {
+            "character": w.character.character,
+            "date": w.issued,
+            "duration": w.duration,
+            "volume_min": w.min_volume,
+            "volume_remain": w.volume_remain,
+            "volume_total": w.volume_total,
+            "item": {
+                "id": w.type_name.type_id,
+                "name": w.type_name.name
+            },
+            "price": w.price,
+            "escrow": w.escrow,
+            "buy_order": w.is_buy_order,
+        }
+        if w.location_name:
+            o['location'] = {
+                "id": w.location_name.location_id,
+                "name": w.location_name.location_name
+            }
+        output["active"].append(o)
+
+    for w in market_data_old:
+        output['total_expired'] += w.price*w.volume_total
+        o = {
+            "character": w.character.character,
+            "date": w.issued,
+            "duration": w.duration,
+            "volume_min": w.min_volume,
+            "volume_remain": w.volume_remain,
+            "volume_total": w.volume_total,
+            "item": {
+                "id": w.type_name.type_id,
+                "name": w.type_name.name
+            },
+            "price": w.price,
+            "escrow": w.escrow,
+            "buy_order": w.is_buy_order,
+        }
+        if w.location_name:
+            o['location'] = {
+                "id": w.location_name.location_id,
+                "name": w.location_name.location_name
+            }
+        output["expired"].append(o)
 
     return output
 

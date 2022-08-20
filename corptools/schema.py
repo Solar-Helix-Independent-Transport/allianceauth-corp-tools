@@ -202,7 +202,14 @@ class CharacterOrder(Schema):
     price: float
     escrow: float = None
     buy_order: bool = None
-    location: EveName
+    location: Optional[EveName]
+
+
+class CharacterMarket(Schema):
+    expired: List[CharacterOrder]
+    active: List[CharacterOrder]
+    total_active: int
+    total_expired: int
 
 
 class Contact(Schema):
