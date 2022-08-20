@@ -1,8 +1,9 @@
 from allianceauth import notifications
 from django.core.management.base import BaseCommand, CommandError
-from django.db.models import F
-from corptools.models import Notification, NotificationText
 from django.db.migrations.recorder import MigrationRecorder
+from django.db.models import F
+
+from corptools.models import Notification, NotificationText
 
 
 class Command(BaseCommand):

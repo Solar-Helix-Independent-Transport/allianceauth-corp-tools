@@ -13,8 +13,8 @@ export async function loadStatus() {
         } catch (err) {
           return p;
         }
-      }, [])
-    )
+      }, []),
+    ),
   );
   headers.sort();
 
@@ -35,7 +35,7 @@ export async function postCorporationRefresh() {
 
 export async function loadAssetLocations(corporation_id) {
   const api = await axios.get(
-    `/audit/api/corporation/${corporation_id}/asset/locations`
+    `/audit/api/corporation/${corporation_id}/asset/locations`,
   );
   console.log(`get asset locations in api ${corporation_id}`);
   return api.data;
@@ -43,7 +43,7 @@ export async function loadAssetLocations(corporation_id) {
 
 export async function loadAssetGroups(corporation_id, location_id) {
   const api = await axios.get(
-    `/audit/api/corporation/${corporation_id}/asset/${location_id}/groups`
+    `/audit/api/corporation/${corporation_id}/asset/${location_id}/groups`,
   );
   console.log(`get asset groups in api ${corporation_id} ${location_id}`);
   return api.data;
@@ -51,7 +51,7 @@ export async function loadAssetGroups(corporation_id, location_id) {
 
 export async function loadAssetContents(item_id) {
   const api = await axios.get(
-    `/audit/api/corporation/asset/${item_id}/contents`
+    `/audit/api/corporation/asset/${item_id}/contents`,
   );
   console.log(`get asset contents in api ${item_id}`);
   return api.data;
@@ -59,7 +59,7 @@ export async function loadAssetContents(item_id) {
 
 export async function loadAssetList(corporation_id, location_id, new_type) {
   const api = await axios.get(
-    `/audit/api/corporation/${corporation_id}/asset/${location_id}/list?new_asset_tree=${new_type}`
+    `/audit/api/corporation/${corporation_id}/asset/${location_id}/list?new_asset_tree=${new_type}`,
   );
   console.log(`get asset list in api ${corporation_id} ${location_id}`);
   return api.data;
@@ -68,7 +68,7 @@ export async function loadAssetList(corporation_id, location_id, new_type) {
 export async function loadWallet(corporation_id, refType = "", page = 1) {
   const api = await axios.get(
     `/audit/api/corporation/${corporation_id}/wallet`,
-    { params: { type_refs: refType, page: page } }
+    { params: { type_refs: refType, page: page } },
   );
   console.log(`get wallet in api ${corporation_id}`);
   return api.data;

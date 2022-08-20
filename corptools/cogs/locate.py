@@ -1,25 +1,26 @@
 # Cog Stuff
+import logging
+
+from aadiscordbot.app_settings import aastatistics_active
+# AA-Discordbot
+from aadiscordbot.cogs.utils.decorators import (has_any_perm, in_channels,
+                                                sender_has_perm)
+from allianceauth.eveonline.evelinks import evewho
+from allianceauth.eveonline.models import EveCharacter
 from discord import AutocompleteContext, option
-from discord.ext import commands
-from discord.embeds import Embed
 from discord.colour import Color
+from discord.embeds import Embed
+from discord.ext import commands
 # AA Contexts
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from allianceauth.eveonline.models import EveCharacter
-from allianceauth.eveonline.evelinks import evewho
-# AA-Discordbot
-from aadiscordbot.cogs.utils.decorators import has_any_perm, in_channels, sender_has_perm
-from aadiscordbot.app_settings import aastatistics_active
-
 from esi.models import Token
-from corptools.providers import esi
-from corptools.models import MapSystem, EveItemType
-
-import logging
-
 from pendulum.datetime import DateTime
+
+from corptools.models import EveItemType, MapSystem
+from corptools.providers import esi
+
 logger = logging.getLogger(__name__)
 
 

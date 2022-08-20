@@ -10,7 +10,7 @@ import { Bars } from "@agney/react-loading";
 
 const CharHeader = ({ character_id }) => {
   const { isLoading, data } = useQuery(["status", character_id], () =>
-    loadStatus(character_id)
+    loadStatus(character_id),
   );
   let isk = 0;
   let sp = 0;

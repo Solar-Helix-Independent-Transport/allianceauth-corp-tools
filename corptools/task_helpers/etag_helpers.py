@@ -1,7 +1,7 @@
+import logging
+
 from bravado.exception import HTTPNotModified
 from django.core.cache import cache
-
-import logging
 
 MAX_ETAG_LIFE = 60*60*24*7  # 7 Days
 

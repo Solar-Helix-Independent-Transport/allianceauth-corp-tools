@@ -1,37 +1,45 @@
 import datetime
-import logging
 import json
+import logging
 from urllib import response
 
-from celery import shared_task, chain
-from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
-from django.utils import timezone
-from django.core.cache import cache
-
-from allianceauth.services.tasks import QueueOnce
 from allianceauth.eveonline.models import EveCharacter
+from allianceauth.eveonline.providers import provider as eve_names
+from allianceauth.services.tasks import QueueOnce
+from celery import chain, shared_task
+from django.core.cache import cache
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
-
 from esi.errors import TokenExpiredError
+from esi.models import Token
 from requests.adapters import MaxRetryError
 
-from .task_helpers.update_tasks import process_map_from_esi, set_error_count_flag, update_ore_comp_table_from_fuzzworks, \
-    process_category_from_esi, fetch_location_name
-from .task_helpers.char_tasks import update_character_transactions, update_corp_history, update_character_assets, update_character_skill_list, \
-    update_character_clones, update_character_skill_queue, update_character_wallet, \
-    update_character_orders, update_character_order_history, update_character_notifications, \
-    update_character_roles, update_character_mail, process_mail_list, update_character_contacts, \
-    update_character_titles
+from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
 
+from . import app_settings, providers
+from .models import (CharacterAsset, CharacterAudit, CharacterMarketOrder,
+                     Clone, CorporationAudit, EveLocation, EveName, JumpClone)
 from .task_helpers import corp_helpers
-from .models import CharacterAudit, CharacterAsset, EveLocation, CorporationAudit, EveName, JumpClone, Clone, CharacterMarketOrder
-from . import providers
-from . import app_settings
-
-from allianceauth.eveonline.providers import provider as eve_names
-
-from esi.models import Token
+from .task_helpers.char_tasks import (process_mail_list,
+                                      update_character_assets,
+                                      update_character_clones,
+                                      update_character_contacts,
+                                      update_character_mail,
+                                      update_character_notifications,
+                                      update_character_order_history,
+                                      update_character_orders,
+                                      update_character_roles,
+                                      update_character_skill_list,
+                                      update_character_skill_queue,
+                                      update_character_titles,
+                                      update_character_transactions,
+                                      update_character_wallet,
+                                      update_corp_history)
+from .task_helpers.update_tasks import (fetch_location_name,
+                                        process_category_from_esi,
+                                        process_map_from_esi,
+                                        set_error_count_flag,
+                                        update_ore_comp_table_from_fuzzworks)
 
 TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
 

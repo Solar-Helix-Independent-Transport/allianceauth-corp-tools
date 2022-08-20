@@ -25,14 +25,14 @@ export const TestEmbed = ({
         locations,
         itemGroups,
         filter_charges,
-        ships_only
+        ships_only,
       ),
     {
       initialData: {
         members: 0,
         structures: [],
       },
-    }
+    },
   );
   if (isFetching && interlock) {
     setInterlock(false);
@@ -94,7 +94,7 @@ export const TestEmbed = ({
                 locations,
                 itemGroups,
                 filter_charges,
-                ships_only
+                ships_only,
               );
               setInterlock(!interlock);
             }}

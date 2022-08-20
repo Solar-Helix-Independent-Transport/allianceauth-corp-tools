@@ -10,7 +10,7 @@ import { PortraitPanel } from "../components/PortraitPanel";
 const PubData = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["pubdata", character_id],
-    () => loadPubData(character_id)
+    () => loadPubData(character_id),
   );
 
   if (isLoading) return <PanelLoader />;

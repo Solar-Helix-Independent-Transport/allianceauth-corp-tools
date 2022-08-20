@@ -1,40 +1,20 @@
 from __future__ import annotations
-from datetime import timedelta
-from lib2to3.pgen2 import token
-import re
-import sys
-from typing import List
-from unicodedata import category
-from xmlrpc.client import boolean
-from allianceauth import notifications
-from corptools import app_settings
-from corptools.task_helpers.update_tasks import fetch_location_name
-from django.utils.timezone import activate
-
-from ninja import NinjaAPI, Form, main
-from ninja.security import django_auth
-from ninja.responses import codes_4xx
-
-from django.core.exceptions import PermissionDenied
-from django.db.models import F, Sum, Q, Count
-from allianceauth.eveonline.models import EveCharacter
-from django.conf import settings
-from django.utils import timezone
-from esi.models import Token
-from corptools import models
-from corptools import tasks
-from corptools import schema
-from corptools import providers
-
-from django.db.models import Q
-
-import functools
 
 import logging
+import re
+from typing import List
+from xmlrpc.client import boolean
 
+from allianceauth.eveonline.models import EveCharacter
+from django.conf import settings
+from django.db.models import Count, F, Q, Sum
+from django.utils import timezone
+from esi.models import Token
+from ninja import Form, NinjaAPI
+from ninja.security import django_auth
 
-from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers
-
+from corptools import app_settings, models, providers, schema, tasks
+from corptools.task_helpers.update_tasks import fetch_location_name
 
 logger = logging.getLogger(__name__)
 

@@ -1,12 +1,13 @@
-from django.core.management.base import BaseCommand, CommandError
 import pprint
-from corptools.tasks import update_character
-from corptools.models import CharacterAudit
-from corptools import app_settings
-from esi.models import Token
-from allianceauth.eveonline.models import EveCharacter
 
+from allianceauth.eveonline.models import EveCharacter
+from django.core.management.base import BaseCommand, CommandError
+from esi.models import Token
 from tqdm import tqdm
+
+from corptools import app_settings
+from corptools.models import CharacterAudit
+from corptools.tasks import update_character
 
 
 class Command(BaseCommand):

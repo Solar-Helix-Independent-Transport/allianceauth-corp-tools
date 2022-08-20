@@ -17,7 +17,7 @@ const AccountList = () => {
     () => loadAccountList(),
     {
       initialData: [],
-    }
+    },
   );
 
   const columns = React.useMemo(
@@ -102,7 +102,7 @@ const AccountList = () => {
         },
       },
     ],
-    []
+    [],
   );
 
   const filterOptions = [
@@ -121,7 +121,7 @@ const AccountList = () => {
   if (!isLoading && filter_inactive) {
     tableData = tableData.filter(
       (acct) =>
-        !acct.characters.reduce((result, char) => result && char.active, true)
+        !acct.characters.reduce((result, char) => result && char.active, true),
     );
   }
 

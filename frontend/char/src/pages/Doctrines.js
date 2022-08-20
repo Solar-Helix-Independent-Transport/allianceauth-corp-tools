@@ -10,7 +10,7 @@ import { DoctrineCheck } from "../components/skills/DoctrineCheck";
 
 const CharDoctrines = ({ character_id }) => {
   const { isLoading, error, data } = useQuery(["doctrines", character_id], () =>
-    loadDoctrines(character_id)
+    loadDoctrines(character_id),
   );
 
   if (isLoading) return <PanelLoader />;

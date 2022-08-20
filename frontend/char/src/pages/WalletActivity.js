@@ -18,7 +18,7 @@ const CharWalletActivity = ({ character_id }) => {
     () => loadWalletActivity(character_id),
     {
       initialData: [],
-    }
+    },
   );
 
   const columns = React.useMemo(
@@ -68,7 +68,7 @@ const CharWalletActivity = ({ character_id }) => {
         Cell: (props) => <div> {props.value.toLocaleString()} </div>,
       },
     ],
-    []
+    [],
   );
 
   if (isLoading) return <PanelLoader />;

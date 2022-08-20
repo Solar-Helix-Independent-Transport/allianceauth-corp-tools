@@ -1,8 +1,10 @@
-from unittest import mock
-from django.test import TestCase
-from django import forms
 import json
-from corptools.templatetags import helpers, colors
+from unittest import mock
+
+from django import forms
+from django.test import TestCase
+
+from corptools.templatetags import colors, helpers
 
 
 class test_form(forms.Form):

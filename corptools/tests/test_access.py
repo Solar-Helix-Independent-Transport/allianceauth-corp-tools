@@ -1,11 +1,12 @@
 from unittest import mock
-from django.test import TestCase
-from allianceauth.tests.auth_utils import AuthUtils
-from ..models import CharacterAudit
-from django.contrib.auth.models import Permission
 
-from allianceauth.eveonline.models import EveCharacter
 from allianceauth.authentication.models import CharacterOwnership
+from allianceauth.eveonline.models import EveCharacter
+from allianceauth.tests.auth_utils import AuthUtils
+from django.contrib.auth.models import Permission
+from django.test import TestCase
+
+from ..models import CharacterAudit
 
 
 class TestCorptoolsAccessPerms(TestCase):

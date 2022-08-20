@@ -16,7 +16,7 @@ const CharContacts = ({ character_id }) => {
     () => loadContacts(character_id),
     {
       initialData: [],
-    }
+    },
   );
 
   const columns = React.useMemo(
@@ -69,7 +69,7 @@ const CharContacts = ({ character_id }) => {
         disableSortBy: true,
       },
     ],
-    []
+    [],
   );
 
   return (

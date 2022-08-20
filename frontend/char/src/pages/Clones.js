@@ -17,7 +17,7 @@ function MyTooltip({ message }) {
 const CharClones = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["clones", character_id],
-    () => loadClones(character_id)
+    () => loadClones(character_id),
   );
 
   if (isLoading) return <PanelLoader />;

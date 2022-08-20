@@ -14,7 +14,7 @@ const colourStyles = {
 
 const CharAssetLocSelect = ({ corporation_id, setLocation }) => {
   const { isLoading, data } = useQuery(["asset_loc", corporation_id], () =>
-    loadAssetLocations(corporation_id)
+    loadAssetLocations(corporation_id),
   );
 
   return (

@@ -12,7 +12,7 @@ const CorpWalletTable = ({ corporation_id, refTypes = "", page = 1 }) => {
     {
       initialData: [],
       refetchOnWindowFocus: false,
-    }
+    },
   );
 
   const columns = React.useMemo(
@@ -63,7 +63,7 @@ const CorpWalletTable = ({ corporation_id, refTypes = "", page = 1 }) => {
         filter: "text",
       },
     ],
-    []
+    [],
   );
 
   return (

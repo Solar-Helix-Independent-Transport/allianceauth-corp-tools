@@ -12,7 +12,7 @@ import { PortraitPanel } from "../components/PortraitPanel";
 const CharStatus = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["status", character_id],
-    () => loadStatus(character_id)
+    () => loadStatus(character_id),
   );
 
   if (isLoading) return <PanelLoader />;

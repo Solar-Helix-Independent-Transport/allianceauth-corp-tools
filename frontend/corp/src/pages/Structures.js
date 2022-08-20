@@ -23,7 +23,7 @@ export const CorpStructures = () => {
     () => loadStructures(),
     {
       initialData: [],
-    }
+    },
   );
 
   const valueSort = React.useMemo(
@@ -35,7 +35,7 @@ export const CorpStructures = () => {
       }
       return a > b ? 1 : -1;
     },
-    []
+    [],
   );
 
   const columns = React.useMemo(
@@ -107,7 +107,7 @@ export const CorpStructures = () => {
               options={[{ id: -1, value: "", label: "All" }].concat(
                 options.map((o, i) => {
                   return { id: i, value: o, label: o };
-                })
+                }),
               )}
             />
           );
@@ -185,7 +185,7 @@ export const CorpStructures = () => {
               options={[{ id: -1, value: "", label: "All" }].concat(
                 options.map((o, i) => {
                   return { id: i, value: o, label: o };
-                })
+                }),
               )}
             />
           );
@@ -225,7 +225,7 @@ export const CorpStructures = () => {
           ),
       },
     ],
-    [valueSort]
+    [valueSort],
   );
 
   return (

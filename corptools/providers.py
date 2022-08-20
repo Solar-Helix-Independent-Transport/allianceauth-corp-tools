@@ -1,9 +1,10 @@
-from esi.clients import EsiClientProvider
-from .task_helpers.skill_helpers import SkillListCache
+import re
 
 import networkx as nx
 from django.utils import timezone
-import re
+from esi.clients import EsiClientProvider
+
+from .task_helpers.skill_helpers import SkillListCache
 
 
 class CorpToolsESIClient(EsiClientProvider):
@@ -45,7 +46,7 @@ class CorpToolsESIClient(EsiClientProvider):
         return group
 
     def _get_eve_type(self, type_id, updates=False):
-        from corptools.models import EveItemType, EveItemDogmaAttribute
+        from corptools.models import EveItemDogmaAttribute, EveItemType
 
         eve_type = self.client.Universe.get_universe_types_type_id(
             type_id=type_id).result()
@@ -164,7 +165,7 @@ class EveRouter():
     def bulid_graph(self):
         self.G.clear()
         #logger.debug("Graph cleared.")
-        from .models import MapSystemGate, MapSystem, MapJumpBridge
+        from .models import MapJumpBridge, MapSystem, MapSystemGate
 
         systems = MapSystem.objects.values_list('system_id', flat=True)
         gates = MapSystemGate.objects.values_list(
@@ -183,7 +184,8 @@ class EveRouter():
         self.last_update = timezone.now()
 
     def route(self, source_id, destination_id):
-        from .models import MapSystem, MapJumpBridge
+        from .models import MapJumpBridge, MapSystem
+
         # logger.debug("----------")
         #logger.debug(f"Source: {source_id}")
         #logger.debug(f"Destination: {destination_id}")

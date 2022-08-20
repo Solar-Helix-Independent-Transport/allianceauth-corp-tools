@@ -22,7 +22,7 @@ export const ActivityChord = ({ data }) => {
         minSize: 0.03,
         padAngle: 3,
         radius: am5.percent(70),
-      })
+      }),
     );
 
     series.links.template.set("fillStyle", "source");
@@ -38,7 +38,7 @@ export const ActivityChord = ({ data }) => {
     series.nodes.data.setAll(
       [...headers].map((a) => {
         return { id: a };
-      })
+      }),
     );
 
     series.nodes.get("colors").set("step", 2);

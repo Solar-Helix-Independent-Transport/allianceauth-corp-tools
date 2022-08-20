@@ -18,7 +18,7 @@ function MyTooltip({ message }) {
 
 const CorpStatus = () => {
   const { isLoading, error, data } = useQuery(["corp-status"], () =>
-    loadStatus()
+    loadStatus(),
   );
 
   if (isLoading) return <PanelLoader />;

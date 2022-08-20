@@ -1,10 +1,12 @@
-from django.urls import re_path, include
+from django.urls import include, re_path
 
-from . import views
-from corptools.audit_views.character import assets, wallet, pub_data, contacts, skills, clones, assets_lists, roles, market, status, notifications
+from corptools.audit_views.character import (assets, assets_lists, clones,
+                                             contacts, market, notifications,
+                                             pub_data, roles, skills, status,
+                                             wallet)
 from corptools.audit_views.corporation import corp_list
-from . import app_settings
 
+from . import app_settings, views
 from .api import api
 
 app_name = 'corptools'

@@ -1,5 +1,6 @@
-from django.urls import re_path
 import allianceauth.urls
+from django.urls import re_path
+
 from . import views
 
 urlpatterns = allianceauth.urls.urlpatterns

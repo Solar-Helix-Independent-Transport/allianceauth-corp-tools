@@ -10,7 +10,7 @@ import "./CorpHeader.css";
 
 const CorpHeader = ({ corporation_id }) => {
   const { isLoading, data } = useQuery(["status"], () =>
-    loadCorpStatus(corporation_id)
+    loadCorpStatus(corporation_id),
   );
 
   return (

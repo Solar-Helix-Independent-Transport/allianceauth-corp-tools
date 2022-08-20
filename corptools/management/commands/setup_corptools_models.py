@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from corptools.tasks import update_or_create_map, process_ores_from_esi, update_ore_comp_table
 from corptools.models import OreTaxRates
+from corptools.tasks import (process_ores_from_esi, update_or_create_map,
+                             update_ore_comp_table)
 
 
 class Command(BaseCommand):

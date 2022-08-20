@@ -16,7 +16,7 @@ const CharSkills = ({ character_id }) => {
   const [level_filter, setLevel] = useState(-1);
 
   const { isLoading, error, data } = useQuery(["skills", character_id], () =>
-    loadSkills(character_id)
+    loadSkills(character_id),
   );
 
   if (isLoading) return <PanelLoader />;
@@ -28,14 +28,14 @@ const CharSkills = ({ character_id }) => {
     return <PanelLoader />;
   } else {
     let char_data = data.filter(
-      (obj) => obj.character.character_id === parseInt(char_id)
+      (obj) => obj.character.character_id === parseInt(char_id),
     );
 
     let skill_data = char_data[0].skills;
 
     if (group_filter !== "" && group_filter !== "All") {
       skill_data = skill_data.filter((o) =>
-        o.group.toLowerCase().includes(group_filter.toLowerCase())
+        o.group.toLowerCase().includes(group_filter.toLowerCase()),
       );
     }
 
@@ -45,7 +45,7 @@ const CharSkills = ({ character_id }) => {
 
     if (skill_filter !== "") {
       skill_data = skill_data.filter((o) =>
-        o.skill.toLowerCase().includes(skill_filter.toLowerCase())
+        o.skill.toLowerCase().includes(skill_filter.toLowerCase()),
       );
     }
     let charOptions = data.map((char) => {
@@ -98,7 +98,7 @@ const CharSkills = ({ character_id }) => {
           value: grp,
           label: grp,
         };
-      })
+      }),
     );
 
     return (

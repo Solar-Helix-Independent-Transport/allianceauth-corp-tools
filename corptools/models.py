@@ -1,31 +1,28 @@
+import datetime
+import json
 import logging
 import os
-import json
-import datetime
-from pyexpat import model
+from collections import defaultdict
 
 from allianceauth.authentication.models import CharacterOwnership, UserProfile
-from django.db import models
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils import timezone
+from allianceauth.eveonline.evelinks import eveimageserver
+from allianceauth.eveonline.models import (EveAllianceInfo, EveCharacter,
+                                           EveCorporationInfo)
+from allianceauth.notifications import notify
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db import models
 from django.db.models import Count, Max
-from collections import defaultdict
-from django.core.exceptions import ValidationError
-
+from django.utils import timezone
 from esi.errors import TokenError
 from esi.models import Token
-from allianceauth.eveonline.models import EveCorporationInfo, EveCharacter, EveAllianceInfo
-from allianceauth.eveonline.evelinks import eveimageserver
-from allianceauth.notifications import notify
-
-from .managers import EveNameManager, EveItemTypeManager, EveGroupManager, \
-    EveCategoryManager, AuditCharacterManager, EveMoonManager, AuditCorporationManager
-from . import providers
-from . import validators
-from . import app_settings
-
 from model_utils import Choices
+from pyexpat import model
+
+from . import app_settings, providers, validators
+from .managers import (AuditCharacterManager, AuditCorporationManager,
+                       EveCategoryManager, EveGroupManager, EveItemTypeManager,
+                       EveMoonManager, EveNameManager)
 
 logger = logging.getLogger(__name__)
 

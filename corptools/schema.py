@@ -1,9 +1,10 @@
 from __future__ import division
-from datetime import datetime
-from xmlrpc.client import boolean
-from ninja import Schema
 
-from typing import Optional, List, Dict
+from datetime import datetime
+from typing import Dict, List, Optional
+from xmlrpc.client import boolean
+
+from ninja import Schema
 
 
 class Message(Schema):

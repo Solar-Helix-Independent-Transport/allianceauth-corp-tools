@@ -1,11 +1,9 @@
 from celery import app
-from django.contrib import admin
-
-from . import models
 from django.conf import settings
-from . import app_settings
-
+from django.contrib import admin
 from django.utils.html import format_html
+
+from . import app_settings, models
 
 admin.site.register(models.CorptoolsConfiguration)
 admin.site.register(models.CharacterAudit)

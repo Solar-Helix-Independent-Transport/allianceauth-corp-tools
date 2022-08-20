@@ -1,16 +1,19 @@
-import logging
-import requests
 import bz2
 import json
-
-from bravado.exception import HTTPForbidden
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from esi.models import Token
-from corptools import providers
-from corptools.models import MapConstellation, MapRegion, MapSystem, InvTypeMaterials, EveItemCategory, EveItemGroup, EveItemType, EveItemDogmaAttribute, EveLocation, MapSystemGate
-from django.core.cache import cache
-
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+import requests
+from bravado.exception import HTTPForbidden
+from django.core.cache import cache
+from esi.models import Token
+
+from corptools import providers
+from corptools.models import (EveItemCategory, EveItemDogmaAttribute,
+                              EveItemGroup, EveItemType, EveLocation,
+                              InvTypeMaterials, MapConstellation, MapRegion,
+                              MapSystem, MapSystemGate)
+
 logger = logging.getLogger(__name__)
 
 #from celery.utils.debug import sample_mem, memdump

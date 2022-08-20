@@ -151,7 +151,7 @@ export function SelectColumnFilter({
       options={[{ id: -1, value: "", label: "All" }].concat(
         options.map((o, i) => {
           return { id: i, value: o, label: o };
-        })
+        }),
       )}
     />
   );
@@ -179,7 +179,7 @@ export const BaseTable = ({
       // Let's set up our default Filter UI
       Filter: DefaultColumnFilter,
     }),
-    []
+    [],
   );
 
   const filterTypes = React.useMemo(
@@ -207,7 +207,7 @@ export const BaseTable = ({
         });
       },
     }),
-    []
+    [],
   );
 
   const {
@@ -240,7 +240,7 @@ export const BaseTable = ({
     useFilters,
     useSortBy,
     useExpanded,
-    usePagination
+    usePagination,
   );
 
   if (isLoading)

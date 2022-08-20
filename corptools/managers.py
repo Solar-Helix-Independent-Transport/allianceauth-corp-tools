@@ -1,9 +1,11 @@
-from django.db import models
-from django.core.exceptions import ObjectDoesNotExist
 import logging
 
+from allianceauth.eveonline.models import (EveAllianceInfo, EveCharacter,
+                                           EveCorporationInfo)
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 from esi.clients import esi_client_factory
-from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo, EveAllianceInfo
+
 from . import providers
 
 logger = logging.getLogger(__name__)
@@ -151,13 +153,14 @@ class EveItemTypeManager(models.Manager):
 
     def create_bulk_from_esi(self, eve_ids):
         """gets or creates with ESI"""
-        from corptools.task_helpers.update_tasks import process_bulk_types_from_esi
+        from corptools.task_helpers.update_tasks import \
+            process_bulk_types_from_esi
         created = process_bulk_types_from_esi(eve_ids)
         return created
 
     def update_or_create_from_esi(self, eve_id):
         """updates or create with ESI"""
-        from corptools.models import EveItemGroup, EveItemDogmaAttribute
+        from corptools.models import EveItemDogmaAttribute, EveItemGroup
 
         try:
             response, dogma = providers.esi._get_eve_type(eve_id, False)

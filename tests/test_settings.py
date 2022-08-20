@@ -4,7 +4,6 @@ Alliance Auth Test Suite Django settings.
 
 from allianceauth.project_template.project_name.settings.base import *
 
-
 # Celery configuration
 CELERY_ALWAYS_EAGER = True  # Forces celery to run locally for testing
 

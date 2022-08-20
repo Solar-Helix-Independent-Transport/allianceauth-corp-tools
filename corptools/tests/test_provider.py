@@ -1,8 +1,12 @@
-from unittest import mock
-from django.test import TestCase
 import json
+from unittest import mock
+
+from django.test import TestCase
+
 from corptools import providers
-from ..models import EveItemCategory, EveItemGroup, EveItemType, EveItemDogmaAttribute
+
+from ..models import (EveItemCategory, EveItemDogmaAttribute, EveItemGroup,
+                      EveItemType)
 
 
 class TestEveCategory(TestCase):

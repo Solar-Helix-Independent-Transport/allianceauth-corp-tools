@@ -11,7 +11,7 @@ const CharNotifications = ({ character_id }) => {
     () => loadNotifications(character_id),
     {
       initialData: [],
-    }
+    },
   );
 
   const columns = React.useMemo(
@@ -38,7 +38,7 @@ const CharNotifications = ({ character_id }) => {
         accessor: "notification_text",
       },
     ],
-    []
+    [],
   );
 
   return (

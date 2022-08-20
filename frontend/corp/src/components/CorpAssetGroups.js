@@ -11,7 +11,7 @@ import { CorpLoader } from "./NoCorp";
 const CharAssetGroups = ({ corporation_id = 0, location_id = 0 }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["assetGroups", corporation_id, location_id],
-    () => loadAssetGroups(corporation_id, location_id)
+    () => loadAssetGroups(corporation_id, location_id),
   );
 
   if (corporation_id === 0) return <CorpLoader />;

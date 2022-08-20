@@ -1,10 +1,10 @@
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
-from corptools.models import Notification, CharacterMarketOrder
 from django.utils import timezone
 
-import logging
+from corptools.models import CharacterMarketOrder, Notification
+
 logger = logging.getLogger(__name__)
 
 NOTIFICAITON_PURGE_TYPES = [

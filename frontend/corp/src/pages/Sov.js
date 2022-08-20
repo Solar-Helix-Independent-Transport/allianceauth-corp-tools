@@ -19,7 +19,7 @@ const colourStyles = {
 export const Sov = () => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["sov"],
-    () => loadSov() //,
+    () => loadSov(), //,
     //{ initialData: [] }
   );
   const [regionFilter, setRegion] = useState("");
@@ -132,7 +132,7 @@ export const Sov = () => {
                 label: u,
               };
             }).sort((a, b) =>
-              a.value > b.value ? 1 : b.value > a.value ? -1 : 0
+              a.value > b.value ? 1 : b.value > a.value ? -1 : 0,
             )}
             isLoading={isFetching}
             isMulti={true}
@@ -153,7 +153,7 @@ export const Sov = () => {
                 label: u,
               };
             }).sort((a, b) =>
-              a.value > b.value ? 1 : b.value > a.value ? -1 : 0
+              a.value > b.value ? 1 : b.value > a.value ? -1 : 0,
             )}
             isLoading={isFetching}
             isMulti={true}
@@ -174,7 +174,7 @@ export const Sov = () => {
                 label: u,
               };
             }).sort((a, b) =>
-              a.value > b.value ? 1 : b.value > a.value ? -1 : 0
+              a.value > b.value ? 1 : b.value > a.value ? -1 : 0,
             )}
             isLoading={isFetching}
             isMulti={true}
@@ -195,7 +195,7 @@ export const Sov = () => {
                 label: u,
               };
             }).sort((a, b) =>
-              a.value > b.value ? 1 : b.value > a.value ? -1 : 0
+              a.value > b.value ? 1 : b.value > a.value ? -1 : 0,
             )}
             isLoading={isFetching}
             isMulti={true}
@@ -209,7 +209,7 @@ export const Sov = () => {
               ? 1
               : b.system.name > a.system.name
               ? -1
-              : 0
+              : 0,
           )
           .map((system) => {
             return (
@@ -248,7 +248,7 @@ export const Sov = () => {
                       <tbody>
                         {system.upgrades
                           .sort((a, b) =>
-                            a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+                            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
                           )
                           .map((u) => {
                             if (upgradesFilter.length) {

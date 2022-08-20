@@ -14,7 +14,7 @@ import { CorpLoader } from "./NoCorp";
 function SubRowAsync({ row, rowProps, visibleColumns }) {
   const { isLoading, error, data } = useQuery(
     ["lazy-load", row.original.id],
-    () => loadAssetContents(row.original.id)
+    () => loadAssetContents(row.original.id),
   );
 
   if (!isLoading) {
@@ -37,7 +37,7 @@ const CorpAssetTable = ({ corporation_id, new_type, location_id = 0 }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["assetList", corporation_id, location_id, new_type],
     () => loadAssetList(corporation_id, location_id, new_type),
-    { initialData: [] }
+    { initialData: [] },
   );
   const renderRowSubComponent = React.useCallback(
     ({ row, rowProps, visibleColumns }) => (
@@ -47,7 +47,7 @@ const CorpAssetTable = ({ corporation_id, new_type, location_id = 0 }) => {
         visibleColumns={visibleColumns}
       />
     ),
-    []
+    [],
   );
 
   const columns = React.useMemo(
@@ -94,7 +94,7 @@ const CorpAssetTable = ({ corporation_id, new_type, location_id = 0 }) => {
         filter: "includes",
       },
     ],
-    []
+    [],
   );
 
   if (corporation_id === 0) return <CorpLoader />;

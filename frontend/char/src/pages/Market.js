@@ -11,7 +11,7 @@ const CharMarket = ({ character_id }) => {
     () => loadMarket(character_id),
     {
       initialData: [],
-    }
+    },
   );
 
   const columns = React.useMemo(
@@ -54,7 +54,7 @@ const CharMarket = ({ character_id }) => {
         ),
       },
     ],
-    []
+    [],
   );
   let active = [];
   let expired = [];

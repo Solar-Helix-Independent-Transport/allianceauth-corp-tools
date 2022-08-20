@@ -10,7 +10,7 @@ const CharSkillBlocks = ({ data }) => {
         ...hash,
         [obj[key]]: (hash[obj[key]] || []).concat(obj),
       }),
-      {}
+      {},
     );
 
   let skills_data = groupByKey(data, "group");

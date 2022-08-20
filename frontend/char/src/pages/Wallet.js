@@ -15,7 +15,7 @@ const CharWallet = ({ character_id }) => {
     () => loadWallet(character_id),
     {
       initialData: [],
-    }
+    },
   );
 
   const columns = React.useMemo(
@@ -66,7 +66,7 @@ const CharWallet = ({ character_id }) => {
         filter: "text",
       },
     ],
-    []
+    [],
   );
 
   return (

@@ -11,7 +11,7 @@ export const Bridges = () => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["bridges"],
     () => loadBridges(),
-    { initialData: [] }
+    { initialData: [] },
   );
 
   if (isLoading) return <PanelLoader />;

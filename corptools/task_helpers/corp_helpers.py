@@ -1,22 +1,24 @@
-from locale import currency
 import logging
-from celery import chain, shared_task
-from corptools.task_helpers.etag_helpers import NotModifiedError, etag_results
-from corptools.task_helpers.update_tasks import fetch_location_name
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db.models.aggregates import Sum
-from django.db.models import Q, F
-from ..models import BridgeOzoneLevel, CorpAsset, CorporationWalletJournalEntry, CorporationAudit, CorporationWalletDivision, EveItemType, EveLocation, EveName, Structure, StructureCelestial, StructureService
-
-from allianceauth.eveonline.models import EveCharacter
-
-from esi.models import Token
-from django.utils import timezone
-from allianceauth.services.tasks import QueueOnce
-
-from .. import providers
+from locale import currency
 
 import requests
+from allianceauth.eveonline.models import EveCharacter
+from allianceauth.services.tasks import QueueOnce
+from celery import chain, shared_task
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.db.models import F, Q
+from django.db.models.aggregates import Sum
+from django.utils import timezone
+from esi.models import Token
+
+from corptools.task_helpers.etag_helpers import NotModifiedError, etag_results
+from corptools.task_helpers.update_tasks import fetch_location_name
+
+from .. import providers
+from ..models import (BridgeOzoneLevel, CorpAsset, CorporationAudit,
+                      CorporationWalletDivision, CorporationWalletJournalEntry,
+                      EveItemType, EveLocation, EveName, Structure,
+                      StructureCelestial, StructureService)
 
 logger = logging.getLogger(__name__)
 

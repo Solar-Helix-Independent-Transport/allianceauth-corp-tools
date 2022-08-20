@@ -1,18 +1,20 @@
 import logging
+
 from bravado import exception
 from celery import shared_task
 from django.core.cache import cache
-from ..models import CharacterAudit, CorporationHistory, EveName, NotificationText, SkillQueue, \
-    Skill, EveItemType, CharacterAsset, CharacterWalletJournalEntry, \
-    SkillTotals, Implant, JumpClone, Clone, EveLocation, CharacterMarketOrder, \
-    Notification, CharacterRoles, MailLabel, MailMessage, MailRecipient, \
-    CharacterContact, CharacterContactLabel, CharacterTitle
-
-from esi.models import Token
 from django.utils import timezone
+from esi.models import Token
 
 from .. import providers
-from .etag_helpers import etag_results, NotModifiedError
+from ..models import (CharacterAsset, CharacterAudit, CharacterContact,
+                      CharacterContactLabel, CharacterMarketOrder,
+                      CharacterRoles, CharacterTitle,
+                      CharacterWalletJournalEntry, Clone, CorporationHistory,
+                      EveItemType, EveLocation, EveName, Implant, JumpClone,
+                      MailLabel, MailMessage, MailRecipient, Notification,
+                      NotificationText, Skill, SkillQueue, SkillTotals)
+from .etag_helpers import NotModifiedError, etag_results
 
 logger = logging.getLogger(__name__)
 

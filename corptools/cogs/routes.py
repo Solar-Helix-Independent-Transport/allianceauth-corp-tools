@@ -1,16 +1,18 @@
 # Cog Stuff
-from discord.ext import commands
-from discord.embeds import Embed
+import json
+import logging
+import traceback
+
 from discord.colour import Color
+from discord.embeds import Embed
+from discord.ext import commands
 # AA Contexts
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from corptools.models import MapSystem, MapJumpBridge
-from corptools.providers import routes
-import logging
-import json
 
-import traceback
+from corptools.models import MapJumpBridge, MapSystem
+from corptools.providers import routes
+
 logger = logging.getLogger(__name__)
 
 

@@ -1,27 +1,34 @@
+import csv
+import json
 import os
+import re
+import xml.etree.ElementTree as ET
+from itertools import chain
+
+from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 from bravado.exception import HTTPError
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.contrib.auth.decorators import (login_required,
+                                            permission_required,
+                                            user_passes_test)
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import Count
-from django.shortcuts import render, redirect, get_object_or_404
-from django.utils.translation import gettext_lazy as _
-from esi.decorators import _check_callback, token_required
-from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 from django.http import HttpResponse
-import xml.etree.ElementTree as ET
-import csv
-import re
-import json
-from itertools import chain
-from .models import *
-from .tasks import update_character, update_all_characters, update_ore_comp_table, update_or_create_map, process_ores_from_esi, update_corp, update_all_corps, check_account, update_all_eve_names
-from .forms import UploadForm
-from . import app_settings
-from django_celery_beat.models import CrontabSchedule, PeriodicTask
-from esi.views import sso_redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+from django_celery_beat.models import CrontabSchedule, PeriodicTask
+from esi.decorators import _check_callback, token_required
+from esi.views import sso_redirect
+
+from . import app_settings
+from .forms import UploadForm
+from .models import *
+from .tasks import (check_account, process_ores_from_esi,
+                    update_all_characters, update_all_corps,
+                    update_all_eve_names, update_character, update_corp,
+                    update_or_create_map, update_ore_comp_table)
 
 CORP_REQUIRED_SCOPES = [
 

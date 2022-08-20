@@ -13,7 +13,7 @@ import { PortraitPanel } from "../components/PortraitPanel";
 const CharSkillQueue = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["skillqueue", character_id],
-    () => loadSkillQueues(character_id)
+    () => loadSkillQueues(character_id),
   );
   const [activeFilter, setActive] = useState(true);
   const [pausedFilter, setPaused] = useState(true);

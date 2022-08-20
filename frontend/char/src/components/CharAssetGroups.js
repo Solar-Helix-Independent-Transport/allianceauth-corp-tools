@@ -10,7 +10,7 @@ import ErrorBoundary from "./ErrorBoundary";
 const CharAssetGroups = ({ character_id, location_id = 0 }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["assetGroups", character_id, location_id],
-    () => loadAssetGroups(character_id, location_id)
+    () => loadAssetGroups(character_id, location_id),
   );
 
   if (isLoading) return <PanelLoader />;

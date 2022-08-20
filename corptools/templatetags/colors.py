@@ -1,6 +1,8 @@
-import random
 import colorsys
+import random
+
 from django import template
+
 register = template.Library()
 
 

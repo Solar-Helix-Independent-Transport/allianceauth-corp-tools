@@ -1,13 +1,16 @@
-from unittest import mock
-from django.test import TestCase
-from allianceauth.tests.auth_utils import AuthUtils
-from allianceauth.eveonline.models import EveCharacter, EveAllianceInfo, EveCorporationInfo
-from allianceauth.authentication.models import CharacterOwnership
-from django.utils import timezone
 from datetime import timedelta
-from corptools import models as ct_models
-from django.contrib.auth.models import User, Group
+from unittest import mock
+
+from allianceauth.authentication.models import CharacterOwnership
+from allianceauth.eveonline.models import (EveAllianceInfo, EveCharacter,
+                                           EveCorporationInfo)
+from allianceauth.tests.auth_utils import AuthUtils
+from django.contrib.auth.models import Group, User
 from django.core.cache import cache
+from django.test import TestCase
+from django.utils import timezone
+
+from corptools import models as ct_models
 
 
 class TestSecGroupBotFilters(TestCase):

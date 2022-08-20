@@ -14,7 +14,7 @@ function SubRowAsync({ row, rowProps, visibleColumns }) {
   const { isLoading, error, data } = useQuery(
     ["lazy-load", row.original.id],
     () =>
-      loadAssetContents(row.original.character.character_id, row.original.id)
+      loadAssetContents(row.original.character.character_id, row.original.id),
   );
 
   if (!isLoading) {
@@ -37,7 +37,7 @@ const CharAssetTable = ({ character_id, location_id = 0 }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["assetList", character_id, location_id],
     () => loadAssetList(character_id, location_id),
-    { initialData: [] }
+    { initialData: [] },
   );
   const renderRowSubComponent = React.useCallback(
     ({ row, rowProps, visibleColumns }) => (
@@ -47,7 +47,7 @@ const CharAssetTable = ({ character_id, location_id = 0 }) => {
         visibleColumns={visibleColumns}
       />
     ),
-    []
+    [],
   );
 
   const columns = React.useMemo(
@@ -101,7 +101,7 @@ const CharAssetTable = ({ character_id, location_id = 0 }) => {
         filter: "includes",
       },
     ],
-    []
+    [],
   );
 
   return (

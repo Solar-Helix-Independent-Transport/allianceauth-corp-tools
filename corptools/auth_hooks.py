@@ -1,9 +1,8 @@
+from allianceauth import hooks
 from allianceauth.services.hooks import MenuItemHook, UrlHook
 from django.utils.translation import gettext_lazy as _
-from allianceauth import hooks
-from . import urls
-from . import models
-from . import app_settings
+
+from . import app_settings, models, urls
 
 
 class MemberAudit(MenuItemHook):
