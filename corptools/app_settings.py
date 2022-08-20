@@ -22,6 +22,7 @@ CT_CHAR_CLONES_MODULE = getattr(settings, 'CT_CHAR_CLONES_MODULE', True)
 CT_CHAR_LOCATIONS_MODULE = getattr(settings, 'CT_CHAR_LOCATIONS_MODULE', True)
 CT_CHAR_MAIL_MODULE = getattr(settings, 'CT_CHAR_MAIL_MODULE', False)
 CT_CHAR_HELPER_MODULE = getattr(settings, 'CT_CHAR_HELPER_MODULE', True)
+CT_CHAR_OPPORTUNITIES = getattr(settings, 'CT_CHAR_OPPORTUNITIES', True)
 
 CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE', False)
@@ -61,7 +62,6 @@ def get_character_scopes():
     _scopes = [
         # Base
         'publicData',
-        'esi-characters.read_opportunities.v1',
     ]
 
     if CT_CHAR_HELPER_MODULE:
@@ -168,6 +168,11 @@ def get_character_scopes():
         _scopes += [
             # Mail
             'esi-mail.read_mail.v1',
+        ]
+
+    if CT_CHAR_OPPORTUNITIES:
+        _scopes += [
+            'esi-characters.read_opportunities.v1',
         ]
 
     if CT_CHAR_CLONES_MODULE or CT_CHAR_ASSETS_MODULE or CT_CHAR_WALLET_MODULE or CT_CHAR_MINING_MODULE:
