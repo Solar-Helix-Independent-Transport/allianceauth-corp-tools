@@ -300,3 +300,7 @@ _corp_scopes_assets = [
 CORP_REQUIRED_SCOPES = _corp_scopes_base+_corp_scopes_tracking + \
     _corp_scopes_structures+_corp_scopes_moons + \
     _corp_scopes_wallets+_corp_scopes_assets
+
+
+CT_PAGINATION_SIZE = getattr(
+    settings, 'CT_PAGINATION_SIZE', 30000)

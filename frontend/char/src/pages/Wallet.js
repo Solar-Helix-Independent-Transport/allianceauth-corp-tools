@@ -14,7 +14,7 @@ const CharWallet = ({ character_id }) => {
     ["wallet", character_id],
     () => loadWallet(character_id),
     {
-      initialData: [],
+      initialData: { items: [], count: 0 },
     },
   );
 
@@ -72,7 +72,10 @@ const CharWallet = ({ character_id }) => {
   return (
     <ErrorBoundary>
       <Panel.Body>
-        <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
+        <BaseTable
+          data={data["items"]}
+          {...{ isLoading, isFetching, columns, error }}
+        />
       </Panel.Body>
     </ErrorBoundary>
   );

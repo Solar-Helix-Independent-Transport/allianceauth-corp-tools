@@ -14,16 +14,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write("Confirming DB models!")
-        if OreTaxRates.objects.all().count() == 0:
-            OreTaxRates.objects.create(
-                tag="Ore Tax",
-                ore_rate=0.2,
-                ubiquitous_rate=0.2,
-                common_rate=0.2,
-                uncommon_rate=0.2,
-                rare_rate=0.2,
-                excptional_rate=0.2
-            )
 
         if options['inline']:
             self.stdout.write("Running Tasks inline this may take some time!")

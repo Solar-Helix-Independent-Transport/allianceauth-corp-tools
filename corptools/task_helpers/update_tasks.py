@@ -258,7 +258,6 @@ def process_category_from_esi(category_id):
 
 
 def process_bulk_types_from_esi(type_ids, update_models=False):
-
     _items = set(type_ids)
     _items_processed = []
     _items_models_creates = []

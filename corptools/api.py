@@ -7,16 +7,37 @@ from xmlrpc.client import boolean
 
 from allianceauth.eveonline.models import EveCharacter
 from django.conf import settings
-from django.db.models import Count, F, Q, Sum
+from django.db.models import Count, F, Q, QuerySet, Sum
 from django.utils import timezone
 from esi.models import Token
-from ninja import Form, NinjaAPI
+from ninja import Field, Form, NinjaAPI, Schema
+from ninja.pagination import LimitOffsetPagination, paginate
 from ninja.security import django_auth
+from ninja.types import DictStrAny
 
 from corptools import app_settings, models, providers, schema, tasks
 from corptools.task_helpers.update_tasks import fetch_location_name
 
 logger = logging.getLogger(__name__)
+
+
+class Paginator(LimitOffsetPagination):
+    class Input(Schema):
+        limit: int = Field(app_settings.CT_PAGINATION_SIZE, ge=1)
+        offset: int = Field(0, ge=0)
+
+    def paginate_queryset(
+        self,
+        queryset: QuerySet,
+        pagination: Input,
+        **params: DictStrAny,
+    ) -> Any:
+        offset = pagination.offset
+        limit: int = pagination.limit
+        return {
+            "items": queryset[offset: offset + limit],
+            "count": self._items_count(queryset),
+        }  # noqa: E203
 
 
 api = NinjaAPI(title="CorpTools API", version="0.0.1",
@@ -629,7 +650,8 @@ def get_character_roles(request, character_id: int):
     response={200: List[schema.CharacterWalletEvent], 403: schema.Message},
     tags=["Account"]
 )
-def get_character_wallet(request, character_id: int):
+@paginate(Paginator)
+def get_character_wallet(request, character_id: int, **kwargs):
     if character_id == 0:
         character_id = request.user.profile.main_character.character_id
     response, main = get_main_character(request, character_id)
@@ -641,7 +663,7 @@ def get_character_wallet(request, character_id: int):
 
     wallet_journal = models.CharacterWalletJournalEntry.objects\
         .filter(character__character__in=characters)\
-        .select_related('first_party_name', 'second_party_name', 'character__character').order_by('-date')
+        .select_related('first_party_name', 'second_party_name', 'character__character').order_by('-date')[:35000]
 
     output = []
     for w in wallet_journal:
