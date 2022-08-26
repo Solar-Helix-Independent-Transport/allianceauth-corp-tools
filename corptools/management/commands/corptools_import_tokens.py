@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--minimal-scopes', action='store_true',
-                            help="Grab Tokens with Bare minimum scopes. Users may ahve to register to get full coverage")
+                            help="Grab Tokens with Bare minimum scopes. Users may have to register to get full coverage")
 
     def handle(self, *args, **options):
         self.stdout.write("Reading Settings!")

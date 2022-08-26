@@ -22,7 +22,7 @@ from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from esi.decorators import _check_callback, token_required
 from esi.views import sso_redirect
 
-from . import app_settings
+from . import __version__, app_settings
 from .forms import UploadForm
 from .models import *
 from .tasks import (check_account, process_ores_from_esi,
@@ -353,7 +353,7 @@ def react_menu(request):
 @login_required
 def react_main(request, character_id):
     # get available models
-    return render(request, 'corptools/character/react_base.html')
+    return render(request, 'corptools/character/react_base.html', context={"version": __version__})
 
 
 @login_required
