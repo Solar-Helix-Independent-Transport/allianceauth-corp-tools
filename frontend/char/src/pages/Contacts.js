@@ -16,6 +16,7 @@ const CharContacts = ({ character_id }) => {
     () => loadContacts(character_id),
     {
       initialData: [],
+      refetchOnWindowFocus: false,
     },
   );
 

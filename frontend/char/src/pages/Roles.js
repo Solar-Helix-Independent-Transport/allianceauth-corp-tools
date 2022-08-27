@@ -18,8 +18,10 @@ const Checkbox = ({ active }) => {
 };
 
 const CharRoles = ({ character_id }) => {
-  const { isLoading, error, data } = useQuery(["roles", character_id], () =>
-    loadRoles(character_id),
+  const { isLoading, error, data } = useQuery(
+    ["roles", character_id],
+    () => loadRoles(character_id),
+    { refetchOnWindowFocus: false },
   );
 
   if (isLoading) return <PanelLoader />;

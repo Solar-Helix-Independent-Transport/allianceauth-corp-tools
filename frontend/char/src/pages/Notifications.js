@@ -11,6 +11,7 @@ const CharNotifications = ({ character_id }) => {
     () => loadNotifications(character_id),
     {
       initialData: [],
+      refetchOnWindowFocus: false,
     },
   );
 

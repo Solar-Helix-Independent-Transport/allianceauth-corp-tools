@@ -18,6 +18,9 @@ const CharClones = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["clones", character_id],
     () => loadClones(character_id),
+    {
+      refetchOnWindowFocus: false,
+    },
   );
 
   if (isLoading) return <PanelLoader />;

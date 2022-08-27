@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import hashlib
 import logging
 import re
+from functools import wraps
 from typing import List
 from xmlrpc.client import boolean
 
@@ -46,6 +48,7 @@ api = NinjaAPI(title="CorpTools API", version="0.0.1",
 
 
 def cache_page_data(f):
+    @wraps(f)
     def decorator(*args, **kwargs):
         print(f)
         out = f(*args, **kwargs)
@@ -90,7 +93,6 @@ def get_alts_queryset(main_char):
     return EveCharacter.objects.filter(id__in=linked_characters)
 
 
-@cache_page_data
 @api.get(
     "account/{character_id}/status",
     response={200: schema.AccountStatus, 403: schema.Message},

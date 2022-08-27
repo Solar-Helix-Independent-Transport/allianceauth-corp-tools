@@ -11,6 +11,7 @@ const PubData = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["pubdata", character_id],
     () => loadPubData(character_id),
+    { refetchOnWindowFocus: false },
   );
 
   if (isLoading) return <PanelLoader />;

@@ -17,6 +17,7 @@ const AccountList = () => {
     () => loadAccountList(),
     {
       initialData: [],
+      refetchOnWindowFocus: false,
     },
   );
 

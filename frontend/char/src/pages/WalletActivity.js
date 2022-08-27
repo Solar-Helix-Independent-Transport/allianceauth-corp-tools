@@ -18,6 +18,7 @@ const CharWalletActivity = ({ character_id }) => {
     () => loadWalletActivity(character_id),
     {
       initialData: [],
+      refetchOnWindowFocus: false,
     },
   );
 

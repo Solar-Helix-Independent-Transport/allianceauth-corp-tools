@@ -15,8 +15,10 @@ const CharSkills = ({ character_id }) => {
   const [skill_filter, setFilter] = useState("");
   const [level_filter, setLevel] = useState(-1);
 
-  const { isLoading, error, data } = useQuery(["skills", character_id], () =>
-    loadSkills(character_id),
+  const { isLoading, error, data } = useQuery(
+    ["skills", character_id],
+    () => loadSkills(character_id),
+    { refetchOnWindowFocus: false },
   );
 
   if (isLoading) return <PanelLoader />;

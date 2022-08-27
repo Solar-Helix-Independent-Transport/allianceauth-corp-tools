@@ -13,6 +13,7 @@ const CharStatus = ({ character_id }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["status", character_id],
     () => loadStatus(character_id),
+    { refetchOnWindowFocus: false },
   );
 
   if (isLoading) return <PanelLoader />;

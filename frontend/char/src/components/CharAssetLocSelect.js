@@ -13,8 +13,10 @@ const colourStyles = {
 };
 
 const CharAssetLocSelect = ({ character_id, setLocation }) => {
-  const { isLoading, data } = useQuery(["asset_loc", character_id], () =>
-    loadAssetLocations(character_id),
+  const { isLoading, data } = useQuery(
+    ["asset_loc", character_id],
+    () => loadAssetLocations(character_id),
+    { refetchOnWindowFocus: false },
   );
 
   return (

@@ -11,7 +11,9 @@ import { loadMenu } from "../apis/Character";
 import "./Menu.css";
 
 const CharMenu = () => {
-  const { isLoading, error, data } = useQuery(["Menu"], () => loadMenu());
+  const { isLoading, error, data } = useQuery(["Menu"], () => loadMenu(), {
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <Navbar fluid collapseOnSelect>

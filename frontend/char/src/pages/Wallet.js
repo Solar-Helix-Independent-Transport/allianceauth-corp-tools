@@ -15,6 +15,7 @@ const CharWallet = ({ character_id }) => {
     () => loadWallet(character_id),
     {
       initialData: { items: [], count: 0 },
+      refetchOnWindowFocus: false,
     },
   );
 

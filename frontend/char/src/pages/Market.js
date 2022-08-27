@@ -11,6 +11,7 @@ const CharMarket = ({ character_id }) => {
     () => loadMarket(character_id),
     {
       initialData: [],
+      refetchOnWindowFocus: false,
     },
   );
 

@@ -15,6 +15,7 @@ function SubRowAsync({ row, rowProps, visibleColumns }) {
     ["lazy-load", row.original.id],
     () =>
       loadAssetContents(row.original.character.character_id, row.original.id),
+    { refetchOnWindowFocus: false },
   );
 
   if (!isLoading) {

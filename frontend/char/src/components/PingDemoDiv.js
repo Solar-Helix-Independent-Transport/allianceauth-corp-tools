@@ -32,6 +32,7 @@ export const TestEmbed = ({
         members: 0,
         structures: [],
       },
+      refetchOnWindowFocus: false,
     },
   );
   if (isFetching && interlock) {
