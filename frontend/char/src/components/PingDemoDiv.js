@@ -106,6 +106,7 @@ export const TestEmbed = ({
                 itemGroups,
                 filter_charges,
                 ships_only,
+                caps_only,
               );
               setInterlock(!interlock);
             }}
