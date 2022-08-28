@@ -220,6 +220,7 @@ export async function postTestPing(
   itemGroups,
   filter_charges = false,
   ships_only = false,
+  caps_only = false,
 ) {
   console.log(`sent ping test ${message}`);
   const api = await axios.post(`/audit/api/pingbot/assets/counts`, null, {
@@ -231,6 +232,7 @@ export async function postTestPing(
       itemGroups: itemGroups.join(","),
       filter_charges: filter_charges,
       ships_only: ships_only,
+      capitals_only: caps_only,
     },
   });
   return api.data;
@@ -243,6 +245,7 @@ export async function postSendPing(
   itemGroups,
   filter_charges = false,
   ships_only = false,
+  caps_only = false,
 ) {
   console.log(`sent ping test ${message}`);
   const api = await axios.post(`/audit/api/pingbot/assets/send`, null, {
@@ -254,6 +257,7 @@ export async function postSendPing(
       itemGroups: itemGroups.join(","),
       filter_charges: filter_charges,
       ships_only: ships_only,
+      capitals_only: caps_only,
     },
   });
   return api.data;

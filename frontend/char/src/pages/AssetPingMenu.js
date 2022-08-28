@@ -14,6 +14,7 @@ const PingAssets = () => {
   const [itemGroups, setItemGroups] = useState([]);
   const [filterCharges, setCharges] = useState(false);
   const [filterShipsOnly, setShipsOnly] = useState(false);
+  const [filterCapsOnly, setCapsOnly] = useState(false);
   const [message, setMessage] = useState();
   return (
     <ErrorBoundary>
@@ -48,6 +49,13 @@ const PingAssets = () => {
           </Checkbox>
           <Checkbox
             onChange={(e) => {
+              setCapsOnly(e.target.checked);
+            }}
+          >
+            Capitals Only
+          </Checkbox>
+          <Checkbox
+            onChange={(e) => {
               setCharges(e.target.checked);
             }}
           >
@@ -60,6 +68,7 @@ const PingAssets = () => {
           locations={systems}
           itemGroups={itemGroups}
           ships_only={filterShipsOnly}
+          caps_only={filterCapsOnly}
           filter_charges={filterCharges}
         />
       </Panel.Body>

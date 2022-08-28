@@ -1960,7 +1960,7 @@ def get_group_search(request, search_text: str, limit: int = 10):
     return models.EveItemGroup.objects.filter(name__icontains=search_text).values("name", id=F("group_id"))[:limit]
 
 
-def build_ping_list(systems, structures, ignore_groups, message, filter_charges=False, ships_only=False):
+def build_ping_list(systems, structures, ignore_groups, message, filter_charges=False, ships_only=False, capitals_only=False):
     pingers = {}
     ammo_exclusions_cat = [8]
     filter_charges = True
@@ -1990,6 +1990,11 @@ def build_ping_list(systems, structures, ignore_groups, message, filter_charges=
             type_name__group__category_id__in=[6]
         )
 
+    if capitals_only:
+        assets = assets.filter(
+            type_name__group_id__in=[30, 485, 513, 547, 659, 883, 902, 1538]
+        )
+
     for a in assets:
         try:
             uid = a.character.character.character_ownership.user.discord.uid
@@ -2013,7 +2018,7 @@ def build_ping_list(systems, structures, ignore_groups, message, filter_charges=
     response={200: schema.Message, 403: schema.Message},
     tags=["Utilities"]
 )
-def post_send_pings_assets(request, message: str, systems: str = "", structures: str = "", ignore_groups: str = "", filter_charges: boolean = False, ships_only: boolean = False):
+def post_send_pings_assets(request, message: str, systems: str = "", structures: str = "", ignore_groups: str = "", filter_charges: boolean = False, ships_only: boolean = False, capitals_only: boolean = False):
     if not request.user.is_superuser:
         return 403, {"message": "Hard no pall!"}
 
@@ -2024,7 +2029,7 @@ def post_send_pings_assets(request, message: str, systems: str = "", structures:
     structures = structures.split(",") if len(structures) else []
     ignore_groups = ignore_groups.split(",") if len(ignore_groups) else []
     pingers = build_ping_list(
-        systems, structures, ignore_groups, message, filter_charges, ships_only)
+        systems, structures, ignore_groups, message, filter_charges, ships_only, capitals_only)
 
     for id, chars in pingers.items():
         embed = Embed(title="Asset Alert!")
@@ -2048,7 +2053,7 @@ def post_send_pings_assets(request, message: str, systems: str = "", structures:
     response={200: schema.PingStats, 403: schema.Message},
     tags=["Utilities"]
 )
-def post_test_pings_assets(request, systems: str = "", structures: str = "", ignore_groups: str = "", filter_charges: boolean = False, ships_only: boolean = False):
+def post_test_pings_assets(request, systems: str = "", structures: str = "", ignore_groups: str = "", filter_charges: boolean = False, ships_only: boolean = False, capitals_only: boolean = False):
     if not request.user.is_superuser:
         return 403, {"message": "Hard no pall!"}
 
@@ -2056,7 +2061,7 @@ def post_test_pings_assets(request, systems: str = "", structures: str = "", ign
     structures = structures.split(",") if len(structures) else []
     ignore_groups = ignore_groups.split(",") if len(ignore_groups) else []
     pingers = build_ping_list(
-        systems, structures, ignore_groups, "", filter_charges, ships_only)
+        systems, structures, ignore_groups, "", filter_charges, ships_only, capitals_only)
 
     locations = set()
 

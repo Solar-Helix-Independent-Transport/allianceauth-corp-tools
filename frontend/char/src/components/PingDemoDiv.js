@@ -14,10 +14,19 @@ export const TestEmbed = ({
   itemGroups,
   filter_charges,
   ships_only,
+  caps_only,
 }) => {
   const [interlock, setInterlock] = useState(false);
   const { isFetching, error, data } = useQuery(
-    ["pingTest", structures, locations, itemGroups, filter_charges, ships_only],
+    [
+      "pingTest",
+      structures,
+      locations,
+      itemGroups,
+      filter_charges,
+      ships_only,
+      caps_only,
+    ],
     () =>
       postTestPing(
         message,
@@ -26,6 +35,7 @@ export const TestEmbed = ({
         itemGroups,
         filter_charges,
         ships_only,
+        caps_only,
       ),
     {
       initialData: {
