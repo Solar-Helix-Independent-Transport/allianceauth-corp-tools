@@ -960,6 +960,9 @@ class FilterBase(models.Model):
 
 
 class FullyLoadedFilter(FilterBase):
+    reversed_logic = models.BooleanField(
+        default=False, help_text="If set all members WITHOUT audit fully loaded will pass the test.")
+
     class Meta:
         verbose_name = "Smart Filter: Audit Fully Loaded"
         verbose_name_plural = verbose_name
@@ -989,6 +992,7 @@ class FullyLoadedFilter(FilterBase):
             return False
 
     def audit_filter(self, users):
+        logic = self.reversed_logic
         co = CharacterOwnership.objects.filter(user__in=users).select_related(
             'user', 'character__characteraudit')
         chars = {}
@@ -1001,17 +1005,18 @@ class FullyLoadedFilter(FilterBase):
             except ObjectDoesNotExist:
                 chars[c.user.id].append(c.character.character_name)
 
-        output = defaultdict(lambda: {"message": "", "check": False})
+        output = defaultdict(lambda: {"message": "", "check": logic})
         for u in users:
             c = chars.get(u.id, False)
             if c is not False:
                 if len(c) > 0:
-                    output[u.id] = {"message": ", ".join(c), "check": False}
+                    output[u.id] = {"message": ", ".join(c), "check": logic}
                     continue
                 else:
-                    output[u.id] = {"message": "", "check": True}
+                    output[u.id] = {
+                        "message": "All Characters Loaded", "check": not logic}
                     continue
-            output[u.id] = {"message": "", "check": False}
+            output[u.id] = {"message": "", "check": logic}
         return output
 
 

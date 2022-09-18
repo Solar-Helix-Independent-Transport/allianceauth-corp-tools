@@ -435,6 +435,29 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[9])
         self.assertFalse(tests[10])
 
+    def test_user_loaded_fully_reverse(self):
+        _filter = ct_models.FullyLoadedFilter.objects.create(name="Fully Loaded Test",
+                                                             description="Something to tell user",
+                                                             reverssd_logic=True)
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k, u in users.items():
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        self.assertFalse(tests[1])
+        self.assertFalse(tests[2])
+        self.assertFalse(tests[3])
+        self.assertFalse(tests[4])
+        self.assertFalse(tests[5])
+        self.assertFalse(tests[6])
+        self.assertFalse(tests[7])
+        self.assertTrue(tests[8])
+        self.assertTrue(tests[9])
+        self.assertTrue(tests[10])
+
     def test_user_assets_no_loc(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")

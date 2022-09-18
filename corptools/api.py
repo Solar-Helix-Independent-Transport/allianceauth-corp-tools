@@ -8,6 +8,8 @@ from typing import List
 from xmlrpc.client import boolean
 
 from allianceauth.eveonline.models import EveCharacter
+from allianceauth.eveonline.tasks import \
+    update_character as eve_character_update
 from django.conf import settings
 from django.db.models import Count, F, Q, QuerySet, Sum
 from django.utils import timezone
@@ -1184,7 +1186,9 @@ def post_acccount_refresh(request, character_id: int):
     for cid in characters.values_list('character_id', flat=True):
         tasks.update_character.apply_async(
             args=[cid], kwargs={"force_refresh": True}, priority=4)
-    return 200, {"message": "Requested Update!"}
+        eve_character_update.apply_async(
+            args=[cid], priority=4)
+    return 200, {"message": "Requested Updates!"}
 
 
 @api.get(
