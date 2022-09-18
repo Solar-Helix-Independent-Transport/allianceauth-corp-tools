@@ -968,6 +968,7 @@ class FullyLoadedFilter(FilterBase):
         verbose_name_plural = verbose_name
 
     def process_filter(self, user: User):
+        logic = self.reversed_logic
         try:
             character_list = user.character_ownerships.all() \
                 .select_related('character', 'character__characteraudit')
@@ -982,11 +983,11 @@ class FullyLoadedFilter(FilterBase):
                         valid_audits += 1
                     character_cnt += 1
                 if valid_audits == character_cnt:
-                    return True
+                    return not logic
                 else:
-                    return False
+                    return logic
             else:
-                return False
+                return logic
         except Exception as e:
             logger.error(e, exc_info=1)
             return False

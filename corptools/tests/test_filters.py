@@ -435,10 +435,26 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[9])
         self.assertFalse(tests[10])
 
+        tests = {}
+        tests = _filter.audit_filter(
+            User.objects.filter(id__in=list(users.keys())))
+        print(tests)
+
+        self.assertTrue(tests[1]["check"])
+        self.assertTrue(tests[2]["check"])
+        self.assertTrue(tests[3]["check"])
+        self.assertTrue(tests[4]["check"])
+        self.assertTrue(tests[5]["check"])
+        self.assertTrue(tests[6]["check"])
+        self.assertTrue(tests[7]["check"])
+        self.assertFalse(tests[8]["check"])
+        self.assertFalse(tests[9]["check"])
+        self.assertFalse(tests[10]["check"])
+
     def test_user_loaded_fully_reverse(self):
         _filter = ct_models.FullyLoadedFilter.objects.create(name="Fully Loaded Test",
                                                              description="Something to tell user",
-                                                             reverssd_logic=True)
+                                                             reversed_logic=True)
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
             users[user.character.character_ownership.user.id] = None
@@ -446,7 +462,7 @@ class TestSecGroupBotFilters(TestCase):
         tests = {}
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
-
+        print(tests)
         self.assertFalse(tests[1])
         self.assertFalse(tests[2])
         self.assertFalse(tests[3])
@@ -457,6 +473,21 @@ class TestSecGroupBotFilters(TestCase):
         self.assertTrue(tests[8])
         self.assertTrue(tests[9])
         self.assertTrue(tests[10])
+
+        tests = {}
+        tests = _filter.audit_filter(
+            User.objects.filter(id__in=list(users.keys())))
+        print(tests)
+        self.assertFalse(tests[1]["check"])
+        self.assertFalse(tests[2]["check"])
+        self.assertFalse(tests[3]["check"])
+        self.assertFalse(tests[4]["check"])
+        self.assertFalse(tests[5]["check"])
+        self.assertFalse(tests[6]["check"])
+        self.assertFalse(tests[7]["check"])
+        self.assertTrue(tests[8]["check"])
+        self.assertTrue(tests[9]["check"])
+        self.assertTrue(tests[10]["check"])
 
     def test_user_assets_no_loc(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
