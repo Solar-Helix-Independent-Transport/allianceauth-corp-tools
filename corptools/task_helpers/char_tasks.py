@@ -19,6 +19,31 @@ from .etag_helpers import NotModifiedError, etag_results
 logger = logging.getLogger(__name__)
 
 
+def get_token(character_id: int, scopes: list) -> "Token":
+    """Helper method to get a valid token for a specific character with specific scopes.
+
+    Args:
+        character_id: Character to filter on.
+        scopes: array of ESI scope strings to search for.
+
+    Returns:
+        Matching token or `False` when token is not found
+
+    TODO: Push upstream to django-esi
+    """
+    token = (
+        Token.objects
+        .filter(character_id=character_id)
+        .require_scopes(scopes)
+        .require_valid()
+        .first()
+    )
+    if token:
+        return token
+    else:
+        return False
+
+
 def update_corp_history(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
@@ -63,7 +88,7 @@ def update_character_skill_list(character_id, force_refresh=False):
 
     req_scopes = ['esi-skills.read_skills.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return "No Tokens"
@@ -119,7 +144,7 @@ def update_character_skill_queue(character_id, force_refresh=False):
 
     req_scopes = ['esi-skills.read_skillqueue.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return "No Tokens"
@@ -172,7 +197,7 @@ def update_character_assets(character_id, force_refresh=False):
 
     req_scopes = ['esi-assets.read_assets.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return "No Tokens"
@@ -260,7 +285,7 @@ def get_current_ship_location(character_id, force_refresh=False):
     req_scopes = ['esi-location.read_location.v1',
                   'esi-location.read_ship_type.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return False
@@ -300,7 +325,7 @@ def update_character_wallet(character_id, force_refresh=False):
 
     req_scopes = ['esi-wallet.read_character_wallet.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return "No Tokens"
@@ -393,7 +418,7 @@ def update_character_transactions(character_id, force_refresh=False):
 
     req_scopes = ['esi-wallet.read_character_wallet.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return "No Tokens"
@@ -444,7 +469,7 @@ def update_character_clones(character_id, force_refresh=False):
 
     req_scopes = ['esi-clones.read_clones.v1', 'esi-clones.read_implants.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return "No Tokens"
@@ -521,7 +546,7 @@ def update_character_orders(character_id, force_refresh=False):
 
     req_scopes = ['esi-markets.read_character_orders.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return "No Tokens"
@@ -612,7 +637,7 @@ def update_character_order_history(character_id, force_refresh=False):
 
     req_scopes = ['esi-markets.read_character_orders.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return "No Tokens"
@@ -701,7 +726,7 @@ def update_character_notifications(character_id, force_refresh=False):
 
     req_scopes = ['esi-characters.read_notifications.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return "No Tokens"
@@ -760,7 +785,7 @@ def update_character_roles(character_id, force_refresh=False):
         character__character_id=character_id)
     req_scopes = ['esi-characters.read_corporation_roles.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return False
@@ -818,7 +843,7 @@ def process_mail_list(character_id: int, ids: list):
         character__character_id=character_id)
     req_scopes = ['esi-mail.read_mail.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return False
@@ -898,7 +923,7 @@ def update_character_mail(character_id, force_refresh=False):
         character__character_id=character_id)
     req_scopes = ['esi-mail.read_mail.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return False
@@ -976,7 +1001,7 @@ def update_character_contacts(character_id, force_refresh=False):
 
     req_scopes = ['esi-characters.read_contacts.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return False
@@ -1075,7 +1100,7 @@ def update_character_titles(character_id, force_refresh=False):
 
     req_scopes = ['esi-characters.read_titles.v1']
 
-    token = Token.get_token(character_id, req_scopes)
+    token = get_token(character_id, req_scopes)
 
     if not token:
         return False
