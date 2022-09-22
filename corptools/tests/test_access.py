@@ -14,6 +14,7 @@ class TestCorptoolsAccessPerms(TestCase):
         cls.user1 = AuthUtils.create_user('Main User1')
         cls.user2 = AuthUtils.create_user('Main User2')
         cls.user3 = AuthUtils.create_user('Main User3')
+        cls.user4 = AuthUtils.create_user('Main User4')
 
         char1 = EveCharacter.objects.create(character_id=1,
                                             character_name='character.name1',
@@ -120,6 +121,29 @@ class TestCorptoolsAccessPerms(TestCase):
         cls.view_all_permission = Permission.objects.get_by_natural_key(
             'global_hr', 'corptools', 'characteraudit')
 
+        cls.char9 = EveCharacter.objects.create(character_id=9,
+                                                character_name='character.name9',
+                                                corporation_id=2,
+                                                corporation_name='corporation.name2',
+                                                corporation_ticker='ABC2',
+                                                alliance_id=3,
+                                                alliance_name='test alliance2',
+                                                alliance_ticker='TEST')
+        CharacterOwnership.objects.create(
+            user=cls.user4, character=cls.char9, owner_hash="def432a")
+
+        char10 = EveCharacter.objects.create(character_id=10,
+                                             character_name='character.name10',
+                                             corporation_id=2,
+                                             corporation_name='corporation.name2',
+                                             corporation_ticker='ABC2',
+                                             alliance_id=3,
+                                             alliance_name='test alliance2',
+                                             alliance_ticker='TEST')
+        cls.ca10 = CharacterAudit.objects.create(character=char10)
+        CharacterOwnership.objects.create(
+            user=cls.user4, character=char10, owner_hash="def432b")
+
     def test_no_perms_get_self_u1(self):  # always get self.
         cs = CharacterAudit.objects.visible_to(self.user1)
         self.assertIn(self.ca1, cs)
@@ -130,6 +154,20 @@ class TestCorptoolsAccessPerms(TestCase):
         self.assertNotIn(self.ca6, cs)
         self.assertNotIn(self.ca7, cs)
         self.assertNotIn(self.ca8, cs)
+        self.assertNotIn(self.ca10, cs)
+
+    def test_no_perms_get_self_u1_ec(self):  # always get self.
+        cs = CharacterAudit.objects.visible_eve_characters(self.user1)
+        self.assertIn(self.ca1.character, cs)
+        self.assertIn(self.ca2.character, cs)
+        self.assertNotIn(self.ca3.character, cs)
+        self.assertNotIn(self.ca4.character, cs)
+        self.assertNotIn(self.ca5.character, cs)
+        self.assertNotIn(self.ca6.character, cs)
+        self.assertNotIn(self.ca7.character, cs)
+        self.assertNotIn(self.ca8.character, cs)
+        self.assertNotIn(self.char9, cs)
+        self.assertNotIn(self.ca10.character, cs)
 
     def test_no_perms_get_self_u2(self):  # always get self.
         cs = CharacterAudit.objects.visible_to(self.user2)
@@ -141,6 +179,20 @@ class TestCorptoolsAccessPerms(TestCase):
         self.assertNotIn(self.ca6, cs)
         self.assertNotIn(self.ca7, cs)
         self.assertNotIn(self.ca8, cs)
+        self.assertNotIn(self.ca10, cs)
+
+    def test_no_perms_get_self_u2_ec(self):  # always get self.
+        cs = CharacterAudit.objects.visible_eve_characters(self.user2)
+        self.assertNotIn(self.ca1.character, cs)
+        self.assertNotIn(self.ca2.character, cs)
+        self.assertIn(self.ca3.character, cs)
+        self.assertNotIn(self.ca4.character, cs)
+        self.assertNotIn(self.ca5.character, cs)
+        self.assertNotIn(self.ca6.character, cs)
+        self.assertNotIn(self.ca7.character, cs)
+        self.assertNotIn(self.ca8.character, cs)
+        self.assertNotIn(self.char9, cs)
+        self.assertNotIn(self.ca10.character, cs)
 
     def test_no_perms_get_self_u3(self):  # always get self.
         cs = CharacterAudit.objects.visible_to(self.user3)
@@ -152,6 +204,20 @@ class TestCorptoolsAccessPerms(TestCase):
         self.assertNotIn(self.ca6, cs)
         self.assertIn(self.ca7, cs)
         self.assertNotIn(self.ca8, cs)
+        self.assertNotIn(self.ca10, cs)
+
+    def test_no_perms_get_self_u3_ec(self):  # always get self.
+        cs = CharacterAudit.objects.visible_eve_characters(self.user3)
+        self.assertNotIn(self.ca1.character, cs)
+        self.assertNotIn(self.ca2.character, cs)
+        self.assertNotIn(self.ca3.character, cs)
+        self.assertNotIn(self.ca4.character, cs)
+        self.assertIn(self.ca5.character, cs)
+        self.assertNotIn(self.ca6.character, cs)
+        self.assertIn(self.ca7.character, cs)
+        self.assertNotIn(self.ca8.character, cs)
+        self.assertNotIn(self.char9, cs)
+        self.assertNotIn(self.ca10.character, cs)
 
     def test_no_perms_get_self_in_alliance(self):
         cs = CharacterAudit.objects.visible_to(self.user2)
@@ -163,6 +229,20 @@ class TestCorptoolsAccessPerms(TestCase):
         self.assertNotIn(self.ca6, cs)
         self.assertNotIn(self.ca7, cs)
         self.assertNotIn(self.ca8, cs)
+        self.assertNotIn(self.ca10, cs)
+
+    def test_no_perms_get_self_in_alliance_ec(self):
+        cs = CharacterAudit.objects.visible_eve_characters(self.user2)
+        self.assertNotIn(self.ca1.character, cs)
+        self.assertNotIn(self.ca2.character, cs)
+        self.assertIn(self.ca3.character, cs)
+        self.assertNotIn(self.ca4.character, cs)
+        self.assertNotIn(self.ca5.character, cs)
+        self.assertNotIn(self.ca6.character, cs)
+        self.assertNotIn(self.ca7.character, cs)
+        self.assertNotIn(self.ca8.character, cs)
+        self.assertNotIn(self.char9, cs)
+        self.assertNotIn(self.ca10.character, cs)
 
     def test_get_corp_in_alliance(self):
         self.user2.user_permissions.add(self.view_corp_permission)
@@ -175,6 +255,21 @@ class TestCorptoolsAccessPerms(TestCase):
         self.assertNotIn(self.ca6, cs)
         self.assertNotIn(self.ca7, cs)
         self.assertNotIn(self.ca8, cs)
+        self.assertIn(self.ca10, cs)
+
+    def test_get_corp_in_alliance_ec(self):
+        self.user2.user_permissions.add(self.view_corp_permission)
+        cs = CharacterAudit.objects.visible_eve_characters(self.user2)
+        self.assertNotIn(self.ca1.character, cs)
+        self.assertNotIn(self.ca2.character, cs)
+        self.assertIn(self.ca3.character, cs)
+        self.assertIn(self.ca4.character, cs)
+        self.assertNotIn(self.ca5.character, cs)
+        self.assertNotIn(self.ca6.character, cs)
+        self.assertNotIn(self.ca7.character, cs)
+        self.assertNotIn(self.ca8.character, cs)
+        self.assertIn(self.char9, cs)
+        self.assertIn(self.ca10.character, cs)
 
     def test_get_alliance(self):
         self.user3.user_permissions.add(self.view_alliance_permission)
@@ -187,10 +282,25 @@ class TestCorptoolsAccessPerms(TestCase):
         self.assertIn(self.ca6, cs)
         self.assertIn(self.ca7, cs)
         self.assertNotIn(self.ca8, cs)
+        self.assertNotIn(self.ca10, cs)
+
+    def test_get_alliance_ec(self):
+        self.user3.user_permissions.add(self.view_alliance_permission)
+        cs = CharacterAudit.objects.visible_eve_characters(self.user3)
+        self.assertNotIn(self.ca1.character, cs)
+        self.assertNotIn(self.ca2.character, cs)
+        self.assertNotIn(self.ca3.character, cs)
+        self.assertNotIn(self.ca4.character, cs)
+        self.assertIn(self.ca5.character, cs)
+        self.assertIn(self.ca6.character, cs)
+        self.assertIn(self.ca7.character, cs)
+        self.assertNotIn(self.ca8.character, cs)
+        self.assertNotIn(self.char9, cs)
+        self.assertNotIn(self.ca10.character, cs)
 
     def test_global_perms_u1(self):
-        self.user3.user_permissions.add(self.view_all_permission)
-        cs = CharacterAudit.objects.visible_to(self.user3)
+        self.user1.user_permissions.add(self.view_all_permission)
+        cs = CharacterAudit.objects.visible_to(self.user1)
         self.assertIn(self.ca1, cs)
         self.assertIn(self.ca2, cs)
         self.assertIn(self.ca3, cs)
@@ -199,6 +309,23 @@ class TestCorptoolsAccessPerms(TestCase):
         self.assertIn(self.ca6, cs)
         self.assertIn(self.ca7, cs)
         self.assertIn(self.ca8, cs)
+        self.assertIn(self.ca10, cs)
+
+    def test_global_perms_u1_ec(self):
+        self.user1.user_permissions.add(self.view_all_permission)
+        cs = CharacterAudit.objects.visible_eve_characters(self.user1)
+        self.assertIn(self.ca1.character, cs)
+        self.assertIn(self.ca2.character, cs)
+        self.assertIn(self.ca3.character, cs)
+        self.assertIn(self.ca4.character, cs)
+        self.assertIn(self.ca5.character, cs)
+        self.assertIn(self.ca6.character, cs)
+        self.assertIn(self.ca7.character, cs)
+        self.assertIn(self.ca8.character, cs)
+        self.assertIn(self.char9, cs)
+        self.assertIn(self.ca10.character, cs)
+        self.assertIn(self.char9, cs)
+        self.assertIn(self.ca10.character, cs)
 
     def test_global_perms_u2(self):
         self.user2.user_permissions.add(self.view_all_permission)
@@ -211,10 +338,25 @@ class TestCorptoolsAccessPerms(TestCase):
         self.assertIn(self.ca6, cs)
         self.assertIn(self.ca7, cs)
         self.assertIn(self.ca8, cs)
+        self.assertIn(self.ca10, cs)
+
+    def test_global_perms_u2_ec(self):
+        self.user2.user_permissions.add(self.view_all_permission)
+        cs = CharacterAudit.objects.visible_eve_characters(self.user2)
+        self.assertIn(self.ca1.character, cs)
+        self.assertIn(self.ca2.character, cs)
+        self.assertIn(self.ca3.character, cs)
+        self.assertIn(self.ca4.character, cs)
+        self.assertIn(self.ca5.character, cs)
+        self.assertIn(self.ca6.character, cs)
+        self.assertIn(self.ca7.character, cs)
+        self.assertIn(self.ca8.character, cs)
+        self.assertIn(self.char9, cs)
+        self.assertIn(self.ca10.character, cs)
 
     def test_global_perms_u3(self):
-        self.user2.user_permissions.add(self.view_all_permission)
-        cs = CharacterAudit.objects.visible_to(self.user2)
+        self.user3.user_permissions.add(self.view_all_permission)
+        cs = CharacterAudit.objects.visible_to(self.user3)
         self.assertIn(self.ca1, cs)
         self.assertIn(self.ca2, cs)
         self.assertIn(self.ca3, cs)
@@ -223,3 +365,18 @@ class TestCorptoolsAccessPerms(TestCase):
         self.assertIn(self.ca6, cs)
         self.assertIn(self.ca7, cs)
         self.assertIn(self.ca8, cs)
+        self.assertIn(self.ca10, cs)
+
+    def test_global_perms_u3_ec(self):
+        self.user3.user_permissions.add(self.view_all_permission)
+        cs = CharacterAudit.objects.visible_eve_characters(self.user3)
+        self.assertIn(self.ca1.character, cs)
+        self.assertIn(self.ca2.character, cs)
+        self.assertIn(self.ca3.character, cs)
+        self.assertIn(self.ca4.character, cs)
+        self.assertIn(self.ca5.character, cs)
+        self.assertIn(self.ca6.character, cs)
+        self.assertIn(self.ca7.character, cs)
+        self.assertIn(self.ca8.character, cs)
+        self.assertIn(self.char9, cs)
+        self.assertIn(self.ca10.character, cs)

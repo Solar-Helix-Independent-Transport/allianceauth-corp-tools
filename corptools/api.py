@@ -67,15 +67,14 @@ def get_main_character(request, character_id):
         .character_ownership.user.profile.main_character
 
     # check access
-    visible = models.CharacterAudit.objects.visible_to(
-        request.user).values_list('character_id', flat=True)
-
-    if main_char.id not in visible:
+    visible = models.CharacterAudit.objects.visible_eve_characters(
+        request.user)
+    if main_char not in visible:
         account_chars = request.user.profile.main_character.character_ownership.user.character_ownerships.all(
-        ).values_list('character_id', flat=True)
+        )
         logger.warning(
             f"{request.user} Can See {list(visible)}, requested {main_char.id}")
-        if main_char.id in account_chars:
+        if main_char in account_chars:
             pass
         else:
             perms = False

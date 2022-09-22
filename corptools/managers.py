@@ -254,6 +254,7 @@ class EveCategoryManager(models.Manager):
 
 
 class AuditCharacterQuerySet(models.QuerySet):
+
     def visible_to(self, user):
         # superusers get all visible
         if user.is_superuser:
@@ -298,6 +299,47 @@ class AuditCharacterQuerySet(models.QuerySet):
 class AuditCharacterManager(models.Manager):
     def get_queryset(self):
         return AuditCharacterQuerySet(self.model, using=self._db)
+
+    @staticmethod
+    def visible_eve_characters(user):
+        qs = EveCharacter.objects.get_queryset()
+        if user.is_superuser:
+            logger.debug('Returning all characters for superuser %s.' % user)
+            return qs.all()
+
+        if user.has_perm('corptools.global_hr'):
+            logger.debug('Returning all characters for %s.' % user)
+            return qs.all()
+
+        try:
+            char = user.profile.main_character
+            assert char
+            # build all accepted queries
+            queries = [models.Q(character_ownership__user=user)]
+            if user.has_perm('corptools.alliance_hr'):
+                if char.alliance_id is not None:
+                    queries.append(
+                        models.Q(alliance_id=char.alliance_id))
+                else:
+                    queries.append(
+                        models.Q(corporation_id=char.corporation_id))
+            if user.has_perm('corptools.corp_hr'):
+                if user.has_perm('corptools.alliance_hr'):
+                    pass
+                else:
+                    queries.append(
+                        models.Q(corporation_id=char.corporation_id))
+            logger.debug('%s queries for user %s visible chracters.' %
+                         (len(queries), user))
+            # filter based on queries
+            query = queries.pop()
+            for q in queries:
+                query |= q
+            return qs.filter(query)
+        except AssertionError:
+            logger.debug(
+                'User %s has no main character. Nothing visible.' % user)
+            return qs.none()
 
     def visible_to(self, user):
         return self.get_queryset().visible_to(user)
