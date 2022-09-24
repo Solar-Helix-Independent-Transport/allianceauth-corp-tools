@@ -9,15 +9,18 @@ import { PanelLoader } from "../components/PanelLoader";
 import ReactTimeAgo from "react-time-ago";
 import { ErrorLoader } from "../components/ErrorLoader";
 import ErrorBoundary from "../components/ErrorBoundary";
+import { useParams } from "react-router-dom";
 
 function MyTooltip({ message }) {
   return <Tooltip id="implant_tooltip">{message}</Tooltip>;
 }
 
-const CharClones = ({ character_id }) => {
+const CharClones = () => {
+  let { characterID } = useParams();
+
   const { isLoading, isFetching, error, data } = useQuery(
-    ["clones", character_id],
-    () => loadClones(character_id),
+    ["clones", characterID],
+    () => loadClones(characterID),
     {
       refetchOnWindowFocus: false,
     },

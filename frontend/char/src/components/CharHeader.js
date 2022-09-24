@@ -7,10 +7,13 @@ import { Badge } from "react-bootstrap";
 import CharActiveBadge from "./CharActiveBadge";
 import { loadStatus } from "../apis/Character";
 import { Bars } from "@agney/react-loading";
+import { useParams } from "react-router-dom";
 
-const CharHeader = ({ character_id }) => {
-  const { isLoading, data } = useQuery(["status", character_id], () =>
-    loadStatus(character_id),
+const CharHeader = () => {
+  let { characterID } = useParams();
+
+  const { isLoading, data } = useQuery(["status", characterID], () =>
+    loadStatus(characterID),
   );
   let isk = 0;
   let sp = 0;
@@ -89,7 +92,7 @@ const CharHeader = ({ character_id }) => {
               <div className="child-end">
                 <CharActiveBadge
                   characters={data.characters}
-                  character_id={character_id}
+                  character_id={characterID}
                 />
               </div>
             </>

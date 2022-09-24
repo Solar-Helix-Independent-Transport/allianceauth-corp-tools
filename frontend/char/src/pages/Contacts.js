@@ -9,11 +9,14 @@ import {
   textColumnFilter,
 } from "../components/BaseTable";
 import ErrorBoundary from "../components/ErrorBoundary";
+import { useParams } from "react-router-dom";
 
-const CharContacts = ({ character_id }) => {
+const CharContacts = () => {
+  let { characterID } = useParams();
+
   const { isLoading, isFetching, error, data } = useQuery(
-    ["contacts", character_id],
-    () => loadContacts(character_id),
+    ["contacts", characterID],
+    () => loadContacts(characterID),
     {
       initialData: [],
       refetchOnWindowFocus: false,

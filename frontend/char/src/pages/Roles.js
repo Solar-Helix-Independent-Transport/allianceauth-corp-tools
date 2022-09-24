@@ -8,6 +8,7 @@ import { Badge } from "react-bootstrap";
 import { Button } from "react-bootstrap";
 import { ErrorLoader } from "../components/ErrorLoader";
 import ErrorBoundary from "../components/ErrorBoundary";
+import { useParams } from "react-router-dom";
 
 const Checkbox = ({ active }) => {
   return (
@@ -17,10 +18,11 @@ const Checkbox = ({ active }) => {
   );
 };
 
-const CharRoles = ({ character_id }) => {
+const CharRoles = () => {
+  let { characterID } = useParams();
   const { isLoading, error, data } = useQuery(
-    ["roles", character_id],
-    () => loadRoles(character_id),
+    ["roles", characterID],
+    () => loadRoles(characterID),
     { refetchOnWindowFocus: false },
   );
 

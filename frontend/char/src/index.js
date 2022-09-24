@@ -4,17 +4,18 @@ import en from "javascript-time-ago/locale/en";
 
 import React from "react";
 import { render } from "react-dom";
-import CharHeader from "./components/CharHeader";
-import CharMenu from "./components/CharMenu";
-import { Col } from "react-bootstrap";
-import { HashRouter as Router, Switch, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Navigate,
+  Routes,
+  Route,
+} from "react-router-dom";
 import CharStatus from "./pages/Status";
 import CharClones from "./pages/Clones";
 import PubData from "./pages/PubData";
 import CharAssets from "./pages/Assets";
 import CharAssetList from "./pages/AssetList";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { Panel } from "react-bootstrap";
 import CharRoles from "./pages/Roles";
 import CharWallet from "./pages/Wallet";
 import CharWalletActivity from "./pages/WalletActivity";
@@ -26,96 +27,55 @@ import "./style.css";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ErrorLoader } from "./components/ErrorLoader";
 import CharSkillQueue from "./pages/SkillQueue";
-import charDoctrines from "./pages/Doctrines";
+import CharDoctrines from "./pages/Doctrines";
 import PingAssets from "./pages/AssetPingMenu";
 import CharMarket from "./pages/Market";
+import CharacterAudit from "./pages/CharacterAudit";
 TimeAgo.addDefaultLocale(en);
 
 const queryClient = new QueryClient();
 
-const character_id = window.location.pathname.split("/")[3]
-  ? window.location.pathname.split("/")[3]
-  : 0;
-
 const CorptoolsCharacterView = () => {
-  console.log(character_id);
+  const url_char_id = window.location.pathname.split("/")[3]
+    ? window.location.pathname.split("/")[3]
+    : 0;
 
+  console.log(url_char_id);
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
+        <br />
         <Router>
-          <br />
-          <CharHeader character_id={character_id}></CharHeader>
-          <CharMenu character_id={character_id}></CharMenu>
-          <Col>
-            <Panel>
-              <Switch>
-                <Route
-                  exact
-                  path={["", "/account/status"]}
-                  component={() => CharStatus({ character_id })}
-                />
-                <Route
-                  path="/account/assets"
-                  component={() => CharAssets({ character_id })}
-                />
-                <Route
-                  path="/account/listassets"
-                  component={() => CharAssetList({ character_id })}
-                />
-                <Route
-                  path="/account/pubdata"
-                  component={() => PubData({ character_id })}
-                />
-                <Route
-                  path="/account/clones"
-                  component={() => CharClones({ character_id })}
-                />
-                <Route
-                  path="/account/roles"
-                  component={() => CharRoles({ character_id })}
-                />
-                <Route
-                  path="/account/wallet"
-                  component={() => CharWallet({ character_id })}
-                />
-                <Route
-                  path="/account/walletactivity"
-                  component={() => CharWalletActivity({ character_id })}
-                />
-                <Route
-                  path="/account/notifications"
-                  component={() => CharNotifications({ character_id })}
-                />
-                <Route
-                  path="/account/contact"
-                  component={() => CharContacts({ character_id })}
-                />
-                <Route
-                  path="/account/skills"
-                  component={() => CharSkills({ character_id })}
-                />
-                <Route
-                  path="/account/skillqueue"
-                  component={() => CharSkillQueue({ character_id })}
-                />
-                <Route
-                  path="/account/doctrines"
-                  component={() => charDoctrines({ character_id })}
-                />
-                <Route
-                  path="/account/market"
-                  component={() => CharMarket({ character_id })}
-                />
-                <Route
-                  path="/account/standings"
-                  component={() => ErrorLoader()}
-                />
-                <Route path="/account/list" component={() => AccountList()} />
-                <Route path="/ping/assets" component={() => PingAssets()} />
-              </Switch>
-            </Panel>
-          </Col>
+          <Routes>
+            <Route path="audit/r/:characterID/" element={<CharacterAudit />}>
+              <Route index element={<CharStatus />} />
+              <Route index path="account/status" element={<CharStatus />} />
+              <Route path="account/assets" element={<CharAssets />} />
+              <Route path="account/listassets" element={<CharAssetList />} />
+              <Route path="account/pubdata" element={<PubData />} />
+              <Route path="account/clones" element={<CharClones />} />
+              <Route path="account/roles" element={<CharRoles />} />
+              <Route path="account/wallet" element={<CharWallet />} />
+              <Route
+                path="account/walletactivity"
+                element={<CharWalletActivity />}
+              />
+              <Route
+                path="account/notifications"
+                element={<CharNotifications />}
+              />
+              <Route path="account/contact" element={<CharContacts />} />
+              <Route path="account/skills" element={<CharSkills />} />
+              <Route path="account/skillqueue" element={<CharSkillQueue />} />
+              <Route path="account/doctrines" element={<CharDoctrines />} />
+              <Route path="account/market" element={<CharMarket />} />
+              <Route path="account/standings" element={<ErrorLoader />} />
+              <Route path="account/list" element={<AccountList />} />
+              <Route path="ping/assets" element={<PingAssets />} />
+            </Route>
+            {/* if no route re-route to the main page, this is mainly for dev work */}
+            <Route path="*" element={<Navigate to="audit/r/0" replace />} />
+          </Routes>
         </Router>
       </ErrorBoundary>
     </QueryClientProvider>

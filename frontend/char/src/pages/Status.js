@@ -8,11 +8,14 @@ import { PanelLoader } from "../components/PanelLoader";
 import { ErrorLoader } from "../components/ErrorLoader";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { PortraitPanel } from "../components/PortraitPanel";
+import { useParams } from "react-router-dom";
 
-const CharStatus = ({ character_id }) => {
+const CharStatus = () => {
+  let { characterID } = useParams();
+
   const { isLoading, isFetching, error, data } = useQuery(
-    ["status", character_id],
-    () => loadStatus(character_id),
+    ["status", characterID],
+    () => loadStatus(characterID),
     { refetchOnWindowFocus: false },
   );
 
@@ -36,7 +39,7 @@ const CharStatus = ({ character_id }) => {
               <h4 className={"text-center"}>Update Status</h4>
               <Table striped style={{ marginBottom: 0 }}>
                 <thead>
-                  <tr key="head">
+                  <tr key={`head-${char.character}`}>
                     <th>Update</th>
                     <th className="text-right">Last Run</th>
                   </tr>

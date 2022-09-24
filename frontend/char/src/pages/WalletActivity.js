@@ -11,11 +11,14 @@ import {
   SelectColumnFilter,
   textColumnFilter,
 } from "../components/BaseTable";
+import { useParams } from "react-router-dom";
 
-const CharWalletActivity = ({ character_id }) => {
+const CharWalletActivity = () => {
+  let { characterID } = useParams();
+
   const { isLoading, isFetching, error, data } = useQuery(
-    ["wallet-activity", character_id],
-    () => loadWalletActivity(character_id),
+    ["wallet-activity", characterID],
+    () => loadWalletActivity(characterID),
     {
       initialData: [],
       refetchOnWindowFocus: false,

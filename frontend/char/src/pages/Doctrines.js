@@ -7,11 +7,14 @@ import { ErrorLoader } from "../components/ErrorLoader";
 import { useQuery } from "react-query";
 import { DoctrinePanel } from "../components/skills/DoctrinePannel";
 import { DoctrineCheck } from "../components/skills/DoctrineCheck";
+import { useParams } from "react-router-dom";
 
-const CharDoctrines = ({ character_id }) => {
+const CharDoctrines = () => {
+  let { characterID } = useParams();
+
   const { isLoading, error, data } = useQuery(
-    ["doctrines", character_id],
-    () => loadDoctrines(character_id),
+    ["doctrines", characterID],
+    () => loadDoctrines(characterID),
     { refetchOnWindowFocus: false },
   );
 

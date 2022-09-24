@@ -9,11 +9,14 @@ import { ErrorLoader } from "../components/ErrorLoader";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { SkillLevelBlock } from "../components/skills/SkillLevelBlock";
 import { PortraitPanel } from "../components/PortraitPanel";
+import { useParams } from "react-router-dom";
 
-const CharSkillQueue = ({ character_id }) => {
+const CharSkillQueue = () => {
+  let { characterID } = useParams();
+
   const { isLoading, isFetching, error, data } = useQuery(
-    ["skillqueue", character_id],
-    () => loadSkillQueues(character_id),
+    ["skillqueue", characterID],
+    () => loadSkillQueues(characterID),
     { refetchOnWindowFocus: false },
   );
   const [activeFilter, setActive] = useState(true);

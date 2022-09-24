@@ -8,8 +8,8 @@ const NavLink = (props) => {
   const location = useLocation();
 
   useEffect(() => {}, [location]);
-
-  var isActive = window.location.href.endsWith(props.href);
+  let url = props.href ? props.href : "";
+  var isActive = window.location.href.endsWith(url);
   var className = isActive ? "active" : "";
 
   return (

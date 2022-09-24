@@ -8,11 +8,14 @@ import {
   textColumnFilter,
 } from "../components/BaseTable";
 import ErrorBoundary from "../components/ErrorBoundary";
+import { useParams } from "react-router-dom";
 
-const CharWallet = ({ character_id }) => {
+const CharWallet = () => {
+  let { characterID } = useParams();
+
   const { isLoading, isFetching, error, data } = useQuery(
-    ["wallet", character_id],
-    () => loadWallet(character_id),
+    ["wallet", characterID],
+    () => loadWallet(characterID),
     {
       initialData: { items: [], count: 0 },
       refetchOnWindowFocus: false,

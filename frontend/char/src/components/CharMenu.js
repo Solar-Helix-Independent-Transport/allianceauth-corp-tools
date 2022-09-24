@@ -4,7 +4,7 @@ import { Nav, Glyphicon } from "react-bootstrap";
 import { NavDropdown } from "react-bootstrap";
 import { Navbar } from "react-bootstrap";
 import { NavItem } from "react-bootstrap";
-
+import { LinkContainer } from "react-router-bootstrap";
 import NavLink from "./NavLinkActive";
 import { Grid } from "@agney/react-loading";
 import { loadMenu } from "../apis/Character";
@@ -22,12 +22,12 @@ const CharMenu = () => {
       </Navbar.Header>
       <Navbar.Collapse>
         <Nav>
-          <NavLink key="Overview" href={`#/account/status`}>
-            Overview
-          </NavLink>
-          <NavLink key="Public Data" href={`#/account/pubdata`}>
-            Public Data
-          </NavLink>
+          <LinkContainer to={`account/status`}>
+            <NavLink key="Overview">Overview</NavLink>
+          </LinkContainer>
+          <LinkContainer to={`account/pubdata`}>
+            <NavLink key="Public Data">Public Data</NavLink>
+          </LinkContainer>
 
           {!error ? (
             isLoading ? (
@@ -39,13 +39,11 @@ const CharMenu = () => {
                     <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
                       {cat.links.map((link) => {
                         return (
-                          <NavLink
-                            id={link.name}
-                            key={link.name}
-                            href={`#${link.link}`}
-                          >
-                            {link.name}
-                          </NavLink>
+                          <LinkContainer to={`${link.link}`}>
+                            <NavLink id={link.name} key={link.name}>
+                              {link.name}
+                            </NavLink>
+                          </LinkContainer>
                         );
                       })}
                     </NavDropdown>
@@ -68,9 +66,9 @@ const CharMenu = () => {
                 <NavLink key="Legacy UI" href={`/audit/`}>
                   Legacy UI
                 </NavLink>
-                <NavLink key="Account List" href={`#/account/list`}>
-                  Account List
-                </NavLink>
+                <LinkContainer to={`account/list`}>
+                  <NavLink key="Account List">Account List</NavLink>
+                </LinkContainer>
               </>
             )
           ) : (

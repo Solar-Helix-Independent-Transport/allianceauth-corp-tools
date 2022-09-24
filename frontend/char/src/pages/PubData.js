@@ -7,10 +7,13 @@ import { PanelLoader } from "../components/PanelLoader";
 import { ErrorLoader } from "../components/ErrorLoader";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { PortraitPanel } from "../components/PortraitPanel";
-const PubData = ({ character_id }) => {
+import { useParams } from "react-router-dom";
+
+const PubData = () => {
+  let { characterID } = useParams();
   const { isLoading, isFetching, error, data } = useQuery(
-    ["pubdata", character_id],
-    () => loadPubData(character_id),
+    ["pubdata", characterID],
+    () => loadPubData(characterID),
     { refetchOnWindowFocus: false },
   );
 

@@ -353,7 +353,7 @@ def react_menu(request):
 @login_required
 def react_main(request, character_id):
     # get available models
-    return render(request, 'corptools/character/react_base.html', context={"version": __version__})
+    return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
 
 
 @login_required

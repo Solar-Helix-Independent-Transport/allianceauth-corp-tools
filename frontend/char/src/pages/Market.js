@@ -4,11 +4,13 @@ import { useQuery } from "react-query";
 import { loadMarket } from "../apis/Character";
 import { BaseTable, SelectColumnFilter } from "../components/BaseTable";
 import ErrorBoundary from "../components/ErrorBoundary";
+import { useParams } from "react-router-dom";
 
-const CharMarket = ({ character_id }) => {
+const CharMarket = () => {
+  let { characterID } = useParams();
   const { isLoading, isFetching, error, data } = useQuery(
-    ["market", character_id],
-    () => loadMarket(character_id),
+    ["market", characterID],
+    () => loadMarket(characterID),
     {
       initialData: [],
       refetchOnWindowFocus: false,

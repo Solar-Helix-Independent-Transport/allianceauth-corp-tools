@@ -8,16 +8,18 @@ import { ErrorLoader } from "../components/ErrorLoader";
 import { useQuery } from "react-query";
 import { TextFilter } from "../components/TextFilter";
 import { SelectFilter } from "../components/SelectFilter";
+import { useParams } from "react-router-dom";
 
-const CharSkills = ({ character_id }) => {
-  const [char_id, setCharacter] = useState(character_id);
+const CharSkills = () => {
+  let { characterID } = useParams();
+  const [char_id, setCharacter] = useState(characterID);
   const [group_filter, setGroup] = useState("All");
   const [skill_filter, setFilter] = useState("");
   const [level_filter, setLevel] = useState(-1);
 
   const { isLoading, error, data } = useQuery(
-    ["skills", character_id],
-    () => loadSkills(character_id),
+    ["skills", characterID],
+    () => loadSkills(characterID),
     { refetchOnWindowFocus: false },
   );
 

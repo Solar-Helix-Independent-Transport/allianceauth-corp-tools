@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Panel, Label, Button, Glyphicon } from "react-bootstrap";
 import { useQuery } from "react-query";
+import { useNavigate } from "react-router-dom";
 import { loadAccountList } from "../apis/Character";
 import {
   BaseTable,
@@ -11,6 +12,7 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import { SelectFilter } from "../components/SelectFilter";
 
 const AccountList = () => {
+  const navigate = useNavigate();
   const [filter_inactive, setFilterInactives] = useState(false);
   const { isLoading, isFetching, error, data } = useQuery(
     ["account-list"],
@@ -32,13 +34,14 @@ const AccountList = () => {
               <Button
                 className="flex-container flex-wide"
                 bsStyle="success"
-                href={"/audit/r/" + props.value.character_id + "/"}
+                id={props.value.character_id}
+                //href={"/audit/r/" + props.value.character_id + "/"}
+                onClick={(e) => {
+                  navigate(`/audit/r/${props.value.character_id}/`);
+                }}
               >
                 <span>{props.value.character_name}</span>
-                <Glyphicon
-                  style={{ "margin-left": "15px" }}
-                  glyph="new-window"
-                />
+                <Glyphicon style={{ marginLeft: "15px" }} glyph="new-window" />
               </Button>
             </>
           ) : (
@@ -103,7 +106,7 @@ const AccountList = () => {
         },
       },
     ],
-    [],
+    [navigate],
   );
 
   const filterOptions = [

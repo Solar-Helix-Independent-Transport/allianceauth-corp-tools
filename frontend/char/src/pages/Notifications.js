@@ -4,11 +4,14 @@ import { useQuery } from "react-query";
 import { loadNotifications } from "../apis/Character";
 import { BaseTable, SelectColumnFilter } from "../components/BaseTable";
 import ErrorBoundary from "../components/ErrorBoundary";
+import { useParams } from "react-router-dom";
 
-const CharNotifications = ({ character_id }) => {
+const CharNotifications = () => {
+  let { characterID } = useParams();
+
   const { isLoading, isFetching, error, data } = useQuery(
-    ["notifications", character_id],
-    () => loadNotifications(character_id),
+    ["notifications", characterID],
+    () => loadNotifications(characterID),
     {
       initialData: [],
       refetchOnWindowFocus: false,

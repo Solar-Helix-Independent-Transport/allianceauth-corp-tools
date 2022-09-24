@@ -236,13 +236,13 @@ def get_character_menu(request):
     if app_settings.CT_CHAR_CONTACTS_MODULE:
         _inter["links"].append({
             "name": "Contact",
-            "link": "/account/contact"
+            "link": "account/contact"
         })
 
     if app_settings.CT_CHAR_NOTIFICATIONS_MODULE:
         _inter["links"].append({
             "name": "Notifications",
-            "link": "/account/notifications"
+            "link": "account/notifications"
         })
 
     # if app_settings.CT_CHAR_STANDINGS_MODULE:
@@ -254,7 +254,7 @@ def get_character_menu(request):
     if app_settings.CT_CHAR_WALLET_MODULE:
         _finance["links"].append({
             "name": "Wallet",
-            "link": "/account/wallet"
+            "link": "account/wallet"
         })
         if (request.user.has_perm("corptools.global_corp_manager") or
             request.user.has_perm("corptools.state_corp_manager") or
@@ -262,53 +262,53 @@ def get_character_menu(request):
                 request.user.has_perm("corptools.own_corp_manager")):
             _finance["links"].append({
                 "name": "Wallet Activity",
-                "link": "/account/walletactivity"
+                "link": "account/walletactivity"
             })
 
         _finance["links"].append({
             "name": "Market",
-            "link": "/account/market"
+            "link": "account/market"
         })
     if app_settings.CT_CHAR_ASSETS_MODULE:
         _char["links"].append({
             "name": "Asset Overview",
-            "link": "/account/assets"
+            "link": "account/assets"
         })
         _char["links"].append({
             "name": "Asset List",
-            "link": "/account/listassets"
+            "link": "account/listassets"
         })
 
     if app_settings.CT_CHAR_CLONES_MODULE:
         _char["links"].append({
             "name": "Clones",
-            "link": "/account/clones"
+            "link": "account/clones"
         })
 
     if app_settings.CT_CHAR_ROLES_MODULE:
         _char["links"].append({
             "name": "Roles",
-            "link": "/account/roles"
+            "link": "account/roles"
         })
 
     if app_settings.CT_CHAR_MAIL_MODULE:
         _char["links"].append({
             "name": "Mail",
-            "link": "/account/mail"
+            "link": "account/mail"
         })
 
     if app_settings.CT_CHAR_SKILLS_MODULE:
         _char["links"].append({
             "name": "Skills",
-            "link": "/account/skills"
+            "link": "account/skills"
         })
         _char["links"].append({
             "name": "Skill Queues",
-            "link": "/account/skillqueue"
+            "link": "account/skillqueue"
         })
         _char["links"].append({
             "name": "Skill List Checks",
-            "link": "/account/doctrines"
+            "link": "account/doctrines"
         })
     out = []
     if len(_char['links']):
