@@ -48,7 +48,7 @@ const CorptoolsCharacterView = () => {
         <Router>
           <Routes>
             <Route path="audit/r/:characterID/" element={<CharacterAudit />}>
-              <Route index element={<CharStatus />} />
+              <Route index element={<Navigate to="account/status" replace />} />
               <Route index path="account/status" element={<CharStatus />} />
               <Route path="account/assets" element={<CharAssets />} />
               <Route path="account/listassets" element={<CharAssetList />} />

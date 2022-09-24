@@ -1,16 +1,17 @@
 import React from "react";
 import { useQuery } from "react-query";
-import { Nav, Glyphicon } from "react-bootstrap";
+import { Nav, Glyphicon, NavItem } from "react-bootstrap";
 import { NavDropdown } from "react-bootstrap";
 import { Navbar } from "react-bootstrap";
-import { NavItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
-import NavLink from "./NavLinkActive";
 import { Grid } from "@agney/react-loading";
 import { loadMenu } from "../apis/Character";
 import "./Menu.css";
+import { useParams } from "react-router-dom";
 
 const CharMenu = () => {
+  let { characterID } = useParams();
+
   const { isLoading, error, data } = useQuery(["Menu"], () => loadMenu(), {
     refetchOnWindowFocus: false,
   });
@@ -22,11 +23,21 @@ const CharMenu = () => {
       </Navbar.Header>
       <Navbar.Collapse>
         <Nav>
-          <LinkContainer to={`account/status`}>
-            <NavLink key="Overview">Overview</NavLink>
+          <LinkContainer
+            activeClassName={"active"}
+            to={`/audit/r/${characterID}/account/status`}
+          >
+            <NavItem key="Overview" to={`account/status`}>
+              Overview
+            </NavItem>
           </LinkContainer>
-          <LinkContainer to={`account/pubdata`}>
-            <NavLink key="Public Data">Public Data</NavLink>
+          <LinkContainer
+            activeClassName={"active"}
+            to={`/audit/r/${characterID}/account/pubdata`}
+          >
+            <NavItem key="Public Data" to={`account/status`}>
+              Public Data
+            </NavItem>
           </LinkContainer>
 
           {!error ? (
@@ -39,10 +50,17 @@ const CharMenu = () => {
                     <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
                       {cat.links.map((link) => {
                         return (
-                          <LinkContainer to={`${link.link}`}>
-                            <NavLink id={link.name} key={link.name}>
+                          <LinkContainer
+                            activeClassName={"active"}
+                            to={`/audit/r/${characterID}/${link.link}`}
+                          >
+                            <NavItem
+                              to={`${link.link}`}
+                              id={link.name}
+                              key={link.name}
+                            >
                               {link.name}
-                            </NavLink>
+                            </NavItem>
                           </LinkContainer>
                         );
                       })}
@@ -63,11 +81,11 @@ const CharMenu = () => {
               </>
             ) : (
               <>
-                <NavLink key="Legacy UI" href={`/audit/`}>
+                <NavItem key="Legacy UI" href={`/audit/`}>
                   Legacy UI
-                </NavLink>
+                </NavItem>
                 <LinkContainer to={`account/list`}>
-                  <NavLink key="Account List">Account List</NavLink>
+                  <NavItem key="Account List">Account List</NavItem>
                 </LinkContainer>
               </>
             )
