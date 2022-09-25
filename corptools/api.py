@@ -11,6 +11,7 @@ from allianceauth.eveonline.models import EveCharacter
 from allianceauth.eveonline.tasks import \
     update_character as eve_character_update
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, F, Q, QuerySet, Sum
 from django.utils import timezone
 from esi.models import Token
@@ -63,8 +64,11 @@ def get_main_character(request, character_id):
     perms = True
     main_char = EveCharacter.objects\
         .select_related('character_ownership', 'character_ownership__user__profile', 'character_ownership__user__profile__main_character', )\
-        .get(character_id=character_id)\
-        .character_ownership.user.profile.main_character
+        .get(character_id=character_id)
+    try:
+        main_char = main_char.character_ownership.user.profile.main_character
+    except (ObjectDoesNotExist):
+        pass
 
     # check access
     visible = models.CharacterAudit.objects.visible_eve_characters(
@@ -88,10 +92,13 @@ def get_main_character(request, character_id):
 
 
 def get_alts_queryset(main_char):
-    linked_characters = main_char.character_ownership.user.character_ownerships.all(
-    ).values_list('character_id', flat=True)
+    try:
+        linked_characters = main_char.character_ownership.user.character_ownerships.all(
+        ).values_list('character_id', flat=True)
 
-    return EveCharacter.objects.filter(id__in=linked_characters)
+        return EveCharacter.objects.filter(id__in=linked_characters)
+    except ObjectDoesNotExist:
+        return EveCharacter.objects.filter(pk=main_char.pk)
 
 
 @api.get(
@@ -1206,12 +1213,14 @@ def get_account_list(request):
         .prefetch_related('character__character_ownership__user__character_ownerships__character')\
         .prefetch_related('character__character_ownership__user__character_ownerships__character__characteraudit')\
 
+    character_ids = []
     output = {}
     for char in characters:
+        main = char.character.character_ownership.user.profile.main_character
         for c in char.character.character_ownership.user.character_ownerships.all():
             if char.character.character_id not in output:
-                output[char.character.character_id] = {
-                    "main": c.character.character_ownership.user.profile.main_character,
+                output[main.character_id] = {
+                    "main": main,
                     "characters": []
                 }
             active = False
@@ -1219,12 +1228,61 @@ def get_account_list(request):
                 active = c.character.characteraudit.is_active()
             except models.CharacterAudit.DoesNotExist:
                 pass
-            output[char.character.character_id]["characters"].append(
+            character_ids.append(c.character.character_id)
+            output[main.character_id]["characters"].append(
                 {
                     "character": c.character,
                     "active": active
                 }
             )
+
+    orphans = models.CharacterAudit.objects.visible_to(
+        request.user).exclude(character__character_id__in=character_ids)\
+        .select_related('character__character_ownership',
+                        'character__character_ownership__user__profile',
+                        'character__character_ownership__user__profile__main_character',
+                        'character__characteraudit')\
+        .prefetch_related('character__character_ownership__user__character_ownerships')\
+        .prefetch_related('character__character_ownership__user__character_ownerships__character')\
+        .prefetch_related('character__character_ownership__user__character_ownerships__character__characteraudit')\
+
+    for char in orphans:
+        try:
+            main = char.character.character_ownership.user.profile.main_character
+            if main.character_id not in output:
+                output[main.character_id] = {
+                    "main": main,
+                    "characters": [{
+                        "character": main,
+                        "active": False
+                    }]
+                }
+            active = False
+            try:
+                active = char.character.characteraudit.is_active()
+            except models.CharacterAudit.DoesNotExist:
+                pass
+            output[main.character_id]["characters"].append(
+                {
+                    "character": char.character,
+                    "active": active
+                }
+            )
+        except:
+            main = char.character
+            active = False
+            try:
+                active = char.character.characteraudit.is_active()
+            except models.CharacterAudit.DoesNotExist:
+                pass
+            output[main.character_id] = {
+                "main": main,
+                "orphan": True,
+                "characters": [{
+                    "character": char.character,
+                    "active": active
+                }]
+            }
 
     return list(output.values())
 

@@ -2,7 +2,7 @@ from __future__ import division
 
 from datetime import datetime
 from typing import Dict, List, Optional
-from xmlrpc.client import boolean
+from xmlrpc.client import Boolean, boolean
 
 from ninja import Schema
 
@@ -43,6 +43,7 @@ class CharacterStatus(Schema):
 class AccountStatus(Schema):
     characters: List[CharacterStatus]
     main: Character
+    orphan: Boolean = False
 
 
 class MenuLink(Schema):

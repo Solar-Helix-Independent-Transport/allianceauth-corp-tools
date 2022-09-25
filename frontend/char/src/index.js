@@ -36,11 +36,6 @@ TimeAgo.addDefaultLocale(en);
 const queryClient = new QueryClient();
 
 const CorptoolsCharacterView = () => {
-  const url_char_id = window.location.pathname.split("/")[3]
-    ? window.location.pathname.split("/")[3]
-    : 0;
-
-  console.log(url_char_id);
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
@@ -49,7 +44,7 @@ const CorptoolsCharacterView = () => {
           <Routes>
             <Route path="audit/r/:characterID/" element={<CharacterAudit />}>
               <Route index element={<Navigate to="account/status" replace />} />
-              <Route index path="account/status" element={<CharStatus />} />
+              <Route path="account/status" element={<CharStatus />} />
               <Route path="account/assets" element={<CharAssets />} />
               <Route path="account/listassets" element={<CharAssetList />} />
               <Route path="account/pubdata" element={<PubData />} />
