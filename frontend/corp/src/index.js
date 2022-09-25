@@ -1,18 +1,19 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import reportWebVitals from "./reportWebVitals";
-import { CorpStructures } from "./pages/Structures";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { Panel } from "react-bootstrap";
-import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import CorpMenu from "./components/CorpMenu";
-import CorpStatus from "./pages/Status";
-import "./style.css";
-import CorpAssets from "./pages/Assets";
 import CorpAssetLists from "./pages/AssetList";
-import CorpWallet from "./pages/Wallets";
+import CorpAssets from "./pages/Assets";
 import { Bridges } from "./pages/Bridges";
 import { Sov } from "./pages/Sov";
+import CorpStatus from "./pages/Status";
+import { CorpStructures } from "./pages/Structures";
+import CorpWallet from "./pages/Wallets";
+import reportWebVitals from "./reportWebVitals";
+import "./style.css";
+import React from "react";
+import { Panel } from "react-bootstrap";
+import ReactDOM from "react-dom";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { Route, HashRouter as Router, Switch } from "react-router-dom";
+
 const queryClient = new QueryClient();
 
 ReactDOM.render(
@@ -23,11 +24,7 @@ ReactDOM.render(
         <CorpMenu />
         <Panel bsStyle="default">
           <Switch>
-            <Route
-              exact
-              path={["", "/structures"]}
-              component={() => CorpStructures()}
-            />
+            <Route exact path={["", "/structures"]} component={() => CorpStructures()} />
             <Route path={"/wallets"} component={() => CorpWallet()} />
             <Route path={"/status"} component={() => CorpStatus()} />
             <Route path={"/assetgroup"} component={() => CorpAssets()} />
@@ -39,7 +36,7 @@ ReactDOM.render(
       </QueryClientProvider>
     </Router>
   </React.StrictMode>,
-  document.getElementById("root"),
+  document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function

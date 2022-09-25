@@ -1,33 +1,20 @@
-import React from "react";
-import { Button, Tooltip, OverlayTrigger } from "react-bootstrap";
-import {
-  useTable,
-  useFilters,
-  usePagination,
-  useSortBy,
-  useExpanded,
-} from "react-table";
-import Select from "react-select";
+import { ErrorLoader } from "../components/ErrorLoader";
+import "./BaseTable.css";
 import { Bars } from "@agney/react-loading";
+import React from "react";
+import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import {
-  ButtonToolbar,
   ButtonGroup,
+  ButtonToolbar,
   Glyphicon,
   MenuItem,
   SplitButton,
   Table,
 } from "react-bootstrap";
-import "./BaseTable.css";
-import { ErrorLoader } from "../components/ErrorLoader";
+import Select from "react-select";
+import { useExpanded, useFilters, usePagination, useSortBy, useTable } from "react-table";
 
-export function SubRows({
-  row,
-  rowProps,
-  visibleColumns,
-  data,
-  error,
-  isLoading,
-}) {
+export function SubRows({ row, rowProps, visibleColumns, data, error, isLoading }) {
   if (isLoading) {
     return (
       <tr>
@@ -92,15 +79,11 @@ function MyTooltip({ message }) {
 }
 
 // Define a default UI for filtering
-function DefaultColumnFilter({
-  column: { filterValue, preFilteredRows, setFilter },
-}) {
+function DefaultColumnFilter({ column: { filterValue, preFilteredRows, setFilter } }) {
   return <></>;
 }
 
-export function textColumnFilter({
-  column: { filterValue, preFilteredRows, setFilter },
-}) {
+export function textColumnFilter({ column: { filterValue, preFilteredRows, setFilter } }) {
   const count = preFilteredRows.length;
 
   return (
@@ -117,9 +100,7 @@ export function textColumnFilter({
 
 // This is a custom filter UI for selecting
 // a unique option from a list
-export function SelectColumnFilter({
-  column: { setFilter, filterValue, preFilteredRows, id },
-}) {
+export function SelectColumnFilter({ column: { setFilter, filterValue, preFilteredRows, id } }) {
   // Calculate the options for filtering
   // using the preFilteredRows
   const options = React.useMemo(() => {
@@ -151,7 +132,7 @@ export function SelectColumnFilter({
       options={[{ id: -1, value: "", label: "All" }].concat(
         options.map((o, i) => {
           return { id: i, value: o, label: o };
-        }),
+        })
       )}
     />
   );
@@ -179,7 +160,7 @@ export const BaseTable = ({
       // Let's set up our default Filter UI
       Filter: DefaultColumnFilter,
     }),
-    [],
+    []
   );
 
   const filterTypes = React.useMemo(
@@ -199,15 +180,13 @@ export const BaseTable = ({
                   return (p += " " + strToKey(id, r));
                 }, "");
               }
-              return rowValue
-                ? rowValue.toLowerCase().includes(filterValue.toLowerCase())
-                : false;
+              return rowValue ? rowValue.toLowerCase().includes(filterValue.toLowerCase()) : false;
             }
           });
         });
       },
     }),
-    [],
+    []
   );
 
   const {
@@ -240,7 +219,7 @@ export const BaseTable = ({
     useFilters,
     useSortBy,
     useExpanded,
-    usePagination,
+    usePagination
   );
 
   if (isLoading)
@@ -300,17 +279,13 @@ export const BaseTable = ({
                 <tr {...row.getRowProps(rowProps)}>
                   {row.cells.map((cell) => {
                     return (
-                      <td
-                        style={{ verticalAlign: "middle" }}
-                        {...cell.getCellProps()}
-                      >
+                      <td style={{ verticalAlign: "middle" }} {...cell.getCellProps()}>
                         {cell.render("Cell")}
                       </td>
                     );
                   })}
                 </tr>
-                {row.isExpanded &&
-                  asyncExpandFunction({ row, rowProps, visibleColumns })}
+                {row.isExpanded && asyncExpandFunction({ row, rowProps, visibleColumns })}
               </>
             );
           })}
@@ -319,25 +294,13 @@ export const BaseTable = ({
       <div className="pagination pull-right">
         <ButtonToolbar>
           <ButtonGroup>
-            <Button
-              bsStyle="success"
-              onClick={() => gotoPage(0)}
-              disabled={!canPreviousPage}
-            >
+            <Button bsStyle="success" onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
               <Glyphicon glyph="step-backward" />
             </Button>{" "}
-            <Button
-              bsStyle="success"
-              onClick={() => previousPage()}
-              disabled={!canPreviousPage}
-            >
+            <Button bsStyle="success" onClick={() => previousPage()} disabled={!canPreviousPage}>
               <Glyphicon glyph="triangle-left" />
             </Button>{" "}
-            <Button
-              bsStyle="success"
-              onClick={() => nextPage()}
-              disabled={!canNextPage}
-            >
+            <Button bsStyle="success" onClick={() => nextPage()} disabled={!canNextPage}>
               <Glyphicon glyph="triangle-right" />
             </Button>{" "}
             <Button
@@ -361,12 +324,7 @@ export const BaseTable = ({
               }}
             >
               {[20, 50, 100, 1000000].map((pageSize) => (
-                <MenuItem
-                  id={pageSize}
-                  key={pageSize}
-                  eventKey={pageSize}
-                  value={pageSize}
-                >
+                <MenuItem id={pageSize} key={pageSize} eventKey={pageSize} value={pageSize}>
                   Show {pageSize}
                 </MenuItem>
               ))}
@@ -395,15 +353,9 @@ export const BaseTable = ({
             }
           </Button>{" "}
           {isFetching ? (
-            <OverlayTrigger
-              placement="bottom"
-              overlay={MyTooltip({ message: "Refreshing Data" })}
-            >
+            <OverlayTrigger placement="bottom" overlay={MyTooltip({ message: "Refreshing Data" })}>
               <Button bsStyle="info">
-                <Glyphicon
-                  className="glyphicon-refresh-animate"
-                  glyph="refresh"
-                />
+                <Glyphicon className="glyphicon-refresh-animate" glyph="refresh" />
               </Button>
             </OverlayTrigger>
           ) : (

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { Panel } from "react-bootstrap";
 import CharAssetLocSelect from "../components/CharAssetLocSelect";
 import CharAssetTable from "../components/CharAssetTable";
 import ErrorBoundary from "../components/ErrorBoundary";
+import React, { useState } from "react";
+import { Panel } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 
 const CharAssets = () => {
@@ -12,10 +12,7 @@ const CharAssets = () => {
   return (
     <ErrorBoundary>
       <Panel.Body className="flex-container-vert-fill">
-        <CharAssetLocSelect
-          character_id={characterID}
-          setLocation={setLocation}
-        />
+        <CharAssetLocSelect character_id={characterID} setLocation={setLocation} />
         <CharAssetTable character_id={characterID} location_id={location} />
       </Panel.Body>
     </ErrorBoundary>

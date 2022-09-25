@@ -1,9 +1,9 @@
-import React from "react";
-import { Panel } from "react-bootstrap";
-import { useQuery } from "react-query";
 import { loadMarket } from "../apis/Character";
 import { BaseTable, SelectColumnFilter } from "../components/BaseTable";
 import ErrorBoundary from "../components/ErrorBoundary";
+import React from "react";
+import { Panel } from "react-bootstrap";
+import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharMarket = () => {
@@ -14,7 +14,7 @@ const CharMarket = () => {
     {
       initialData: [],
       refetchOnWindowFocus: false,
-    },
+    }
   );
 
   const columns = React.useMemo(
@@ -57,7 +57,7 @@ const CharMarket = () => {
         ),
       },
     ],
-    [],
+    []
   );
   let active = [];
   let expired = [];
@@ -73,17 +73,12 @@ const CharMarket = () => {
             Active Orders
             <br />
             {data.active ? (
-              <span className="small">
-                Remaining: ${data.total_active.toLocaleString()}
-              </span>
+              <span className="small">Remaining: ${data.total_active.toLocaleString()}</span>
             ) : (
               <></>
             )}
           </h4>
-          <BaseTable
-            data={active}
-            {...{ isLoading, isFetching, columns, error }}
-          />
+          <BaseTable data={active} {...{ isLoading, isFetching, columns, error }} />
         </div>
         <hr />
         <div>
@@ -91,17 +86,12 @@ const CharMarket = () => {
             Expired Orders
             <br />
             {data.active ? (
-              <span className="small">
-                Total: ${data.total_expired.toLocaleString()}
-              </span>
+              <span className="small">Total: ${data.total_expired.toLocaleString()}</span>
             ) : (
               <></>
             )}
           </h4>
-          <BaseTable
-            data={expired}
-            {...{ isLoading, isFetching, columns, error }}
-          />
+          <BaseTable data={expired} {...{ isLoading, isFetching, columns, error }} />
         </div>
       </Panel.Body>
     </ErrorBoundary>

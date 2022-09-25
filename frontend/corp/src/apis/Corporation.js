@@ -1,5 +1,6 @@
 import axios from "axios";
 import cookies from "js-cookies";
+
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
 export async function loadStatus() {
@@ -13,8 +14,8 @@ export async function loadStatus() {
         } catch (err) {
           return p;
         }
-      }, []),
-    ),
+      }, [])
+    )
   );
   headers.sort();
 
@@ -34,42 +35,37 @@ export async function postCorporationRefresh() {
 }
 
 export async function loadAssetLocations(corporation_id) {
-  const api = await axios.get(
-    `/audit/api/corporation/${corporation_id}/asset/locations`,
-  );
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/asset/locations`);
   console.log(`get asset locations in api ${corporation_id}`);
   return api.data;
 }
 
 export async function loadAssetGroups(corporation_id, location_id) {
   const api = await axios.get(
-    `/audit/api/corporation/${corporation_id}/asset/${location_id}/groups`,
+    `/audit/api/corporation/${corporation_id}/asset/${location_id}/groups`
   );
   console.log(`get asset groups in api ${corporation_id} ${location_id}`);
   return api.data;
 }
 
 export async function loadAssetContents(item_id) {
-  const api = await axios.get(
-    `/audit/api/corporation/asset/${item_id}/contents`,
-  );
+  const api = await axios.get(`/audit/api/corporation/asset/${item_id}/contents`);
   console.log(`get asset contents in api ${item_id}`);
   return api.data;
 }
 
 export async function loadAssetList(corporation_id, location_id, new_type) {
   const api = await axios.get(
-    `/audit/api/corporation/${corporation_id}/asset/${location_id}/list?new_asset_tree=${new_type}`,
+    `/audit/api/corporation/${corporation_id}/asset/${location_id}/list?new_asset_tree=${new_type}`
   );
   console.log(`get asset list in api ${corporation_id} ${location_id}`);
   return api.data;
 }
 
 export async function loadWallet(corporation_id, refType = "", page = 1) {
-  const api = await axios.get(
-    `/audit/api/corporation/${corporation_id}/wallet`,
-    { params: { type_refs: refType, page: page } },
-  );
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/wallet`, {
+    params: { type_refs: refType, page: page },
+  });
   console.log(`get wallet in api ${corporation_id}`);
   return api.data;
 }

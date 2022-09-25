@@ -1,20 +1,18 @@
+import { loadStatus } from "../apis/Character";
+import CharActiveBadge from "./CharActiveBadge";
+import { Bars } from "@agney/react-loading";
 import React from "react";
 import { Col } from "react-bootstrap";
-import { useQuery } from "react-query";
 import { Image } from "react-bootstrap";
 import { Panel } from "react-bootstrap";
 import { Badge } from "react-bootstrap";
-import CharActiveBadge from "./CharActiveBadge";
-import { loadStatus } from "../apis/Character";
-import { Bars } from "@agney/react-loading";
+import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharHeader = () => {
   let { characterID } = useParams();
 
-  const { isLoading, data } = useQuery(["status", characterID], () =>
-    loadStatus(characterID),
-  );
+  const { isLoading, data } = useQuery(["status", characterID], () => loadStatus(characterID));
   let isk = 0;
   let sp = 0;
   if (!isLoading) {
@@ -90,10 +88,7 @@ const CharHeader = () => {
                 </>
               )}
               <div className="child-end">
-                <CharActiveBadge
-                  characters={data.characters}
-                  character_id={characterID}
-                />
+                <CharActiveBadge characters={data.characters} character_id={characterID} />
               </div>
             </>
           ) : (

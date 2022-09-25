@@ -1,7 +1,7 @@
+import { loadStatus } from "../apis/Corporation";
 import React from "react";
 import { useQuery } from "react-query";
 import Select from "react-select";
-import { loadStatus } from "../apis/Corporation";
 
 const colourStyles = {
   option: (styles) => {

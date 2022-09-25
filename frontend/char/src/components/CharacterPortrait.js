@@ -1,6 +1,6 @@
+import "./CharacterPortrait.css";
 import React from "react";
 import { Image } from "react-bootstrap";
-import "./CharacterPortrait.css";
 
 const CharacterPortrait = ({ character, className = "" }) => {
   return (

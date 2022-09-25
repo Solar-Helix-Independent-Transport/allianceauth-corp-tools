@@ -1,7 +1,7 @@
-import React from "react";
-import Select from "react-select";
 import { loadRefTypes } from "../../apis/Corporation";
+import React from "react";
 import { useQuery } from "react-query";
+import Select from "react-select";
 
 const colourStyles = {
   option: (styles) => {

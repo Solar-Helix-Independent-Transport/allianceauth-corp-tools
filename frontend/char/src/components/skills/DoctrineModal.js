@@ -1,15 +1,9 @@
+import { SkillBlock } from "./SkillBlock";
+import "./doctrine.css";
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
-import "./doctrine.css";
-import { SkillBlock } from "./SkillBlock";
 
-export const DoctrineModal = ({
-  show,
-  setShow,
-  name,
-  skill_reqs,
-  skill_list,
-}) => {
+export const DoctrineModal = ({ show, setShow, name, skill_reqs, skill_list }) => {
   const toggleLevel = () => {
     setShow(!show);
   };
@@ -25,14 +19,7 @@ export const DoctrineModal = ({
           if (skill_list[k]) {
             trained_level = skill_list[k].active_level;
           }
-          return (
-            <SkillBlock
-              skill={k}
-              level={v}
-              active={trained_level}
-              className="full-width"
-            />
-          );
+          return <SkillBlock skill={k} level={v} active={trained_level} className="full-width" />;
         })}
       </Modal.Body>
       <Modal.Footer>

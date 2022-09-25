@@ -1,30 +1,26 @@
-import React from "react";
-import { Panel, Label } from "react-bootstrap";
-import { useQuery } from "react-query";
 import { loadStructures } from "../apis/Structures";
-import Select from "react-select";
 import {
   BaseTable,
   SelectColumnFilter,
-  textColumnFilter,
   colourStyles,
+  textColumnFilter,
 } from "../components/BaseTable";
-import ReactTimeAgo from "react-time-ago";
 import { TypeIcon } from "../components/EveImages";
+import { CorporationLogo } from "../components/EveImages";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
-import { CorporationLogo } from "../components/EveImages";
+import React from "react";
+import { Label, Panel } from "react-bootstrap";
+import { useQuery } from "react-query";
+import Select from "react-select";
+import ReactTimeAgo from "react-time-ago";
 
 TimeAgo.addDefaultLocale(en);
 
 export const CorpStructures = () => {
-  const { isLoading, isFetching, error, data } = useQuery(
-    ["stuctures"],
-    () => loadStructures(),
-    {
-      initialData: [],
-    },
-  );
+  const { isLoading, isFetching, error, data } = useQuery(["stuctures"], () => loadStructures(), {
+    initialData: [],
+  });
 
   const valueSort = React.useMemo(
     () => (rowA, rowB, columnId) => {
@@ -35,7 +31,7 @@ export const CorpStructures = () => {
       }
       return a > b ? 1 : -1;
     },
-    [],
+    []
   );
 
   const columns = React.useMemo(
@@ -46,12 +42,7 @@ export const CorpStructures = () => {
         Filter: SelectColumnFilter,
         filter: "text",
         Cell: (props) => (
-          <a
-            href={
-              "https://evemaps.dotlan.net/system/" +
-              props.value.name.replace(" ", "_")
-            }
-          >
+          <a href={"https://evemaps.dotlan.net/system/" + props.value.name.replace(" ", "_")}>
             {props.value.name}
           </a>
         ),
@@ -81,9 +72,7 @@ export const CorpStructures = () => {
         Header: "Owner",
         accessor: "owner",
         disableSortBy: true,
-        Filter: ({
-          column: { setFilter, filterValue, preFilteredRows, id },
-        }) => {
+        Filter: ({ column: { setFilter, filterValue, preFilteredRows, id } }) => {
           const options = React.useMemo(() => {
             const options = new Set();
             if (!preFilteredRows) {
@@ -107,7 +96,7 @@ export const CorpStructures = () => {
               options={[{ id: -1, value: "", label: "All" }].concat(
                 options.map((o, i) => {
                   return { id: i, value: o, label: o };
-                }),
+                })
               )}
             />
           );
@@ -142,9 +131,7 @@ export const CorpStructures = () => {
         Header: "Fuel Expiry",
         accessor: "fuel_expiry",
         sortType: valueSort,
-        Cell: (props) => (
-          <div>{props.value ? <ReactTimeAgo date={props.value} /> : ""}</div>
-        ),
+        Cell: (props) => <div>{props.value ? <ReactTimeAgo date={props.value} /> : ""}</div>,
       },
       {
         Header: "State",
@@ -157,9 +144,7 @@ export const CorpStructures = () => {
         Header: "Services",
         accessor: "services",
         disableSortBy: true,
-        Filter: ({
-          column: { setFilter, filterValue, preFilteredRows, id },
-        }) => {
+        Filter: ({ column: { setFilter, filterValue, preFilteredRows, id } }) => {
           const options = React.useMemo(() => {
             const options = new Set();
             if (!preFilteredRows) {
@@ -185,7 +170,7 @@ export const CorpStructures = () => {
               options={[{ id: -1, value: "", label: "All" }].concat(
                 options.map((o, i) => {
                   return { id: i, value: o, label: o };
-                }),
+                })
               )}
             />
           );
@@ -225,7 +210,7 @@ export const CorpStructures = () => {
           ),
       },
     ],
-    [valueSort],
+    [valueSort]
   );
 
   return (

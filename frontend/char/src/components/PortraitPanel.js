@@ -1,6 +1,6 @@
-import React from "react";
-import { Panel, Glyphicon } from "react-bootstrap";
 import CharacterPortrait from "./CharacterPortrait";
+import React from "react";
+import { Glyphicon, Panel } from "react-bootstrap";
 
 export function PortraitPanel({
   children,
@@ -10,20 +10,13 @@ export function PortraitPanel({
   headerIcon = false,
 }) {
   return (
-    <Panel
-      key={`panel ${character.character_name}`}
-      {...panelStyles}
-      className={"flex-child"}
-    >
+    <Panel key={`panel ${character.character_name}`} {...panelStyles} className={"flex-child"}>
       <Panel.Heading>
         <h4 className={"text-center"}>
           {headerIcon && <Glyphicon className="pull-left" glyph={headerIcon} />}
           {character.character_name}
           {isFetching && (
-            <Glyphicon
-              className="glyphicon-refresh-animate pull-right"
-              glyph="refresh"
-            />
+            <Glyphicon className="glyphicon-refresh-animate pull-right" glyph="refresh" />
           )}
         </h4>
       </Panel.Heading>

@@ -1,40 +1,27 @@
-import React from "react";
-import { Label, Tooltip, OverlayTrigger, ProgressBar } from "react-bootstrap";
 import "./BridgeLink.css";
+import React from "react";
+import { Label, OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 
 function MyTooltip({ message }) {
   return <Tooltip id="tooltip">{message}</Tooltip>;
 }
 
-export const BridgeLink = ({
-  start = { known: false },
-  end = { known: false },
-}) => {
+export const BridgeLink = ({ start = { known: false }, end = { known: false } }) => {
   return (
     <div class="bridge-div flex-container col-xs-12">
       {start.known ? (
         <>
-          <div
-            className={`start ${
-              start.active ? "gate-active" : "gate-inactive"
-            }`}
-          >
+          <div className={`start ${start.active ? "gate-active" : "gate-inactive"}`}>
             <h4>{start.system_name}</h4>
             <p>{start.name}</p>
           </div>
 
           <div className="flex-container-vert-fill">
-            <Label
-              className="flex-child"
-              bsStyle={start.ozone > 2500000 ? "info" : "danger"}
-            >
+            <Label className="flex-child" bsStyle={start.ozone > 2500000 ? "info" : "danger"}>
               {" "}
               Ozone: {start.ozone.toLocaleString()}
             </Label>
-            <Label
-              className="flex-child"
-              bsStyle={start.expires > 13 ? "info" : "danger"}
-            >
+            <Label className="flex-child" bsStyle={start.expires > 13 ? "info" : "danger"}>
               {" "}
               Fuel: {start.expires} days
             </Label>
@@ -42,10 +29,7 @@ export const BridgeLink = ({
           {start.active ? (
             <></>
           ) : (
-            <OverlayTrigger
-              placement="top"
-              overlay={MyTooltip({ message: "Gate Offline!" })}
-            >
+            <OverlayTrigger placement="top" overlay={MyTooltip({ message: "Gate Offline!" })}>
               <i class="far fa-times-circle"></i>
             </OverlayTrigger>
           )}
@@ -87,33 +71,22 @@ export const BridgeLink = ({
           {end.active ? (
             <></>
           ) : (
-            <OverlayTrigger
-              placement="top"
-              overlay={MyTooltip({ message: "Gate Offline!" })}
-            >
+            <OverlayTrigger placement="top" overlay={MyTooltip({ message: "Gate Offline!" })}>
               <i class="far fa-times-circle"></i>
             </OverlayTrigger>
           )}
 
           <div className="flex-container-vert-fill">
-            <Label
-              className="flex-child"
-              bsStyle={end.ozone > 2500000 ? "info" : "danger"}
-            >
+            <Label className="flex-child" bsStyle={end.ozone > 2500000 ? "info" : "danger"}>
               {" "}
               Ozone: {end.ozone.toLocaleString()}
             </Label>
-            <Label
-              className="flex-child"
-              bsStyle={end.expires > 13 ? "info" : "danger"}
-            >
+            <Label className="flex-child" bsStyle={end.expires > 13 ? "info" : "danger"}>
               {" "}
               Fuel: {end.expires} Days
             </Label>
           </div>
-          <div
-            className={`end ${end.active ? "gate-active" : "gate-inactive"}`}
-          >
+          <div className={`end ${end.active ? "gate-active" : "gate-inactive"}`}>
             <h4>{end.system_name}</h4>
             <p>{end.name}</p>
           </div>

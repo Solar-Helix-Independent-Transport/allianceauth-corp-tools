@@ -1,15 +1,15 @@
-import React from "react";
-import { Tooltip, OverlayTrigger, Table, Glyphicon } from "react-bootstrap";
-import { Panel } from "react-bootstrap";
-import CharacterPortrait from "../components/CharacterPortrait";
-import { useQuery } from "react-query";
 import { loadClones } from "../apis/Character";
+import CharacterPortrait from "../components/CharacterPortrait";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { ErrorLoader } from "../components/ErrorLoader";
 import { TypeIcon } from "../components/EveImages";
 import { PanelLoader } from "../components/PanelLoader";
-import ReactTimeAgo from "react-time-ago";
-import { ErrorLoader } from "../components/ErrorLoader";
-import ErrorBoundary from "../components/ErrorBoundary";
+import React from "react";
+import { Glyphicon, OverlayTrigger, Table, Tooltip } from "react-bootstrap";
+import { Panel } from "react-bootstrap";
+import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
+import ReactTimeAgo from "react-time-ago";
 
 function MyTooltip({ message }) {
   return <Tooltip id="implant_tooltip">{message}</Tooltip>;
@@ -23,7 +23,7 @@ const CharClones = () => {
     () => loadClones(characterID),
     {
       refetchOnWindowFocus: false,
-    },
+    }
   );
 
   if (isLoading) return <PanelLoader />;
@@ -43,10 +43,7 @@ const CharClones = () => {
                 <h4 className={"text-center"}>
                   {char.character.character_name}
                   {isFetching ? (
-                    <Glyphicon
-                      className="glyphicon-refresh-animate pull-right"
-                      glyph="refresh"
-                    />
+                    <Glyphicon className="glyphicon-refresh-animate pull-right" glyph="refresh" />
                   ) : (
                     <></>
                   )}
@@ -57,9 +54,7 @@ const CharClones = () => {
                   <CharacterPortrait character={char.character} />
                   <div style={{ margin: "auto" }}>
                     <h4 className="text-center">Home Station</h4>
-                    <p className="text-center">{`${
-                      char.home ? char.home.name : "No Data"
-                    }`}</p>
+                    <p className="text-center">{`${char.home ? char.home.name : "No Data"}`}</p>
                     <h4 className="text-center">Last Clone Jump</h4>
                     <p className="text-center">{`${
                       char.last_clone_jump
@@ -67,11 +62,7 @@ const CharClones = () => {
                         : "No Data"
                     }`}</p>
                     <p className="text-center">
-                      {char.last_clone_jump ? (
-                        <ReactTimeAgo date={char.last_clone_jump} />
-                      ) : (
-                        ""
-                      )}
+                      {char.last_clone_jump ? <ReactTimeAgo date={char.last_clone_jump} /> : ""}
                     </p>
                     <h4 className="text-center">Last Station Change</h4>
                     <p className="text-center">{`${
@@ -106,11 +97,7 @@ const CharClones = () => {
                             <tr>
                               <td className="text-left">
                                 <p>{c.name != null && <>{`${c.name}`}</>}</p>
-                                <p>
-                                  {c.location != null && (
-                                    <>{`${c.location.name}`}</>
-                                  )}
-                                </p>
+                                <p>{c.location != null && <>{`${c.location.name}`}</>}</p>
                               </td>
                               <td className="text-right no-wrap">
                                 {c.implants.map((i) => {

@@ -1,4 +1,5 @@
 import axios from "axios";
+
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
 export async function loadStructures() {

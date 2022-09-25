@@ -1,10 +1,9 @@
+import CorpBadge from "./CorpBadge";
+import "./Menu.css";
+import NavLink from "./NavLinkActive";
 import React from "react";
 import { Nav, NavDropdown } from "react-bootstrap";
 import { Navbar } from "react-bootstrap";
-
-import NavLink from "./NavLinkActive";
-import "./Menu.css";
-import CorpBadge from "./CorpBadge";
 
 const CorpMenu = () => {
   return (

@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { Panel, Glyphicon, Table, Label } from "react-bootstrap";
-import { useQuery } from "react-query";
-import Select from "react-select";
 import { loadSov } from "../apis/Corporation";
 import { ErrorLoader } from "../components/ErrorLoader";
 import { DataMessage } from "../components/NoData";
 import { PanelLoader } from "../components/PanelLoader";
+import React, { useState } from "react";
+import { Glyphicon, Label, Panel, Table } from "react-bootstrap";
+import { useQuery } from "react-query";
+import Select from "react-select";
 
 const colourStyles = {
   option: (styles) => {
@@ -19,7 +19,7 @@ const colourStyles = {
 export const Sov = () => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["sov"],
-    () => loadSov(), //,
+    () => loadSov() //,
     //{ initialData: [] }
   );
   const [regionFilter, setRegion] = useState("");
@@ -131,9 +131,7 @@ export const Sov = () => {
                 value: u,
                 label: u,
               };
-            }).sort((a, b) =>
-              a.value > b.value ? 1 : b.value > a.value ? -1 : 0,
-            )}
+            }).sort((a, b) => (a.value > b.value ? 1 : b.value > a.value ? -1 : 0))}
             isLoading={isFetching}
             isMulti={true}
             onChange={regionToState}
@@ -152,9 +150,7 @@ export const Sov = () => {
                 value: u,
                 label: u,
               };
-            }).sort((a, b) =>
-              a.value > b.value ? 1 : b.value > a.value ? -1 : 0,
-            )}
+            }).sort((a, b) => (a.value > b.value ? 1 : b.value > a.value ? -1 : 0))}
             isLoading={isFetching}
             isMulti={true}
             onChange={constellationToState}
@@ -173,9 +169,7 @@ export const Sov = () => {
                 value: u,
                 label: u,
               };
-            }).sort((a, b) =>
-              a.value > b.value ? 1 : b.value > a.value ? -1 : 0,
-            )}
+            }).sort((a, b) => (a.value > b.value ? 1 : b.value > a.value ? -1 : 0))}
             isLoading={isFetching}
             isMulti={true}
             onChange={upgradesToState}
@@ -194,9 +188,7 @@ export const Sov = () => {
                 value: u,
                 label: u,
               };
-            }).sort((a, b) =>
-              a.value > b.value ? 1 : b.value > a.value ? -1 : 0,
-            )}
+            }).sort((a, b) => (a.value > b.value ? 1 : b.value > a.value ? -1 : 0))}
             isLoading={isFetching}
             isMulti={true}
             onChange={stateToState}
@@ -205,11 +197,7 @@ export const Sov = () => {
         <hr className="col-xs-12" />
         {viewData
           .sort((a, b) =>
-            a.system.name > b.system.name
-              ? 1
-              : b.system.name > a.system.name
-              ? -1
-              : 0,
+            a.system.name > b.system.name ? 1 : b.system.name > a.system.name ? -1 : 0
           )
           .map((system) => {
             return (
@@ -218,10 +206,7 @@ export const Sov = () => {
                   <h4 className={"text-center"}>
                     {system.system.name}
                     {isFetching && (
-                      <Glyphicon
-                        className="glyphicon-refresh-animate pull-right"
-                        glyph="refresh"
-                      />
+                      <Glyphicon className="glyphicon-refresh-animate pull-right" glyph="refresh" />
                     )}
                   </h4>
                 </Panel.Heading>
@@ -240,16 +225,13 @@ export const Sov = () => {
                   </Table>
                   <div
                     className={`table-div ${
-                      (stateFilter.length || upgradesFilter.length) &&
-                      "table-div-no-hight"
+                      (stateFilter.length || upgradesFilter.length) && "table-div-no-hight"
                     }`}
                   >
                     <Table striped>
                       <tbody>
                         {system.upgrades
-                          .sort((a, b) =>
-                            a.name > b.name ? 1 : b.name > a.name ? -1 : 0,
-                          )
+                          .sort((a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0))
                           .map((u) => {
                             if (upgradesFilter.length) {
                               if (!upgradesFilter.includes(u.name)) {

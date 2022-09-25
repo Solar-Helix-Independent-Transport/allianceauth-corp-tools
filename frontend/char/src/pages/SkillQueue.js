@@ -1,15 +1,15 @@
+import { loadSkillQueues } from "../apis/Character";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { ErrorLoader } from "../components/ErrorLoader";
+import { PanelLoader } from "../components/PanelLoader";
+import { PortraitPanel } from "../components/PortraitPanel";
+import { SkillLevelBlock } from "../components/skills/SkillLevelBlock";
 import React, { useState } from "react";
 import { Checkbox, FormGroup, Table } from "react-bootstrap";
-import { Panel, Glyphicon } from "react-bootstrap";
-import ReactTimeAgo from "react-time-ago";
+import { Glyphicon, Panel } from "react-bootstrap";
 import { useQuery } from "react-query";
-import { loadSkillQueues } from "../apis/Character";
-import { PanelLoader } from "../components/PanelLoader";
-import { ErrorLoader } from "../components/ErrorLoader";
-import ErrorBoundary from "../components/ErrorBoundary";
-import { SkillLevelBlock } from "../components/skills/SkillLevelBlock";
-import { PortraitPanel } from "../components/PortraitPanel";
 import { useParams } from "react-router-dom";
+import ReactTimeAgo from "react-time-ago";
 
 const CharSkillQueue = () => {
   let { characterID } = useParams();
@@ -17,7 +17,7 @@ const CharSkillQueue = () => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["skillqueue", characterID],
     () => loadSkillQueues(characterID),
-    { refetchOnWindowFocus: false },
+    { refetchOnWindowFocus: false }
   );
   const [activeFilter, setActive] = useState(true);
   const [pausedFilter, setPaused] = useState(true);
@@ -54,11 +54,7 @@ const CharSkillQueue = () => {
     } else {
       empty = true;
     }
-    return (
-      (activeFilter && active) ||
-      (emptyFilter && empty) ||
-      (pausedFilter && paused)
-    );
+    return (activeFilter && active) || (emptyFilter && empty) || (pausedFilter && paused);
   });
 
   return (
@@ -66,18 +62,10 @@ const CharSkillQueue = () => {
       <Panel.Body className="flex-container">
         <h4 className="text-center">Queue Filter</h4>
         <FormGroup className="col-xs-12 text-center">
-          <Checkbox
-            defaultChecked={activeFilter}
-            onChange={handleActive}
-            inline
-          >
+          <Checkbox defaultChecked={activeFilter} onChange={handleActive} inline>
             Active
           </Checkbox>
-          <Checkbox
-            defaultChecked={pausedFilter}
-            onChange={handlePaused}
-            inline
-          >
+          <Checkbox defaultChecked={pausedFilter} onChange={handlePaused} inline>
             Paused
           </Checkbox>
           <Checkbox defaultChecked={emptyFilter} onChange={handleEmpty} inline>
@@ -87,9 +75,7 @@ const CharSkillQueue = () => {
         <hr className="col-xs-12 text-center" />
         {filtered_data.length ? (
           filtered_data.map((char) => {
-            let char_status = char.queue.length
-              ? { bsStyle: "success" }
-              : { bsStyle: "warning" };
+            let char_status = char.queue.length ? { bsStyle: "success" } : { bsStyle: "warning" };
             if (char.queue.length > 0 && !char.queue[0].end) {
               char_status = { bsStyle: "info" };
             }
@@ -98,9 +84,7 @@ const CharSkillQueue = () => {
                 isFetching={isFetching}
                 character={char.character}
                 panelStyles={char_status}
-                headerIcon={
-                  char.queue.length > 0 && !char.queue[0].end ? "pause" : false
-                }
+                headerIcon={char.queue.length > 0 && !char.queue[0].end ? "pause" : false}
               >
                 <h4 className={"text-center"}>Skill Queue</h4>
                 <div className={"table-div skill-queue"}>
@@ -115,30 +99,21 @@ const CharSkillQueue = () => {
                               <td>
                                 <div className="flex-container flex-space-between">
                                   <p className="no-margin">{s.skill}</p>
-                                  <SkillLevelBlock
-                                    level={s.end_level}
-                                    active={s.current_level}
-                                  />
+                                  <SkillLevelBlock level={s.end_level} active={s.current_level} />
                                 </div>
                                 <div className="flex-container flex-space-between">
                                   {s.end ? (
                                     <>
                                       <ReactTimeAgo date={Date.parse(s.end)} />
                                       <p className="no-margin">
-                                        {(
-                                          s.end_sp - s.start_sp
-                                        ).toLocaleString()}{" "}
-                                        SP
+                                        {(s.end_sp - s.start_sp).toLocaleString()} SP
                                       </p>
                                     </>
                                   ) : (
                                     <>
                                       <Glyphicon glyph="pause" />
                                       <p className="no-margin">
-                                        {(
-                                          s.end_sp - s.start_sp
-                                        ).toLocaleString()}{" "}
-                                        SP
+                                        {(s.end_sp - s.start_sp).toLocaleString()} SP
                                       </p>
                                     </>
                                   )}

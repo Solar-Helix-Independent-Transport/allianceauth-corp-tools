@@ -1,14 +1,14 @@
+import { loadStatus } from "../apis/Character";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { ErrorLoader } from "../components/ErrorLoader";
+import { PanelLoader } from "../components/PanelLoader";
+import { PortraitPanel } from "../components/PortraitPanel";
 import React from "react";
 import { Table } from "react-bootstrap";
 import { Panel } from "react-bootstrap";
-import ReactTimeAgo from "react-time-ago";
 import { useQuery } from "react-query";
-import { loadStatus } from "../apis/Character";
-import { PanelLoader } from "../components/PanelLoader";
-import { ErrorLoader } from "../components/ErrorLoader";
-import ErrorBoundary from "../components/ErrorBoundary";
-import { PortraitPanel } from "../components/PortraitPanel";
 import { useParams } from "react-router-dom";
+import ReactTimeAgo from "react-time-ago";
 
 const CharStatus = () => {
   let { characterID } = useParams();
@@ -16,7 +16,7 @@ const CharStatus = () => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["status", characterID],
     () => loadStatus(characterID),
-    { refetchOnWindowFocus: false },
+    { refetchOnWindowFocus: false }
   );
 
   if (isLoading) return <PanelLoader />;
@@ -27,9 +27,7 @@ const CharStatus = () => {
     <ErrorBoundary>
       <Panel.Body className="flex-container">
         {data.characters.map((char) => {
-          let char_status = char.active
-            ? { bsStyle: "success" }
-            : { bsStyle: "warning" };
+          let char_status = char.active ? { bsStyle: "success" } : { bsStyle: "warning" };
           return (
             <PortraitPanel
               panelStyles={char_status}
@@ -55,9 +53,7 @@ const CharStatus = () => {
                           <td className="text-right">
                             {char.last_updates ? (
                               char.last_updates[h] ? (
-                                <ReactTimeAgo
-                                  date={Date.parse(char.last_updates[h])}
-                                />
+                                <ReactTimeAgo date={Date.parse(char.last_updates[h])} />
                               ) : (
                                 "Never"
                               )

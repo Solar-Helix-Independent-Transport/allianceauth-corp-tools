@@ -1,13 +1,10 @@
+import { searchItemGroup, searchLocation, searchSystem } from "../apis/Character";
+import { ApiMultiSelect } from "../components/ApiMultiSelect";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { TestEmbed } from "../components/PingDemoDiv";
 import React, { useState } from "react";
 import { Checkbox, FormControl, Panel } from "react-bootstrap";
-import ErrorBoundary from "../components/ErrorBoundary";
-import { ApiMultiSelect } from "../components/ApiMultiSelect";
-import {
-  searchItemGroup,
-  searchLocation,
-  searchSystem,
-} from "../apis/Character";
-import { TestEmbed } from "../components/PingDemoDiv";
+
 const PingAssets = () => {
   const [systems, setSystems] = useState([]);
   const [structures, setStructures] = useState([]);

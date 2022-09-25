@@ -1,6 +1,6 @@
+import "./PanelLoader.css";
 import React from "react";
 import { Panel } from "react-bootstrap";
-import "./PanelLoader.css";
 
 export const ErrorLoader = () => {
   return (

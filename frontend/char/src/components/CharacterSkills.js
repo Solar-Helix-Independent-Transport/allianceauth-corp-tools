@@ -1,7 +1,7 @@
-import React from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import { FilterFail } from "./FilterFail";
 import { SkillGroup } from "./skills/SkillGroup";
+import React from "react";
 
 const CharSkillBlocks = ({ data }) => {
   const groupByKey = (list, key) =>
@@ -10,7 +10,7 @@ const CharSkillBlocks = ({ data }) => {
         ...hash,
         [obj[key]]: (hash[obj[key]] || []).concat(obj),
       }),
-      {},
+      {}
     );
 
   let skills_data = groupByKey(data, "group");

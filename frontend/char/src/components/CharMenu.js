@@ -1,12 +1,12 @@
-import React from "react";
-import { useQuery } from "react-query";
-import { Nav, Glyphicon, NavItem } from "react-bootstrap";
-import { NavDropdown } from "react-bootstrap";
-import { Navbar } from "react-bootstrap";
-import { LinkContainer } from "react-router-bootstrap";
-import { Grid } from "@agney/react-loading";
 import { loadMenu } from "../apis/Character";
 import "./Menu.css";
+import { Grid } from "@agney/react-loading";
+import React from "react";
+import { Glyphicon, Nav, NavItem } from "react-bootstrap";
+import { NavDropdown } from "react-bootstrap";
+import { Navbar } from "react-bootstrap";
+import { useQuery } from "react-query";
+import { LinkContainer } from "react-router-bootstrap";
 import { useParams } from "react-router-dom";
 
 const CharMenu = () => {
@@ -23,18 +23,12 @@ const CharMenu = () => {
       </Navbar.Header>
       <Navbar.Collapse>
         <Nav>
-          <LinkContainer
-            activeClassName={"active"}
-            to={`/audit/r/${characterID}/account/status`}
-          >
+          <LinkContainer activeClassName={"active"} to={`/audit/r/${characterID}/account/status`}>
             <NavItem key="Overview" to={`account/status`}>
               Overview
             </NavItem>
           </LinkContainer>
-          <LinkContainer
-            activeClassName={"active"}
-            to={`/audit/r/${characterID}/account/pubdata`}
-          >
+          <LinkContainer activeClassName={"active"} to={`/audit/r/${characterID}/account/pubdata`}>
             <NavItem key="Public Data" to={`account/status`}>
               Public Data
             </NavItem>
@@ -54,11 +48,7 @@ const CharMenu = () => {
                             activeClassName={"active"}
                             to={`/audit/r/${characterID}/${link.link}`}
                           >
-                            <NavItem
-                              to={`${link.link}`}
-                              id={link.name}
-                              key={link.name}
-                            >
+                            <NavItem to={`${link.link}`} id={link.name} key={link.name}>
                               {link.name}
                             </NavItem>
                           </LinkContainer>

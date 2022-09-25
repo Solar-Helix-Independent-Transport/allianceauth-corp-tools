@@ -1,17 +1,15 @@
+import { loadCorpStatus } from "../apis/Corporation";
+import CorpActiveBadge from "./CorpActiveBadge";
+import "./CorpHeader.css";
+import { Bars } from "@agney/react-loading";
 import React from "react";
 import { Col } from "react-bootstrap";
-import { useQuery } from "react-query";
 import { Image } from "react-bootstrap";
 import { Panel } from "react-bootstrap";
-import CorpActiveBadge from "./CorpActiveBadge";
-import { Bars } from "@agney/react-loading";
-import { loadCorpStatus } from "../apis/Corporation";
-import "./CorpHeader.css";
+import { useQuery } from "react-query";
 
 const CorpHeader = ({ corporation_id }) => {
-  const { isLoading, data } = useQuery(["status"], () =>
-    loadCorpStatus(corporation_id),
-  );
+  const { isLoading, data } = useQuery(["status"], () => loadCorpStatus(corporation_id));
 
   return (
     <Panel>
@@ -26,9 +24,7 @@ const CorpHeader = ({ corporation_id }) => {
                 ></Image>
               </div>
               <div class="child">
-                <h1 style={{ margin: 0 }}>
-                  {data.corporation.corporation_name}
-                </h1>
+                <h1 style={{ margin: 0 }}>{data.corporation.corporation_name}</h1>
               </div>
               {data.corporation.alliance_id != null && (
                 <>

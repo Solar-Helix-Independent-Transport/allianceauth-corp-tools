@@ -1,11 +1,6 @@
 import React from "react";
-import {
-  Button,
-  ButtonGroup,
-  Glyphicon,
-  Tooltip,
-  OverlayTrigger,
-} from "react-bootstrap";
+import { Button, ButtonGroup, Glyphicon, OverlayTrigger, Tooltip } from "react-bootstrap";
+
 //import { useMutation } from "react-query";
 //import { postAccountRefresh } from "../apis/Character";
 function MyTooltip({ message }) {
@@ -17,18 +12,12 @@ function CorpActiveBadge() {
 
   return (
     <ButtonGroup>
-      <OverlayTrigger
-        placement="top"
-        overlay={MyTooltip({ message: "Add New Corporation Token" })}
-      >
+      <OverlayTrigger placement="top" overlay={MyTooltip({ message: "Add New Corporation Token" })}>
         <Button className="btn-info" href="/audit/corp/add/">
           <Glyphicon glyph="plus" />
         </Button>
       </OverlayTrigger>
-      <OverlayTrigger
-        placement="top"
-        overlay={MyTooltip({ message: "Refresh Corporation Data" })}
-      >
+      <OverlayTrigger placement="top" overlay={MyTooltip({ message: "Refresh Corporation Data" })}>
         <Button className="btn-success">
           <Glyphicon glyph="refresh" />
         </Button>

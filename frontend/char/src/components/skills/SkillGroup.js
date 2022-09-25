@@ -1,6 +1,6 @@
+import { SkillBlock } from "./SkillBlock";
 import React from "react";
 import { Panel } from "react-bootstrap";
-import { SkillBlock } from "./SkillBlock";
 
 export const SkillGroup = ({ group, skills }) => {
   return (
@@ -18,13 +18,7 @@ export const SkillGroup = ({ group, skills }) => {
             return 0; //default return value (no sorting)
           })
           .map((skill) => {
-            return (
-              <SkillBlock
-                skill={skill.skill}
-                level={skill.level}
-                active={skill.active}
-              />
-            );
+            return <SkillBlock skill={skill.skill} level={skill.level} active={skill.active} />;
           })}
       </Panel.Body>
     </Panel>

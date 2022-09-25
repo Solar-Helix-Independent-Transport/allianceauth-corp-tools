@@ -1,7 +1,7 @@
+import { DoctrineModal } from "./DoctrineModal";
+import "./doctrine.css";
 import React, { useState } from "react";
 import { Button, ButtonGroup, Glyphicon } from "react-bootstrap";
-import "./doctrine.css";
-import { DoctrineModal } from "./DoctrineModal";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 export const DoctrineCheck = ({ name, skill_reqs, skill_list }) => {
@@ -49,9 +49,7 @@ export const DoctrineCheck = ({ name, skill_reqs, skill_list }) => {
             )}
           </ButtonGroup>
           {!completed ? (
-            <DoctrineModal
-              {...{ show, setShow, name, skill_reqs, skill_list }}
-            />
+            <DoctrineModal {...{ show, setShow, name, skill_reqs, skill_list }} />
           ) : (
             <></>
           )}

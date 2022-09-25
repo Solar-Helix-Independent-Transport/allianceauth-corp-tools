@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { Panel } from "react-bootstrap";
-import ErrorBoundary from "../components/ErrorBoundary";
 import CorpSelect from "../components/CorpSelect";
 import CorpWalletTable from "../components/CorpWalletTable";
-import { RefTypeSelect } from "../components/filters/RefTypeFilters";
+import ErrorBoundary from "../components/ErrorBoundary";
 import { CorpLoader } from "../components/NoCorp";
+import { RefTypeSelect } from "../components/filters/RefTypeFilters";
+import React, { useState } from "react";
+import { Panel } from "react-bootstrap";
 
 const CorpWallet = () => {
   const [corporation_id, setCorp] = useState(0);
@@ -20,16 +20,10 @@ const CorpWallet = () => {
   return (
     <ErrorBoundary>
       <Panel.Body className="flex-container-vert-fill">
-        <RefTypeSelect
-          labelText={"Reference Type Filter"}
-          setFilter={RefsToState}
-        />
+        <RefTypeSelect labelText={"Reference Type Filter"} setFilter={RefsToState} />
         <CorpSelect setCorporation={setCorp} />
         {corporation_id && ref_types !== "" ? (
-          <CorpWalletTable
-            corporation_id={corporation_id}
-            refTypes={ref_types}
-          />
+          <CorpWalletTable corporation_id={corporation_id} refTypes={ref_types} />
         ) : (
           <CorpLoader />
         )}

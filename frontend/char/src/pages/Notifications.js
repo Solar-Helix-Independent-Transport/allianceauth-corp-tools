@@ -1,9 +1,9 @@
-import React from "react";
-import { Panel } from "react-bootstrap";
-import { useQuery } from "react-query";
 import { loadNotifications } from "../apis/Character";
 import { BaseTable, SelectColumnFilter } from "../components/BaseTable";
 import ErrorBoundary from "../components/ErrorBoundary";
+import React from "react";
+import { Panel } from "react-bootstrap";
+import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharNotifications = () => {
@@ -15,7 +15,7 @@ const CharNotifications = () => {
     {
       initialData: [],
       refetchOnWindowFocus: false,
-    },
+    }
   );
 
   const columns = React.useMemo(
@@ -42,7 +42,7 @@ const CharNotifications = () => {
         accessor: "notification_text",
       },
     ],
-    [],
+    []
   );
 
   return (

@@ -1,20 +1,14 @@
-import React from "react";
-import { Panel, Glyphicon } from "react-bootstrap";
-import { useQuery } from "react-query";
-import { loadAssetList, loadAssetContents } from "../apis/Corporation";
-import {
-  BaseTable,
-  SubRows,
-  SelectColumnFilter,
-  textColumnFilter,
-} from "../components/BaseTable";
+import { loadAssetContents, loadAssetList } from "../apis/Corporation";
+import { BaseTable, SelectColumnFilter, SubRows, textColumnFilter } from "../components/BaseTable";
 import ErrorBoundary from "./ErrorBoundary";
 import { CorpLoader } from "./NoCorp";
+import React from "react";
+import { Glyphicon, Panel } from "react-bootstrap";
+import { useQuery } from "react-query";
 
 function SubRowAsync({ row, rowProps, visibleColumns }) {
-  const { isLoading, error, data } = useQuery(
-    ["lazy-load", row.original.id],
-    () => loadAssetContents(row.original.id),
+  const { isLoading, error, data } = useQuery(["lazy-load", row.original.id], () =>
+    loadAssetContents(row.original.id)
   );
 
   if (!isLoading) {
@@ -37,17 +31,13 @@ const CorpAssetTable = ({ corporation_id, new_type, location_id = 0 }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["assetList", corporation_id, location_id, new_type],
     () => loadAssetList(corporation_id, location_id, new_type),
-    { initialData: [] },
+    { initialData: [] }
   );
   const renderRowSubComponent = React.useCallback(
     ({ row, rowProps, visibleColumns }) => (
-      <SubRowAsync
-        row={row}
-        rowProps={rowProps}
-        visibleColumns={visibleColumns}
-      />
+      <SubRowAsync row={row} rowProps={rowProps} visibleColumns={visibleColumns} />
     ),
-    [],
+    []
   );
 
   const columns = React.useMemo(
@@ -59,11 +49,7 @@ const CorpAssetTable = ({ corporation_id, new_type, location_id = 0 }) => {
         Cell: ({ row }) =>
           row.original.expand ? (
             <span {...row.getToggleRowExpandedProps()}>
-              {row.isExpanded ? (
-                <Glyphicon glyph="minus-sign" />
-              ) : (
-                <Glyphicon glyph="plus-sign" />
-              )}
+              {row.isExpanded ? <Glyphicon glyph="minus-sign" /> : <Glyphicon glyph="plus-sign" />}
             </span>
           ) : (
             <></>
@@ -94,7 +80,7 @@ const CorpAssetTable = ({ corporation_id, new_type, location_id = 0 }) => {
         filter: "includes",
       },
     ],
-    [],
+    []
   );
 
   if (corporation_id === 0) return <CorpLoader />;

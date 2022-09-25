@@ -1,5 +1,5 @@
-import React from "react";
 import { SkillLevelBlock } from "./SkillLevelBlock";
+import React from "react";
 
 export const SkillBlock = ({ skill, level, active = -10, className = "" }) => {
   return (

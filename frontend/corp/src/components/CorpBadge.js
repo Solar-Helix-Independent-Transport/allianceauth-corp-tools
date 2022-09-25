@@ -1,15 +1,8 @@
+import { postCorporationRefresh } from "../apis/Corporation";
 import React from "react";
-
-import {
-  Glyphicon,
-  NavItem,
-  Checkbox,
-  NavDropdown,
-  FormControl,
-} from "react-bootstrap";
+import { Checkbox, FormControl, Glyphicon, NavDropdown, NavItem } from "react-bootstrap";
 import { Form } from "react-bootstrap/lib/Navbar";
 import { useMutation } from "react-query";
-import { postCorporationRefresh } from "../apis/Corporation";
 
 function CorpBadge() {
   const { mutate } = useMutation(postCorporationRefresh);
@@ -17,19 +10,9 @@ function CorpBadge() {
   return (
     <>
       <NavDropdown title="Add Corporate Token">
-        <form
-          action="/audit/corp/add_options"
-          method="get"
-          style={{ width: "350px" }}
-        >
+        <form action="/audit/corp/add_options" method="get" style={{ width: "350px" }}>
           <Form>
-            <Checkbox
-              style={{ width: "100%" }}
-              defaultChecked={true}
-              inline={true}
-              id="s"
-              name="s"
-            >
+            <Checkbox style={{ width: "100%" }} defaultChecked={true} inline={true} id="s" name="s">
               Structures
             </Checkbox>
             <br />
@@ -66,12 +49,7 @@ function CorpBadge() {
             </Checkbox>
             <br />
             <br />
-            <FormControl
-              style={{ width: "100%" }}
-              bsSize="small"
-              type="submit"
-              value="Add Token"
-            />
+            <FormControl style={{ width: "100%" }} bsSize="small" type="submit" value="Add Token" />
           </Form>
         </form>
       </NavDropdown>

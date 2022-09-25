@@ -1,18 +1,16 @@
-import React from "react";
-import { Panel, Label, Glyphicon } from "react-bootstrap";
-import { useQuery } from "react-query";
 import { loadBridges } from "../apis/Corporation";
 import { BridgeLink } from "../components/BridgeLink";
 import { ErrorLoader } from "../components/ErrorLoader";
-import { PanelLoader } from "../components/PanelLoader";
 import { DataMessage } from "../components/NoData";
+import { PanelLoader } from "../components/PanelLoader";
+import React from "react";
+import { Glyphicon, Label, Panel } from "react-bootstrap";
+import { useQuery } from "react-query";
 
 export const Bridges = () => {
-  const { isLoading, isFetching, error, data } = useQuery(
-    ["bridges"],
-    () => loadBridges(),
-    { initialData: [] },
-  );
+  const { isLoading, isFetching, error, data } = useQuery(["bridges"], () => loadBridges(), {
+    initialData: [],
+  });
 
   if (isLoading) return <PanelLoader />;
 
@@ -73,10 +71,7 @@ export const Bridges = () => {
           </Label>
         </div>
         {isFetching && (
-          <Glyphicon
-            className="glyphicon-refresh-animate pull-right"
-            glyph="refresh"
-          />
+          <Glyphicon className="glyphicon-refresh-animate pull-right" glyph="refresh" />
         )}
 
         <hr className="col-xs-12" />

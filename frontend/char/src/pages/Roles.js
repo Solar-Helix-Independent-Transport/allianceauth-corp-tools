@@ -1,13 +1,13 @@
+import { loadRoles } from "../apis/Character";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { ErrorLoader } from "../components/ErrorLoader";
+import { PanelLoader } from "../components/PanelLoader";
 import React from "react";
 import { Glyphicon, Table } from "react-bootstrap";
 import { Panel } from "react-bootstrap";
-import { useQuery } from "react-query";
-import { loadRoles } from "../apis/Character";
-import { PanelLoader } from "../components/PanelLoader";
 import { Badge } from "react-bootstrap";
 import { Button } from "react-bootstrap";
-import { ErrorLoader } from "../components/ErrorLoader";
-import ErrorBoundary from "../components/ErrorBoundary";
+import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const Checkbox = ({ active }) => {
@@ -23,7 +23,7 @@ const CharRoles = () => {
   const { isLoading, error, data } = useQuery(
     ["roles", characterID],
     () => loadRoles(characterID),
-    { refetchOnWindowFocus: false },
+    { refetchOnWindowFocus: false }
   );
 
   if (isLoading) return <PanelLoader />;

@@ -1,13 +1,9 @@
+import { loadWallet } from "../apis/Character";
+import { BaseTable, SelectColumnFilter, textColumnFilter } from "../components/BaseTable";
+import ErrorBoundary from "../components/ErrorBoundary";
 import React from "react";
 import { Panel } from "react-bootstrap";
 import { useQuery } from "react-query";
-import { loadWallet } from "../apis/Character";
-import {
-  BaseTable,
-  SelectColumnFilter,
-  textColumnFilter,
-} from "../components/BaseTable";
-import ErrorBoundary from "../components/ErrorBoundary";
 import { useParams } from "react-router-dom";
 
 const CharWallet = () => {
@@ -19,7 +15,7 @@ const CharWallet = () => {
     {
       initialData: { items: [], count: 0 },
       refetchOnWindowFocus: false,
-    },
+    }
   );
 
   const columns = React.useMemo(
@@ -70,16 +66,13 @@ const CharWallet = () => {
         filter: "text",
       },
     ],
-    [],
+    []
   );
 
   return (
     <ErrorBoundary>
       <Panel.Body>
-        <BaseTable
-          data={data["items"]}
-          {...{ isLoading, isFetching, columns, error }}
-        />
+        <BaseTable data={data["items"]} {...{ isLoading, isFetching, columns, error }} />
       </Panel.Body>
     </ErrorBoundary>
   );

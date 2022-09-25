@@ -1,9 +1,9 @@
-import React from "react";
-import { Panel } from "react-bootstrap";
 import CharHeader from "../components/CharHeader";
 import CharMenu from "../components/CharMenu";
+import React from "react";
+import { Panel } from "react-bootstrap";
 import { Col } from "react-bootstrap";
-import { useParams, Outlet } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 
 const CharacterAudit = () => {
   let { characterID } = useParams();

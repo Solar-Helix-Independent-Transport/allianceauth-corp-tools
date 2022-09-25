@@ -1,14 +1,9 @@
+import { loadContacts } from "../apis/Character";
+import { BaseTable, SelectColumnFilter, textColumnFilter } from "../components/BaseTable";
+import ErrorBoundary from "../components/ErrorBoundary";
 import React from "react";
-
 import { Panel } from "react-bootstrap";
 import { useQuery } from "react-query";
-import { loadContacts } from "../apis/Character";
-import {
-  BaseTable,
-  SelectColumnFilter,
-  textColumnFilter,
-} from "../components/BaseTable";
-import ErrorBoundary from "../components/ErrorBoundary";
 import { useParams } from "react-router-dom";
 
 const CharContacts = () => {
@@ -20,7 +15,7 @@ const CharContacts = () => {
     {
       initialData: [],
       refetchOnWindowFocus: false,
-    },
+    }
   );
 
   const columns = React.useMemo(
@@ -41,11 +36,7 @@ const CharContacts = () => {
         Header: "Blocked",
         accessor: "blocked",
         Cell: (props) => (
-          <span
-            className={
-              props.value ? "fas fa-check-circle" : "far fa-times-circle"
-            }
-          />
+          <span className={props.value ? "fas fa-check-circle" : "far fa-times-circle"} />
         ),
         disableSortBy: true,
       },
@@ -53,11 +44,7 @@ const CharContacts = () => {
         Header: "Watching",
         accessor: "watched",
         Cell: (props) => (
-          <span
-            className={
-              props.value ? "fas fa-check-circle" : "far fa-times-circle"
-            }
-          />
+          <span className={props.value ? "fas fa-check-circle" : "far fa-times-circle"} />
         ),
         disableSortBy: true,
       },
@@ -73,7 +60,7 @@ const CharContacts = () => {
         disableSortBy: true,
       },
     ],
-    [],
+    []
   );
 
   return (

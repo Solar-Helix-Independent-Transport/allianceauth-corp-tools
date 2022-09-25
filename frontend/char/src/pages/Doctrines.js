@@ -1,12 +1,12 @@
+import { loadDoctrines } from "../apis/Character";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { ErrorLoader } from "../components/ErrorLoader";
+import { PanelLoader } from "../components/PanelLoader";
+import { DoctrineCheck } from "../components/skills/DoctrineCheck";
+import { DoctrinePanel } from "../components/skills/DoctrinePannel";
 import React from "react";
 import { Panel } from "react-bootstrap";
-import ErrorBoundary from "../components/ErrorBoundary";
-import { loadDoctrines } from "../apis/Character";
-import { PanelLoader } from "../components/PanelLoader";
-import { ErrorLoader } from "../components/ErrorLoader";
 import { useQuery } from "react-query";
-import { DoctrinePanel } from "../components/skills/DoctrinePannel";
-import { DoctrineCheck } from "../components/skills/DoctrineCheck";
 import { useParams } from "react-router-dom";
 
 const CharDoctrines = () => {
@@ -15,7 +15,7 @@ const CharDoctrines = () => {
   const { isLoading, error, data } = useQuery(
     ["doctrines", characterID],
     () => loadDoctrines(characterID),
-    { refetchOnWindowFocus: false },
+    { refetchOnWindowFocus: false }
   );
 
   if (isLoading) return <PanelLoader />;

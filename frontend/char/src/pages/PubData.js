@@ -1,12 +1,12 @@
+import { loadPubData } from "../apis/Character";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { ErrorLoader } from "../components/ErrorLoader";
+import { PanelLoader } from "../components/PanelLoader";
+import { PortraitPanel } from "../components/PortraitPanel";
 import React from "react";
 import { Table } from "react-bootstrap";
 import { Panel } from "react-bootstrap";
 import { useQuery } from "react-query";
-import { loadPubData } from "../apis/Character";
-import { PanelLoader } from "../components/PanelLoader";
-import { ErrorLoader } from "../components/ErrorLoader";
-import ErrorBoundary from "../components/ErrorBoundary";
-import { PortraitPanel } from "../components/PortraitPanel";
 import { useParams } from "react-router-dom";
 
 const PubData = () => {
@@ -14,7 +14,7 @@ const PubData = () => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["pubdata", characterID],
     () => loadPubData(characterID),
-    { refetchOnWindowFocus: false },
+    { refetchOnWindowFocus: false }
   );
 
   if (isLoading) return <PanelLoader />;
@@ -52,9 +52,7 @@ const PubData = () => {
                             }
                           >
                             <td>{h.corporation.corporation_name}</td>
-                            <td className="text-right no-wrap">
-                              {h.start.slice(0, 10)}
-                            </td>
+                            <td className="text-right no-wrap">{h.start.slice(0, 10)}</td>
                           </tr>
                         );
                       })

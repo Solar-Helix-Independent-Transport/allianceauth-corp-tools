@@ -1,7 +1,7 @@
+import { loadAssetLocations } from "../apis/Character";
 import React from "react";
 import { useQuery } from "react-query";
 import Select from "react-select";
-import { loadAssetLocations } from "../apis/Character";
 
 const colourStyles = {
   option: (styles) => {
@@ -16,7 +16,7 @@ const CharAssetLocSelect = ({ character_id, setLocation }) => {
   const { isLoading, data } = useQuery(
     ["asset_loc", character_id],
     () => loadAssetLocations(character_id),
-    { refetchOnWindowFocus: false },
+    { refetchOnWindowFocus: false }
   );
 
   return (

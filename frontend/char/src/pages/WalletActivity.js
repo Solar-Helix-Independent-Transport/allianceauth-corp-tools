@@ -1,16 +1,12 @@
+import { loadWalletActivity } from "../apis/Character";
+import { ActivityChord } from "../components/ActivityChord";
+import { BaseTable, SelectColumnFilter, textColumnFilter } from "../components/BaseTable";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { ErrorLoader } from "../components/ErrorLoader";
+import { PanelLoader } from "../components/PanelLoader";
 import React from "react";
 import { Panel } from "react-bootstrap";
 import { useQuery } from "react-query";
-import { loadWalletActivity } from "../apis/Character";
-import ErrorBoundary from "../components/ErrorBoundary";
-import { PanelLoader } from "../components/PanelLoader";
-import { ErrorLoader } from "../components/ErrorLoader";
-import { ActivityChord } from "../components/ActivityChord";
-import {
-  BaseTable,
-  SelectColumnFilter,
-  textColumnFilter,
-} from "../components/BaseTable";
 import { useParams } from "react-router-dom";
 
 const CharWalletActivity = () => {
@@ -22,7 +18,7 @@ const CharWalletActivity = () => {
     {
       initialData: [],
       refetchOnWindowFocus: false,
-    },
+    }
   );
 
   const columns = React.useMemo(
@@ -32,11 +28,7 @@ const CharWalletActivity = () => {
         accessor: "fpn",
         Filter: textColumnFilter,
         filter: "text",
-        Cell: (props) => (
-          <a href={`https://zkillboard.com/search/${props.value}`}>
-            {props.value}
-          </a>
-        ),
+        Cell: (props) => <a href={`https://zkillboard.com/search/${props.value}`}>{props.value}</a>,
       },
       {
         Header: "From - Category",
@@ -49,11 +41,7 @@ const CharWalletActivity = () => {
         accessor: "spn",
         Filter: textColumnFilter,
         filter: "text",
-        Cell: (props) => (
-          <a href={`https://zkillboard.com/search/${props.value}`}>
-            {props.value}
-          </a>
-        ),
+        Cell: (props) => <a href={`https://zkillboard.com/search/${props.value}`}>{props.value}</a>,
       },
       {
         Header: "To - Category",
@@ -72,7 +60,7 @@ const CharWalletActivity = () => {
         Cell: (props) => <div> {props.value.toLocaleString()} </div>,
       },
     ],
-    [],
+    []
   );
 
   if (isLoading) return <PanelLoader />;

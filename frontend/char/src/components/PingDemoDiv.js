@@ -1,10 +1,11 @@
+import { postSendPing, postTestPing } from "../apis/Character";
+import { ErrorLoader } from "./ErrorLoader";
+import AwesomeDebouncePromise from "awesome-debounce-promise";
 import React, { useState } from "react";
 import { ButtonGroup, Panel } from "react-bootstrap";
-import { postTestPing, postSendPing } from "../apis/Character";
-import { useQuery } from "react-query";
 import { Button } from "react-bootstrap";
-import AwesomeDebouncePromise from "awesome-debounce-promise";
-import { ErrorLoader } from "./ErrorLoader";
+import { useQuery } from "react-query";
+
 const debounceSend = AwesomeDebouncePromise(postSendPing, 1000);
 
 export const TestEmbed = ({
@@ -18,15 +19,7 @@ export const TestEmbed = ({
 }) => {
   const [interlock, setInterlock] = useState(false);
   const { isFetching, error, data } = useQuery(
-    [
-      "pingTest",
-      structures,
-      locations,
-      itemGroups,
-      filter_charges,
-      ships_only,
-      caps_only,
-    ],
+    ["pingTest", structures, locations, itemGroups, filter_charges, ships_only, caps_only],
     () =>
       postTestPing(
         message,
@@ -35,7 +28,7 @@ export const TestEmbed = ({
         itemGroups,
         filter_charges,
         ships_only,
-        caps_only,
+        caps_only
       ),
     {
       initialData: {
@@ -43,7 +36,7 @@ export const TestEmbed = ({
         structures: [],
       },
       refetchOnWindowFocus: false,
-    },
+    }
   );
   if (isFetching && interlock) {
     setInterlock(false);
@@ -53,9 +46,7 @@ export const TestEmbed = ({
   }
   return (
     <Panel style={{ margin: "15px", width: "400px" }}>
-      <Panel.Heading>
-        Example Asset Alert ({data.members} Characters!)
-      </Panel.Heading>
+      <Panel.Heading>Example Asset Alert ({data.members} Characters!)</Panel.Heading>
       <Panel.Body>
         <p>
           {message ? (
@@ -73,15 +64,14 @@ export const TestEmbed = ({
         </p>
         <h4>Characters</h4>
         <p>
-          Master Chief, Obi-wan, Grogu, Katheryn Janeway, Postman Pat, Wally,
-          Bill, Ted, ArielKable
+          Master Chief, Obi-wan, Grogu, Katheryn Janeway, Postman Pat, Wally, Bill, Ted, ArielKable
         </p>
         <h4>Structures</h4>
         <p>{data.structures.join(", ")}</p>
         <h4>Items</h4>
         <p>
-          Molok, Molok, Avatar, Avatar, Revelation, Revelation, Revelation, Apoc
-          Navy Issue, Omen, Prophecy
+          Molok, Molok, Avatar, Avatar, Revelation, Revelation, Revelation, Apoc Navy Issue, Omen,
+          Prophecy
         </p>
       </Panel.Body>
       <Panel.Footer className="text-center">
@@ -106,7 +96,7 @@ export const TestEmbed = ({
                 itemGroups,
                 filter_charges,
                 ships_only,
-                caps_only,
+                caps_only
               );
               setInterlock(!interlock);
             }}

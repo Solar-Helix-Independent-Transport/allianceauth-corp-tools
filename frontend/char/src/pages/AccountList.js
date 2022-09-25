@@ -1,15 +1,11 @@
-import React, { useState } from "react";
-import { Panel, Label, Button, Glyphicon } from "react-bootstrap";
-import { useQuery } from "react-query";
-import { useNavigate } from "react-router-dom";
 import { loadAccountList } from "../apis/Character";
-import {
-  BaseTable,
-  textColumnFilter,
-  SelectColumnFilter,
-} from "../components/BaseTable";
+import { BaseTable, SelectColumnFilter, textColumnFilter } from "../components/BaseTable";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { SelectFilter } from "../components/SelectFilter";
+import React, { useState } from "react";
+import { Button, Glyphicon, Label, Panel } from "react-bootstrap";
+import { useQuery } from "react-query";
+import { useNavigate } from "react-router-dom";
 
 const AccountList = () => {
   const navigate = useNavigate();
@@ -20,7 +16,7 @@ const AccountList = () => {
     {
       initialData: [],
       refetchOnWindowFocus: false,
-    },
+    }
   );
 
   const columns = React.useMemo(
@@ -53,16 +49,14 @@ const AccountList = () => {
         accessor: "main.corporation_name",
         Filter: SelectColumnFilter,
         filter: "text",
-        Cell: (props) =>
-          props.value ? <span className="no-wrap">{props.value}</span> : <></>,
+        Cell: (props) => (props.value ? <span className="no-wrap">{props.value}</span> : <></>),
       },
       {
         Header: "Alliance",
         accessor: "main.alliance_name",
         Filter: SelectColumnFilter,
         filter: "text",
-        Cell: (props) =>
-          props.value ? <span className="no-wrap">{props.value}</span> : <></>,
+        Cell: (props) => (props.value ? <span className="no-wrap">{props.value}</span> : <></>),
       },
       {
         Header: "Characters",
@@ -75,10 +69,7 @@ const AccountList = () => {
             <div className="flex-container text-center">
               {props.value.map((char) => {
                 return (
-                  <Label
-                    className="padded-label"
-                    bsStyle={char.active ? "primary" : "danger"}
-                  >
+                  <Label className="padded-label" bsStyle={char.active ? "primary" : "danger"}>
                     {char.character.character_name}
                   </Label>
                 );
@@ -106,7 +97,7 @@ const AccountList = () => {
         },
       },
     ],
-    [navigate],
+    [navigate]
   );
 
   const filterOptions = [
@@ -124,8 +115,7 @@ const AccountList = () => {
 
   if (!isLoading && filter_inactive) {
     tableData = tableData.filter(
-      (acct) =>
-        !acct.characters.reduce((result, char) => result && char.active, true),
+      (acct) => !acct.characters.reduce((result, char) => result && char.active, true)
     );
   }
 
@@ -137,10 +127,7 @@ const AccountList = () => {
           options={filterOptions}
           labelText="Filter Missing Characters:"
         />
-        <BaseTable
-          data={tableData}
-          {...{ isLoading, isFetching, columns, error }}
-        />
+        <BaseTable data={tableData} {...{ isLoading, isFetching, columns, error }} />
       </Panel.Body>
     </ErrorBoundary>
   );

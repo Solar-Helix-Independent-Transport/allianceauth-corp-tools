@@ -1,15 +1,13 @@
 import axios from "axios";
 import cookies from "js-cookies";
+
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
 function fetchFromObject(obj, prop) {
   if (typeof obj === "undefined") return "Error";
   var _index = prop.indexOf(".");
   if (_index > -1) {
-    return fetchFromObject(
-      obj[prop.substring(0, _index)],
-      prop.substr(_index + 1),
-    );
+    return fetchFromObject(obj[prop.substring(0, _index)], prop.substr(_index + 1));
   }
   return obj[prop];
 }
@@ -41,8 +39,8 @@ export async function loadStatus(character_id) {
         } catch (err) {
           return p;
         }
-      }, []),
-    ),
+      }, [])
+    )
   );
   headers.sort();
 
@@ -70,33 +68,25 @@ export async function loadPubData(character_id) {
 }
 
 export async function loadAssetLocations(character_id) {
-  const api = await axios.get(
-    `/audit/api/account/${character_id}/asset/locations`,
-  );
+  const api = await axios.get(`/audit/api/account/${character_id}/asset/locations`);
   console.log(`get asset locations in api ${character_id}`);
   return api.data;
 }
 
 export async function loadAssetGroups(character_id, location_id) {
-  const api = await axios.get(
-    `/audit/api/account/${character_id}/asset/${location_id}/groups`,
-  );
+  const api = await axios.get(`/audit/api/account/${character_id}/asset/${location_id}/groups`);
   console.log(`get asset groups in api ${character_id} ${location_id}`);
   return api.data;
 }
 
 export async function loadAssetList(character_id, location_id) {
-  const api = await axios.get(
-    `/audit/api/account/${character_id}/asset/${location_id}/list`,
-  );
+  const api = await axios.get(`/audit/api/account/${character_id}/asset/${location_id}/list`);
   console.log(`get asset list in api ${character_id} ${location_id}`);
   return api.data;
 }
 
 export async function loadAssetContents(character_id, item_id) {
-  const api = await axios.get(
-    `/audit/api/account/${character_id}/asset/${item_id}/contents`,
-  );
+  const api = await axios.get(`/audit/api/account/${character_id}/asset/${item_id}/contents`);
   console.log(`get asset contents in api ${character_id} ${item_id}`);
   return api.data;
 }
@@ -132,9 +122,7 @@ export async function loadRoles(character_id) {
 }
 
 export async function loadNotifications(character_id) {
-  const api = await axios.get(
-    `/audit/api/account/${character_id}/notifications`,
-  );
+  const api = await axios.get(`/audit/api/account/${character_id}/notifications`);
   console.log(`get notifications in api ${character_id}`);
   return api.data;
 }
@@ -152,9 +140,7 @@ export async function loadMarket(character_id) {
 }
 
 export async function loadWalletActivity(character_id) {
-  const api = await axios.get(
-    `/audit/api/account/${character_id}/wallet/activity`,
-  );
+  const api = await axios.get(`/audit/api/account/${character_id}/wallet/activity`);
   console.log(`get wallet activity in api ${character_id}`);
   return api.data;
 }
@@ -184,7 +170,7 @@ export async function postAccountRefresh(character_id) {
   const api = await axios.post(
     `/audit/api/account/refresh?character_id=${character_id}`,
     { character_id: character_id },
-    { headers: { "X-CSRFToken": cookies.getItem("csrftoken") } },
+    { headers: { "X-CSRFToken": cookies.getItem("csrftoken") } }
   );
   return api.data;
 }
@@ -220,7 +206,7 @@ export async function postTestPing(
   itemGroups,
   filter_charges = false,
   ships_only = false,
-  caps_only = false,
+  caps_only = false
 ) {
   console.log(`sent ping test ${message}`);
   const api = await axios.post(`/audit/api/pingbot/assets/counts`, null, {
@@ -245,7 +231,7 @@ export async function postSendPing(
   itemGroups,
   filter_charges = false,
   ships_only = false,
-  caps_only = false,
+  caps_only = false
 ) {
   console.log(`sent ping test ${message}`);
   const api = await axios.post(`/audit/api/pingbot/assets/send`, null, {

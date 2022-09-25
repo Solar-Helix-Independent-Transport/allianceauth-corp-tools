@@ -1,9 +1,9 @@
+import { loadWallet } from "../apis/Corporation";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { BaseTable, SelectColumnFilter, textColumnFilter } from "./BaseTable";
 import React from "react";
 import { Panel } from "react-bootstrap";
 import { useQuery } from "react-query";
-import ErrorBoundary from "../components/ErrorBoundary";
-import { loadWallet } from "../apis/Corporation";
-import { BaseTable, SelectColumnFilter, textColumnFilter } from "./BaseTable";
 
 const CorpWalletTable = ({ corporation_id, refTypes = "", page = 1 }) => {
   const { isLoading, isFetching, error, data } = useQuery(
@@ -12,7 +12,7 @@ const CorpWalletTable = ({ corporation_id, refTypes = "", page = 1 }) => {
     {
       initialData: [],
       refetchOnWindowFocus: false,
-    },
+    }
   );
 
   const columns = React.useMemo(
@@ -63,7 +63,7 @@ const CorpWalletTable = ({ corporation_id, refTypes = "", page = 1 }) => {
         filter: "text",
       },
     ],
-    [],
+    []
   );
 
   return (

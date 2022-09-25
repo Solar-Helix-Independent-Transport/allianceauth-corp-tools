@@ -1,12 +1,12 @@
-import React from "react";
-import { Label, Table } from "react-bootstrap";
-import { Panel, Tooltip, OverlayTrigger } from "react-bootstrap";
-import ReactTimeAgo from "react-time-ago";
-import { useQuery } from "react-query";
 import { loadStatus } from "../apis/Corporation";
-import { PanelLoader } from "../components/PanelLoader";
 import { ErrorLoader } from "../components/ErrorLoader";
 import { CorporationLogo } from "../components/EveImages";
+import { PanelLoader } from "../components/PanelLoader";
+import React from "react";
+import { Label, Table } from "react-bootstrap";
+import { OverlayTrigger, Panel, Tooltip } from "react-bootstrap";
+import { useQuery } from "react-query";
+import ReactTimeAgo from "react-time-ago";
 
 function MyTooltip({ message }) {
   return (
@@ -17,9 +17,7 @@ function MyTooltip({ message }) {
 }
 
 const CorpStatus = () => {
-  const { isLoading, error, data } = useQuery(["corp-status"], () =>
-    loadStatus(),
-  );
+  const { isLoading, error, data } = useQuery(["corp-status"], () => loadStatus());
 
   if (isLoading) return <PanelLoader />;
 
@@ -31,16 +29,11 @@ const CorpStatus = () => {
         return (
           <Panel className={"flex-child"}>
             <Panel.Heading>
-              <h4 className={"text-center"}>
-                {corp.corporation.corporation_name}
-              </h4>
+              <h4 className={"text-center"}>{corp.corporation.corporation_name}</h4>
             </Panel.Heading>
             <Panel.Body className="flex-body">
               <div className="text-center">
-                <CorporationLogo
-                  corporation_id={corp.corporation.corporation_id}
-                  size={256}
-                />
+                <CorporationLogo corporation_id={corp.corporation.corporation_id} size={256} />
               </div>
               <h4 className={"text-center"}>Update Status</h4>
               <Table striped style={{ marginBottom: 0 }}>
@@ -62,15 +55,10 @@ const CorpStatus = () => {
                             <OverlayTrigger
                               placement="top"
                               overlay={MyTooltip({
-                                message:
-                                  "Characters with Roles in Audit vs Tokens Available.",
+                                message: "Characters with Roles in Audit vs Tokens Available.",
                               })}
                             >
-                              <Label
-                                className="pull-right"
-                                bsStyle="info"
-                                size={"small"}
-                              >
+                              <Label className="pull-right" bsStyle="info" size={"small"}>
                                 Chars/Tokens: {corp.last_updates[h].chars}/
                                 {corp.last_updates[h].tokens}
                               </Label>
@@ -78,9 +66,7 @@ const CorpStatus = () => {
                           </td>
                           <td className="text-right">
                             {corp.last_updates[h].update ? (
-                              <ReactTimeAgo
-                                date={Date.parse(corp.last_updates[h].update)}
-                              />
+                              <ReactTimeAgo date={Date.parse(corp.last_updates[h].update)} />
                             ) : (
                               <>{"Never"}</>
                             )}

@@ -1,21 +1,15 @@
-import React from "react";
-import { Panel, Glyphicon } from "react-bootstrap";
-import { useQuery } from "react-query";
-import { loadAssetList, loadAssetContents } from "../apis/Character";
-import {
-  BaseTable,
-  SubRows,
-  SelectColumnFilter,
-  textColumnFilter,
-} from "../components/BaseTable";
+import { loadAssetContents, loadAssetList } from "../apis/Character";
+import { BaseTable, SelectColumnFilter, SubRows, textColumnFilter } from "../components/BaseTable";
 import ErrorBoundary from "./ErrorBoundary";
+import React from "react";
+import { Glyphicon, Panel } from "react-bootstrap";
+import { useQuery } from "react-query";
 
 function SubRowAsync({ row, rowProps, visibleColumns }) {
   const { isLoading, error, data } = useQuery(
     ["lazy-load", row.original.id],
-    () =>
-      loadAssetContents(row.original.character.character_id, row.original.id),
-    { refetchOnWindowFocus: false },
+    () => loadAssetContents(row.original.character.character_id, row.original.id),
+    { refetchOnWindowFocus: false }
   );
 
   if (!isLoading) {
@@ -38,17 +32,13 @@ const CharAssetTable = ({ character_id, location_id = 0 }) => {
   const { isLoading, isFetching, error, data } = useQuery(
     ["assetList", character_id, location_id],
     () => loadAssetList(character_id, location_id),
-    { initialData: [] },
+    { initialData: [] }
   );
   const renderRowSubComponent = React.useCallback(
     ({ row, rowProps, visibleColumns }) => (
-      <SubRowAsync
-        row={row}
-        rowProps={rowProps}
-        visibleColumns={visibleColumns}
-      />
+      <SubRowAsync row={row} rowProps={rowProps} visibleColumns={visibleColumns} />
     ),
-    [],
+    []
   );
 
   const columns = React.useMemo(
@@ -60,11 +50,7 @@ const CharAssetTable = ({ character_id, location_id = 0 }) => {
         Cell: ({ row }) =>
           row.original.expand ? (
             <span {...row.getToggleRowExpandedProps()}>
-              {row.isExpanded ? (
-                <Glyphicon glyph="minus-sign" />
-              ) : (
-                <Glyphicon glyph="plus-sign" />
-              )}
+              {row.isExpanded ? <Glyphicon glyph="minus-sign" /> : <Glyphicon glyph="plus-sign" />}
             </span>
           ) : (
             <></>
@@ -102,7 +88,7 @@ const CharAssetTable = ({ character_id, location_id = 0 }) => {
         filter: "includes",
       },
     ],
-    [],
+    []
   );
 
   return (

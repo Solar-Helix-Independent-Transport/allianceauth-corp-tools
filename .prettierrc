@@ -1,0 +1,4 @@
+importOrderSeparation: true
+importOrderSortSpecifiers: true
+tabWidth: 2
+printWidth: 100
