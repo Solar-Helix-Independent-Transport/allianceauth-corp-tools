@@ -25,10 +25,11 @@ from esi.views import sso_redirect
 from . import __version__, app_settings
 from .forms import UploadForm
 from .models import *
-from .tasks import (check_account, process_ores_from_esi,
+from .tasks import (check_account, clear_all_etags, process_ores_from_esi,
                     update_all_characters, update_all_corps,
-                    update_all_eve_names, update_character, update_corp,
-                    update_or_create_map, update_ore_comp_table)
+                    update_all_eve_names, update_all_locations,
+                    update_character, update_corp, update_or_create_map,
+                    update_ore_comp_table)
 
 CORP_REQUIRED_SCOPES = [
 
@@ -233,6 +234,12 @@ def admin_run_tasks(request):
         if request.POST.get('run_corp_updates'):
             messages.info(request, "Queued update_all_corps")
             update_all_corps.apply_async(priority=6)
+        if request.POST.get('run_locations'):
+            messages.info(request, "Queued update_all_locations")
+            update_all_locations.apply_async(priority=6)
+        if request.POST.get('run_clear_etag'):
+            messages.info(request, "Queued clear_all_etags")
+            clear_all_etags.apply_async(priority=1)
 
     return redirect('corptools:admin')
 

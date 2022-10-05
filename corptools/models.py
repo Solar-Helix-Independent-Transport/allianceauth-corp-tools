@@ -576,6 +576,11 @@ class WalletJournalEntry(models.Model):
 
     class Meta:
         abstract = True
+        indexes = (
+            models.Index(fields=['date']),
+            models.Index(fields=['entry_id']),
+            models.Index(fields=['ref_type'])
+        )
 
 
 class CorporationWalletDivision(models.Model):
