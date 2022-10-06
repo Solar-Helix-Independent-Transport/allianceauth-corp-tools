@@ -9,7 +9,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    needs: test
     steps:
       - uses: actions/checkout@v2
 
@@ -25,6 +24,9 @@ jobs:
 
       - name: install dependencies
         run: make dev
+
+      - name: Run Tests
+        run: make test
 
       - name: clean up
         run: make clean
