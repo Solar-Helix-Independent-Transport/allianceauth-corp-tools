@@ -7,7 +7,7 @@ from corptools.tasks import (process_ores_from_esi, update_or_create_map,
 
 
 class Command(BaseCommand):
-    help = 'Update or Populate base EVE Models'
+    help = 'Bootstrap the CorpTools Module'
 
     def add_arguments(self, parser):
         parser.add_argument('--inline', action='store_true',
