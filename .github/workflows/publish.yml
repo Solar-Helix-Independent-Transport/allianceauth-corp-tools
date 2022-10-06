@@ -25,9 +25,6 @@ jobs:
       - name: install dependencies
         run: make dev
 
-      - name: Run Tests
-        run: make test
-
       - name: clean up
         run: make clean
 
