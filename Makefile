@@ -17,8 +17,8 @@ clean:
 
 dev:
 	pip install --upgrade pip
-	pip install wheel
-	pip install tox
+	pip install wheel -U
+	pip install tox -U
 	pip install -e .
 
 test:
@@ -26,10 +26,7 @@ test:
 
 deploy:
 	pip install twine
-	echo "[pypi]" > ~/.pypirc
-	echo "username=__token__" >> ~/.pypirc
-	echo "password=${pypi-api-token}" >> ~/.pypirc
-	cut -c-20 ~/.pypirc
+	twine upload dist/*
 
 buildjs:
 	cd frontend/corp;yarn install;yarn build
