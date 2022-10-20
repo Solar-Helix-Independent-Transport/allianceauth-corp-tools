@@ -221,38 +221,72 @@ def update_character(char_id, force_refresh=False):
             logger.info("No Tokens for {}".format(char_id))
             return False
 
-    logger.info("Starting Updates for {}".format(
+    logger.info("Processing Updates for {}".format(
         character.character.character_name))
+
+    skip_date = timezone.now() - datetime.timedelta(hours=12)  # hook into the settings
+
     que = []
-    que.append(update_char_roles.si(
-        character.character.character_id, force_refresh=force_refresh))
-    que.append(update_char_titles.si(
-        character.character.character_id, force_refresh=force_refresh))
+
     que.append(update_char_corp_history.si(
         character.character.character_id, force_refresh=force_refresh))
-    que.append(update_char_notifications.si(
-        character.character.character_id, force_refresh=force_refresh))
-    que.append(update_char_assets.si(
-        character.character.character_id, force_refresh=force_refresh))
-    que.append(update_char_skill_list.si(
-        character.character.character_id, force_refresh=force_refresh))
-    que.append(update_char_skill_queue.si(
-        character.character.character_id, force_refresh=force_refresh))
-    que.append(update_clones.si(
-        character.character.character_id, force_refresh=force_refresh))
-    que.append(update_char_wallet.si(
-        character.character.character_id, force_refresh=force_refresh))
-    que.append(update_char_orders.si(
-        character.character.character_id, force_refresh=force_refresh))
-    que.append(update_char_contacts.si(
-        character.character.character_id, force_refresh=force_refresh))
-    que.append(update_char_order_history.si(
-        character.character.character_id, force_refresh=force_refresh))
-    que.append(update_char_transactions.si(
-        character.character.character_id, force_refresh=force_refresh))
+
+    if app_settings.CT_CHAR_ROLES_MODULE:
+        if character.last_update_roles <= skip_date or force_refresh:
+            que.append(update_char_roles.si(
+                character.character.character_id, force_refresh=force_refresh))
+        if character.last_update_titles <= skip_date or force_refresh:
+            que.append(update_char_titles.si(
+                character.character.character_id, force_refresh=force_refresh))
+
+    if app_settings.CT_CHAR_NOTIFICATIONS_MODULE:
+        if character.last_update_notif <= skip_date or force_refresh:
+            que.append(update_char_notifications.si(
+                character.character.character_id, force_refresh=force_refresh))
+
+    if app_settings.CT_CHAR_ASSETS_MODULE:
+        if character.last_update_assets <= skip_date or force_refresh:
+            que.append(update_char_assets.si(
+                character.character.character_id, force_refresh=force_refresh))
+
+    if app_settings.CT_CHAR_SKILLS_MODULE:
+        if character.last_update_skills <= skip_date or force_refresh:
+            que.append(update_char_skill_list.si(
+                character.character.character_id, force_refresh=force_refresh))
+        if character.last_update_skill_que <= skip_date or force_refresh:
+            que.append(update_char_skill_queue.si(
+                character.character.character_id, force_refresh=force_refresh))
+
+    if app_settings.CT_CHAR_CLONES_MODULE:
+        if character.last_update_clones <= skip_date or force_refresh:
+            que.append(update_clones.si(
+                character.character.character_id, force_refresh=force_refresh))
+
+    if app_settings.CT_CHAR_CONTACTS_MODULE:
+        if character.last_update_contacts <= skip_date or force_refresh:
+            que.append(update_char_contacts.si(
+                character.character.character_id, force_refresh=force_refresh))
+
+    if app_settings.CT_CHAR_WALLET_MODULE:
+        if character.last_update_wallet <= skip_date or force_refresh:
+            que.append(update_char_wallet.si(
+                character.character.character_id, force_refresh=force_refresh))
+            que.append(update_char_transactions.si(
+                character.character.character_id, force_refresh=force_refresh))
+        if character.last_update_orders <= skip_date or force_refresh:
+            que.append(update_char_orders.si(
+                character.character.character_id, force_refresh=force_refresh))
+            que.append(update_char_order_history.si(
+                character.character.character_id, force_refresh=force_refresh))
+
     if app_settings.CT_CHAR_MAIL_MODULE:
         que.append(update_char_mail.si(
             character.character.character_id, force_refresh=force_refresh))
+
+    logger.info("Queued {} Updates for {}".format(
+        len(que),
+        character.character.character_name)
+    )
     chain(que).apply_async(priority=6)
 
 
