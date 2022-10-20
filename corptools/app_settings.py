@@ -20,6 +20,7 @@ CT_CHAR_WALLET_MODULE = getattr(settings, 'CT_CHAR_WALLET_MODULE', True)
 CT_CHAR_SKILLS_MODULE = getattr(settings, 'CT_CHAR_SKILLS_MODULE', True)
 CT_CHAR_CLONES_MODULE = getattr(settings, 'CT_CHAR_CLONES_MODULE', True)
 CT_CHAR_LOCATIONS_MODULE = getattr(settings, 'CT_CHAR_LOCATIONS_MODULE', True)
+CT_CHAR_FLEET_MODULE = getattr(settings, 'CT_CHAR_FLEET_MODULE', True)
 CT_CHAR_MAIL_MODULE = getattr(settings, 'CT_CHAR_MAIL_MODULE', False)
 CT_CHAR_HELPER_MODULE = getattr(settings, 'CT_CHAR_HELPER_MODULE', True)
 CT_CHAR_OPPORTUNITIES = getattr(settings, 'CT_CHAR_OPPORTUNITIES', True)
@@ -161,12 +162,18 @@ def get_character_scopes():
             'esi-location.read_online.v1',
             'esi-location.read_ship_type.v1',
             'esi-characters.read_fatigue.v1',
+        ]
+
+    if CT_CHAR_FLEET_MODULE:
+        _scopes += [
+            # Fleets
             'esi-fleets.read_fleet.v1',
+            'esi-fleets.write_fleet.v1',
         ]
 
     if CT_CHAR_MAIL_MODULE:
         _scopes += [
-            # Mail
+            # Mailsn
             'esi-mail.read_mail.v1',
         ]
 
