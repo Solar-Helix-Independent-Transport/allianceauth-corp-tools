@@ -1,7 +1,6 @@
 import datetime
 import json
 import logging
-from urllib import response
 
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.eveonline.providers import provider as eve_names
@@ -231,49 +230,52 @@ def update_character(char_id, force_refresh=False):
     que.append(update_char_corp_history.si(
         character.character.character_id, force_refresh=force_refresh))
 
+    mindt = timezone.now() - datetime.timedelta(days=90)
+
     if app_settings.CT_CHAR_ROLES_MODULE:
-        if character.last_update_roles <= skip_date or force_refresh:
+        if (character.last_update_roles or mindt) <= skip_date or force_refresh:
             que.append(update_char_roles.si(
                 character.character.character_id, force_refresh=force_refresh))
-        if character.last_update_titles <= skip_date or force_refresh:
+        if (character.last_update_titles or mindt) <= skip_date or force_refresh:
             que.append(update_char_titles.si(
                 character.character.character_id, force_refresh=force_refresh))
 
     if app_settings.CT_CHAR_NOTIFICATIONS_MODULE:
-        if character.last_update_notif <= skip_date or force_refresh:
+        if (character.last_update_notif or mindt) <= skip_date or force_refresh:
             que.append(update_char_notifications.si(
                 character.character.character_id, force_refresh=force_refresh))
 
     if app_settings.CT_CHAR_ASSETS_MODULE:
-        if character.last_update_assets <= skip_date or force_refresh:
+        if (character.last_update_assets or mindt) <= skip_date or force_refresh:
             que.append(update_char_assets.si(
                 character.character.character_id, force_refresh=force_refresh))
 
     if app_settings.CT_CHAR_SKILLS_MODULE:
-        if character.last_update_skills <= skip_date or force_refresh:
+
+        if (character.last_update_skills or mindt) <= skip_date or force_refresh:
             que.append(update_char_skill_list.si(
                 character.character.character_id, force_refresh=force_refresh))
-        if character.last_update_skill_que <= skip_date or force_refresh:
+        if (character.last_update_skill_que or mindt) <= skip_date or force_refresh:
             que.append(update_char_skill_queue.si(
                 character.character.character_id, force_refresh=force_refresh))
 
     if app_settings.CT_CHAR_CLONES_MODULE:
-        if character.last_update_clones <= skip_date or force_refresh:
+        if (character.last_update_clones or mindt) <= skip_date or force_refresh:
             que.append(update_clones.si(
                 character.character.character_id, force_refresh=force_refresh))
 
     if app_settings.CT_CHAR_CONTACTS_MODULE:
-        if character.last_update_contacts <= skip_date or force_refresh:
+        if (character.last_update_contacts or mindt) <= skip_date or force_refresh:
             que.append(update_char_contacts.si(
                 character.character.character_id, force_refresh=force_refresh))
 
     if app_settings.CT_CHAR_WALLET_MODULE:
-        if character.last_update_wallet <= skip_date or force_refresh:
+        if (character.last_update_wallet or mindt) <= skip_date or force_refresh:
             que.append(update_char_wallet.si(
                 character.character.character_id, force_refresh=force_refresh))
             que.append(update_char_transactions.si(
                 character.character.character_id, force_refresh=force_refresh))
-        if character.last_update_orders <= skip_date or force_refresh:
+        if (character.last_update_orders or mindt) <= skip_date or force_refresh:
             que.append(update_char_orders.si(
                 character.character.character_id, force_refresh=force_refresh))
             que.append(update_char_order_history.si(
