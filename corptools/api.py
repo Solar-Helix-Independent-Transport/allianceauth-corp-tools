@@ -157,7 +157,7 @@ def get_character_status(request, character_id: int):
                     "location": character.characteraudit.location.current_location.location_name,
                     "ship": f"{character.characteraudit.location.current_ship_name} ({character.characteraudit.location.current_ship.name})"
                 })
-            except models.CharacterAudit.location.RelatedObjectDoesNotExist:
+            except Exception:
                 pass
         except models.CharacterAudit.DoesNotExist:
             pass
