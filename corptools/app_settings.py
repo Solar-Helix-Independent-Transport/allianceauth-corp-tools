@@ -203,6 +203,12 @@ def get_character_update_attributes():
             ("Contacts", 'last_update_contacts'),
         ]
 
+    if CT_CHAR_LOCATIONS_MODULE:
+        _attribs += [
+            # Location
+            ("Location", 'last_update_location'),
+        ]
+
     if CT_CHAR_NOTIFICATIONS_MODULE:
         _attribs += [
             # Notifications

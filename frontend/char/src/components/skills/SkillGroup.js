@@ -18,7 +18,14 @@ export const SkillGroup = ({ group, skills }) => {
             return 0; //default return value (no sorting)
           })
           .map((skill) => {
-            return <SkillBlock skill={skill.skill} level={skill.level} active={skill.active} />;
+            return (
+              <SkillBlock
+                skill={skill.skill}
+                level={skill.level}
+                active={skill.active}
+                trained={skill.active}
+              />
+            );
           })}
       </Panel.Body>
     </Panel>

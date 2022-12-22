@@ -6,10 +6,12 @@ from django.core.cache import cache
 from django.utils import timezone
 from esi.models import Token
 
+from corptools.task_helpers.update_tasks import fetch_location_name
+
 from .. import providers
 from ..models import (CharacterAsset, CharacterAudit, CharacterContact,
-                      CharacterContactLabel, CharacterMarketOrder,
-                      CharacterRoles, CharacterTitle,
+                      CharacterContactLabel, CharacterLocation,
+                      CharacterMarketOrder, CharacterRoles, CharacterTitle,
                       CharacterWalletJournalEntry, Clone, CorporationHistory,
                       EveItemType, EveLocation, EveName, Implant, JumpClone,
                       MailLabel, MailMessage, MailRecipient, Notification,
@@ -42,6 +44,72 @@ def get_token(character_id: int, scopes: list) -> "Token":
         return token
     else:
         return False
+
+
+def update_character_location(character_id, force_refresh=False):
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+    logger.debug("updating location for: {}".format(
+        audit_char.character.character_name))
+
+    req_scopes = ['esi-location.read_ship_type.v1',
+                  'esi-location.read_location.v1']
+
+    token = get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+
+    try:
+        location_op = providers.esi.client.Location.get_characters_character_id_location(
+            character_id=character_id)
+
+        loc_data = etag_results(
+            location_op, token, force_refresh=force_refresh)
+
+        loc_id = None
+
+        if loc_data['structure_id']:
+            loc_id = loc_data['structure_id']
+        elif loc_data['station_id']:
+            loc_id = loc_data['station_id']
+        else:
+            loc_id = loc_data['solar_system_id']
+
+        _loc = fetch_location_name(loc_id, "solar_system", character_id)
+
+        if _loc:
+            _loc.save()
+
+        ship_op = providers.esi.client.Location.get_characters_character_id_ship(
+            character_id=character_id)
+
+        ship_data = etag_results(
+            ship_op, token, force_refresh=force_refresh)
+
+        ship, _ = EveItemType.objects.get_or_create_from_esi(
+            ship_data["ship_type_id"])
+
+        CharacterLocation.objects.update_or_create(
+            character=audit_char,
+            defaults={
+                "current_ship": ship,
+                "current_ship_name": ship_data["ship_name"],
+                "current_ship_name": ship_data["ship_name"],
+                "current_location": _loc if _loc else None
+            }
+        )
+
+    except NotModifiedError:
+        logger.info("CT: No New Location data for: {}".format(
+            audit_char.character.character_name))
+        pass
+
+    audit_char.last_update_location = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
+    return "CT: Finished location for: {}".format(audit_char.character.character_name)
 
 
 def update_corp_history(character_id, force_refresh=False):

@@ -165,6 +165,55 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
         f"CT: Corp {corp_id} Div {wallet_division}, OLDEST DATA! {audit_corp} {_min_time}")
 
 
+def update_corporation_transactions(corp_id, wallet_division, full_update=False):
+    audit_corp = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+
+    division = CorporationWalletDivision.objects.get(
+        corporation=audit_corp, division=wallet_division)
+
+    logger.debug("Updating market transactions for: {} (Div: {})".format(
+        audit_corp.corporation.corporation_name, division))
+
+    req_scopes = ['esi-wallet.read_corporation_wallets.v1',
+                  'esi-characters.read_corporation_roles.v1']
+
+    req_roles = ['CEO', 'Director', 'Accountant', 'Junior_Accountant']
+
+    token = get_corp_token(corp_id, req_scopes, req_roles)
+
+    if not token:
+        return "No Tokens"
+
+    try:
+        journal_items_ob = providers.esi.client.Wallet.get_corporations_corporation_id_wallets_division_transactions(
+            corporation_id=audit_corp.corporation.corporation_id,
+            division=wallet_division)
+
+        journal_items = etag_results(
+            journal_items_ob, token, force_refresh=full_update)
+
+        _current_journal = CharacterWalletJournalEntry.objects.filter(
+            character=audit_char,
+            context_id_type="market_transaction_id",
+            reason__exact="").values_list('context_id', flat=True)[:2500]  # Max items from ESI
+
+        _new_names = []
+
+        items = []
+        for item in journal_items:
+            if item.get('transaction_id') in _current_journal:
+                type_name, _ = EveItemType.objects.get_or_create_from_esi(
+                    item.get('type_id'))
+
+    except NotModifiedError:
+        logger.info("CT: No New market transaction data for: {}".format(
+            audit_char.character.character_name))
+        pass
+
+    return "CT: Finished market transactions for: {}".format(audit_char.character.character_name)
+
+
 def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
     # logger.debug("Started wallet divs for: %s" % str(character_id))
     audit_corp = CorporationAudit.objects.get(

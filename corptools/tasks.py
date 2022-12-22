@@ -23,6 +23,7 @@ from .task_helpers.char_tasks import (process_mail_list,
                                       update_character_assets,
                                       update_character_clones,
                                       update_character_contacts,
+                                      update_character_location,
                                       update_character_mail,
                                       update_character_notifications,
                                       update_character_order_history,
@@ -281,6 +282,10 @@ def update_character(char_id, force_refresh=False):
             que.append(update_char_order_history.si(
                 character.character.character_id, force_refresh=force_refresh))
 
+    if app_settings.CT_CHAR_LOCATIONS_MODULE:
+        que.append(update_char_location.si(
+            character.character.character_id, force_refresh=force_refresh))
+
     if app_settings.CT_CHAR_MAIL_MODULE:
         que.append(update_char_mail.si(
             character.character.character_id, force_refresh=force_refresh))
@@ -314,6 +319,15 @@ def update_char_roles(self, character_id, force_refresh=False):
 def update_char_skill_list(self, character_id, force_refresh=False):
     try:
         return update_character_skill_list(character_id, force_refresh=force_refresh)
+    except Exception as e:
+        logger.exception(e)
+        return "Failed"
+
+
+@shared_task(bind=True, base=QueueOnce)
+def update_char_location(self, character_id, force_refresh=False):
+    try:
+        return update_character_location(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"

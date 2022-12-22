@@ -127,7 +127,8 @@ def get_character_status(request, character_id: int):
     for c in char_skill_total:
         skills[c.get('char')] = c.get('total_sp')
 
-    characters = characters.select_related('characteraudit')
+    characters = characters.select_related(
+        'characteraudit', "characteraudit__location")
     output = {"characters": [],
               "main": main
               }
@@ -135,6 +136,8 @@ def get_character_status(request, character_id: int):
         _o = {
             "character": character,
             "isk": 0,
+            "location": "Unknown",
+            "ship": "Unknown",
             "sp": skills.get(character.character_id, 0),
             "active": False,
             "last_updates": None
@@ -149,6 +152,13 @@ def get_character_status(request, character_id: int):
                 "active": character.characteraudit.is_active(),
                 "last_updates": _updates
             })
+            try:
+                _o.update({
+                    "location": character.characteraudit.location.current_location.location_name,
+                    "ship": f"{character.characteraudit.location.current_ship_name} ({character.characteraudit.location.current_ship.name})"
+                })
+            except models.CharacterAudit.location.RelatedObjectDoesNotExist:
+                pass
         except models.CharacterAudit.DoesNotExist:
             pass
         output["characters"].append(_o)
@@ -595,10 +605,12 @@ def get_character_clones(request, character_id: int):
                 "id": i.type_name_id,
                 "name": i.type_name.name
             })
-        loc = None
+        loc = {"id": j.location_id,
+               "name": f"ID#{j.location_id}"}
+
         if j.location_name:
-            loc = {"id": j.location_name_id,
-                   "name": j.location_name.location_name}
+            loc["name"] = j.location_name.location_name
+
         table_data[j.character.character.character_name]["clones"].append({
             "name": j.name,
             "location": loc,
@@ -607,10 +619,13 @@ def get_character_clones(request, character_id: int):
         )
 
     for c in clones:
-        table_data[c.character.character.character_name]["home"] = {
-            "id": c.location_id,
-            "name": c.location_name.location_name
-        }
+        loc = {"id": c.location_id,
+               "name": f"ID#{c.location_id}"}
+
+        if c.location_name:
+            loc["name"] = c.location_name.location_name
+
+        table_data[c.character.character.character_name]["home"] = loc
         table_data[c.character.character.character_name]["last_station_change"] = c.last_station_change_date
         table_data[c.character.character.character_name]["last_clone_jump"] = c.last_clone_jump_date
 

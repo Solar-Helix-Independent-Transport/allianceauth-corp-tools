@@ -98,6 +98,9 @@ class CharacterAudit(models.Model):
     last_update_mails = models.DateTimeField(
         null=True, default=None, blank=True)
 
+    last_update_location = models.DateTimeField(
+        null=True, default=None, blank=True)
+
     balance = models.DecimalField(
         max_digits=20, decimal_places=2, null=True, default=None)
 
@@ -688,6 +691,62 @@ class SkillList(models.Model):
 
     def __str__(self):
         return "({}){} (Updated: {})".format(self.order_weight, self.name, self.last_update.strftime("%Y-%m-%d %H:%M:%S"))
+
+
+# ************************ Contract Models
+
+# class Contract(models.Model):
+    """
+    acceptor_id*	integer ($int32)
+    assignee_id*	integer ($int32)
+    availability*	string [ public, personal, corporation, alliance ]
+    buyout	number($double)
+    collateral	number($double)
+    contract_id*	integer($int32)
+    date_accepted	string($date-time)
+    date_completed	string($date-time)
+    date_expired*	string($date-time)
+    date_issued*	string($date-time)
+    days_to_complete	integer($int32)
+    end_location_id	integer($int64)
+    for_corporation*	boolean
+    issuer_corporation_id*	integer($int32)
+    issuer_id*	integer($int32)
+    price	number($double)
+    reward	number($double)
+    start_location_id	integer($int64)
+    status*	string [ outstanding, in_progress, finished_issuer, finished_contractor, finished, cancelled, rejected, failed, deleted, reversed ]
+    title	string
+    type*	string [ unknown, item_exchange, auction, courier, loan ]
+    volume	number($double)
+    """
+
+# class ContractItem(models.Model):
+    """
+    is_included*	boolean
+    is_singleton*	boolean
+    quantity*	integer($int32)
+    raw_quantity	integer($int32)
+    record_id*	integer($int64)
+    type_id*	integer($int32)
+    """
+
+# ************************ Meta Models
+
+
+class CharacterLocation(models.Model):
+    character = models.OneToOneField(
+        CharacterAudit, on_delete=models.CASCADE, related_name="location")
+
+    current_location = models.ForeignKey(
+        EveLocation, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    current_ship = models.ForeignKey(
+        EveItemType, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    current_ship_unique = models.BigIntegerField(
+        null=True, blank=True, default=None)
+    current_ship_name = models.TextField(
+        max_length=150, null=True, blank=True, default=None)
+
 
 # ************************ Corp Models
 # Structure models
