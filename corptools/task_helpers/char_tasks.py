@@ -1,4 +1,5 @@
 import logging
+import time
 
 from bravado import exception
 from celery import shared_task
@@ -66,6 +67,7 @@ def update_character_location(character_id, force_refresh=False):
 
         loc_data = etag_results(
             location_op, token, force_refresh=force_refresh)
+        _st = time.perf_counter()
 
         loc_id = None
 
@@ -99,6 +101,8 @@ def update_character_location(character_id, force_refresh=False):
                 "current_location": _loc if _loc else None
             }
         )
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_location {character_id}")
 
     except NotModifiedError:
         logger.info("CT: No New Location data for: {}".format(
@@ -123,7 +127,7 @@ def update_corp_history(character_id, force_refresh=False):
 
         corp_history = etag_results(
             corp_history_op, None, force_refresh=force_refresh)
-
+        _st = time.perf_counter()
         for corp in corp_history:
             corp_name, created = EveName.objects.get_or_create_from_esi(
                 corp.get('corporation_id'))
@@ -134,6 +138,8 @@ def update_corp_history(character_id, force_refresh=False):
                                             'corporation_name': corp_name,
                                             'is_deleted': corp.get('is_deleted', False),
                                             'start_date': corp.get('start_date')})
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_corp_history {character_id}")
     except NotModifiedError:
         logger.info("CT: No New pub data for: {}".format(
             audit_char.character.character_name))
@@ -167,6 +173,7 @@ def update_character_skill_list(character_id, force_refresh=False):
         skills = etag_results(skills_op, token, force_refresh=force_refresh)
 
         # Delete current SkillList
+        _st = time.perf_counter()
         Skill.objects.filter(character=audit_char).delete()
 
         SkillTotals.objects.update_or_create(character=audit_char,
@@ -191,6 +198,9 @@ def update_character_skill_list(character_id, force_refresh=False):
 
         EveItemType.objects.create_bulk_from_esi(_check_skills)
         Skill.objects.bulk_create(_create_skills)
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_skill_list {character_id}")
+
     except NotModifiedError:
         logger.info("CT: No New skills for: {}".format(
             audit_char.character.character_name))
@@ -222,6 +232,7 @@ def update_character_skill_queue(character_id, force_refresh=False):
 
         queue = etag_results(queue_op, token, force_refresh=force_refresh)
 
+        _st = time.perf_counter()
         # Delete current SkillList
         SkillQueue.objects.filter(character=audit_char).delete()
 
@@ -245,6 +256,9 @@ def update_character_skill_queue(character_id, force_refresh=False):
 
         EveItemType.objects.create_bulk_from_esi(_check_skills)
         SkillQueue.objects.bulk_create(items)
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_skill_queue {character_id}")
+
     except NotModifiedError:
         logger.info("CT: No New skill queue for: {}".format(
             audit_char.character.character_name))
@@ -275,6 +289,7 @@ def update_character_assets(character_id, force_refresh=False):
 
         assets = etag_results(assets_op, token, force_refresh=force_refresh)
 
+        _st = time.perf_counter()
         location_names = list(
             EveLocation.objects.all().values_list('location_id', flat=True))
         _current_type_ids = []
@@ -335,6 +350,9 @@ def update_character_assets(character_id, force_refresh=False):
             delete_query._raw_delete(delete_query.db)
 
         CharacterAsset.objects.bulk_create(items)
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_assets {character_id}")
+
     except NotModifiedError:
         logger.info("CT: No New assets for: {}".format(
             audit_char.character.character_name))
@@ -405,6 +423,7 @@ def update_character_wallet(character_id, force_refresh=False):
         journal_items = etag_results(
             journal_items_ob, token, force_refresh=force_refresh)
 
+        _st = time.perf_counter()
         _current_journal = CharacterWalletJournalEntry.objects.filter(
             character=audit_char).values_list('entry_id', flat=True)  # TODO add time filter
         _current_eve_ids = list(
@@ -466,6 +485,8 @@ def update_character_wallet(character_id, force_refresh=False):
             CharacterWalletJournalEntry.objects.bulk_create(items)
         else:
             raise Exception("ESI Fail")
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_wallet {character_id}")
     except NotModifiedError:
         logger.info("CT: No New wallet data for: {}".format(
             audit_char.character.character_name))
@@ -497,6 +518,7 @@ def update_character_transactions(character_id, force_refresh=False):
 
         journal_items = etag_results(
             journal_items_ob, token, force_refresh=force_refresh)
+        _st = time.perf_counter()
 
         _current_journal = CharacterWalletJournalEntry.objects.filter(
             character=audit_char,
@@ -520,6 +542,8 @@ def update_character_transactions(character_id, force_refresh=False):
                     reason=message
                 )
                 print(f"{audit_char.character.character_name} {message}")
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_transactions {character_id}")
 
     except NotModifiedError:
         logger.info("CT: No New wallet data for: {}".format(
@@ -624,6 +648,7 @@ def update_character_orders(character_id, force_refresh=False):
     try:
         open_orders = etag_results(
             open_orders_op, token, force_refresh=force_refresh)
+        _st = time.perf_counter()
 
         open_ids = list(CharacterMarketOrder.objects.filter(
             character=audit_char, state='active').values_list("order_id", flat=True))
@@ -684,6 +709,8 @@ def update_character_orders(character_id, force_refresh=False):
 
         if len(creates) > 0:
             CharacterMarketOrder.objects.bulk_create(creates)
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_orders {character_id}")
 
     except NotModifiedError:
         logger.info("CT: No New orders data for: {}".format(
@@ -716,6 +743,7 @@ def update_character_order_history(character_id, force_refresh=False):
     try:
         order_history = etag_results(
             order_history_op, token, force_refresh=force_refresh)
+        _st = time.perf_counter()
 
         closed_ids = list(CharacterMarketOrder.objects.filter(
             character=audit_char).values_list("order_id", flat=True))
@@ -777,6 +805,9 @@ def update_character_order_history(character_id, force_refresh=False):
 
         if len(creates) > 0:
             CharacterMarketOrder.objects.bulk_create(creates, batch_size=1000)
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_order_history {character_id}")
+
     except NotModifiedError:
         logger.info("CT: No New old orders data for: {}".format(
             audit_char.character.character_name))
@@ -805,6 +836,7 @@ def update_character_notifications(character_id, force_refresh=False):
 
         notifications = etag_results(
             notifications_op, token, force_refresh=force_refresh)
+        _st = time.perf_counter()
 
         last_five_hundred = list(
             Notification.objects.filter(character=audit_char)
@@ -835,6 +867,8 @@ def update_character_notifications(character_id, force_refresh=False):
         NotificationText.objects.bulk_create(
             _create_notifs, ignore_conflicts=True, batch_size=500)
         Notification.objects.bulk_create(_creates, batch_size=500)
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_notifications {character_id}")
 
     except NotModifiedError:
         logger.info("CT: No New notifications for: {}".format(
@@ -862,6 +896,7 @@ def update_character_roles(character_id, force_refresh=False):
             character_id=character_id)
 
         roles = etag_results(roles_op, token, force_refresh=force_refresh)
+        _st = time.perf_counter()
 
         director = False
         accountant = False
@@ -888,6 +923,9 @@ def update_character_roles(character_id, force_refresh=False):
                                                                          "personnel_manager": personnel_manager
                                                                      }
                                                                      )
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_roles {character_id}")
+
     except NotModifiedError:
         logger.info("CT: No New roles for: {}".format(
             audit_char.character.character_name))
@@ -1082,6 +1120,7 @@ def update_character_contacts(character_id, force_refresh=False):
             character_id=character_id)
 
         labels = etag_results(labels_op, token, force_refresh=force_refresh)
+        _st = time.perf_counter()
 
         labels_to_create = []
 
@@ -1096,6 +1135,8 @@ def update_character_contacts(character_id, force_refresh=False):
 
         CharacterContactLabel.objects.filter(character=audit_char).delete()
         CharacterContactLabel.objects.bulk_create(labels_to_create)
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} CharacterContactLabel {character_id}")
 
     except NotModifiedError:
         logger.info("CT: No New labels for: {}".format(
@@ -1108,6 +1149,7 @@ def update_character_contacts(character_id, force_refresh=False):
 
         contacts = etag_results(
             contacts_op, token, force_refresh=force_refresh)
+        _st = time.perf_counter()
 
         ContactLabelThrough = CharacterContact.labels.through
         _contacts_to_create = []
@@ -1148,6 +1190,9 @@ def update_character_contacts(character_id, force_refresh=False):
 
         CharacterContact.objects.bulk_create(_contacts_to_create)
         ContactLabelThrough.objects.bulk_create(_through_to_create)
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_contacts {character_id}")
+
     except NotModifiedError:
         logger.info("CT: No New contacts for: {}".format(
             audit_char.character.character_name))
@@ -1177,6 +1222,7 @@ def update_character_titles(character_id, force_refresh=False):
             character_id=character_id)
 
         titles = etag_results(titles_op, token, force_refresh=force_refresh)
+        _st = time.perf_counter()
 
         title_models = []
         for t in titles:  # update labels
@@ -1197,6 +1243,9 @@ def update_character_titles(character_id, force_refresh=False):
             audit_char.characterroles.titles.remove(*rem_tits)
         else:
             audit_char.characterroles.titles.clear()
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_titles {character_id}")
+
     except NotModifiedError:
         logger.info("CT: No New titles for: {}".format(
             audit_char.character.character_name))

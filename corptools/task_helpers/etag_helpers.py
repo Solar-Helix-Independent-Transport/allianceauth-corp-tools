@@ -1,4 +1,5 @@
 import logging
+import time
 
 from bravado.exception import HTTPNotModified
 from django.core.cache import cache
@@ -56,6 +57,7 @@ def stringify_params(operation):
 
 
 def etag_results(operation, token, force_refresh=False):
+    _start_tm = time.perf_counter()
     results = list()
     # override to always get the raw response for expiry header
     operation.request_config.also_return_response = True
@@ -71,6 +73,7 @@ def etag_results(operation, token, force_refresh=False):
 
         # loop all pages and add data to output array
         while current_page <= total_pages:
+            _pg_tm = time.perf_counter()
             operation.future.request.params["page"] = current_page
             # will use cache if applicable
             try:
@@ -123,7 +126,7 @@ def etag_results(operation, token, force_refresh=False):
 
             except (NotModifiedError) as e:  # etag is match in cache
                 logger.debug(
-                    f"ETag: NotModifiedError Hit ETag {operation.operation.operation_id} Ei:{etags_incomplete} - {stringify_params(operation)} - P:{headers.headers['X-Pages']}")
+                    f"ESI_TIME: PAGE {time.perf_counter()-_pg_tm} {operation.operation.operation_id} {stringify_params(operation)}")
                 total_pages = int(headers.headers['X-Pages'])
 
                 if not etags_incomplete:
@@ -131,7 +134,8 @@ def etag_results(operation, token, force_refresh=False):
                 else:
                     current_page = 1  # reset to page 1 and fetch everything, we should not get here
                     results = list()
-
+            logger.debug(
+                f"ETag: No Etag {operation.operation.operation_id} - {stringify_params(operation)}")
         if not etags_incomplete and not force_refresh:
             raise NotModifiedError()
 
@@ -161,5 +165,6 @@ def etag_results(operation, token, force_refresh=False):
             logger.debug(
                 f"ETag: Saving Etag {operation.operation.operation_id} F:{force_refresh} - {stringify_params(operation)}")
             set_etag_header(operation, headers)
-
+    logger.debug(
+        f"ESI_TIME: OVERALL {time.perf_counter()-_start_tm} {operation.operation.operation_id} {stringify_params(operation)}")
     return results

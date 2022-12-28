@@ -1206,7 +1206,7 @@ def post_acccount_refresh(request, character_id: int):
 
     for cid in characters.values_list('character_id', flat=True):
         tasks.update_character.apply_async(
-            args=[cid], kwargs={"force_refresh": True}, priority=4)
+            args=[cid], kwargs={"force_refresh": request.user.is_superuser}, priority=4)
         eve_character_update.apply_async(
             args=[cid], priority=4)
     return 200, {"message": "Requested Updates!"}
