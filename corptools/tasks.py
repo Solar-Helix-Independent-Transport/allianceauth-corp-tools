@@ -176,8 +176,8 @@ def update_all_characters():
         update_character.apply_async(args=[char.character.character_id])
 
 
-@shared_task
-def update_subset_of_characters(subset=48, min_runs=5, force=False):
+@shared_task(bind=True, base=QueueOnce)
+def update_subset_of_characters(self, subset=48, min_runs=5, force=False):
     amount_of_updates = max(
         CharacterAudit.objects.all().count()/subset, min_runs)
     characters = CharacterAudit.objects.all().order_by(
@@ -204,8 +204,8 @@ def check_account(character_id):
         update_character.apply_async(args=[cid], priority=6)
 
 
-@shared_task
-def update_character(char_id, force_refresh=False):
+@shared_task(bind=True, base=QueueOnce)
+def update_character(self, char_id, force_refresh=False):
     character = CharacterAudit.objects.filter(
         character__character_id=char_id).first()
     if character is None:
