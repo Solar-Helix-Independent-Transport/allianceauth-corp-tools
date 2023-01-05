@@ -70,9 +70,10 @@ def character_skill_overview(context) -> dict:
     )
     for c, d in checks.items():
         del (d["skills"])
+
     response = {
-        "skills": list(skills.values()),
-        "chars": checks
+        "skills": list(sorted(skills.values(), key=lambda item: item["n"])),
+        "chars": dict(sorted(checks.items()))
     }
     context["skills"] = response
     return context
