@@ -24,8 +24,11 @@ def character_skill_overview(context) -> dict:
     _skill_ids = [182, 183, 184, 1285, 1289, 1290]
     _level_ids = [277, 278, 279, 1286, 1287, 1288]
 
-    _types = EveItemDogmaAttribute.objects.filter(Q(eve_type_id__in=_items) or Q(
-        eve_type_id=_fit.ship_type_type_id), attribute_id__in=_skill_ids+_level_ids)
+    _types = EveItemDogmaAttribute.objects.filter(
+        eve_type_id__in=_items, attribute_id__in=_skill_ids+_level_ids)
+    _types = _types | EveItemDogmaAttribute.objects.filter(
+        eve_type_id=_fit.ship_type_type_id, attribute_id__in=_skill_ids+_level_ids)
+
     required = {}
     skills = {}
     sids = set()
