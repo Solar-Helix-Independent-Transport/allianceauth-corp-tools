@@ -423,7 +423,7 @@ def get_character_asset_list(request, character_id: int, location_id: int):
                 },
                 "quantity": a.quantity,
                 "id": a.item_id,
-                "expand": True if a.type_name.group.category.category_id in expandable_cats else False,
+                "expand": True if a.type_name.group.category.category_id in expandable_cats else True if a.type_name_id == 60 else False,  # ships or asset wraps
                 "location": {
                     "id": a.location_name.location_id,
                     "name": a.location_name.location_name
