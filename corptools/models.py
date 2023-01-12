@@ -77,6 +77,9 @@ class CharacterAudit(models.Model):
     last_update_contacts = models.DateTimeField(
         null=True, default=None, blank=True)
 
+    last_update_contracts = models.DateTimeField(
+        null=True, default=None, blank=True)
+
     last_update_assets = models.DateTimeField(
         null=True, default=None, blank=True)
 
@@ -695,41 +698,78 @@ class SkillList(models.Model):
 
 # ************************ Contract Models
 
-# class Contract(models.Model):
-    """
-    acceptor_id*	integer ($int32)
-    assignee_id*	integer ($int32)
-    availability*	string [ public, personal, corporation, alliance ]
-    buyout	number($double)
-    collateral	number($double)
-    contract_id*	integer($int32)
-    date_accepted	string($date-time)
-    date_completed	string($date-time)
-    date_expired*	string($date-time)
-    date_issued*	string($date-time)
-    days_to_complete	integer($int32)
-    end_location_id	integer($int64)
-    for_corporation*	boolean
-    issuer_corporation_id*	integer($int32)
-    issuer_id*	integer($int32)
-    price	number($double)
-    reward	number($double)
-    start_location_id	integer($int64)
-    status*	string [ outstanding, in_progress, finished_issuer, finished_contractor, finished, cancelled, rejected, failed, deleted, reversed ]
-    title	string
-    type*	string [ unknown, item_exchange, auction, courier, loan ]
-    volume	number($double)
-    """
+class Contract(models.Model):
+    id = models.CharField(max_length=50, primary_key=True)
 
-# class ContractItem(models.Model):
-    """
-    is_included*	boolean
-    is_singleton*	boolean
-    quantity*	integer($int32)
-    raw_quantity	integer($int32)
-    record_id*	integer($int64)
-    type_id*	integer($int32)
-    """
+    contract_id = models.IntegerField()
+
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+    acceptor_id = models.IntegerField()
+    acceptor_name = models.ForeignKey(
+        EveName, on_delete=models.CASCADE, related_name="contractacceptor")
+    assignee_id = models.IntegerField()
+    assignee_name = models.ForeignKey(
+        EveName, on_delete=models.CASCADE, related_name="contractassignee")
+    issuer_id = models.IntegerField()
+    issuer_name = models.ForeignKey(
+        EveName, on_delete=models.CASCADE, related_name="contractissuer")
+    issuer_corporation_id = models.IntegerField()
+    issuer_corporation_name = models.ForeignKey(
+        EveName, on_delete=models.CASCADE, related_name="contractissuercorporation")
+    days_to_complete = models.IntegerField()
+
+    collateral = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+    buyout = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+    price = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+    reward = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+
+    volume = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+
+    days_to_complete = models.IntegerField(null=True, blank=True)
+
+    start_location_id = models.BigIntegerField(null=True, blank=True)
+    start_location_name = models.ForeignKey(
+        EveLocation, on_delete=models.SET_NULL, null=True, default=None, related_name="contractfrom")
+
+    end_location_id = models.BigIntegerField(null=True, blank=True)
+    end_location_name = models.ForeignKey(
+        EveLocation, on_delete=models.SET_NULL, null=True, default=None, related_name="contractto")
+
+    for_corporation = models.BooleanField()
+
+    date_accepted = models.DateTimeField(null=True, blank=True)
+    date_completed = models.DateTimeField(null=True, blank=True)
+
+    date_expired = models.DateTimeField()
+    date_issued = models.DateTimeField()
+
+    status = models.CharField(max_length=25)
+    contract_type = models.CharField(max_length=20)
+    availability = models.CharField(max_length=15)
+
+    title = models.CharField(max_length=256)
+
+    @staticmethod
+    def build_pk(char, cont):
+        return f"{char}{cont}"
+
+    class Meta:
+        unique_together = (("character", "contract_id"),)
+
+
+class ContractItem(models.Model):
+    contract = models.ForeignKey(Contract, on_delete=models.CASCADE)
+    is_included = models.BooleanField()
+    is_singleton = models.BooleanField()
+    quantity = models.IntegerField()
+    raw_quantity = models.IntegerField(null=True, blank=True)
+    record_id = models.BigIntegerField()
+    type_name = models.ForeignKey(EveItemType, on_delete=models.CASCADE)
 
 # ************************ Meta Models
 
@@ -931,6 +971,8 @@ class MailMessage(models.Model):
 
     # message
     subject = models.CharField(max_length=255, null=True, default=None)
+
+    # not in bulk data
     body = models.CharField(max_length=12000, null=True, default=None)
 
 

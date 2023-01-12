@@ -19,12 +19,13 @@ from . import app_settings, providers
 from .models import (CharacterAsset, CharacterAudit, CharacterMarketOrder,
                      Clone, CorporationAudit, EveLocation, EveName, JumpClone)
 from .task_helpers import corp_helpers
-from .task_helpers.char_tasks import (process_mail_list,
-                                      update_character_assets,
+from .task_helpers.char_tasks import (update_character_assets,
                                       update_character_clones,
                                       update_character_contacts,
+                                      update_character_contract_items,
+                                      update_character_contracts,
                                       update_character_location,
-                                      update_character_mail,
+                                      update_character_mail_headers,
                                       update_character_notifications,
                                       update_character_order_history,
                                       update_character_orders,
@@ -281,6 +282,9 @@ def update_character(self, char_id, force_refresh=False):
                 character.character.character_id, force_refresh=force_refresh))
             que.append(update_char_order_history.si(
                 character.character.character_id, force_refresh=force_refresh))
+        if (character.last_update_contracts or mindt) <= skip_date or force_refresh:
+            que.append(update_char_contracts.si(
+                character.character.character_id, force_refresh=force_refresh))
 
     if app_settings.CT_CHAR_LOCATIONS_MODULE:
         que.append(update_char_location.si(
@@ -421,28 +425,39 @@ def update_char_titles(self, character_id, force_refresh=False):
 @shared_task(bind=True, base=QueueOnce)
 def update_char_mail(self, character_id, force_refresh=False):
     try:
-        mail_ids = update_character_mail(
+        update_character_mail_headers(
             character_id, force_refresh=force_refresh)
-        # Get and Create messages
-        if mail_ids:
-            chunks = [mail_ids[i:i + 50] for i in range(0, len(mail_ids), 50)]
-            for chunk in chunks:
-                # Process mails in chunks of 500
-                process_char_mail.apply_async(
-                    priority=9, args=[character_id, chunk])
         return "Completed mail pre-fetch for: %s" % str(character_id)
     except Exception as e:
         logger.exception(e)
         return "Failed"
 
 
-@shared_task(bind=True)
-def process_char_mail(self, character_id, ids):
+@shared_task(bind=True, base=QueueOnce)
+def update_char_contract_items(self, character_id, contract_id, force_refresh=False):
     try:
-        return process_mail_list(character_id, ids)
+        update_character_contract_items(
+            character_id, contract_id, force_refresh=force_refresh)
+        # Get and Create messages
+        return "Completed items for: %s" % str(character_id)
     except Exception as e:
         logger.exception(e)
-        self.retry(exc=e, max_retries=5)
+        return "Failed"
+
+
+@shared_task(bind=True, base=QueueOnce)
+def update_char_contracts(self, character_id, force_refresh=False):
+    try:
+        msg, ids = update_character_contracts(
+            character_id, force_refresh=force_refresh)
+        for id in ids:
+            update_char_contract_items.apply_async(
+                args=[character_id, id], priority=8)
+
+        return "Completed Contracts for: %s" % str(character_id)
+
+    except Exception as e:
+        logger.exception(e)
         return "Failed"
 
 

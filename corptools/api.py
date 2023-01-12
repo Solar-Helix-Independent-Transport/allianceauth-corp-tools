@@ -281,6 +281,10 @@ def get_character_menu(request):
                 "name": "Wallet Activity",
                 "link": "account/walletactivity"
             })
+        _finance["links"].append({
+            "name": "Contracts",
+            "link": "account/contract"
+        })
 
         _finance["links"].append({
             "name": "Market",
@@ -954,10 +958,9 @@ def get_character_contacts(request, character_id: int):
     return output
 
 
-"""
 @api.get(
     "account/{character_id}/contracts",
-    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    response={200: List, 403: schema.Message},
     tags=["Account"]
 )
 def get_character_contracts(request, character_id: int):
@@ -967,7 +970,57 @@ def get_character_contracts(request, character_id: int):
         return 403, {"message": "Permission Denied"}
 
     characters = get_alts_queryset(main)
-"""
+
+    contracts = models.Contract.objects\
+        .filter(character__character__in=characters)\
+        .select_related('character__character', 'acceptor_name', 'assignee_name', 'issuer_corporation_name', 'issuer_name') \
+        .prefetch_related("contractitem_set", "contractitem_set__type_name").order_by("-date_issued")
+
+    output = []
+
+    for c in contracts:
+        _i = []
+        for i in c.contractitem_set.all():
+            _i.append({
+                "is_included": i.is_included,
+                "is_singleton": i.is_singleton,
+                "quantity": i.quantity,
+                "raw_quantity": i.raw_quantity,
+                "record_id": i.record_id,
+                "type_name": i.type_name.name,
+            })
+        _c = {
+            "character": c.character.character.character_name,
+            "acceptor": c.acceptor_name.name if c.acceptor_id else None,
+            "assignee": c.assignee_name.name if c.assignee_id else None,
+            "contract": c.contract_id,
+            "issuer": c.issuer_name.name,
+            "issuer_corporation_id": c.issuer_corporation_name.name,
+            "days_to_complete": c.days_to_complete,
+            "collateral": c.collateral or 0,
+            "buyout": c.buyout or 0,
+            "price": c.price or 0,
+            "reward": c.reward or 0,
+            "volume": c.volume or 0,
+            "days_to_complete": c.days_to_complete,
+            "start_location_id": c.start_location_id,
+            "end_location_id": c.end_location_id,
+            "for_corporation": c.for_corporation,
+            "date_accepted": c.date_accepted,
+            "date_completed": c.date_completed,
+            "date_expired": c.date_expired,
+            "date_issued": c.date_issued,
+            "status": c.status,
+            "contract_type": c.contract_type,
+            "availability": c.availability,
+            "title": c.title,
+            "items": _i
+        }
+        output.append(_c)
+
+    return output
+
+
 """
 @api.get(
     "account/{character_id}/standings",

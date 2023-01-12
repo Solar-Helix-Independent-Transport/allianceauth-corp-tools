@@ -85,6 +85,18 @@ export async function loadAssetList(character_id, location_id) {
   return api.data;
 }
 
+export async function loadContracts(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/contracts`);
+  console.log(`get Contracts in api ${character_id}`);
+  return api.data;
+}
+
+export async function loadMail(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/mail`);
+  console.log(`get Contracts in api ${character_id}`);
+  return api.data;
+}
+
 export async function loadAssetContents(character_id, item_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/asset/${item_id}/contents`);
   console.log(`get asset contents in api ${character_id} ${item_id}`);

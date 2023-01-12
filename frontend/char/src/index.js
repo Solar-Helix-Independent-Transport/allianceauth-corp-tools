@@ -8,6 +8,7 @@ import AuditAdmin from "./pages/AuditAdmin";
 import CharacterAudit from "./pages/CharacterAudit";
 import CharClones from "./pages/Clones";
 import CharContacts from "./pages/Contacts";
+import CharContracts from "./pages/Contracts";
 import CharDoctrines from "./pages/Doctrines";
 import CharMarket from "./pages/Market";
 import CharNotifications from "./pages/Notifications";
@@ -49,6 +50,7 @@ const CorptoolsCharacterView = () => {
               <Route path="account/walletactivity" element={<CharWalletActivity />} />
               <Route path="account/notifications" element={<CharNotifications />} />
               <Route path="account/contact" element={<CharContacts />} />
+              <Route path="account/contract" element={<CharContracts />} />
               <Route path="account/skills" element={<CharSkills />} />
               <Route path="account/skillqueue" element={<CharSkillQueue />} />
               <Route path="account/doctrines" element={<CharDoctrines />} />

@@ -13,9 +13,10 @@ from .. import providers
 from ..models import (CharacterAsset, CharacterAudit, CharacterContact,
                       CharacterContactLabel, CharacterLocation,
                       CharacterMarketOrder, CharacterRoles, CharacterTitle,
-                      CharacterWalletJournalEntry, Clone, CorporationHistory,
-                      EveItemType, EveLocation, EveName, Implant, JumpClone,
-                      MailLabel, MailMessage, MailRecipient, Notification,
+                      CharacterWalletJournalEntry, Clone, Contract,
+                      ContractItem, CorporationHistory, EveItemType,
+                      EveLocation, EveName, Implant, JumpClone, MailLabel,
+                      MailMessage, MailRecipient, Notification,
                       NotificationText, Skill, SkillQueue, SkillTotals)
 from .etag_helpers import NotModifiedError, etag_results
 
@@ -938,15 +939,11 @@ def update_character_roles(character_id, force_refresh=False):
     return "CT: Finished roles for: {0}".format(audit_char.character.character_name)
 
 
-def process_mail_list(character_id: int, ids: list):
-    """
-    Takes list of mail ids to process
-    :param character_id: int
-    :param ids: list of ids to process
-    :return: Nothing
-    """
+def update_character_mail_headers(character_id, force_refresh=False):
+    # This function will deal with ALL mail related updates
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
+
     req_scopes = ['esi-mail.read_mail.v1']
 
     token = get_token(character_id, req_scopes)
@@ -958,84 +955,6 @@ def process_mail_list(character_id: int, ids: list):
         EveName.objects.all().values_list('eve_id', flat=True))
     _current_mail_rec = list(
         MailRecipient.objects.all().values_list('recipient_id', flat=True))
-
-    messages = []
-    m_l_map = {}
-    m_r_map = {}
-    for id in ids:
-
-        msg = providers.esi.client.Mail.get_characters_character_id_mail_mail_id(character_id=character_id, mail_id=id,
-                                                                                 token=token.valid_access_token()).result()
-        id_k = int(str(audit_char.character.character_id)+str(id))
-        if msg.get('from', 0) not in _current_eve_ids:
-            EveName.objects.get_or_create_from_esi(msg.get('from'))
-            _current_eve_ids.append(msg.get('from', 0))
-        msg_obj = MailMessage(character=audit_char, id_key=id_k, mail_id=id, from_id=msg.get('from', None),
-                              from_name_id=msg.get('from', None),
-                              is_read=msg.get('read', None), timestamp=msg.get('timestamp'),
-                              subject=msg.get('subject', None), body=msg.get('body', None))
-        messages.append(msg_obj)
-        if msg.get('labels'):
-            labels = msg.get('labels')
-            m_l_map[id] = labels
-        m_r_map[id] = [(r.get('recipient_id'), r.get('recipient_type'))
-                       for r in msg.get('recipients')]
-
-    msgs = MailMessage.objects.bulk_create(messages)
-    logger.debug(
-        "Message Objects for {} to {} created".format(ids[0], ids[-1]))
-
-    LabelThroughModel = MailMessage.labels.through
-    lms = []
-    for msg in msgs:
-        if msg.mail_id in m_l_map:
-            for label in m_l_map[msg.mail_id]:
-                lm = LabelThroughModel(mailmessage_id=msg.id_key,
-                                       maillabel_id=MailLabel.objects.get(character=audit_char, label_id=label).pk)
-                lms.append(lm)
-
-    LabelThroughModel.objects.bulk_create(lms)
-
-    RecipThroughModel = MailMessage.recipients.through
-    rms = []
-    for msg in msgs:
-        if msg.mail_id in m_r_map:
-
-            for recip, r_type in m_r_map[msg.mail_id]:
-                recip_name = None
-                if r_type != "mailing_list":
-                    if recip not in _current_eve_ids:
-                        EveName.objects.get_or_create_from_esi(recip)
-                        _current_eve_ids.append(recip)
-                        recip_name = recip
-                if recip not in _current_mail_rec:
-                    MailRecipient.objects.get_or_create(recipient_id=recip,
-                                                        recipient_name_id=recip_name,
-                                                        recipient_type=r_type)
-                    _current_mail_rec.append(recip)
-
-                rm = RecipThroughModel(
-                    mailmessage_id=msg.id_key, mailrecipient_id=recip)
-                rms.append(rm)
-
-    RecipThroughModel.objects.bulk_create(rms)
-
-    return "CT: Completed mail fetch for: %s" % str(character_id)
-
-
-def update_character_mail(character_id, force_refresh=False):
-    #  This function will deal with ALL mail related updates
-    audit_char = CharacterAudit.objects.get(
-        character__character_id=character_id)
-    req_scopes = ['esi-mail.read_mail.v1']
-
-    token = get_token(character_id, req_scopes)
-
-    if not token:
-        return False
-
-    _current_eve_ids = list(
-        EveName.objects.all().values_list('eve_id', flat=True))
 
     # Mail Labels
     labels = providers.esi.client.Mail.get_characters_character_id_mail_labels(character_id=character_id,
@@ -1051,13 +970,8 @@ def update_character_mail(character_id, force_refresh=False):
                                            })
 
     # Get all mail ids
-    mail_ids = []
-    try:
-        last_id_db = MailMessage.objects.filter(
-            character=audit_char).order_by('-mail_id')[0].mail_id
-    except IndexError:
-        last_id_db = None
-
+    mail_ids = MailMessage.objects.filter(
+        character=audit_char).values_list("mail_id", flat=True)
     last_id = None
     while True:
         if last_id is None:
@@ -1072,17 +986,81 @@ def update_character_mail(character_id, force_refresh=False):
             # end of retrievable mail.
             break
 
+        messages = []
+        m_l_map = {}
+        m_r_map = {}
+        failed_ids = set()
         stop = False
         for msg in mail:
-            if msg.get('mail_id') == last_id_db:
-                # Break both loops if we have reached the most recent mail in the db.
-                print("Found {} in database for user {}.".format(
-                    msg.get('mail_id'), character_id))
-                stop = True
-                break
+            if msg.get('mail_id') == mail_ids:
+                if not force_refresh:
+                    break
+                continue
 
-            mail_ids.append(msg.get('mail_id'))
+            id_k = int(str(audit_char.character.character_id) +
+                       str(msg.get('mail_id')))
+            if msg.get('from', 0) not in _current_eve_ids:
+                if msg.get('from', 0) not in failed_ids:
+                    try:
+                        EveName.objects.get_or_create_from_esi(msg.get('from'))
+                        _current_eve_ids.append(msg.get('from', 0))
+                    except:
+                        failed_ids.add(msg.get('from'))
+                        pass
+            msg_obj = MailMessage(character=audit_char, id_key=id_k, mail_id=msg.get('mail_id'), from_id=msg.get('from', None),
+                                  is_read=msg.get('read', None), timestamp=msg.get('timestamp'),
+                                  subject=msg.get('subject', None), body=msg.get('body', None))
+
+            from_name_id = msg.get('from', None)
+            if from_name_id in _current_eve_ids:
+                msg_obj.from_name_id = msg.get('from', None)
+
+            messages.append(msg_obj)
+
+            if msg.get('labels'):
+                labels = msg.get('labels')
+                m_l_map[id] = labels
+
+            m_r_map[id] = [(r.get('recipient_id'), r.get('recipient_type'))
+                           for r in msg.get('recipients')]
             last_id = msg.get('mail_id')
+
+        msgs = MailMessage.objects.bulk_create(
+            messages, batch_size=1000, ignore_conflicts=True)
+
+        LabelThroughModel = MailMessage.labels.through
+        lms = []
+        for _msg in msgs:
+            if _msg.mail_id in m_l_map:
+                for label in m_l_map[_msg.mail_id]:
+                    lm = LabelThroughModel(mailmessage_id=_msg.id_key,
+                                           maillabel_id=MailLabel.objects.get(character=audit_char, label_id=label).pk)
+                    lms.append(lm)
+
+        LabelThroughModel.objects.bulk_create(lms, ignore_conflicts=True)
+
+        RecipThroughModel = MailMessage.recipients.through
+        rms = []
+        for _msg in msgs:
+            if _msg.mail_id in m_r_map:
+                for recip, r_type in m_r_map[_msg.mail_id]:
+                    recip_name = None
+                    if r_type != "mailing_list":
+                        if recip not in _current_eve_ids:
+                            EveName.objects.get_or_create_from_esi(recip)
+                            _current_eve_ids.append(recip)
+                            recip_name = recip
+                    if recip not in _current_mail_rec:
+                        MailRecipient.objects.get_or_create(recipient_id=recip,
+                                                            recipient_name_id=recip_name,
+                                                            recipient_type=r_type)
+                        _current_mail_rec.append(recip)
+
+                    rm = RecipThroughModel(
+                        mailmessage_id=_msg.id_key, mailrecipient_id=recip)
+                    rms.append(rm)
+
+        RecipThroughModel.objects.bulk_create(rms, ignore_conflicts=True)
 
         if stop is True:
             # Break the while loop if we reach the last mail message that is in the db.
@@ -1256,3 +1234,150 @@ def update_character_titles(character_id, force_refresh=False):
     audit_char.is_active()
 
     return "CT: Completed titles for: %s" % str(character_id)
+
+
+def update_character_contracts(character_id, force_refresh=False):
+    logger.debug("updating contracts for: %s" % str(character_id))
+
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+
+    req_scopes = ['esi-contracts.read_character_contracts.v1']
+
+    token = get_token(character_id, req_scopes)
+
+    if not token:
+        return False, []
+    try:
+        contracts_op = providers.esi.client.Contracts.get_characters_character_id_contracts(
+            character_id=character_id)
+
+        contracts = etag_results(
+            contracts_op, token, force_refresh=force_refresh)
+        _st = time.perf_counter()
+
+        contract_models_new = []
+        contract_models_old = []
+        eve_names = set()
+        contract_ids = [Contract.objects.filter(
+            character=audit_char).values_list("contract_id", flat=True)]
+        for c in contracts:  # update labels
+            _contract_item = Contract(
+                id=Contract.build_pk(audit_char.id, c.get('contract_id')),
+                character=audit_char,
+                assignee_id=c.get('assignee_id'),
+                assignee_name_id=c.get('assignee_id'),
+                acceptor_id=c.get('acceptor_id'),
+                acceptor_name_id=c.get('acceptor_id'),
+                contract_id=c.get('contract_id'),
+                availability=c.get('availability'),
+                buyout=c.get('buyout'),
+                collateral=c.get('collateral'),
+                date_accepted=c.get('date_accepted'),
+                date_completed=c.get('date_completed'),
+                date_expired=c.get('date_expired'),
+                date_issued=c.get('date_issued'),
+                days_to_complete=c.get('days_to_complete'),
+                end_location_id=c.get('end_location_id'),
+                for_corporation=c.get('for_corporation'),
+                issuer_corporation_name_id=c.get('issuer_corporation_id'),
+                issuer_name_id=c.get('issuer_id'),
+                price=c.get('price'),
+                reward=c.get('reward'),
+                start_location_id=c.get('start_location_id'),
+                status=c.get('status'),
+                title=c.get('title'),
+                contract_type=c.get('type'),
+                volume=c.get('volume')
+            )
+
+            eve_names.add(c.get('assignee_id'))
+            eve_names.add(c.get('issuer_corporation_id'))
+            eve_names.add(c.get('issuer_id'))
+            eve_names.add(c.get('acceptor_id'))
+
+            if c.get('contract_id') in contract_ids:
+                contract_models_old.append(_contract_item)
+            else:
+                contract_models_new.append(_contract_item)
+
+        EveName.objects.create_bulk_from_esi(list(eve_names))
+
+        if len(contract_models_new) > 0:
+            Contract.objects.bulk_create(
+                contract_models_new, batch_size=1000, ignore_conflicts=True)
+
+        if len(contract_models_old) > 0:
+            Contract.objects.bulk_update(contract_models_old, batch_size=1000,
+                                         fields=['date_accepted', 'date_completed', 'acceptor_id', 'date_expired', 'status',
+                                                 'assignee_name', 'acceptor_name', 'issuer_corporation_name', 'issuer_name'])
+
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_titles {character_id}")
+
+    except NotModifiedError:
+        logger.info("CT: No New Contracts for: {}".format(
+            audit_char.character.character_name))
+        pass
+
+    audit_char.last_update_contracts = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
+    new_contract_ids = [c.contract_id for c in contract_models_new]
+    if force_refresh:
+        new_contract_ids += [c.contract_id for c in contract_models_old]
+
+    return "CT: Completed Contracts for: %s" % str(character_id), new_contract_ids
+
+
+def update_character_contract_items(character_id, contract_id, force_refresh=False):
+    logger.debug("updating contracts for: %s" % str(character_id))
+
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+
+    contract = Contract.objects.get(
+        character=audit_char,
+        contract_id=contract_id)
+
+    req_scopes = ['esi-contracts.read_character_contracts.v1']
+
+    token = get_token(character_id, req_scopes)
+
+    if not token:
+        return False
+    try:
+        contracts_op = providers.esi.client.Contracts.get_characters_character_id_contracts_contract_id_items(
+            character_id=character_id,
+            contract_id=contract_id)
+
+        contracts = etag_results(
+            contracts_op, token, force_refresh=force_refresh)
+        _st = time.perf_counter()
+
+        contract_models_new = []
+        _types = set()
+        for c in contracts:  # update labels
+            _contract_item = ContractItem(
+                contract=contract,
+                is_included=c.get('is_included'),
+                is_singleton=c.get('is_singleton'),
+                quantity=c.get('quantity'),
+                raw_quantity=c.get('raw_quantity'),
+                record_id=c.get('record_id'),
+                type_name_id=c.get('type_id'),
+            )
+            _types.add(c.get('type_id'))
+            contract_models_new.append(_contract_item)
+        EveItemType.objects.create_bulk_from_esi(list(_types))
+        ContractItem.objects.bulk_create(
+            contract_models_new, batch_size=1000, ignore_conflicts=True)
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_tokens {character_id}")
+    except NotModifiedError:
+        logger.info("CT: No New Contract items for: {}".format(
+            audit_char.character.character_name))
+        pass
+
+    return "CT: Completed Contract items %s for: %s" % (str(contract_id), str(character_id))
