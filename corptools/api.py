@@ -14,6 +14,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, F, Q, QuerySet, Sum
 from django.utils import timezone
+from django.utils.html import strip_tags
 from esi.models import Token
 from ninja import Field, Form, NinjaAPI, Schema
 from ninja.pagination import LimitOffsetPagination, paginate
@@ -21,6 +22,7 @@ from ninja.security import django_auth
 from ninja.types import DictStrAny
 
 from corptools import app_settings, models, providers, schema, tasks
+from corptools.task_helpers.char_tasks import update_character_mail_body
 from corptools.task_helpers.update_tasks import fetch_location_name
 
 logger = logging.getLogger(__name__)
@@ -994,6 +996,7 @@ def get_character_contracts(request, character_id: int):
 
         _m = {
             "character": m.character.character.character_name,
+            "character_id": m.character.character.character_id,
             "mail_id": m.mail_id,
             "subject": m.subject,
             "from": f"{_from_ret}",
@@ -1006,6 +1009,32 @@ def get_character_contracts(request, character_id: int):
         output.append(_m)
 
     return output
+
+
+@api.get(
+    "account/{character_id}/mail/{mail_id}",
+    response={200: dict, 403: str},
+    tags=["Characters"]
+)
+def get_mail_message_requesst(request, character_id: int, mail_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, "Permission Denied"
+
+    msg = models.MailMessage.objects.get(
+        character__character__character_id=character_id, mail_id=mail_id)
+
+    if not msg.body:
+        try:
+            msg = update_character_mail_body(
+                character_id=character_id, mail_message=msg)
+            msg.save()
+        except Exception as e:
+            logger.error("failed to fetch mail")
+    return 200, {"body": msg.body.replace("size=", "_size_=").replace("color=", "_color_=")}
 
 
 @api.get(

@@ -8,9 +8,11 @@ export function StrToFields({ strValue, text, valuePre = "", valuePost = "", chi
         <p className="text-right">{text}</p>
       </td>
       <td style={{ paddingLeft: "10px" }}>
-        <p>
-          {valuePre} {strValue} {valuePost}
-        </p>
+        {strValue && (
+          <p>
+            {valuePre} {strValue} {valuePost}
+          </p>
+        )}
         {children}
       </td>
     </tr>

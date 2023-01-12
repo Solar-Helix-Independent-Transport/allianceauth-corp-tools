@@ -1,10 +1,21 @@
+import { getMailBody } from "../apis/Character";
 import { DateToFields, StrToFields } from "./ModalFields";
 import React from "react";
 import { Button, Label, Modal } from "react-bootstrap";
+import { useQuery } from "react-query";
 
-function CharMailModal({ data, shown, setShown }) {
+function CharMailModal({ msg_data, shown, setShown }) {
+  const { isFetching, error, data } = useQuery(
+    ["mailBody", msg_data?.character_id, msg_data?.mail_id],
+    () => getMailBody(msg_data?.character_id, msg_data?.mail_id),
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
+
   return (
     <Modal
+      bsSize="large"
       show={shown}
       onHide={() => {
         setShown(false);
@@ -15,26 +26,30 @@ function CharMailModal({ data, shown, setShown }) {
       </Modal.Header>
       <Modal.Body>
         <div className="container-fluid">
-          <StrToFields strValue={data?.from} text={"From:"} />
+          <StrToFields strValue={msg_data?.from} text={"From:"} />
           <StrToFields text={"Labels:"}>
-            <p style={{ overflowWrap: "anywhere" }}>
-              {data?.labels.map((name) => (
+            <span style={{ overflowWrap: "anywhere" }}>
+              {msg_data?.labels.map((name) => (
                 <Label style={{ marginLeft: "5px" }}>{name}</Label>
               ))}
-            </p>
+            </span>
           </StrToFields>
           <StrToFields text={"Recipients:"}>
-            {data?.recipients.length > 2 && <p>{data?.recipients.length} Recipients</p>}
+            {msg_data?.recipients.length > 2 && <p>{msg_data?.recipients.length} Recipients</p>}
 
-            <p style={{ overflowWrap: "anywhere" }}>
-              {data?.recipients.map((name) => (
+            <span style={{ overflowWrap: "anywhere" }}>
+              {msg_data?.recipients.map((name) => (
                 <Label style={{ marginLeft: "5px" }}>{name}</Label>
               ))}
-            </p>
+            </span>
           </StrToFields>
-          <DateToFields dateStrValue={data?.timestamp} text={"Timestamp:"} />
-          <StrToFields strValue={data?.subject} text={"Subject:"} />
+          <DateToFields dateStrValue={msg_data?.timestamp} text={"Timestamp:"} />
+          <StrToFields strValue={msg_data?.subject} text={"Subject:"} />
         </div>
+        <hr />
+        {error && <p>Error from API</p>}
+        {isFetching && <p>Loading From API...</p>}
+        {data && <p dangerouslySetInnerHTML={{ __html: `${data?.body}` }}></p>}
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={() => setShown(false)}>Close</Button>

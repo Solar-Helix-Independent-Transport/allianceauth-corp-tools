@@ -187,6 +187,17 @@ export async function postAccountRefresh(character_id) {
   return api.data;
 }
 
+export async function getMailBody(character_id, mail_id) {
+  console.log(`sent postMailBody ${character_id}, ${mail_id}`);
+  if (!character_id && !mail_id) {
+    return {};
+  }
+  const api = await axios.get(`/audit/api/account/${character_id}/mail/${mail_id}`);
+  console.log(`search mail body in api ${character_id}, ${mail_id}`);
+
+  return api.data;
+}
+
 export async function searchSystem(system_id) {
   const api = await axios.get(`/audit/api/search/system/${system_id}`);
   console.log(`search systems in api ${system_id}`);

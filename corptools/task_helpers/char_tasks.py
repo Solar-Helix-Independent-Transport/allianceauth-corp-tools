@@ -939,6 +939,25 @@ def update_character_roles(character_id, force_refresh=False):
     return "CT: Finished roles for: {0}".format(audit_char.character.character_name)
 
 
+def update_character_mail_body(character_id, mail_message, force_refresh=False):
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+
+    req_scopes = ['esi-mail.read_mail.v1']
+
+    token = get_token(character_id, req_scopes)
+
+    if not token:
+        return False
+
+    details = providers.esi.client.Mail.get_characters_character_id_mail_mail_id(character_id=character_id, mail_id=mail_message.mail_id,
+                                                                                 token=token.valid_access_token()).result()
+
+    mail_message.body = details.get('body')
+
+    return mail_message
+
+
 def update_character_mail_headers(character_id, force_refresh=False):
     # This function will deal with ALL mail related updates
     audit_char = CharacterAudit.objects.get(

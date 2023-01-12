@@ -100,7 +100,7 @@ const CharMail = () => {
     <ErrorBoundary>
       <Panel.Body>
         <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
-        <CharMailModal data={modalData} shown={showModal} setShown={setModal} />
+        <CharMailModal msg_data={modalData} shown={showModal} setShown={setModal} />
       </Panel.Body>
     </ErrorBoundary>
   );
