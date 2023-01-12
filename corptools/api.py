@@ -313,7 +313,7 @@ def get_character_menu(request):
         })
 
     if app_settings.CT_CHAR_MAIL_MODULE:
-        _char["links"].append({
+        _inter["links"].append({
             "name": "Mail",
             "link": "account/mail"
         })
@@ -954,6 +954,56 @@ def get_character_contacts(request, character_id: int):
             "watched": c.watched,
 
         })
+
+    return output
+
+
+@api.get(
+    "account/{character_id}/mail",
+    response={200: List, 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_contracts(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    mail = models.MailMessage.objects\
+        .filter(character__character__in=characters)\
+        .select_related('character__character', 'from_name')\
+        .prefetch_related("labels", "recipients").order_by("-timestamp")
+
+    output = []
+
+    for m in mail:
+
+        _r = []
+        for r in m.recipients.all():
+            if r.recipient_name:
+                _r.append(f"{r.recipient_name.name}")
+            else:
+                _r.append(f"{r.recipient_id} ({r.recipient_type})")
+
+        _l = []
+        _from_ret = m.from_name.name if m.from_name else m.from_id
+        for l in m.labels.all():
+            _l.append(l.label_name if l.label_name else l.label_id)
+
+        _m = {
+            "character": m.character.character.character_name,
+            "mail_id": m.mail_id,
+            "subject": m.subject,
+            "from": f"{_from_ret}",
+            "recipients": _r,
+            "labels": _l,
+            "timestamp": m.timestamp
+
+        }
+
+        output.append(_m)
 
     return output
 

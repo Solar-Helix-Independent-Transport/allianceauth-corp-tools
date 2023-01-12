@@ -1,62 +1,7 @@
 import CharContractModalTable from "./CharContractModalTable";
+import { DateToFields, StrIntToFields, StrToFields } from "./ModalFields";
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
-
-function StrToFields({ strValue, text, valuePre = "", valuePost = "" }) {
-  //console.log("StrToFields", strValue, text);
-  return strValue ? (
-    <div className="row">
-      <div className="col-xs-4">
-        <p className="text-right">{text}</p>
-      </div>
-      <div className="col">
-        <p>
-          {valuePre} {strValue} {valuePost}
-        </p>
-      </div>
-    </div>
-  ) : (
-    <></>
-  );
-}
-
-function DateToFields({ dateStrValue, text, valuePre = "", valuePost = "" }) {
-  //console.log("IntToFields", intValue, text);
-  return dateStrValue ? (
-    <StrToFields
-      strValue={new Date(dateStrValue).toLocaleString()}
-      text={text}
-      valuePre={valuePre}
-      valuePost={valuePost}
-    />
-  ) : (
-    <></>
-  );
-}
-
-function IntToFields({ intValue, text, valuePre = "", valuePost = "" }) {
-  //console.log("IntToFields", intValue, text);
-  return intValue !== 0 ? (
-    <StrToFields
-      strValue={intValue.toLocaleString()}
-      text={text}
-      valuePre={valuePre}
-      valuePost={valuePost}
-    />
-  ) : (
-    <></>
-  );
-}
-
-function StrIntToFields({ strValue, text, valuePre = "", valuePost = "" }) {
-  //console.log("StrIntToFields", strValue, text);
-  let intValue = parseInt(strValue);
-  return strValue ? (
-    <IntToFields intValue={intValue} text={text} valuePre={valuePre} valuePost={valuePost} />
-  ) : (
-    <></>
-  );
-}
 
 function CharContractModal({ data, shown, setShown }) {
   return (

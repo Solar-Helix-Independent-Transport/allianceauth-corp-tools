@@ -1,9 +1,9 @@
 import { loadMail } from "../apis/Character";
 import { BaseTable, SelectColumnFilter, textColumnFilter } from "../components/BaseTable";
-import CharContractModal from "../components/CharContractModal";
+import CharMailModal from "../components/CharMailModal";
 import ErrorBoundary from "../components/ErrorBoundary";
 import React, { useState } from "react";
-import { Button, Panel } from "react-bootstrap";
+import { Button, Label, Panel } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
@@ -30,27 +30,50 @@ const CharMail = () => {
         filter: "includes",
       },
       {
+        Header: "From",
+        accessor: "from",
+        Filter: SelectColumnFilter,
+        filter: "includes",
+      },
+      {
+        Header: "Labels",
+        accessor: "labels",
+        Cell: (props) => (
+          <p>
+            {props.value.map((name) => (
+              <Label style={{ marginLeft: "5px" }}>{name}</Label>
+            ))}
+          </p>
+        ),
+      },
+      {
+        Header: "To",
+        accessor: "recipients",
+        Cell: (props) =>
+          props.value.length > 2 ? (
+            <p>
+              <Label bsStyle="warning">+ {props.value.length} Recipients</Label>
+            </p>
+          ) : (
+            <p>
+              {props.value.map((name) => (
+                <Label style={{ marginLeft: "5px" }} bsStyle="info">
+                  {name}
+                </Label>
+              ))}
+            </p>
+          ),
+      },
+      {
         Header: "Date",
-        accessor: "date_issued",
-        Cell: (props) => <div> {new Date(props.value).toLocaleString()} </div>,
+        accessor: "timestamp",
+        Cell: (props) => <div>{new Date(props.value).toLocaleString()}</div>,
       },
       {
         Header: "subject",
         accessor: "subject",
         Filter: textColumnFilter,
         filter: "includes",
-      },
-      {
-        Header: "From",
-        accessor: "from",
-        Filter: textColumnFilter,
-        filter: "includes",
-      },
-      {
-        Header: "To",
-        accessor: "recipients",
-        Filter: textColumnFilter,
-        filter: "text",
       },
       {
         Header: "Details",
@@ -77,10 +100,10 @@ const CharMail = () => {
     <ErrorBoundary>
       <Panel.Body>
         <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
-        <CharContractModal data={modalData} shown={showModal} setShown={setModal} />
+        <CharMailModal data={modalData} shown={showModal} setShown={setModal} />
       </Panel.Body>
     </ErrorBoundary>
   );
 };
 
-export default CharContracts;
+export default CharMail;

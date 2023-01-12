@@ -771,6 +771,10 @@ class ContractItem(models.Model):
     record_id = models.BigIntegerField()
     type_name = models.ForeignKey(EveItemType, on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = (("record_id", "contract"),)
+
+
 # ************************ Meta Models
 
 

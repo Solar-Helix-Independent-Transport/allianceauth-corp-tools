@@ -450,9 +450,13 @@ def update_char_contracts(self, character_id, force_refresh=False):
     try:
         msg, ids = update_character_contracts(
             character_id, force_refresh=force_refresh)
+
+        _chain = []
         for id in ids:
-            update_char_contract_items.apply_async(
-                args=[character_id, id], priority=8)
+            _chain.append(update_char_contract_items.si(
+                character_id, id, force_refresh=force_refresh))
+
+        chain(_chain).apply_async(priority=8)
 
         return "Completed Contracts for: %s" % str(character_id)
 

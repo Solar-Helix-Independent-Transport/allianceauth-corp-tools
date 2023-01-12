@@ -1019,10 +1019,10 @@ def update_character_mail_headers(character_id, force_refresh=False):
 
             if msg.get('labels'):
                 labels = msg.get('labels')
-                m_l_map[id] = labels
+                m_l_map[msg.get('mail_id')] = labels
 
-            m_r_map[id] = [(r.get('recipient_id'), r.get('recipient_type'))
-                           for r in msg.get('recipients')]
+            m_r_map[msg.get('mail_id')] = [(r.get('recipient_id'), r.get('recipient_type'))
+                                           for r in msg.get('recipients')]
             last_id = msg.get('mail_id')
 
         msgs = MailMessage.objects.bulk_create(
@@ -1049,12 +1049,14 @@ def update_character_mail_headers(character_id, force_refresh=False):
                         if recip not in _current_eve_ids:
                             EveName.objects.get_or_create_from_esi(recip)
                             _current_eve_ids.append(recip)
-                            recip_name = recip
-                    if recip not in _current_mail_rec:
-                        MailRecipient.objects.get_or_create(recipient_id=recip,
-                                                            recipient_name_id=recip_name,
-                                                            recipient_type=r_type)
-                        _current_mail_rec.append(recip)
+                        recip_name = recip
+                    if recip not in _current_mail_rec or force_refresh:
+                        MailRecipient.objects.update_or_create(recipient_id=recip,
+                                                               defaults={
+                                                                   "recipient_name_id": recip_name,
+                                                                   "recipient_type": r_type})
+                        if not force_refresh:
+                            _current_mail_rec.append(recip)
 
                     rm = RecipThroughModel(
                         mailmessage_id=_msg.id_key, mailrecipient_id=recip)
@@ -1332,7 +1334,8 @@ def update_character_contracts(character_id, force_refresh=False):
 
 
 def update_character_contract_items(character_id, contract_id, force_refresh=False):
-    logger.debug("updating contracts for: %s" % str(character_id))
+    logger.debug("updating contract items for: %s (%s)" %
+                 (str(character_id), str(contract_id)))
 
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
@@ -1374,7 +1377,7 @@ def update_character_contract_items(character_id, contract_id, force_refresh=Fal
         ContractItem.objects.bulk_create(
             contract_models_new, batch_size=1000, ignore_conflicts=True)
         logger.debug(
-            f"CT_TIME: {time.perf_counter()-_st} update_character_tokens {character_id}")
+            f"CT_TIME: {time.perf_counter()-_st} update_character_contract_items {character_id}")
     except NotModifiedError:
         logger.info("CT: No New Contract items for: {}".format(
             audit_char.character.character_name))
