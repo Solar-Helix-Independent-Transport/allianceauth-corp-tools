@@ -12,6 +12,7 @@ help:
 
 clean:
 	rm -rf dist/*
+	rm -rf frontend/frontend/build/*
 	rm -rf frontend/corp/build/*
 	rm -rf frontend/char/build/*
 
