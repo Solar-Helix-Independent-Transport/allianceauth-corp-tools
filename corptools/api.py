@@ -38,7 +38,7 @@ class Paginator(LimitOffsetPagination):
         queryset: QuerySet,
         pagination: Input,
         **params: DictStrAny,
-    ) -> Any:
+    ) -> any:
         offset = pagination.offset
         limit: int = pagination.limit
         return {

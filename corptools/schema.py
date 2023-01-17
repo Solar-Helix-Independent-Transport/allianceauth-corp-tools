@@ -180,7 +180,7 @@ class CharacterWalletEvent(Schema):
     ref_type: str
     balance: float
     amount: float
-    reason: str
+    reason: Optional[str]
 
 
 class CorporationWalletEvent(Schema):
@@ -192,7 +192,7 @@ class CorporationWalletEvent(Schema):
     ref_type: str
     balance: float
     amount: float
-    reason: str
+    reason: Optional[str]
 
 
 class CharacterOrder(Schema):
