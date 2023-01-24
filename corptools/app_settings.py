@@ -58,7 +58,7 @@ CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE = getattr(
 CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE', False)
 
-CT_CHAR_PAUSE_CONTRACTS = getattr(settings, 'CT_CHAR_STOP_CONTRACTS', True)
+CT_CHAR_PAUSE_CONTRACTS = getattr(settings, 'CT_CHAR_STOP_CONTRACTS', False)
 
 
 def get_character_scopes():
