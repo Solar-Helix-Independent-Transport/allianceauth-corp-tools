@@ -282,7 +282,7 @@ def update_character(self, char_id, force_refresh=False):
                 character.character.character_id, force_refresh=force_refresh))
             que.append(update_char_order_history.si(
                 character.character.character_id, force_refresh=force_refresh))
-        if force_refresh or not app_settings.CT_CHAR_PAUSE_CONTRACTS:  # only on manual refreshes ATM
+        if force_refresh or not app_settings.CT_CHAR_PAUSE_CONTRACTS:  # only on manual refreshes
             if (character.last_update_contracts or mindt) <= skip_date or force_refresh:
                 que.append(update_char_contracts.si(
                     character.character.character_id, force_refresh=force_refresh))
@@ -299,7 +299,7 @@ def update_character(self, char_id, force_refresh=False):
         len(que),
         character.character.character_name)
     )
-    chain(que).apply_async(priority=6)
+    chain(que).apply_async(priority=9)
 
 
 @shared_task(bind=True, base=QueueOnce)

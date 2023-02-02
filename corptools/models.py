@@ -465,6 +465,17 @@ class SkillTotals(models.Model):
     unallocated_sp = models.IntegerField(null=True, default=None)
 
 
+class SkillTotalHistory(models.Model):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now=True)
+    total_sp = models.BigIntegerField()
+    unallocated_sp = models.IntegerField(default=0)
+
+    @property
+    def sp(self):
+        return self.total_sp+self.unallocated_sp
+
+
 class Skill(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
     skill_id = models.IntegerField()
@@ -1050,6 +1061,14 @@ class CorporationContact(Contact):
     watched = models.BooleanField(default=False)
     labels = models.ManyToManyField(CorporationContactLabel)
 
+
+"""
+class CharacterStanding(Contact):
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+    from = models.BooleanField(default=False)
+    to = models.BooleanField(default=False)
+
+"""
 
 # sec group classes
 

@@ -1226,6 +1226,44 @@ def get_character_skills(request, character_id: int):
 
 
 @api.get(
+    "account/{character_id}/skill/history",
+    response={200: List[schema.CharacterSkillHistory], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_skill_history(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    skill_history = models.SkillTotalHistory.objects.filter(character__character__in=characters)\
+        .select_related('character__character').order_by("date")
+
+    output = {}
+
+    for s in skill_history:
+        if s.character_id not in output:
+            output[s.character_id] = {
+                "character": s.character.character,
+                "history": [],
+            }
+        output[s.character_id]["history"].append(
+            {
+                "date": s.date,
+                "sp": s.sp,
+                "total_sp": s.total_sp,
+                "unallocated_sp": s.unallocated_sp,
+            }
+        )
+
+    return list(output.values())
+
+
+@api.get(
     "account/{character_id}/skillqueues",
     response={200: List[schema.CharacterQueue], 403: schema.Message},
     tags=["Account"]

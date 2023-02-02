@@ -17,7 +17,8 @@ from ..models import (CharacterAsset, CharacterAudit, CharacterContact,
                       ContractItem, CorporationHistory, EveItemType,
                       EveLocation, EveName, Implant, JumpClone, MailLabel,
                       MailMessage, MailRecipient, Notification,
-                      NotificationText, Skill, SkillQueue, SkillTotals)
+                      NotificationText, Skill, SkillQueue, SkillTotalHistory,
+                      SkillTotals)
 from .etag_helpers import NotModifiedError, etag_results
 
 logger = logging.getLogger(__name__)
@@ -182,6 +183,12 @@ def update_character_skill_list(character_id, force_refresh=False):
                                                  'total_sp': skills.get('total_sp', 0),
                                                  'unallocated_sp': skills.get('unallocated_sp', 0)
                                              })
+
+        SkillTotalHistory.objects.create(character=audit_char,
+                                         total_sp=skills.get('total_sp', 0),
+                                         unallocated_sp=skills.get(
+                                             'unallocated_sp', 0)
+                                         )
 
         _check_skills = []
         _create_skills = []

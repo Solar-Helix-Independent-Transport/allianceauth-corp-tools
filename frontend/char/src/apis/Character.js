@@ -73,6 +73,12 @@ export async function loadAssetLocations(character_id) {
   return api.data;
 }
 
+export async function loadSkillHistory(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/skill/history`);
+  console.log(`get loadSkillHistory in api ${character_id}`);
+  return api.data;
+}
+
 export async function loadAssetGroups(character_id, location_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/asset/${location_id}/groups`);
   console.log(`get asset groups in api ${character_id} ${location_id}`);

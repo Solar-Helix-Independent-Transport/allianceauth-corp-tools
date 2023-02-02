@@ -143,6 +143,18 @@ class CharacterSkills(Schema):
     unallocated_sp: int
 
 
+class SkillHistory(Schema):
+    date: datetime
+    total_sp: int
+    unallocated_sp: int
+    sp: int
+
+
+class CharacterSkillHistory(Schema):
+    character: Character
+    history: List[SkillHistory]
+
+
 class CharacterQueue(Schema):
     character: Character
     queue: List[CharacterQueueItem]
