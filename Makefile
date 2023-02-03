@@ -12,7 +12,6 @@ help:
 
 clean:
 	rm -rf dist/*
-	rm -rf frontend/frontend/build/*
 	rm -rf frontend/corp/build/*
 	rm -rf frontend/char/build/*
 
@@ -30,12 +29,12 @@ deploy:
 	twine upload dist/*
 
 buildjs:
-	cd frontend/corp;yarn install;yarn build
-	cd frontend/char;yarn install;yarn build
+	cd frontend/corp;yarn install;yarn build;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/corp\/static\/js\//g' {} \;
+	cd frontend/char;yarn install;yarn build;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/char\/static\/js\//g' {} \;
 
 package:
-	cd frontend/corp;yarn install;yarn build
-	cd frontend/char;yarn install;yarn build
+	cd frontend/corp;yarn install;yarn build;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/corp\/static\/js\//g' {} \;
+	cd frontend/char;yarn install;yarn build;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/char\/static\/js\//g' {} \;
 	python setup.py sdist
 
 devcorp:

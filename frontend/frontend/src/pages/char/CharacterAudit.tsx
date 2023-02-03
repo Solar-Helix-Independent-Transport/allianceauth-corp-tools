@@ -1,6 +1,7 @@
 import { CharMenuAsync } from "../../components";
+import { CharMenuRight } from "../../components/CharacterMenu/CharacterMenuRight";
+import { CharHeader } from "./CharacterHeader";
 import React from "react";
-import { Panel } from "react-bootstrap";
 import { Col } from "react-bootstrap";
 import { Outlet } from "react-router-dom";
 
@@ -8,10 +9,10 @@ const CharacterAudit = () => {
   return (
     <>
       <CharMenuAsync />
+      <CharMenuRight />
+      <CharHeader />
       <Col>
-        <Panel>
-          <Outlet /> {/* Render the Children here */}
-        </Panel>
+        <Outlet /> {/* Render the Children here */}
       </Col>
     </>
   );

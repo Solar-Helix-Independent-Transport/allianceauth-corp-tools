@@ -24,8 +24,6 @@ import {
   Button,
   ButtonGroup,
   ButtonToolbar,
-  Glyphicon,
-  MenuItem,
   OverlayTrigger,
   Popover,
   SplitButton,
@@ -136,17 +134,10 @@ function BaseTableSpec({
                           {header.column.getCanSort() ? (
                             <>
                               {{
-                                asc: (
-                                  <Glyphicon className="pull-right" glyph="sort-by-attributes" />
-                                ),
-                                desc: (
-                                  <Glyphicon
-                                    className="pull-right"
-                                    glyph="sort-by-attributes-alt"
-                                  />
-                                ),
+                                asc: <i className="fas fa-sort-amount-up-alt pull-right"></i>,
+                                desc: <i className="fas fa-sort-amount-down-alt pull-right"></i>,
                               }[header.column.getIsSorted() as string] ?? (
-                                <Glyphicon className="pull-right" glyph="sort" />
+                                <i className="fas fa-sort fa-fw pull-right"></i>
                               )}
                             </>
                           ) : null}
@@ -194,55 +185,54 @@ function BaseTableSpec({
         <ButtonToolbar>
           <ButtonGroup>
             <Button
-              bsStyle="success"
+              variant="success"
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
-              <Glyphicon glyph="step-backward" />
+              <i className="fas fa-step-backward"></i>
             </Button>{" "}
             <Button
-              bsStyle="success"
+              variant="success"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              <Glyphicon glyph="triangle-left" />
+              <i className="fas fa-caret-left"></i>
             </Button>{" "}
             <Button
-              bsStyle="success"
+              variant="success"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              <Glyphicon glyph="triangle-right" />
-            </Button>{" "}
+              <i className="fas fa-caret-right"></i>
+            </Button>
             <Button
-              bsStyle="success"
+              variant="success"
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
             >
-              <Glyphicon glyph="step-forward" />
+              <i className="fas fa-step-forward"></i>
             </Button>
           </ButtonGroup>
           <ButtonGroup>
-            <Button active bsStyle="success">
+            <Button active variant="success">
               {"Page Size:"}
-            </Button>{" "}
+            </Button>
             <SplitButton
               id="pageSizeDropdown"
-              bsStyle="success"
+              variant="success"
               title={table.getState().pagination.pageSize}
             >
               {[10, 50, 100, 1000000].map((_pageSize) => (
-                <MenuItem
+                <li
                   id={String(_pageSize)}
                   key={_pageSize}
-                  eventKey={_pageSize}
                   value={_pageSize}
                   onClick={() => {
                     table.setPageSize(Number(_pageSize));
                   }}
                 >
                   Show {_pageSize}
-                </MenuItem>
+                </li>
               ))}
             </SplitButton>
           </ButtonGroup>
@@ -250,7 +240,7 @@ function BaseTableSpec({
       </div>
       <div className="pagination pull-left">
         <ButtonGroup>
-          <Button active bsStyle="info">
+          <Button active variant="info">
             {
               <>
                 {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
@@ -263,8 +253,8 @@ function BaseTableSpec({
               trigger="focus"
               overlay={MyTooltip("Refreshing Data")}
             >
-              <Button bsStyle="info">
-                <Glyphicon className={tableStyles.glyphiconRefreshAnimate} glyph="refresh" />
+              <Button variant="info">
+                <i className={`fas fa-sync-alt fa-fw ${tableStyles.glyphiconRefreshAnimate}`} />
               </Button>
             </OverlayTrigger>
           ) : (
@@ -273,8 +263,8 @@ function BaseTableSpec({
               trigger="focus"
               overlay={MyTooltip("Data Loaded: " + new Date().toLocaleString())}
             >
-              <Button bsStyle="info">
-                <Glyphicon glyph="ok" />
+              <Button variant="info">
+                <i className="fas fa-check"></i>
               </Button>
             </OverlayTrigger>
           )}
@@ -339,10 +329,10 @@ function Filter({ column, table }: { column: Column<any, any>; table: ReactTable
   return typeof firstValue === "number" ? (
     <OverlayTrigger trigger="click" placement="bottom" overlay={popoverNumber}>
       <ButtonGroup style={{ display: "flex" }}>
-        <Button className={tableStyles.filterBtn} bsStyle="primary" bsSize="small">
+        <Button className={tableStyles.filterBtn} variant="primary" size="sm">
           {`Range`}
         </Button>
-        <Button className={tableStyles.filterToggle} bsStyle="primary" bsSize="small">
+        <Button className={tableStyles.filterToggle} variant="primary" size="sm">
           <svg height="20" width="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
             <path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"></path>
           </svg>

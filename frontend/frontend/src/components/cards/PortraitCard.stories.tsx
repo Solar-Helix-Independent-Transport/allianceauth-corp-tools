@@ -1,21 +1,21 @@
-import { PortraitPanel, PortraitPanelProps } from "./PortraitPanel";
+import { PortraitCard, PortraitCardProps } from "./PortraitCard";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
-  title: "Panels/PortraitPanel",
-  component: PortraitPanel,
+  title: "Panels/PortraitCard",
+  component: PortraitCard,
 
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
-} as ComponentMeta<typeof PortraitPanel>;
+} as ComponentMeta<typeof PortraitCard>;
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
-const Template: ComponentStory<typeof PortraitPanel> = (args: PortraitPanelProps) => (
-  <PortraitPanel {...args}>
+const Template: ComponentStory<typeof PortraitCard> = (args: PortraitCardProps) => (
+  <PortraitCard {...args}>
     <h4 className="text-center">Information Goes Here</h4>
     <p className="text-center">Add some test or some tables or something...</p>
-  </PortraitPanel>
+  </PortraitCard>
 );
 
 export const Alliance = Template.bind({});
@@ -58,6 +58,6 @@ RoundImages.args = {
     corporation_id: 98628563,
     alliance_id: 1354830081,
   },
-  roundedImages: true,
+  roundedImages: "100",
   heading: "Round!",
 };

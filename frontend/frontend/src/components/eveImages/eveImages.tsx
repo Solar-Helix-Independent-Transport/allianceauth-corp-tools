@@ -35,6 +35,7 @@ export const CorporationLogo = (props: CorporationLogoProps) => {
     <Image
       height={props.height && props.height}
       width={props.width && props.width}
+      className={props.className}
       style={props.style && props.style}
       src={`https://images.evetech.net/corporations/${props.corporation_id}/logo?size=${props.size}`}
     />
@@ -54,6 +55,7 @@ export const AllianceLogo = (props: AllianceLogoProps) => {
     <Image
       height={props.height && props.height}
       width={props.width && props.width}
+      className={props.className}
       style={props.style && props.style}
       src={`https://images.evetech.net/alliances/${props.alliance_id}/logo?size=${props.size}`}
     />
@@ -74,6 +76,7 @@ export const TypeIcon = (props: TypeIconProps) => {
       height={props.height && props.height}
       width={props.width && props.width}
       style={props.style && props.style}
+      className={props.className}
       src={`https://images.evetech.net/types/${props.type_id}/${
         props.size > 64 ? "render" : "icon"
       }?size=${props.size}`}
@@ -89,12 +92,12 @@ export interface PortraitProps extends Partial<HTMLElement> {
     faction_id?: number;
   };
   size: number;
-  roundedImages?: boolean;
+  roundedImages?: string;
   style?: any;
 }
 
 export const CharacterAllegiancePortrait = (props: PortraitProps) => {
-  let border = props.roundedImages ? "50%" : "0%";
+  let border = props.roundedImages ? props.roundedImages : "0";
   return (
     <div
       style={{
@@ -105,7 +108,7 @@ export const CharacterAllegiancePortrait = (props: PortraitProps) => {
     >
       <CharacterPortrait
         style={{
-          borderRadius: border,
+          borderRadius: `${border}%`,
         }}
         height={props.size}
         width={props.size}
@@ -117,12 +120,13 @@ export const CharacterAllegiancePortrait = (props: PortraitProps) => {
           position: "absolute",
           bottom: "0",
           left: "0",
-          borderRadius: border,
+          borderRadius: `${border}%`,
         }}
         height={props.size / 4}
         width={props.size / 4}
         corporation_id={props.character.corporation_id}
         size={256}
+        className="m-2"
       />
       {props.character.faction_id ? (
         <CorporationLogo
@@ -130,12 +134,13 @@ export const CharacterAllegiancePortrait = (props: PortraitProps) => {
             position: "absolute",
             bottom: "0",
             right: "0",
-            borderRadius: border,
+            borderRadius: `${border}%`,
           }}
           height={props.size / 4}
           width={props.size / 4}
           corporation_id={props.character.faction_id}
           size={256}
+          className="m-2"
         />
       ) : (
         props.character.alliance_id && (
@@ -144,12 +149,13 @@ export const CharacterAllegiancePortrait = (props: PortraitProps) => {
               position: "absolute",
               bottom: "0",
               right: "0",
-              borderRadius: border,
+              borderRadius: `${border}%`,
             }}
             height={props.size / 4}
             width={props.size / 4}
             alliance_id={props.character.alliance_id}
             size={256}
+            className="m-2"
           />
         )
       )}
