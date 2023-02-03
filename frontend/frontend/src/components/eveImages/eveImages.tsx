@@ -17,6 +17,7 @@ export const CharacterPortrait = (props: CharacterPortraitProps) => {
       height={props.height && props.height}
       width={props.width && props.width}
       style={props.style && props.style}
+      className={props.className}
       src={`https://images.evetech.net/characters/${props.character_id}/portrait?size=${props.size}`}
     />
   );

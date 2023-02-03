@@ -48,72 +48,72 @@ const CharHeader = () => {
 
   return (
     <Card>
-      <Card.Body>
-        <div className="d-flex justify-content-start align-items-center flex-no-wrap">
-          <CharacterPortrait style={style} character_id={data?.main.character_id} size={64} />
-          <h4 className="m-1 ms-3">{data?.main.character_name}</h4>
-          <CorporationLogo
-            style={style}
-            className="m-1 ms-3"
-            corporation_id={data?.main.corporation_id}
-            size={32}
-          />
-          <h5 className="m-1 ms-3">{data?.main.corporation_name}</h5>
-          {data?.main.alliance_id && (
+      <div className="d-flex justify-content-start align-items-center flex-no-wrap">
+        <CharacterPortrait
+          style={{ borderRadius: "0.375rem 0 0 0.375rem" }}
+          className="m-0"
+          character_id={data?.main.character_id}
+          size={64}
+        />
+        <h4 className="m-1 ms-3">{data?.main.character_name}</h4>
+        <CorporationLogo
+          style={style}
+          className="m-1 ms-3"
+          corporation_id={data?.main.corporation_id}
+          size={32}
+        />
+        <h5 className="m-1 ms-3">{data?.main.corporation_name}</h5>
+        {data?.main.alliance_id && (
+          <>
+            <AllianceLogo
+              style={style}
+              className="m-1 ms-3"
+              alliance_id={data?.main.alliance_id}
+              size={32}
+            />
+            <h5 className="m-1 ms-3">{data?.main.alliance_name}</h5>
+          </>
+        )}
+        <p className="m-1 ms-4 me-auto">
+          {sp ? (
             <>
-              <AllianceLogo
-                style={style}
-                className="m-1 ms-3"
-                alliance_id={data?.main.alliance_id}
-                size={32}
-              />
-              <h5 className="m-1 ms-3">{data?.main.alliance_name}</h5>
+              <Badge>Total SP: {sp.toLocaleString()}</Badge> <br />
             </>
+          ) : (
+            <></>
           )}
-          <p className="m-1 m-4 me-auto">
-            {sp ? (
-              <>
-                <Badge>Total SP: {sp.toLocaleString()}</Badge> <br />
-              </>
+          {isk ? (
+            <>
+              <Badge>Total Isk: {isk.toLocaleString()}</Badge>
+            </>
+          ) : (
+            <></>
+          )}
+        </p>
+        <ButtonGroup className="me-3">
+          <RefreshCharButton />
+          {data ? (
+            bad_chars.length === 0 ? (
+              <OverlayTrigger placement="left" overlay={MyTooltip({ message: "No Account Flags" })}>
+                <Button className="btn-success">
+                  <i className="fa-solid fa-check"></i>
+                </Button>
+              </OverlayTrigger>
             ) : (
-              <></>
-            )}
-            {isk ? (
-              <>
-                <Badge>Total Isk: {isk.toLocaleString()}</Badge>
-              </>
-            ) : (
-              <></>
-            )}
-          </p>
-          <ButtonGroup>
-            <RefreshCharButton />
-            {data ? (
-              bad_chars.length === 0 ? (
-                <OverlayTrigger
-                  placement="left"
-                  overlay={MyTooltip({ message: "No Account Flags" })}
-                >
-                  <Button className="btn-success">
-                    <i className="fa-solid fa-check"></i>
-                  </Button>
-                </OverlayTrigger>
-              ) : (
-                <OverlayTrigger
-                  placement="left"
-                  overlay={MyTooltip({
-                    message: `Character Flags: ${bad_chars.join(", ")}`,
-                  })}
-                >
-                  <Button className="btn-danger">{bad_chars.length}</Button>
-                </OverlayTrigger>
-              )
-            ) : (
-              <></>
-            )}
-          </ButtonGroup>
-        </div>
-      </Card.Body>
+              <OverlayTrigger
+                placement="left"
+                overlay={MyTooltip({
+                  message: `Character Flags: ${bad_chars.join(", ")}`,
+                })}
+              >
+                <Button className="btn-danger">{bad_chars.length}</Button>
+              </OverlayTrigger>
+            )
+          ) : (
+            <></>
+          )}
+        </ButtonGroup>
+      </div>
     </Card>
   );
 };
