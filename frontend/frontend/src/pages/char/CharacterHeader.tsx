@@ -1,6 +1,10 @@
 import { loadCharacterStatus } from "../../api/character";
-import { AllianceLogo, CharacterPortrait, CorporationLogo } from "../../components";
 import { RefreshCharButton } from "../../components/RefreshAccountButton";
+import {
+  AllianceLogo,
+  CharacterPortrait,
+  CorporationLogo,
+} from "../../components/eveImages/eveImages";
 import React from "react";
 import { Badge, Card } from "react-bootstrap";
 import Button from "react-bootstrap/Button";

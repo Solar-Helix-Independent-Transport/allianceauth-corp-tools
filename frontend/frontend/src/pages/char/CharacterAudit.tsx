@@ -1,4 +1,4 @@
-import { CharMenuAsync } from "../../components";
+import { CharMenuAsync } from "../../components/CharacterMenu/CharacterMenuAsync";
 import { CharMenuRight } from "../../components/CharacterMenu/CharacterMenuRight";
 import { CharHeader } from "./CharacterHeader";
 import React from "react";

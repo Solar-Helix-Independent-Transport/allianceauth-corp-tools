@@ -1,4 +1,4 @@
-import { CharacterAllegiancePortrait } from "../eveImages";
+import { CharacterAllegiancePortrait } from "../eveImages/eveImages";
 import styles from "./PortraitCard.module.css";
 import React from "react";
 import { Card } from "react-bootstrap";

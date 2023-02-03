@@ -1,6 +1,6 @@
 import { loadCharacterStatus } from "../../api/character";
-import { CollapseBlock } from "../../components/Helpers";
-import { PortraitCard } from "../../components/cards";
+import { CollapseBlock } from "../../components/Helpers/CollapseBlock";
+import { PortraitCard } from "../../components/cards/PortraitCard";
 import React from "react";
 import { Badge, Card, Table } from "react-bootstrap";
 import { useQuery } from "react-query";
