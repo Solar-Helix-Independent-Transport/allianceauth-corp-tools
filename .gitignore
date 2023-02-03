@@ -147,3 +147,4 @@ corptools/static/corptools/asset-manifest.json
 corptools/static/corptools/static
 corptools/static/corptools/static/*
 frontend/frontend
+frontend/frontend/*
