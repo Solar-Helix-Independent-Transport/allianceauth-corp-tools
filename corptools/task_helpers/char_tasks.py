@@ -1287,8 +1287,8 @@ def update_character_contracts(character_id, force_refresh=False):
         contract_models_new = []
         contract_models_old = []
         eve_names = set()
-        contract_ids = [Contract.objects.filter(
-            character=audit_char).values_list("contract_id", flat=True)]
+        contract_ids = list(Contract.objects.filter(
+            character=audit_char).values_list("contract_id", flat=True))
         for c in contracts:  # update labels
             _contract_item = Contract(
                 id=Contract.build_pk(audit_char.id, c.get('contract_id')),
