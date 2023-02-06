@@ -319,3 +319,6 @@ CORP_REQUIRED_SCOPES = _corp_scopes_base+_corp_scopes_tracking + \
 
 CT_PAGINATION_SIZE = getattr(
     settings, 'CT_PAGINATION_SIZE', 30000)
+
+CT_USERS_CAN_FORCE_REFRESH = getattr(
+    settings, 'CT_USERS_CAN_FORCE_REFRESH', False)
