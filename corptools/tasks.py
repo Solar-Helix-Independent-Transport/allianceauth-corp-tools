@@ -341,7 +341,8 @@ def update_char_location(self, character_id, force_refresh=False):
 @shared_task(bind=True, base=QueueOnce)
 def cache_user_skill_list(self, character_id, force_refresh=False):
     try:
-        providers.skills.get_and_cache_user(character_id)
+        providers.skills.get_and_cache_user(
+            character_id, force_rebuild=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"

@@ -24,7 +24,6 @@ class SkillListCache():
 
     def get_and_cache_users(self, users):
         from ..models import SkillList  # TODO fix the recursive import
-        from ..tasks import cache_user_skill_list
         linked_characters = CharacterOwnership.objects.filter(user__in=users).values(
             'user_id', 'character__character_name', 'character__character_id')
         skill_lists = SkillList.objects.all().order_by('order_weight', 'name')
@@ -101,7 +100,7 @@ class SkillListCache():
         # Join them all and ship it.
         return skill_tables
 
-    def get_and_cache_user(self, user_id):
+    def get_and_cache_user(self, user_id, force_rebuild=False):
         from ..models import SkillList  # TODO fix the recursive import
 
         linked_characters = User.objects.get(id=user_id).character_ownerships.all(
@@ -113,12 +112,12 @@ class SkillListCache():
         cached_header = cache.get(SKILL_CACHE_HEADERS_KEY, False)
         skill_lists_up_to_date = cached_header == skill_list_hash
 
-        if skill_lists_up_to_date:
+        if skill_lists_up_to_date and not force_rebuild:
             cached_skills = cache.get(account_key, False)
 
             if cached_skills is not False:  # check if cached at all?
                 cached_skills = json.loads(cached_skills)
-                # check what is in chache is valid
+                # check what is in chach is valid
                 if cached_skills.get("doctrines", False) == skill_list_hash:
                     return cached_skills  # Else build it.
 
