@@ -14,6 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.db.models import Count, Max
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from esi.errors import TokenError
 from esi.models import Token
 from model_utils import Choices
@@ -102,6 +103,9 @@ class CharacterAudit(models.Model):
         null=True, default=None, blank=True)
 
     last_update_location = models.DateTimeField(
+        null=True, default=None, blank=True)
+
+    last_update_loyaltypoints = models.DateTimeField(
         null=True, default=None, blank=True)
 
     balance = models.DecimalField(
@@ -1069,6 +1073,24 @@ class CharacterStanding(Contact):
     to = models.BooleanField(default=False)
 
 """
+
+# Loyalty Points
+
+
+class LoyaltyPoint (models.Model):
+    character = models.ForeignKey(
+        CharacterAudit, verbose_name=_("Character"), on_delete=models.CASCADE)
+    corporation = models.ForeignKey(
+        EveName, verbose_name=_("NPC Corporation"), on_delete=models.CASCADE)
+    amount = models.IntegerField(_("LP"))
+
+    class Meta:
+        verbose_name = _("Loyalty Point")
+        unique_together = ('character', 'corporation',)
+
+    def __str__(self):
+        return f"{self.character} - {self.corporation}"
+
 
 # sec group classes
 
