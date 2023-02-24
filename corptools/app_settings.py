@@ -60,8 +60,11 @@ CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE', False)
 CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE', False)
-
 CT_CHAR_PAUSE_CONTRACTS = getattr(settings, 'CT_CHAR_PAUSE_CONTRACTS', False)
+
+# New scopes so existing all will fail so lets ignore this by default.
+CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE = getattr(
+    settings, 'CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE', True)
 
 
 def get_character_scopes():

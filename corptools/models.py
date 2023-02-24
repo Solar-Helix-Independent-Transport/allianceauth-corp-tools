@@ -143,6 +143,9 @@ class CharacterAudit(models.Model):
                 is_active = is_active and (self.last_update_roles > time_ref)
             if app_settings.CT_CHAR_MAIL_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE:
                 is_active = is_active and (self.last_update_mails > time_ref)
+            if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE:
+                is_active = is_active and (
+                    self.last_update_loyaltypoints > time_ref)
 
             if self.active != is_active:
                 self.active = is_active
@@ -1077,7 +1080,7 @@ class CharacterStanding(Contact):
 # Loyalty Points
 
 
-class LoyaltyPoint (models.Model):
+class LoyaltyPoint(models.Model):
     character = models.ForeignKey(
         CharacterAudit, verbose_name=_("Character"), on_delete=models.CASCADE)
     corporation = models.ForeignKey(

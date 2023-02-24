@@ -652,14 +652,16 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
 
-    loyaltypoints = providers.esi.client.Loyalty.get_characters_character_id_loyalty_points(
-        character_id=character_id,
-        token=token.valid_access_token()).result()
+    loyaltypoints_op = providers.esi.client.Loyalty.get_characters_character_id_loyalty_points(
+        character_id=character_id)
+
+    loyaltypoints = etag_results(
+        loyaltypoints_op, token, force_refresh=force_refresh)
 
     _bulkcreate = []
 
     for lp in loyaltypoints:
-        lp_corp, created = EveName.objects.get_or_create_from_esi(
+        lp_corp, _ = EveName.objects.get_or_create_from_esi(
             lp.get('corporation_id'))
 
         _bulkcreate.append(
