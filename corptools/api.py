@@ -14,6 +14,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, F, Q, QuerySet, Sum
 from django.utils import timezone
+from django.utils.html import strip_tags
 from esi.models import Token
 from ninja import Field, Form, NinjaAPI, Schema
 from ninja.pagination import LimitOffsetPagination, paginate
@@ -21,6 +22,7 @@ from ninja.security import django_auth
 from ninja.types import DictStrAny
 
 from corptools import app_settings, models, providers, schema, tasks
+from corptools.task_helpers.char_tasks import update_character_mail_body
 from corptools.task_helpers.update_tasks import fetch_location_name
 
 logger = logging.getLogger(__name__)
@@ -36,7 +38,7 @@ class Paginator(LimitOffsetPagination):
         queryset: QuerySet,
         pagination: Input,
         **params: DictStrAny,
-    ) -> Any:
+    ) -> any:
         offset = pagination.offset
         limit: int = pagination.limit
         return {
@@ -127,7 +129,8 @@ def get_character_status(request, character_id: int):
     for c in char_skill_total:
         skills[c.get('char')] = c.get('total_sp')
 
-    characters = characters.select_related('characteraudit')
+    characters = characters.select_related(
+        'characteraudit', "characteraudit__location")
     output = {"characters": [],
               "main": main
               }
@@ -135,6 +138,8 @@ def get_character_status(request, character_id: int):
         _o = {
             "character": character,
             "isk": 0,
+            "location": "Unknown",
+            "ship": "Unknown",
             "sp": skills.get(character.character_id, 0),
             "active": False,
             "last_updates": None
@@ -149,6 +154,13 @@ def get_character_status(request, character_id: int):
                 "active": character.characteraudit.is_active(),
                 "last_updates": _updates
             })
+            try:
+                _o.update({
+                    "location": character.characteraudit.location.current_location.location_name,
+                    "ship": f"{character.characteraudit.location.current_ship_name} ({character.characteraudit.location.current_ship.name})"
+                })
+            except Exception:
+                pass
         except models.CharacterAudit.DoesNotExist:
             pass
         output["characters"].append(_o)
@@ -271,6 +283,10 @@ def get_character_menu(request):
                 "name": "Wallet Activity",
                 "link": "account/walletactivity"
             })
+        _finance["links"].append({
+            "name": "Contracts",
+            "link": "account/contract"
+        })
 
         _finance["links"].append({
             "name": "Market",
@@ -299,7 +315,7 @@ def get_character_menu(request):
         })
 
     if app_settings.CT_CHAR_MAIL_MODULE:
-        _char["links"].append({
+        _inter["links"].append({
             "name": "Mail",
             "link": "account/mail"
         })
@@ -413,7 +429,7 @@ def get_character_asset_list(request, character_id: int, location_id: int):
                 },
                 "quantity": a.quantity,
                 "id": a.item_id,
-                "expand": True if a.type_name.group.category.category_id in expandable_cats else False,
+                "expand": True if a.type_name.group.category.category_id in expandable_cats else True if a.type_name_id == 60 else False,  # ships or asset wraps
                 "location": {
                     "id": a.location_name.location_id,
                     "name": a.location_name.location_name
@@ -595,10 +611,12 @@ def get_character_clones(request, character_id: int):
                 "id": i.type_name_id,
                 "name": i.type_name.name
             })
-        loc = None
+        loc = {"id": j.location_id,
+               "name": f"ID#{j.location_id}"}
+
         if j.location_name:
-            loc = {"id": j.location_name_id,
-                   "name": j.location_name.location_name}
+            loc["name"] = j.location_name.location_name
+
         table_data[j.character.character.character_name]["clones"].append({
             "name": j.name,
             "location": loc,
@@ -607,10 +625,13 @@ def get_character_clones(request, character_id: int):
         )
 
     for c in clones:
-        table_data[c.character.character.character_name]["home"] = {
-            "id": c.location_id,
-            "name": c.location_name.location_name
-        }
+        loc = {"id": c.location_id,
+               "name": f"ID#{c.location_id}"}
+
+        if c.location_name:
+            loc["name"] = c.location_name.location_name
+
+        table_data[c.character.character.character_name]["home"] = loc
         table_data[c.character.character.character_name]["last_station_change"] = c.last_station_change_date
         table_data[c.character.character.character_name]["last_clone_jump"] = c.last_clone_jump_date
 
@@ -939,10 +960,9 @@ def get_character_contacts(request, character_id: int):
     return output
 
 
-"""
 @api.get(
-    "account/{character_id}/contracts",
-    response={200: List[schema.CharacterAssetGroups], 403: schema.Message},
+    "account/{character_id}/mail",
+    response={200: List, 403: schema.Message},
     tags=["Account"]
 )
 def get_character_contracts(request, character_id: int):
@@ -952,7 +972,134 @@ def get_character_contracts(request, character_id: int):
         return 403, {"message": "Permission Denied"}
 
     characters = get_alts_queryset(main)
-"""
+
+    mail = models.MailMessage.objects\
+        .filter(character__character__in=characters)\
+        .select_related('character__character', 'from_name')\
+        .prefetch_related("labels", "recipients").order_by("-timestamp")
+
+    output = []
+
+    for m in mail:
+
+        _r = []
+        for r in m.recipients.all():
+            if r.recipient_name:
+                _r.append(f"{r.recipient_name.name}")
+            else:
+                _r.append(f"{r.recipient_id} ({r.recipient_type})")
+
+        _l = []
+        _from_ret = m.from_name.name if m.from_name else m.from_id
+        for l in m.labels.all():
+            _l.append(l.label_name if l.label_name else l.label_id)
+
+        _m = {
+            "character": m.character.character.character_name,
+            "character_id": m.character.character.character_id,
+            "mail_id": m.mail_id,
+            "subject": m.subject,
+            "from": f"{_from_ret}",
+            "recipients": _r,
+            "labels": _l,
+            "timestamp": m.timestamp
+
+        }
+
+        output.append(_m)
+
+    return output
+
+
+@api.get(
+    "account/{character_id}/mail/{mail_id}",
+    response={200: dict, 403: str},
+    tags=["Characters"]
+)
+def get_mail_message_requesst(request, character_id: int, mail_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, "Permission Denied"
+
+    msg = models.MailMessage.objects.get(
+        character__character__character_id=character_id, mail_id=mail_id)
+
+    if not msg.body:
+        try:
+            msg = update_character_mail_body(
+                character_id=character_id, mail_message=msg)
+            msg.save()
+        except Exception as e:
+            logger.error("failed to fetch mail")
+    return 200, {"body": msg.body.replace("size=", "_size_=").replace("color=", "_color_=")}
+
+
+@api.get(
+    "account/{character_id}/contracts",
+    response={200: List, 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_contracts(request, character_id: int):
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    contracts = models.Contract.objects\
+        .filter(character__character__in=characters)\
+        .select_related('character__character', 'acceptor_name', 'assignee_name', 'issuer_corporation_name', 'issuer_name') \
+        .prefetch_related("contractitem_set", "contractitem_set__type_name").order_by("-date_issued")
+
+    output = []
+
+    for c in contracts:
+        _i = []
+        for i in c.contractitem_set.all():
+            _i.append({
+                "is_included": i.is_included,
+                "is_singleton": i.is_singleton,
+                "quantity": i.quantity,
+                "raw_quantity": i.raw_quantity,
+                "record_id": i.record_id,
+                "type_name": i.type_name.name,
+            })
+        _c = {
+            "character": c.character.character.character_name,
+            "acceptor": c.acceptor_name.name if c.acceptor_id else None,
+            "assignee": c.assignee_name.name if c.assignee_id else None,
+            "contract": c.contract_id,
+            "issuer": c.issuer_name.name,
+            "issuer_corporation_id": c.issuer_corporation_name.name,
+            "days_to_complete": c.days_to_complete,
+            "collateral": c.collateral or 0,
+            "buyout": c.buyout or 0,
+            "price": c.price or 0,
+            "reward": c.reward or 0,
+            "volume": c.volume or 0,
+            "days_to_complete": c.days_to_complete,
+            "start_location_id": c.start_location_id,
+            "end_location_id": c.end_location_id,
+            "for_corporation": c.for_corporation,
+            "date_accepted": c.date_accepted,
+            "date_completed": c.date_completed,
+            "date_expired": c.date_expired,
+            "date_issued": c.date_issued,
+            "status": c.status,
+            "contract_type": c.contract_type,
+            "availability": c.availability,
+            "title": c.title,
+            "items": _i
+        }
+        output.append(_c)
+
+    return output
+
+
 """
 @api.get(
     "account/{character_id}/standings",
@@ -1079,6 +1226,44 @@ def get_character_skills(request, character_id: int):
 
 
 @api.get(
+    "account/{character_id}/skill/history",
+    response={200: List[schema.CharacterSkillHistory], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_skill_history(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    skill_history = models.SkillTotalHistory.objects.filter(character__character__in=characters)\
+        .select_related('character__character').order_by("date")
+
+    output = {}
+
+    for s in skill_history:
+        if s.character_id not in output:
+            output[s.character_id] = {
+                "character": s.character.character,
+                "history": [],
+            }
+        output[s.character_id]["history"].append(
+            {
+                "date": s.date,
+                "sp": s.sp,
+                "total_sp": s.total_sp,
+                "unallocated_sp": s.unallocated_sp,
+            }
+        )
+
+    return list(output.values())
+
+
+@api.get(
     "account/{character_id}/skillqueues",
     response={200: List[schema.CharacterQueue], 403: schema.Message},
     tags=["Account"]
@@ -1188,10 +1373,11 @@ def post_acccount_refresh(request, character_id: int):
         return 403, {"message": "Permission Denied"}
 
     characters = get_alts_queryset(main)
+    force = app_settings.CT_USERS_CAN_FORCE_REFRESH or request.user.is_superuser
 
     for cid in characters.values_list('character_id', flat=True):
         tasks.update_character.apply_async(
-            args=[cid], kwargs={"force_refresh": True}, priority=4)
+            args=[cid], kwargs={"force_refresh": force}, priority=4)
         eve_character_update.apply_async(
             args=[cid], priority=4)
     return 200, {"message": "Requested Updates!"}
@@ -2133,3 +2319,74 @@ def post_test_pings_assets(request, systems: str = "", structures: str = "", ign
     locations.sort()
 
     return 200, {"members": len(pingers), "structures": locations}
+
+
+@api.get(
+    "/extras/fittings/fit/{fit_id}",
+    tags=["Fittings"]
+)
+def get_fit_items(request, fit_id: str):
+    if not request.user.is_superuser:
+        return 403, {"message": "Hard no pall!"}
+    from django.db.models import Q
+    from fittings.models import Fitting, FittingItem
+    _fit = Fitting.objects.get(id=1)
+    _items = FittingItem.objects.filter(
+        fit=_fit).values_list("type_id", flat=True)
+
+    _skill_ids = [182, 183, 184, 1285, 1289, 1290]
+    _level_ids = [277, 278, 279, 1286, 1287, 1288]
+
+    _types = models.EveItemDogmaAttribute.objects.filter(Q(eve_type_id__in=_items) or Q(
+        eve_type_id=_fit.ship_type_type_id), attribute_id__in=_skill_ids+_level_ids)
+    required = {}
+    skills = {}
+    sids = set()
+    for t in _types:
+        if t.eve_type_id not in required:
+            required[t.eve_type_id] = {0: {"skill": 0, "level": 0},
+                                       1: {"skill": 0, "level": 0},
+                                       2: {"skill": 0, "level": 0},
+                                       3: {"skill": 0, "level": 0},
+                                       4: {"skill": 0, "level": 0},
+                                       5: {"skill": 0, "level": 0}}
+        a = t.attribute_id
+        v = t.value
+        if a in _skill_ids:
+            required[t.eve_type_id][_skill_ids.index(a)]["skill"] = v
+        elif a in _level_ids:
+            indx = _level_ids.index(a)
+            if required[t.eve_type_id][indx]["level"] < v:
+                required[t.eve_type_id][indx]["level"] = v
+
+        for t in required.values():
+            for s in t.values():
+                if s["skill"]:
+                    if s["skill"] not in skills:
+                        skills[s["skill"]] = {"s": s["skill"], "l": 0, "n": ""}
+                        sids.add(s["skill"])
+                    if s["level"] > skills[s["skill"]]["l"]:
+                        skills[s["skill"]]["l"] = s["level"]
+    sk_check = {
+
+    }
+    for t in models.EveItemType.objects.filter(type_id__in=list(sids)):
+        skills[t.type_id]["n"] = t.name
+        sk_check[t.name] = skills[t.type_id]["l"]
+
+    import json
+
+    from .models import SkillList
+    from .task_helpers.skill_helpers import SkillListCache
+
+    checks = SkillListCache().check_skill_lists(
+        [SkillList(name="fit", skill_list=json.dumps(sk_check))],
+        request.user.character_ownerships.all(
+        ).values_list('character__character_id', flat=True)
+    )
+    for c, d in checks.items():
+        del (d["skills"])
+    return {
+        "skills": list(skills.values()),
+        "chars": checks
+    }

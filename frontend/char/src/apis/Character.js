@@ -73,6 +73,12 @@ export async function loadAssetLocations(character_id) {
   return api.data;
 }
 
+export async function loadSkillHistory(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/skill/history`);
+  console.log(`get loadSkillHistory in api ${character_id}`);
+  return api.data;
+}
+
 export async function loadAssetGroups(character_id, location_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/asset/${location_id}/groups`);
   console.log(`get asset groups in api ${character_id} ${location_id}`);
@@ -82,6 +88,18 @@ export async function loadAssetGroups(character_id, location_id) {
 export async function loadAssetList(character_id, location_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/asset/${location_id}/list`);
   console.log(`get asset list in api ${character_id} ${location_id}`);
+  return api.data;
+}
+
+export async function loadContracts(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/contracts`);
+  console.log(`get Contracts in api ${character_id}`);
+  return api.data;
+}
+
+export async function loadMail(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/mail`);
+  console.log(`get Contracts in api ${character_id}`);
   return api.data;
 }
 
@@ -172,6 +190,17 @@ export async function postAccountRefresh(character_id) {
     { character_id: character_id },
     { headers: { "X-CSRFToken": cookies.getItem("csrftoken") } }
   );
+  return api.data;
+}
+
+export async function getMailBody(character_id, mail_id) {
+  console.log(`sent postMailBody ${character_id}, ${mail_id}`);
+  if (!character_id && !mail_id) {
+    return {};
+  }
+  const api = await axios.get(`/audit/api/account/${character_id}/mail/${mail_id}`);
+  console.log(`search mail body in api ${character_id}, ${mail_id}`);
+
   return api.data;
 }
 

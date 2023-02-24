@@ -1,0 +1,40 @@
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        Character Skill Checks
+    </div>
+    <div class="panel-body">
+        {% for c,d in skills.chars.items %}
+        <p>
+            {{c}}
+            <span class="pull-right">
+                <span
+                    class="label {% if d.doctrines.fit|length > 0%}label-danger{%else%}label-success{% endif %}">
+                    <span
+                        class="fa fas {% if d.doctrines.fit|length > 0%}fa-times{% else %}fa-check{% endif %} fa-fw">
+                    </span>
+                </span>
+                <!--<span
+                    class="label {% if d.omega%}label-warning{%else%}label-success{% endif %}">
+                    <i class="fa-solid fa-money-bill-wave fa-fw"></i>
+                </span>-->
+            </span>
+        </p>
+        {% endfor %}
+    </div>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        Skills Required
+    </div>
+    <div class="panel-body" >
+        <div class="alert alert-info" style="-webkit-animation: progress-bar-stripes 2s linear infinite; animation: progress-bar-stripes 2s linear infinite; background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent); background-size: 40px 40px;">
+            <p class="text-center">Basic skills required to <b>sit in the hull</b> and <b>fit the modules</b>.<br/>Extra skills may be required to use this fitting in fleets.</p>
+        </div>
+        {% for s in skills.skills %}
+        <p>
+            {{s.n}}
+            <span class="pull-right">&nbsp;{{s.l | floatformat:"-10" }}</span>
+        </p>
+        {% endfor %}
+    </div>
+</div>

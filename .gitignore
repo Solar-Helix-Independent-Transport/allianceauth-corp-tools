@@ -141,3 +141,8 @@ packages/react-devtools-extensions/.tempUserDataDir
 packages/react-devtools-inline/dist
 packages/react-devtools-shell/dist
 packages/react-devtools-scheduling-profiler/dist
+
+# Future A-A-Ron packages
+corptools/static/corptools/asset-manifest.json
+corptools/static/corptools/static
+corptools/static/corptools/static/*

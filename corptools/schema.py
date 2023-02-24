@@ -32,20 +32,6 @@ class Corporation(Schema):
     alliance_name: Optional[str]
 
 
-class CharacterStatus(Schema):
-    character: Character
-    isk: Optional[float]
-    sp: Optional[int]
-    active: bool
-    last_updates: Optional[Dict]
-
-
-class AccountStatus(Schema):
-    characters: List[CharacterStatus]
-    main: Character
-    orphan: Boolean = False
-
-
 class MenuLink(Schema):
     name: str
     link: str
@@ -70,6 +56,22 @@ class EveName(Schema):
     id: int
     name: str
     cat: Optional[str]
+
+
+class CharacterStatus(Schema):
+    character: Character
+    isk: Optional[float]
+    sp: Optional[int]
+    location: Optional[str]
+    ship: Optional[str]
+    active: bool
+    last_updates: Optional[Dict]
+
+
+class AccountStatus(Schema):
+    characters: List[CharacterStatus]
+    main: Character
+    orphan: Boolean = False
 
 
 class ValueLabel(Schema):
@@ -141,6 +143,18 @@ class CharacterSkills(Schema):
     unallocated_sp: int
 
 
+class SkillHistory(Schema):
+    date: datetime
+    total_sp: int
+    unallocated_sp: int
+    sp: int
+
+
+class CharacterSkillHistory(Schema):
+    character: Character
+    history: List[SkillHistory]
+
+
 class CharacterQueue(Schema):
     character: Character
     queue: List[CharacterQueueItem]
@@ -178,7 +192,7 @@ class CharacterWalletEvent(Schema):
     ref_type: str
     balance: float
     amount: float
-    reason: str
+    reason: Optional[str]
 
 
 class CorporationWalletEvent(Schema):
@@ -190,7 +204,7 @@ class CorporationWalletEvent(Schema):
     ref_type: str
     balance: float
     amount: float
-    reason: str
+    reason: Optional[str]
 
 
 class CharacterOrder(Schema):

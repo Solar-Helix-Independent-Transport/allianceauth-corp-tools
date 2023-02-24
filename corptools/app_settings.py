@@ -61,6 +61,8 @@ CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE = getattr(
 CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE', False)
 
+CT_CHAR_PAUSE_CONTRACTS = getattr(settings, 'CT_CHAR_PAUSE_CONTRACTS', False)
+
 
 def get_character_scopes():
     _scopes = [
@@ -211,6 +213,12 @@ def get_character_update_attributes():
             ("Contacts", 'last_update_contacts'),
         ]
 
+    if CT_CHAR_LOCATIONS_MODULE:
+        _attribs += [
+            # Location
+            ("Location", 'last_update_location'),
+        ]
+
     if CT_CHAR_NOTIFICATIONS_MODULE:
         _attribs += [
             # Notifications
@@ -319,3 +327,6 @@ CORP_REQUIRED_SCOPES = _corp_scopes_base+_corp_scopes_tracking + \
 
 CT_PAGINATION_SIZE = getattr(
     settings, 'CT_PAGINATION_SIZE', 30000)
+
+CT_USERS_CAN_FORCE_REFRESH = getattr(
+    settings, 'CT_USERS_CAN_FORCE_REFRESH', False)
