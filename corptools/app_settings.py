@@ -24,6 +24,9 @@ CT_CHAR_FLEET_MODULE = getattr(settings, 'CT_CHAR_FLEET_MODULE', True)
 CT_CHAR_MAIL_MODULE = getattr(settings, 'CT_CHAR_MAIL_MODULE', False)
 CT_CHAR_HELPER_MODULE = getattr(settings, 'CT_CHAR_HELPER_MODULE', True)
 CT_CHAR_OPPORTUNITIES = getattr(settings, 'CT_CHAR_OPPORTUNITIES', True)
+CT_CHAR_LOYALTYPOINTS_MODULE = getattr(
+    settings, 'CT_CHAR_LOYALTYPOINTS_MODULE', True)
+
 
 CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE', False)
@@ -186,6 +189,11 @@ def get_character_scopes():
         _scopes += [
             'esi-universe.read_structures.v1',
             'esi-search.search_structures.v1',
+        ]
+
+    if CT_CHAR_LOYALTYPOINTS_MODULE:
+        _scopes += [
+            'esi-characters.read_loyalty.v1',
         ]
 
     return list(set(_scopes))
