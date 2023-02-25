@@ -308,7 +308,7 @@ def update_char_corp_history(self, character_id, force_refresh=False):
         return update_corp_history(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -317,7 +317,7 @@ def update_char_roles(self, character_id, force_refresh=False):
         return update_character_roles(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -326,7 +326,7 @@ def update_char_skill_list(self, character_id, force_refresh=False):
         return update_character_skill_list(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -335,7 +335,7 @@ def update_char_location(self, character_id, force_refresh=False):
         return update_character_location(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -345,7 +345,7 @@ def cache_user_skill_list(self, character_id, force_refresh=False):
             character_id, force_rebuild=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -354,7 +354,7 @@ def update_char_skill_queue(self, character_id, force_refresh=False):
         return update_character_skill_queue(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -363,7 +363,7 @@ def update_char_notifications(self, character_id, force_refresh=False):
         return update_character_notifications(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -376,7 +376,7 @@ def update_char_assets(self, character_id, force_refresh=False):
 
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -385,7 +385,7 @@ def update_char_wallet(self, character_id, force_refresh=False):
         return update_character_wallet(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -394,7 +394,7 @@ def update_char_contacts(self, character_id, force_refresh=False):
         return update_character_contacts(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -403,7 +403,7 @@ def update_char_orders(self, character_id, force_refresh=False):
         return update_character_orders(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -412,7 +412,7 @@ def update_char_transactions(self, character_id, force_refresh=False):
         return update_character_transactions(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -421,7 +421,7 @@ def update_char_titles(self, character_id, force_refresh=False):
         return update_character_titles(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -432,7 +432,7 @@ def update_char_mail(self, character_id, force_refresh=False):
         return "Completed mail pre-fetch for: %s" % str(character_id)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -444,7 +444,7 @@ def update_char_contract_items(self, character_id, contract_id, force_refresh=Fa
         return "Completed items for: %s" % str(character_id)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -464,7 +464,7 @@ def update_char_contracts(self, character_id, force_refresh=False):
 
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -473,7 +473,7 @@ def update_char_order_history(self, character_id, force_refresh=False):
         return update_character_order_history(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 @shared_task
@@ -485,7 +485,7 @@ def update_clones(character_id, force_refresh=False):
         return output
     except Exception as e:
         logger.exception(e)
-        return "Failed"
+        raise e
 
 
 def build_location_cache_tag(location_id):
