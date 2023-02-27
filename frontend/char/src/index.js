@@ -11,6 +11,7 @@ import CharContacts from "./pages/Contacts";
 import CharContracts from "./pages/Contracts";
 import CharDoctrines from "./pages/Doctrines";
 import CharHistory from "./pages/History";
+import CharLoyaltyPoints from "./pages/LoyaltyPonts";
 import CharMail from "./pages/Mail";
 import CharMarket from "./pages/Market";
 import CharNotifications from "./pages/Notifications";
@@ -61,6 +62,7 @@ const CorptoolsCharacterView = () => {
               <Route path="account/market" element={<CharMarket />} />
               <Route path="account/standings" element={<ErrorLoader />} />
               <Route path="account/list" element={<AccountList />} />
+              <Route path="account/lp" element={<CharLoyaltyPoints />} />
               <Route path="ping/assets" element={<PingAssets />} />
             </Route>
             {/* if no route re-route to the main page, this is mainly for dev work */}

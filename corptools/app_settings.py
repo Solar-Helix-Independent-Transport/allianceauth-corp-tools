@@ -242,6 +242,11 @@ def get_character_update_attributes():
             ("Orders", 'last_update_orders'),
         ]
 
+    if CT_CHAR_LOYALTYPOINTS_MODULE:
+        _attribs += [
+            ("LP", 'last_update_loyaltypoints'),
+        ]
+
     if CT_CHAR_ASSETS_MODULE:
         _attribs += [
             # Assets
