@@ -195,6 +195,12 @@ class CharacterWalletEvent(Schema):
     reason: Optional[str]
 
 
+class LoyaltyPoints(Schema):
+    character: Character
+    corporation: EveName
+    amount: int
+
+
 class CorporationWalletEvent(Schema):
     division: str
     id: int

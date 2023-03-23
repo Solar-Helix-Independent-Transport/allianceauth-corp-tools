@@ -292,6 +292,13 @@ def get_character_menu(request):
             "name": "Market",
             "link": "account/market"
         })
+
+    if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE:
+        _finance["links"].append({
+            "name": "Loyalty Points",
+            "link": "account/lp"
+        })
+
     if app_settings.CT_CHAR_ASSETS_MODULE:
         _char["links"].append({
             "name": "Asset Overview",
@@ -1261,6 +1268,36 @@ def get_character_skill_history(request, character_id: int):
         )
 
     return list(output.values())
+
+
+@api.get(
+    "account/{character_id}/loyalty",
+    response={200: List[schema.LoyaltyPoints], 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_loyalty_Points(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    lp = models.LoyaltyPoint.objects.filter(character__character__in=characters)\
+        .select_related('character__character', "corporation")
+
+    output = []
+
+    for l in lp:
+        output.append({
+            "character": l.character.character,
+            "corporation": {"id": l.corporation.eve_id, "name": l.corporation.name},
+            "amount": l.amount
+        })
+
+    return output
 
 
 @api.get(

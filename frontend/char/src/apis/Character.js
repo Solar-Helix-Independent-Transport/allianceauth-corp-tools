@@ -115,6 +115,12 @@ export async function loadSkills(character_id) {
   return api.data;
 }
 
+export async function loadLoyaltyPoints(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/loyalty`);
+  console.log(`get loyalty in api ${character_id}`);
+  return api.data;
+}
+
 export async function loadDoctrines(character_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/doctrines`);
   console.log(`get doctrines in api ${character_id}`);

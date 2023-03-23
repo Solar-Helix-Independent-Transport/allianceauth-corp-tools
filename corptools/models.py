@@ -14,6 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.db.models import Count, Max
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from esi.errors import TokenError
 from esi.models import Token
 from model_utils import Choices
@@ -104,6 +105,9 @@ class CharacterAudit(models.Model):
     last_update_location = models.DateTimeField(
         null=True, default=None, blank=True)
 
+    last_update_loyaltypoints = models.DateTimeField(
+        null=True, default=None, blank=True)
+
     balance = models.DecimalField(
         max_digits=20, decimal_places=2, null=True, default=None)
 
@@ -139,6 +143,9 @@ class CharacterAudit(models.Model):
                 is_active = is_active and (self.last_update_roles > time_ref)
             if app_settings.CT_CHAR_MAIL_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE:
                 is_active = is_active and (self.last_update_mails > time_ref)
+            if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE:
+                is_active = is_active and (
+                    self.last_update_loyaltypoints > time_ref)
 
             if self.active != is_active:
                 self.active = is_active
@@ -1069,6 +1076,24 @@ class CharacterStanding(Contact):
     to = models.BooleanField(default=False)
 
 """
+
+# Loyalty Points
+
+
+class LoyaltyPoint(models.Model):
+    character = models.ForeignKey(
+        CharacterAudit, verbose_name=_("Character"), on_delete=models.CASCADE)
+    corporation = models.ForeignKey(
+        EveName, verbose_name=_("NPC Corporation"), on_delete=models.CASCADE)
+    amount = models.IntegerField(_("LP"))
+
+    class Meta:
+        verbose_name = _("Loyalty Point")
+        unique_together = ('character', 'corporation',)
+
+    def __str__(self):
+        return f"{self.character} - {self.corporation}"
+
 
 # sec group classes
 

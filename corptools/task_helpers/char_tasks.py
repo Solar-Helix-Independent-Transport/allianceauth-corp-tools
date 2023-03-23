@@ -1,6 +1,7 @@
 import logging
 import time
 
+from allianceauth.eveonline.models import EveCorporationInfo
 from bravado import exception
 from celery import shared_task
 from django.core.cache import cache
@@ -15,8 +16,8 @@ from ..models import (CharacterAsset, CharacterAudit, CharacterContact,
                       CharacterMarketOrder, CharacterRoles, CharacterTitle,
                       CharacterWalletJournalEntry, Clone, Contract,
                       ContractItem, CorporationHistory, EveItemType,
-                      EveLocation, EveName, Implant, JumpClone, MailLabel,
-                      MailMessage, MailRecipient, Notification,
+                      EveLocation, EveName, Implant, JumpClone, LoyaltyPoint,
+                      MailLabel, MailMessage, MailRecipient, Notification,
                       NotificationText, Skill, SkillQueue, SkillTotalHistory,
                       SkillTotals)
 from .etag_helpers import NotModifiedError, etag_results
@@ -636,6 +637,47 @@ def update_character_clones(character_id, force_refresh=False):
     audit_char.is_active()
 
     return "CT: Finished clones for: {}".format(audit_char.character.character_name)
+
+
+def update_character_loyaltypoints(character_id, force_refresh=False):
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+    logger.debug("Updating Loyalty Points for: {}".format(
+        audit_char.character.character_name))
+
+    req_scopes = ['esi-characters.read_loyalty.v1', ]
+
+    token = get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+
+    loyaltypoints_op = providers.esi.client.Loyalty.get_characters_character_id_loyalty_points(
+        character_id=character_id)
+
+    loyaltypoints = etag_results(
+        loyaltypoints_op, token, force_refresh=force_refresh)
+
+    _bulkcreate = []
+
+    for lp in loyaltypoints:
+        lp_corp, _ = EveName.objects.get_or_create_from_esi(
+            lp.get('corporation_id'))
+
+        _bulkcreate.append(
+            LoyaltyPoint(
+                character=audit_char,
+                corporation=lp_corp,
+                amount=lp.get('loyalty_points')))
+
+    LoyaltyPoint.objects.bulk_create(
+        _bulkcreate, ignore_conflicts=True, batch_size=500)
+
+    audit_char.last_update_loyaltypoints = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
+    return f"CT: Finished Loyalty Points for: {audit_char.character.character_name}"
 
 
 def update_character_orders(character_id, force_refresh=False):

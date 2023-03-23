@@ -24,6 +24,9 @@ CT_CHAR_FLEET_MODULE = getattr(settings, 'CT_CHAR_FLEET_MODULE', True)
 CT_CHAR_MAIL_MODULE = getattr(settings, 'CT_CHAR_MAIL_MODULE', False)
 CT_CHAR_HELPER_MODULE = getattr(settings, 'CT_CHAR_HELPER_MODULE', True)
 CT_CHAR_OPPORTUNITIES = getattr(settings, 'CT_CHAR_OPPORTUNITIES', True)
+CT_CHAR_LOYALTYPOINTS_MODULE = getattr(
+    settings, 'CT_CHAR_LOYALTYPOINTS_MODULE', True)
+
 
 CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE', False)
@@ -57,8 +60,11 @@ CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE', False)
 CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE', False)
-
 CT_CHAR_PAUSE_CONTRACTS = getattr(settings, 'CT_CHAR_PAUSE_CONTRACTS', False)
+
+# New scopes so existing all will fail so lets ignore this by default.
+CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE = getattr(
+    settings, 'CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE', True)
 
 
 def get_character_scopes():
@@ -190,6 +196,11 @@ def get_character_scopes():
             'esi-search.search_structures.v1',
         ]
 
+    if CT_CHAR_LOYALTYPOINTS_MODULE:
+        _scopes += [
+            'esi-characters.read_loyalty.v1',
+        ]
+
     return list(set(_scopes))
 
 
@@ -229,6 +240,11 @@ def get_character_update_attributes():
             # Wallet / Market /  Contracts
             ("Wallet", 'last_update_wallet'),
             ("Orders", 'last_update_orders'),
+        ]
+
+    if CT_CHAR_LOYALTYPOINTS_MODULE:
+        _attribs += [
+            ("LP", 'last_update_loyaltypoints'),
         ]
 
     if CT_CHAR_ASSETS_MODULE:

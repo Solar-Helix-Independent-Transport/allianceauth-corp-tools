@@ -25,6 +25,7 @@ from .task_helpers.char_tasks import (update_character_assets,
                                       update_character_contract_items,
                                       update_character_contracts,
                                       update_character_location,
+                                      update_character_loyaltypoints,
                                       update_character_mail_headers,
                                       update_character_notifications,
                                       update_character_order_history,
@@ -295,6 +296,10 @@ def update_character(self, char_id, force_refresh=False):
         que.append(update_char_mail.si(
             character.character.character_id, force_refresh=force_refresh))
 
+    if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE:
+        que.append(update_char_loyaltypoints.si(
+            character.character.character_id, force_refresh=force_refresh))
+
     logger.info("Queued {} Updates for {}".format(
         len(que),
         character.character.character_name)
@@ -480,6 +485,18 @@ def update_char_order_history(self, character_id, force_refresh=False):
 def update_clones(character_id, force_refresh=False):
     try:
         output = update_character_clones(
+            character_id, force_refresh=force_refresh)
+        # update_all_locations.apply_async(priority=7)
+        return output
+    except Exception as e:
+        logger.exception(e)
+        return "Failed"
+
+
+@shared_task
+def update_char_loyaltypoints(character_id, force_refresh=False):
+    try:
+        output = update_character_loyaltypoints(
             character_id, force_refresh=force_refresh)
         # update_all_locations.apply_async(priority=7)
         return output
