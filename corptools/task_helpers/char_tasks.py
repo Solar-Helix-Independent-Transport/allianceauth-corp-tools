@@ -156,8 +156,6 @@ def update_corp_history(character_id, force_refresh=False):
 
 
 def update_character_skill_list(character_id, force_refresh=False):
-    from ..tasks import cache_user_skill_list
-
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating Skills for: {}".format(
@@ -218,7 +216,6 @@ def update_character_skill_list(character_id, force_refresh=False):
     audit_char.last_update_skills = timezone.now()
     audit_char.save()
     audit_char.is_active()
-    cache_user_skill_list.s(token.user_id).apply_async(priority=7)
 
     return "CT: Finished skills for: {}".format(audit_char.character.character_name)
 

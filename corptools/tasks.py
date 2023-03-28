@@ -258,6 +258,9 @@ def update_character(self, char_id, force_refresh=False):
         if (character.last_update_skills or mindt) <= skip_date or force_refresh:
             que.append(update_char_skill_list.si(
                 character.character.character_id, force_refresh=force_refresh))
+            que.append(cache_user_skill_list.si(
+                character.character.character_ownership.user_id, force_refresh=force_refresh))
+
         if (character.last_update_skill_que or mindt) <= skip_date or force_refresh:
             que.append(update_char_skill_queue.si(
                 character.character.character_id, force_refresh=force_refresh))
@@ -344,10 +347,10 @@ def update_char_location(self, character_id, force_refresh=False):
 
 
 @shared_task(bind=True, base=QueueOnce)
-def cache_user_skill_list(self, character_id, force_refresh=False):
+def cache_user_skill_list(self, user_id, force_refresh=False):
     try:
         providers.skills.get_and_cache_user(
-            character_id, force_rebuild=force_refresh)
+            user_id, force_rebuild=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"
