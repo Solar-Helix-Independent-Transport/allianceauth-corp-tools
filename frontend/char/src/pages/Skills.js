@@ -27,26 +27,26 @@ const CharSkills = () => {
 
   if (error) return <ErrorLoader />;
 
-  if (char_id === 0) {
+  if (char_id === "0") {
     setCharacter(data[0].character.character_id);
     return <PanelLoader />;
   } else {
     let char_data = data.filter((obj) => obj.character.character_id === parseInt(char_id));
 
-    let skill_data = char_data[0].skills;
+    let skill_data = char_data?.[0].skills;
 
     if (group_filter !== "" && group_filter !== "All") {
-      skill_data = skill_data.filter((o) =>
+      skill_data = skill_data?.filter((o) =>
         o.group.toLowerCase().includes(group_filter.toLowerCase())
       );
     }
 
     if (level_filter >= 0) {
-      skill_data = skill_data.filter((o) => o.level === level_filter);
+      skill_data = skill_data?.filter((o) => o.level === level_filter);
     }
 
     if (skill_filter !== "") {
-      skill_data = skill_data.filter((o) =>
+      skill_data = skill_data?.filter((o) =>
         o.skill.toLowerCase().includes(skill_filter.toLowerCase())
       );
     }
@@ -90,7 +90,7 @@ const CharSkills = () => {
 
     let groupOptions = new Set();
 
-    char_data[0].skills.forEach((skill) => {
+    char_data[0].skills?.forEach((skill) => {
       groupOptions.add(skill.group);
     });
 
