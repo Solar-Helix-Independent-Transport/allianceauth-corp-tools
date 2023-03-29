@@ -618,11 +618,13 @@ def get_character_clones(request, character_id: int):
                 "id": i.type_name_id,
                 "name": i.type_name.name
             })
-        loc = {"id": j.location_id,
-               "name": f"ID#{j.location_id}"}
+        loc = None
+        if j.location_id:
+            loc = {"id": j.location_id,
+                   "name": f"Location ID {j.location_id}"}
 
-        if j.location_name:
-            loc["name"] = j.location_name.location_name
+            if j.location_name:
+                loc["name"] = j.location_name.location_name
 
         table_data[j.character.character.character_name]["clones"].append({
             "name": j.name,
@@ -1517,10 +1519,10 @@ def get_account_list(request):
 )
 def get_visible_structures(request):
     perms = (
-        request.user.has_perm('corptools.corp_hr') |
-        request.user.has_perm('corptools.alliance_hr') |
-        request.user.has_perm('corptools.state_hr') |
-        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.own_corp_manager') |
+        request.user.has_perm('corptools.alliance_corp_manager') |
+        request.user.has_perm('corptools.state_corp_manager') |
+        request.user.has_perm('corptools.global_corp_manager') |
         request.user.has_perm('corptools.holding_corp_structures')
     )
 
@@ -1714,10 +1716,10 @@ def get_corporation_status(request, corporation_id: int):
 )
 def get_corporation_wallet_types(request):
     perms = (
-        request.user.has_perm('corptools.corp_hr') |
-        request.user.has_perm('corptools.alliance_hr') |
-        request.user.has_perm('corptools.state_hr') |
-        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.own_corp_manager') |
+        request.user.has_perm('corptools.alliance_corp_manager') |
+        request.user.has_perm('corptools.state_corp_manager') |
+        request.user.has_perm('corptools.global_corp_manager') |
         request.user.has_perm('corptools.holding_corp_wallets')
     )
 
@@ -1739,10 +1741,10 @@ def get_corporation_wallet_types(request):
 )
 def get_corporation_wallet(request, corporation_id: int, type_refs: str = "", page: int = 1):
     perms = (
-        request.user.has_perm('corptools.corp_hr') |
-        request.user.has_perm('corptools.alliance_hr') |
-        request.user.has_perm('corptools.state_hr') |
-        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.own_corp_manager') |
+        request.user.has_perm('corptools.alliance_corp_manager') |
+        request.user.has_perm('corptools.state_corp_manager') |
+        request.user.has_perm('corptools.global_corp_manager') |
         request.user.has_perm('corptools.holding_corp_wallets')
     )
 
@@ -1800,10 +1802,10 @@ def get_corporation_wallet(request, corporation_id: int, type_refs: str = "", pa
 )
 def get_corporation_asset_locations(request, corporation_id: int):
     perms = (
-        request.user.has_perm('corptools.corp_hr') |
-        request.user.has_perm('corptools.alliance_hr') |
-        request.user.has_perm('corptools.state_hr') |
-        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.own_corp_manager') |
+        request.user.has_perm('corptools.alliance_corp_manager') |
+        request.user.has_perm('corptools.state_corp_manager') |
+        request.user.has_perm('corptools.global_corp_manager') |
         request.user.has_perm('corptools.holding_corp_assets')
     )
 
@@ -1835,10 +1837,10 @@ def get_corporation_asset_locations(request, corporation_id: int):
 )
 def get_corporation_asset_list(request, corporation_id: int, location_id: int, new_asset_tree: boolean = False):
     perms = (
-        request.user.has_perm('corptools.corp_hr') |
-        request.user.has_perm('corptools.alliance_hr') |
-        request.user.has_perm('corptools.state_hr') |
-        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.own_corp_manager') |
+        request.user.has_perm('corptools.alliance_corp_manager') |
+        request.user.has_perm('corptools.state_corp_manager') |
+        request.user.has_perm('corptools.global_corp_manager') |
         request.user.has_perm('corptools.holding_corp_assets')
     )
 
@@ -1961,10 +1963,10 @@ def get_corporation_asset_list(request, corporation_id: int, location_id: int, n
 )
 def get_corporation_asset_contents(request, item_id: int):
     perms = (
-        request.user.has_perm('corptools.corp_hr') |
-        request.user.has_perm('corptools.alliance_hr') |
-        request.user.has_perm('corptools.state_hr') |
-        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.own_corp_manager') |
+        request.user.has_perm('corptools.alliance_corp_manager') |
+        request.user.has_perm('corptools.state_corp_manager') |
+        request.user.has_perm('corptools.global_corp_manager') |
         request.user.has_perm('corptools.holding_corp_assets')
     )
 
@@ -2007,10 +2009,10 @@ def get_corporation_asset_contents(request, item_id: int):
 )
 def get_corporation_asset_groups(request, corporation_id: int, location_id: int):
     perms = (
-        request.user.has_perm('corptools.corp_hr') |
-        request.user.has_perm('corptools.alliance_hr') |
-        request.user.has_perm('corptools.state_hr') |
-        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.own_corp_manager') |
+        request.user.has_perm('corptools.alliance_corp_manager') |
+        request.user.has_perm('corptools.state_corp_manager') |
+        request.user.has_perm('corptools.global_corp_manager') |
         request.user.has_perm('corptools.holding_corp_assets')
     )
 
@@ -2094,10 +2096,10 @@ def get_corporation_asset_groups(request, corporation_id: int, location_id: int)
 )
 def get_visible_gates(request):
     perms = (
-        request.user.has_perm('corptools.corp_hr') |
-        request.user.has_perm('corptools.alliance_hr') |
-        request.user.has_perm('corptools.state_hr') |
-        request.user.has_perm('corptools.global_hr') |
+        request.user.has_perm('corptools.own_corp_manager') |
+        request.user.has_perm('corptools.alliance_corp_manager') |
+        request.user.has_perm('corptools.state_corp_manager') |
+        request.user.has_perm('corptools.global_corp_manager') |
         request.user.has_perm('corptools.holding_corp_structures')
     )
 
