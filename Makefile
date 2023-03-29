@@ -9,6 +9,8 @@ help:
 	@echo "  deploy     Configure the PyPi config file in CI"
 	@echo "  packagejs  Build the React Project"
 	@echo "  packagepy  Build the PyPi package"
+	@echo "  devchar    Run the React Character Dev server"
+	@echo "  devcorp    Run the React Corporation Dev server"
 
 clean:
 	rm -rf dist/*
