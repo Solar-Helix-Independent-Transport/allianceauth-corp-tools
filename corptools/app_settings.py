@@ -5,6 +5,7 @@ CORPTOOLS_APP_NAME = getattr(settings, "CORPTOOLS_APP_NAME", "Character Audit")
 CORPTOOLS_DISCORD_BOT_COGS = getattr(
     settings, 'CORPTOOLS_DISCORD_BOT_COGS', ["corptools.cogs.routes", "corptools.cogs.locate"])
 
+CT_CHAT_MAX_INACTIVE_DAYS = getattr(settings, 'CT_CHAT_MAX_INACTIVE_DAYS', 3)
 CT_CHAR_ASSETS_MODULE = getattr(settings, 'CT_CHAR_ASSETS_MODULE', True)
 CT_CHAR_STANDINGS_MODULE = getattr(settings, 'CT_CHAR_STANDINGS_MODULE', True)
 CT_CHAR_KILLMAILS_MODULE = getattr(settings, 'CT_CHAR_KILLMAILS_MODULE', True)
