@@ -7,6 +7,7 @@ from allianceauth.eveonline.providers import provider as eve_names
 from allianceauth.services.tasks import QueueOnce
 from celery import chain, shared_task
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 from esi.errors import TokenExpiredError
@@ -258,8 +259,11 @@ def update_character(self, char_id, force_refresh=False):
         if (character.last_update_skills or mindt) <= skip_date or force_refresh:
             que.append(update_char_skill_list.si(
                 character.character.character_id, force_refresh=force_refresh))
-            que.append(cache_user_skill_list.si(
-                character.character.character_ownership.user_id, force_refresh=force_refresh))
+            try:
+                que.append(cache_user_skill_list.si(
+                    character.character.character_ownership.user_id, force_refresh=force_refresh))
+            except ObjectDoesNotExist:
+                pass
 
         if (character.last_update_skill_que or mindt) <= skip_date or force_refresh:
             que.append(update_char_skill_queue.si(
