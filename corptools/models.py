@@ -27,8 +27,6 @@ from .managers import (AuditCharacterManager, AuditCorporationManager,
 
 logger = logging.getLogger(__name__)
 
-MAX_INACTIVE_DAYS = 3
-
 
 class CorptoolsConfiguration(models.Model):
     holding_corps = models.ManyToManyField(EveCorporationInfo)
@@ -122,7 +120,7 @@ class CharacterAudit(models.Model):
                        ('global_hr', 'Can access other character\'s data for characters in any corp/alliance/state.'))
 
     def is_active(self):
-        time_ref = timezone.now() - datetime.timedelta(days=MAX_INACTIVE_DAYS)
+        time_ref = timezone.now() - datetime.timedelta(days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS)
         try:
             is_active = (self.last_update_pub_data > time_ref)
 
