@@ -93,12 +93,27 @@ There are some basic access perms
 
 All permissions are filtered by main character, if a person has neutral alts loaded they will also be visible to someone who can see their main.
 
+### Character
+
 | Perm                | Admin Site | Perm                                                                         | Description                                            |
 | ------------------- | ---------- | ---------------------------------------------------------------------------- | ------------------------------------------------------ |
 | view_characteraudit | nill       | Can view character audit.                                                    | Generic Access perm to show the Member Audit Menu item |
 | global_hr           | nill       | Can access other character's data for characters in any corp/alliance/state. | Superuser level access                                 |
 | alliance_hr         | nill       | Can access other character's data for own alliance.                          | Alliance only level access                             |
-| corp_hr             | nill       | Can access other character's data for own corp.                              | Corp restricted level access                           |
+| corp_hr             | nill       | Can access other character's data for own corp.                              | Own Corp restricted level access                       |
+
+### Corporate
+
+| Perm                    | Admin Site | Perm                                                                         | Description                        |
+| ----------------------- | ---------- | ---------------------------------------------------------------------------- | ---------------------------------- |
+| global_corp_manager     | nill       | Can access other character's data for characters in any corp/alliance/state. | Superuser level access             |
+| alliance_corp_manager   | nill       | Can access other character's data for own alliance.                          | Alliance only level access         |
+| own_corp_manager        | nill       | Can access other character's data for own corp.                              | Own Corp restricted level access   |
+| holding_corp_structures | nill       | Can access configured holding corp structure data.                           | Holding Corp Structure data access |
+| holding_corp_wallets    | nill       | Can access configured holding corp wallet data.                              | Holding Corp Structure data access |
+| holding_corp_assets     | nill       | Can access configured holding corp asset data.                               | Holding Corp Structure data access |
+
+Note: Configure the "Holding Corps" in the `Corptools Configuration` Admin Model. via the auth admin interface.
 
 ## Settings
 
@@ -143,6 +158,16 @@ If `Assets`, `Clones`, `Wallets` or `Minning` are enabled these extra spoces are
 
 - 'esi-universe.read_structures.v1'
 - 'esi-search.search_structures.v1'
+
+### Other Settings
+
+| Setting                      | Default                                              | Description                                                                                                                                                   |
+| ---------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CORPTOOLS_APP_NAME`         | "Character Audit"                                    | Name on the menu for Character Audit                                                                                                                          |
+| `CT_CHAR_MAX_INACTIVE_DAYS`  | 3                                                    | Days till data is considered Stale                                                                                                                            |
+| `CORPTOOLS_DISCORD_BOT_COGS` | `["corptools.cogs.routes", "corptools.cogs.locate"]` | Discord bot cogs to enable/disable                                                                                                                            |
+| `CT_PAGINATION_SIZE`         | 30000                                                | Max items per page of data in the UI                                                                                                                          |
+| `CT_USERS_CAN_FORCE_REFRESH` | False                                                | Set to `True` to force cache invalidation on a regular user requresting updates from the UI. Superusers will always cache invalidate on requesting an update. |
 
 ## Contributing
 
