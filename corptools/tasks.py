@@ -259,11 +259,6 @@ def update_character(self, char_id, force_refresh=False):
         if (character.last_update_skills or mindt) <= skip_date or force_refresh:
             que.append(update_char_skill_list.si(
                 character.character.character_id, force_refresh=force_refresh))
-            try:
-                que.append(cache_user_skill_list.si(
-                    character.character.character_ownership.user_id, force_refresh=force_refresh))
-            except ObjectDoesNotExist:
-                pass
 
         if (character.last_update_skill_que or mindt) <= skip_date or force_refresh:
             que.append(update_char_skill_queue.si(
@@ -306,6 +301,17 @@ def update_character(self, char_id, force_refresh=False):
     if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE:
         que.append(update_char_loyaltypoints.si(
             character.character.character_id, force_refresh=force_refresh))
+
+    if app_settings.CT_CHAR_SKILLS_MODULE:
+        # Must be last due to this being not a user level queue, Celery once will stall the queue here if characters on an account block.
+        # TODO: make this better
+
+        if (character.last_update_skills or mindt) <= skip_date or force_refresh:
+            try:
+                que.append(cache_user_skill_list.si(
+                    character.character.character_ownership.user_id, force_refresh=force_refresh))
+            except ObjectDoesNotExist:
+                pass
 
     logger.info("Queued {} Updates for {}".format(
         len(que),
