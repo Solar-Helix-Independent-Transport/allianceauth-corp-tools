@@ -547,7 +547,7 @@ def update_character_transactions(character_id, force_refresh=False):
                 ).update(
                     reason=message
                 )
-                print(f"{audit_char.character.character_name} {message}")
+                #print(f"{audit_char.character.character_name} {message}")
         logger.debug(
             f"CT_TIME: {time.perf_counter()-_st} update_character_transactions {character_id}")
 
@@ -1313,6 +1313,8 @@ def update_character_contracts(character_id, force_refresh=False):
 
     token = get_token(character_id, req_scopes)
 
+    new_contract_ids = []
+
     if not token:
         return False, []
     try:
@@ -1382,6 +1384,10 @@ def update_character_contracts(character_id, force_refresh=False):
         logger.debug(
             f"CT_TIME: {time.perf_counter()-_st} update_character_titles {character_id}")
 
+        new_contract_ids = [c.contract_id for c in contract_models_new]
+        if force_refresh:
+            new_contract_ids += [c.contract_id for c in contract_models_old]
+
     except NotModifiedError:
         logger.info("CT: No New Contracts for: {}".format(
             audit_char.character.character_name))
@@ -1390,10 +1396,6 @@ def update_character_contracts(character_id, force_refresh=False):
     audit_char.last_update_contracts = timezone.now()
     audit_char.save()
     audit_char.is_active()
-
-    new_contract_ids = [c.contract_id for c in contract_models_new]
-    if force_refresh:
-        new_contract_ids += [c.contract_id for c in contract_models_old]
 
     return "CT: Completed Contracts for: %s" % str(character_id), new_contract_ids
 

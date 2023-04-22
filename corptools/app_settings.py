@@ -6,11 +6,12 @@ CORPTOOLS_DISCORD_BOT_COGS = getattr(
     settings, 'CORPTOOLS_DISCORD_BOT_COGS', ["corptools.cogs.routes", "corptools.cogs.locate"])
 
 CT_CHAR_MAX_INACTIVE_DAYS = getattr(settings, 'CT_CHAR_MAX_INACTIVE_DAYS', 3)
+
 CT_CHAR_ASSETS_MODULE = getattr(settings, 'CT_CHAR_ASSETS_MODULE', True)
 CT_CHAR_STANDINGS_MODULE = getattr(settings, 'CT_CHAR_STANDINGS_MODULE', True)
 CT_CHAR_KILLMAILS_MODULE = getattr(settings, 'CT_CHAR_KILLMAILS_MODULE', True)
 CT_CHAR_FITTINGS_MODULE = getattr(settings, 'CT_CHAR_FITTINGS_MODULE', True)
-CT_CHAR_CALLENDAR_MODULE = getattr(settings, 'CT_CHAR_CALLENDAR_MODULE', True)
+CT_CHAR_CALENDAR_MODULE = getattr(settings, 'CT_CHAR_CALENDAR_MODULE', True)
 CT_CHAR_CONTACTS_MODULE = getattr(settings, 'CT_CHAR_CONTACTS_MODULE', True)
 CT_CHAR_NOTIFICATIONS_MODULE = getattr(
     settings, 'CT_CHAR_NOTIFICATIONS_MODULE', True)
@@ -99,7 +100,7 @@ def get_character_scopes():
             'esi-fittings.read_fittings.v1',
         ]
 
-    if CT_CHAR_CALLENDAR_MODULE:
+    if CT_CHAR_CALENDAR_MODULE:
         _scopes += [
             # Callendar
             'esi-calendar.read_calendar_events.v1',
