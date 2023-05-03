@@ -106,6 +106,9 @@ class CharacterAudit(models.Model):
     last_update_loyaltypoints = models.DateTimeField(
         null=True, default=None, blank=True)
 
+    last_update_mining = models.DateTimeField(
+        null=True, default=None, blank=True)
+
     balance = models.DecimalField(
         max_digits=20, decimal_places=2, null=True, default=None)
 
@@ -144,6 +147,8 @@ class CharacterAudit(models.Model):
             if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE:
                 is_active = is_active and (
                     self.last_update_loyaltypoints > time_ref)
+            if app_settings.CT_CHAR_MINING_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE:
+                is_active = is_active and (self.last_update_mining > time_ref)
 
             if self.active != is_active:
                 self.active = is_active
@@ -646,6 +651,21 @@ class CharacterWalletJournalEntry(WalletJournalEntry):
         EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_first_party')
     second_party_name = models.ForeignKey(
         EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_second_party')
+
+
+# Mining Models
+
+class CharacterMiningLedger(models.Model):
+    id = models.CharField(max_length=50, primary_key=True)
+    character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
+    date = models.DateField()
+    type_name = models.ForeignKey(EveItemType, on_delete=models.CASCADE)
+    system = models.ForeignKey(MapSystem, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+
+    @staticmethod
+    def create_primary_key(character_id, mining_record):
+        return f"{mining_record['date'].strftime('%Y%m%d')}-{mining_record['type_id']}-{character_id}-{mining_record['solar_system_id']}"
 
 # Market Models
 

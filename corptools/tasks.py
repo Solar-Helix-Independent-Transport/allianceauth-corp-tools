@@ -28,6 +28,7 @@ from .task_helpers.char_tasks import (update_character_assets,
                                       update_character_location,
                                       update_character_loyaltypoints,
                                       update_character_mail_headers,
+                                      update_character_mining,
                                       update_character_notifications,
                                       update_character_order_history,
                                       update_character_orders,
@@ -274,6 +275,11 @@ def update_character(self, char_id, force_refresh=False):
             que.append(update_char_contacts.si(
                 character.character.character_id, force_refresh=force_refresh))
 
+    if app_settings.CT_CHAR_MINING_MODULE:
+        if (character.last_update_mining or mindt) <= skip_date or force_refresh:
+            que.append(update_char_mining_ledger.si(
+                character.character.character_id, force_refresh=force_refresh))
+
     if app_settings.CT_CHAR_WALLET_MODULE:
         if (character.last_update_wallet or mindt) <= skip_date or force_refresh:
             que.append(update_char_wallet.si(
@@ -369,6 +375,15 @@ def cache_user_skill_list(self, user_id, force_refresh=False):
 def update_char_skill_queue(self, character_id, force_refresh=False):
     try:
         return update_character_skill_queue(character_id, force_refresh=force_refresh)
+    except Exception as e:
+        logger.exception(e)
+        return "Failed"
+
+
+@shared_task(bind=True, base=QueueOnce)
+def update_char_mining_ledger(self, character_id, force_refresh=False):
+    try:
+        return update_character_mining(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"

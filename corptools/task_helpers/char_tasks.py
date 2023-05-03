@@ -1,5 +1,6 @@
 import logging
 import time
+from datetime import timedelta
 
 from allianceauth.eveonline.models import EveCorporationInfo
 from bravado import exception
@@ -13,7 +14,8 @@ from corptools.task_helpers.update_tasks import fetch_location_name
 from .. import providers
 from ..models import (CharacterAsset, CharacterAudit, CharacterContact,
                       CharacterContactLabel, CharacterLocation,
-                      CharacterMarketOrder, CharacterRoles, CharacterTitle,
+                      CharacterMarketOrder, CharacterMiningLedger,
+                      CharacterRoles, CharacterTitle,
                       CharacterWalletJournalEntry, Clone, Contract,
                       ContractItem, CorporationHistory, EveItemType,
                       EveLocation, EveName, Implant, JumpClone, LoyaltyPoint,
@@ -369,6 +371,73 @@ def update_character_assets(character_id, force_refresh=False):
     audit_char.is_active()
 
     return "CT: Finished assets for: {}".format(audit_char.character.character_name)
+
+
+def update_character_mining(character_id, force_refresh=False):
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+    logger.debug("Updating Mining for: {}".format(
+        audit_char.character.character_name))
+
+    req_scopes = ['esi-industry.read_character_mining.v1']
+
+    token = get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+    try:
+        mining_op = providers.esi.client.Industry.get_characters_character_id_mining(
+            character_id=character_id)
+
+        ledger = etag_results(mining_op, token, force_refresh=force_refresh)
+
+        _st = time.perf_counter()
+        existings_pks = set(CharacterMiningLedger.objects.filter(
+            character=audit_char, date__gte=timezone.now()-timedelta(days=30)
+        ).values_list("id", flat=True))
+        type_ids = set()
+        new_events = []
+        old_events = []
+        for event in ledger:
+
+            type_ids.add(event.get('type_id'))
+            pk = CharacterMiningLedger.create_primary_key(character_id, event)
+            _e = CharacterMiningLedger(
+                character=audit_char,
+                id=pk,
+                date=event.get('date'),
+                type_name_id=event.get('type_id'),
+                system_id=event.get('solar_system_id'),
+                quantity=event.get('quantity')
+            )
+            if pk in existings_pks:
+                old_events.append(_e)
+            else:
+                new_events.append(_e)
+
+        EveItemType.objects.create_bulk_from_esi(list(type_ids))
+
+        if len(new_events):
+            CharacterMiningLedger.objects.bulk_create(
+                new_events, ignore_conflicts=True)
+
+        if len(old_events):
+            CharacterMiningLedger.objects.bulk_update(
+                old_events, fields=['quantity'])
+
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_mining {character_id}")
+
+    except NotModifiedError:
+        logger.info("CT: No New Mining for: {}".format(
+            audit_char.character.character_name))
+        pass
+
+    audit_char.last_update_mining = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
+    return "CT: Finished Mining for: {}".format(audit_char.character.character_name)
 
 
 def get_current_ship_location(character_id, force_refresh=False):

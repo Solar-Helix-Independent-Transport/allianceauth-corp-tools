@@ -48,8 +48,6 @@ CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE', False)
 CT_CHAR_ACTIVE_IGNORE_INDUSTRY_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_INDUSTRY_MODULE', False)
-CT_CHAR_ACTIVE_IGNORE_MINING_MODULE = getattr(
-    settings, 'CT_CHAR_ACTIVE_IGNORE_MINING_MODULE', False)
 CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE', False)
 CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE = getattr(
@@ -67,6 +65,10 @@ CT_CHAR_PAUSE_CONTRACTS = getattr(settings, 'CT_CHAR_PAUSE_CONTRACTS', False)
 # New scopes so existing all will fail so lets ignore this by default.
 CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE', True)
+
+# Swap to true for a release or 2
+CT_CHAR_ACTIVE_IGNORE_MINING_MODULE = getattr(
+    settings, 'CT_CHAR_ACTIVE_IGNORE_MINING_MODULE', True)
 
 
 def get_character_scopes():
@@ -228,6 +230,11 @@ def get_character_update_attributes():
         _attribs += [
             # Notifications
             ("Notifications", 'last_update_notif'),
+        ]
+    if CT_CHAR_NOTIFICATIONS_MODULE:
+        _attribs += [
+            # Notifications
+            ("Mining", 'last_update_mining'),
         ]
 
     if CT_CHAR_ROLES_MODULE:
