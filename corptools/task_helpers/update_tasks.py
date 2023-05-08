@@ -53,7 +53,7 @@ def process_map_from_esi():
     MapRegion.objects.bulk_update(_region_models_updates, [
                                   'name', 'description'], batch_size=1000)  # bulk update
     MapRegion.objects.bulk_create(
-        _region_models_creates, batch_size=1000)  # bulk create
+        _region_models_creates, batch_size=1000, ignore_conflicts=True)  # bulk create
     # sample_mem()
     _processes = []
     _current_constellations = MapConstellation.objects.all(
@@ -74,7 +74,7 @@ def process_map_from_esi():
     MapConstellation.objects.bulk_update(_constelation_model_updates, [
                                          'name', 'region_id'], batch_size=1000)  # bulk update
     MapConstellation.objects.bulk_create(
-        _constelation_model_creates, batch_size=1000)  # bulk create
+        _constelation_model_creates, batch_size=1000, ignore_conflicts=True)  # bulk create
     # sample_mem()
     _processes = []
     _current_systems = MapSystem.objects.all().values_list('system_id', flat=True)
@@ -95,7 +95,7 @@ def process_map_from_esi():
     MapSystem.objects.bulk_update(_system_models_updates, [
                                   'name', 'constellation_id', 'star_id', 'security_class', 'x', 'y', 'z', 'security_status'], batch_size=1000)  # bulk update
     MapSystem.objects.bulk_create(
-        _system_models_creates, batch_size=1000)  # bulk update
+        _system_models_creates, batch_size=1000, ignore_conflicts=True)  # bulk update
     # sample_mem()
     _processes = []
     _gate_links_array = set(_gate_links_array)
