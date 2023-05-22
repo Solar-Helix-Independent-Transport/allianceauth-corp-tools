@@ -24,8 +24,8 @@ export const CorpStructures = () => {
 
   const valueSort = React.useMemo(
     () => (rowA, rowB, columnId, desc) => {
-      const a = rowA.values[columnId];
-      const b = rowB.values[columnId];
+      const a = rowA.values[columnId] ? rowA.values[columnId] : "0001-01-01T00:00:00Z";
+      const b = rowB.values[columnId] ? rowB.values[columnId] : "0001-01-01T00:00:00Z";
       if (a > b) return 1;
       if (b > a) return -1;
       return 0; //null at end
