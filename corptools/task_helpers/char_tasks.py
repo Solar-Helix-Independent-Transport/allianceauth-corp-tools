@@ -13,9 +13,9 @@ from corptools.task_helpers.update_tasks import fetch_location_name
 
 from .. import providers
 from ..models import (CharacterAsset, CharacterAudit, CharacterContact,
-                      CharacterContactLabel, CharacterLocation,
-                      CharacterMarketOrder, CharacterMiningLedger,
-                      CharacterRoles, CharacterTitle,
+                      CharacterContactLabel, CharacterIndustryJob,
+                      CharacterLocation, CharacterMarketOrder,
+                      CharacterMiningLedger, CharacterRoles, CharacterTitle,
                       CharacterWalletJournalEntry, Clone, Contract,
                       ContractItem, CorporationHistory, EveItemType,
                       EveLocation, EveName, Implant, JumpClone, LoyaltyPoint,
@@ -298,56 +298,15 @@ def update_character_assets(character_id, force_refresh=False):
         assets = etag_results(assets_op, token, force_refresh=force_refresh)
 
         _st = time.perf_counter()
-
+        location_names = list(
+            EveLocation.objects.all().values_list('location_id', flat=True))
         _current_type_ids = []
-
+        item_ids = []
         items = []
-        # all asset id's
-        item_ids = set()
-        for i in assets:
-            item_ids.add(i['item_id'])
-
-        # Assets with items in them
-        named_item_ids = set()
-        # Locations not an asset in this tree
-        other_location_ids = set()
-        for i in assets:
-            if i['location_id'] in item_ids:
-                named_item_ids.add(i['location_id'])
-            else:
-                other_location_ids.add(i['location_id'])
-
-        # what names do we have now?
-        location_names = EveLocation.objects.filter(
-            location_id__in=other_location_ids)
-        locations = {}
-        for n in location_names:
-            locations[n.location_id] = n
-
-        managed_systems = {}
-        for i in assets:
-            if i['item_id'] in named_item_ids:
-                pass
-
-        # calculate the asset names that are needed.
-        names = []
-        try:
-            names += providers.esi.client.Assets.post_characters_character_id_assets_names(
-                character_id=character_id, item_ids=providers.esi.chunk_ids(list(named_item_ids))).result()
-        except Exception as e:
-            logger.exception(e)
-
-        names = {name['item_id']: name['name'] for name in names.items()}
-
-        for l in named_item_ids:
-            if l in names:
-                managed_names[l] = {
-                    "name": "asdf"
-                }
-
         for item in assets:
             if item.get('type_id') not in _current_type_ids:
                 _current_type_ids.append(item.get('type_id'))
+            item_ids.append(item.get('item_id'))
             asset_item = CharacterAsset(character=audit_char,
                                         blueprint_copy=item.get(
                                             'is_blueprint_copy'),
@@ -479,6 +438,93 @@ def update_character_mining(character_id, force_refresh=False):
     audit_char.is_active()
 
     return "CT: Finished Mining for: {}".format(audit_char.character.character_name)
+
+
+def update_character_industry_jobs(character_id, force_refresh=False):
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+    logger.debug("Updating Industry Jobs for: {}".format(
+        audit_char.character.character_name))
+
+    req_scopes = ['esi-industry.read_character_jobs.v1']
+
+    token = get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+    try:
+        indy_op = providers.esi.client.Industry.get_characters_character_id_industry_jobs(
+            character_id=character_id)
+
+        jobs = etag_results(indy_op, token, force_refresh=force_refresh)
+
+        _st = time.perf_counter()
+        existing_pks = set(CharacterIndustryJob.objects.filter(
+            character=audit_char
+        ).values_list("job_id", flat=True))
+        type_ids = set()
+        new_events = []
+        old_events = []
+        for event in jobs:
+            type_ids.add(event.get('blueprint_type_id'))
+            if event.get('product_type_id'):
+                type_ids.add(event.get('product_type_id'))
+
+            _e = CharacterIndustryJob(
+                character=audit_char,
+                activity_id=event.get("activity_id"),
+                blueprint_id=event.get("blueprint_id"),
+                blueprint_location_id=event.get("blueprint_location_id"),
+                blueprint_type_id=event.get("blueprint_type_id"),
+                blueprint_type_name_id=event.get("blueprint_type_id"),
+                completed_character_id=event.get("completed_character_id"),
+                completed_date=event.get("completed_date"),
+                cost=event.get("cost"),
+                duration=event.get("duration"),
+                end_date=event.get("end_date"),
+                facility_id=event.get("facility_id"),
+                installer_id=event.get("installer_id"),
+                job_id=event.get("job_id"),
+                licensed_runs=event.get("licensed_runs"),
+                output_location_id=event.get("output_location_id"),
+                pause_date=event.get("pause_date"),
+                probability=event.get("probability"),
+                product_type_id=event.get("product_type_id"),
+                product_type_name_id=event.get("product_type_id"),
+                runs=event.get("runs"),
+                start_date=event.get("start_date"),
+                station_id=event.get("station_id"),
+                status=event.get("status"),
+                successful_runs=event.get("successful_runs")
+            )
+            if event.get('job_id') in existing_pks:
+                old_events.append(_e)
+            else:
+                new_events.append(_e)
+
+        EveItemType.objects.create_bulk_from_esi(list(type_ids))
+
+        if len(new_events):
+            CharacterMiningLedger.objects.bulk_create(
+                new_events, ignore_conflicts=True)
+
+        if len(old_events):
+            CharacterMiningLedger.objects.bulk_update(
+                old_events, fields=['completed_character_id', 'completed_date', 'end_date', 'pause_date', 'status', 'successful_runs'])
+
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_mining {character_id}")
+
+    except NotModifiedError:
+        logger.info("CT: No New Mining for: {}".format(
+            audit_char.character.character_name))
+        pass
+
+    audit_char.last_update_indy = timezone.now()
+    audit_char.save()
+    audit_char.is_active()
+
+    return "CT: Finished Industry Jobs for: {}".format(audit_char.character.character_name)
 
 
 def get_current_ship_location(character_id, force_refresh=False):

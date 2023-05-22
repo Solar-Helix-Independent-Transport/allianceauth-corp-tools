@@ -25,6 +25,7 @@ from .task_helpers.char_tasks import (update_character_assets,
                                       update_character_contacts,
                                       update_character_contract_items,
                                       update_character_contracts,
+                                      update_character_industry_jobs,
                                       update_character_location,
                                       update_character_loyaltypoints,
                                       update_character_mail_headers,
@@ -308,6 +309,10 @@ def update_character(self, char_id, force_refresh=False):
         que.append(update_char_loyaltypoints.si(
             character.character.character_id, force_refresh=force_refresh))
 
+    if app_settings.CT_CHAR_INDUSTRY_MODULE:
+        que.append(update_char_industry_jobs.si(
+            character.character.character_id, force_refresh=force_refresh))
+
     if app_settings.CT_CHAR_SKILLS_MODULE:
         # Must be last due to this being not a user level queue, Celery once will stall the queue here if characters on an account block.
         # TODO: make this better
@@ -366,6 +371,15 @@ def cache_user_skill_list(self, user_id, force_refresh=False):
     try:
         providers.skills.get_and_cache_user(
             user_id, force_rebuild=force_refresh)
+    except Exception as e:
+        logger.exception(e)
+        return "Failed"
+
+
+@shared_task(bind=True, base=QueueOnce)
+def update_char_industry_jobs(self, character_id, force_refresh=False):
+    try:
+        return update_character_industry_jobs(character_id, force_refresh=force_refresh)
     except Exception as e:
         logger.exception(e)
         return "Failed"
