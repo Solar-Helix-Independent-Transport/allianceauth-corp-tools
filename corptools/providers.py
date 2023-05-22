@@ -11,6 +11,11 @@ class CorpToolsESIClient(EsiClientProvider):
 
     # TODO create provider dummy classes for use here to not have to deal with ORM model bullshit and maybe be more async?.
 
+    @staticmethod
+    def chunk_ids(l, n=750):
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
+
     def _get_category(self, category_id, updates=False):
         from corptools.models import EveItemCategory
 

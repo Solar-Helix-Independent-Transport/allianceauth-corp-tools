@@ -298,15 +298,56 @@ def update_character_assets(character_id, force_refresh=False):
         assets = etag_results(assets_op, token, force_refresh=force_refresh)
 
         _st = time.perf_counter()
-        location_names = list(
-            EveLocation.objects.all().values_list('location_id', flat=True))
+
         _current_type_ids = []
-        item_ids = []
+
         items = []
+        # all asset id's
+        item_ids = set()
+        for i in assets:
+            item_ids.add(i['item_id'])
+
+        # Assets with items in them
+        named_item_ids = set()
+        # Locations not an asset in this tree
+        other_location_ids = set()
+        for i in assets:
+            if i['location_id'] in item_ids:
+                named_item_ids.add(i['location_id'])
+            else:
+                other_location_ids.add(i['location_id'])
+
+        # what names do we have now?
+        location_names = EveLocation.objects.filter(
+            location_id__in=other_location_ids)
+        locations = {}
+        for n in location_names:
+            locations[n.location_id] = n
+
+        managed_systems = {}
+        for i in assets:
+            if i['item_id'] in named_item_ids:
+                pass
+
+        # calculate the asset names that are needed.
+        names = []
+        try:
+            names += providers.esi.client.Assets.post_characters_character_id_assets_names(
+                character_id=character_id, item_ids=providers.esi.chunk_ids(list(named_item_ids))).result()
+        except Exception as e:
+            logger.exception(e)
+
+        names = {name['item_id']: name['name'] for name in names.items()}
+
+        for l in named_item_ids:
+            if l in names:
+                managed_names[l] = {
+                    "name": "asdf"
+                }
+
         for item in assets:
             if item.get('type_id') not in _current_type_ids:
                 _current_type_ids.append(item.get('type_id'))
-            item_ids.append(item.get('item_id'))
             asset_item = CharacterAsset(character=audit_char,
                                         blueprint_copy=item.get(
                                             'is_blueprint_copy'),

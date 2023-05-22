@@ -23,13 +23,12 @@ export const CorpStructures = () => {
   });
 
   const valueSort = React.useMemo(
-    () => (rowA, rowB, columnId) => {
+    () => (rowA, rowB, columnId, desc) => {
       const a = rowA.values[columnId];
       const b = rowB.values[columnId];
-      if ((a === null) | (b === null)) {
-        return 1; //null at end
-      }
-      return a > b ? 1 : -1;
+      if (a > b) return 1;
+      if (b > a) return -1;
+      return 0; //null at end
     },
     []
   );
@@ -131,7 +130,18 @@ export const CorpStructures = () => {
         Header: "Fuel Expiry",
         accessor: "fuel_expiry",
         sortType: valueSort,
-        Cell: (props) => <div>{props.value ? <ReactTimeAgo date={props.value} /> : ""}</div>,
+        Cell: (props) => (
+          <div>
+            {props.value ? (
+              <>
+                {/* {props.value}<br/> */}
+                <ReactTimeAgo date={props.value} />
+              </>
+            ) : (
+              ""
+            )}
+          </div>
+        ),
       },
       {
         Header: "State",
@@ -193,7 +203,18 @@ export const CorpStructures = () => {
         },
         Cell: (props) =>
           props.value ? (
-            <div className="text-center">
+            <div
+              className="text-center"
+              style={{
+                maxWidth: "300px",
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                alignContent: "center",
+                justifyContent: "center",
+                flexDirection: "row",
+              }}
+            >
               {props.value.map((service) => {
                 return (
                   <Label
