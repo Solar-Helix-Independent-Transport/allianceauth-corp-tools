@@ -454,7 +454,7 @@ def update_character_industry_jobs(character_id, force_refresh=False):
         return "No Tokens"
     try:
         indy_op = providers.esi.client.Industry.get_characters_character_id_industry_jobs(
-            character_id=character_id)
+            character_id=character_id, include_completed=True)
 
         jobs = etag_results(indy_op, token, force_refresh=force_refresh)
 
@@ -505,11 +505,11 @@ def update_character_industry_jobs(character_id, force_refresh=False):
         EveItemType.objects.create_bulk_from_esi(list(type_ids))
 
         if len(new_events):
-            CharacterMiningLedger.objects.bulk_create(
+            CharacterIndustryJob.objects.bulk_create(
                 new_events, ignore_conflicts=True)
 
         if len(old_events):
-            CharacterMiningLedger.objects.bulk_update(
+            CharacterIndustryJob.objects.bulk_update(
                 old_events, fields=['completed_character_id', 'completed_date', 'end_date', 'pause_date', 'status', 'successful_runs'])
 
         logger.debug(

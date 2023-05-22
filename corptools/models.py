@@ -737,7 +737,7 @@ class CharacterIndustryJob(models.Model):
     cost = models.DecimalField(
         max_digits=20, decimal_places=2, default=None, null=True, blank=True)
     duration = models.IntegerField()
-    end_date = models.IntegerField()
+    end_date = models.DateTimeField()
     facility_id = models.BigIntegerField()
     installer_id = models.IntegerField()
     job_id = models.IntegerField()
