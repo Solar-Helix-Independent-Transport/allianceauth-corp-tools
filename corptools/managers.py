@@ -156,7 +156,7 @@ class EvePlanetManager(models.Manager):
         try:
             response = providers.esi._get_planet(planet_id, False)
             entity, created = self.update_or_create(
-                moon_id=response.planet_id,
+                planet_id=response.planet_id,
                 defaults={
                     'system_id': response.system_id,
                     'name': response.name,
