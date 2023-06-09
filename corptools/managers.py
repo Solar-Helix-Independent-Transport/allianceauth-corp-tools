@@ -120,7 +120,6 @@ class EveMoonManager(models.Manager):
 
     def update_or_create_from_esi(self, moon_id):
         """updates or create with ESI"""
-        from corptools.models import MapSystemMoon
 
         try:
             response = providers.esi._get_moon(moon_id, False)
@@ -136,6 +135,38 @@ class EveMoonManager(models.Manager):
             )
         except Exception as e:
             logger.exception('ESI Error id {} - {}'.format(moon_id, e))
+            raise e
+        return entity, created
+
+
+class EvePlanetManager(models.Manager):
+
+    def get_or_create_from_esi(self, planet_id):
+        """gets or creates with ESI"""
+        try:
+            entity = self.get(planet_id=planet_id)
+            created = False
+        except ObjectDoesNotExist:
+            entity, created = self.update_or_create_from_esi(planet_id)
+        return entity, created
+
+    def update_or_create_from_esi(self, planet_id):
+        """updates or create with ESI"""
+
+        try:
+            response = providers.esi._get_planet(planet_id, False)
+            entity, created = self.update_or_create(
+                moon_id=response.planet_id,
+                defaults={
+                    'system_id': response.system_id,
+                    'name': response.name,
+                    'x': response.x,
+                    'y': response.y,
+                    'z': response.z
+                }
+            )
+        except Exception as e:
+            logger.exception('ESI Error id {} - {}'.format(planet_id, e))
             raise e
         return entity, created
 

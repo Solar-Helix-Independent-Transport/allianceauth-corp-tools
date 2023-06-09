@@ -155,6 +155,26 @@ class CorpToolsESIClient(EsiClientProvider):
         else:
             return moon
 
+    def _get_planet(self, planet_id, updates):
+        from corptools.models import MapSystemPlanet
+
+        planet = self.client.Universe.get_universe_planets_planet_id(
+            planet_id=planet_id).result()
+        planet = MapSystemPlanet(planet_id=planet_id,
+                                 name=planet.get('name'),
+                                 system_id=planet.get('system_id', None),
+                                 x=planet.get('position', {}).get('x'),
+                                 y=planet.get('position', {}).get('y'),
+                                 z=planet.get('position', {}).get('z'),
+                                 )
+        if updates is not False:
+            if planet_id in updates:
+                return planet, False
+            else:
+                return False, planet
+        else:
+            return planet
+
     def _get_stargate(self, gate_id):
         gate = self.client.Universe.get_universe_stargates_stargate_id(
             stargate_id=gate_id).result()

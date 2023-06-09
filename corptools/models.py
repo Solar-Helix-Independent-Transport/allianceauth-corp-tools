@@ -23,7 +23,7 @@ from pyexpat import model
 from . import app_settings, providers, validators
 from .managers import (AuditCharacterManager, AuditCorporationManager,
                        EveCategoryManager, EveGroupManager, EveItemTypeManager,
-                       EveMoonManager, EveNameManager)
+                       EveMoonManager, EveNameManager, EvePlanetManager)
 
 logger = logging.getLogger(__name__)
 
@@ -354,6 +354,8 @@ class MapSystemGate(models.Model):
 
 
 class MapSystemPlanet(models.Model):
+    objects = EvePlanetManager()
+
     planet_id = models.IntegerField(primary_key=True)
     system = models.ForeignKey(
         MapSystem, on_delete=models.CASCADE, related_name="planet")
