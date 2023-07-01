@@ -1,10 +1,11 @@
 import json
+import xml.etree.ElementTree as ET
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
-import xml.etree.ElementTree as ET
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import redirect, render
+from django.template import TemplateDoesNotExist
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
@@ -348,7 +349,10 @@ def react_menu(request):
 @login_required
 def react_main(request, character_id):
     # get available models
-    return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
+    try:
+        return render(request, 'corptools/base_bs5.html', context={"version": __version__, "app_name": "corptools/bs5", "page_title": "Audit"})
+    except TemplateDoesNotExist:
+        return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
 
 
 @login_required

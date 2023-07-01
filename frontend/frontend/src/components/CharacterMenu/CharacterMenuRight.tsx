@@ -9,10 +9,21 @@ const menuRoot = document.getElementById("nav-right");
 
 const CharMenuRight = () => {
   const isLoading = useIsFetching();
+  const [innerHtmlEmptied, setInnerHtmlEmptied] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!innerHtmlEmptied) {
+      if (menuRoot) {
+        menuRoot.innerHTML = "";
+        setInnerHtmlEmptied(true);
+      }
+    }
+  }, [innerHtmlEmptied]);
+
+  if (!innerHtmlEmptied) return null;
   if (!menuRoot) {
     return <></>;
   }
-
   return ReactDOM.createPortal(
     <>
       {isLoading ? (

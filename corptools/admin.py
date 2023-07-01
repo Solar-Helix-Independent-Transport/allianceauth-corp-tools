@@ -278,3 +278,4 @@ if 'securegroups' in settings.INSTALLED_APPS:
     if app_settings.CT_CHAR_ROLES_MODULE:
         admin.site.register(models.Titlefilter, titleFilterAdmin)
         admin.site.register(models.Rolefilter, rolesFilterAdmin)
+    admin.site.register(models.HighestSPFilter)

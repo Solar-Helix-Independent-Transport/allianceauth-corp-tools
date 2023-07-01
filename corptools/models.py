@@ -1236,6 +1236,54 @@ class FullyLoadedFilter(FilterBase):
         return output
 
 
+class HighestSPFilter(FilterBase):
+    sp_cutoff = models.BigIntegerField(default=5000000000)
+    swap_logic = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "Smart Filter: Highest SP Character"
+        verbose_name_plural = f"{verbose_name}"
+
+    def process_filter(self, user: User):
+        try:
+            return self.audit_filter([user])[user.id]['check']
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False
+
+    def audit_filter(self, users):
+        co = CharacterOwnership.objects.filter(
+            user__in=users).select_related('user', 'character')
+        chars = {}
+        all_sp = SkillTotals.objects.filter(
+            character__character__in=co.values_list('character'))
+    # total_sp = models.BigIntegerField()
+    # unallocated_sp = models.IntegerField(null=True, default=None)
+
+        failure = self.swap_logic
+        for i in all_sp:
+            uid = i.character.character.character_ownership.user.id
+            tsp = i.total_sp
+            if i.unallocated_sp:
+                tsp += i.unallocated_sp
+
+            if uid not in chars:
+                chars[uid] = tsp
+            elif tsp > chars[uid]:
+                chars[uid] = tsp
+
+        output = defaultdict(lambda: {"message": 0, "check": False})
+        for u in users:
+            c = chars.get(u.id, 0)
+            if c < self.sp_cutoff:
+                output[u.id] = {"message": c, "check": failure}
+                continue
+            else:
+                output[u.id] = {"message": c, "check": not failure}
+                continue
+        return output
+
+
 class TimeInCorpFilter(FilterBase):
     class Meta:
         verbose_name = "Smart Filter: Main's Time in Corp"
@@ -1483,7 +1531,7 @@ class Skillfilter(FilterBase):
                     for d_name, d_list in skill_list_base.items():
                         if len(skill_tables[char]["doctrines"][d_name]) == 0:
                             skill_list_base[d_name]['pass'] = True
-                            message.append("{}:{}".format(char, d_name))
+                            message.append("{}: {}".format(char, d_name))
 
                 if req_one.count() > 0:
                     single_pass = False
@@ -1491,7 +1539,7 @@ class Skillfilter(FilterBase):
                         for d_name, d_list in skill_list_single.items():
                             if len(skill_tables[char]["doctrines"][d_name]) == 0:
                                 single_pass = True
-                                message.append("{}:{}".format(char, d_name))
+                                message.append("{}: {}".format(char, d_name))
                                 break
 
                 result = True

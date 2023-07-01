@@ -1,3 +1,5 @@
+from django import template
+from django.template.defaultfilters import stringfilter
 from django.template.defaulttags import register
 from django.utils.safestring import mark_safe
 
@@ -57,3 +59,13 @@ def standing_span(standing):
             return mark_safe('<span class="label label-danger">{}</span>'.format(standing))
     else:
         return mark_safe('<span class="label label-default">{}</span>'.format(standing))
+
+
+@register.filter
+@stringfilter
+def template_exists(value):
+    try:
+        template.loader.get_template(value)
+        return True
+    except template.TemplateDoesNotExist:
+        return False
