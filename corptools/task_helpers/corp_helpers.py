@@ -384,6 +384,8 @@ def update_corp_structures(corp_id):  # pagnated results
     try:
         structures = etag_results(operation, token)
     except NotModifiedError:
+        _corporation.last_update_structures = timezone.now()
+        _corporation.save()
         return "No New structure data for: {0}".format(_corporation)
 
     for structure in structures:
@@ -413,6 +415,7 @@ def update_corp_structures(corp_id):  # pagnated results
     Structure.objects.filter(corporation=_corporation).exclude(
         structure_id__in=structure_ids).delete()  # structures die/leave
 
+    _corporation.last_change_structures = timezone.now()
     _corporation.last_update_structures = timezone.now()
     _corporation.save()
 

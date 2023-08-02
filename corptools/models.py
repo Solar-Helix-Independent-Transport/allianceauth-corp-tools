@@ -171,32 +171,32 @@ class CorporationAudit(models.Model):
 
     last_update_pub_data = models.DateTimeField(
         null=True, default=None, blank=True)
-    cache_expire_pub_data = models.DateTimeField(
+    last_change_pub_data = models.DateTimeField(
         null=True, default=None, blank=True)
 
     last_update_assets = models.DateTimeField(
         null=True, default=None, blank=True)
-    cache_expire_assets = models.DateTimeField(
+    last_change_assets = models.DateTimeField(
         null=True, default=None, blank=True)
 
     last_update_structures = models.DateTimeField(
         null=True, default=None, blank=True)
-    cache_expire_structures = models.DateTimeField(
+    last_change_structures = models.DateTimeField(
         null=True, default=None, blank=True)
 
     last_update_moons = models.DateTimeField(
         null=True, default=None, blank=True)
-    cache_expire_moons = models.DateTimeField(
+    last_change_moons = models.DateTimeField(
         null=True, default=None, blank=True)
 
     last_update_observers = models.DateTimeField(
         null=True, default=None, blank=True)
-    cache_expire_observers = models.DateTimeField(
+    last_change_observers = models.DateTimeField(
         null=True, default=None, blank=True)
 
     last_update_wallet = models.DateTimeField(
         null=True, default=None, blank=True)
-    cache_expire_wallet = models.DateTimeField(
+    last_change_wallet = models.DateTimeField(
         null=True, default=None, blank=True)
 
     def __str__(self):
@@ -950,8 +950,8 @@ class Structure(models.Model):
             corps_holding = CorptoolsConfiguration.objects.get(
                 id=1).holding_corp_qs()
             corps_vis = corps_vis | corps_holding
-
-        return cls.objects.filter(corporation__in=corps_vis)
+        update_time_filter = timezone.now() - datetime.timedelta(days=14)
+        return cls.objects.filter(corporation__in=corps_vis, corporation__last_update_structures__gte=update_time_filter)
 
 
 class StructureService(models.Model):
