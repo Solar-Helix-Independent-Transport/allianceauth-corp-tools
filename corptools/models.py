@@ -1177,6 +1177,7 @@ class FilterBase(models.Model):
 class FullyLoadedFilter(FilterBase):
     reversed_logic = models.BooleanField(
         default=False, help_text="If set all members WITHOUT audit fully loaded will pass the test.")
+    count_message_only = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Smart Filter: Audit Fully Loaded"
@@ -1226,7 +1227,10 @@ class FullyLoadedFilter(FilterBase):
             c = chars.get(u.id, False)
             if c is not False:
                 if len(c) > 0:
-                    output[u.id] = {"message": ", ".join(c), "check": logic}
+                    _msg = ", ".join(c)
+                    if self.count_message_only:
+                        _msg = len(c)
+                    output[u.id] = {"message": _msg, "check": logic}
                     continue
                 else:
                     output[u.id] = {
@@ -1338,6 +1342,7 @@ class AssetsFilter(FilterBase):
     class Meta:
         verbose_name = "Smart Filter: Assets in Locations"
         verbose_name_plural = verbose_name
+    count_message_only = models.BooleanField(default=False)
 
     types = models.ManyToManyField(EveItemType, blank=True,
                                    help_text="Filter on Asset Types.")
@@ -1429,18 +1434,22 @@ class AssetsFilter(FilterBase):
             asset_type = c['type_name__name']
             if char_name not in chars[uid]:
                 chars[uid][char_name] = []
-            if asset_type not in chars[uid][char_name]:
-                chars[uid][char_name].append(asset_type)
+            chars[uid][char_name].append(asset_type)
 
         output = defaultdict(lambda: {"message": "", "check": False})
         for u in users:
-
             if len(chars[u.id]) > 0:
+                dread_count = 0
                 out_message = []
                 for char, char_items in chars[u.id].items():
-                    out_message.append(f"{char}: {', '.join(char_items)}")
-                output[u.id] = {"message": "<br>".join(
-                    out_message), "check": True}
+                    dread_count += len(char_items)
+                    out_message.append(
+                        f"{char}: {', '.join(list(set(char_items)))}")
+                if self.count_message_only:
+                    output[u.id] = {"message": dread_count, "check": True}
+                else:
+                    output[u.id] = {"message": "<br>".join(
+                        out_message), "check": True}
             else:
                 output[u.id] = {"message": "", "check": False}
         return output
@@ -1450,6 +1459,8 @@ class Skillfilter(FilterBase):
     class Meta:
         verbose_name = "Smart Filter: Skill list checks"
         verbose_name_plural = verbose_name
+
+    count_message_only = models.BooleanField(default=False)
 
     required_skill_lists = models.ManyToManyField(SkillList, blank=True)
     single_req_skill_lists = models.ManyToManyField(
@@ -1545,12 +1556,15 @@ class Skillfilter(FilterBase):
                 result = True
                 for skill_list, skills_result in skill_list_base.items():
                     result = result and skills_result['pass']
+                _msg = "<br>".join(message)
+                if self.count_message_only:
+                    _msg = len(message)
                 if req_one.count() > 0:
                     output[uid] = {'check': result and single_pass,
-                                   'message': "<br>".join(message)}
+                                   'message': _msg}
                 else:
                     output[uid] = {'check': result,
-                                   'message': "<br>".join(message)}
+                                   'message': _msg}
             except KeyError:
                 pass
 

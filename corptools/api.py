@@ -1366,7 +1366,8 @@ def get_character_doctrines(request, character_id: int):
 
     skilllists = providers.skills.get_and_cache_user(
         main.character_ownership.user_id)
-
+    visibles = list(models.SkillList.objects.filter(
+        show_on_audit=True).values_list("name", flat=True))
     output = {}
     for c in characters:
         output[c.character_id] = {
@@ -1376,7 +1377,10 @@ def get_character_doctrines(request, character_id: int):
         }
 
     for k, s in skilllists['skills_list'].items():
-        output[s['character_id']]["doctrines"] = s["doctrines"]
+        for k, d in s["doctrines"].items():
+            # filter out hidden items
+            if k in visibles:
+                output[s['character_id']]["doctrines"][k] = d
         output[s['character_id']]["skills"] = s["skills"]
 
     return list(output.values())
