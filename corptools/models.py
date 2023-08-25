@@ -128,8 +128,10 @@ class CharacterAudit(models.Model):
     def is_active(self):
         time_ref = timezone.now() - datetime.timedelta(days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS)
         try:
-            is_active = (self.last_update_pub_data > time_ref)
-
+            is_active = True
+            if app_settings.CT_CHAR_ACTIVE_IGNORE_CORP_HISTORY:
+                is_active = is_active and (
+                    self.last_update_pub_data > time_ref)
             if app_settings.CT_CHAR_ASSETS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE:
                 is_active = is_active and (self.last_update_assets > time_ref)
             if app_settings.CT_CHAR_CLONES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE:

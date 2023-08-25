@@ -29,7 +29,8 @@ CT_CHAR_OPPORTUNITIES = getattr(settings, 'CT_CHAR_OPPORTUNITIES', True)
 CT_CHAR_LOYALTYPOINTS_MODULE = getattr(
     settings, 'CT_CHAR_LOYALTYPOINTS_MODULE', True)
 
-
+CT_CHAR_ACTIVE_IGNORE_CORP_HISTORY = getattr(
+    settings, 'CT_CHAR_ACTIVE_IGNORE_CORP_HISTORY', True)
 CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE', False)
 CT_CHAR_ACTIVE_IGNORE_STANDINGS_MODULE = getattr(
@@ -60,6 +61,7 @@ CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE', False)
 CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE', False)
+
 CT_CHAR_PAUSE_CONTRACTS = getattr(settings, 'CT_CHAR_PAUSE_CONTRACTS', False)
 
 # New scopes so existing all will fail so lets ignore this by default.

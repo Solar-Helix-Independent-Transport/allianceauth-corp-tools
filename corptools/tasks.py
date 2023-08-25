@@ -187,11 +187,30 @@ def update_subset_of_characters(self, subset=48, min_runs=5, force=False):
         CharacterAudit.objects.all().count()/subset, min_runs)
     characters = CharacterAudit.objects.all().order_by(
         'last_update_pub_data')[:amount_of_updates]
+    char_ids = []
     for char in characters:
+        char_ids.append(char.character.character_id)
         update_character.apply_async(args=[char.character.character_id], kwargs={
                                      "force_refresh": force})
     update_all_eve_names.apply_async(priority=7, kwargs={"chunk": 5000})
+    process_corp_histories.apply_async(args=[char_ids], priority=6)
     return f"Queued {len(characters)} Character Updates"
+
+
+@shared_task()
+def re_que_corp_histories(character_ids):
+    process_corp_histories.apply_async(args=[character_ids], priority=6)
+
+
+@shared_task(bind=True, base=QueueOnce)
+def process_corp_histories(self, character_ids):
+    if len(character_ids):
+        cid = character_ids.pop()
+        update_char_corp_history(cid)
+        re_que_corp_histories.apply_async(args=[character_ids], countdown=1)
+        return f"{len(character_ids)} Character histories still to Fetch"
+    else:
+        return "Completed"
 
 
 @shared_task
@@ -233,8 +252,10 @@ def update_character(self, char_id, force_refresh=False):
 
     que = []
 
-    que.append(update_char_corp_history.si(
-        character.character.character_id, force_refresh=force_refresh))
+    # TODO review this later
+    if force_refresh:
+        que.append(update_char_corp_history.si(
+            character.character.character_id, force_refresh=force_refresh))
 
     mindt = timezone.now() - datetime.timedelta(days=90)
 
