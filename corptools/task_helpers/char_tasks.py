@@ -470,6 +470,18 @@ def update_character_industry_jobs(character_id, force_refresh=False):
             if event.get('product_type_id'):
                 type_ids.add(event.get('product_type_id'))
 
+            if event.get('job_id') in existing_pks:
+                _m = CharacterIndustryJob.objects.get(
+                    character=audit_char, job_id=event.get("job_id"))
+                _m.completed_character_id = event.get("completed_character_id")
+                _m.completed_date = event.get("completed_date")
+                _m.end_date = event.get("end_date")
+                _m.pause_date = event.get("pause_date")
+                _m.status = event.get("status")
+                _m.successful_runs = event.get("successful_runs")
+                _m.save()
+                continue
+
             _e = CharacterIndustryJob(
                 character=audit_char,
                 activity_id=event.get("activity_id"),
@@ -497,10 +509,7 @@ def update_character_industry_jobs(character_id, force_refresh=False):
                 status=event.get("status"),
                 successful_runs=event.get("successful_runs")
             )
-            if event.get('job_id') in existing_pks:
-                old_events.append(_e)
-            else:
-                new_events.append(_e)
+            new_events.append(_e)
 
         EveItemType.objects.create_bulk_from_esi(list(type_ids))
 
@@ -508,15 +517,11 @@ def update_character_industry_jobs(character_id, force_refresh=False):
             CharacterIndustryJob.objects.bulk_create(
                 new_events, ignore_conflicts=True)
 
-        if len(old_events):
-            CharacterIndustryJob.objects.bulk_update(
-                old_events, fields=['completed_character_id', 'completed_date', 'end_date', 'pause_date', 'status', 'successful_runs'])
-
         logger.debug(
-            f"CT_TIME: {time.perf_counter()-_st} update_character_mining {character_id}")
+            f"CT_TIME: {time.perf_counter()-_st} update_character_industry_jobs {character_id}")
 
     except NotModifiedError:
-        logger.info("CT: No New Mining for: {}".format(
+        logger.info("CT: No New Industry for: {}".format(
             audit_char.character.character_name))
         pass
 
