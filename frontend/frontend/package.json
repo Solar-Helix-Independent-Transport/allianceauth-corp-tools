@@ -5,6 +5,7 @@
   "dependencies": {
     "@agney/react-loading": "^0.1.2",
     "@faker-js/faker": "^7.6.0",
+    "@pvyparts/allianceauth-components": "^2.0.0",
     "@tanstack/match-sorter-utils": "^8.7.6",
     "@tanstack/react-table": "^8.7.6",
     "@testing-library/jest-dom": "^5.16.5",
@@ -81,7 +82,7 @@
     "@storybook/testing-library": "^0.0.13",
     "babel-plugin-named-exports-order": "^0.0.2",
     "prop-types": "^15.8.1",
-    "storybook-addon-react-router-v6": "^0.2.1",
+    "storybook-addon-react-router-v6": "^2.0.0",
     "webpack": "^5.75.0"
   },
   "proxy": "http://localhost:8000"

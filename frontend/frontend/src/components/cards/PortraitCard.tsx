@@ -1,5 +1,5 @@
-import { CharacterAllegiancePortrait } from "../eveImages/eveImages";
 import styles from "./PortraitCard.module.css";
+import { CharacterAllegiancePortrait } from "@pvyparts/allianceauth-components";
 import React from "react";
 import { Card } from "react-bootstrap";
 import Row from "react-bootstrap/Row";

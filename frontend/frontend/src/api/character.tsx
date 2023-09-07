@@ -27,6 +27,15 @@ export async function loadCharacterStatus(character_id: any) {
   return data;
 }
 
+export async function loadPubData(character_id: any) {
+  const api = await axios.get(`/audit/api/account/${character_id}/pubdata`);
+  console.log(`get pubdata in api ${character_id}`);
+  let data = {
+    characters: api.data,
+  };
+  return data;
+}
+
 export async function postAccountRefresh(character_id: any) {
   console.log(`sent account refresh ${character_id}`);
   const api = await axios.post(

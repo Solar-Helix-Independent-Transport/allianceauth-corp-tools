@@ -1,5 +1,6 @@
 import { loadCharacterStatus } from "../../api/character";
-import CharacterStatusTable from "../../components/CharacterStatusTable";
+import CharacterStatusPanels from "../../components/character/CharacterStatusPanels";
+import CharacterStatusTable from "../../components/character/CharacterStatusTable";
 import React from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
@@ -16,9 +17,10 @@ const CharacterStatus = () => {
   );
 
   return (
-    <div className="d-flex justify-content-center align-items-center flex-row flex-wrap">
-      <CharacterStatusTable {...{ isFetching }} data={data?.characters} />
-    </div>
+    <>
+      {/* <CharacterStatusPanels {...{ isFetching }} data={data} /> */}
+      <CharacterStatusTable {...{ isFetching }} data={data} />
+    </>
   );
 };
 

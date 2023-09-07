@@ -1,8 +1,7 @@
-import { CollapseBlock } from "./Helpers/CollapseBlock";
-import { BaseTable } from "./baseTable/baseTable";
-import { PortraitCard } from "./cards/PortraitCard";
+import { CollapseBlock } from "../Helpers/CollapseBlock";
+import { BaseTable, PanelLoader } from "@pvyparts/allianceauth-components";
 import React from "react";
-import { Badge, Card, Table } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 
 const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
   const columns = React.useMemo(() => {
@@ -70,7 +69,10 @@ const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boo
     ];
     return cols;
   }, []);
-  return <>{data ? <BaseTable {...{ data, isFetching, columns }} /> : <>Loading</>}</>;
+  if (!data) {
+    return <PanelLoader message="Loading Please Wait!" />;
+  }
+  return <BaseTable data={data?.characters} {...{ isFetching, columns }} />;
 };
 
 export default CharacterStatusTable;

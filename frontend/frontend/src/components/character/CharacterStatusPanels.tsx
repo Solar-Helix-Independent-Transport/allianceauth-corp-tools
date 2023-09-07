@@ -1,17 +1,13 @@
-import { loadCharacterStatus } from "../api/character";
-import { CollapseBlock } from "./Helpers/CollapseBlock";
-import { PortraitCard } from "./cards/PortraitCard";
+import { loadCharacterStatus } from "../../api/character";
+import { CollapseBlock } from "../Helpers/CollapseBlock";
+import { PortraitCard } from "../cards/PortraitCard";
 import React from "react";
 import { Badge, Card, Table } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
-const CharacterStatus = () => {
-  let { characterID } = useParams();
-
-  const { data } = useQuery(["status", characterID], () => loadCharacterStatus(characterID), {
-    refetchOnWindowFocus: false,
-  });
+const CharacterStatus = ({ data }: { data: any }) => {
+  if (!data) return <p>Loading</p>;
 
   return (
     <div className="d-flex justify-content-center align-items-center flex-row flex-wrap">
