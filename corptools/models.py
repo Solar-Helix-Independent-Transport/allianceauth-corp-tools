@@ -991,6 +991,17 @@ class Poco(models.Model):
     system_name = models.ForeignKey(
         MapSystem, on_delete=models.SET_NULL, null=True, default=None)
 
+    @classmethod
+    def get_visible(cls, user):
+        corps_vis = CorporationAudit.objects.visible_to(user)
+        if user.has_perm("corptools.holding_corp_structures"):
+            corps_holding = CorptoolsConfiguration.objects.get(
+                id=1).holding_corp_qs()
+            corps_vis = corps_vis | corps_holding
+        #update_time_filter = timezone.now() - datetime.timedelta(days=7)
+        # , corporation__last_update_pocos__gte=update_time_filter)
+        return cls.objects.filter(corporation__in=corps_vis)
+
 
 class StructureService(models.Model):
     structure = models.ForeignKey(Structure, on_delete=models.CASCADE)

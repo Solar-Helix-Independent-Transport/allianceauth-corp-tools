@@ -214,7 +214,7 @@ def update_corporation_transactions(corp_id, wallet_division, full_update=False)
     return "CT: Finished market transactions for: {}".format(audit_char.character.character_name)
 
 
-def update_corporation_pocos(corp_id, full_update=True):
+def update_corporation_pocos(corp_id, full_update=False):
     audit_corp = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
 
@@ -300,7 +300,8 @@ def update_corporation_pocos(corp_id, full_update=True):
                 }
             )
 
-        Poco.objects.all().exclude(office_id__in=_all_ids).delete()
+        Poco.objects.filter(corporation=audit_corp).exclude(
+            office_id__in=_all_ids).delete()
 
     except NotModifiedError:
         logger.info("CT: No New Poco data for: {}".format(
