@@ -300,6 +300,8 @@ def update_corporation_pocos(corp_id, full_update=True):
                 }
             )
 
+        Poco.objects.all().exclude(office_id__in=_all_ids).delete()
+
     except NotModifiedError:
         logger.info("CT: No New Poco data for: {}".format(
             audit_corp.corporation.corporation_name))
