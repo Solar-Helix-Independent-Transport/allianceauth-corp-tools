@@ -26,6 +26,9 @@ const CorpMenu = () => {
           <NavLink key="assetlists" href={`#/assetlist`}>
             Asset List
           </NavLink>
+          <NavLink key="Pocos" href={`#/pocos`}>
+            Pocos
+          </NavLink>
           <NavDropdown title="Dashboards">
             <NavLink key="bridges" href={`#/bridges`}>
               Bridges

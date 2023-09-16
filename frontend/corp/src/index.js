@@ -2,6 +2,7 @@ import CorpMenu from "./components/CorpMenu";
 import CorpAssetLists from "./pages/AssetList";
 import CorpAssets from "./pages/Assets";
 import { Bridges } from "./pages/Bridges";
+import { CorpPocos } from "./pages/Pocos";
 import { Sov } from "./pages/Sov";
 import CorpStatus from "./pages/Status";
 import { CorpStructures } from "./pages/Structures";
@@ -26,6 +27,7 @@ ReactDOM.render(
           <Switch>
             <Route exact path={["", "/structures"]} component={() => CorpStructures()} />
             <Route path={"/wallets"} component={() => CorpWallet()} />
+            <Route path={"/pocos"} component={() => CorpPocos()} />
             <Route path={"/status"} component={() => CorpStatus()} />
             <Route path={"/assetgroup"} component={() => CorpAssets()} />
             <Route path={"/assetlist"} component={() => CorpAssetLists()} />
