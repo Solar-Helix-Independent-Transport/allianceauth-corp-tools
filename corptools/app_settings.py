@@ -253,6 +253,12 @@ def get_character_update_attributes():
             ("Orders", 'last_update_orders'),
         ]
 
+    if CT_CHAR_INDUSTRY_MODULE:
+        _attribs += [
+            # Roles
+            ("Industry", 'last_update_indy'),
+        ]
+
     if CT_CHAR_LOYALTYPOINTS_MODULE:
         _attribs += [
             ("LP", 'last_update_loyaltypoints'),
@@ -336,6 +342,10 @@ _corp_scopes_wallets = [
 # assets
 _corp_scopes_assets = [
     'esi-assets.read_corporation_assets.v1',
+]
+
+_corp_scopes_pocos = [
+    'esi-planets.read_customs_offices.v1',
 ]
 
 

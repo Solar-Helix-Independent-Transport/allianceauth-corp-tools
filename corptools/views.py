@@ -84,6 +84,7 @@ def add_corp_section(request, *args, **kwargs):
     structures = request.GET.get('s', False)
     wallets = request.GET.get('w', False)
     moons = request.GET.get('m', False)
+    pocos = request.GET.get('p', False)
 
     # if we're coming back from SSO with a new token, return it
     token = _check_callback(request)
@@ -118,7 +119,11 @@ def add_corp_section(request, *args, **kwargs):
     if wallets:
         scopes += app_settings._corp_scopes_wallets
 
-    if assets:
+    if assets and not pocos:
+        scopes += app_settings._corp_scopes_assets
+
+    if pocos:
+        scopes += app_settings._corp_scopes_pocos
         scopes += app_settings._corp_scopes_assets
 
     # user has selected to add a new token

@@ -956,6 +956,42 @@ class Structure(models.Model):
         return cls.objects.filter(corporation__in=corps_vis, corporation__last_update_structures__gte=update_time_filter)
 
 
+class Poco(models.Model):
+    corporation = models.ForeignKey(
+        CorporationAudit, on_delete=models.CASCADE, related_name='ct_poco')
+
+    office_id = models.BigIntegerField()
+
+    standing_level = models.CharField(max_length=50)
+
+    alliance_tax_rate = models.FloatField(null=True, default=None)
+    corporation_tax_rate = models.FloatField(null=True, default=None)
+
+    terrible_standing_tax_rate = models.FloatField(null=True, default=None)
+    bad_standing_tax_rate = models.FloatField(null=True, default=None)
+    neutral_standing_tax_rate = models.FloatField(null=True, default=None)
+    good_standing_tax_rate = models.FloatField(null=True, default=None)
+    excellent_standing_tax_rate = models.FloatField(null=True, default=None)
+
+    reinforce_exit_end = models.IntegerField()
+    reinforce_exit_start = models.IntegerField()
+
+    standing_level = models.CharField(max_length=150, null=True, default=None)
+
+    allow_access_with_standings = models.BooleanField(null=True, default=None)
+    allow_alliance_access = models.BooleanField(null=True, default=None)
+
+    system_id = models.IntegerField()
+
+    name = models.CharField(max_length=150, null=True,
+                            default=None, blank=True)
+
+    planet = models.ForeignKey(
+        MapSystemPlanet, on_delete=models.SET_NULL, null=True, default=None)
+    system_name = models.ForeignKey(
+        MapSystem, on_delete=models.SET_NULL, null=True, default=None)
+
+
 class StructureService(models.Model):
     structure = models.ForeignKey(Structure, on_delete=models.CASCADE)
 

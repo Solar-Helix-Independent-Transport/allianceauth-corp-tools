@@ -18,8 +18,8 @@ from corptools.task_helpers.update_tasks import fetch_location_name
 from .. import providers
 from ..models import (BridgeOzoneLevel, CorpAsset, CorporationAudit,
                       CorporationWalletDivision, CorporationWalletJournalEntry,
-                      EveItemType, EveLocation, EveName, Structure,
-                      StructureCelestial, StructureService)
+                      EveItemType, EveLocation, EveName, MapSystemPlanet, Poco,
+                      Structure, StructureCelestial, StructureService)
 
 logger = logging.getLogger(__name__)
 
@@ -212,6 +212,100 @@ def update_corporation_transactions(corp_id, wallet_division, full_update=False)
         pass
 
     return "CT: Finished market transactions for: {}".format(audit_char.character.character_name)
+
+
+def update_corporation_pocos(corp_id, full_update=True):
+    audit_corp = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+
+    logger.debug("Updating Pocos for: {}".format(
+        audit_corp.corporation.corporation_name))
+
+    req_scopes = ['esi-planets.read_customs_offices.v1']
+
+    req_roles = ['Director']
+
+    token = get_corp_token(corp_id, req_scopes, req_roles)
+
+    if not token:
+        return "No Tokens"
+
+    try:
+        poco_ob = providers.esi.client.Planetary_Interaction.get_corporations_corporation_id_customs_offices(
+            corporation_id=audit_corp.corporation.corporation_id)
+
+        poco_data = etag_results(
+            poco_ob, token, force_refresh=full_update)
+
+        # Get all Poco Names ( planet name here )
+        _all_ids = [p.get("office_id") for p in poco_data]
+
+        token_assets = get_corp_token(
+            corp_id, ['esi-assets.read_corporation_assets.v1'], req_roles)
+
+        _all_names = []
+
+        for id_chunk in providers.esi.chunk_ids(_all_ids):
+            _all_names += providers.esi.client.Assets.post_corporations_corporation_id_assets_names(
+                corporation_id=corp_id,
+                item_ids=id_chunk,
+                token=token_assets.valid_access_token()
+            ).result()
+
+        _planets = []
+        _office_to_names = {}
+        _planet_to_office = {}
+        for n in _all_names:
+            pn = n['name'][16: -1]
+            _office_to_names[n['item_id']] = {"n": n['name'], "p": None}
+            _planet_to_office[pn] = n['item_id']
+            _planets += pn
+
+        # Ensure all planets are in DB
+        _all_system_ids = [p.get("system_id") for p in poco_data]
+
+        _pids = []
+        for system_id in _all_system_ids:
+            _s = providers.esi.client.Universe.get_universe_systems_system_id(
+                system_id=system_id).results()
+            _pids += [_p['planet_id'] for _p in _s.get('planets', [])]
+
+        for _p in _pids:
+            p, _ = MapSystemPlanet.objects.get_or_create_from_esi(_p)
+            if p.name in _planet_to_office:
+                _office_to_names[_planet_to_office[p.name]]["p"] = p.planet_id
+
+        for poco in poco_data:
+            Poco.objects.update_or_create(
+                office_id=poco.get('office_id'),
+                corporation=audit_corp,
+                defaults={
+                    "alliance_tax_rate": poco.get('alliance_tax_rate'),
+                    "allow_access_with_standings": poco.get('allow_access_with_standings'),
+                    "allow_alliance_access": poco.get('allow_alliance_access'),
+                    "bad_standing_tax_rate": poco.get('bad_standing_tax_rate'),
+                    "corporation_tax_rate": poco.get('corporation_tax_rate'),
+                    "excellent_standing_tax_rate": poco.get('excellent_standing_tax_rate'),
+                    "good_standing_tax_rate": poco.get('good_standing_tax_rate'),
+                    "neutral_standing_tax_rate": poco.get('neutral_standing_tax_rate'),
+                    "office_id": poco.get('office_id'),
+                    "reinforce_exit_end": poco.get('reinforce_exit_end'),
+                    "reinforce_exit_start": poco.get('reinforce_exit_start'),
+                    "standing_level": poco.get('standing_level'),
+                    "system_id": poco.get('system_id'),
+                    "system_name_id": poco.get('system_id'),
+                    "name": _office_to_names.get(poco.get('office_id'))['n'],
+                    "planet_id": _office_to_names.get(poco.get('office_id'))['p'],
+                    "terrible_standing_tax_rate": poco.get('terrible_standing_tax_rate')
+                }
+            )
+
+    except NotModifiedError:
+        logger.info("CT: No New Poco data for: {}".format(
+            audit_corp.corporation.corporation_name))
+        pass
+
+    return "CT: Finished Pocos for: {}".format(audit_corp.corporation.corporation_name)
 
 
 def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
