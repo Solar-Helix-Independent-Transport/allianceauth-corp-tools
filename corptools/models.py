@@ -123,6 +123,7 @@ class CharacterAudit(models.Model):
                        ('alliance_hr',
                         'Can access other character\'s data for own alliance.'),
                        ('state_hr', 'Can access other character\'s data for own state.'),
+                       ('guest_hr', 'Can access guest users\'s data for HR purposes.'),
                        ('global_hr', 'Can access other character\'s data for characters in any corp/alliance/state.'))
 
     def is_active(self):

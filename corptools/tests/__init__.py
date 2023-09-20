@@ -136,3 +136,7 @@ class CorptoolsTestCase(TestCase):
             'alliance_hr', 'corptools', 'characteraudit')
         cls.view_all_permission = Permission.objects.get_by_natural_key(
             'global_hr', 'corptools', 'characteraudit')
+        cls.view_guest_permission = Permission.objects.get_by_natural_key(
+            'guest_hr', 'corptools', 'characteraudit')
+        cls.view_state_permission = Permission.objects.get_by_natural_key(
+            'state_hr', 'corptools', 'characteraudit')
