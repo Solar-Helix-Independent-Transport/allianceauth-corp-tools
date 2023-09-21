@@ -314,6 +314,13 @@ class AuditCharacterQuerySet(models.QuerySet):
                 else:
                     queries.append(
                         models.Q(character__corporation_id=char.corporation_id))
+            if user.has_perm('corptools.guest_hr'):
+                queries.append(
+                    models.Q(character__character_ownership__user__profile__state__name="Guest", character__character_ownership__user__profile__main_character__isnull=False))
+            if user.has_perm('corptools.state_hr'):
+                queries.append(
+                    models.Q(character__character_ownership__user__profile__state=user.profile.state))
+
             logger.debug('%s queries for user %s visible chracters.' %
                          (len(queries), user))
             # filter based on queries

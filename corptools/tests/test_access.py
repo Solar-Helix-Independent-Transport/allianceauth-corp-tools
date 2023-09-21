@@ -306,3 +306,55 @@ class TestCorptoolsCharAccessPerms(CorptoolsTestCase):
         self.assertNotIn(self.ca8.character, cs)    # unlinked
         self.assertNotIn(self.char9, cs)            # u4 no main
         self.assertNotIn(self.ca10.character, cs)   # u4 no main
+
+    def test_guest_perms_u1_ca(self):
+        m = State.objects.get(name="Member")
+        m.member_characters.add(self.char1)
+        m.member_characters.add(self.char3)
+        self.user1.user_permissions.add(self.view_guest_permission)
+        self.user1.refresh_from_db()
+        cs = CharacterAudit.objects.visible_to(self.user1)
+        self.assertIn(self.ca1, cs)       # own
+        self.assertIn(self.ca2, cs)       # own
+        self.assertNotIn(self.ca3, cs)    # member
+        self.assertNotIn(self.ca4, cs)    # unlinked
+        self.assertIn(self.ca5, cs)       # u3 guest
+        self.assertNotIn(self.ca6, cs)    # unlinked
+        self.assertIn(self.ca7, cs)       # u3 guest
+        self.assertNotIn(self.ca8, cs)    # unlinked
+        self.assertNotIn(self.ca10, cs)   # u4 no main
+
+    def test_state_perms_u1_ca(self):
+        m = State.objects.get(name="Member")
+        m.member_characters.add(self.char1)
+        m.member_characters.add(self.char3)
+        self.user1.user_permissions.add(self.view_state_permission)
+        self.user1.refresh_from_db()
+        cs = CharacterAudit.objects.visible_to(self.user1)
+        self.assertIn(self.ca1, cs)       # own
+        self.assertIn(self.ca2, cs)       # own
+        self.assertIn(self.ca3, cs)       # member
+        self.assertNotIn(self.ca4, cs)    # unlinked
+        self.assertNotIn(self.ca5, cs)    # u3 guest
+        self.assertNotIn(self.ca6, cs)    # unlinked
+        self.assertNotIn(self.ca7, cs)    # u3 guest
+        self.assertNotIn(self.ca8, cs)    # unlinked
+        self.assertNotIn(self.ca10, cs)   # u4 no main
+
+    def test_state_and_guest_perms_u1_ca(self):
+        m = State.objects.get(name="Member")
+        m.member_characters.add(self.char1)
+        m.member_characters.add(self.char3)
+        self.user1.user_permissions.add(self.view_state_permission)
+        self.user1.user_permissions.add(self.view_guest_permission)
+        self.user1.refresh_from_db()
+        cs = CharacterAudit.objects.visible_to(self.user1)
+        self.assertIn(self.ca1, cs)       # own
+        self.assertIn(self.ca2, cs)       # own
+        self.assertIn(self.ca3, cs)       # member
+        self.assertNotIn(self.ca4, cs)    # unlinked
+        self.assertIn(self.ca5, cs)       # u3 guest
+        self.assertNotIn(self.ca6, cs)    # unlinked
+        self.assertIn(self.ca7, cs)       # u3 guest
+        self.assertNotIn(self.ca8, cs)    # unlinked
+        self.assertNotIn(self.ca10, cs)   # u4 no main
