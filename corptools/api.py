@@ -3,8 +3,9 @@ from __future__ import annotations
 import hashlib
 import logging
 import re
+from datetime import date, timedelta
 from functools import wraps
-from typing import List
+from typing import List, Optional
 from xmlrpc.client import boolean
 
 from allianceauth.eveonline.models import EveCharacter
@@ -806,6 +807,104 @@ def get_character_market(request, character_id: int):
         output["expired"].append(o)
 
     return output
+
+
+@api.get(
+    "account/{character_id}/mining/chars",
+    response={200: dict, 403: schema.Message},
+    tags=["Account"]
+)
+def get_all_characters_character_mining(request, character_id: int):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    return characters
+
+
+@api.get(
+    "account/{character_id}/mining",
+    response={200: dict, 403: schema.Message},
+    tags=["Account"]
+)
+def get_character_mining(request,
+                         character_id: int,
+                         filter_characters: Optional[List[int]] = [],
+                         look_back: Optional[int] = 90):
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+    response, main = get_main_character(request, character_id)
+
+    if not response:
+        return 403, {"message": "Permission Denied"}
+
+    characters = get_alts_queryset(main)
+
+    if len(filter_characters):
+        characters = characters.exclude(character_id__in=filter_characters)
+
+    start_date = timezone.now() - timedelta(days=look_back)
+
+    mining_ledger_data = models.CharacterMiningLedger.objects.filter(
+        character__character__in=characters,
+        date__gte=start_date
+    ).select_related(
+        'character__character',
+        'type_name'
+    )
+
+    all_ores = set()
+    all_systems = set()
+    t_val = 0
+    t_vol = 0
+    output = {}
+    for t in [(timezone.now() - timedelta(days=i)).date() for i in range(look_back)]:
+        output[str(t)] = {
+            "date": str(t),
+            "ores": {},
+            "characters": [],
+            "systems": [],
+        }
+
+    for w in mining_ledger_data:
+        _d = str(w.date)
+
+        all_ores.add(w.type_name.name)
+        all_systems.add(w.system.name)
+        vol = w.quantity*w.type_name.volume
+        t_vol += vol
+
+        if w.type_name.type_id not in output[_d]["ores"]:
+            output[_d]["ores"][w.type_name.type_id] = {
+                "name": w.type_name.name,
+                "id": w.type_name.type_id,
+                "volume": 0,
+                "value": 0
+            }
+        output[_d]["ores"][w.type_name.type_id]["volume"] += vol
+
+        if w.character.character.character_name not in output[_d]["characters"]:
+            output[_d]["characters"].append(
+                w.character.character.character_name)
+
+        if w.system.name not in output[_d]["systems"]:
+            output[_d]["systems"].append(w.system.name)
+
+    for k, d in output.items():
+        d["ores"] = list(d["ores"].values())
+
+    return {
+        "all_ores": list(all_ores),
+        "all_systems": list(all_systems),
+        "total_volume": t_vol,
+        "total_value": t_val,
+        "data": list(output.values())
+    }
 
 
 @api.get(
