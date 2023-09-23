@@ -248,6 +248,10 @@ def get_character_menu(request):
         "name": "Finances",
         "links": []
     }
+    _industry = {
+        "name": "Industry",
+        "links": []
+    }
     _char = {
         "name": "Characters",
         "links": []
@@ -310,6 +314,12 @@ def get_character_menu(request):
             "link": "account/listassets"
         })
 
+    if app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE:
+        _industry["links"].append({
+            "name": "Mining Ledger",
+            "link": "account/mining"
+        })
+
     if app_settings.CT_CHAR_CLONES_MODULE:
         _char["links"].append({
             "name": "Clones",
@@ -347,6 +357,9 @@ def get_character_menu(request):
 
     if len(_finance['links']):
         out.append(_finance)
+
+    if len(_industry['links']):
+        out.append(_industry)
 
     if len(_inter['links']):
         out.append(_inter)

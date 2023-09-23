@@ -145,6 +145,12 @@ export async function loadRoles(character_id) {
   return api.data;
 }
 
+export async function loadMining(character_id) {
+  const api = await axios.get(`/audit/api/account/${character_id}/mining?look_back=150`);
+  console.log(`get mining in api ${character_id}`);
+  return api.data;
+}
+
 export async function loadNotifications(character_id) {
   const api = await axios.get(`/audit/api/account/${character_id}/notifications`);
   console.log(`get notifications in api ${character_id}`);

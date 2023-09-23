@@ -6,6 +6,7 @@ import PingAssets from "./pages/AssetPingMenu";
 import CharAssets from "./pages/Assets";
 import AuditAdmin from "./pages/AuditAdmin";
 import CharacterAudit from "./pages/CharacterAudit";
+import CharacterMiningLedger from "./pages/CharacterMiningLedge";
 import CharClones from "./pages/Clones";
 import CharContacts from "./pages/Contacts";
 import CharContracts from "./pages/Contracts";
@@ -53,6 +54,7 @@ const CorptoolsCharacterView = () => {
               <Route path="account/mail" element={<CharMail />} />
               <Route path="account/walletactivity" element={<CharWalletActivity />} />
               <Route path="account/history" element={<CharHistory />} />
+              <Route path="account/mining" element={<CharacterMiningLedger />} />
               <Route path="account/notifications" element={<CharNotifications />} />
               <Route path="account/contact" element={<CharContacts />} />
               <Route path="account/contract" element={<CharContracts />} />
