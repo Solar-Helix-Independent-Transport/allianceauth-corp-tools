@@ -61,7 +61,7 @@ const MiningLedger = ({ data }) => {
   return (
     <div>
       <div style={{ height: "250px", margin: "5px", background: "#303030" }}>
-        <MiningTotalsGraph data={totalData} keys={data.all_ores} />
+        <MiningTotalsGraph data={totalData} keys={data.all_groups} />
       </div>
       <div style={{ height: "300px", margin: "5px", background: "#303030" }}>
         <MiningGraph data={graphData} keys={data.all_ores} />
