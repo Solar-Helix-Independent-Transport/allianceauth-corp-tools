@@ -42,7 +42,7 @@ export const MiningGraph = ({ data, keys }) => {
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
       colors={{ scheme: "set1" }}
-      colorBy="id"
+      colorBy="group"
       borderWidth={0}
       borderRadius={0}
       valueFormat=" ^-,.0f"
@@ -64,6 +64,7 @@ export const MiningGraph = ({ data, keys }) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
+        format: (tick) => `${tick.toLocaleString()}`,
         legend: "Daily Volume",
         legendPosition: "middle",
         legendOffset: -70,

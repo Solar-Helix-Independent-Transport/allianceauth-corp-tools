@@ -47,7 +47,7 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        tickFormat: " ^-,.0f",
+        format: (tick) => `${tick.toLocaleString()}`,
         legend: "Total Volume",
         legendPosition: "middle",
         legendOffset: -70,
