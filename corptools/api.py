@@ -868,10 +868,12 @@ def get_character_mining(request,
         date__gte=start_date
     ).select_related(
         'character__character',
-        'type_name'
+        'type_name',
+        'type_name__group'
     )
 
     all_ores = set()
+    all_groups = set()
     all_systems = set()
     t_val = 0
     t_vol = 0
@@ -888,6 +890,7 @@ def get_character_mining(request,
         _d = str(w.date)
 
         all_ores.add(w.type_name.name)
+        all_groups.add(w.type_name.group.name)
         all_systems.add(w.system.name)
         vol = w.quantity*w.type_name.volume
         t_vol += vol
@@ -895,6 +898,7 @@ def get_character_mining(request,
         if w.type_name.type_id not in output[_d]["ores"]:
             output[_d]["ores"][w.type_name.type_id] = {
                 "name": w.type_name.name,
+                "group": w.type_name.group.name,
                 "id": w.type_name.type_id,
                 "volume": 0,
                 "value": 0
@@ -913,6 +917,7 @@ def get_character_mining(request,
 
     return {
         "all_ores": list(all_ores),
+        "all_groups": list(all_groups),
         "all_systems": list(all_systems),
         "total_volume": t_vol,
         "total_value": t_val,
