@@ -69,24 +69,24 @@ const CharHeader = () => {
                   <div className="child association-hide">
                     <h4>{data.main.alliance_name}</h4>
                   </div>
-                  <div className="info-hide">
-                    {sp ? (
-                      <>
-                        <Badge>Total SP: {sp.toLocaleString()}</Badge> <br />
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {isk ? (
-                      <>
-                        <Badge>Total Isk: {isk.toLocaleString()}</Badge>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                  </div>
                 </>
               )}
+              <div className="info-hide">
+                {sp ? (
+                  <>
+                    <Badge>Total SP: {sp.toLocaleString()}</Badge> <br />
+                  </>
+                ) : (
+                  <></>
+                )}
+                {isk ? (
+                  <>
+                    <Badge>Total Isk: {isk.toLocaleString()}</Badge>
+                  </>
+                ) : (
+                  <></>
+                )}
+              </div>
               <div className="child-end">
                 <CharActiveBadge characters={data.characters} character_id={characterID} />
               </div>
