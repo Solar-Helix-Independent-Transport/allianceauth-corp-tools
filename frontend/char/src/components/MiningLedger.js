@@ -66,15 +66,24 @@ const MiningLedger = ({ data }) => {
     })
   );
   return (
-    <div>
-      <div style={{ height: "250px", margin: "5px", background: "#303030" }}>
+    <div
+      style={{
+        background: "#646464",
+        color: "#ffffff",
+        paddingTop: "2px",
+        paddingBottom: "2px",
+        borderRadius: "10px",
+        margin: "5px",
+      }}
+    >
+      <div style={{ height: "250px", margin: "5px", background: "#646464" }}>
         <MiningTotalsGraph data={totalData} groups={data.all_groups} ores={data.all_ores} />
       </div>
-      <div style={{ height: "300px", margin: "5px", background: "#303030" }}>
+      <div style={{ height: "300px", margin: "5px", background: "#646464" }}>
         <MiningGraph data={graphData} keys={data.all_ores} />
       </div>
-      <div style={{ display: "flex", margin: "5px" }}>
-        <p style={{ margin: "5px", marginTop: "auto", marginBottom: "auto" }}>Focus:</p>
+      <div style={{ display: "flex", margin: "7px" }}>
+        <p style={{ margin: "5px", marginTop: "auto", marginBottom: "auto" }}>Zoom:</p>
         <div style={{ flexGrow: "1", height: "50px" }}>
           <ReactSlider
             className="slider"

@@ -15,7 +15,7 @@ export const MiningGraphBrush = ({ data, keys }) => {
       keys={keys}
       indexBy="id"
       margin={{ top: 0, right: 5, bottom: 0, left: 5 }}
-      pixelRatio={1}
+      pixelRatio={2}
       // padding={0.2}
       innerPadding={0}
       groupMode="stacked"
@@ -23,7 +23,7 @@ export const MiningGraphBrush = ({ data, keys }) => {
       reverse={false}
       // valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: false }}
-      colors={{ scheme: "red_blue" }}
+      colors={{ scheme: "set1" }}
       colorBy="id"
       borderWidth={0}
       borderRadius={0}
@@ -40,7 +40,7 @@ export const MiningGraphBrush = ({ data, keys }) => {
       isInteractive={false}
       legends={[]}
       theme={{
-        background: "#303030",
+        background: "#646464",
         text: {
           fontSize: 11,
           fill: "#fff",
@@ -50,7 +50,7 @@ export const MiningGraphBrush = ({ data, keys }) => {
         axis: {
           domain: {
             line: {
-              stroke: "#666",
+              stroke: "#ddd",
               strokeWidth: 1,
             },
           },
@@ -64,7 +64,7 @@ export const MiningGraphBrush = ({ data, keys }) => {
           },
           ticks: {
             line: {
-              stroke: "#666",
+              stroke: "#ddd",
               strokeWidth: 1,
             },
             text: {
@@ -77,7 +77,7 @@ export const MiningGraphBrush = ({ data, keys }) => {
         },
         grid: {
           line: {
-            stroke: "#666",
+            stroke: "#999",
             strokeWidth: 1,
           },
         },
@@ -100,7 +100,7 @@ export const MiningGraphBrush = ({ data, keys }) => {
             line: {},
             text: {
               fontSize: 10,
-              fill: "#333333",
+              fill: "#000",
               outlineWidth: 0,
               outlineColor: "transparent",
             },
@@ -109,27 +109,27 @@ export const MiningGraphBrush = ({ data, keys }) => {
         annotations: {
           text: {
             fontSize: 13,
-            fill: "#333333",
+            fill: "#ddd",
             outlineWidth: 2,
             outlineColor: "#ffffff",
             outlineOpacity: 1,
           },
           link: {
-            stroke: "#000000",
+            stroke: "#ddd",
             strokeWidth: 1,
             outlineWidth: 2,
             outlineColor: "#ffffff",
             outlineOpacity: 1,
           },
           outline: {
-            stroke: "#000000",
+            stroke: "#ddd",
             strokeWidth: 2,
             outlineWidth: 2,
             outlineColor: "#ffffff",
             outlineOpacity: 1,
           },
           symbol: {
-            fill: "#000000",
+            fill: "#ddd",
             outlineWidth: 2,
             outlineColor: "#ffffff",
             outlineOpacity: 1,
@@ -137,7 +137,7 @@ export const MiningGraphBrush = ({ data, keys }) => {
         },
         tooltip: {
           container: {
-            background: "#444",
+            background: "#000",
             fontSize: 12,
           },
           basic: {},

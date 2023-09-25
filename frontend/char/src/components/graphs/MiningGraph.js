@@ -32,7 +32,7 @@ export const MiningGraph = ({ data, keys }) => {
       indexBy="id"
       padding={0.2}
       margin={{ top: 10, right: 0, bottom: 50, left: 80 }}
-      pixelRatio={1}
+      pixelRatio={2}
       innerPadding={0}
       minValue="auto"
       maxValue="auto"
@@ -41,7 +41,7 @@ export const MiningGraph = ({ data, keys }) => {
       reverse={false}
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
-      colors={{ scheme: "red_blue" }}
+      colors={{ scheme: "set1" }}
       colorBy="id"
       borderWidth={0}
       borderRadius={0}
@@ -77,9 +77,9 @@ export const MiningGraph = ({ data, keys }) => {
       isInteractive={true}
       legends={[]}
       theme={{
-        background: "#303030",
+        background: "#646464",
         text: {
-          fontSize: 12,
+          fontSize: 11,
           fill: "#fff",
           outlineWidth: 0,
           outlineColor: "transparent",
@@ -87,13 +87,13 @@ export const MiningGraph = ({ data, keys }) => {
         axis: {
           domain: {
             line: {
-              stroke: "#666",
+              stroke: "#ddd",
               strokeWidth: 1,
             },
           },
           legend: {
             text: {
-              fontSize: 12,
+              fontSize: 14,
               fill: "#fff",
               outlineWidth: 0,
               outlineColor: "transparent",
@@ -101,11 +101,11 @@ export const MiningGraph = ({ data, keys }) => {
           },
           ticks: {
             line: {
-              stroke: "#666",
+              stroke: "#ddd",
               strokeWidth: 1,
             },
             text: {
-              fontSize: 12,
+              fontSize: 14,
               fill: "#fff",
               outlineWidth: 0,
               outlineColor: "transparent",
@@ -114,21 +114,21 @@ export const MiningGraph = ({ data, keys }) => {
         },
         grid: {
           line: {
-            stroke: "#666",
+            stroke: "#999",
             strokeWidth: 1,
           },
         },
         legends: {
           title: {
             text: {
-              fontSize: 12,
+              fontSize: 14,
               fill: "#fff",
               outlineWidth: 0,
               outlineColor: "transparent",
             },
           },
           text: {
-            fontSize: 12,
+            fontSize: 14,
             fill: "#fff",
             outlineWidth: 0,
             outlineColor: "transparent",
@@ -137,7 +137,7 @@ export const MiningGraph = ({ data, keys }) => {
             line: {},
             text: {
               fontSize: 12,
-              fill: "#333333",
+              fill: "#000",
               outlineWidth: 0,
               outlineColor: "transparent",
             },
@@ -145,28 +145,28 @@ export const MiningGraph = ({ data, keys }) => {
         },
         annotations: {
           text: {
-            fontSize: 13,
-            fill: "#333333",
+            fontSize: 12,
+            fill: "#ddd",
             outlineWidth: 2,
             outlineColor: "#ffffff",
             outlineOpacity: 1,
           },
           link: {
-            stroke: "#000000",
+            stroke: "#ddd",
             strokeWidth: 1,
             outlineWidth: 2,
             outlineColor: "#ffffff",
             outlineOpacity: 1,
           },
           outline: {
-            stroke: "#000000",
+            stroke: "#ddd",
             strokeWidth: 2,
             outlineWidth: 2,
             outlineColor: "#ffffff",
             outlineOpacity: 1,
           },
           symbol: {
-            fill: "#000000",
+            fill: "#ddd",
             outlineWidth: 2,
             outlineColor: "#ffffff",
             outlineOpacity: 1,
@@ -174,8 +174,8 @@ export const MiningGraph = ({ data, keys }) => {
         },
         tooltip: {
           container: {
-            background: "#444",
-            fontSize: 12,
+            background: "#000",
+            fontSize: 14,
           },
           basic: {},
           chip: {},

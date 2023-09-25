@@ -17,7 +17,7 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
       indexBy={"name"}
       padding={0.2}
       margin={{ top: 10, right: 0, bottom: 50, left: 80 }}
-      pixelRatio={1}
+      pixelRatio={2}
       innerPadding={0}
       minValue="auto"
       maxValue="auto"
@@ -26,7 +26,7 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
       reverse={false}
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
-      colors={{ scheme: "red_blue" }}
+      colors={{ scheme: "set1" }}
       colorBy="id"
       borderWidth={0}
       borderRadius={0}
@@ -47,6 +47,7 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
+        tickFormat: " ^-,.0f",
         legend: "Total Volume",
         legendPosition: "middle",
         legendOffset: -70,
@@ -61,9 +62,9 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
       isInteractive={true}
       legends={[]}
       theme={{
-        background: "#303030",
+        background: "#646464",
         text: {
-          fontSize: 12,
+          fontSize: 11,
           fill: "#fff",
           outlineWidth: 0,
           outlineColor: "transparent",
@@ -71,13 +72,13 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
         axis: {
           domain: {
             line: {
-              stroke: "#666",
+              stroke: "#ddd",
               strokeWidth: 1,
             },
           },
           legend: {
             text: {
-              fontSize: 12,
+              fontSize: 14,
               fill: "#fff",
               outlineWidth: 0,
               outlineColor: "transparent",
@@ -85,11 +86,11 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
           },
           ticks: {
             line: {
-              stroke: "#666",
+              stroke: "#ddd",
               strokeWidth: 1,
             },
             text: {
-              fontSize: 12,
+              fontSize: 14,
               fill: "#fff",
               outlineWidth: 0,
               outlineColor: "transparent",
@@ -98,21 +99,21 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
         },
         grid: {
           line: {
-            stroke: "#666",
+            stroke: "#999",
             strokeWidth: 1,
           },
         },
         legends: {
           title: {
             text: {
-              fontSize: 12,
+              fontSize: 14,
               fill: "#fff",
               outlineWidth: 0,
               outlineColor: "transparent",
             },
           },
           text: {
-            fontSize: 12,
+            fontSize: 14,
             fill: "#fff",
             outlineWidth: 0,
             outlineColor: "transparent",
@@ -121,7 +122,7 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
             line: {},
             text: {
               fontSize: 12,
-              fill: "#333333",
+              fill: "#000",
               outlineWidth: 0,
               outlineColor: "transparent",
             },
@@ -129,28 +130,28 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
         },
         annotations: {
           text: {
-            fontSize: 13,
-            fill: "#333333",
+            fontSize: 12,
+            fill: "#ddd",
             outlineWidth: 2,
             outlineColor: "#ffffff",
             outlineOpacity: 1,
           },
           link: {
-            stroke: "#000000",
+            stroke: "#ddd",
             strokeWidth: 1,
             outlineWidth: 2,
             outlineColor: "#ffffff",
             outlineOpacity: 1,
           },
           outline: {
-            stroke: "#000000",
+            stroke: "#ddd",
             strokeWidth: 2,
             outlineWidth: 2,
             outlineColor: "#ffffff",
             outlineOpacity: 1,
           },
           symbol: {
-            fill: "#000000",
+            fill: "#ddd",
             outlineWidth: 2,
             outlineColor: "#ffffff",
             outlineOpacity: 1,
@@ -158,8 +159,8 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
         },
         tooltip: {
           container: {
-            background: "#444",
-            fontSize: 12,
+            background: "#000",
+            fontSize: 14,
           },
           basic: {},
           chip: {},
