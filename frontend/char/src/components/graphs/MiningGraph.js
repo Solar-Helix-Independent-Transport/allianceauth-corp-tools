@@ -42,7 +42,7 @@ export const MiningGraph = ({ data, keys }) => {
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
       colors={{ scheme: "spectral" }}
-      colorBy="group"
+      colorBy="id"
       borderWidth={0}
       borderRadius={0}
       valueFormat=" ^-,.0f"
