@@ -57,6 +57,7 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
       labelSkipWidth={24}
       labelSkipHeight={24}
       labelTextColor={"#fff"}
+      valueFormat=" ^-.0f"
       isInteractive={true}
       legends={[]}
       theme={{
