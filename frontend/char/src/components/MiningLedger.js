@@ -30,14 +30,16 @@ function apiDataToObject(input, dataKey = "volume") {
 }
 
 // Function to create js objects from python api data. types later...
-function apiDataToTotals(keys, input, dataKey = "volume") {
-  let out = Object.fromEntries(keys.map((x) => [x, 0]));
+function apiDataToTotals(group_list, ore_list, input, dataKey = "volume") {
+  let ore_ob = Object.fromEntries(ore_list.map((x) => [x, 0]));
+  let out = Object.fromEntries(group_list.map((x) => [x, ore_ob]));
   input.map((d) => {
-    for (let i = 0; i < d.ores.length; ++i) out[d.ores[i]["group"]] += d.ores[i][dataKey];
+    for (let i = 0; i < d.ores.length; ++i)
+      out[d.ores[i]["group"]][d.ores[i]["name"]] += d.ores[i][dataKey];
   });
   return Object.entries(out).map((elem) => {
     let out = { name: elem[0] };
-    out[elem[0]] = elem[1];
+    Object.entries(elem[1]).map((subElem) => (out[subElem[0]] = subElem[1]));
     return out;
   });
 }
@@ -53,6 +55,7 @@ const MiningLedger = ({ data }) => {
   );
   const totalData = apiDataToTotals(
     data.all_groups,
+    data.all_ores,
     data.data.filter((e, index) => {
       let pass = slice[0] < index && index < slice[1];
       return pass;
@@ -61,7 +64,7 @@ const MiningLedger = ({ data }) => {
   return (
     <div>
       <div style={{ height: "250px", margin: "5px", background: "#303030" }}>
-        <MiningTotalsGraph data={totalData} keys={data.all_groups} />
+        <MiningTotalsGraph data={totalData} groups={data.all_groups} ores={data.all_ores} />
       </div>
       <div style={{ height: "300px", margin: "5px", background: "#303030" }}>
         <MiningGraph data={graphData} keys={data.all_ores} />

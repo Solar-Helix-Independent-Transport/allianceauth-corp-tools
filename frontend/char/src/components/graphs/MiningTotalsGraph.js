@@ -8,12 +8,12 @@ import { ResponsiveBarCanvas } from "@nivo/bar";
 // website examples showcase many properties,
 // you'll often use just a few of them.
 
-export const MiningTotalsGraph = ({ data, keys }) => {
-  console.log(keys, data);
+export const MiningTotalsGraph = ({ data, ores, groups }) => {
+  console.log(ores, data);
   return (
     <ResponsiveBarCanvas
       data={data}
-      keys={keys}
+      keys={ores}
       indexBy={"name"}
       padding={0.2}
       margin={{ top: 10, right: 0, bottom: 50, left: 80 }}
