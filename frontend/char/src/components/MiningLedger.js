@@ -31,12 +31,16 @@ function apiDataToObject(input, dataKey = "volume") {
 
 // Function to create js objects from python api data. types later...
 function apiDataToTotals(group_list, ore_list, input, dataKey = "volume") {
-  let ore_ob = Object.fromEntries(ore_list.map((x) => [x, 0]));
-  let out = Object.fromEntries(group_list.map((x) => [x, ore_ob]));
+  let out = Object.fromEntries(
+    group_list.map((x) => [x, Object.fromEntries(ore_list.map((x) => [x, 0]))])
+  );
+  console.log("PRE", out);
   input.map((d) => {
     for (let i = 0; i < d.ores.length; ++i)
       out[d.ores[i]["group"]][d.ores[i]["name"]] += d.ores[i][dataKey];
   });
+  console.log("POST", out);
+
   return Object.entries(out).map((elem) => {
     let out = { name: elem[0] };
     Object.entries(elem[1]).map((subElem) => (out[subElem[0]] = subElem[1]));
