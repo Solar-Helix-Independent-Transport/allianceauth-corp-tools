@@ -23,7 +23,7 @@ export const MiningGraphBrush = ({ data, keys }) => {
       reverse={false}
       // valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: false }}
-      colors={{ scheme: "set1" }}
+      colors={{ scheme: "spectral" }}
       colorBy="id"
       borderWidth={0}
       borderRadius={0}

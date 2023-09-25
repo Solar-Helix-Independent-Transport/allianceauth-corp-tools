@@ -26,8 +26,8 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
       reverse={false}
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
-      colors={{ scheme: "set1" }}
-      colorBy="id"
+      colors={{ scheme: "spectral" }}
+      colorBy="group"
       borderWidth={0}
       borderRadius={0}
       borderColor={{
