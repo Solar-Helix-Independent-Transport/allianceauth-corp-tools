@@ -45,7 +45,7 @@ export const MiningGraph = ({ data, keys }) => {
       colorBy="id"
       borderWidth={0}
       borderRadius={0}
-      valueFormat=" ^-.0f"
+      valueFormat=" ^-,.0f"
       borderColor={{
         from: "color",
         modifiers: [["brighter", 2]],
