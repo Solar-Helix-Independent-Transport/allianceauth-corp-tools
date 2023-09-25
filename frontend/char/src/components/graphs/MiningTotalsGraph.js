@@ -1,5 +1,6 @@
 // install (please try to align the version of installed @nivo packages)
 // yarn add @nivo/bar
+import { abbreviateNumber } from "./GraphHelpers";
 import { ResponsiveBarCanvas } from "@nivo/bar";
 
 // make sure parent container have a defined height when using
@@ -47,7 +48,7 @@ export const MiningTotalsGraph = ({ data, ores, groups }) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        format: (tick) => `${tick.toLocaleString()}`,
+        format: (tick) => `${abbreviateNumber(tick)}`,
         legend: "Total Volume",
         legendPosition: "middle",
         legendOffset: -70,
