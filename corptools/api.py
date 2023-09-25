@@ -878,7 +878,7 @@ def get_character_mining(request,
     t_val = 0
     t_vol = 0
     output = {}
-    for t in [(timezone.now() - timedelta(days=i)).date() for i in range(look_back)]:
+    for t in [(timezone.now() - timedelta(days=i)).date() for i in range(look_back+1)]:
         output[str(t)] = {
             "date": str(t),
             "ores": {},
