@@ -7,7 +7,7 @@ from allianceauth.tests.auth_utils import AuthUtils
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 
-from .. import api
+from ..api import helpers
 from ..models import CharacterAudit
 
 
@@ -155,37 +155,37 @@ class TestCorptoolsAPIAccess(TestCase):
         request = mock.Mock()
         request.user = self.user1
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca1.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca2.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca3.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca3.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca5.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca7.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.char9.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca10.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
@@ -195,37 +195,37 @@ class TestCorptoolsAPIAccess(TestCase):
         request.user = self.user1
         self.user1.user_permissions.add(self.view_module)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca1.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca2.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca3.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca3.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca5.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca7.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.char9.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca10.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
@@ -233,37 +233,37 @@ class TestCorptoolsAPIAccess(TestCase):
     def test_no_perms_get_self_u2(self):  # always get self.
         request = mock.Mock()
         request.user = self.user2
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca1.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca2.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca3.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca3.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca5.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca7.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.char9.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca10.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
@@ -273,37 +273,37 @@ class TestCorptoolsAPIAccess(TestCase):
         request.user = self.user2
         self.user2.user_permissions.add(self.view_module)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca1.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca2.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca3.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca3.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca5.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca7.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.char9.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca10.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
@@ -311,37 +311,37 @@ class TestCorptoolsAPIAccess(TestCase):
     def test_no_perms_get_self_u3(self):  # always get self.
         request = mock.Mock()
         request.user = self.user3
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca1.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca2.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca3.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca3.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca5.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca7.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.char9.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca10.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
@@ -351,37 +351,37 @@ class TestCorptoolsAPIAccess(TestCase):
         request.user = self.user3
         self.user3.user_permissions.add(self.view_module)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca1.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca2.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca3.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca3.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca5.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca7.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.char9.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca10.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
@@ -391,37 +391,37 @@ class TestCorptoolsAPIAccess(TestCase):
         self.user2.user_permissions.add(self.view_module)
         request = mock.Mock()
         request.user = self.user2
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca1.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca2.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca3.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca3.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca5.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca7.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.char9.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.char9)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca10.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.char9)
@@ -431,37 +431,37 @@ class TestCorptoolsAPIAccess(TestCase):
         self.user3.user_permissions.add(self.view_module)
         request = mock.Mock()
         request.user = self.user3
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca1.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca2.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca3.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.ca3.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca5.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca7.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.char9.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca10.character.character_id)
         self.assertFalse(perms)
         self.assertEqual(main_char, self.char9)
@@ -473,37 +473,37 @@ class TestCorptoolsAPIAccess(TestCase):
         request = mock.Mock()
         request.user = self.user1
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca1.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca2.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca3.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca3.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca5.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca7.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.char9.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.char9)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca10.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.char9)
@@ -514,37 +514,37 @@ class TestCorptoolsAPIAccess(TestCase):
 
         request = mock.Mock()
         request.user = self.user2
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca1.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca2.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca3.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca3.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca5.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca7.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.char9.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.char9)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca10.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.char9)
@@ -555,37 +555,37 @@ class TestCorptoolsAPIAccess(TestCase):
 
         request = mock.Mock()
         request.user = self.user3
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca1.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca2.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca1.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca3.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca3.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca5.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca7.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.ca5.character)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.char9.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.char9)
 
-        perms, main_char = api.get_main_character(
+        perms, main_char = helpers.get_main_character(
             request, self.ca10.character.character_id)
         self.assertTrue(perms)
         self.assertEqual(main_char, self.char9)
