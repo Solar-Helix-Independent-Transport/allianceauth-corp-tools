@@ -77,13 +77,13 @@ export async function loadRefTypes() {
 }
 
 export async function loadBridges() {
-  const api = await axios.get(`/audit/api/corp/gates`);
+  const api = await axios.get(`/audit/api/dashboard/gates`);
   console.log(`get bridges in api`);
   return api.data;
 }
 
 export async function loadSov() {
-  const api = await axios.get(`/audit/api/alliance/sov`);
+  const api = await axios.get(`/audit/api/dashboard/sov`);
   console.log(`get sov in api`);
   return api.data;
 }
