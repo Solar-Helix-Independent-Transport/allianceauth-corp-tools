@@ -17,9 +17,8 @@ class MenuApiEndpoints:
             "account/menu",
             response=List[schema.MenuCategory],
             tags=self.tags
-
         )
-        def get_character_menu(self, request):
+        def get_character_menu(request):
             _inter = {
                 "name": "Interactions",
                 "links": []

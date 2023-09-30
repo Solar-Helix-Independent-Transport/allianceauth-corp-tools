@@ -5,7 +5,7 @@ from django.db.models import Q
 from esi.models import Token
 from ninja import NinjaAPI
 
-from corptools import models
+from corptools import app_settings, models
 from corptools.api import schema
 
 

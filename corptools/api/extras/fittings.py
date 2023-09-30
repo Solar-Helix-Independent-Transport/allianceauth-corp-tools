@@ -12,6 +12,7 @@ class FittingsApiEndpoints:
     def __init__(self, api: NinjaAPI):
         @api.get(
             "/extras/fit2skills/{fit_id}",
+            response={200: dict, 403: str, 404: str, 500: str},
             tags=["Fittings"]
         )
         def get_fit_skills(request, fit_id: str):
@@ -24,9 +25,11 @@ class FittingsApiEndpoints:
                 from fittings.models import Fitting, FittingItem
             except ImportError:
                 return 500, "Fittings module not found!"
-
-            _fit = Fitting.objects.get(
-                id=int(request.resolver_match.kwargs['fit_id']))
+            try:
+                _fit = Fitting.objects.get(
+                    id=int(request.resolver_match.kwargs['fit_id']))
+            except Fitting.DoesNotExist:
+                return 404, "Fitting not found"
             _items = FittingItem.objects.filter(
                 fit=_fit).values_list("type_id", flat=True)
 
