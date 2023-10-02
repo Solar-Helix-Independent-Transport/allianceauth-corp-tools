@@ -554,8 +554,9 @@ def update_character_logins_from_corp(corp_id):
             audit_corp.corporation))
         pass
 
-    audit_corp.last_update_assets = timezone.now()
-    audit_corp.save()
+    all_chars = CharacterAudit.objects.filter(
+        character__corporation_id=corp_id)
+    all_chars.update(last_update_login=timezone.now())
 
     return "Finished Logins for: {}".format(audit_corp.corporation)
 

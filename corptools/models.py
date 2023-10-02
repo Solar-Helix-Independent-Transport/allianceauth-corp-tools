@@ -1790,12 +1790,17 @@ class LastLoginfilter(FilterBase):
 
     days_since_login = models.IntegerField(
         default=30,
-        help_text="Days since last login of any Character in the accounts Main's Corporation to pass filter.")
+        help_text="Days since last login of any Character in the accounts before failing the filter.")
 
     no_data_pass = models.BooleanField(
         default=False,
         blank=True,
         help_text="If there is no data (No Valid Corp Token) for a characters account then should this filter automatically pass.")
+
+    main_corp_only = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Only check characters in main's corporation.")
 
     def process_filter(self, user: User):
         try:
@@ -1813,12 +1818,17 @@ class LastLoginfilter(FilterBase):
         valid_logins = timezone.now(
         ) - datetime.timedelta(days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS)
         co = CharacterOwnership.objects.filter(user__in=users, character__characteraudit__last_update_login__gte=valid_logins).select_related(
-            "character__characteraudit", "character")
+            "character__characteraudit", "character", "user__profile__main_character")
 
         chars = {}
         for c in co:
+            if self.main_corp_only:
+                if c.character.corporation_id != c.user.profile.main_character.corporation_id:
+                    continue  # Skip this character
+
             if c.user_id not in chars:
                 chars[c.user_id] = []
+
             if c.character.characteraudit.last_known_login:  # Login as Logoff in not always accurate
                 chars[c.user_id].append(
                     c.character.characteraudit.last_known_login)  # Login as Logoff in not always accurate
@@ -1827,7 +1837,7 @@ class LastLoginfilter(FilterBase):
             lambda: {"message": "No Data", "check": self.no_data_pass})
         for u in users:
             c = chars.get(u.id, False)
-            if c is not False:
+            if c is not False and len(c):
                 max_date = max(c)
                 string_date = max_date.strftime("%Y/%m/%d")
                 days_since = (timezone.now() - max_date).days

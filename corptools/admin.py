@@ -265,6 +265,11 @@ class titleAdmin(admin.ModelAdmin):
         return {}
 
 
+class loginAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'days_since_login',
+                    'no_data_pass', 'main_corp_only']
+
+
 admin.site.register(models.CharacterTitle, titleAdmin)
 
 
@@ -279,3 +284,4 @@ if 'securegroups' in settings.INSTALLED_APPS:
         admin.site.register(models.Titlefilter, titleFilterAdmin)
         admin.site.register(models.Rolefilter, rolesFilterAdmin)
     admin.site.register(models.HighestSPFilter)
+    admin.site.register(models.LastLoginfilter, loginAdmin)

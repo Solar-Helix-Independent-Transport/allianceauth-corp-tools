@@ -1181,3 +1181,36 @@ class TestSecGroupBotFilters(TestCase):
         self.assertTrue(tests[8]['check'])
         self.assertTrue(tests[9]['check'])
         self.assertTrue(tests[10]['check'])
+
+    def test_user_has_logged_in_main_only(self):
+        _filter = ct_models.LastLoginfilter.objects.create(name="login Test",
+                                                           description="Something to tell user",
+                                                           days_since_login=30,
+                                                           main_corp_only=True)
+
+        c1 = ct_models.CharacterAudit.objects.filter(
+            id__gte=11)  # All the alts
+        c1.update(last_known_login=timezone.now() -
+                  timedelta(days=15), last_update_login=timezone.now())
+        c2 = ct_models.CharacterAudit.objects.filter(
+            character__character_ownership__user_id=2)
+        c2.update(last_known_login=timezone.now() -
+                  timedelta(days=15), last_update_login=timezone.now())
+
+        print(c1)
+        print(c2)
+        users = []
+        for user in ct_models.CharacterAudit.objects.all():
+            users.append(user.character.character_ownership.user.id)
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=users))
+        self.assertFalse(tests[1]['check'])
+        self.assertTrue(tests[2]['check'])
+        self.assertFalse(tests[3]['check'])
+        self.assertFalse(tests[4]['check'])
+        self.assertFalse(tests[5]['check'])
+        self.assertFalse(tests[6]['check'])
+        self.assertFalse(tests[7]['check'])
+        self.assertFalse(tests[8]['check'])
+        self.assertFalse(tests[9]['check'])
+        self.assertFalse(tests[10]['check'])
