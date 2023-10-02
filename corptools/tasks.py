@@ -794,6 +794,11 @@ def update_corp_pocos(self, corp_id):
     return corp_helpers.update_corporation_pocos(corp_id)
 
 
+@shared_task(bind=True, base=QueueOnce)
+def update_corp_logins(self, corp_id):
+    return corp_helpers.update_character_logins_from_corp(corp_id)
+
+
 @shared_task
 def update_corp(corp_id):
     corp = CorporationAudit.objects.get(corporation__corporation_id=corp_id)
@@ -804,6 +809,7 @@ def update_corp(corp_id):
     que.append(update_corp_structures.si(corp_id))
     que.append(update_corp_assets.si(corp_id))
     que.append(update_corp_pocos.si(corp_id))
+    que.append(update_corp_logins.si(corp_id))
     chain(que).apply_async(priority=6)
 
 

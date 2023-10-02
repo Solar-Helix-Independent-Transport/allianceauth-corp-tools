@@ -16,10 +16,11 @@ from corptools.task_helpers.etag_helpers import NotModifiedError, etag_results
 from corptools.task_helpers.update_tasks import fetch_location_name
 
 from .. import providers
-from ..models import (BridgeOzoneLevel, CorpAsset, CorporationAudit,
-                      CorporationWalletDivision, CorporationWalletJournalEntry,
-                      EveItemType, EveLocation, EveName, MapSystemPlanet, Poco,
-                      Structure, StructureCelestial, StructureService)
+from ..models import (BridgeOzoneLevel, CharacterAudit, CorpAsset,
+                      CorporationAudit, CorporationWalletDivision,
+                      CorporationWalletJournalEntry, EveItemType, EveLocation,
+                      EveName, MapSystemPlanet, Poco, Structure,
+                      StructureCelestial, StructureService)
 
 logger = logging.getLogger(__name__)
 
@@ -517,6 +518,46 @@ def update_corp_structures(corp_id):  # pagnated results
     _corporation.save()
 
     return "Updated structures for: {0}".format(_corporation)
+
+
+def update_character_logins_from_corp(corp_id):
+    audit_corp = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+    logger.debug("Updating Logins for: {}".format(
+        audit_corp.corporation))
+
+    req_scopes = ['esi-corporations.track_members.v1',
+                  'esi-characters.read_corporation_roles.v1']
+    req_roles = ['Director']
+
+    token = get_corp_token(corp_id, req_scopes, req_roles)
+
+    if not token:
+        return "No Tokens"
+    try:
+        tracking_op = providers.esi.client.Corporation.get_corporations_corporation_id_membertracking(
+            corporation_id=corp_id)
+        tracking = etag_results(tracking_op, token)
+
+        for c in tracking:
+            try:
+                ca = CharacterAudit.objects.get(
+                    character__character_id=c['character_id'])
+                ca.last_known_login = c.get('logon_date', None)
+                ca.last_known_logoff = c.get('logoff_date', None)
+                ca.save()
+            except CharacterAudit.DoesNotExist:
+                pass
+
+    except NotModifiedError:
+        logger.info("CT: No New Logins for: {}".format(
+            audit_corp.corporation))
+        pass
+
+    audit_corp.last_update_assets = timezone.now()
+    audit_corp.save()
+
+    return "Finished Logins for: {}".format(audit_corp.corporation)
 
 
 def update_corp_assets(corp_id):

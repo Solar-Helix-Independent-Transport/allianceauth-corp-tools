@@ -112,8 +112,17 @@ class CharacterAudit(models.Model):
     last_update_indy = models.DateTimeField(
         null=True, default=None, blank=True)
 
+    last_update_login = models.DateTimeField(
+        null=True, default=None, blank=True)
+
     balance = models.DecimalField(
         max_digits=20, decimal_places=2, null=True, default=None)
+
+    last_known_login = models.DateTimeField(
+        null=True, default=None, blank=True)
+
+    last_known_logoff = models.DateTimeField(
+        null=True, default=None, blank=True)
 
     def __str__(self):
         return "{}'s Character Data".format(self.character.character_name)
@@ -200,6 +209,9 @@ class CorporationAudit(models.Model):
     last_update_wallet = models.DateTimeField(
         null=True, default=None, blank=True)
     last_change_wallet = models.DateTimeField(
+        null=True, default=None, blank=True)
+
+    last_update_known_login = models.DateTimeField(
         null=True, default=None, blank=True)
 
     def __str__(self):
@@ -1768,4 +1780,58 @@ class Titlefilter(FilterBase):
                     output[u.id] = {"message": "", "check": False}
                     continue
             output[u.id] = {"message": "", "check": False}
+        return output
+
+
+class LastLoginfilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Corporate Title checks"
+        verbose_name_plural = verbose_name
+
+    days_since_login = models.IntegerField(
+        default=30,
+        help_text="Days since last login of any Character in the accounts Main's Corporation to pass filter.")
+
+    no_data_pass = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="If there is no data (No Valid Corp Token) for a characters account then should this filter automatically pass.")
+
+    def process_filter(self, user: User):
+        try:
+            check = self.audit_filter([user])
+
+            if check[user.id]['check']:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False
+
+    def audit_filter(self, users):
+        valid_logins = timezone.now(
+        ) - datetime.timedelta(days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS)
+        co = CharacterOwnership.objects.filter(user__in=users, character__characteraudit__last_update_login__gte=valid_logins).select_related(
+            "character__characteraudit", "character")
+
+        chars = {}
+        for c in co:
+            if c.user_id not in chars:
+                chars[c.user_id] = []
+            if c.character.characteraudit.last_known_login:
+                chars[c.user_id].append(
+                    c.character.characteraudit.last_known_login)
+
+        output = defaultdict(
+            lambda: {"message": "No Data", "check": self.no_data_pass})
+        for u in users:
+            c = chars.get(u.id, False)
+            if c is not False:
+                max_date = max(c)
+                string_date = max_date.strftime("%Y/%m/%d")
+                days_since = (timezone.now() - max_date).days
+                output[u.id] = {"message": f"{string_date} - {days_since} Days Ago",
+                                "check": False if days_since > self.days_since_login else True}
+                continue
         return output
