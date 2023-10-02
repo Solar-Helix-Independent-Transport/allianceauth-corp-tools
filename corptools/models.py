@@ -1785,7 +1785,7 @@ class Titlefilter(FilterBase):
 
 class LastLoginfilter(FilterBase):
     class Meta:
-        verbose_name = "Smart Filter: Corporate Title checks"
+        verbose_name = "Smart Filter: Last Login Check"
         verbose_name_plural = verbose_name
 
     days_since_login = models.IntegerField(
