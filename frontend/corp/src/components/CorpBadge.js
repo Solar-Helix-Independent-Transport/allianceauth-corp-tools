@@ -47,6 +47,7 @@ function CorpBadge() {
             >
               Wallets
             </Checkbox>
+            <h6>Required for invoice module on holding corps</h6>
 
             <Checkbox
               style={{ width: "100%" }}
