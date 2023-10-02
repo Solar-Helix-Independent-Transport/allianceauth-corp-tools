@@ -1819,9 +1819,9 @@ class LastLoginfilter(FilterBase):
         for c in co:
             if c.user_id not in chars:
                 chars[c.user_id] = []
-            if c.character.characteraudit.last_known_login:
+            if c.character.characteraudit.last_known_login:  # Login as Logoff in not always accurate
                 chars[c.user_id].append(
-                    c.character.characteraudit.last_known_login)
+                    c.character.characteraudit.last_known_login)  # Login as Logoff in not always accurate
 
         output = defaultdict(
             lambda: {"message": "No Data", "check": self.no_data_pass})
