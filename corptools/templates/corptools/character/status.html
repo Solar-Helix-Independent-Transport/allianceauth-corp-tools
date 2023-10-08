@@ -17,70 +17,70 @@
                             {% if data.character.alliance_name %}
                                 <br><span class="badge badge-default">{{ data.character.alliance_name }}</span>
                             {% endif %}<br><br>
-                            <span class="badge badge-default">Total SP: {{ data.total_sp|intcomma }}</span>
-                            <span class="badge badge-default">Isk: {{ data.character.characteraudit.balance|intcomma }}</span>
+                            <span class="badge badge-default">{% trans "Total SP" %}: {{ data.total_sp|intcomma }}</span>
+                            <span class="badge badge-default">{% trans "Isk" %}: {{ data.character.characteraudit.balance|intcomma }}</span>
                         </div>
                     </div>
                     <div class="col-md-8 col-lg-8 pannel-hieght-locked scroll-bar-narrow">
                         <table class="table datatable table-hover">
                             <thead>
-                                <th class="text-right">Dataset</th>
-                                <th>Last Update</th>
+                                <th class="text-right">{% trans "Dataset" %}</th>
+                                <th>{% trans "Last Update" %}</th>
                             </thead>
                             <tbody>
                                 {% app_setting as appset %}
 
                                 <tr>
-                                    <td class="text-right">Public Data</td><td>{{ data.character.characteraudit.last_update_pub_data|timesince}} ago</td>
+                                    <td class="text-right">{% trans "Public Data" %}</td><td>{{ data.character.characteraudit.last_update_pub_data|timesince}} {% trans "ago" %}</td>
                                 </tr>
                                 {% if appset.CT_CHAR_ASSETS_MODULE %}
                                     <tr>
-                                        <td class="text-right">Assets</td><td>{{ data.character.characteraudit.last_update_assets|timesince}} ago</td>
+                                        <td class="text-right">{% trans "Assets" %}</td><td>{{ data.character.characteraudit.last_update_assets|timesince}} {% trans "ago" %}</td>
                                     </tr>
                                 {% endif %}
                                 {% if appset.CT_CHAR_CLONES_MODULE %}
                                     <tr>
-                                        <td class="text-right">Clones</td><td>{{ data.character.characteraudit.last_update_clones|timesince}} ago</td>
+                                        <td class="text-right">{% trans "Clones" %}</td><td>{{ data.character.characteraudit.last_update_clones|timesince}} {% trans "ago" %}</td>
                                     </tr>
                                 {% endif %}
                                 {% if appset.CT_CHAR_CONTACTS_MODULE %}
                                     <tr>
-                                        <td class="text-right">Contacts</td><td>{{ data.character.characteraudit.last_update_contacts|timesince}} ago</td>
+                                        <td class="text-right">{% trans "Contacts" %}</td><td>{{ data.character.characteraudit.last_update_contacts|timesince}} {% trans "ago" %}</td>
                                     </tr>
                                 {% endif %}
                                 {% if appset.CT_CHAR_WALLET_MODULE %}
                                     <tr>
-                                        <td class="text-right">Orders</td><td>{{ data.character.characteraudit.last_update_orders|timesince}} ago</td>
+                                        <td class="text-right">{% trans "Orders" %}</td><td>{{ data.character.characteraudit.last_update_orders|timesince}} {% trans "ago" %}</td>
                                     </tr>
                                 {% endif %}
                                 {% if appset.CT_CHAR_NOTIFICATIONS_MODULE %}
                                     <tr>
-                                        <td class="text-right">Notifications</td><td>{{ data.character.characteraudit.last_update_notif|timesince}} ago</td>
+                                        <td class="text-right">{% trans "Notifications" %}</td><td>{{ data.character.characteraudit.last_update_notif|timesince}} {% trans "ago" %}</td>
                                     </tr>
                                 {% endif %}
                                 {% if appset.CT_CHAR_MAIL_MODULE %}
                                     <tr>
-                                        <td class="text-right">Mails</td><td>{{ data.character.characteraudit.last_update_mails|timesince}} ago</td>
+                                        <td class="text-right">{% trans "Mails" %}</td><td>{{ data.character.characteraudit.last_update_mails|timesince}} {% trans "ago" %}</td>
                                     </tr>
                                 {% endif %}
                                 {% if appset.CT_CHAR_ROLES_MODULE %}
                                     <tr>
-                                        <td class="text-right">Roles</td><td>{{ data.character.characteraudit.last_update_roles|timesince}} ago</td>
+                                        <td class="text-right">{% trans "Roles" %}</td><td>{{ data.character.characteraudit.last_update_roles|timesince}} {% trans "ago" %}</td>
                                     <tr>
-                                        <td class="text-right">Titles</td><td>{{ data.character.characteraudit.last_update_titles|timesince}} ago</td>
+                                        <td class="text-right">{% trans "Titles" %}</td><td>{{ data.character.characteraudit.last_update_titles|timesince}} {% trans "ago" %}</td>
                                     </tr>
                                 {% endif %}
                                 {% if appset.CT_CHAR_SKILLS_MODULE %}
                                     <tr>
-                                        <td class="text-right">Skills</td><td>{{ data.character.characteraudit.last_update_skills|timesince}} ago</td>
+                                        <td class="text-right">{% trans "Skills" %}</td><td>{{ data.character.characteraudit.last_update_skills|timesince}} {% trans "ago" %}</td>
                                     </tr>
                                     <tr>
-                                        <td class="text-right">Skill Que</td><td>{{ data.character.characteraudit.last_update_skill_que|timesince}} ago</td>
+                                        <td class="text-right">{% trans "Skill Que" %}</td><td>{{ data.character.characteraudit.last_update_skill_que|timesince}} {% trans "ago" %}</td>
                                     </tr>
                                 {% endif %}
                                 {% if appset.CT_CHAR_WALLET_MODULE %}
                                     <tr>
-                                        <td class="text-right">Wallet</td><td>{{ data.character.characteraudit.last_update_wallet|timesince}} ago</td>
+                                        <td class="text-right">{% trans "Wallet" %}</td><td>{{ data.character.characteraudit.last_update_wallet|timesince}} {% trans "ago" %}</td>
                                     </tr>
                                 {% endif %}
                             </tbody>

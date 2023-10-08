@@ -6,34 +6,34 @@
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
+                <span class="sr-only">{% trans "Toggle navigation" %}</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{% url 'corptools:view' %}">Account Audit</a>
+            <a class="navbar-brand" href="{% url 'corptools:view' %}">{% trans "Account Audit" %}</a>
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 {% if perms.corptools.admin %}
-                 <li><a class="" href="{% url 'corptools:admin' %}">DB Admin</a></li>
+                 <li><a class="" href="{% url 'corptools:admin' %}">{% trans "DB Admin" %}</a></li>
 
                 {% endif %}
                 {% if perms.corptools.alliance_corp_manager or perms.corptools.global_corp_manager or perms.corptools.state_corp_manager %}
-                    <li class=>
-                        <a href="{% url 'corptools:corp_menu' %}">Corporations</a>
+                    <li {% trans "class" %}=>
+                        <a href="{% url 'corptools:corp_menu' %}">{% trans "Corporations" %}</a>
                     <li>
                 {% endif %}
 
             </ul>
             <ul class="nav navbar-nav pull-right">
-                <li class=>
-                    <a href="{% url 'corptools:add_char' %}">Add Character Token</a>
+                <li {% trans "class" %}=>
+                    <a href="{% url 'corptools:add_char' %}">{% trans "Add Character Token" %}</a>
                 </li>
                 {% if perms.corptools.alliance_corp_manager or perms.corptools.global_corp_manager or perms.corptools.state_corp_manager %}
-                    <li class=>
-                        <a href="{% url 'corptools:add_corp' %}">Add Corporate Token</a>
+                    <li {% trans "class" %}=>
+                        <a href="{% url 'corptools:add_corp' %}">{% trans "Add Corporate Token" %}</a>
                     <li>
                 {% endif %}
 
@@ -46,10 +46,10 @@
     <table class="table table-hover dateTable" id="characters">
         <thead>
             <th></th>
-            <th>Main Character</th>
-            <th>Corporation</th>
-            <th>Alliance</th>
-            <th>Alts</th>
+            <th>{% trans "Main Character" %}</th>
+            <th>{% trans "Corporation" %}</th>
+            <th>{% trans "Alliance" %}</th>
+            <th>{% trans "Alts" %}</th>
         </thead>
         <tbody>
             {% for char,alts in characters.items %}

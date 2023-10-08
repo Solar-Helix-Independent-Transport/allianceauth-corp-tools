@@ -1,7 +1,7 @@
 {% load humanize  %}
 <div class="col-md-4 col-xs-12 col-sm-12">
     <div class="panel panel-primary">
-        <div class="panel-heading text-center"> Capital Ships </div>
+        <div class="panel-heading text-center"> {% trans "Capital Ships" %} </div>
         <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
             <table class="table">
                 {% for g in capital_asset_groups %}
@@ -13,7 +13,7 @@
 </div>
 <div class="col-md-4 col-xs-12 col-sm-12">
     <div class="panel panel-primary">
-        <div class="panel-heading text-center "> Sub-Capital Ships </div>
+        <div class="panel-heading text-center "> {% trans "Sub-Capital Ships" %} </div>
         <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
             <table class="table">
                 {% for g in subcap_asset_groups %}
@@ -25,7 +25,7 @@
 </div>
 <div class="col-md-4 col-xs-12 col-sm-12">
     <div class="panel panel-primary">
-        <div class="panel-heading text-center"> Notable Others Assets </div>
+        <div class="panel-heading text-center"> {% trans "Notable Others Assets" %} </div>
         <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
             <table class="table">
                 {% for g in noteable_asset_groups %}
@@ -37,7 +37,7 @@
 </div>
 <div class="col-md-4 col-xs-12 col-sm-12">
     <div class="panel panel-primary">
-        <div class="panel-heading text-center"> BPO's </div>
+        <div class="panel-heading text-center"> {% trans "BPO's" %} </div>
         <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
             <table class="table">
                 {% for g in bpo_asset_groups %}
@@ -49,7 +49,7 @@
 </div>
 <div class="col-md-4 col-xs-12 col-sm-12">
     <div class="panel panel-primary">
-        <div class="panel-heading text-center"> Structures </div>
+        <div class="panel-heading text-center"> {% trans "Structures" %} </div>
         <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
             <table class="table">
                 {% for g in structure_asset_groups %}
@@ -61,7 +61,7 @@
 </div>
 <div class="col-md-4 col-xs-12 col-sm-12">
     <div class="panel panel-primary">
-        <div class="panel-heading text-center"> Rest </div>
+        <div class="panel-heading text-center"> {% trans "Rest" %} </div>
         <div class="panel-body pannel-hieght-locked scroll-bar-narrow">
             <table class="table">
                 {% for g in remaining_asset_groups %}
