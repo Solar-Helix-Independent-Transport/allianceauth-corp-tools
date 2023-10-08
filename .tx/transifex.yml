@@ -6,5 +6,5 @@ filters:
     translation_files_expression: corptools/locale/<lang>/LC_MESSAGES/django.po
 
 settings:
-language_mapping:
-zh-Hans: zh_Hans
+  language_mapping:
+    zh-Hans: zh_Hans
