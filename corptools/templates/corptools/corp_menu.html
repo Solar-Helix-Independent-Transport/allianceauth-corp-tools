@@ -22,15 +22,15 @@
                 {% endif %}
             </ul>
             <ul class="nav navbar-nav pull-right">
-                <li {% trans "class" %}=>
+                <li class=>
                     <a href="{% url 'corptools:add_char' %}">{% trans "Add Character Token" %}</a>
                 </li>
                 {% if perms.corptools.alliance_corp_manager or perms.corptools.global_corp_manager or perms.corptools.state_corp_manager %}
-                    <li {% trans "class" %}=>
+                    <li class=>
                         <a href="{% url 'corptools:add_corp' %}">{% trans "Add Corporate Token" %}</a>
                     <li>
                 {% endif %}
-                <li {% trans "class" %}=>
+                <li class=>
                     <a href="{% url 'corptools:view' %}">{% trans "Characters" %}</a>
                 <li>
 
