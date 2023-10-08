@@ -3,13 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
+# Translators:
+# Peter Pfeufer, 2023
+# 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-08 18:52+1000\n"
-"PO-Revision-Date: 2023-10-08 08:55+0000\n"
+"PO-Revision-Date: 2023-10-08 09:09+0000\n"
+"Last-Translator: Peter Pfeufer, 2023\n"
 "Language-Team: German (https://app.transifex.com/alliance-auth/teams/107430/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,32 +23,33 @@ msgstr ""
 
 #: corptools/models.py:1208
 msgid "Character"
-msgstr ""
+msgstr "Charakter"
 
 #: corptools/models.py:1210
 msgid "NPC Corporation"
-msgstr ""
+msgstr "NPC Corporation"
 
 #: corptools/models.py:1211
 msgid "LP"
-msgstr ""
+msgstr "LP"
 
 #: corptools/models.py:1214
 msgid "Loyalty Point"
-msgstr ""
+msgstr "Loyalitätspunkte"
 
 #: corptools/templates/corptools/base.html:71
 msgid "Add All Token"
-msgstr ""
+msgstr "Alle Token hinzufügen"
 
 #: corptools/templates/corptools/corporation/react_base.html:3
 msgid "Corporation Audit"
-msgstr ""
+msgstr "Corporation Audit"
 
 #: corptools/templates/corptools/dashboard.corptools.status.html:6
 msgid "Characters"
-msgstr ""
+msgstr "Charaktere"
 
 #: corptools/validators.py:12
 msgid "This is not valid JSON, please check it and try again."
 msgstr ""
+"Dies ist kein valides JSON, bitte prüfe dies und versuche es noch einmal."
