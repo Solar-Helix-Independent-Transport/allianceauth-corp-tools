@@ -4,3 +4,7 @@ filters:
     source_file: corptools/locale/en/LC_MESSAGES/django.po
     source_language: en
     translation_files_expression: corptools/locale/<lang>/LC_MESSAGES/django.po
+
+settings:
+language_mapping:
+zh-Hans: zh_Hans
