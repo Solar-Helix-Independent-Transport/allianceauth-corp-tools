@@ -6,10 +6,13 @@ import { Col } from "react-bootstrap";
 import { Image } from "react-bootstrap";
 import { Panel } from "react-bootstrap";
 import { Badge } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharHeader = () => {
+  const { t, i18n } = useTranslation();
+
   let { characterID } = useParams();
 
   const { isLoading, data } = useQuery(["status", characterID], () => loadStatus(characterID));
@@ -36,7 +39,7 @@ const CharHeader = () => {
       <Panel.Body>
         <Col xs={12} className="flex">
           <div className="child info-hide">
-            <h1 style={{ margin: 0 }}>Character Audit</h1>
+            <h1 style={{ margin: 0 }}>{t("Character Audit")}</h1>
           </div>
           {!isLoading ? (
             <>
@@ -74,14 +77,19 @@ const CharHeader = () => {
               <div className="info-hide">
                 {sp ? (
                   <>
-                    <Badge>Total SP: {sp.toLocaleString()}</Badge> <br />
+                    <Badge>
+                      {t("Total SP")}: {sp.toLocaleString()}
+                    </Badge>{" "}
+                    <br />
                   </>
                 ) : (
                   <></>
                 )}
                 {isk ? (
                   <>
-                    <Badge>Total Isk: {isk.toLocaleString()}</Badge>
+                    <Badge>
+                      {t("Total Isk")}: {isk.toLocaleString()}
+                    </Badge>
                   </>
                 ) : (
                   <></>

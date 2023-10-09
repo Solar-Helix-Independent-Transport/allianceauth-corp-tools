@@ -24,12 +24,21 @@ import CharStatus from "./pages/Status";
 import CharWallet from "./pages/Wallet";
 import CharWalletActivity from "./pages/WalletActivity";
 import "./style.css";
+import i18n from "i18next";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import React from "react";
 import { render } from "react-dom";
+import { initReactI18next } from "react-i18next";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+
+i18n.use(initReactI18next).init({
+  fallbackLng: "en",
+  interpolation: {
+    escapeValue: false, // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
+  },
+});
 
 TimeAgo.addDefaultLocale(en);
 
