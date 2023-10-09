@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from django.utils.translation import gettext_lazy as _
 from ninja import Field, Form, NinjaAPI
 
 from ... import app_settings, models
@@ -20,31 +21,31 @@ class MenuApiEndpoints:
         )
         def get_character_menu(request):
             _inter = {
-                "name": "Interactions",
+                "name": _("Interactions"),
                 "links": []
             }
             _finance = {
-                "name": "Finances",
+                "name": _("Finances"),
                 "links": []
             }
             _industry = {
-                "name": "Industry",
+                "name": _("Industry"),
                 "links": []
             }
             _char = {
-                "name": "Characters",
+                "name": _("Characters"),
                 "links": []
             }
 
             if app_settings.CT_CHAR_CONTACTS_MODULE:
                 _inter["links"].append({
-                    "name": "Contact",
+                    "name": _("Contact"),
                     "link": "account/contact"
                 })
 
             if app_settings.CT_CHAR_NOTIFICATIONS_MODULE:
                 _inter["links"].append({
-                    "name": "Notifications",
+                    "name": _("Notifications"),
                     "link": "account/notifications"
                 })
 
@@ -56,7 +57,7 @@ class MenuApiEndpoints:
 
             if app_settings.CT_CHAR_WALLET_MODULE:
                 _finance["links"].append({
-                    "name": "Wallet",
+                    "name": _("Wallet"),
                     "link": "account/wallet"
                 })
                 if (request.user.has_perm("corptools.global_corp_manager") or
@@ -64,70 +65,70 @@ class MenuApiEndpoints:
                     request.user.has_perm("corptools.alliance_corp_manager") or
                         request.user.has_perm("corptools.own_corp_manager")):
                     _finance["links"].append({
-                        "name": "Wallet Activity",
+                        "name": _("Wallet Activity"),
                         "link": "account/walletactivity"
                     })
                 _finance["links"].append({
-                    "name": "Contracts",
+                    "name": _("Contracts"),
                     "link": "account/contract"
                 })
 
                 _finance["links"].append({
-                    "name": "Market",
+                    "name": _("Market"),
                     "link": "account/market"
                 })
 
             if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE:
                 _finance["links"].append({
-                    "name": "Loyalty Points",
+                    "name": _("Loyalty Points"),
                     "link": "account/lp"
                 })
 
             if app_settings.CT_CHAR_ASSETS_MODULE:
                 _char["links"].append({
-                    "name": "Asset Overview",
+                    "name": _("Asset Overview"),
                     "link": "account/assets"
                 })
                 _char["links"].append({
-                    "name": "Asset List",
+                    "name": _("Asset List"),
                     "link": "account/listassets"
                 })
 
             if app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE:
                 _industry["links"].append({
-                    "name": "Mining Ledger",
+                    "name": _("Mining Ledger"),
                     "link": "account/mining"
                 })
 
             if app_settings.CT_CHAR_CLONES_MODULE:
                 _char["links"].append({
-                    "name": "Clones",
+                    "name": _("Clones"),
                     "link": "account/clones"
                 })
 
             if app_settings.CT_CHAR_ROLES_MODULE:
                 _char["links"].append({
-                    "name": "Roles",
+                    "name": _("Roles"),
                     "link": "account/roles"
                 })
 
             if app_settings.CT_CHAR_MAIL_MODULE:
                 _inter["links"].append({
-                    "name": "Mail",
+                    "name": _("Mail"),
                     "link": "account/mail"
                 })
 
             if app_settings.CT_CHAR_SKILLS_MODULE:
                 _char["links"].append({
-                    "name": "Skills",
+                    "name": _("Skills"),
                     "link": "account/skills"
                 })
                 _char["links"].append({
-                    "name": "Skill Queues",
+                    "name": _("Skill Queues"),
                     "link": "account/skillqueue"
                 })
                 _char["links"].append({
-                    "name": "Skill List Checks",
+                    "name": _("Skill List Checks"),
                     "link": "account/doctrines"
                 })
             out = []

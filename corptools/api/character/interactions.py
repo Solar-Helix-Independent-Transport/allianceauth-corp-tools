@@ -1,11 +1,15 @@
+import logging
 from typing import List
 
+from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI
 
 from corptools import models
 from corptools.api import schema
 from corptools.api.helpers import get_alts_queryset, get_main_character
 from corptools.task_helpers.char_tasks import update_character_mail_body
+
+logger = logging.getLogger(__name__)
 
 
 class InteractionApiEndpoints:
@@ -24,7 +28,7 @@ class InteractionApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -69,7 +73,7 @@ class InteractionApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -115,13 +119,13 @@ class InteractionApiEndpoints:
             response={200: dict, 403: str},
             tags=self.tags
         )
-        def get_mail_message_requesst(request, character_id: int, mail_id: int):
+        def get_mail_message_request(request, character_id: int, mail_id: int):
             if character_id == 0:
                 character_id = request.user.profile.main_character.character_id
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             msg = models.MailMessage.objects.get(
                 character__character__character_id=character_id, mail_id=mail_id)
@@ -146,7 +150,7 @@ class InteractionApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 

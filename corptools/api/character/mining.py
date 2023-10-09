@@ -2,6 +2,7 @@ from datetime import timedelta
 from typing import List, Optional
 
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI
 
 from corptools import models
@@ -25,7 +26,7 @@ class MiningApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -45,7 +46,7 @@ class MiningApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 

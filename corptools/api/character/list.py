@@ -2,6 +2,7 @@
 from typing import List
 
 from django.db.models import F
+from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI
 
 from corptools import models

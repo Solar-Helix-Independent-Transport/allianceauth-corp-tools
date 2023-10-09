@@ -1,6 +1,7 @@
 from typing import List
 
 from django.db.models import Count, F, Sum
+from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI
 from ninja.pagination import paginate
 
@@ -28,7 +29,7 @@ class FinancesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -72,7 +73,7 @@ class FinancesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -117,7 +118,7 @@ class FinancesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -198,7 +199,7 @@ class FinancesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
             ref_types = ["player_donation", "player_trading",
@@ -261,7 +262,7 @@ class FinancesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -325,7 +326,7 @@ class FinancesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
