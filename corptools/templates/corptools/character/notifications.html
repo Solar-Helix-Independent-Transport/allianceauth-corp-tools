@@ -6,15 +6,15 @@
 
 <div class="col-md-12">
     <div class="row panel panel-primary">
-        <div class="panel-heading text-center">Wallets</div>
+        <div class="panel-heading text-center">{% trans "Wallets" %}</div>
         <div class="panel-body">
             <table id="wallet" class="table table-responsive">
                 <thead>
-                    <th>Date</th>
-                    <th>Character</th>
-                    <th>Type</th>
-                    <th>Text</th>
-                    <th>Read</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Character" %}</th>
+                    <th>{% trans "Type" %}</th>
+                    <th>{% trans "Text" %}</th>
+                    <th>{% trans "Read" %}</th>
                 </thead>
                 <tbody>
                     {% for n in table_data %}

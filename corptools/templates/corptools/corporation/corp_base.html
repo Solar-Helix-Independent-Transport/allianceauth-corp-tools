@@ -185,30 +185,30 @@ tr.group,
                     <div class="container-fluid">
                         <div class="navbar-header">
                             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                                <span class="sr-only">Toggle navigation</span>
+                                <span class="sr-only">{% trans "Toggle navigation" %}</span>
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                             </button>
-                            <a class="navbar-brand" href="{% url 'corptools:view' %}">Account Audit</a>
+                            <a class="navbar-brand" href="{% url 'corptools:view' %}">{% trans "Account Audit" %}</a>
                         </div>
 
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul class="nav navbar-nav">
                                 <li class="">
-                                    <a href="{% url 'corptools:overview' main_char.character_id %}">Overview</a>
+                                    <a href="{% url 'corptools:overview' main_char.character_id %}">{% trans "Overview" %}</a>
                                 </li>
                                 <li class="">
-                                    <a href="{% url 'corptools:assets' main_char.character_id%}">Assets</a>
+                                    <a href="{% url 'corptools:assets' main_char.character_id%}">{% trans "Assets" %}</a>
                                 </li>
                                 <li class="">
-                                    <a href="{% url 'corptools:clones' main_char.character_id%}">Clones</a>
+                                    <a href="{% url 'corptools:clones' main_char.character_id%}">{% trans "Clones" %}</a>
                                 </li>
                                 <li class="">
-                                    <a href="{% url 'corptools:skills' main_char.character_id%}">Skills</a>
+                                    <a href="{% url 'corptools:skills' main_char.character_id%}">{% trans "Skills" %}</a>
                                 </li>
                                 <li class="">
-                                    <a href="{% url 'corptools:wallet' main_char.character_id %}">Wallet</a>
+                                    <a href="{% url 'corptools:wallet' main_char.character_id %}">{% trans "Wallet" %}</a>
                                 </li>
                             </ul>
                             <ul class="nav navbar-nav pull-right">
@@ -216,11 +216,11 @@ tr.group,
                                     <a href="{% url 'corptools:update_account' main_char.character_id%}"><i class="fas fa-sync"></i></a>
                                 </li>
                                 <li class=>
-                                    <a href="{% url 'corptools:add_char' %}">Add Character Token</a>
+                                    <a href="{% url 'corptools:add_char' %}">{% trans "Add Character Token" %}</a>
                                 </li>
                                 {% if perms.corptools.alliance_corp_manager or perms.corptools.global_corp_manager or perms.corptools.state_corp_manager %}
                                     <li class=>
-                                        <a href="{% url 'corptools:add_corp' %}">Add Corporate Token</a>
+                                        <a href="{% url 'corptools:add_corp' %}">{% trans "Add Corporate Token" %}</a>
                                     <li>
                                 {% endif %}
 
@@ -248,13 +248,13 @@ tr.group,
                         {% endif %}
                         <div class="col-xs-12 hidden-md hidden-lg"><hr></div>
                         <div class="text-center col-md-6"  rowspan="2">
-                            <h4>Linked characters</h4>
+                            <h4>{% trans "Linked characters" %}</h4>
                             {% for alt in alts|slice:":15" %}
-                        <span rel="tooltip" style="background-color: {% if alt.characteraudit.is_active %}#008844{% else %}#AA0000{% endif %}" class="label label-default" data-toggle="tooltip" data-placement="top" data-html="true" title data-original-title="Public Data: {{ alt.characteraudit.last_update_pub_data|timesince}} ago<br>Skills: {{ alt.characteraudit.last_update_skills|timesince}} ago<br>Skill Que: {{ alt.characteraudit.last_update_skill_que|timesince}} ago<br>Clones: {{ alt.characteraudit.last_update_clones|timesince}} ago<br>Assets: {{ alt.characteraudit.last_update_assets|timesince}} ago<br>Wallets: {{ alt.characteraudit.last_update_wallet|timesince}} ago"><img class="ra-avatar img-circle img-pad" src="{{ alt.portrait_url_32 }}"> {{ alt.character_name }}</span>
+                        <span rel="tooltip" style="background-color: {% if alt.characteraudit.is_active %}#008844{% else %}#AA0000{% endif %}" class="label label-default" data-toggle="tooltip" data-placement="top" data-html="true" {% trans "title" %} data-original-title="{% trans "Public Data" %}: {{ alt.characteraudit.last_update_pub_data|timesince}} {% trans "ago" %}<br>{% trans "Skills" %}: {{ alt.characteraudit.last_update_skills|timesince}} {% trans "ago" %}<br>{% trans "Skill Que" %}: {{ alt.characteraudit.last_update_skill_que|timesince}} {% trans "ago" %}<br>{% trans "Clones" %}: {{ alt.characteraudit.last_update_clones|timesince}} {% trans "ago" %}<br>{% trans "Assets" %}: {{ alt.characteraudit.last_update_assets|timesince}} {% trans "ago" %}<br>{% trans "Wallets" %}: {{ alt.characteraudit.last_update_wallet|timesince}} {% trans "ago" %}"><img class="ra-avatar img-circle img-pad" src="{{ alt.portrait_url_32 }}"> {{ alt.character_name }}</span>
                             {% endfor %}
-                            {% if alts.count > 15 %}<span class="label label-default">{{ alts.count|subtract:15 }} More... </span>{% endif %}
+                            {% if alts.count > 15 %}<span class="label label-default">{{ alts.count|subtract:15 }} {% trans "More" %}... </span>{% endif %}
                             <br>
-                            <span class="label label-default">Total Account ISK: {{ net_worth|intcomma }}</span>
+                            <span class="label label-default">{% trans "Total Account ISK" %}: {{ net_worth|intcomma }}</span>
                         </div>
                     </div>
                 </div>

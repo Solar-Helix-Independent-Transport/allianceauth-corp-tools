@@ -4,19 +4,19 @@
 {% load helpers %}
 {% block ct_block %}
     <div class="panel panel-default">
-        <div class="panel-heading">Contacts</div>
+        <div class="panel-heading">{% trans "Contacts" %}</div>
         <div class="panel-body">
             <table id="table-contacts" class="table table-hover dataTable">
                 <thead>
                     <th class="text-center"></th>
-                    <th class="text-center">Name</th>
-                    <th class="text-center">Standing</th>
-                    <th class="text-center">Labels</th>
-                    <th class="text-center">Blocked</th>
-                    <th class="text-center">Watched</th>
-                    <th class="text-center">Blocked</th>
-                    <th class="text-center">Watched</th>
-                    <th class="text-center">Owner</th>
+                    <th class="text-center">{% trans "Name" %}</th>
+                    <th class="text-center">{% trans "Standing" %}</th>
+                    <th class="text-center">{% trans "Labels" %}</th>
+                    <th class="text-center">{% trans "Blocked" %}</th>
+                    <th class="text-center">{% trans "Watched" %}</th>
+                    <th class="text-center">{% trans "Blocked" %}</th>
+                    <th class="text-center">{% trans "Watched" %}</th>
+                    <th class="text-center">{% trans "Owner" %}</th>
                 </thead>
                 <tbody>
                 {% for contact in table_data %}
@@ -46,17 +46,17 @@
                         </td>
                         <td class="text-center">
                         {% if contact.blocked %}
-                            Yes
+                            {% trans "Yes" %}
                         {% else %}
-                            No
+                            {% trans "No" %}
                         {% endif %}
                         </td>
 
                         <td class="text-center">
                         {% if contact.watched %}
-                            Yes
+                            {% trans "Yes" %}
                         {% else %}
-                            No
+                            {% trans "No" %}
                         {% endif %}
                         </td>
                         <td class="text-center">{{ contact.character.character.character_name}}</td>

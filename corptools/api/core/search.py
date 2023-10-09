@@ -2,6 +2,7 @@ import logging
 from typing import List
 
 from django.db.models import F, Q, Sum
+from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI
 
 from corptools import models
@@ -23,7 +24,7 @@ class SearchApiEndpoints:
         )
         def get_system_search(request, search_text: str, limit: int = 10):
             if not request.user.is_superuser:
-                return 403, "Hard no pall!"
+                return 403, _("Hard no pall!")
             return models.MapSystem.objects.filter(name__icontains=search_text).values("name", id=F("system_id"))[:limit]
 
         @api.get(
@@ -33,7 +34,7 @@ class SearchApiEndpoints:
         )
         def get_location_search(request, search_text: str, limit: int = 10):
             if not request.user.is_superuser:
-                return 403, "Hard no pall!"
+                return 403, _("Hard no pall!")
 
             return models.EveLocation.objects.filter(location_name__icontains=search_text).exclude(location_id__lte=0).values(name=F("location_name"), id=F("location_id"))[:limit]
 
@@ -44,6 +45,6 @@ class SearchApiEndpoints:
         )
         def get_group_search(request, search_text: str, limit: int = 10):
             if not request.user.is_superuser:
-                return 403, "Hard no pall!"
+                return 403, _("Hard no pall!")
 
             return models.EveItemGroup.objects.filter(name__icontains=search_text).values("name", id=F("group_id"))[:limit]

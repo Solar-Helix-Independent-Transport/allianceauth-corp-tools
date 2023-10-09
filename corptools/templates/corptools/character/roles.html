@@ -5,18 +5,18 @@
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-primary"style="border-radius: 0 0 4px 4px; border-top-width: 0;">
-            <div class="panel-heading text-center">Roles</div>
+            <div class="panel-heading text-center">{% trans "Roles" %}</div>
             <div class="panel-body">
                     <div class="col-md-12">
-                        <h4 class="text-center">Character Roles</h5>
+                        <h4 class="text-center">{% trans "Character Roles" %}</h5>
                         <table class="table table-hover datatable scroll-bar-narrow" id="roles-table" width="100%">
                             <thead>
-                                <th>Character</th>
-                                <th class="text-center">Corporation</th>
-                                <th class="text-center">Director</th>
-                                <th class="text-center">Accountant</th>
-                                <th class="text-center">Station Manager</th>
-                                <th class="text-center">Personnel Manager</th>
+                                <th>{% trans "Character" %}</th>
+                                <th class="text-center">{% trans "Corporation" %}</th>
+                                <th class="text-center">{% trans "Director" %}</th>
+                                <th class="text-center">{% trans "Accountant" %}</th>
+                                <th class="text-center">{% trans "Station Manager" %}</th>
+                                <th class="text-center">{% trans "Personnel Manager" %}</th>
                             </thead>
                             <tbody>
                                 {% for char_roles in char_data %}

@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-md-6">
             <div class="panel panel-primary">
-                <div class="panel-heading text-center">Sell Order Total</div>
+                <div class="panel-heading text-center">{% trans "Sell Order Total" %}</div>
                 <div class="panel-body">
                     <h3 class="text-center">$ {{total_sell|intcomma}}</h3>
                 </div>
@@ -16,7 +16,7 @@
         </div>
         <div class="col-md-6">
             <div class="panel panel-primary">
-                <div class="panel-heading text-center">Buy Order Total</div>
+                <div class="panel-heading text-center">{% trans "Buy Order Total" %}</div>
                 <div class="panel-body">
                     <h3 class="text-center"> {{total_buy|intcomma}}</h3>
                 </div>
@@ -24,28 +24,28 @@
         </div>
     </div>
     <div class="row panel panel-primary">
-        <div class="panel-heading text-center">Active Orders</div>
+        <div class="panel-heading text-center">{% trans "Active Orders" %}</div>
         <div class="panel-body">
             <table id="market" class="table table-responsive" style="width: 100%;">
                 <thead>
-                    <th>Date</th>
-                    <th>Item</th>
-                    <th>Item Price</th>
-                    <th>Remaining</th>
-                    <th>Location</th>
-                    <th>Character Filter</th>
-                    <th>Buy/Sell</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Item" %}</th>
+                    <th>{% trans "Item Price" %}</th>
+                    <th>{% trans "Remaining" %}</th>
+                    <th>{% trans "Location" %}</th>
+                    <th>{% trans "Character Filter" %}</th>
+                    <th>{% trans "Buy/Sell" %}</th>
                 </thead>
                 <tbody>
                     {% for m in char_data %}
                     <tr>
-                        <td class="">{{m.issued|date:"Y-m-d h:i"}} ({{m.duration}} day)</td>
+                        <td class="">{{m.issued|date:"Y-m-d h:i"}} ({{m.duration}} {% trans "day" %})</td>
                         <td class="">{{m.type_name.name}}</td>
                         <td class="">{{m.price|intcomma}}</td>
-                        <td class="">{{m.volume_remain}} of {{m.volume_total}}</td>
+                        <td class="">{{m.volume_remain}} {% trans "of" %} {{m.volume_total}}</td>
                         <td class="">{{m.location_name.location_name}}</td>
                         <td class="">{{m.character.character.character_name}}</td>
-                        <td class="">{% if m.is_buy_order %}Buy{% else %}Sell{% endif %}</td>
+                        <td class="">{% if m.is_buy_order %}{% trans "Buy" %}{% else %}{% trans "Sell" %}{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -53,30 +53,30 @@
         </div>
     </div>
     <div class="row panel panel-primary">
-        <div class="panel-heading text-center">Completed Orders</div>
+        <div class="panel-heading text-center">{% trans "Completed Orders" %}</div>
         <div class="panel-body">
             <table id="orders" class="table table-responsive" style="width: 100%;">
                 <thead>
-                    <th>Date</th>
-                    <th>State</th>
-                    <th>Item</th>
-                    <th>Item Price</th>
-                    <th>Remaining</th>
-                    <th>Location</th>
-                    <th>Character Filter</th>
-                    <th>Buy/Sell</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "State" %}</th>
+                    <th>{% trans "Item" %}</th>
+                    <th>{% trans "Item Price" %}</th>
+                    <th>{% trans "Remaining" %}</th>
+                    <th>{% trans "Location" %}</th>
+                    <th>{% trans "Character Filter" %}</th>
+                    <th>{% trans "Buy/Sell" %}</th>
                 </thead>
                 <tbody>
                     {% for m in old_data %}
                     <tr>
-                        <td class="">{{m.issued|date:"Y-m-d h:i"}} ({{m.duration}} day)</td>
+                        <td class="">{{m.issued|date:"Y-m-d h:i"}} ({{m.duration}} {% trans "day" %})</td>
                         <td class="">{{m.state}}</td>
                         <td class="">{{m.type_name.name}}</td>
                         <td class="">{{m.price|intcomma}}</td>
-                        <td class="">{{m.volume_remain}} of {{m.volume_total}}</td>
+                        <td class="">{{m.volume_remain}} {% trans "of" %} {{m.volume_total}}</td>
                         <td class="">{{m.location_name.location_name}}</td>
                         <td class="">{{m.character.character.character_name}}</td>
-                        <td class="">{% if m.is_buy_order %}Buy{% else %}Sell{% endif %}</td>
+                        <td class="">{% if m.is_buy_order %}{% trans "Buy" %}{% else %}{% trans "Sell" %}{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -12,8 +12,8 @@
                         <div class="text-center">
                             <img class="ra-avatar img-circle" src="{{ data.character.portrait_url_128 }}">
                             <h4>{{ data.character.character_name }}</h4>
-                            <span class="badge badge-success">Total SP: {{ data.total_sp|intcomma }}</span><br>
-                            <span class="badge badge-success">Isk: {{ data.character.characteraudit.balance|intcomma }}</span>
+                            <span class="badge badge-success">{% trans "Total SP" %}: {{ data.total_sp|intcomma }}</span><br>
+                            <span class="badge badge-success">{% trans "Isk" %}: {{ data.character.characteraudit.balance|intcomma }}</span>
                         </div>
                     </div>
                     {% if data.history|length > 0 %}
@@ -21,8 +21,8 @@
                                 <table class="table datatable table-hover">
                                     <thead>
                                         <th></th>
-                                        <th>Corporations</th>
-                                        <th>Joined</th>
+                                        <th>{% trans "Corporations" %}</th>
+                                        <th>{% trans "Joined" %}</th>
                                         <th></th>
                                     </thead>
                                     <tbody>
@@ -39,8 +39,8 @@
                         </div>
                     {% else %}
                     <div class="col-md-8 flex-middle text-center pannel-hieght-locked">
-                        <div class="alert alert-warning"><h4 class="alert-heading">No Data</h4>
-                        <p>You probably need to load a token, or wait for an update to run!</p></div>
+                        <div class="alert alert-warning"><h4 class="alert-heading">{% trans "No Data" %}</h4>
+                        <p>{% trans "You probably need to load a token, or wait for an update to run" %}!</p></div>
                     </div>
                     {% endif %}
                 </div>

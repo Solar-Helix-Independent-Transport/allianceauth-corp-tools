@@ -20,7 +20,7 @@
                     {% for char, skills_lists in skill_tables.items %}
                     <div class="tab-pane fade {% if forloop.first %}in active{% endif %} col-md-12" id="{{char|slugify}}">
                         <div class="col-md-12 text-center" style="border-bottom: 1px solid #aaa;">
-                            <h4>Doctrine Checker</h4>
+                            <h4>{% trans "Doctrine Checker" %}</h4>
                             <p>
                                 {% for dctrn, skills in skills_lists.doctrines.items %}
                                     {% if skills|length > 0 %}
@@ -29,21 +29,21 @@
                                     <span style="background-color: #008844" class="label label-default">{{dctrn}}</span>
                                     {% endif %}
                                 {% empty %}
-                                <span class="label label-default">No Doctrines Loaded</span>
+                                <span class="label label-default">{% trans "No Doctrines Loaded" %}</span>
                                 {% endfor %}
                             </p>
                         </div>
                         <div class="col-md-12">
-                        <h4 class="text-center"><span class="label label-default">Total SP: {{skills_lists.total_sp|intcomma}}</span>
-                            <span class="label label-default">Unallocated SP: {{skills_lists.unallocated_sp|intcomma}}</span>
-                            <span style=" {% if skills_lists.omega %}{% else %}background-color:#AA0000{% endif %}" class="label label-default">Estimated Clone State: {% if skills_lists.omega %}Omega{% else %}Alpha{% endif %}</span></p>
+                        <h4 class="text-center"><span class="label label-default">{% trans "Total SP" %}: {{skills_lists.total_sp|intcomma}}</span>
+                            <span class="label label-default">{% trans "Unallocated SP" %}: {{skills_lists.unallocated_sp|intcomma}}</span>
+                            <span style=" {% if skills_lists.omega %}{% else %}background-color:#AA0000{% endif %}" class="label label-default">{% trans "Estimated Clone State" %}: {% if skills_lists.omega %}{% trans "Omega" %}{% else %}{% trans "Alpha" %}{% endif %}</span></p>
                         </div>
                         <div class="col-md-7 " >
                             <table class=" table table-hover dataTable scroll-bar-narrow noheader" id="skill-table-{{forloop.counter}}" style="width:100%">
                                 <thead>
-                                    <th>Skill</th>
-                                    <th class="text-right">Level</th>
-                                    <th>Group</th>
+                                    <th>{% trans "Skill" %}</th>
+                                    <th class="text-right">{% trans "Level" %}</th>
+                                    <th>{% trans "Group" %}</th>
                                 </thead>
                                 <tbody>
                                     {% for skill, items in skills_lists.skills.items %}
@@ -57,13 +57,13 @@
                             </table>
                         </div>
                         <div class="col-md-5 " >
-                            <h4 class="text-center">Queue</h5>
+                            <h4 class="text-center">{% trans "Queue" %}</h5>
                             <table class="table table-hover dataTable scroll-bar-narrow" id="que-table-{{forloop.counter}}" width="100%">
                                 <thead>
-                                    <th>Skill</th>
-                                    <th>Level</th>
-                                    <th>Completion</th>
-                                    <th>item</th>
+                                    <th>{% trans "Skill" %}</th>
+                                    <th>{% trans "Level" %}</th>
+                                    <th>{% trans "Completion" %}</th>
+                                    <th>{% trans "item" %}</th>
 
                                 </thead>
                                 <tbody>
@@ -76,7 +76,7 @@
 
                                         </tr>
                                     {% empty %}
-                                    <tr class="alert alert-info"><td colspan="3">Not Training!</td><td></td><td></td><td></td></tr>
+                                    <tr class="alert alert-info"><td colspan="3">{% trans "Not Training" %}!</td><td></td><td></td><td></td></tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -92,7 +92,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="main-modal-title">Account Checks</h5>
+                <h5 class="modal-title" id="main-modal-title">{% trans "Account Checks" %}</h5>
             </div>
             <div id="main-modal-body" class="modal-body"  style="overflow-y:auto;"></div>
 
