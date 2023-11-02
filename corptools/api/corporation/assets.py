@@ -241,7 +241,7 @@ class AssetsApiEndpoints:
                     f"Permission Denied for {request.user} to view wallets!")
                 return 403, "Permission Denied!"
 
-            capital_groups = [30, 547, 659, 1538, 485, 902, 513, 883]
+            capital_groups = [30, 547, 659, 1538, 485, 902, 513, 883, 77283]
             subcap_cat = [6]
             noteable_cats = [4, 20, 23, 25, 34, 35, 87, 91]
             structure_cats = [22, 24, 40, 41, 46, 65, 66, ]
