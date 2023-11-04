@@ -828,11 +828,9 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
                 lp.get('corporation_id'))
             
             if lp.get('corporation_id') in existing_lp_corps:
-                _bulkupdate.append(
-                    LoyaltyPoint(
-                        character=audit_char,
-                        corporation=lp_corp,
-                        amount=lp.get('loyalty_points')))
+                existing = LoyaltyPoint.objects.get(character=audit_char, corporation=lp_corp)
+                existing.amount = lp.get('loyalty_points')
+                _bulkupdate.append(existing)
             else:                
                 _bulkcreate.append(
                     LoyaltyPoint(
