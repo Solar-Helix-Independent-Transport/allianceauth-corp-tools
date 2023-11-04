@@ -810,6 +810,9 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
 
+    existing_lp_corps = LoyaltyPoint.objects.filter(
+        character=audit_char).values_list("corporation_id")
+
     try:
         loyaltypoints_op = providers.esi.client.Loyalty.get_characters_character_id_loyalty_points(
             character_id=character_id)
@@ -818,19 +821,30 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
             loyaltypoints_op, token, force_refresh=force_refresh)
 
         _bulkcreate = []
+        _bulkupdate = []
 
         for lp in loyaltypoints:
             lp_corp, _ = EveName.objects.get_or_create_from_esi(
                 lp.get('corporation_id'))
-
-            _bulkcreate.append(
-                LoyaltyPoint(
-                    character=audit_char,
-                    corporation=lp_corp,
-                    amount=lp.get('loyalty_points')))
+            
+            if lp.get('corporation_id') in existing_lp_corps:
+                _bulkupdate.append(
+                    LoyaltyPoint(
+                        character=audit_char,
+                        corporation=lp_corp,
+                        amount=lp.get('loyalty_points')))
+            else:                
+                _bulkcreate.append(
+                    LoyaltyPoint(
+                        character=audit_char,
+                        corporation=lp_corp,
+                        amount=lp.get('loyalty_points')))
 
         LoyaltyPoint.objects.bulk_create(
             _bulkcreate, ignore_conflicts=True, batch_size=500)
+        LoyaltyPoint.objects.bulk_update(
+            _bulkupdate, batch_size=500, fields=['amount'])
+    
     except NotModifiedError:
         logger.info("CT: No New LP data for: {}".format(
             audit_char.character.character_name))
