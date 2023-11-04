@@ -811,7 +811,7 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
         return "No Tokens"
 
     existing_lp_corps = LoyaltyPoint.objects.filter(
-        character=audit_char).values_list("corporation_id")
+        character=audit_char).values_list("corporation_id", flat=True)
 
     try:
         loyaltypoints_op = providers.esi.client.Loyalty.get_characters_character_id_loyalty_points(
