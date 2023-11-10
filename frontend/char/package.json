@@ -11,7 +11,7 @@
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "awesome-debounce-promise": "^2.1.0",
-    "axios": "^0.21.4",
+    "axios": "^1.6.0",
     "javascript-time-ago": "^2.3.8",
     "js-cookies": "^1.0.4",
     "pretier": "^0.0.1",
