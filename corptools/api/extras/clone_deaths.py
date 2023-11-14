@@ -17,7 +17,7 @@ class CloneDeathApiEndpoints:
             response={200: dict, 403: str, 404: str, 500: str},
             tags=self.tags
         )
-        def get_dead_clones_in_location(request, location_id: int, look_back: int = 48):
+        def get_dead_clones_in_location(request, location_id: int, look_back: int):
             """
                 Find Dead Clones :pepewhy:
             """
