@@ -9,7 +9,7 @@ install_requires = [
     'django-esi>=2.0.0',
     'django-model-utils',
     'networkx',
-    'django-ninja>=0.19.1'
+    'django-ninja>=1.0.1,<2.0.0',
 ]
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
     README = readme.read()

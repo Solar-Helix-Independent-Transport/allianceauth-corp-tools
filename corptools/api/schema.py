@@ -1,8 +1,7 @@
 from __future__ import division
 
 from datetime import datetime
-from typing import Dict, List, Optional
-from xmlrpc.client import Boolean, boolean
+from typing import Dict, List, Optional, Union
 
 from ninja import Schema
 
@@ -21,15 +20,15 @@ class Character(Schema):
     character_id: int
     corporation_id: int
     corporation_name: str
-    alliance_id: Optional[int]
-    alliance_name: Optional[str]
+    alliance_id: Optional[int] = None
+    alliance_name: Optional[str] = None
 
 
 class Corporation(Schema):
     corporation_id: int
     corporation_name: str
-    alliance_id: Optional[int]
-    alliance_name: Optional[str]
+    alliance_id: Optional[int] = None
+    alliance_name: Optional[str] = None
 
 
 class MenuLink(Schema):
@@ -39,7 +38,7 @@ class MenuLink(Schema):
 
 class MenuCategory(Schema):
     name: str
-    links: List[MenuLink]
+    links: List[MenuLink] = None
 
 
 class CorpHistory(Schema):
@@ -55,33 +54,33 @@ class CharacterHistory(Schema):
 class EveName(Schema):
     id: int
     name: str
-    cat: Optional[str]
+    cat: Optional[str] = None
 
 
 class CharacterStatus(Schema):
     character: Character
-    isk: Optional[float]
-    sp: Optional[int]
-    location: Optional[str]
-    ship: Optional[str]
+    isk: Optional[float] = None
+    sp: Optional[int] = None
+    location: Optional[str] = None
+    ship: Optional[str] = None
     active: bool
-    last_updates: Optional[Dict]
+    last_updates: Optional[Dict] = None
 
 
 class AccountStatus(Schema):
-    characters: List[CharacterStatus]
+    characters: List[CharacterStatus] = None
     main: Character
-    orphan: Boolean = False
+    orphan: bool = False
 
 
 class ValueLabel(Schema):
-    value: str
+    value: Union[str, int, float, bool]
     label: str
 
 
 class CharacterAssetGroups(Schema):
     name: str
-    items: List[ValueLabel]
+    items: List[ValueLabel] = None
 
 
 class CharacterAssetItem(Schema):
@@ -90,7 +89,7 @@ class CharacterAssetItem(Schema):
     item: EveName
     quantity: int = 0
     location: EveName = None
-    expand: boolean = None
+    expand: bool = None
 
 
 class CorporationAssetItem(Schema):
@@ -98,12 +97,12 @@ class CorporationAssetItem(Schema):
     item: EveName
     quantity: int = 0
     location: EveName = None
-    expand: boolean = None
+    expand: bool = None
 
 
 class CharacterClone(Schema):
-    name: Optional[str]
-    location: Optional[EveName]
+    name: Optional[str] = None
+    location: Optional[EveName] = None
     implants: List[EveName] = None
 
 
@@ -111,8 +110,8 @@ class CharacterClones(Schema):
     character: Character
     clones: List[CharacterClone] = None
     home: EveName = None
-    last_station_change: Optional[datetime]
-    last_clone_jump: Optional[datetime]
+    last_station_change: Optional[datetime] = None
+    last_clone_jump: Optional[datetime] = None
 
 
 class Skill(Schema):
@@ -128,17 +127,17 @@ class CharacterQueueItem(Schema):
     group: str
     end_level: int
     position: int
-    current_level: int = 0
-    current_sp: int = 0
+    current_level: Optional[int] = 0
+    current_sp: Optional[int] = 0
     start_sp: int
     end_sp: int
-    start: datetime = None
-    end: datetime = None
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
 
 
 class CharacterSkills(Schema):
     character: Character
-    skills: List[Skill]
+    skills: Optional[List[Skill]] = None
     total_sp: int
     unallocated_sp: int
 
@@ -152,12 +151,12 @@ class SkillHistory(Schema):
 
 class CharacterSkillHistory(Schema):
     character: Character
-    history: List[SkillHistory]
+    history: Optional[List[SkillHistory]] = None
 
 
 class CharacterQueue(Schema):
     character: Character
-    queue: List[CharacterQueueItem]
+    queue: Optional[List[CharacterQueueItem]] = None
 
 
 class CharacterDoctrines(Schema):
@@ -171,7 +170,7 @@ class CharacterNotification(Schema):
     notification_text: str
     notification_type: str
     timestamp: datetime
-    is_read: bool = None
+    is_read: Optional[bool] = None
 
 
 class CharacterRoles(Schema):
@@ -180,7 +179,7 @@ class CharacterRoles(Schema):
     station_manager: bool
     personnel_manager: bool
     accountant: bool
-    titles: List[EveName]
+    titles: Optional[List[EveName]] = None
 
 
 class CharacterWalletEvent(Schema):
@@ -192,7 +191,7 @@ class CharacterWalletEvent(Schema):
     ref_type: str
     balance: float
     amount: float
-    reason: Optional[str]
+    reason: Optional[str] = None
 
 
 class LoyaltyPoints(Schema):
@@ -210,26 +209,26 @@ class CorporationWalletEvent(Schema):
     ref_type: str
     balance: float
     amount: float
-    reason: Optional[str]
+    reason: Optional[str] = None
 
 
 class CharacterOrder(Schema):
     character: Character
     date: datetime
     duration: int
-    volume_min: int = None
+    volume_min: Optional[int] = None
     volume_remain: int
     volume_total: int
     item: EveName
     price: float
-    escrow: float = None
-    buy_order: bool = None
-    location: Optional[EveName]
+    escrow: Optional[float] = None
+    buy_order: Optional[bool] = None
+    location: Optional[EveName] = None
 
 
 class CharacterMarket(Schema):
-    expired: List[CharacterOrder]
-    active: List[CharacterOrder]
+    expired: List[CharacterOrder] = None
+    active: List[CharacterOrder] = None
     total_active: int
     total_expired: int
 
@@ -253,12 +252,12 @@ class Structure(Schema):
     owner: Corporation
     name: str
     type: EveName
-    services: Optional[List[StructureService]]
+    services: Optional[List[StructureService]] = None
     location: EveName
-    celestial: Optional[str]
-    fuel_expiry: Optional[datetime]
+    celestial: Optional[str] = None
+    fuel_expiry: Optional[datetime] = None
     state: str = None
-    state_expiry: Optional[datetime]
+    state_expiry: Optional[datetime] = None
 
 
 class FittingItem(Schema):
@@ -270,9 +269,9 @@ class CorpStatus(Schema):
     corporation: Corporation
     characters: int
     active: bool
-    last_updates: Optional[Dict]
+    last_updates: Optional[Dict] = None
 
 
 class PingStats(Schema):
     members: int
-    structures: List[str]
+    structures: List[str] = None
