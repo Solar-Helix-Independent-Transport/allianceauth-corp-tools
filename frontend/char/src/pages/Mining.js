@@ -153,7 +153,7 @@ const CharMining = () => {
           <Line type="monotone" dataKey="pv" stroke="#ff0000" fill="#ff0000" />
           <Line type="monotone" dataKey="uv" stroke="#00ff00" fill="#00ff00" />
           <Line type="monotone" dataKey="amt" stroke="#0000ff" fill="#0000ff" />
-          <Brush dataKey={"due_date"} tickFormatter={formatXAxis} onChange={brushOnChange}>
+          <Brush dataKey={"due_date"} tickFormatter={formatXAxis}>
             <AreaChart
               margin={{
                 top: 10,
@@ -169,7 +169,7 @@ const CharMining = () => {
           </Brush>
         </LineChart>
 
-        <BaseTable {...{ isLoading, isFetching, data, columns, error }} />
+        <BaseTable {...{ data, columns }} />
       </Panel.Body>
     </ErrorBoundary>
   );

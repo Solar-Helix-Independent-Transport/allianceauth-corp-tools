@@ -1,0 +1,3 @@
+**/frontend/char/build/**/*.js
+**/frontend/corp/build/**/*.js
+**/frontend/frontend/build/**/*.js
