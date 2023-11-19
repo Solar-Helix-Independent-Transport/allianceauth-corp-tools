@@ -58,5 +58,8 @@ jobs:
           # A file, directory or wildcard pattern that describes what to upload
           path: htmlcov/
 
-      - name: Build Projects
+      - name: Build JS
+        run: make buildjs
+
+      - name: Build Python
         run: make package
