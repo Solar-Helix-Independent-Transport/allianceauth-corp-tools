@@ -166,7 +166,7 @@ export const CorpPocos = () => {
         accessor: "reinforce_exit_end",
       },
     ],
-    [valueSort]
+    []
   );
 
   return (
