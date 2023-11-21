@@ -356,6 +356,7 @@ def update_char_corp_history(self, character_id, force_refresh=False):
     try:
         return update_corp_history(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_corp_history {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -365,6 +366,7 @@ def update_char_roles(self, character_id, force_refresh=False):
     try:
         return update_character_roles(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_roles {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -374,6 +376,7 @@ def update_char_skill_list(self, character_id, force_refresh=False):
     try:
         return update_character_skill_list(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_roles {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -383,6 +386,7 @@ def update_char_location(self, character_id, force_refresh=False):
     try:
         return update_character_location(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_location {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -420,6 +424,7 @@ def update_char_mining_ledger(self, character_id, force_refresh=False):
     try:
         return update_character_mining(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_mining_ledger {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -429,6 +434,7 @@ def update_char_notifications(self, character_id, force_refresh=False):
     try:
         return update_character_notifications(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_notifications {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -442,6 +448,7 @@ def update_char_assets(self, character_id, force_refresh=False):
         return results
 
     except Exception as e:
+        logger.error(f"FAILED update_char_assets {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -451,6 +458,7 @@ def update_char_wallet(self, character_id, force_refresh=False):
     try:
         return update_character_wallet(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_wallet {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -460,6 +468,7 @@ def update_char_contacts(self, character_id, force_refresh=False):
     try:
         return update_character_contacts(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_contacts {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -469,6 +478,7 @@ def update_char_orders(self, character_id, force_refresh=False):
     try:
         return update_character_orders(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_orders {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -478,6 +488,7 @@ def update_char_transactions(self, character_id, force_refresh=False):
     try:
         return update_character_transactions(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_transactions {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -487,6 +498,7 @@ def update_char_titles(self, character_id, force_refresh=False):
     try:
         return update_character_titles(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_titles {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -498,6 +510,7 @@ def update_char_mail(self, character_id, force_refresh=False):
             character_id, force_refresh=force_refresh)
         return "Completed mail pre-fetch for: %s" % str(character_id)
     except Exception as e:
+        logger.error(f"FAILED update_char_mail {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -510,6 +523,7 @@ def update_char_contract_items(self, character_id, contract_id, force_refresh=Fa
         # Get and Create messages
         return "Completed items for: %s" % str(character_id)
     except Exception as e:
+        logger.error(f"FAILED update_char_contract_items {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -530,6 +544,7 @@ def update_char_contracts(self, character_id, force_refresh=False):
         return "Completed Contracts for: %s" % str(character_id)
 
     except Exception as e:
+        logger.error(f"FAILED update_char_contracts {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -539,30 +554,33 @@ def update_char_order_history(self, character_id, force_refresh=False):
     try:
         return update_character_order_history(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_order_history {character_id}")
         logger.exception(e)
         return "Failed"
 
 
-@shared_task
-def update_clones(character_id, force_refresh=False):
+@shared_task(bind=True, base=QueueOnce)
+def update_clones(self, character_id, force_refresh=False):
     try:
         output = update_character_clones(
             character_id, force_refresh=force_refresh)
         # update_all_locations.apply_async(priority=7)
         return output
     except Exception as e:
+        logger.error(f"FAILED update_clones {character_id}")
         logger.exception(e)
         return "Failed"
 
 
-@shared_task
-def update_char_loyaltypoints(character_id, force_refresh=False):
+@shared_task(bind=True, base=QueueOnce)
+def update_char_loyaltypoints(self, character_id, force_refresh=False):
     try:
         output = update_character_loyaltypoints(
             character_id, force_refresh=force_refresh)
         # update_all_locations.apply_async(priority=7)
         return output
     except Exception as e:
+        logger.error(f"FAILED update_char_loyaltypoints {character_id}")
         logger.exception(e)
         return "Failed"
 
