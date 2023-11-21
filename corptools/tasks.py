@@ -397,6 +397,7 @@ def cache_user_skill_list(self, user_id, force_refresh=False):
         providers.skills.get_and_cache_user(
             user_id, force_rebuild=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED cache_user_skill_list {user_id}")
         logger.exception(e)
         return "Failed"
 
@@ -406,6 +407,7 @@ def update_char_industry_jobs(self, character_id, force_refresh=False):
     try:
         return update_character_industry_jobs(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_industry_jobs {character_id}")
         logger.exception(e)
         return "Failed"
 
@@ -415,6 +417,7 @@ def update_char_skill_queue(self, character_id, force_refresh=False):
     try:
         return update_character_skill_queue(character_id, force_refresh=force_refresh)
     except Exception as e:
+        logger.error(f"FAILED update_char_skill_queue {character_id}")
         logger.exception(e)
         return "Failed"
 
