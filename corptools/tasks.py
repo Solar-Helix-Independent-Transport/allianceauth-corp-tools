@@ -1,11 +1,14 @@
 import datetime
 import json
 import logging
+from functools import wraps
 
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.eveonline.providers import provider as eve_names
 from allianceauth.services.tasks import QueueOnce
-from celery import chain, shared_task
+from celery import chain as Chain
+from celery import shared_task, signature
+from celery_once import AlreadyQueued
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
@@ -228,6 +231,41 @@ def check_account(character_id):
         update_character.apply_async(args=[cid], priority=6)
 
 
+def no_fail_chain(func):
+    """
+        Chain tasks provided in the chain kwargs regardless of task failures.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        excp = None
+        _ret = None
+        try:
+            _ret = func(*args, **kwargs)
+        except Exception as e:
+            excp = e
+        finally:
+            _chn = kwargs.get("chain", [])
+            while (True):
+                if len(_chn):
+                    _t = _chn.pop(0)
+                    _t = signature(_t)
+                    _t.kwargs.update({"chain": _chn})
+                    try:
+                        _t.apply_async(priority=9)
+                        break
+                    except AlreadyQueued:
+                        # skip this bad boy
+                        print(f"Skipping task as its already running {_t}")
+                        pass
+                else:
+                    print(f"No More Tasks")
+                    break
+            if excp:
+                raise excp
+        return _ret
+    return wrapper
+
+
 @shared_task(bind=True, base=QueueOnce)
 def update_character(self, char_id, force_refresh=False):
     character = CharacterAudit.objects.filter(
@@ -248,21 +286,21 @@ def update_character(self, char_id, force_refresh=False):
     logger.info("Processing Updates for {}".format(
         character.character.character_name))
 
-    skip_date = timezone.now() - datetime.timedelta(hours=12)  # hook into the settings
+    skip_date = timezone.now() - datetime.timedelta(hours=2)  # hook into the settings
 
     que = []
 
     # TODO review this later
-    if force_refresh:
-        que.append(update_char_corp_history.si(
-            character.character.character_id, force_refresh=force_refresh))
 
     mindt = timezone.now() - datetime.timedelta(days=90)
 
     if app_settings.CT_CHAR_ROLES_MODULE:
         if (character.last_update_roles or mindt) <= skip_date or force_refresh:
             que.append(update_char_roles.si(
-                character.character.character_id, force_refresh=force_refresh))
+                character.character.character_id,
+                force_refresh=force_refresh
+            )
+            )
         if (character.last_update_titles or mindt) <= skip_date or force_refresh:
             que.append(update_char_titles.si(
                 character.character.character_id, force_refresh=force_refresh))
@@ -339,253 +377,172 @@ def update_character(self, char_id, force_refresh=False):
         # TODO: make this better
         if (character.last_update_skills or mindt) <= skip_date or force_refresh:
             try:
-                que.append(cache_user_skill_list.si(
-                    character.character.character_ownership.user_id, force_refresh=force_refresh))
+                que.append(cache_user_skill_list.s(
+                    character.character.character_ownership.user_id, force_refresh=force_refresh
+                ))
             except ObjectDoesNotExist:
                 pass
+
+    while (True):
+        if len(que):
+            _t = que.pop(0)
+            _t = signature(_t)
+            _t.kwargs.update({"chain": que})
+            try:
+                _t.apply_async(priority=9)
+                break
+            except AlreadyQueued:
+                # skip this bad boy
+                print(f"Skipping task as its already running {_t}")
+                pass
+        else:
+            break
 
     logger.info("Queued {} Updates for {}".format(
         len(que),
         character.character.character_name)
     )
-    chain(que).apply_async(priority=9)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_corp_history(self, character_id, force_refresh=False):
-    try:
-        return update_corp_history(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_corp_history {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_corp_history")
+@no_fail_chain
+def update_char_corp_history(self, character_id, force_refresh=False, chain=[]):
+    return update_corp_history(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_roles(self, character_id, force_refresh=False):
-    try:
-        return update_character_roles(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_roles {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_roles")
+@no_fail_chain
+def update_char_roles(self, character_id, force_refresh=False, chain=[]):
+    return update_character_roles(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_skill_list(self, character_id, force_refresh=False):
-    try:
-        return update_character_skill_list(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_roles {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_skill_list")
+@no_fail_chain
+def update_char_skill_list(self, character_id, force_refresh=False, chain=[]):
+    return update_character_skill_list(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_location(self, character_id, force_refresh=False):
-    try:
-        return update_character_location(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_location {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_location")
+@no_fail_chain
+def update_char_location(self, character_id, force_refresh=False, chain=[]):
+    return update_character_location(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def cache_user_skill_list(self, user_id, force_refresh=False):
-    try:
-        providers.skills.get_and_cache_user(
-            user_id, force_rebuild=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED cache_user_skill_list {user_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={"keys": ["user_id"]}, name="corptools.tasks.cache_user_skill_list")
+@no_fail_chain
+def cache_user_skill_list(self, user_id, force_refresh=False, chain=[]):
+    providers.skills.get_and_cache_user(
+        user_id, force_rebuild=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_industry_jobs(self, character_id, force_refresh=False):
-    try:
-        return update_character_industry_jobs(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_industry_jobs {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_industry_jobs")
+@no_fail_chain
+def update_char_industry_jobs(self, character_id, force_refresh=False, chain=[]):
+    return update_character_industry_jobs(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_skill_queue(self, character_id, force_refresh=False):
-    try:
-        return update_character_skill_queue(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_skill_queue {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_skill_queue")
+@no_fail_chain
+def update_char_skill_queue(self, character_id, force_refresh=False, chain=[]):
+    return update_character_skill_queue(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_mining_ledger(self, character_id, force_refresh=False):
-    try:
-        return update_character_mining(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_mining_ledger {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_mining_ledger")
+@no_fail_chain
+def update_char_mining_ledger(self, character_id, force_refresh=False, chain=[]):
+    return update_character_mining(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_notifications(self, character_id, force_refresh=False):
-    try:
-        return update_character_notifications(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_notifications {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_notifications")
+@no_fail_chain
+def update_char_notifications(self, character_id, force_refresh=False, chain=[]):
+    return update_character_notifications(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_assets(self, character_id, force_refresh=False):
-    try:
-        results = update_character_assets(
-            character_id, force_refresh=force_refresh)
-        # update_all_locations.apply_async(priority=7)
-        return results
-
-    except Exception as e:
-        logger.error(f"FAILED update_char_assets {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_assets")
+@no_fail_chain
+def update_char_assets(self, character_id, force_refresh=False, chain=[]):
+    return update_character_assets(
+        character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_wallet(self, character_id, force_refresh=False):
-    try:
-        return update_character_wallet(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_wallet {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_wallet")
+@no_fail_chain
+def update_char_wallet(self, character_id, force_refresh=False, chain=[]):
+    return update_character_wallet(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_contacts(self, character_id, force_refresh=False):
-    try:
-        return update_character_contacts(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_contacts {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_contacts")
+@no_fail_chain
+def update_char_contacts(self, character_id, force_refresh=False, chain=[]):
+    return update_character_contacts(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_orders(self, character_id, force_refresh=False):
-    try:
-        return update_character_orders(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_orders {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_orders")
+@no_fail_chain
+def update_char_orders(self, character_id, force_refresh=False, chain=[]):
+    return update_character_orders(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_transactions(self, character_id, force_refresh=False):
-    try:
-        return update_character_transactions(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_transactions {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_transactions")
+@no_fail_chain
+def update_char_transactions(self, character_id, force_refresh=False, chain=[]):
+    return update_character_transactions(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_titles(self, character_id, force_refresh=False):
-    try:
-        return update_character_titles(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_titles {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_titles")
+@no_fail_chain
+def update_char_titles(self, character_id, force_refresh=False, chain=[]):
+    return update_character_titles(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_mail(self, character_id, force_refresh=False):
-    try:
-        update_character_mail_headers(
-            character_id, force_refresh=force_refresh)
-        return "Completed mail pre-fetch for: %s" % str(character_id)
-    except Exception as e:
-        logger.error(f"FAILED update_char_mail {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_mail")
+@no_fail_chain
+def update_char_mail(self, character_id, force_refresh=False, chain=[]):
+    update_character_mail_headers(
+        character_id, force_refresh=force_refresh)
+    return "Completed mail pre-fetch for: %s" % str(character_id)
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_contract_items")
 def update_char_contract_items(self, character_id, contract_id, force_refresh=False):
-    try:
-        update_character_contract_items(
-            character_id, contract_id, force_refresh=force_refresh)
-        # Get and Create messages
-        return "Completed items for: %s" % str(character_id)
-    except Exception as e:
-        logger.error(f"FAILED update_char_contract_items {character_id}")
-        logger.exception(e)
-        return "Failed"
+    return update_character_contract_items(
+        character_id, contract_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_contracts(self, character_id, force_refresh=False):
-    try:
-        msg, ids = update_character_contracts(
-            character_id, force_refresh=force_refresh)
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_contracts")
+@no_fail_chain
+def update_char_contracts(self, character_id, force_refresh=False, chain=[]):
+    _, ids = update_character_contracts(
+        character_id, force_refresh=force_refresh)
 
-        _chain = []
-        for id in ids:
-            _chain.append(update_char_contract_items.si(
-                character_id, id, force_refresh=force_refresh))
+    _chain = []
+    for id in ids:
+        _chain.append(update_char_contract_items.si(
+            character_id, id, force_refresh=force_refresh))
+    Chain(_chain).apply_async(priority=8)
 
-        chain(_chain).apply_async(priority=8)
-
-        return "Completed Contracts for: %s" % str(character_id)
-
-    except Exception as e:
-        logger.error(f"FAILED update_char_contracts {character_id}")
-        logger.exception(e)
-        return "Failed"
+    return "Completed Contracts for: %s" % str(character_id)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_order_history(self, character_id, force_refresh=False):
-    try:
-        return update_character_order_history(character_id, force_refresh=force_refresh)
-    except Exception as e:
-        logger.error(f"FAILED update_char_order_history {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_order_history")
+@no_fail_chain
+def update_char_order_history(self, character_id, force_refresh=False, chain=[]):
+    return update_character_order_history(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_clones(self, character_id, force_refresh=False):
-    try:
-        output = update_character_clones(
-            character_id, force_refresh=force_refresh)
-        # update_all_locations.apply_async(priority=7)
-        return output
-    except Exception as e:
-        logger.error(f"FAILED update_clones {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_clones")
+@no_fail_chain
+def update_clones(self, character_id, force_refresh=False, chain=[]):
+    return update_character_clones(
+        character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def update_char_loyaltypoints(self, character_id, force_refresh=False):
-    try:
-        output = update_character_loyaltypoints(
-            character_id, force_refresh=force_refresh)
-        # update_all_locations.apply_async(priority=7)
-        return output
-    except Exception as e:
-        logger.error(f"FAILED update_char_loyaltypoints {character_id}")
-        logger.exception(e)
-        return "Failed"
+@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_loyaltypoints")
+@no_fail_chain
+def update_char_loyaltypoints(self, character_id, force_refresh=False, chain=[]):
+    return update_character_loyaltypoints(
+        character_id, force_refresh=force_refresh)
 
 
 def build_location_cache_tag(location_id):
