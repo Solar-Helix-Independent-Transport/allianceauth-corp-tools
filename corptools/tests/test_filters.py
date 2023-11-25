@@ -395,7 +395,7 @@ class TestSecGroupBotFilters(TestCase):
         u1 = ct_models.CharacterRoles.objects.create(
             character=audits[0], director=True, personnel_manager=True)
 
-        u1 = ct_models.CharacterRoles.objects.create(
+        ct_models.CharacterRoles.objects.create(
             character=audits[16], director=True, personnel_manager=True)
 
         u1.titles.add(cls.c1t1)
