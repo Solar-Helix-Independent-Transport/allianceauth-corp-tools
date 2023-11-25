@@ -231,6 +231,20 @@ def check_account(character_id):
         update_character.apply_async(args=[cid], priority=6)
 
 
+def enqueue_next_task(chain):
+    while (len(chain)):
+        _t = chain.pop(0)
+        _t = signature(_t)
+        _t.kwargs.update({"chain": chain})
+        try:
+            _t.apply_async(priority=9)
+        except AlreadyQueued:
+            # skip this task as it is already in the queue
+            print(f"Skipping task as its already queued {_t}")
+            continue
+        break
+
+
 def no_fail_chain(func):
     """
         Chain tasks provided in the chain kwargs regardless of task failures.
@@ -245,21 +259,7 @@ def no_fail_chain(func):
             excp = e
         finally:
             _chn = kwargs.get("chain", [])
-            while (True):
-                if len(_chn):
-                    _t = _chn.pop(0)
-                    _t = signature(_t)
-                    _t.kwargs.update({"chain": _chn})
-                    try:
-                        _t.apply_async(priority=9)
-                        break
-                    except AlreadyQueued:
-                        # skip this bad boy
-                        print(f"Skipping task as its already running {_t}")
-                        pass
-                else:
-                    print(f"No More Tasks")
-                    break
+            enqueue_next_task(_chn)
             if excp:
                 raise excp
         return _ret
@@ -383,23 +383,10 @@ def update_character(self, char_id, force_refresh=False):
             except ObjectDoesNotExist:
                 pass
 
-    while (True):
-        if len(que):
-            _t = que.pop(0)
-            _t = signature(_t)
-            _t.kwargs.update({"chain": que})
-            try:
-                _t.apply_async(priority=9)
-                break
-            except AlreadyQueued:
-                # skip this bad boy
-                print(f"Skipping task as its already running {_t}")
-                pass
-        else:
-            break
+    enqueue_next_task(que)
 
     logger.info("Queued {} Updates for {}".format(
-        len(que),
+        len(que)+1,
         character.character.character_name)
     )
 
