@@ -1643,7 +1643,7 @@ class Rolefilter(FilterBase):
     has_station_manager = models.BooleanField(default=False)
     has_personnel_manager = models.BooleanField(default=False)
 
-    #main_only = models.BooleanField(default=False)
+    main_only = models.BooleanField(default=False)
 
     corp_filter = models.ForeignKey(
         EveCorporationInfo, on_delete=models.CASCADE, related_name='audit_role_filter', null=True, blank=True, default=None)
@@ -1654,6 +1654,9 @@ class Rolefilter(FilterBase):
         try:
             characters = user.character_ownerships.all()
             queries = []
+            if self.main_only:
+                characters = characters.filter(
+                    character__character_id=user.profile.main_character.character_id)
             if self.corp_filter:
                 characters = characters.filter(
                     character__corporation_id=self.corp_filter.corporation_id)
@@ -1691,6 +1694,9 @@ class Rolefilter(FilterBase):
 
         co = CharacterOwnership.objects.filter(user__in=users)
         queries = []
+        if self.main_only:
+            co = co.filter(character__character_id=models.F(
+                "user__profile__main_character__character_id"))
         if self.corp_filter:
             co = co.filter(
                 character__corporation_id=self.corp_filter.corporation_id)
