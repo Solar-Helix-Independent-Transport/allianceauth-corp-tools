@@ -246,6 +246,8 @@ class TimeInCorpFilterAdmin(admin.ModelAdmin):
 
 
 class rolesFilterAdmin(admin.ModelAdmin):
+    filter_horizontal = ["corps_filter",
+                         "alliances_filter"]
 
     list_display = ['__str__', 'has_director', 'has_accountant',
                     'has_station_manager', 'has_personnel_manager']

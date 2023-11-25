@@ -1645,10 +1645,11 @@ class Rolefilter(FilterBase):
 
     main_only = models.BooleanField(default=False)
 
-    corp_filter = models.ForeignKey(
-        EveCorporationInfo, on_delete=models.CASCADE, related_name='audit_role_filter', null=True, blank=True, default=None)
-    alliance_filter = models.ForeignKey(
-        EveAllianceInfo, on_delete=models.CASCADE, related_name='audit_role_filter', null=True, blank=True, default=None)
+    corps_filter = models.ManyToManyField(
+        EveCorporationInfo, related_name='audit_role_filters', blank=True)
+
+    alliances_filter = models.ManyToManyField(
+        EveAllianceInfo, related_name='audit_role_filters', blank=True)
 
     def process_filter(self, user: User):
         try:
@@ -1657,12 +1658,12 @@ class Rolefilter(FilterBase):
             if self.main_only:
                 characters = characters.filter(
                     character__character_id=user.profile.main_character.character_id)
-            if self.corp_filter:
+            if self.corps_filter.all().count():
                 characters = characters.filter(
-                    character__corporation_id=self.corp_filter.corporation_id)
-            if self.alliance_filter:
+                    character__corporation_id__in=self.corps_filter.all().values_list("corporation_id", flat=True))
+            if self.alliances_filter.all().count():
                 characters = characters.filter(
-                    character__alliance_id=self.alliance_filter.alliance_id)
+                    character__alliance_id__in=self.alliances_filter.all().values_list("alliance_id", flat=True))
             if self.has_director:
                 _q = models.Q(
                     character__characteraudit__characterroles__director=True)
@@ -1697,12 +1698,12 @@ class Rolefilter(FilterBase):
         if self.main_only:
             co = co.filter(character__character_id=models.F(
                 "user__profile__main_character__character_id"))
-        if self.corp_filter:
+        if self.corps_filter.all().count():
             co = co.filter(
-                character__corporation_id=self.corp_filter.corporation_id)
-        if self.alliance_filter:
+                character__corporation_id__in=self.corps_filter.all().values_list("corporation_id", flat=True))
+        if self.alliances_filter.all().count():
             co = co.filter(
-                character__alliance_id=self.alliance_filter.alliance_id)
+                character__alliance_id__in=self.alliances_filter.all().values_list("alliance_id", flat=True))
         if self.has_director:
             _q = models.Q(
                 character__characteraudit__characterroles__director=True)

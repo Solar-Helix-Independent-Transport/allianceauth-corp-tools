@@ -986,8 +986,9 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_has_roles_personel_alli_filtered(self):
         _filter = ct_models.Rolefilter.objects.create(name="roles Test",
                                                       description="Something to tell user",
-                                                      alliance_filter=self.alli)
+                                                      )
         _filter.has_personnel_manager = True
+        _filter.alliances_filter.add(self.alli)
 
         users = []
         for user in ct_models.CharacterAudit.objects.all():
@@ -1025,8 +1026,9 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_has_roles_personel_corp_filtered(self):
         _filter = ct_models.Rolefilter.objects.create(name="roles Test",
                                                       description="Something to tell user",
-                                                      corp_filter=self.corp)
+                                                      )
         _filter.has_personnel_manager = True
+        _filter.corps_filter.add(self.corp)
 
         users = []
         for user in ct_models.CharacterAudit.objects.all():
