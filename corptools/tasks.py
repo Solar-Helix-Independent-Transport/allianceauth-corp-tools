@@ -170,7 +170,7 @@ def process_all_categories():
     for category in categories:
         que.append(update_category.si(category))
 
-    chain(que).apply_async(priority=8)
+    Chain(que).apply_async(priority=8)
 
     return "Queued {} Tasks".format(len(que))
 
@@ -232,6 +232,9 @@ def check_account(character_id):
 
 
 def enqueue_next_task(chain):
+    """
+        Queue next task, and attach the rest of the chain to it.
+    """
     while (len(chain)):
         _t = chain.pop(0)
         _t = signature(_t)
@@ -247,7 +250,7 @@ def enqueue_next_task(chain):
 
 def no_fail_chain(func):
     """
-        Chain tasks provided in the chain kwargs regardless of task failures.
+        Decorator to chain tasks provided in the chain kwargs regardless of task failures.
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -775,7 +778,7 @@ def update_corp(corp_id):
     que.append(update_corp_assets.si(corp_id))
     que.append(update_corp_pocos.si(corp_id))
     que.append(update_corp_logins.si(corp_id))
-    chain(que).apply_async(priority=6)
+    Chain(que).apply_async(priority=6)
 
 
 @shared_task
