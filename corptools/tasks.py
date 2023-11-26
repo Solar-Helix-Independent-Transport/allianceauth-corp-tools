@@ -494,7 +494,7 @@ def update_char_mail(self, character_id, force_refresh=False, chain=[]):
     return "Completed mail pre-fetch for: %s" % str(character_id)
 
 
-@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_contract_items")
+@shared_task(bind=True, base=QueueOnce, once={'graceful': True, "keys": ["character_id", "contract_id"]}, name="corptools.tasks.update_char_contract_items")
 def update_char_contract_items(self, character_id, contract_id, force_refresh=False):
     return update_character_contract_items(
         character_id, contract_id, force_refresh=force_refresh)
