@@ -294,6 +294,12 @@ def update_character(self, char_id, force_refresh=False):
     que = []
 
     # TODO review this later
+    if force_refresh:
+        que.append(update_char_corp_history.si(
+            character.character.character_id,
+            force_refresh=force_refresh
+        )
+        )
 
     mindt = timezone.now() - datetime.timedelta(days=90)
 
