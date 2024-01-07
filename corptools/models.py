@@ -413,9 +413,10 @@ class MapJumpBridge(models.Model):
     owner = models.ForeignKey(
         EveName, on_delete=models.SET_NULL, null=True, default=None)
     updated = models.DateTimeField(auto_now=True)
+    manually_input = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.from_solar_system.name} >> {self.to_solar_system.name} ({self.structure_id})"
+        return f"{self.from_solar_system.name} >> {self.to_solar_system.name} ({self.structure_id}) (Auto: {not self.manually_input})"
 
 # ************************ Asset Models
 

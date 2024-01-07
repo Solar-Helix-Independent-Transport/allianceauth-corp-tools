@@ -1,4 +1,5 @@
 import logging
+import re
 from locale import currency
 
 import requests
@@ -19,8 +20,8 @@ from .. import providers
 from ..models import (BridgeOzoneLevel, CharacterAudit, CorpAsset,
                       CorporationAudit, CorporationWalletDivision,
                       CorporationWalletJournalEntry, EveItemType, EveLocation,
-                      EveName, MapSystemPlanet, Poco, Structure,
-                      StructureCelestial, StructureService)
+                      EveName, MapJumpBridge, MapSystem, MapSystemPlanet, Poco,
+                      Structure, StructureCelestial, StructureService)
 
 logger = logging.getLogger(__name__)
 
@@ -821,3 +822,41 @@ def build_managed_asset_locations(self, corp_id):
 
     CorpAsset.objects.filter(location_id__in=current).update(
         location_name_id=F("location_id"))
+
+
+@shared_task(bind=True, base=QueueOnce)
+def build_jb_network(self):
+    structures = Structure.objects.filter(type_id=35841).select_related(
+        "corporation__corporation", "system_name"
+    ).prefetch_related('structureservice_set')
+
+    second_systems = set()
+    output = {}
+    regex = r"^(.*) » ([^ - ]*) - (.*)"
+    for s in structures:
+        matches = re.findall(regex, s.name)
+        matches = matches[0]
+        output[matches[0]] = {}
+        output[matches[0]]["start"] = {"system": s.system_name,
+                                       "structure_id": s.structure_id,
+                                       "owner": s.corporation.corporation.alliance.alliance_id,
+                                       "name": s.name}
+        _exit = MapSystem.objects.get(name=matches[1])
+        output[matches[0]]["end"] = {"system": _exit,
+                                     "name": _exit.name}
+
+    new_jbs = []
+    for k, m in output.items():
+        new_jbs.append(
+            MapJumpBridge(
+                structure_id=m["start"]["structure_id"],
+                from_solar_system=m["start"]["system"],
+                to_solar_system=m["end"]["system"],
+                owner_id=m["start"]["owner"]
+            )
+        )
+
+    MapJumpBridge.objects.filter(manually_input=False).delete()
+    MapJumpBridge.objects.bulk_create(new_jbs)
+
+    return f"Created {len(new_jbs)} new JB links"
