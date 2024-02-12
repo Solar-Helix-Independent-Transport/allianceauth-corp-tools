@@ -1,5 +1,6 @@
 import logging
 import re
+import time
 from locale import currency
 
 import requests
@@ -18,6 +19,7 @@ from corptools.task_helpers.update_tasks import fetch_location_name
 
 from .. import providers
 from ..models import (BridgeOzoneLevel, CharacterAudit, CorpAsset,
+                      CorporateContract, CorporateContractItem,
                       CorporationAudit, CorporationWalletDivision,
                       CorporationWalletJournalEntry, EveItemType, EveLocation,
                       EveName, MapJumpBridge, MapSystem, MapSystemPlanet, Poco,
@@ -45,17 +47,20 @@ def get_corp_token(corp_id, scopes, req_roles):
 
     for token in tokens:
         try:
-            roles = providers.esi.client.Character.get_characters_character_id_roles(character_id=token.character_id,
-                                                                                     token=token.valid_access_token()).result()
-            has_roles = False
-            for role in roles.get('roles', []):
-                if role in req_roles:
-                    has_roles = True
+            if req_roles:  # There are endpoints with no requirements
+                roles = providers.esi.client.Character.get_characters_character_id_roles(character_id=token.character_id,
+                                                                                         token=token.valid_access_token()).result()
+                has_roles = False
+                for role in roles.get('roles', []):
+                    if role in req_roles:
+                        has_roles = True
 
-            if has_roles:
-                return token
+                if has_roles:
+                    return token
+                else:
+                    pass  # TODO Maybe remove token?
             else:
-                pass  # TODO Maybe remove token?
+                return token
         except TokenError as e:
             logger.error(f"Token ID: {token.pk} ({e})")
 
@@ -860,3 +865,160 @@ def build_jb_network(self):
     MapJumpBridge.objects.bulk_create(new_jbs)
 
     return f"Created {len(new_jbs)} new JB links"
+
+
+def update_corporate_contracts(corp_id, force_refresh=False):
+    _corporation = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+    logger.debug("updating corporate contracts for: %s" %
+                 str(_corporation.corporation.corporation_name))
+
+    req_scopes = ['esi-contracts.read_corporation_contracts.v1',
+                  'esi-characters.read_corporation_roles.v1']
+
+    token = get_corp_token(corp_id, req_scopes, False)
+
+    new_contract_ids = []
+
+    if not token:
+        return False, []
+    try:
+        contracts_op = providers.esi.client.Contracts.get_corporations_corporation_id_contracts(
+            corporation_id=corp_id)
+
+        contracts = etag_results(
+            contracts_op, token, force_refresh=force_refresh)
+
+        contract_models_new = []
+        contract_models_old = []
+        eve_names = set()
+        contract_ids = list(CorporateContract.objects.filter(
+            corporation=_corporation).values_list("contract_id", flat=True))
+        for c in contracts:  # update labels
+            _contract_item = CorporateContract(
+                id=CorporateContract.build_pk(
+                    _corporation.id, c.get('contract_id')),
+                corporation=_corporation,
+                assignee_id=c.get('assignee_id'),
+                assignee_name_id=c.get('assignee_id'),
+                acceptor_id=c.get('acceptor_id'),
+                acceptor_name_id=c.get('acceptor_id'),
+                contract_id=c.get('contract_id'),
+                availability=c.get('availability'),
+                buyout=c.get('buyout'),
+                collateral=c.get('collateral'),
+                date_accepted=c.get('date_accepted'),
+                date_completed=c.get('date_completed'),
+                date_expired=c.get('date_expired'),
+                date_issued=c.get('date_issued'),
+                days_to_complete=c.get('days_to_complete'),
+                end_location_id=c.get('end_location_id'),
+                for_corporation=c.get('for_corporation'),
+                issuer_corporation_name_id=c.get('issuer_corporation_id'),
+                issuer_name_id=c.get('issuer_id'),
+                price=c.get('price'),
+                reward=c.get('reward'),
+                start_location_id=c.get('start_location_id'),
+                status=c.get('status'),
+                title=c.get('title'),
+                contract_type=c.get('type'),
+                volume=c.get('volume')
+            )
+
+            eve_names.add(c.get('assignee_id'))
+            eve_names.add(c.get('issuer_corporation_id'))
+            eve_names.add(c.get('issuer_id'))
+            eve_names.add(c.get('acceptor_id'))
+
+            if c.get('contract_id') in contract_ids:
+                contract_models_old.append(_contract_item)
+            else:
+                contract_models_new.append(_contract_item)
+
+        EveName.objects.create_bulk_from_esi(list(eve_names))
+
+        if len(contract_models_new) > 0:
+            CorporateContract.objects.bulk_create(
+                contract_models_new, batch_size=1000, ignore_conflicts=True)
+
+        if len(contract_models_old) > 0:
+            CorporateContract.objects.bulk_update(contract_models_old, batch_size=1000,
+                                                  fields=['date_accepted', 'date_completed', 'acceptor_id', 'date_expired', 'status',
+                                                          'assignee_name', 'acceptor_name', 'issuer_corporation_name', 'issuer_name'])
+
+        new_contract_ids = [c.contract_id for c in contract_models_new]
+        if force_refresh:
+            new_contract_ids += [c.contract_id for c in contract_models_old]
+
+    except NotModifiedError:
+        logger.info("CT: No New Contracts for: {}".format(
+            _corporation.corporation.corporation_name))
+        pass
+
+    _corporation.last_update_contracts = timezone.now()
+    _corporation.save()
+
+    return "CT: Completed corporate contracts for: %s" % str(_corporation.corporation.corporation_name), new_contract_ids
+
+
+@shared_task(bind=True, base=QueueOnce)
+def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=False):
+    _corporation = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+
+    logger.debug("updating contract items for: %s (%s)" %
+                 (str(_corporation.corporation.corporation_name), str(contract_id)))
+
+    contract = CorporateContract.objects.get(
+        corporation=_corporation,
+        contract_id=contract_id)
+
+    if contract.status != "deleted":
+        req_scopes = ['esi-contracts.read_corporation_contracts.v1',
+                      'esi-characters.read_corporation_roles.v1']
+
+        token = get_corp_token(corp_id, req_scopes, False)
+
+        if not token:
+            return False
+        try:
+            contracts_op = providers.esi.client.Contracts.get_corporations_corporation_id_contracts_contract_id_items(
+                corporation_id=corp_id,
+                contract_id=contract_id)
+
+            try:
+                contracts = etag_results(
+                    contracts_op, token, force_refresh=force_refresh)
+            except NotModifiedError as e:
+                raise e
+            except Exception as e:
+                if e.status_code == 404:
+                    logger.warning("CT: Contract items %s (%s) NOT FOUND ERROR" % (
+                        str(_corporation.corporation.corporation_name), str(contract_id)))
+                    return
+                else:
+                    self.retry()
+
+            contract_models_new = []
+            _types = set()
+            for c in contracts:  # update labels
+                _contract_item = CorporateContractItem(
+                    contract=contract,
+                    is_included=c.get('is_included'),
+                    is_singleton=c.get('is_singleton'),
+                    quantity=c.get('quantity'),
+                    raw_quantity=c.get('raw_quantity'),
+                    record_id=c.get('record_id'),
+                    type_name_id=c.get('type_id'),
+                )
+                _types.add(c.get('type_id'))
+                contract_models_new.append(_contract_item)
+            EveItemType.objects.create_bulk_from_esi(list(_types))
+            CorporateContractItem.objects.bulk_create(
+                contract_models_new, batch_size=1000, ignore_conflicts=True)
+        except NotModifiedError:
+            logger.info("CT: No New Corporate Contract items for: {} ({})".format(
+                _corporation.corporation.corporation_name), contract_id)
+            pass
+
+    return "CT: Completed Corporate Contract items %s (%s)" % (str(_corporation.corporation.corporation_name), str(contract_id))

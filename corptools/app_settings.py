@@ -344,6 +344,10 @@ _corp_scopes_assets = [
     'esi-assets.read_corporation_assets.v1',
 ]
 
+_corp_scopes_contracts = [
+    "esi-contracts.read_corporation_contracts.v1",
+]
+
 _corp_scopes_pocos = [
     'esi-planets.read_customs_offices.v1',
 ]

@@ -773,6 +773,21 @@ def update_corp_logins(self, corp_id):
     return corp_helpers.update_character_logins_from_corp(corp_id)
 
 
+@shared_task(bind=True, base=QueueOnce)
+def update_corp_contracts(self, corp_id, force_refresh=True):
+    _, ids = corp_helpers.update_corporate_contracts(
+        corp_id, force_refresh=force_refresh)
+
+    _chain = []
+    for id in ids:
+        _chain.append(corp_helpers.update_corporate_contract_items.si(
+            corp_id, id)
+        )
+    Chain(_chain).apply_async(priority=8)
+
+    return "Completed Que of contract items for: %s" % str(corp_id)
+
+
 @shared_task
 def update_corp(corp_id):
     corp = CorporationAudit.objects.get(corporation__corporation_id=corp_id)
@@ -783,6 +798,7 @@ def update_corp(corp_id):
     que.append(update_corp_structures.si(corp_id))
     que.append(update_corp_assets.si(corp_id))
     que.append(update_corp_pocos.si(corp_id))
+    que.append(update_corp_contracts.si(corp_id))
     que.append(update_corp_logins.si(corp_id))
     Chain(que).apply_async(priority=6)
 

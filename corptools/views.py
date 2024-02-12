@@ -1,4 +1,5 @@
 import json
+import logging
 import xml.etree.ElementTree as ET
 
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
@@ -19,6 +20,8 @@ from .tasks import (check_account, clear_all_etags, update_all_characters,
                     update_all_corps, update_all_eve_names,
                     update_all_locations, update_character, update_corp,
                     update_or_create_map)
+
+logger = logging.getLogger(__name__)
 
 CORP_REQUIRED_SCOPES = [
 
@@ -86,6 +89,7 @@ def add_corp_section(request, *args, **kwargs):
     wallets = request.GET.get('w', False)
     moons = request.GET.get('m', False)
     pocos = request.GET.get('p', False)
+    contracts = request.GET.get('c', False)
 
     # if we're coming back from SSO with a new token, return it
     token = _check_callback(request)
@@ -127,6 +131,8 @@ def add_corp_section(request, *args, **kwargs):
         scopes += app_settings._corp_scopes_pocos
         scopes += app_settings._corp_scopes_assets
 
+    if contracts:
+        scopes += app_settings._corp_scopes_contracts
     # user has selected to add a new token
     return sso_redirect(request, scopes=scopes)
 
