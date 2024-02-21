@@ -361,10 +361,13 @@ def react_menu(request):
 @login_required
 def react_main(request, character_id):
     # get available models
-    try:
-        return render(request, 'corptools/base_bs5.html', context={"version": __version__, "app_name": "corptools/bs5", "page_title": "Audit"})
-    except TemplateDoesNotExist:
-        return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
+    if app_settings.CT_BETA_UI:
+        try:
+            return render(request, 'corptools/base_bs5.html', context={"version": __version__, "app_name": "corptools/bs5", "page_title": "Audit"})
+        except TemplateDoesNotExist:
+            pass
+
+    return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
 
 
 @login_required
