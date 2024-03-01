@@ -354,23 +354,24 @@ def update_account(request, character_id):
 
 @login_required
 def react_menu(request):
-    # get available models
     return redirect('corptools:reactmain', request.user.profile.main_character.character_id)
 
 
 @login_required
 def react_main(request, character_id):
-    # get available models
-    if app_settings.CT_BETA_UI:
-        try:
-            return render(request, 'corptools/base_bs5.html', context={"version": __version__, "app_name": "corptools/bs5", "page_title": "Audit"})
-        except TemplateDoesNotExist:
-            pass
+    try:
+        return render(request, 'corptools/base_bs5.html', context={"version": __version__, "app_name": "corptools/bs5", "page_title": "Audit"})
+    except TemplateDoesNotExist:
+        pass
 
     return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
 
 
 @login_required
+def v3_ui_render(request, character_id):
+    return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
+
+
+@login_required
 def react_corp(request):
-    # get available models
     return render(request, 'corptools/corporation/react_base.html')

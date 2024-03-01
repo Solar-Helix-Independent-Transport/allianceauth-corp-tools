@@ -211,7 +211,10 @@ export const BaseTable = ({
       data,
       defaultColumn,
       filterTypes,
-      initialState: { pageSize: 20 },
+      initialState: {
+        pageSize: 20,
+        sortBy: [],
+      },
     },
     useFilters,
     useSortBy,
