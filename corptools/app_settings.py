@@ -3,7 +3,7 @@ from django.conf import settings
 CORPTOOLS_APP_NAME = getattr(settings, "CORPTOOLS_APP_NAME", "Character Audit")
 
 CORPTOOLS_DISCORD_BOT_COGS = getattr(
-    settings, 'CORPTOOLS_DISCORD_BOT_COGS', ["corptools.cogs.routes", "corptools.cogs.locate"])
+    settings, 'CORPTOOLS_DISCORD_BOT_COGS', ["corptools.cogs.routes", "corptools.cogs.locate", "corptools.cogs.where"])
 
 CT_CHAR_MAX_INACTIVE_DAYS = getattr(settings, 'CT_CHAR_MAX_INACTIVE_DAYS', 3)
 
