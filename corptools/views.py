@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
 from django.template import TemplateDoesNotExist
 from django.urls import reverse
@@ -375,3 +376,76 @@ def v3_ui_render(request, character_id):
 @login_required
 def react_corp(request):
     return render(request, 'corptools/corporation/react_base.html')
+
+
+@login_required
+def fuel_levels(request):
+    if not (request.user.has_perm('corptools.own_corp_manager') or
+            request.user.has_perm('corptools.alliance_corp_manager') or
+            request.user.has_perm('corptools.state_corp_manager') or
+            request.user.has_perm('corptools.global_corp_manager') or
+            request.user.has_perm('corptools.holding_corp_structures')):
+        raise PermissionDenied("No perms to view")
+
+    # hourly fuel reqs [ cit, eng, ref, flex ]
+    citadel_service_mods = {
+        'Clone Bay': [8, 10, 10, 10],
+        'Market': [30, 40, 40, 40],
+        'Manufacturing (Capitals)': [24, 18, 24, 24],
+        'Standup Hyasyoda Research Lab': [10, 8, 10, 10],  # how to detect this
+        'Invention': [12, 9, 12, 12],
+        'Manufacturing (Standard)': [12, 9, 12, 12],
+        'Blueprint Copying': [12, 9, 12, 12],
+        'Material Efficiency Research': [0, 0, 0, 0],  # part of above
+        'Time Efficiency Research': [0, 0, 0, 0],  # part of above
+        'Manufacturing (Super Capitals)': [36, 27, 36, 36],
+        'Composite Reactions': [15, 15, 12, 15],
+        'Hybrid Reactions': [15, 15, 12, 15],
+        'Moon Drilling': [5, 5, 4, 5],
+        'Biochemical Reactions': [15, 15, 12, 15],
+        'Reprocessing': [10, 10, 8, 10],
+        'Jump Access': [9999, 9999, 9999, 15],  # large to show errors
+        'Cynosural Jammer': [9999, 9999, 9999, 40],
+        'Jump Gate Access': [9999, 9999, 9999, 30]
+    }
+
+    cit = [35833, 47516, 47512, 47513, 47514, 47515, 35832, 35834]
+    eng = [35827, 35826, 35825]
+    ref = [35835, 35836]
+    fle = [37534, 35841, 35840]
+
+    all_structures = Structure.get_visible(request.user).select_related(
+        'corporation', 'corporation__corporation', 'system_name', 'type_name',
+        'system_name__constellation', 'system_name__constellation__region'
+    ).prefetch_related('structureservice_set')
+
+    structure_tree = []
+    total_hourly_fuel = 0
+    for s in all_structures:
+        structure_hourly_fuel = 0
+        structure_type = 99
+
+        if s.type_id in cit:
+            structure_type = 0
+        elif s.type_id in eng:
+            structure_type = 1
+        elif s.type_id in ref:
+            structure_type = 2
+        elif s.type_id in fle:
+            structure_type = 3
+
+        for service in s.structureservice_set.all():
+            if service.state == 'online':
+                fuel_use = citadel_service_mods[service.name][structure_type]
+                total_hourly_fuel += fuel_use
+                structure_hourly_fuel += fuel_use
+
+        structure_tree.append(
+            {'structure': s, 'fuel_req': structure_hourly_fuel}
+        )
+
+    context = {
+        'structures': structure_tree,
+        'total_hourly_fuel': total_hourly_fuel,
+    }
+    return render(request, 'corptools/dashboards/fuel_dash.html', context=context)

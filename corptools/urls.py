@@ -78,5 +78,6 @@ urlpatterns = [
         re_path(r'^add/$', views.add_corp, name='add_corp'),
         re_path(r'^add_options/$', views.add_corp_section,
                 name='add_corp_options'),
+        re_path(r'^dashboard/fuel', views.fuel_levels, name='fuel_dashboard'),
     ])),
 ]
