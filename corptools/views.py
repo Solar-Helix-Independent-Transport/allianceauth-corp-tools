@@ -441,7 +441,10 @@ def fuel_levels(request):
                 total_hourly_fuel += fuel_use
                 structure_hourly_fuel += fuel_use
 
-        hours = (s.fuel_expires - timezone.now()).total_seconds()//3600
+        hours = 0
+
+        if s.fuel_expires:
+            hours = (s.fuel_expires - timezone.now()).total_seconds()//3600
 
         structure_tree.append(
             {'structure': s,
