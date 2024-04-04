@@ -137,9 +137,9 @@
                 }, 0 );
 
                 var total_count = api.column(9, { page: 'current'}).data().count();
-                var systems = api.column(5, { page: 'current'}).data().unique().count();
-                var constel = api.column(6, { page: 'current'}).data().unique().count();
-                var region = api.column(7, { page: 'current'}).data().unique().count();
+                var systems = api.column(6, { page: 'current'}).data().unique().count();
+                var constel = api.column(7, { page: 'current'}).data().unique().count();
+                var region = api.column(8, { page: 'current'}).data().unique().count();
 
                 var types = [];
 
@@ -196,7 +196,7 @@
                     elem.innerText = 0;
                 }
             }
-            duration_90d_span.innerText =numberWithCommas(total_reqs);
+            duration_90d_span.innerText = numberWithCommas(total_reqs);
 
         }
         fuelInput.addEventListener('input', inputHandler);
