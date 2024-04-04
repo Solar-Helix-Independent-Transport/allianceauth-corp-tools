@@ -447,7 +447,7 @@ def fuel_levels(request):
             {'structure': s,
              'fuel_req': structure_hourly_fuel,
              "current_blocks": hours*structure_hourly_fuel,
-             "90day": ((structure_hourly_fuel*90*24)-(hours*structure_hourly_fuel))}
+             "90day": max(int((structure_hourly_fuel*90*24)-(hours*structure_hourly_fuel)), 0)}
         )
 
     context = {

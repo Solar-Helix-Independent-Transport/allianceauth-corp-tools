@@ -12,6 +12,7 @@
                 <h4 class="text-center">Filtered Stats</h4>
                 <p>Structures Matching Filter <span id="total_str" class="badge bg-primary"></span></p>
                 <p> Block Usage (Month) <span id="total_fuel" class="badge bg-primary"></span></p>
+                <p> Required Blocks for <span id="totalDaysTitle"></span> Days <span id="total_fuel_90d" class="badge bg-primary"></span></p>
                 <p>Filtered System Count <span id="total_system" class="badge bg-primary"></span></p>
                 <p>Filtered Constelation Count <span id="total_const" class="badge bg-primary"></span></p>
                 <p>Filtered Region Count <span id="total_region" class="badge bg-primary"></span></p>
@@ -55,7 +56,7 @@
                         <td class="text-center">{{ structure.structure.fuel_expires|date:"Y-m-d" }}</br>
                             <span class="badge bg-secondary">{{ structure.structure.fuel_expires|timeuntil }}</span>
                         </td>
-                        <td class="text-center"><span class="blocks-till" start_blocks="{{structure.current_blocks}}" hourly="{{structure.fuel_req}}">{{ structure.90day }}</span></td>
+                        <td class="text-center blocks-till" start_blocks="{{structure.current_blocks}}" hourly="{{structure.fuel_req}}">{{ structure.90day }}</td>
                         <td class="text-center">{% for service in structure.structure.structureservice_set.all %}
                             {% if service.state == 'online' %}
                                 <span class="badge bg-primary">{{ service.name }}</span>
@@ -85,6 +86,10 @@
 
 {% endblock %}
 {% block extra_script %}
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     $(document).ready(function() {
         $('#table-structs').DataTable({
             filterDropDown: {
@@ -115,17 +120,21 @@
             responsive: true,
             pageLength: -1,
             footerCallback: function ( row, data, start, end, display ) {
-                function numberWithCommas(x) {
-                    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                }
                 var api = this.api(), data;
 
                 var pageTotal = api
-                    .column(2, { page: 'current'})
-                    .data()
-                    .reduce( function (a, b) {
-                        return Number(a) + Number(b);
-                    }, 0 );
+                .column(2, { page: 'current'})
+                .data()
+                .reduce( function (a, b) {
+                    return Number(a) + Number(b);
+                }, 0 );
+
+                pageTotal_req = api
+                .column(4, { page: 'current'})
+                .data()
+                .reduce( function (a, b) {
+                    return Number(a) + Number(b);
+                }, 0 );
 
                 var total_count = api.column(9, { page: 'current'}).data().count();
                 var systems = api.column(5, { page: 'current'}).data().unique().count();
@@ -152,6 +161,7 @@
                 console.log(types);
                 console.log(type_count);
                 $('#total_fuel').html(numberWithCommas(pageTotal))
+                $('#total_fuel_90d').html(numberWithCommas(pageTotal_req))
                 $('#total_str').html(numberWithCommas(total_count))
                 $('#total_system').html(numberWithCommas(systems))
                 $('#total_const').html(numberWithCommas(constel))
@@ -160,6 +170,9 @@
             }
         });
         const duration_title = document.getElementById('daytitle');
+        const duration_title2 = document.getElementById('totalDaysTitle');
+        const duration_90d_span = document.getElementById('total_fuel_90d');
+
         const fuelInput = document.getElementById('fuelDuration');
         const inputHandler = function(e) {
             const fuelItems = document.getElementsByClassName("blocks-till");
@@ -169,14 +182,22 @@
             }
             const hours = days*24
             duration_title.innerText = days;
-
+            duration_title2.innerText = days;
+            var total_reqs = 0
             for (const elem of fuelItems) {
                 console.log(elem);
                 const start_blocks = elem.getAttribute("start_blocks");
                 const hourly = elem.getAttribute("hourly");
                 var blocks = hourly*hours - start_blocks;
-                elem.innerText = blocks;
+                if (blocks >=0){
+                    elem.innerText = blocks;
+                    total_reqs += blocks;
+                } else {
+                    elem.innerText = 0;
+                }
             }
+            duration_90d_span.innerText =numberWithCommas(total_reqs);
+
         }
         fuelInput.addEventListener('input', inputHandler);
 
