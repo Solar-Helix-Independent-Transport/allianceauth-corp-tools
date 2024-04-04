@@ -9,6 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
 from django.template import TemplateDoesNotExist
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from esi.decorators import _check_callback, token_required
@@ -440,8 +441,13 @@ def fuel_levels(request):
                 total_hourly_fuel += fuel_use
                 structure_hourly_fuel += fuel_use
 
+        hours = (s.fuel_expires - timezone.now()).total_seconds()//3600
+
         structure_tree.append(
-            {'structure': s, 'fuel_req': structure_hourly_fuel}
+            {'structure': s,
+             'fuel_req': structure_hourly_fuel,
+             "current_blocks": hours*structure_hourly_fuel,
+             "90day": ((structure_hourly_fuel*90*24)-(hours*structure_hourly_fuel))}
         )
 
     context = {

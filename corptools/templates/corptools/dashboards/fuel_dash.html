@@ -23,7 +23,10 @@
             </div> -->
         </div>
         <hr>
-        <h4>Filtering</h4>
+        <div class="">
+            <label for="fuelDuration" class="form-label">Refuel Duration in days</label>
+            <input type="number" class="form-control" id="fuelDuration" placeholder="90">
+        </div>
         <div class="table-responsive">
             <table id="table-structs" class="table table-responsive ">
                 <thead>
@@ -32,6 +35,7 @@
                         <th>Structure</th>
                         <th class="text-center">Fuel Use 30d</th>
                         <th class="text-center">Fuel Expires</th>
+                        <th class="text-center">Blocks for <span id="daytitle">90</span>d Refuel</th>
                         <th class="text-center">Services</th>
                         <th>System</th>
                         <th>Constellation</th>
@@ -50,6 +54,8 @@
                         <td class="text-center">{% widthratio structure.fuel_req 1 720 %}</td>
                         <td class="text-center">{{ structure.structure.fuel_expires|date:"Y-m-d" }}</br>
                             <span class="badge bg-secondary">{{ structure.structure.fuel_expires|timeuntil }}</span>
+                        </td>
+                        <td class="text-center"><span class="blocks-till" start_blocks="{{structure.current_blocks}}" hourly="{{structure.fuel_req}}">{{ structure.90day }}</span></td>
                         <td class="text-center">{% for service in structure.structure.structureservice_set.all %}
                             {% if service.state == 'online' %}
                                 <span class="badge bg-primary">{{ service.name }}</span>
@@ -83,7 +89,7 @@
         $('#table-structs').DataTable({
             filterDropDown: {
 					columns: [{
-                        idx: 6
+                        idx: 10
                             },
                             {
                         idx: 7
@@ -100,7 +106,7 @@
             columnDefs: [
                 { "searchable": false, "targets": [0] },
                 { "sortable": false, "targets": [0] },
-                { "visible": false, "targets": [5, 6, 7, 8, 9] }
+                { "visible": false, "targets": [10, 6, 7, 8, 9] }
             ],
             order: [
                 [1, "desc"]
@@ -153,6 +159,27 @@
 
             }
         });
+        const duration_title = document.getElementById('daytitle');
+        const fuelInput = document.getElementById('fuelDuration');
+        const inputHandler = function(e) {
+            const fuelItems = document.getElementsByClassName("blocks-till");
+            var days = Number(e.target.value)
+            if (days <= 30 ){
+                days = 30;
+            }
+            const hours = days*24
+            duration_title.innerText = days;
+
+            for (const elem of fuelItems) {
+                console.log(elem);
+                const start_blocks = elem.getAttribute("start_blocks");
+                const hourly = elem.getAttribute("hourly");
+                var blocks = hourly*hours - start_blocks;
+                elem.innerText = blocks;
+            }
+        }
+        fuelInput.addEventListener('input', inputHandler);
+
     });
 {% endblock %}
 {% block extra_css %}
