@@ -443,7 +443,7 @@ def fuel_levels(request):
 
         hours = 0
 
-        if s.fuel_expires:
+        if s.fuel_expires is not None:
             hours = (s.fuel_expires - timezone.now()).total_seconds()//3600
 
         structure_tree.append(
