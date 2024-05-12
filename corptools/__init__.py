@@ -1,2 +1,4 @@
-default_app_config = 'corptools.apps.CorpToolsConfig'
+"""
+This module is the core of the CorpTools Ecosystem
+"""
 __version__ = "2.7.0"
