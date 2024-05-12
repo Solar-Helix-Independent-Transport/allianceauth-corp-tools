@@ -1,5 +1,0 @@
-include LICENSE
-include README.md
-recursive-include corptools/templates *
-recursive-include corptools/static *
-recursive-include corptools/ *.py
