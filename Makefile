@@ -9,13 +9,10 @@ help:
 	@echo "  deploy     Configure the PyPi config file in CI"
 	@echo "  packagejs  Build the React Project"
 	@echo "  packagepy  Build the PyPi package"
-	@echo "  devchar    Run the React Character Dev server"
-	@echo "  devcorp    Run the React Corporation Dev server"
 
 clean:
 	rm -rf dist/*
-	rm -rf frontend/corp/build/*
-	rm -rf frontend/char/build/*
+	rm -rf frontend/build/*
 
 dev:
 	pip install --upgrade pip
@@ -31,12 +28,16 @@ deploy:
 	twine upload dist/*
 
 buildjs:
-	cd frontend/corp;yarn install;yarn build;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/corp\/static\/js\//g' {} \;
-	cd frontend/char;yarn install;yarn build;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/char\/static\/js\//g' {} \;
+	cd frontend/corp;yarn install;yarn build
+	cd frontend/corp;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/corp\/static\/js\//g' {} \;
+	cd frontend/char;yarn install;yarn build
+	cd frontend/char;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/char\/static\/js\//g' {} \;
 
 package:
-	cd frontend/corp;yarn install;yarn build;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/corp\/static\/js\//g' {} \;
-	cd frontend/char;yarn install;yarn build;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/char\/static\/js\//g' {} \;
+	cd frontend/corp;yarn install;yarn build
+	cd frontend/corp;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/corp\/static\/js\//g' {} \;
+	cd frontend/char;yarn install;yarn build
+	cd frontend/char;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/char\/static\/js\//g' {} \;
 	python setup.py sdist
 
 devcorp:

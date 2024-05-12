@@ -22,10 +22,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
-        # python-version: ['3.9']
+        python-version: ["3.9", "3.10", "3.11"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - uses: shogo82148/actions-setup-redis@v1
         with:
@@ -33,11 +32,11 @@ jobs:
 
       - run: redis-cli ping
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: "16"
 
@@ -58,5 +57,8 @@ jobs:
           # A file, directory or wildcard pattern that describes what to upload
           path: htmlcov/
 
-      - name: Build Projects
+      - name: Build JS
+        run: make buildjs
+
+      - name: Build Python
         run: make package

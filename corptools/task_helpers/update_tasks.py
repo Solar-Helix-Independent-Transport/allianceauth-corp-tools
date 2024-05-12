@@ -140,21 +140,21 @@ def process_map_from_esi():
 def update_ore_comp_table_from_fuzzworks():
     # prime the provider or th ram will go bye bye
     status = providers.esi.client.Status.get_status().result()
-    InvTypeMaterials.objects.all().delete()
     # Get needed SDE file
-    sysNames_url = 'https://www.fuzzwork.co.uk/dump/latest/invTypeMaterials.csv.bz2'
+    inv_url = 'https://www.fuzzwork.co.uk/dump/latest/invTypeMaterials.csv.bz2'
 
-    sysNames_req = requests.get(sysNames_url)
+    invNames_req = requests.get(inv_url)
     with open('invTypeMaterials.csv.bz2', 'wb') as iN:
-        iN.write(sysNames_req.content)
+        iN.write(invNames_req.content)
 
     # Decompress SDE files
     open('invTypeMaterials.csv', 'wb').write(
-        bz2.open('invTypeMaterials.csv.bz2', 'rb').read())
+        bz2.open('invTypeMaterials.csv.bz2', 'rb').read()
+    )
 
     # Parse file(s) and Update names object(s)
-    ore_details = []
-    mets = set()
+    ore_details = []  # new stuff
+    mets = set()  # new stuff
     with open('invTypeMaterials.csv', 'r', encoding='UTF-8') as iN:
         csv_list = iN.read().split('\n')
         for row in csv_list[1:]:
@@ -169,9 +169,12 @@ def update_ore_comp_table_from_fuzzworks():
                     material_type_id=spl[1],
                     met_type_id=spl[1]
                 ))
-        ids = process_bulk_types_from_esi(mets)
-        InvTypeMaterials.objects.bulk_create(
-            ore_details, batch_size=500, ignore_conflicts=True)
+
+    ids = process_bulk_types_from_esi(mets)
+    # delete it all and start again
+    InvTypeMaterials.objects.all().delete()
+    InvTypeMaterials.objects.bulk_create(
+        ore_details, batch_size=500, ignore_conflicts=True)
 
 
 def process_category_from_esi(category_id):

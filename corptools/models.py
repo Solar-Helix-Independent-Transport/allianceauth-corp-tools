@@ -211,6 +211,11 @@ class CorporationAudit(models.Model):
     last_change_wallet = models.DateTimeField(
         null=True, default=None, blank=True)
 
+    last_update_contracts = models.DateTimeField(
+        null=True, default=None, blank=True)
+    last_change_contracts = models.DateTimeField(
+        null=True, default=None, blank=True)
+
     last_update_known_login = models.DateTimeField(
         null=True, default=None, blank=True)
 
@@ -413,9 +418,10 @@ class MapJumpBridge(models.Model):
     owner = models.ForeignKey(
         EveName, on_delete=models.SET_NULL, null=True, default=None)
     updated = models.DateTimeField(auto_now=True)
+    manually_input = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.from_solar_system.name} >> {self.to_solar_system.name} ({self.structure_id})"
+        return f"{self.from_solar_system.name} >> {self.to_solar_system.name} ({self.structure_id}) (Auto: {not self.manually_input})"
 
 # ************************ Asset Models
 
@@ -868,6 +874,82 @@ class ContractItem(models.Model):
     class Meta:
         unique_together = (("record_id", "contract"),)
 
+
+class CorporateContract(models.Model):
+    id = models.CharField(max_length=50, primary_key=True)
+
+    contract_id = models.BigIntegerField()
+
+    corporation = models.ForeignKey(CorporationAudit, on_delete=models.CASCADE)
+    acceptor_id = models.IntegerField()
+    acceptor_name = models.ForeignKey(
+        EveName, on_delete=models.CASCADE, related_name="corporationcontractacceptor")
+    assignee_id = models.IntegerField()
+    assignee_name = models.ForeignKey(
+        EveName, on_delete=models.CASCADE, related_name="corporationcontractassignee")
+    issuer_id = models.IntegerField()
+    issuer_name = models.ForeignKey(
+        EveName, on_delete=models.CASCADE, related_name="corporationcontractissuer")
+    issuer_corporation_id = models.IntegerField()
+    issuer_corporation_name = models.ForeignKey(
+        EveName, on_delete=models.CASCADE, related_name="corporationcontractissuercorporation")
+    days_to_complete = models.IntegerField()
+
+    collateral = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+    buyout = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+    price = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+    reward = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+
+    volume = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+
+    days_to_complete = models.IntegerField(null=True, blank=True)
+
+    start_location_id = models.BigIntegerField(null=True, blank=True)
+    start_location_name = models.ForeignKey(
+        EveLocation, on_delete=models.SET_NULL, null=True, default=None, related_name="corporationcontractfrom")
+
+    end_location_id = models.BigIntegerField(null=True, blank=True)
+    end_location_name = models.ForeignKey(
+        EveLocation, on_delete=models.SET_NULL, null=True, default=None, related_name="corporationcontractto")
+
+    for_corporation = models.BooleanField()
+
+    date_accepted = models.DateTimeField(null=True, blank=True)
+    date_completed = models.DateTimeField(null=True, blank=True)
+
+    date_expired = models.DateTimeField()
+    date_issued = models.DateTimeField()
+
+    status = models.CharField(max_length=25)
+    contract_type = models.CharField(max_length=20)
+    availability = models.CharField(max_length=15)
+
+    title = models.CharField(max_length=256)
+
+    @staticmethod
+    def build_pk(corp, cont):
+        return f"{corp}{cont}"
+
+    class Meta:
+        unique_together = (("corporation", "contract_id"),)
+
+
+class CorporateContractItem(models.Model):
+    contract = models.ForeignKey(CorporateContract, on_delete=models.CASCADE)
+    is_included = models.BooleanField()
+    is_singleton = models.BooleanField()
+    quantity = models.IntegerField()
+    raw_quantity = models.IntegerField(null=True, blank=True)
+    record_id = models.BigIntegerField()
+    type_name = models.ForeignKey(EveItemType, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (("record_id", "contract"),)
 
 # ************************ Meta Models
 
@@ -1643,23 +1725,27 @@ class Rolefilter(FilterBase):
     has_station_manager = models.BooleanField(default=False)
     has_personnel_manager = models.BooleanField(default=False)
 
-    #main_only = models.BooleanField(default=False)
+    main_only = models.BooleanField(default=False)
 
-    corp_filter = models.ForeignKey(
-        EveCorporationInfo, on_delete=models.CASCADE, related_name='audit_role_filter', null=True, blank=True, default=None)
-    alliance_filter = models.ForeignKey(
-        EveAllianceInfo, on_delete=models.CASCADE, related_name='audit_role_filter', null=True, blank=True, default=None)
+    corps_filter = models.ManyToManyField(
+        EveCorporationInfo, related_name='audit_role_filters', blank=True)
+
+    alliances_filter = models.ManyToManyField(
+        EveAllianceInfo, related_name='audit_role_filters', blank=True)
 
     def process_filter(self, user: User):
         try:
             characters = user.character_ownerships.all()
             queries = []
-            if self.corp_filter:
+            if self.main_only:
                 characters = characters.filter(
-                    character__corporation_id=self.corp_filter.corporation_id)
-            if self.alliance_filter:
+                    character__character_id=user.profile.main_character.character_id)
+            if self.corps_filter.all().count():
                 characters = characters.filter(
-                    character__alliance_id=self.alliance_filter.alliance_id)
+                    character__corporation_id__in=self.corps_filter.all().values_list("corporation_id", flat=True))
+            if self.alliances_filter.all().count():
+                characters = characters.filter(
+                    character__alliance_id__in=self.alliances_filter.all().values_list("alliance_id", flat=True))
             if self.has_director:
                 _q = models.Q(
                     character__characteraudit__characterroles__director=True)
@@ -1691,12 +1777,15 @@ class Rolefilter(FilterBase):
 
         co = CharacterOwnership.objects.filter(user__in=users)
         queries = []
-        if self.corp_filter:
+        if self.main_only:
+            co = co.filter(character__character_id=models.F(
+                "user__profile__main_character__character_id"))
+        if self.corps_filter.all().count():
             co = co.filter(
-                character__corporation_id=self.corp_filter.corporation_id)
-        if self.alliance_filter:
+                character__corporation_id__in=self.corps_filter.all().values_list("corporation_id", flat=True))
+        if self.alliances_filter.all().count():
             co = co.filter(
-                character__alliance_id=self.alliance_filter.alliance_id)
+                character__alliance_id__in=self.alliances_filter.all().values_list("alliance_id", flat=True))
         if self.has_director:
             _q = models.Q(
                 character__characteraudit__characterroles__director=True)

@@ -3,7 +3,7 @@ from django.conf import settings
 CORPTOOLS_APP_NAME = getattr(settings, "CORPTOOLS_APP_NAME", "Character Audit")
 
 CORPTOOLS_DISCORD_BOT_COGS = getattr(
-    settings, 'CORPTOOLS_DISCORD_BOT_COGS', ["corptools.cogs.routes", "corptools.cogs.locate"])
+    settings, 'CORPTOOLS_DISCORD_BOT_COGS', ["corptools.cogs.routes", "corptools.cogs.locate", "corptools.cogs.where"])
 
 CT_CHAR_MAX_INACTIVE_DAYS = getattr(settings, 'CT_CHAR_MAX_INACTIVE_DAYS', 3)
 
@@ -344,6 +344,10 @@ _corp_scopes_assets = [
     'esi-assets.read_corporation_assets.v1',
 ]
 
+_corp_scopes_contracts = [
+    "esi-contracts.read_corporation_contracts.v1",
+]
+
 _corp_scopes_pocos = [
     'esi-planets.read_customs_offices.v1',
 ]
@@ -353,6 +357,8 @@ CORP_REQUIRED_SCOPES = _corp_scopes_base+_corp_scopes_tracking + \
     _corp_scopes_structures+_corp_scopes_moons + \
     _corp_scopes_wallets+_corp_scopes_assets
 
+CT_BETA_UI = getattr(
+    settings, 'CT_BETA_UI', False)
 
 CT_PAGINATION_SIZE = getattr(
     settings, 'CT_PAGINATION_SIZE', 30000)

@@ -59,7 +59,9 @@ urlpatterns = [
     re_path(r'^api/', api.urls),
     re_path(r'^r/$', views.react_menu, name='react'),
     re_path(r'^r/(?P<character_id>(\d)*)/',
-            views.react_main, name='reactmain'),
+            views.v3_ui_render, name='reactmain'),
+    # re_path(r'^r4/(?P<character_id>(\d)*)/',
+    #         views.react_main, name='reactmain_beta'),
     re_path(r'^check_account/(?P<character_id>(\d)*)/$',
             views.update_account, name='update_account'),
     re_path(r'^admin/$', views.admin, name='admin'),
@@ -76,5 +78,6 @@ urlpatterns = [
         re_path(r'^add/$', views.add_corp, name='add_corp'),
         re_path(r'^add_options/$', views.add_corp_section,
                 name='add_corp_options'),
+        re_path(r'^dashboard/fuel', views.fuel_levels, name='fuel_dashboard'),
     ])),
 ]

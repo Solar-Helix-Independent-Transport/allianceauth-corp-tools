@@ -38,6 +38,7 @@ function apiDataToTotals(group_list, ore_list, input, dataKey = "volume") {
   input.map((d) => {
     for (let i = 0; i < d.ores.length; ++i)
       out[d.ores[i]["group"]][d.ores[i]["name"]] += d.ores[i][dataKey];
+    return 0;
   });
   console.log("POST", out);
 

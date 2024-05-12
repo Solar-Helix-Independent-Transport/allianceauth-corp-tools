@@ -60,6 +60,16 @@ function CorpBadge() {
             </Checkbox>
             <h6>Member Tracking enables the Last Login Tracking of characters for smart filters</h6>
 
+            <Checkbox
+              style={{ width: "100%" }}
+              defaultChecked={false}
+              inline={true}
+              id="c"
+              name="c"
+            >
+              Contracts
+            </Checkbox>
+
             <br />
             <br />
             <FormControl style={{ width: "100%" }} bsSize="small" type="submit" value="Add Token" />

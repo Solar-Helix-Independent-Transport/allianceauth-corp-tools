@@ -1,0 +1,48 @@
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.refreshAnimate {
+  -animation: spin 2s infinite linear;
+  -ms-animation: spin 2s infinite linear;
+  -webkit-animation: spin 2s infinite linear;
+  -moz-animation: spin 2s infinite linear;
+}
+
+.filterBtn {
+  color: hsl(0, 0%, 50%) !important;
+  margin-top: 2px !important;
+  min-height: 38px !important;
+  background-color: white !important;
+  border-color: hsl(0, 0%, 80%) !important;
+  border-top-left-radius: 4px !important;
+  border-bottom-left-radius: 4px !important;
+  border-right: 0 !important;
+  border-width: 1px !important;
+  font-weight: bold !important;
+  display: flex !important;
+  font-size: 15px !important;
+  font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+
+.filterToggle {
+  stroke: hsl(0, 0%, 80%) !important;
+  fill: hsl(0, 0%, 80%) !important;
+  stroke-width: 0;
+  padding-top: 8px !important;
+  margin-top: 2px !important;
+  min-height: 38px !important;
+  background-color: white !important;
+  border-color: hsl(0, 0%, 80%) !important;
+  border-top-right-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+  border-left: 0 !important;
+  border-width: 1px !important;
+  display: flex !important;
+  font-size: 15px !important;
+}

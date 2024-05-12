@@ -35,7 +35,9 @@ class Locator(commands.Cog):
     def get_locate_embeds(self, char):
         alts = char.character_ownership.user.character_ownerships.all().select_related('character')
 
-        alt_list = []
+        alt_online = []
+        alt_offline = []
+        alt_no_token = []
         for alt in alts:
             _alt = {
                 "cid": alt.character.character_id,
@@ -80,28 +82,44 @@ class Locator(commands.Cog):
                     ship['ship_type_id'])
                 _alt['ship'] = shp
                 _alt['lookup'] = True
-            alt_list.append(_alt)
-        embeds = []
-        for alt_grp in [alt_list[i:i + 10] for i in range(0, len(alt_list), 10)]:
-            altstr = []
-            for a in alt_grp:
-                if a['lookup']:
-                    altstr.append(f"[{a['cnm']}](https://evewho.com/character/{a['cid']}) "
-                                  f"*[ [{a['crpnm']}](https://evewho.com/corporation/{a['crpid']}) ]*: "
-                                  f"{a['online']}"
-                                  f" in [{a['system']}](https://evemaps.dotlan.net/system/{a['system'].replace(' ', '_')})"
-                                  f"\n ```Currently in a {a['ship']}"
-                                  f" Last Online: {a['last_online'].strftime('%Y-%m-%d %H:%M')}```")
+                if online["online"]:
+                    alt_online.append(_alt)
                 else:
-                    altstr.append(f"[{a['cnm']}](https://evewho.com/character/{a['cid']}) "
-                                  f"*[ [{a['crpnm']}](https://evewho.com/corporation/{a['crpid']}) ]*: "
-                                  f"Unknown No Tokens"
-                                  f"")
+                    alt_offline.append(_alt)
+            else:
+                alt_no_token.append(_alt)
 
-            e = Embed()
-            e.description = "\n".join(altstr)
-            embeds.append(e)
-        return embeds
+        out_embeds = []
+
+        def process_list(header, alt_list):
+            embeds = []
+            for alt_grp in [alt_list[i:i + 10] for i in range(0, len(alt_list), 10)]:
+                altstr = []
+                for a in alt_grp:
+                    if a['lookup']:
+                        altstr.append(f"[{a['cnm']}](https://evewho.com/character/{a['cid']}) "
+                                      f"*[ [{a['crpnm']}](https://evewho.com/corporation/{a['crpid']}) ]*: "
+                                      f"{a['online']}"
+                                      f" in [{a['system']}](https://evemaps.dotlan.net/system/{a['system'].replace(' ', '_')})"
+                                      f"\n ```Currently in a {a['ship']}"
+                                      f" Last Online: {a['last_online'].strftime('%Y-%m-%d %H:%M')}```")
+                    else:
+                        altstr.append(f"[{a['cnm']}](https://evewho.com/character/{a['cid']}) "
+                                      f"*[ [{a['crpnm']}](https://evewho.com/corporation/{a['crpid']}) ]*: "
+                                      f"Unknown No Tokens"
+                                      f"")
+
+                e = Embed(title=header)
+                e.description = "\n".join(altstr)
+                embeds.append(e)
+            return embeds
+        if len(alt_online):
+            out_embeds += process_list("Online", alt_online)
+        if len(alt_offline):
+            out_embeds += process_list("Offline", alt_offline)
+        if len(alt_no_token):
+            out_embeds += process_list("No Tokens", alt_no_token)
+        return out_embeds
 
     @commands.command(pass_context=True)
     @sender_has_perm('corputils.view_alliance_corpstats')
