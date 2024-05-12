@@ -1,8 +1,5 @@
-from __future__ import division
-
 from datetime import datetime
 from typing import Dict, List, Optional, Union
-from xmlrpc.client import Boolean, boolean
 
 from ninja import Schema
 
@@ -33,20 +30,13 @@ class Corporation(Schema):
 
 
 class MenuLink(Schema):
-    name: Any  # TODO type the translate objects, or use the not lazy one
+    name: str
     link: str
 
 
 class MenuCategory(Schema):
-
-
-<< << << < HEAD
-name: Any  # TODO type the translate objects, or use the not lazy one
-links: List[MenuLink]
-== == == =
-name: str
-links: List[MenuLink] = None
->>>>>> > 8e93fe5d98344df295389a388010d1bd30fd44c7
+    name: str
+    links: List[MenuLink] = None
 
 
 class CorpHistory(Schema):
