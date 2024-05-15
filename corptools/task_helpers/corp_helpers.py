@@ -1018,7 +1018,7 @@ def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=Fa
                 contract_models_new, batch_size=1000, ignore_conflicts=True)
         except NotModifiedError:
             logger.info("CT: No New Corporate Contract items for: {} ({})".format(
-                _corporation.corporation.corporation_name), contract_id)
+                _corporation.corporation.corporation_name, contract_id)
             pass
 
     return "CT: Completed Corporate Contract items %s (%s)" % (str(_corporation.corporation.corporation_name), str(contract_id))
