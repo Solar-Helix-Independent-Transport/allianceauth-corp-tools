@@ -1652,14 +1652,14 @@ class CurrentShipFilter(FilterBase):
 
         if self.systems.all().count() > 0:
             output.append(models.Q(current_location__system__in=self.systems.all()))
-            output.append(models.Q(current_location__system_id=self.systems.all().values_list('system_id', flat=True)))
+            output.append(models.Q(current_location__system_id__in=self.systems.all().values_list('system_id', flat=True)))
         if self.constellations.all().count() > 0:
             output.append(models.Q(current_location__system__constellation__in=self.constellations.all()))
-            output.append(models.Q(current_location__system_id=MapSystem.objects.filter(
+            output.append(models.Q(current_location__system_id__in=MapSystem.objects.filter(
                 constellation__in=self.constellations.all()).values_list('system_id', flat=True)))
         if self.regions.all().count() > 0:
             output.append(models.Q(current_location__system__constellation__region__in=self.regions.all()))
-            output.append(models.Q(current_location__system_id=MapSystem.objects.filter(
+            output.append(models.Q(current_location__system_id__in=MapSystem.objects.filter(
                 constellation__region__in=self.regions.all()).values_list('system_id', flat=True)))
 
         if len(output) > 0:
