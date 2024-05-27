@@ -216,8 +216,8 @@ class assetFilterAdmin(admin.ModelAdmin):
 
 class CurrentShipFilterAdmin(admin.ModelAdmin):
 
-    list_display = ['__str__', '_types', '_groups',
-                    '_systems', '_constellations', '_regions']
+    list_display = ['__str__', '_types', '_groups', '_systems', '_constellations', '_regions']
+    filter_horizontal = ["types", "groups", "systems", "constellations", "regions"]
 
     def _list_2_html_w_tooltips(self, my_items: list, max_items: int) -> str:
         """converts list of strings into HTML with cutoff and tooltip"""
@@ -236,66 +236,35 @@ class CurrentShipFilterAdmin(admin.ModelAdmin):
             )
         return result
 
-    @admin.display(
-        description='types'
-    )
+    @admin.display(description='types')
     def _types(self, obj):
         my_types = [x.name for x in obj.types.order_by('name')]
 
-        return self._list_2_html_w_tooltips(
-            my_types,
-            10
-        )
+        return self._list_2_html_w_tooltips(my_types, 10)
 
-    @admin.display(
-        description='groups'
-    )
+    @admin.display(description='groups')
     def _groups(self, obj):
-        my_groups = [x.name for x in obj.groups.order_by('name')]
+        my_groups = [x.name for x in obj.types.order_by('name')]
 
-        return self._list_2_html_w_tooltips(
-            my_groups,
-            10
-        )
+        return self._list_2_html_w_tooltips(my_groups, 10)
 
-    @admin.display(
-        description='systems'
-    )
+    @admin.display(description='systems')
     def _systems(self, obj):
-        my_systems = [x.name for x in obj.systems.order_by('name')]
+        my_systems = [x.name for x in obj.types.order_by('name')]
 
-        return self._list_2_html_w_tooltips(
-            my_systems,
-            10
-        )
+        return self._list_2_html_w_tooltips(my_systems, 10)
 
-    @admin.display(
-        description='constellations'
-    )
+    @admin.display(description='constellations')
     def _constellations(self, obj):
-        my_constels = [x.name for x in obj.constellations.order_by('name')]
+        my_constellations = [x.name for x in obj.types.order_by('name')]
 
-        return self._list_2_html_w_tooltips(
-            my_constels,
-            10
-        )
+        return self._list_2_html_w_tooltips(my_constellations, 10)
 
-    @admin.display(
-        description='regions'
-    )
+    @admin.display(description='regions')
     def _regions(self, obj):
-        my_regions = [x.name for x in obj.regions.order_by('name')]
+        my_regions = [x.name for x in obj.types.order_by('name')]
 
-        return self._list_2_html_w_tooltips(
-            my_regions,
-            10
-        )
-
-    filter_horizontal = ["types",
-                         "groups",
-                         "systems",
-                         "constellations",
-                         "regions"]
+        return self._list_2_html_w_tooltips(my_regions, 10)
 
 
 class skillsFilterAdmin(admin.ModelAdmin):
