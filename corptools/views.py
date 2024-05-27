@@ -383,7 +383,7 @@ def v3_ui_render(request, character_id):
 
 @login_required
 def react_corp(request):
-    return render(request, 'corptools/corporation/react_base.html')
+    return render(request, 'corptools/corporation/react_base.html', context={"version": __version__, "app_name": "corptools/corp", "page_title": "Corporation Audit"})
 
 
 @login_required
