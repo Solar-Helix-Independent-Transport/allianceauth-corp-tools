@@ -1,6 +1,6 @@
 from ninja import NinjaAPI
 
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 from allianceauth.eveonline.tasks import (
     update_character as eve_character_update,

@@ -41,7 +41,7 @@ repos:
       # git checks
       - id: check-merge-conflict
       - id: check-added-large-files
-        args: [--maxkb=1000]
+        args: [--maxkb=10000]
       - id: detect-private-key
       - id: check-case-conflict
       # Python checks

@@ -2,7 +2,7 @@ from typing import List
 
 from ninja import NinjaAPI
 
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 from allianceauth.services.hooks import get_extension_logger
 
@@ -43,10 +43,10 @@ class InteractionApiEndpoints:
 
             for c in contacts:
                 labels = []
-                for l in c.labels.all():
+                for _l in c.labels.all():
                     labels.append({
-                        "value": l.label_id,
-                        "label": l.label_name
+                        "value": _l.label_id,
+                        "label": _l.label_name
                     })
                 output.append({
                     "character": c.character.character,
@@ -97,8 +97,8 @@ class InteractionApiEndpoints:
 
                 _l = []
                 _from_ret = m.from_name.name if m.from_name else m.from_id
-                for l in m.labels.all():
-                    _l.append(l.label_name if l.label_name else l.label_id)
+                for __l in m.labels.all():
+                    _l.append(__l.label_name if __l.label_name else __l.label_id)
 
                 _m = {
                     "character": m.character.character.character_name,

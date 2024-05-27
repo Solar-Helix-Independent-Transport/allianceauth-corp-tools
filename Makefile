@@ -34,11 +34,12 @@ buildjs:
 	cd frontend/char;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/char\/static\/js\//g' {} \;
 
 package:
+	pip install -U hatch
 	cd frontend/corp;yarn install;yarn build
 	cd frontend/corp;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/corp\/static\/js\//g' {} \;
 	cd frontend/char;yarn install;yarn build
 	cd frontend/char;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/char\/static\/js\//g' {} \;
-	python setup.py sdist
+	hatch build
 
 devcorp:
 	cd frontend/corp;yarn install;yarn start

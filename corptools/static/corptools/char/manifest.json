@@ -1,0 +1,26 @@
+{
+  "_@libs-CiMUVuCO.js": {
+    "file": "assets/@libs-CiMUVuCO.js",
+    "name": "@libs"
+  },
+  "_@react-router-BjvdJdjz.js": {
+    "file": "assets/@react-router-BjvdJdjz.js",
+    "name": "@react-router",
+    "imports": [
+      "_@libs-CiMUVuCO.js"
+    ]
+  },
+  "index.html": {
+    "file": "assets/index-DPqEJKZR.js",
+    "name": "index",
+    "src": "index.html",
+    "isEntry": true,
+    "imports": [
+      "_@libs-CiMUVuCO.js",
+      "_@react-router-BjvdJdjz.js"
+    ],
+    "css": [
+      "assets/index-DABrfijg.css"
+    ]
+  }
+}
