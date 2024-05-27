@@ -342,6 +342,11 @@ class HomeStationFilterAdmin(admin.ModelAdmin):
     filter_horizontal = ["evelocation"]
 
 
+class JumpCloneFilterAdmin(admin.ModelAdmin):
+
+    filter_horizontal = ["evelocation"]
+
+
 if apps.is_installed('securegroups'):
     admin.site.register(models.FullyLoadedFilter)
     admin.site.register(models.TimeInCorpFilter, TimeInCorpFilterAdmin)
@@ -356,5 +361,6 @@ if apps.is_installed('securegroups'):
         admin.site.register(models.Rolefilter, rolesFilterAdmin)
     if app_settings.CT_CHAR_CLONES_MODULE:
         admin.site.register(models.HomeStationFilter, HomeStationFilterAdmin)
+        admin.site.register(models.JumpCloneFilter, JumpCloneFilterAdmin)
     admin.site.register(models.HighestSPFilter)
     admin.site.register(models.LastLoginfilter, LoginAdmin)
