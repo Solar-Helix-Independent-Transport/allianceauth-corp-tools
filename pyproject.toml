@@ -5,7 +5,7 @@ requires = [
 ]
 
 [project]
-name = "allianceauth-corp-tools"
+name = "allianceauth-corptools"
 readme = "README.md"
 keywords = [
     "allianceauth",
