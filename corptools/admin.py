@@ -97,6 +97,7 @@ class SkillListAdmin(admin.ModelAdmin):
     search_fields = ['name', 'skill_list', ]
 
 
+@admin.register(models.MapJumpBridge)
 class BridgeAdmin(admin.ModelAdmin):
 
     list_select_related = (
@@ -107,7 +108,14 @@ class BridgeAdmin(admin.ModelAdmin):
     autocomplete_fields = ['from_solar_system', 'to_solar_system', 'owner']
 
 
-admin.site.register(models.MapJumpBridge, BridgeAdmin)
+@admin.register(models.CharacterTitle)
+class TitleAdmin(admin.ModelAdmin):
+    list_display = ['title', 'corporation_name']
+    search_fields = ['title', 'corporation_name']
+    list_filter = ['corporation_name']
+
+    def get_model_perms(self, request):
+        return {}
 
 
 class assetFilterAdmin(admin.ModelAdmin):
