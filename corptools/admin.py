@@ -1,4 +1,4 @@
-from django.conf import settings
+from django.apps import apps
 from django.contrib import admin
 from django.utils.html import format_html
 
@@ -97,6 +97,7 @@ class SkillListAdmin(admin.ModelAdmin):
     search_fields = ['name', 'skill_list', ]
 
 
+@admin.register(models.MapJumpBridge)
 class BridgeAdmin(admin.ModelAdmin):
 
     list_select_related = (
@@ -107,7 +108,14 @@ class BridgeAdmin(admin.ModelAdmin):
     autocomplete_fields = ['from_solar_system', 'to_solar_system', 'owner']
 
 
-admin.site.register(models.MapJumpBridge, BridgeAdmin)
+@admin.register(models.CharacterTitle)
+class TitleAdmin(admin.ModelAdmin):
+    list_display = ['title', 'corporation_name']
+    search_fields = ['title', 'corporation_name']
+    list_filter = ['corporation_name']
+
+    def get_model_perms(self, request):
+        return {}
 
 
 class assetFilterAdmin(admin.ModelAdmin):
@@ -206,6 +214,59 @@ class assetFilterAdmin(admin.ModelAdmin):
                          "regions"]
 
 
+class CurrentShipFilterAdmin(admin.ModelAdmin):
+
+    list_display = ['__str__', '_types', '_groups', '_systems', '_constellations', '_regions']
+    filter_horizontal = ["types", "groups", "systems", "constellations", "regions"]
+
+    def _list_2_html_w_tooltips(self, my_items: list, max_items: int) -> str:
+        """converts list of strings into HTML with cutoff and tooltip"""
+        items_truncated_str = ', '.join(my_items[:max_items])
+        if not my_items:
+            result = None
+        elif len(my_items) <= max_items:
+            result = items_truncated_str
+        else:
+            items_truncated_str += ', (...)'
+            items_all_str = ', '.join(my_items)
+            result = format_html(
+                '<span data-tooltip="{}" class="tooltip">{}</span>',
+                items_all_str,
+                items_truncated_str
+            )
+        return result
+
+    @admin.display(description='types')
+    def _types(self, obj):
+        my_types = [x.name for x in obj.types.order_by('name')]
+
+        return self._list_2_html_w_tooltips(my_types, 10)
+
+    @admin.display(description='groups')
+    def _groups(self, obj):
+        my_groups = [x.name for x in obj.types.order_by('name')]
+
+        return self._list_2_html_w_tooltips(my_groups, 10)
+
+    @admin.display(description='systems')
+    def _systems(self, obj):
+        my_systems = [x.name for x in obj.types.order_by('name')]
+
+        return self._list_2_html_w_tooltips(my_systems, 10)
+
+    @admin.display(description='constellations')
+    def _constellations(self, obj):
+        my_constellations = [x.name for x in obj.types.order_by('name')]
+
+        return self._list_2_html_w_tooltips(my_constellations, 10)
+
+    @admin.display(description='regions')
+    def _regions(self, obj):
+        my_regions = [x.name for x in obj.types.order_by('name')]
+
+        return self._list_2_html_w_tooltips(my_regions, 10)
+
+
 class skillsFilterAdmin(admin.ModelAdmin):
 
     list_display = ['__str__', '_required_skill_lists',
@@ -264,8 +325,7 @@ class rolesFilterAdmin(admin.ModelAdmin):
     filter_horizontal = ["corps_filter",
                          "alliances_filter"]
 
-    list_display = ['__str__', 'has_director', 'has_accountant',
-                    'has_station_manager', 'has_personnel_manager']
+    list_display = ['__str__', 'has_director', 'has_accountant', 'has_station_manager', 'has_personnel_manager']
 
 
 class titleFilterAdmin(admin.ModelAdmin):
@@ -273,32 +333,34 @@ class titleFilterAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'titles']
 
 
-class titleAdmin(admin.ModelAdmin):
-    list_display = ['title', 'corporation_name']
-    search_fields = ['title', 'corporation_name']
-    list_filter = ['corporation_name']
-
-    def get_model_perms(self, request):
-        return {}
+class LoginAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'days_since_login', 'no_data_pass', 'main_corp_only']
 
 
-class loginAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'days_since_login',
-                    'no_data_pass', 'main_corp_only']
+class HomeStationFilterAdmin(admin.ModelAdmin):
+
+    filter_horizontal = ["evelocation"]
 
 
-admin.site.register(models.CharacterTitle, titleAdmin)
+class JumpCloneFilterAdmin(admin.ModelAdmin):
+
+    filter_horizontal = ["evelocation"]
 
 
-if 'securegroups' in settings.INSTALLED_APPS:
+if apps.is_installed('securegroups'):
     admin.site.register(models.FullyLoadedFilter)
     admin.site.register(models.TimeInCorpFilter, TimeInCorpFilterAdmin)
     if app_settings.CT_CHAR_ASSETS_MODULE:
         admin.site.register(models.AssetsFilter, assetFilterAdmin)
+    if app_settings.CT_CHAR_LOCATIONS_MODULE:
+        admin.site.register(models.CurrentShipFilter, CurrentShipFilterAdmin)
     if app_settings.CT_CHAR_SKILLS_MODULE:
         admin.site.register(models.Skillfilter, skillsFilterAdmin)
     if app_settings.CT_CHAR_ROLES_MODULE:
         admin.site.register(models.Titlefilter, titleFilterAdmin)
         admin.site.register(models.Rolefilter, rolesFilterAdmin)
+    if app_settings.CT_CHAR_CLONES_MODULE:
+        admin.site.register(models.HomeStationFilter, HomeStationFilterAdmin)
+        admin.site.register(models.JumpCloneFilter, JumpCloneFilterAdmin)
     admin.site.register(models.HighestSPFilter)
-    admin.site.register(models.LastLoginfilter, loginAdmin)
+    admin.site.register(models.LastLoginfilter, LoginAdmin)
