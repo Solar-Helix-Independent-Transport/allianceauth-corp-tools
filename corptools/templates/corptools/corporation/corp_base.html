@@ -1,273 +1,310 @@
 {% extends 'allianceauth/base.html' %}
 {% load i18n %}
-{% load humanize  %}
+{% load humanize %}
 {% load helpers %}
-{% block page_title %}{% app_name %}{% endblock %}
+{% block page_title %}
+    {% app_name %}
+{% endblock %}
 {% block extra_css %}
-{% include 'bundles/datatables-css.html' %}
+    {% include 'bundles/datatables-css.html' %}
 
- <style>
-.noheader thead {
-  display: none;
-}
+    <style>
+        .noheader thead {
+            display: none;
+        }
 
-.flex-container {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-    align-items: center;
-    justify-content: center;
-}
-.flex-wrap {
-    display: -webkit-flex; /* Safari */
-    -webkit-flex-wrap: wrap; /* Safari 6.1+ */
-    display: flex;
-    flex-wrap: wrap;
-}
+        .flex-container {
+            display: flex;
+            flex-direction: row;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+        }
 
-.form-control {
-    margin: 2px;
-}
+        .flex-wrap {
+            display: -webkit-flex;
+            /* Safari */
+            -webkit-flex-wrap: wrap;
+            /* Safari 6.1+ */
+            display: flex;
+            flex-wrap: wrap;
+        }
 
-.flex-middle {
-    display: flex;
-    align-items: center;
-  justify-content: center;
-}
+        .form-control {
+            margin: 2px;
+        }
 
-.pannel-hieght-locked {
-  min-height: 300px;
-  max-height: 300px;
-  overflow-y: auto;
-}
+        .flex-middle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.panel-height-locked-large {
-  min-height: 600px;
-  max-height: 600px;
-  overflow-y: auto;
-}
+        .pannel-hieght-locked {
+            min-height: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
 
-.scroll-bar-narrow::-webkit-scrollbar-track {
-    border-radius: 5px;
+        .panel-height-locked-large {
+            min-height: 600px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
 
-}
+        .scroll-bar-narrow::-webkit-scrollbar-track {
+            border-radius: 5px;
 
-.scroll-bar-narrow::-webkit-scrollbar-track-piece {
-  background-color: #375a7f;
-  border-color: transparent;
-  border-width: 7px;
-  border-style: solid;
-  background-clip: padding-box;
+        }
 
-}
+        .scroll-bar-narrow::-webkit-scrollbar-track-piece {
+            background-color: #375a7f;
+            border-color: transparent;
+            border-width: 7px;
+            border-style: solid;
+            background-clip: padding-box;
 
-.scroll-bar-narrow::-webkit-scrollbar
-{
-	width: 15px;
-    border-width: 5px;
-    background-color: transparent;
-}
+        }
 
-.scroll-bar-narrow::-webkit-scrollbar-thumb
-{
-    background-color: #375a7f;
-    border-radius: 10px;
-    border: 4px solid transparent;
-    background-clip: padding-box;
-}
+        .scroll-bar-narrow::-webkit-scrollbar {
+            width: 15px;
+            border-width: 5px;
+            background-color: transparent;
+        }
 
-.img-pad
-{
-    padding: 5px;
-}
+        .scroll-bar-narrow::-webkit-scrollbar-thumb {
+            background-color: #375a7f;
+            border-radius: 10px;
+            border: 4px solid transparent;
+            background-clip: padding-box;
+        }
 
-table.dataTable tbody td {
-  vertical-align: middle;
-}
+        .img-pad {
+            padding: 5px;
+        }
 
-#chartdiv {
-  width	: 100%;
-  height	: 500px;
-}
+        table.dataTable tbody td {
+            vertical-align: middle;
+        }
 
-tr.group,
+        #chartdiv {
+            width: 100%;
+            height: 500px;
+        }
+
+        tr.group,
         tr.group:hover {
             background-color: #3498DB !important;
         }
 
-.lds-spinner {
-    color: official;
-    display: inline-block;
-    position: relative;
-    width: 20px;
-    height: 20px;
-    }
-    .lds-spinner div {
-    transform-origin: 10px 10px;
-    animation: lds-spinner 1.2s linear infinite;
-    }
-    .lds-spinner div:after {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 3px;
-    height: 6px;
-    border-radius: 50%;
-    background: #5cb85c;
-    }
-    .lds-spinner div:nth-child(1) {
-    transform: rotate(0deg);
-    animation-delay: -1.1s;
-    }
-    .lds-spinner div:nth-child(2) {
-    transform: rotate(30deg);
-    animation-delay: -1s;
-    }
-    .lds-spinner div:nth-child(3) {
-    transform: rotate(60deg);
-    animation-delay: -0.9s;
-    }
-    .lds-spinner div:nth-child(4) {
-    transform: rotate(90deg);
-    animation-delay: -0.8s;
-    }
-    .lds-spinner div:nth-child(5) {
-    transform: rotate(120deg);
-    animation-delay: -0.7s;
-    }
-    .lds-spinner div:nth-child(6) {
-    transform: rotate(150deg);
-    animation-delay: -0.6s;
-    }
-    .lds-spinner div:nth-child(7) {
-    transform: rotate(180deg);
-    animation-delay: -0.5s;
-    }
-    .lds-spinner div:nth-child(8) {
-    transform: rotate(210deg);
-    animation-delay: -0.4s;
-    }
-    .lds-spinner div:nth-child(9) {
-    transform: rotate(240deg);
-    animation-delay: -0.3s;
-    }
-    .lds-spinner div:nth-child(10) {
-    transform: rotate(270deg);
-    animation-delay: -0.2s;
-    }
-    .lds-spinner div:nth-child(11) {
-    transform: rotate(300deg);
-    animation-delay: -0.1s;
-    }
-    .lds-spinner div:nth-child(12) {
-    transform: rotate(330deg);
-    animation-delay: 0s;
-    }
-    @keyframes lds-spinner {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-    }
+        .lds-spinner {
+            color: official;
+            display: inline-block;
+            position: relative;
+            width: 20px;
+            height: 20px;
+        }
 
-</style>
+        .lds-spinner div {
+            transform-origin: 10px 10px;
+            animation: lds-spinner 1.2s linear infinite;
+        }
+
+        .lds-spinner div:after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 3px;
+            height: 6px;
+            border-radius: 50%;
+            background: #5cb85c;
+        }
+
+        .lds-spinner div:nth-child(1) {
+            transform: rotate(0deg);
+            animation-delay: -1.1s;
+        }
+
+        .lds-spinner div:nth-child(2) {
+            transform: rotate(30deg);
+            animation-delay: -1s;
+        }
+
+        .lds-spinner div:nth-child(3) {
+            transform: rotate(60deg);
+            animation-delay: -0.9s;
+        }
+
+        .lds-spinner div:nth-child(4) {
+            transform: rotate(90deg);
+            animation-delay: -0.8s;
+        }
+
+        .lds-spinner div:nth-child(5) {
+            transform: rotate(120deg);
+            animation-delay: -0.7s;
+        }
+
+        .lds-spinner div:nth-child(6) {
+            transform: rotate(150deg);
+            animation-delay: -0.6s;
+        }
+
+        .lds-spinner div:nth-child(7) {
+            transform: rotate(180deg);
+            animation-delay: -0.5s;
+        }
+
+        .lds-spinner div:nth-child(8) {
+            transform: rotate(210deg);
+            animation-delay: -0.4s;
+        }
+
+        .lds-spinner div:nth-child(9) {
+            transform: rotate(240deg);
+            animation-delay: -0.3s;
+        }
+
+        .lds-spinner div:nth-child(10) {
+            transform: rotate(270deg);
+            animation-delay: -0.2s;
+        }
+
+        .lds-spinner div:nth-child(11) {
+            transform: rotate(300deg);
+            animation-delay: -0.1s;
+        }
+
+        .lds-spinner div:nth-child(12) {
+            transform: rotate(330deg);
+            animation-delay: 0s;
+        }
+
+        @keyframes lds-spinner {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
 {% endblock extra_css %}
 {% block content %}
     <div class="col-lg-12">
         <div class="col-lg-12 container">
-            <br>
+            <br />
             <div class="panel panel-primary">
                 <nav class="navbar navbar-default">
                     <div class="container-fluid">
                         <div class="navbar-header">
-                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                                <span class="sr-only">{% trans "Toggle navigation" %}</span>
+                            <button type="button"
+                                    class="navbar-toggle collapsed"
+                                    data-toggle="collapse"
+                                    data-target="#bs-example-navbar-collapse-1"
+                                    aria-expanded="false">
+                                <span class="sr-only">{% translate "Toggle navigation" %}</span>
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                             </button>
-                            <a class="navbar-brand" href="{% url 'corptools:view' %}">{% trans "Account Audit" %}</a>
+                            <a class="navbar-brand" href="{% url 'corptools:view' %}">{% translate "Account Audit" %}</a>
                         </div>
 
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul class="nav navbar-nav">
                                 <li class="">
-                                    <a href="{% url 'corptools:overview' main_char.character_id %}">{% trans "Overview" %}</a>
+                                    <a href="{% url 'corptools:overview' main_char.character_id %}">{% translate "Overview" %}</a>
                                 </li>
                                 <li class="">
-                                    <a href="{% url 'corptools:assets' main_char.character_id%}">{% trans "Assets" %}</a>
+                                    <a href="{% url 'corptools:assets' main_char.character_id %}">{% translate "Assets" %}</a>
                                 </li>
                                 <li class="">
-                                    <a href="{% url 'corptools:clones' main_char.character_id%}">{% trans "Clones" %}</a>
+                                    <a href="{% url 'corptools:clones' main_char.character_id %}">{% translate "Clones" %}</a>
                                 </li>
                                 <li class="">
-                                    <a href="{% url 'corptools:skills' main_char.character_id%}">{% trans "Skills" %}</a>
+                                    <a href="{% url 'corptools:skills' main_char.character_id %}">{% translate "Skills" %}</a>
                                 </li>
                                 <li class="">
-                                    <a href="{% url 'corptools:wallet' main_char.character_id %}">{% trans "Wallet" %}</a>
+                                    <a href="{% url 'corptools:wallet' main_char.character_id %}">{% translate "Wallet" %}</a>
                                 </li>
                             </ul>
                             <ul class="nav navbar-nav pull-right">
                                 <li class=>
-                                    <a href="{% url 'corptools:update_account' main_char.character_id%}"><i class="fas fa-sync"></i></a>
+                                    <a href="{% url 'corptools:update_account' main_char.character_id %}"><i class="fas fa-sync"></i></a>
                                 </li>
                                 <li class=>
-                                    <a href="{% url 'corptools:add_char' %}">{% trans "Add Character Token" %}</a>
+                                    <a href="{% url 'corptools:add_char' %}">{% translate "Add Character Token" %}</a>
                                 </li>
                                 {% if perms.corptools.alliance_corp_manager or perms.corptools.global_corp_manager or perms.corptools.state_corp_manager %}
                                     <li class=>
-                                        <a href="{% url 'corptools:add_corp' %}">{% trans "Add Corporate Token" %}</a>
-                                    <li>
-                                {% endif %}
+                                        <a href="{% url 'corptools:add_corp' %}">{% translate "Add Corporate Token" %}</a>
+                                        <li>
+                                        {% endif %}
 
-                            </ul>
-                        </div>
+                                    </ul>
+                                </div>
 
-                    </div>
-                </nav>
-
-                <div class="panel panel-body">
-                    <div class="row">
-                        <div class="text-center col-md-2">
-                            <img class="ra-avatar img-circle" src="{{ main_char.portrait_url_128 }}">
-                            <h4>{{ main_char.character_name }}</h4>
-                        </div>
-                        <div class="text-center col-md-2 hidden-xs hidden-sm">
-                            <img class="ra-avatar img-circle" src="{{ main_char.corporation_logo_url_128 }}">
-                            <h4>{{ main_char.corporation_name }}</h4>
-                        </div>
-                        {% if main_char.alliance_id %}
-                            <div class="text-center col-md-2 hidden-xs hidden-sm">
-                                <img class="ra-avatar img-circle" src="{{ main_char.alliance_logo_url_128 }}">
-                                <h4>{{ main_char.alliance_name }}</h4>
                             </div>
-                        {% endif %}
-                        <div class="col-xs-12 hidden-md hidden-lg"><hr></div>
-                        <div class="text-center col-md-6"  rowspan="2">
-                            <h4>{% trans "Linked characters" %}</h4>
-                            {% for alt in alts|slice:":15" %}
-                        <span rel="tooltip" style="background-color: {% if alt.characteraudit.is_active %}#008844{% else %}#AA0000{% endif %}" class="label label-default" data-toggle="tooltip" data-placement="top" data-html="true" {% trans "title" %} data-original-title="{% trans "Public Data" %}: {{ alt.characteraudit.last_update_pub_data|timesince}} {% trans "ago" %}<br>{% trans "Skills" %}: {{ alt.characteraudit.last_update_skills|timesince}} {% trans "ago" %}<br>{% trans "Skill Que" %}: {{ alt.characteraudit.last_update_skill_que|timesince}} {% trans "ago" %}<br>{% trans "Clones" %}: {{ alt.characteraudit.last_update_clones|timesince}} {% trans "ago" %}<br>{% trans "Assets" %}: {{ alt.characteraudit.last_update_assets|timesince}} {% trans "ago" %}<br>{% trans "Wallets" %}: {{ alt.characteraudit.last_update_wallet|timesince}} {% trans "ago" %}"><img class="ra-avatar img-circle img-pad" src="{{ alt.portrait_url_32 }}"> {{ alt.character_name }}</span>
-                            {% endfor %}
-                            {% if alts.count > 15 %}<span class="label label-default">{{ alts.count|subtract:15 }} {% trans "More" %}... </span>{% endif %}
-                            <br>
-                            <span class="label label-default">{% trans "Total Account ISK" %}: {{ net_worth|intcomma }}</span>
+                        </nav>
+
+                        <div class="panel panel-body">
+                            <div class="row">
+                                <div class="text-center col-md-2">
+                                    <img class="ra-avatar img-circle" src="{{ main_char.portrait_url_128 }}" />
+                                    <h4>{{ main_char.character_name }}</h4>
+                                </div>
+                                <div class="text-center col-md-2 hidden-xs hidden-sm">
+                                    <img class="ra-avatar img-circle" src="{{ main_char.corporation_logo_url_128 }}" />
+                                    <h4>{{ main_char.corporation_name }}</h4>
+                                </div>
+                                {% if main_char.alliance_id %}
+                                    <div class="text-center col-md-2 hidden-xs hidden-sm">
+                                        <img class="ra-avatar img-circle" src="{{ main_char.alliance_logo_url_128 }}" />
+                                        <h4>{{ main_char.alliance_name }}</h4>
+                                    </div>
+                                {% endif %}
+                                <div class="col-xs-12 hidden-md hidden-lg">
+                                    <hr />
+                                </div>
+                                <div class="text-center col-md-6"  rowspan="2">
+                                    <h4>{% translate "Linked characters" %}</h4>
+                                    {% for alt in alts|slice:":15" %}
+                                        <span rel="tooltip" style="background-color: {% if alt.characteraudit.is_active %}#008844{% else %}#AA0000{% endif %}" class="label label-default" data-toggle="tooltip" data-placement="top" data-html="true" {% translate "title" %} data-original-title="{% translate "Public Data" %}: {{ alt.characteraudit.last_update_pub_data|timesince }} {% translate "ago" %}
+                                            <br>
+                                            {% translate "Skills" %}: {{ alt.characteraudit.last_update_skills|timesince }} {% translate "ago" %}
+                                            <br>
+                                            {% translate "Skill Que" %}: {{ alt.characteraudit.last_update_skill_que|timesince }} {% translate "ago" %}
+                                            <br>
+                                            {% translate "Clones" %}: {{ alt.characteraudit.last_update_clones|timesince }} {% translate "ago" %}
+                                            <br>
+                                            {% translate "Assets" %}: {{ alt.characteraudit.last_update_assets|timesince }} {% translate "ago" %}
+                                            <br>
+                                            {% translate "Wallets" %}: {{ alt.characteraudit.last_update_wallet|timesince }} {% translate "ago" %}">
+                                            <img class="ra-avatar img-circle img-pad" src="{{ alt.portrait_url_32 }}" />
+                                        {{ alt.character_name }}</span>
+                                    {% endfor %}
+                                    {% if alts.count > 15 %}
+                                        <span class="label label-default">{{ alts.count|subtract:15 }} {% translate "More" %}...</span>
+                                    {% endif %}
+                                    <br />
+                                    <span class="label label-default">{% translate "Total Account ISK" %}: {{ net_worth|intcomma }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    {% block ct_block %}{% endblock %}
                 </div>
-            </div>
-            {% block ct_block %}{% endblock %}
-    </div>
-{% endblock %}
+            {% endblock %}
 
-{% block extra_script %}
-    $(document).ready(function() {
-        $("[rel='tooltip']").tooltip();
-        }
-    )
-    {% block ct_extra_script %}{% endblock %}
+            {% block extra_script %}
+                $(document).ready(function() {
+                $("[rel='tooltip']").tooltip();
+                }
+                )
+                {% block ct_extra_script %}{% endblock %}
 
-{% endblock %}
+            {% endblock %}
