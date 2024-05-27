@@ -42,7 +42,8 @@ dynamic = [
 ]
 dependencies = [
     "allianceauth<5.0.0,>=3",
-    "django-ninja>=0.19.1",
+    "django-model-utils",
+    "django-ninja<2.0.0,>=1.0.1",
     "networkx",
 ]
 [project.optional-dependencies]
