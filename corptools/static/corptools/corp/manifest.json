@@ -1,0 +1,35 @@
+{
+  "_@libs-QbF75Uzh.js": {
+    "file": "assets/@libs-QbF75Uzh.js",
+    "name": "@libs"
+  },
+  "_@react-router-BaAp73Kv.js": {
+    "file": "assets/@react-router-BaAp73Kv.js",
+    "name": "@react-router",
+    "imports": [
+      "_@libs-QbF75Uzh.js"
+    ]
+  },
+  "index.html": {
+    "file": "assets/index-Db6H6-lI.js",
+    "name": "index",
+    "src": "index.html",
+    "isEntry": true,
+    "imports": [
+      "_@libs-QbF75Uzh.js",
+      "_@react-router-BaAp73Kv.js"
+    ],
+    "dynamicImports": [
+      "node_modules/web-vitals/dist/web-vitals.js"
+    ],
+    "css": [
+      "assets/index-D8QT6okd.css"
+    ]
+  },
+  "node_modules/web-vitals/dist/web-vitals.js": {
+    "file": "assets/web-vitals-BA3w2fPb.js",
+    "name": "web-vitals",
+    "src": "node_modules/web-vitals/dist/web-vitals.js",
+    "isDynamicEntry": true
+  }
+}

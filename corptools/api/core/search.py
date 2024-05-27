@@ -3,7 +3,7 @@ from typing import List
 from ninja import NinjaAPI
 
 from django.db.models import F
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 from allianceauth.services.hooks import get_extension_logger
 

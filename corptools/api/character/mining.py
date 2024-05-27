@@ -4,7 +4,7 @@ from typing import List, Optional
 from ninja import NinjaAPI
 
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 from corptools import models
 from corptools.api.helpers import get_alts_queryset, get_main_character

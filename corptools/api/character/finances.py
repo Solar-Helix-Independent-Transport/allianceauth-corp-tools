@@ -4,7 +4,7 @@ from ninja import NinjaAPI
 from ninja.pagination import paginate
 
 from django.db.models import Count, F, Sum
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_noop as _
 
 from corptools import models
 from corptools.api import schema
@@ -336,11 +336,11 @@ class FinancesApiEndpoints:
 
             output = []
 
-            for l in lp:
+            for _l in lp:
                 output.append({
-                    "character": l.character.character,
-                    "corporation": {"id": l.corporation.eve_id, "name": l.corporation.name},
-                    "amount": l.amount
+                    "character": _l.character.character,
+                    "corporation": {"id": _l.corporation.eve_id, "name": _l.corporation.name},
+                    "amount": _l.amount
                 })
 
             return output

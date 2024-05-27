@@ -2,7 +2,7 @@ from typing import List
 
 from ninja import NinjaAPI
 
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 from ... import app_settings
 from .. import schema
