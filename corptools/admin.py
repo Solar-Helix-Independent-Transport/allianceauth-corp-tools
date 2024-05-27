@@ -1,4 +1,4 @@
-from django.conf import settings
+from django.apps import apps
 from django.contrib import admin
 from django.utils.html import format_html
 
@@ -325,8 +325,7 @@ class rolesFilterAdmin(admin.ModelAdmin):
     filter_horizontal = ["corps_filter",
                          "alliances_filter"]
 
-    list_display = ['__str__', 'has_director', 'has_accountant',
-                    'has_station_manager', 'has_personnel_manager']
+    list_display = ['__str__', 'has_director', 'has_accountant', 'has_station_manager', 'has_personnel_manager']
 
 
 class titleFilterAdmin(admin.ModelAdmin):
@@ -334,24 +333,16 @@ class titleFilterAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'titles']
 
 
-class titleAdmin(admin.ModelAdmin):
-    list_display = ['title', 'corporation_name']
-    search_fields = ['title', 'corporation_name']
-    list_filter = ['corporation_name']
-
-    def get_model_perms(self, request):
-        return {}
+class LoginAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'days_since_login', 'no_data_pass', 'main_corp_only']
 
 
-class loginAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'days_since_login',
-                    'no_data_pass', 'main_corp_only']
+class HomeStationFilterAdmin(admin.ModelAdmin):
+
+    filter_horizontal = ["evelocation"]
 
 
-admin.site.register(models.CharacterTitle, titleAdmin)
-
-
-if 'securegroups' in settings.INSTALLED_APPS:
+if apps.is_installed('securegroups'):
     admin.site.register(models.FullyLoadedFilter)
     admin.site.register(models.TimeInCorpFilter, TimeInCorpFilterAdmin)
     if app_settings.CT_CHAR_ASSETS_MODULE:
@@ -363,5 +354,7 @@ if 'securegroups' in settings.INSTALLED_APPS:
     if app_settings.CT_CHAR_ROLES_MODULE:
         admin.site.register(models.Titlefilter, titleFilterAdmin)
         admin.site.register(models.Rolefilter, rolesFilterAdmin)
+    if app_settings.CT_CHAR_CLONES_MODULE:
+        admin.site.register(models.HomeStationFilter, HomeStationFilterAdmin)
     admin.site.register(models.HighestSPFilter)
-    admin.site.register(models.LastLoginfilter, loginAdmin)
+    admin.site.register(models.LastLoginfilter, LoginAdmin)
