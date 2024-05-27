@@ -1,9 +1,11 @@
 import pprint
 
-from allianceauth.eveonline.models import EveCharacter
-from django.core.management.base import BaseCommand, CommandError
-from esi.models import Token
 from tqdm import tqdm
+
+from django.core.management.base import BaseCommand
+
+from allianceauth.eveonline.models import EveCharacter
+from esi.models import Token
 
 from corptools import app_settings
 from corptools.models import CharacterAudit
@@ -60,6 +62,6 @@ class Command(BaseCommand):
                         CharacterAudit.objects.update_or_create(
                             character=EveCharacter.objects.get_character_by_id(token))
                         update_character.apply_async(args=[token], priority=6)
-                    except:
+                    except Exception:
                         pass
                     t.update(1)

@@ -2,15 +2,17 @@ import logging
 import re
 from typing import List
 
-from django.db.models import F, Q, Sum
-from django.utils import timezone
 from ninja import NinjaAPI
 
-from corptools import app_settings, models
+from django.utils import timezone
+
+from allianceauth.services.hooks import get_extension_logger
+
+from corptools import models
 from corptools.api import schema
 from corptools.task_helpers.update_tasks import fetch_location_name
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 class DashboardApiEndpoints:
@@ -25,11 +27,11 @@ class DashboardApiEndpoints:
         )
         def get_dashboard_gates(request):
             perms = (
-                request.user.has_perm('corptools.own_corp_manager') |
-                request.user.has_perm('corptools.alliance_corp_manager') |
-                request.user.has_perm('corptools.state_corp_manager') |
-                request.user.has_perm('corptools.global_corp_manager') |
-                request.user.has_perm('corptools.holding_corp_structures')
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_structures')
             )
 
             if not perms:

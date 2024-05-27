@@ -5,8 +5,9 @@ from django.test import TestCase
 
 from corptools import providers
 
-from ..models import (EveItemCategory, EveItemDogmaAttribute, EveItemGroup,
-                      EveItemType)
+from ..models import (
+    EveItemCategory, EveItemDogmaAttribute, EveItemGroup, EveItemType,
+)
 
 
 class TestEveCategory(TestCase):

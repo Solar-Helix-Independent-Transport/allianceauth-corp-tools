@@ -1,14 +1,12 @@
-import logging
-
-from allianceauth.eveonline.models import (EveAllianceInfo, EveCharacter,
-                                           EveCorporationInfo)
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from esi.clients import esi_client_factory
+
+from allianceauth.eveonline.models import EveCharacter
+from allianceauth.services.hooks import get_extension_logger
 
 from . import providers
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 class EveNameManager(models.Manager):
@@ -60,7 +58,7 @@ class EveNameManager(models.Manager):
                 }
             )
         except Exception as e:
-            logger.exception('ESI Error id {} - {}'.format(eve_id, e))
+            logger.exception(f'ESI Error id {eve_id} - {e}')
             raise e
         return entity, created
 
@@ -101,7 +99,7 @@ class EveNameManager(models.Manager):
         except ObjectDoesNotExist as e:
             # TODO Fallback to ESI
             logger.exception(
-                'Failed to create name: {} - {}'.format(eve_id, e))
+                f'Failed to create name: {eve_id} - {e}')
             raise e
 
         return character, created
@@ -134,7 +132,7 @@ class EveMoonManager(models.Manager):
                 }
             )
         except Exception as e:
-            logger.exception('ESI Error id {} - {}'.format(moon_id, e))
+            logger.exception(f'ESI Error id {moon_id} - {e}')
             raise e
         return entity, created
 
@@ -166,7 +164,7 @@ class EvePlanetManager(models.Manager):
                 }
             )
         except Exception as e:
-            logger.exception('ESI Error id {} - {}'.format(planet_id, e))
+            logger.exception(f'ESI Error id {planet_id} - {e}')
             raise e
         return entity, created
 
@@ -184,8 +182,9 @@ class EveItemTypeManager(models.Manager):
 
     def create_bulk_from_esi(self, eve_ids):
         """gets or creates with ESI"""
-        from corptools.task_helpers.update_tasks import \
-            process_bulk_types_from_esi
+        from corptools.task_helpers.update_tasks import (
+            process_bulk_types_from_esi,
+        )
         created = process_bulk_types_from_esi(eve_ids)
         return created
 
@@ -220,7 +219,7 @@ class EveItemTypeManager(models.Manager):
             EveItemDogmaAttribute.objects.bulk_create(
                 dogma, batch_size=1000, ignore_conflicts=True)  # bulk create
         except Exception as e:
-            logger.exception('ESI Error id {} - {}'.format(eve_id, e))
+            logger.exception(f'ESI Error id {eve_id} - {e}')
             raise e
         return entity, created
 
@@ -252,7 +251,7 @@ class EveGroupManager(models.Manager):
                 }
             )
         except Exception as e:
-            logger.exception('ESI Error id {} - {}'.format(eve_id, e))
+            logger.exception(f'ESI Error id {eve_id} - {e}')
             raise e
         return entity, created
 
@@ -279,7 +278,7 @@ class EveCategoryManager(models.Manager):
                 }
             )
         except Exception as e:
-            logger.exception('ESI Error id {} - {}'.format(eve_id, e))
+            logger.exception(f'ESI Error id {eve_id} - {e}')
             raise e
         return entity, created
 

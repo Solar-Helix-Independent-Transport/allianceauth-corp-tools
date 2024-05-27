@@ -1,9 +1,6 @@
-import json
-
 from ninja import NinjaAPI
 
 from ... import models
-from ...task_helpers.skill_helpers import SkillListCache
 
 
 class FittingsApiEndpoints:
@@ -37,9 +34,9 @@ class FittingsApiEndpoints:
             _level_ids = [277, 278, 279, 1286, 1287, 1288]
 
             _types = models.EveItemDogmaAttribute.objects.filter(
-                eve_type_id__in=_items, attribute_id__in=_skill_ids+_level_ids)
+                eve_type_id__in=_items, attribute_id__in=_skill_ids + _level_ids)
             _types = _types | models.EveItemDogmaAttribute.objects.filter(
-                eve_type_id=_fit.ship_type_type_id, attribute_id__in=_skill_ids+_level_ids)
+                eve_type_id=_fit.ship_type_type_id, attribute_id__in=_skill_ids + _level_ids)
 
             required = {}
             skills = {}

@@ -1,6 +1,8 @@
-from typing import List, Optional
+from typing import List
 
-from ninja import Field, Form, NinjaAPI
+from ninja import NinjaAPI
+
+from django.utils.translation import gettext_lazy as _
 
 from corptools import models
 from corptools.api import schema
@@ -23,7 +25,7 @@ class RolesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 

@@ -1,22 +1,18 @@
-# Cog Stuff
 import logging
 
-from aadiscordbot.app_settings import aastatistics_active
-# AA-Discordbot
-from aadiscordbot.cogs.utils.decorators import (has_any_perm, in_channels,
-                                                sender_has_perm)
-from allianceauth.eveonline.evelinks import evewho
-from allianceauth.eveonline.models import EveCharacter
+from aadiscordbot.cogs.utils.decorators import (
+    has_any_perm, in_channels, sender_has_perm,
+)
 from discord import AutocompleteContext, option
-from discord.colour import Color
 from discord.embeds import Embed
 from discord.ext import commands
-# AA Contexts
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
-from esi.models import Token
 from pendulum.datetime import DateTime
+
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+
+from allianceauth.eveonline.models import EveCharacter
+from esi.models import Token
 
 from corptools.models import EveItemType, MapSystem
 from corptools.providers import esi
@@ -63,12 +59,12 @@ class Locator(commands.Cog):
                                                                                 token=t.valid_access_token()).result()
                 try:
                     _alt['online'] = "**Online**" if online['online'] else "**Offline**"
-                except:
+                except Exception:
                     pass
 
                 try:
                     _alt['last_online'] = online['last_logout']
-                except:
+                except Exception:
                     pass
 
                 location = esi.client.Location.get_characters_character_id_location(character_id=alt.character.character_id,
@@ -160,11 +156,7 @@ class Locator(commands.Cog):
 
     @commands.slash_command(name='locate', guild_ids=[int(settings.DISCORD_GUILD_ID)])
     @option("character", description="Search for a Character!", autocomplete=search_characters)
-    async def slash_locate(
-        self,
-        ctx,
-        character: str,
-    ):
+    async def slash_locate(self, ctx, character: str,):
         try:
             in_channels(ctx.channel.id, settings.ADMIN_DISCORD_BOT_CHANNELS)
             has_any_perm(ctx.author.id, [
@@ -188,9 +180,9 @@ class Locator(commands.Cog):
                     for e in embeds:
                         await ctx.respond(embed=e)
                 except ObjectDoesNotExist:
-                    return await ctx.respond(f"Character **{input_name}** Unlinked in auth")
+                    return await ctx.respond(f"Character **{character}** Unlinked in auth")
             except EveCharacter.DoesNotExist:
-                return await ctx.respond(f"Character **{input_name}** does not exist in our Auth system")
+                return await ctx.respond(f"Character **{character}** does not exist in our Auth system")
         except commands.MissingPermissions as e:
             return await ctx.respond(e.missing_permissions[0], ephemeral=True)
 

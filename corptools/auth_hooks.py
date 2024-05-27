@@ -1,6 +1,5 @@
 from allianceauth import hooks
 from allianceauth.services.hooks import MenuItemHook, UrlHook
-from django.utils.translation import gettext_lazy as _
 
 from . import app_settings, models, urls
 
@@ -43,13 +42,13 @@ class Structures(MenuItemHook):
                               navactive=['corptools:corp_react'])
 
     def render(self, request):
-        if (request.user.has_perm('corptools.own_corp_manager') or
-            request.user.has_perm('corptools.alliance_corp_manager') or
-            request.user.has_perm('corptools.state_corp_manager') or
-            request.user.has_perm('corptools.global_corp_manager') or
-            request.user.has_perm('corptools.holding_corp_structures') or
-            request.user.has_perm('corptools.holding_corp_assets') or
-                request.user.has_perm('corptools.holding_corp_wallets')):
+        if (request.user.has_perm('corptools.own_corp_manager')
+            or request.user.has_perm('corptools.alliance_corp_manager')
+            or request.user.has_perm('corptools.state_corp_manager')
+            or request.user.has_perm('corptools.global_corp_manager')
+            or request.user.has_perm('corptools.holding_corp_structures')
+            or request.user.has_perm('corptools.holding_corp_assets')
+                or request.user.has_perm('corptools.holding_corp_wallets')):
             return MenuItemHook.render(self, request)
         return ''
 

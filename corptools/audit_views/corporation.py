@@ -1,24 +1,7 @@
-import copy
-import csv
-import os
-import re
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 
-from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
-from bravado.exception import HTTPError
-from django.contrib import messages
-from django.contrib.auth.decorators import (login_required,
-                                            permission_required,
-                                            user_passes_test)
-from django.core.exceptions import PermissionDenied
-from django.db import IntegrityError
-from django.db.models import Count, F, Max, Q, Sum
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.translation import gettext_lazy as _
-from esi.decorators import token_required
-
-from .. import providers
-from ..models import *
+from ..models import CorporationAudit
 
 
 @login_required

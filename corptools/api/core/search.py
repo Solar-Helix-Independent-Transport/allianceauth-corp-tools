@@ -1,13 +1,16 @@
-import logging
 from typing import List
 
-from django.db.models import F, Q, Sum
 from ninja import NinjaAPI
+
+from django.db.models import F
+from django.utils.translation import gettext_lazy as _
+
+from allianceauth.services.hooks import get_extension_logger
 
 from corptools import models
 from corptools.api import schema
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 class SearchApiEndpoints:
@@ -23,7 +26,7 @@ class SearchApiEndpoints:
         )
         def get_system_search(request, search_text: str, limit: int = 10):
             if not request.user.is_superuser:
-                return 403, "Hard no pall!"
+                return 403, _("Hard no pall!")
             return models.MapSystem.objects.filter(name__icontains=search_text).values("name", id=F("system_id"))[:limit]
 
         @api.get(
@@ -33,7 +36,7 @@ class SearchApiEndpoints:
         )
         def get_location_search(request, search_text: str, limit: int = 10):
             if not request.user.is_superuser:
-                return 403, "Hard no pall!"
+                return 403, _("Hard no pall!")
 
             return models.EveLocation.objects.filter(location_name__icontains=search_text).exclude(location_id__lte=0).values(name=F("location_name"), id=F("location_id"))[:limit]
 
@@ -44,6 +47,6 @@ class SearchApiEndpoints:
         )
         def get_group_search(request, search_text: str, limit: int = 10):
             if not request.user.is_superuser:
-                return 403, "Hard no pall!"
+                return 403, _("Hard no pall!")
 
             return models.EveItemGroup.objects.filter(name__icontains=search_text).values("name", id=F("group_id"))[:limit]

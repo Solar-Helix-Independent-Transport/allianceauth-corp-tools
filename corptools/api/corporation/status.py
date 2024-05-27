@@ -1,13 +1,11 @@
-import logging
-from typing import List
-
-from django.db.models import F, Q, Sum
 from ninja import NinjaAPI
+
+from allianceauth.services.hooks import get_extension_logger
 
 from corptools import app_settings, models
 from corptools.api import schema
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 class StatusApiEndpoints:

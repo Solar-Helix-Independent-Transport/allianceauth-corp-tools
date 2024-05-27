@@ -1,6 +1,3 @@
-import json
-from unittest import mock
-
 from django import forms
 from django.test import TestCase
 
@@ -42,14 +39,14 @@ class TestHelpers(TestCase):
 
         lvl3and5 = '<div role="text" aria-label="Level 3"><span class="fas fa-circle"></span> <span class="fas fa-circle"></span> <span class="fas fa-circle"></span> <span class="fas fa-circle text-danger"></span> <span class="fas fa-circle text-danger"></span> </div>'
 
-        self.assertEquals(helpers.skill_level(5, 5), lvl5)
-        self.assertEquals(helpers.skill_level(4, 4), lvl4)
-        self.assertEquals(helpers.skill_level(3, 3), lvl3)
-        self.assertEquals(helpers.skill_level(2, 2), lvl2)
-        self.assertEquals(helpers.skill_level(1, 1), lvl1)
-        self.assertEquals(helpers.skill_level(0, 0), lvl0)
+        self.assertEqual(helpers.skill_level(5, 5), lvl5)
+        self.assertEqual(helpers.skill_level(4, 4), lvl4)
+        self.assertEqual(helpers.skill_level(3, 3), lvl3)
+        self.assertEqual(helpers.skill_level(2, 2), lvl2)
+        self.assertEqual(helpers.skill_level(1, 1), lvl1)
+        self.assertEqual(helpers.skill_level(0, 0), lvl0)
 
-        self.assertEquals(helpers.skill_level(3, 5), lvl3and5)
+        self.assertEqual(helpers.skill_level(3, 5), lvl3and5)
 
 
 class TestColours(TestCase):

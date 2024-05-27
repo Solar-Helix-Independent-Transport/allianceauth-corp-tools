@@ -1,14 +1,8 @@
-# Cog Stuff
-import json
 import logging
-import traceback
 
 from discord.colour import Color
 from discord.embeds import Embed
 from discord.ext import commands
-# AA Contexts
-from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 
 from corptools.models import MapJumpBridge, MapSystem
 from corptools.providers import routes
@@ -53,7 +47,7 @@ class Routes(commands.Cog):
         List all known Jumpbridges's
         """
 
-        embed = Embed(title=f"Known Jump Bridges")
+        embed = Embed(title="Known Jump Bridges")
         embed.colour = Color.blue()
         embed.description = "These do not auto populate. Please advise admins of ommisions/errors!\n\n"
 

@@ -1,9 +1,8 @@
-from django.core.management.base import BaseCommand
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
-from corptools.models import OreTaxRates
-from corptools.tasks import (process_ores_from_esi, update_or_create_map,
-                             update_ore_comp_table)
+from django.core.management.base import BaseCommand
+
+from corptools.tasks import update_or_create_map
 
 
 class Command(BaseCommand):
@@ -31,7 +30,7 @@ class Command(BaseCommand):
                                                                  timezone='UTC'
                                                                  )
 
-        task_char = PeriodicTask.objects.update_or_create(
+        PeriodicTask.objects.update_or_create(
             task='corptools.tasks.update_subset_of_characters',
             defaults={
                 'crontab': schedule_char,
@@ -40,7 +39,7 @@ class Command(BaseCommand):
             }
         )
 
-        task_corp = PeriodicTask.objects.update_or_create(
+        PeriodicTask.objects.update_or_create(
             task='corptools.tasks.update_all_corps',
             defaults={
                 'crontab': schedule_corp,

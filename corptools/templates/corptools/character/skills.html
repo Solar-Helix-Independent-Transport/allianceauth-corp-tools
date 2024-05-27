@@ -1,120 +1,216 @@
-{% extends 'corptools/character/char_base.html' %}
-{% load humanize  %}
+{% extends "corptools/character/char_base.html" %}
+{% load humanize %}
+{% load i18n %}
 {% load evelinks %}
 {% load helpers %}
 {% block ct_block %}
-<div class="row">
-    <div class="col-md-12">
-        <ul class="col-md-12 nav nav-tabs">
-            {% for char in skill_tables %}
-            <li class="nav-item {% if forloop.first  %}active{% endif %}">
-                <a class="nav-link" href="#{{char|slugify}}" data-toggle="pill">{{char}}</a>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div class="col-md-12">
-        <div class="panel panel-default"style="border-radius: 0 0 4px 4px; border-top-width: 0;">
-            <div class="panel-body">
-                <div class="tab-content">
-                    {% for char, skills_lists in skill_tables.items %}
-                    <div class="tab-pane fade {% if forloop.first %}in active{% endif %} col-md-12" id="{{char|slugify}}">
-                        <div class="col-md-12 text-center" style="border-bottom: 1px solid #aaa;">
-                            <h4>Doctrine Checker</h4>
-                            <p>
-                                {% for dctrn, skills in skills_lists.doctrines.items %}
-                                    {% if skills|length > 0 %}
-                                    <a style="background-color: #AA0000" rel="tooltip" class="label label-default show-skills-button" data="{% for skl, lvl in skills.items %}{{skl}} {{lvl}}<br>{% endfor %}">{{dctrn}}</a>
-                                    {% else %}
-                                    <span style="background-color: #008844" class="label label-default">{{dctrn}}</span>
-                                    {% endif %}
-                                {% empty %}
-                                <span class="label label-default">No Doctrines Loaded</span>
-                                {% endfor %}
-                            </p>
-                        </div>
-                        <div class="col-md-12">
-                        <h4 class="text-center"><span class="label label-default">Total SP: {{skills_lists.total_sp|intcomma}}</span>
-                            <span class="label label-default">Unallocated SP: {{skills_lists.unallocated_sp|intcomma}}</span>
-                            <span style=" {% if skills_lists.omega %}{% else %}background-color:#AA0000{% endif %}" class="label label-default">Estimated Clone State: {% if skills_lists.omega %}Omega{% else %}Alpha{% endif %}</span></p>
-                        </div>
-                        <div class="col-md-7 " >
-                            <table class=" table table-hover dataTable scroll-bar-narrow noheader" id="skill-table-{{forloop.counter}}" style="width:100%">
-                                <thead>
-                                    <th>Skill</th>
-                                    <th class="text-right">Level</th>
-                                    <th>Group</th>
-                                </thead>
-                                <tbody>
-                                    {% for skill, items in skills_lists.skills.items %}
-                                        <tr>
-                                            <td>{{ skill }}</td>
-                                            <td class="text-right">{{ items.active_level|level:items.trained_level }}</td>
-                                            <td>{{ items.grp }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-5 " >
-                            <h4 class="text-center">Queue</h5>
-                            <table class="table table-hover dataTable scroll-bar-narrow" id="que-table-{{forloop.counter}}" width="100%">
-                                <thead>
-                                    <th>Skill</th>
-                                    <th>Level</th>
-                                    <th>Completion</th>
-                                    <th>item</th>
-
-                                </thead>
-                                <tbody>
-                                    {% for que in skills_lists.queue %}
-                                        <tr>
-                                            <td>{{ que.skill_name }}</td>
-                                            <td>{{ que.finish_level|level:que.finish_level }}</td>
-                                            <td>{{ que.finish_date|timeuntil }}</td>
-                                            <td>{{ que.queue_position }}</td>
-
-                                        </tr>
+    <div class="row">
+        <div class="col-md-12">
+            <ul class="col-md-12 nav nav-tabs">
+                {% for char in skill_tables %}
+                    <li class="nav-item {% if forloop.first %}active{% endif %}">
+                        <a class="nav-link" href="#{{ char|slugify }}" data-toggle="pill">{{ char }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-12">
+            <div class="panel panel-default"style="border-radius: 0 0 4px 4px; border-top-width: 0;">
+                <div class="panel-body">
+                    <div class="tab-content">
+                        {% for char, skills_lists in skill_tables.items %}
+                            <div class="tab-pane fade {% if forloop.first %}in active{% endif %} col-md-12" id="{{ char|slugify }}">
+                                <div class="col-md-12 text-center" style="border-bottom: 1px solid #aaa;">
+                                    <h4>{% translate "Doctrine Checker" %}</h4>
+                                    <p>
+                                        {% for dctrn, skills in skills_lists.doctrines.items %}
+                                            {% if skills|length > 0 %}
+                                                <a style="background-color: #AA0000" rel="tooltip" class="label label-default show-skills-button" data="{% for skl, lvl in skills.items %}{{ skl }} {{ lvl }}
+                                                    <br>
+                                                {% endfor %}
+                                            ">{{ dctrn }}</a>
+                                        {% else %}
+                                            <span style="background-color: #008844" class="label label-default">{{ dctrn }}</span>
+                                        {% endif %}
                                     {% empty %}
-                                    <tr class="alert alert-info"><td colspan="3">Not Training!</td><td></td><td></td><td></td></tr>
+                                        <span class="label label-default">{% translate "No Doctrines Loaded" %}</span>
                                     {% endfor %}
-                                </tbody>
-                            </table>
+                                </p>
+                            </div>
+                            <div class="col-md-12">
+                                <h4 class="text-center">
+                                    <span class="label label-default">{% translate "Total SP" %}: {{ skills_lists.total_sp|intcomma }}</span>
+                                    <span class="label label-default">{% translate "Unallocated SP" %}: {{ skills_lists.unallocated_sp|intcomma }}</span>
+                                    <span style=" {% if skills_lists.omega %}{% else %}background-color:#AA0000{% endif %}" class="label label-default">{% translate "Estimated Clone State" %}:
+                                        {% if skills_lists.omega %}
+                                            {% translate "Omega" %}
+                                        {% else %}
+                                            {% translate "Alpha" %}
+                                        {% endif %}
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="col-md-7 ">
+                                <table class="table table-hover dataTable scroll-bar-narrow noheader"
+                                       id="skill-table-{{ forloop.counter }}"
+                                       style="width:100%">
+                                    <thead>
+                                        <th>{% translate "Skill" %}</th>
+                                        <th class="text-right">{% translate "Level" %}</th>
+                                        <th>{% translate "Group" %}</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for skill, items in skills_lists.skills.items %}
+                                            <tr>
+                                                <td>{{ skill }}</td>
+                                                <td class="text-right">{{ items.active_level|level:items.trained_level }}</td>
+                                                <td>{{ items.grp }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-5 ">
+                                <h4 class="text-center">
+                                    {% translate "Queue" %}
+                                </h5>
+                                <table class="table table-hover dataTable scroll-bar-narrow" id="que-table-{{ forloop.counter }}" width="100%">
+                                    <thead>
+                                        <th>{% translate "Skill" %}</th>
+                                        <th>{% translate "Level" %}</th>
+                                        <th>{% translate "Completion" %}</th>
+                                        <th>{% translate "item" %}</th>
+
+                                    </thead>
+                                    <tbody>
+                                        {% for que in skills_lists.queue %}
+                                            <tr>
+                                                <td>{{ que.skill_name }}</td>
+                                                <td>{{ que.finish_level|level:que.finish_level }}</td>
+                                                <td>{{ que.finish_date|timeuntil }}</td>
+                                                <td>{{ que.queue_position }}</td>
+
+                                            </tr>
+                                        {% empty %}
+                                            <tr class="alert alert-info">
+                                                <td colspan="3">{% translate "Not Training" %}!</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-<div class="modal fade" id="modal-main" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade"
+     id="modal-main"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="main-modal-title">Account Checks</h5>
+                <h5 class="modal-title" id="main-modal-title">{% translate "Account Checks" %}</h5>
             </div>
             <div id="main-modal-body" class="modal-body"  style="overflow-y:auto;"></div>
 
-            </div>
         </div>
     </div>
 </div>
+</div>
 
-{% endblock %}
+{% endblock ct_block %}
 {% block extra_javascript %}
-    {% include 'bundles/datatables-js.html' %}
-    <script>!function(t){function e(t){var e={columns:[],columnsIdxList:[],bootstrap:!1,autoSize:!0,label:"Filter "};if("bootstrap"in t&&"boolean"==typeof t.bootstrap&&(e.bootstrap=t.bootstrap),"autoSize"in t&&"boolean"==typeof t.autoSize&&(e.autoSize=t.autoSize),"label"in t&&"string"==typeof t.label&&(e.label=t.label),"columns"in t)for(var i=0;i<t.columns.length;i++){var n=t.columns[i];if("idx"in n&&"number"==typeof n.idx){var o=n.idx;e.columns[o]={title:null,maxWidth:null,autoSize:!0},e.columnsIdxList.push(o),"title"in n&&"string"==typeof n.title&&(e.columns[o].title=n.title),"maxWidth"in n&&"string"==typeof n.maxWidth&&(e.columns[o].maxWidth=n.maxWidth),"autoSize"in n&&"boolean"==typeof n.autoSize&&(e.columns[o].autoSize=n.autoSize)}}return e}t(document).on("preInit.dt",function(i,n){if("dt"===i.namespace){var o=new t.fn.dataTable.Api(n),a=o.table().node().id,l=o.init();if("filterDropDown"in l){var r=e(l.filterDropDown);if(0!=r.columns.length){var u=o.table().container(),s=a+"_filterWrapper",c=s+" "+(r.bootstrap?"form-inline":"");t(u).prepend('<div id="'+s+'" class="'+c+'">'+r.label+"</div>"),o.columns(r.columnsIdxList).every(function(){var e=this.index(),i=null!==r.columns[e].title?r.columns[e].title:t(this.header()).html();""==i&&(i="column "+(e+1));var n="form-control "+a+"_filterSelect",o=a+"_filterSelect"+e;t("#"+s).append('<select id="'+o+'" class="'+n+'"></select>');var l=t("#"+o).empty().append('<option value="">('+i+")</option>");})}}}}),t(document).on("init.dt",function(i,n){if("dt"===i.namespace){var o=new t.fn.dataTable.Api(n),a=o.table().node().id,l=o.init();if("filterDropDown"in l){var r=e(l.filterDropDown);o.table().container();o.columns(r.columnsIdxList).every(function(){var e=this,i=e.index(),n=t("#"+(a+"_filterSelect"+i));n.on("change",function(){var i=t.fn.dataTable.util.escapeRegex(t(this).val());e.search(i?"^"+i+"$":"",!0,!1).draw()}),e.data().unique().sort().each(function(t,e){""!=t&&n.append('<option value="'+t+'">'+t+"</option>")})})}}})}(jQuery);</script>
+    {% include "bundles/datatables-js.html" %}
+    <script>
+        ! function(t) {
+            function e(t) {
+                var e = {
+                    columns: [],
+                    columnsIdxList: [],
+                    bootstrap: !1,
+                    autoSize: !0,
+                    label: "Filter "
+                };
+                if ("bootstrap" in t && "boolean" == typeof t.bootstrap && (e.bootstrap = t.bootstrap), "autoSize" in t && "boolean" == typeof t.autoSize && (e.autoSize = t.autoSize), "label" in t && "string" == typeof t.label && (e.label = t.label), "columns" in t)
+                    for (var i = 0; i < t.columns.length; i++) {
+                        var n = t.columns[i];
+                        if ("idx" in n && "number" == typeof n.idx) {
+                            var o = n.idx;
+                            e.columns[o] = {
+                                title: null,
+                                maxWidth: null,
+                                autoSize: !0
+                            }, e.columnsIdxList.push(o), "title" in n && "string" == typeof n.title && (e.columns[o].title = n.title), "maxWidth" in n && "string" == typeof n.maxWidth && (e.columns[o].maxWidth = n.maxWidth), "autoSize" in n && "boolean" == typeof n.autoSize && (e.columns[o].autoSize = n.autoSize)
+                        }
+                    }
+                return e
+            }
+            t(document).on("preInit.dt", function(i, n) {
+                if ("dt" === i.namespace) {
+                    var o = new t.fn.dataTable.Api(n),
+                        a = o.table().node().id,
+                        l = o.init();
+                    if ("filterDropDown" in l) {
+                        var r = e(l.filterDropDown);
+                        if (0 != r.columns.length) {
+                            var u = o.table().container(),
+                                s = a + "_filterWrapper",
+                                c = s + " " + (r.bootstrap ? "form-inline" : "");
+                            t(u).prepend('<div id="' + s + '" class="' + c + '">' + r.label + "</div>"), o.columns(r.columnsIdxList).every(function() {
+                                var e = this.index(),
+                                    i = null !== r.columns[e].title ? r.columns[e].title : t(this.header()).html();
+                                "" == i && (i = "column " + (e + 1));
+                                var n = "form-control " + a + "_filterSelect",
+                                    o = a + "_filterSelect" + e;
+                                t("#" + s).append('<select id="' + o + '" class="' + n + '"></select>');
+                                var l = t("#" + o).empty().append('<option value="">(' + i + ")</option>");
+                            })
+                        }
+                    }
+                }
+            }), t(document).on("init.dt", function(i, n) {
+                if ("dt" === i.namespace) {
+                    var o = new t.fn.dataTable.Api(n),
+                        a = o.table().node().id,
+                        l = o.init();
+                    if ("filterDropDown" in l) {
+                        var r = e(l.filterDropDown);
+                        o.table().container();
+                        o.columns(r.columnsIdxList).every(function() {
+                            var e = this,
+                                i = e.index(),
+                                n = t("#" + (a + "_filterSelect" + i));
+                            n.on("change", function() {
+                                var i = t.fn.dataTable.util.escapeRegex(t(this).val());
+                                e.search(i ? "^" + i + "$" : "", !0, !1).draw()
+                            }), e.data().unique().sort().each(function(t, e) {
+                                "" != t && n.append('<option value="' + t + '">' + t + "</option>")
+                            })
+                        })
+                    }
+                }
+            })
+        }(jQuery);
+    </script>
 
-{% endblock %}
+{% endblock extra_javascript %}
 {% block ct_extra_script %}
-var groupColumn = 2;
+    var groupColumn = 2;
 
-var config = {
+    var config = {
     "filterDropDown": {
     columns: [{
-        idx: 2
-            }],
+    idx: 2
+    }],
     bootstrap: true
     },
     info: false,
@@ -128,40 +224,44 @@ var config = {
     ],
     "fnDrawCallback": function ( settings ) {
 
-        var api = this.api();
-        var rows = api.rows( {page:'current'} ).nodes();
-        var last=null;
+    var api = this.api();
+    var rows = api.rows( {page:'current'} ).nodes();
+    var last=null;
 
-        api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
-            if ( last !== group ) {
-                $(rows).eq( i ).before(
-                    '<tr class="group alert alert-info"><td colspan="3">'+group+'</td></tr>'
-                );
-                last = group;
-            }
-        });
+    api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
+    if ( last !== group ) {
+    $(rows).eq( i ).before(
+    '
+    <tr class="group alert alert-info">
+        <td colspan="3">'+group+'</td>
+    </tr>
+    '
+    );
+    last = group;
     }
-}
+    });
+    }
+    }
 
-function sort_table(table_input) {
+    function sort_table(table_input) {
     var currentOrder = table_input.order()[0];
     if ( currentOrder[0] === groupColumn && currentOrder[1] === 'asc' ) {
-        table_input.order( [ groupColumn, 'desc' ] ).draw();
+    table_input.order( [ groupColumn, 'desc' ] ).draw();
     }
     else {
-        table_input.order( [ groupColumn, 'asc' ] ).draw();
+    table_input.order( [ groupColumn, 'asc' ] ).draw();
     }
-}
+    }
 
-$(document).ready(function() {
+    $(document).ready(function() {
 
     {% for char in skill_tables %}
-    var table_{{forloop.counter}} = $('#skill-table-{{forloop.counter}}').DataTable(config);
-    $('#skill-table-{{forloop.counter}} tbody').on('click', 'tr.group', function () {
-        sort_table(table_{{forloop.counter}})
-    }
-    );
-    $('#que-table-{{forloop.counter}}').DataTable( {
+        var table_{{ forloop.counter }} = $('#skill-table-{{ forloop.counter }}').DataTable(config);
+        $('#skill-table-{{ forloop.counter }} tbody').on('click', 'tr.group', function () {
+        sort_table(table_{{ forloop.counter }})
+        }
+        );
+        $('#que-table-{{ forloop.counter }}').DataTable( {
         scrollY:        '600px',
         scrollCollapse: true,
         paging:         false,
@@ -176,29 +276,29 @@ $(document).ready(function() {
         ],
         "autoWidth": false,
         "columns": [{
-            "width": "50%"
+        "width": "50%"
         }, {
-            "width": "20%"
+        "width": "20%"
         }, {
-            "width": "30%"
+        "width": "30%"
         }]
 
-    });
+        });
     {% endfor %}
     $('body').find('.dataTables_scrollBody').addClass("scroll-bar-narrow").css('min-height','600px');
     $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
-        $($.fn.dataTable.tables(true)).DataTable()
-           .columns.adjust()
+    $($.fn.dataTable.tables(true)).DataTable()
+    .columns.adjust()
     });
 
-})
-$(".show-skills-button").on("click", function() {
+    })
+    $(".show-skills-button").on("click", function() {
     data = this.attributes.data.nodeValue;
     modal_body = $("#main-modal-body")[0];
     modal_title = $("#main-modal-title")[0];
     modal_title.innerHTML = this.innerText;
     modal_body.innerHTML = data;
     $("#modal-main").modal();
-});
+    });
 
-{% endblock %}
+{% endblock ct_extra_script %}

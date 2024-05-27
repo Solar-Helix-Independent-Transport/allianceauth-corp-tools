@@ -1,57 +1,51 @@
 import datetime
 import json
-import logging
 from functools import wraps
 
-from allianceauth.eveonline.models import EveCharacter
-from allianceauth.eveonline.providers import provider as eve_names
-from allianceauth.services.tasks import QueueOnce
-from celery import chain as Chain
-from celery import shared_task, signature
+from celery import chain as Chain, shared_task, signature
 from celery_once import AlreadyQueued
+
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
+
+from allianceauth.eveonline.models import EveCharacter
+from allianceauth.eveonline.providers import provider as eve_names
+from allianceauth.services.hooks import get_extension_logger
+from allianceauth.services.tasks import QueueOnce
 from esi.errors import TokenExpiredError
 from esi.models import Token
-from requests.adapters import MaxRetryError
 
 from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
 
 from . import app_settings, providers
-from .models import (CharacterAsset, CharacterAudit, CharacterMarketOrder,
-                     Clone, CorporationAudit, EveLocation, EveName, JumpClone)
+from .models import (
+    CharacterAsset, CharacterAudit, CharacterMarketOrder, Clone,
+    CorporationAudit, EveLocation, EveName, JumpClone,
+)
 from .task_helpers import corp_helpers
-from .task_helpers.char_tasks import (update_character_assets,
-                                      update_character_clones,
-                                      update_character_contacts,
-                                      update_character_contract_items,
-                                      update_character_contracts,
-                                      update_character_industry_jobs,
-                                      update_character_location,
-                                      update_character_loyaltypoints,
-                                      update_character_mail_headers,
-                                      update_character_mining,
-                                      update_character_notifications,
-                                      update_character_order_history,
-                                      update_character_orders,
-                                      update_character_roles,
-                                      update_character_skill_list,
-                                      update_character_skill_queue,
-                                      update_character_titles,
-                                      update_character_transactions,
-                                      update_character_wallet,
-                                      update_corp_history)
-from .task_helpers.update_tasks import (fetch_location_name,
-                                        process_category_from_esi,
-                                        process_map_from_esi,
-                                        set_error_count_flag,
-                                        update_ore_comp_table_from_fuzzworks)
+from .task_helpers.char_tasks import (
+    update_character_assets, update_character_clones,
+    update_character_contacts, update_character_contract_items,
+    update_character_contracts, update_character_industry_jobs,
+    update_character_location, update_character_loyaltypoints,
+    update_character_mail_headers, update_character_mining,
+    update_character_notifications, update_character_order_history,
+    update_character_orders, update_character_roles,
+    update_character_skill_list, update_character_skill_queue,
+    update_character_titles, update_character_transactions,
+    update_character_wallet, update_corp_history,
+)
+from .task_helpers.update_tasks import (
+    fetch_location_name, process_category_from_esi, process_map_from_esi,
+    set_error_count_flag, update_ore_comp_table_from_fuzzworks,
+)
 
 TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
 
-logger = logging.getLogger(__name__)
+
+logger = get_extension_logger(__name__)
 
 # Bulk Updates
 
@@ -172,7 +166,7 @@ def process_all_categories():
 
     Chain(que).apply_async(priority=8)
 
-    return "Queued {} Tasks".format(len(que))
+    return f"Queued {len(que)} Tasks"
 
 # Character Tasks
 
@@ -187,14 +181,13 @@ def update_all_characters():
 @shared_task(bind=True, base=QueueOnce)
 def update_subset_of_characters(self, subset=48, min_runs=5, force=False):
     amount_of_updates = max(
-        CharacterAudit.objects.all().count()/subset, min_runs)
+        CharacterAudit.objects.all().count() / subset, min_runs)
     characters = CharacterAudit.objects.all().order_by(
         'last_update_pub_data')[:amount_of_updates]
     char_ids = []
     for char in characters:
         char_ids.append(char.character.character_id)
-        update_character.apply_async(args=[char.character.character_id], kwargs={
-                                     "force_refresh": force})
+        update_character.apply_async(args=[char.character.character_id], kwargs={"force_refresh": force})
     update_all_eve_names.apply_async(priority=7, kwargs={"chunk": 5000})
     process_corp_histories.apply_async(args=[char_ids], priority=6)
     return f"Queued {len(characters)} Character Updates"
@@ -283,7 +276,7 @@ def update_character(self, char_id, force_refresh=False):
             except TokenExpiredError:
                 return False
         else:
-            logger.info("No Tokens for {}".format(char_id))
+            logger.info(f"No Tokens for {char_id}")
             return False
 
     logger.info("Processing Updates for {}".format(
@@ -395,7 +388,7 @@ def update_character(self, char_id, force_refresh=False):
     enqueue_next_task(que)
 
     logger.info("Queued {} Updates for {}".format(
-        len(que)+1,
+        len(que) + 1,
         character.character.character_name)
     )
 
@@ -542,11 +535,11 @@ def update_char_loyaltypoints(self, character_id, force_refresh=False, chain=[])
 
 
 def build_location_cache_tag(location_id):
-    return "loc_id_{}".format(location_id)
+    return f"loc_id_{location_id}"
 
 
 def build_location_cooloff_cache_tag(location_id):
-    return "cooldown_loc_id_{}".format(location_id)
+    return f"cooldown_loc_id_{location_id}"
 
 
 def get_location_cooloff(location_id):
@@ -555,7 +548,7 @@ def get_location_cooloff(location_id):
 
 def set_location_cooloff(location_id):
     # timeout for 7 days
-    return cache.set(build_location_cooloff_cache_tag(location_id), True, (60*60*24*7))
+    return cache.set(build_location_cooloff_cache_tag(location_id), True, (60 * 60 * 24 * 7))
 
 
 def get_error_count_flag():
@@ -569,7 +562,7 @@ def location_get(location_id):
         try:
             data['date'] = datetime.datetime.strptime(
                 data.get('date'), TZ_STRING).replace(tzinfo=timezone.utc)
-        except:
+        except Exception:
             data['date'] = datetime.datetime.min.replace(tzinfo=timezone.utc)
     return data
 
@@ -617,7 +610,7 @@ def update_location(self, location_id, force_citadel=False):
         if force_citadel and location_id > 64000000:
             pass
         else:
-            return "Cooloff on ID: {}".format(location_id)
+            return f"Cooloff on ID: {location_id}"
 
     cached_data = location_get(location_id)
 
@@ -642,7 +635,7 @@ def update_location(self, location_id, force_citadel=False):
             marketorder = marketorder.exclude(
                 character__character__character_id__in=cached_data.get('characters'))
 
-    location_flag = None
+    # location_flag = None
     char_ids = []
 
     if asset.exists():
@@ -677,7 +670,7 @@ def update_location(self, location_id, force_citadel=False):
 
     if len(char_ids) == 0:
         set_location_cooloff(location_id)
-        return "No more Characters for Location_id: {} cooling off for a while".format(location_id)
+        return f"No more Characters for Location_id: {location_id} cooling off for a while"
 
     for c_id in char_ids:
         location = fetch_location_name(location_id, None, c_id)
@@ -698,7 +691,7 @@ def update_location(self, location_id, force_citadel=False):
                 self.retry(countdown=300)
 
     set_location_cooloff(location_id)
-    return "No more Characters for Location_id: {} cooling off for a while".format(location_id)
+    return f"No more Characters for Location_id: {location_id} cooling off for a while"
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -736,8 +729,7 @@ def update_all_locations(self, force_citadels=False):
     queryset6 = list(CharacterMarketOrder.objects.filter(
         location_name_id__isnull=True).values_list('location_id', flat=True))
 
-    all_locations = set(queryset1 + queryset2 + queryset3 +
-                        queryset4 + queryset5 + queryset6)
+    all_locations = set(queryset1 + queryset2 + queryset3 + queryset4 + queryset5 + queryset6)
     # print(all_locations)
     print(f"{len(all_locations)} Locations to find")
     count = 0

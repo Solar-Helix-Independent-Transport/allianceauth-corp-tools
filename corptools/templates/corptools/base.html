@@ -1,80 +1,90 @@
-{% extends 'allianceauth/base.html' %}
+{% extends "allianceauth/base.html" %}
 {% load i18n %}
 {% load helpers %}
-{% block page_title %}{% app_name %}{% endblock %}
+{% block page_title %}
+    {% app_name %}
+{% endblock page_title %}
 {% block extra_css %}
-{% include 'bundles/datatables-css.html' %}
+    {% include "bundles/datatables-css.html" %}
 
-<style>
-  .flex-container {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-    align-items: center;
-    justify-content: center;
-  }
-  .flex-wrap {
-    display: -webkit-flex; /* Safari */
-    -webkit-flex-wrap: wrap; /* Safari 6.1+ */
-    display: flex;
-    flex-wrap: wrap;
-  }
+    <style>
+        .flex-container {
+            display: flex;
+            flex-direction: row;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+        }
 
-  .form-control {
-    margin: 2px;
-  }
+        .flex-wrap {
+            display: -webkit-flex;
+            /* Safari */
+            -webkit-flex-wrap: wrap;
+            /* Safari 6.1+ */
+            display: flex;
+            flex-wrap: wrap;
+        }
 
-  .pannel-hieght-locked {
-    min-height: 300px;
-    max-height: 300px;
-    overflow-y: auto;
-  }
+        .form-control {
+            margin: 2px;
+        }
 
-  .scroll-bar-narrow::-webkit-scrollbar-track {
-    border-radius: 5px;
-  }
+        .pannel-hieght-locked {
+            min-height: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
 
-  .scroll-bar-narrow::-webkit-scrollbar-track-piece {
-    background-color: #375a7f;
-    border-color: transparent;
-    border-width: 7px;
-    border-style: solid;
-    background-clip: padding-box;
-  }
+        .scroll-bar-narrow::-webkit-scrollbar-track {
+            border-radius: 5px;
+        }
 
-  .scroll-bar-narrow::-webkit-scrollbar {
-    width: 15px;
-    border-width: 5px;
-    background-color: transparent;
-  }
+        .scroll-bar-narrow::-webkit-scrollbar-track-piece {
+            background-color: #375a7f;
+            border-color: transparent;
+            border-width: 7px;
+            border-style: solid;
+            background-clip: padding-box;
+        }
 
-  .scroll-bar-narrow::-webkit-scrollbar-thumb {
-    background-color: #375a7f;
-    border-radius: 10px;
-    border: 4px solid transparent;
-    background-clip: padding-box;
-  }
+        .scroll-bar-narrow::-webkit-scrollbar {
+            width: 15px;
+            border-width: 5px;
+            background-color: transparent;
+        }
 
-  table.dataTable tbody td {
-    vertical-align: middle;
-  }
-</style>
+        .scroll-bar-narrow::-webkit-scrollbar-thumb {
+            background-color: #375a7f;
+            border-radius: 10px;
+            border: 4px solid transparent;
+            background-clip: padding-box;
+        }
+
+        table.dataTable tbody td {
+            vertical-align: middle;
+        }
+    </style>
 
 {% endblock extra_css %}
 {% block content %}
-<div class="col-lg-12">
-  <div class="col-lg-12 container">
-    {% block audit_title %} {% endblock %} {%if show_menu %}
-    <nav class="navbar navbar-default">
-      <div class="container-fluid">
-        <ul class="nav navbar-nav">
-          <li><a href="">{% trans "Add All Token" %}</a></li>
-        </ul>
-      </div>
-    </nav>
-    {% endif %}
-    {% block ct_block %}
-    {% endblock %}
-  </div>
-</div>
-{% endblock %}
+    <div class="col-lg-12">
+        <div class="col-lg-12 container">
+            {% block audit_title %}
+            {% endblock audit_title %}
+
+            {% if show_menu %}
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <ul class="nav navbar-nav">
+                            <li>
+                                <a href="">{% translate "Add All Token" %}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            {% endif %}
+            {% block ct_block %}
+            {% endblock ct_block %}
+        </div>
+    </div>
+{% endblock content %}

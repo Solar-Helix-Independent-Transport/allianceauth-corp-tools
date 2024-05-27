@@ -1,30 +1,28 @@
-import logging
 import time
 from datetime import timedelta
 
-from allianceauth.eveonline.models import EveCorporationInfo
-from bravado import exception
 from celery import shared_task
-from django.core.cache import cache
+
 from django.utils import timezone
+
+from allianceauth.services.hooks import get_extension_logger
 from esi.models import Token
 
 from corptools.task_helpers.update_tasks import fetch_location_name
 
 from .. import providers
-from ..models import (CharacterAsset, CharacterAudit, CharacterContact,
-                      CharacterContactLabel, CharacterIndustryJob,
-                      CharacterLocation, CharacterMarketOrder,
-                      CharacterMiningLedger, CharacterRoles, CharacterTitle,
-                      CharacterWalletJournalEntry, Clone, Contract,
-                      ContractItem, CorporationHistory, EveItemType,
-                      EveLocation, EveName, Implant, JumpClone, LoyaltyPoint,
-                      MailLabel, MailMessage, MailRecipient, Notification,
-                      NotificationText, Skill, SkillQueue, SkillTotalHistory,
-                      SkillTotals)
+from ..models import (
+    CharacterAsset, CharacterAudit, CharacterContact, CharacterContactLabel,
+    CharacterIndustryJob, CharacterLocation, CharacterMarketOrder,
+    CharacterMiningLedger, CharacterRoles, CharacterTitle,
+    CharacterWalletJournalEntry, Clone, Contract, ContractItem,
+    CorporationHistory, EveItemType, EveLocation, EveName, Implant, JumpClone,
+    LoyaltyPoint, MailLabel, MailMessage, MailRecipient, Notification,
+    NotificationText, Skill, SkillQueue, SkillTotalHistory, SkillTotals,
+)
 from .etag_helpers import NotModifiedError, etag_results
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 def get_token(character_id: int, scopes: list) -> "Token":
@@ -102,7 +100,6 @@ def update_character_location(character_id, force_refresh=False):
             defaults={
                 "current_ship": ship,
                 "current_ship_name": ship_data["ship_name"],
-                "current_ship_name": ship_data["ship_name"],
                 "current_location": _loc if _loc else None
             }
         )
@@ -118,7 +115,7 @@ def update_character_location(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "CT: Finished location for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished location for: {audit_char.character.character_name}"
 
 
 def update_corp_history(character_id, force_refresh=False):
@@ -154,7 +151,7 @@ def update_corp_history(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "CT: Finished pub data for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished pub data for: {audit_char.character.character_name}"
 
 
 def update_character_skill_list(character_id, force_refresh=False):
@@ -219,7 +216,7 @@ def update_character_skill_list(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "CT: Finished skills for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished skills for: {audit_char.character.character_name}"
 
 
 def update_character_skill_queue(character_id, force_refresh=False):
@@ -276,7 +273,7 @@ def update_character_skill_queue(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "CT: Finished skill queue for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished skill queue for: {audit_char.character.character_name}"
 
 
 def update_character_assets(character_id, force_refresh=False):
@@ -370,7 +367,7 @@ def update_character_assets(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "CT: Finished assets for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished assets for: {audit_char.character.character_name}"
 
 
 def update_character_mining(character_id, force_refresh=False):
@@ -393,7 +390,7 @@ def update_character_mining(character_id, force_refresh=False):
 
         _st = time.perf_counter()
         existings_pks = set(CharacterMiningLedger.objects.filter(
-            character=audit_char, date__gte=timezone.now()-timedelta(days=30)
+            character=audit_char, date__gte=timezone.now() - timedelta(days=30)
         ).values_list("id", flat=True))
         type_ids = set()
         new_events = []
@@ -437,7 +434,7 @@ def update_character_mining(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "CT: Finished Mining for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished Mining for: {audit_char.character.character_name}"
 
 
 def update_character_industry_jobs(character_id, force_refresh=False):
@@ -464,7 +461,7 @@ def update_character_industry_jobs(character_id, force_refresh=False):
         ).values_list("job_id", flat=True))
         type_ids = set()
         new_events = []
-        old_events = []
+        # old_events = []
         for event in jobs:
             type_ids.add(event.get('blueprint_type_id'))
             if event.get('product_type_id'):
@@ -529,11 +526,11 @@ def update_character_industry_jobs(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "CT: Finished Industry Jobs for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished Industry Jobs for: {audit_char.character.character_name}"
 
 
 def get_current_ship_location(character_id, force_refresh=False):
-    audit_char = CharacterAudit.objects.get(
+    CharacterAudit.objects.get(
         character__character_id=character_id)
     req_scopes = ['esi-location.read_location.v1',
                   'esi-location.read_ship_type.v1']
@@ -663,7 +660,7 @@ def update_character_wallet(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "CT: Finished wallet transactions for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished wallet transactions for: {audit_char.character.character_name}"
 
 
 def update_character_transactions(character_id, force_refresh=False):
@@ -692,9 +689,9 @@ def update_character_transactions(character_id, force_refresh=False):
             context_id_type="market_transaction_id",
             reason__exact="").values_list('context_id', flat=True)[:2500]  # Max items from ESI
 
-        _new_names = []
+        # _new_names = []
 
-        items = []
+        # items = []
         for item in journal_items:
             if item.get('transaction_id') in _current_journal:
                 type_name, _ = EveItemType.objects.get_or_create_from_esi(
@@ -708,7 +705,7 @@ def update_character_transactions(character_id, force_refresh=False):
                 ).update(
                     reason=message
                 )
-                #print(f"{audit_char.character.character_name} {message}")
+                # print(f"{audit_char.character.character_name} {message}")
         logger.debug(
             f"CT_TIME: {time.perf_counter()-_st} update_character_transactions {character_id}")
 
@@ -717,7 +714,7 @@ def update_character_transactions(character_id, force_refresh=False):
             audit_char.character.character_name))
         pass
 
-    return "CT: Finished market transactions for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished market transactions for: {audit_char.character.character_name}"
 
 
 def update_character_clones(character_id, force_refresh=False):
@@ -794,7 +791,7 @@ def update_character_clones(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "CT: Finished clones for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished clones for: {audit_char.character.character_name}"
 
 
 def update_character_loyaltypoints(character_id, force_refresh=False):
@@ -826,12 +823,12 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
         for lp in loyaltypoints:
             lp_corp, _ = EveName.objects.get_or_create_from_esi(
                 lp.get('corporation_id'))
-            
+
             if lp.get('corporation_id') in existing_lp_corps:
                 existing = LoyaltyPoint.objects.get(character=audit_char, corporation=lp_corp)
                 existing.amount = lp.get('loyalty_points')
                 _bulkupdate.append(existing)
-            else:                
+            else:
                 _bulkcreate.append(
                     LoyaltyPoint(
                         character=audit_char,
@@ -842,7 +839,7 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
             _bulkcreate, ignore_conflicts=True, batch_size=500)
         LoyaltyPoint.objects.bulk_update(
             _bulkupdate, batch_size=500, fields=['amount'])
-    
+
     except NotModifiedError:
         logger.info("CT: No New LP data for: {}".format(
             audit_char.character.character_name))
@@ -945,7 +942,7 @@ def update_character_orders(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "CT: Finished Orders for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished Orders for: {audit_char.character.character_name}"
 
 
 def update_character_order_history(character_id, force_refresh=False):
@@ -1037,7 +1034,7 @@ def update_character_order_history(character_id, force_refresh=False):
             audit_char.character.character_name))
         pass
 
-    return "CT: Finished Order History for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished Order History for: {audit_char.character.character_name}"
 
 
 @shared_task
@@ -1103,7 +1100,7 @@ def update_character_notifications(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "CT: Finished notifications for: {0}".format(audit_char.character.character_name)
+    return f"CT: Finished notifications for: {audit_char.character.character_name}"
 
 
 def update_character_roles(character_id, force_refresh=False):
@@ -1159,12 +1156,11 @@ def update_character_roles(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
-    return "CT: Finished roles for: {0}".format(audit_char.character.character_name)
+    return f"CT: Finished roles for: {audit_char.character.character_name}"
 
 
 def update_character_mail_body(character_id, mail_message, force_refresh=False):
-    audit_char = CharacterAudit.objects.get(
-        character__character_id=character_id)
+    CharacterAudit.objects.get(character__character_id=character_id)
 
     req_scopes = ['esi-mail.read_mail.v1']
 
@@ -1239,14 +1235,13 @@ def update_character_mail_headers(character_id, force_refresh=False):
                     break
                 continue
 
-            id_k = int(str(audit_char.character.character_id) +
-                       str(msg.get('mail_id')))
+            id_k = int(str(audit_char.character.character_id) + str(msg.get('mail_id')))
             if msg.get('from', 0) not in _current_eve_ids:
                 if msg.get('from', 0) not in failed_ids:
                     try:
                         EveName.objects.get_or_create_from_esi(msg.get('from'))
                         _current_eve_ids.append(msg.get('from', 0))
-                    except:
+                    except Exception:
                         failed_ids.add(msg.get('from'))
                         pass
             msg_obj = MailMessage(character=audit_char, id_key=id_k, mail_id=msg.get('mail_id'), from_id=msg.get('from', None),
@@ -1315,7 +1310,7 @@ def update_character_mail_headers(character_id, force_refresh=False):
     audit_char.is_active()
 
     if len(mail_ids) == 0:
-        logger.debug("No new mails for {}".format(character_id))
+        logger.debug(f"No new mails for {character_id}")
         return
 
     return mail_ids
@@ -1401,7 +1396,7 @@ def update_character_contacts(character_id, force_refresh=False):
 
             if contact.get('label_ids', False):  # add labels
                 for _label in contact.get('label_ids'):
-                    _label_id = int(str(audit_char.id)+str(_label))
+                    _label_id = int(str(audit_char.id) + str(_label))
                     _lbl = ContactLabelThrough(
                         charactercontact_id=_id,
                         charactercontactlabel_id=_label_id
@@ -1627,4 +1622,4 @@ def update_character_contract_items(character_id, contract_id, force_refresh=Fal
             audit_char.character.character_name))
         pass
 
-    return "CT: Completed Contract items %s for: %s" % (str(contract_id), str(character_id))
+    return f"CT: Completed Contract items {str(contract_id)} for: {str(character_id)}"

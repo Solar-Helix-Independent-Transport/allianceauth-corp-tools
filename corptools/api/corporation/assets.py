@@ -1,13 +1,16 @@
 import logging
 from typing import List
 
-from django.db.models import F, Q, Sum
 from ninja import NinjaAPI
+
+from django.db.models import F, Q, Sum
+
+from allianceauth.services.hooks import get_extension_logger
 
 from corptools import models
 from corptools.api import schema
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 class AssetsApiEndpoints:
@@ -22,11 +25,11 @@ class AssetsApiEndpoints:
         )
         def get_corporation_asset_locations(request, corporation_id: int):
             perms = (
-                request.user.has_perm('corptools.own_corp_manager') |
-                request.user.has_perm('corptools.alliance_corp_manager') |
-                request.user.has_perm('corptools.state_corp_manager') |
-                request.user.has_perm('corptools.global_corp_manager') |
-                request.user.has_perm('corptools.holding_corp_assets')
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_assets')
             )
 
             if not perms:
@@ -57,11 +60,11 @@ class AssetsApiEndpoints:
         )
         def get_corporation_asset_list(request, corporation_id: int, location_id: int, new_asset_tree: bool = False):
             perms = (
-                request.user.has_perm('corptools.own_corp_manager') |
-                request.user.has_perm('corptools.alliance_corp_manager') |
-                request.user.has_perm('corptools.state_corp_manager') |
-                request.user.has_perm('corptools.global_corp_manager') |
-                request.user.has_perm('corptools.holding_corp_assets')
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_assets')
             )
 
             if not perms:
@@ -183,11 +186,11 @@ class AssetsApiEndpoints:
         )
         def get_corporation_asset_contents(request, item_id: int):
             perms = (
-                request.user.has_perm('corptools.own_corp_manager') |
-                request.user.has_perm('corptools.alliance_corp_manager') |
-                request.user.has_perm('corptools.state_corp_manager') |
-                request.user.has_perm('corptools.global_corp_manager') |
-                request.user.has_perm('corptools.holding_corp_assets')
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_assets')
             )
 
             if not perms:
@@ -229,11 +232,11 @@ class AssetsApiEndpoints:
         )
         def get_corporation_asset_groups(request, corporation_id: int, location_id: int):
             perms = (
-                request.user.has_perm('corptools.own_corp_manager') |
-                request.user.has_perm('corptools.alliance_corp_manager') |
-                request.user.has_perm('corptools.state_corp_manager') |
-                request.user.has_perm('corptools.global_corp_manager') |
-                request.user.has_perm('corptools.holding_corp_assets')
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_assets')
             )
 
             if not perms:

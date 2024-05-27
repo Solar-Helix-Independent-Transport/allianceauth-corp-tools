@@ -1,0 +1,883 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-27 12:40+1000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: corptools/api/character/assets.py:30 corptools/api/character/assets.py:62
+#: corptools/api/character/assets.py:121 corptools/api/character/assets.py:170
+#: corptools/api/character/clones.py:29 corptools/api/character/finances.py:34
+#: corptools/api/character/finances.py:78
+#: corptools/api/character/finances.py:123
+#: corptools/api/character/finances.py:204
+#: corptools/api/character/finances.py:267
+#: corptools/api/character/finances.py:330
+#: corptools/api/character/interactions.py:33
+#: corptools/api/character/interactions.py:78
+#: corptools/api/character/interactions.py:130
+#: corptools/api/character/interactions.py:155
+#: corptools/api/character/mining.py:29 corptools/api/character/mining.py:49
+#: corptools/api/character/refresh.py:46 corptools/api/character/roles.py:28
+#: corptools/api/character/skills.py:29 corptools/api/character/skills.py:77
+#: corptools/api/character/skills.py:114 corptools/api/character/skills.py:160
+#: corptools/api/character/status.py:30 corptools/api/character/status.py:94
+msgid "Permission Denied"
+msgstr ""
+
+#: corptools/api/character/assets.py:39
+msgid "Everywhere"
+msgstr ""
+
+#: corptools/api/character/assets.py:40
+msgid "AssetSafety"
+msgstr ""
+
+#: corptools/api/character/assets.py:227
+#: corptools/templates/corptools/character/assets_lists.html:4
+msgid "Capital Ships"
+msgstr ""
+
+#: corptools/api/character/assets.py:229
+msgid "Subcaps Ships"
+msgstr ""
+
+#: corptools/api/character/assets.py:231
+msgid "Noteable Assets"
+msgstr ""
+
+#: corptools/api/character/assets.py:233
+#: corptools/templates/corptools/character/assets_lists.html:52
+msgid "Structures"
+msgstr ""
+
+#: corptools/api/character/assets.py:235
+msgid "BPO"
+msgstr ""
+
+#: corptools/api/character/assets.py:237
+#: corptools/templates/corptools/character/market.html:34
+#: corptools/templates/corptools/character/market.html:64
+msgid "Remaining"
+msgstr ""
+
+#: corptools/api/core/menu.py:24
+#: corptools/templates/corptools/character/char_menu.html:70
+msgid "Interactions"
+msgstr ""
+
+#: corptools/api/core/menu.py:28
+msgid "Finances"
+msgstr ""
+
+#: corptools/api/core/menu.py:32
+msgid "Industry"
+msgstr ""
+
+#: corptools/api/core/menu.py:36
+#: corptools/templates/corptools/corp_menu.html:34
+#: corptools/templates/corptools/dashboard.corptools.status.html:6
+msgid "Characters"
+msgstr ""
+
+#: corptools/api/core/menu.py:42
+msgid "Contact"
+msgstr ""
+
+#: corptools/api/core/menu.py:48
+#: corptools/templates/corptools/character/char_menu.html:100
+#: corptools/templates/corptools/character/status.html:58
+msgid "Notifications"
+msgstr ""
+
+#: corptools/api/core/menu.py:60
+#: corptools/templates/corptools/character/char_menu.html:52
+#: corptools/templates/corptools/character/status.html:83
+#: corptools/templates/corptools/corporation/corp_base.html:211
+msgid "Wallet"
+msgstr ""
+
+#: corptools/api/core/menu.py:68
+#: corptools/templates/corptools/character/wallet.html:40
+msgid "Wallet Activity"
+msgstr ""
+
+#: corptools/api/core/menu.py:72
+msgid "Contracts"
+msgstr ""
+
+#: corptools/api/core/menu.py:77
+#: corptools/templates/corptools/character/char_menu.html:47
+msgid "Market"
+msgstr ""
+
+#: corptools/api/core/menu.py:83
+msgid "Loyalty Points"
+msgstr ""
+
+#: corptools/api/core/menu.py:89
+msgid "Asset Overview"
+msgstr ""
+
+#: corptools/api/core/menu.py:93
+msgid "Asset List"
+msgstr ""
+
+#: corptools/api/core/menu.py:99
+msgid "Mining Ledger"
+msgstr ""
+
+#: corptools/api/core/menu.py:105
+#: corptools/templates/corptools/character/char_menu.html:19
+#: corptools/templates/corptools/character/clones.html:23
+#: corptools/templates/corptools/character/status.html:43
+#: corptools/templates/corptools/corporation/corp_base.html:205
+#: corptools/templates/corptools/corporation/corp_base.html:253
+msgid "Clones"
+msgstr ""
+
+#: corptools/api/core/menu.py:111
+#: corptools/templates/corptools/character/char_menu.html:31
+#: corptools/templates/corptools/character/roles.html:8
+#: corptools/templates/corptools/character/status.html:68
+msgid "Roles"
+msgstr ""
+
+#: corptools/api/core/menu.py:117
+msgid "Mail"
+msgstr ""
+
+#: corptools/api/core/menu.py:123
+#: corptools/templates/corptools/character/char_menu.html:36
+#: corptools/templates/corptools/character/status.html:75
+#: corptools/templates/corptools/corporation/corp_base.html:208
+#: corptools/templates/corptools/corporation/corp_base.html:253
+msgid "Skills"
+msgstr ""
+
+#: corptools/api/core/menu.py:127
+msgid "Skill Queues"
+msgstr ""
+
+#: corptools/api/core/menu.py:131
+msgid "Skill List Checks"
+msgstr ""
+
+#: corptools/api/core/search.py:29 corptools/api/core/search.py:39
+#: corptools/api/core/search.py:50
+msgid "Hard no pall!"
+msgstr ""
+
+#: corptools/models.py:1290 corptools/templates/corptools/admin.html:44
+#: corptools/templates/corptools/character/char_menu.html:10
+#: corptools/templates/corptools/character/notifications.html:14
+#: corptools/templates/corptools/character/roles.html:14
+msgid "Character"
+msgstr ""
+
+#: corptools/models.py:1292
+msgid "NPC Corporation"
+msgstr ""
+
+#: corptools/models.py:1293
+msgid "LP"
+msgstr ""
+
+#: corptools/models.py:1296
+msgid "Loyalty Point"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:3
+msgid "Admin Info"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:6
+#: corptools/templates/corptools/admin.html:31
+#: corptools/templates/corptools/admin.html:42
+msgid "DataBase"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:8
+msgid "EvE Models"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:10
+msgid "Names"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:11
+msgid "Structure Names"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:12
+msgid "Categories"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:13
+msgid "Groups"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:14
+msgid "Types"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:15
+msgid "Dogma Attributes"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:16
+msgid "Type Material Outputs"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:18
+msgid "EvE Map"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:20
+msgid "Regions"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:21
+msgid "Constellations"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:22
+msgid "Systems"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:23
+msgid "Gate Links"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:24
+msgid "Jump Bridge Links"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:33
+msgid "Corporate"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:35
+msgid "Corporation Audits"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:46
+msgid "Character Audits"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:47
+#: corptools/templates/corptools/admin.html:100
+msgid "Skill Lists"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:55
+msgid "Periodic Tasks"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:57
+msgid "Tasks"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:59
+msgid "Character Task"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:60
+msgid "Corporation Task"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:62
+msgid "Create or Update Periodic Tasks"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:69
+msgid "Task Helper"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:74
+msgid "Clear all cached Etags"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:77
+msgid "Update Map Data"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:80
+msgid "Update all locations"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:83
+msgid "Force Character Update"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:86
+msgid "Update Eve Models"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:89
+msgid "Update Corp Updates"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:92
+msgid "Submit"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:105
+msgid "Skill List Description"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:107
+msgid "This will show as the name of the Skill List"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:117
+msgid "Browse"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:120
+msgid "PYFA XML Skills required list"
+msgstr ""
+
+#: corptools/templates/corptools/base.html:71
+msgid "Add All Token"
+msgstr ""
+
+#: corptools/templates/corptools/base_bs5.html:176
+#: corptools/templates/corptools/character/react_base.html:177
+msgid "Loading Page"
+msgstr ""
+
+#: corptools/templates/corptools/base_bs5.html:177
+#: corptools/templates/corptools/character/react_base.html:178
+msgid "Please Wait"
+msgstr ""
+
+#: corptools/templates/corptools/base_bs5.html:195
+#: corptools/templates/corptools/character/react_base.html:196
+msgid "Error Loading JavaScript"
+msgstr ""
+
+#: corptools/templates/corptools/base_bs5.html:196
+#: corptools/templates/corptools/character/react_base.html:197
+msgid "Check Browser Console for Logs"
+msgstr ""
+
+#: corptools/templates/corptools/character/assets_lists.html:16
+msgid "Sub-Capital Ships"
+msgstr ""
+
+#: corptools/templates/corptools/character/assets_lists.html:28
+msgid "Notable Others Assets"
+msgstr ""
+
+#: corptools/templates/corptools/character/assets_lists.html:40
+msgid "BPO's"
+msgstr ""
+
+#: corptools/templates/corptools/character/assets_lists.html:64
+msgid "Rest"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_base.html:200
+#: corptools/templates/corptools/corp_menu.html:10
+#: corptools/templates/corptools/corporation/corp_base.html:188
+#: corptools/templates/corptools/menu.html:9
+msgid "Toggle navigation"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_base.html:205
+#: corptools/templates/corptools/corp_menu.html:15
+#: corptools/templates/corptools/corporation/corp_base.html:193
+#: corptools/templates/corptools/menu.html:14
+msgid "Account Audit"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_base.html:217
+#: corptools/templates/corptools/corp_menu.html:26
+#: corptools/templates/corptools/corporation/corp_base.html:219
+#: corptools/templates/corptools/menu.html:32
+msgid "Add Character Token"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_base.html:221
+#: corptools/templates/corptools/corp_menu.html:30
+#: corptools/templates/corptools/corporation/corp_base.html:223
+#: corptools/templates/corptools/menu.html:36
+msgid "Add Corporate Token"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_base.html:224
+#: corptools/templates/corptools/character/public.html:24
+#: corptools/templates/corptools/menu.html:25
+msgid "Corporations"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_base.html:228
+msgid "New UI"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_base.html:253
+#: corptools/templates/corptools/corporation/corp_base.html:251
+msgid "Linked characters"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_base.html:257
+#: corptools/templates/corptools/corporation/corp_base.html:255
+msgid "More"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_base.html:259
+#: corptools/templates/corptools/corporation/corp_base.html:257
+msgid "Total Account ISK"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_menu.html:4
+#: corptools/templates/corptools/corporation/corp_base.html:199
+msgid "Overview"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_menu.html:7
+#: corptools/templates/corptools/character/status.html:34
+#: corptools/templates/corptools/corporation/corp_base.html:253
+msgid "Public Data"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_menu.html:14
+#: corptools/templates/corptools/character/status.html:38
+#: corptools/templates/corptools/corporation/corp_base.html:202
+#: corptools/templates/corptools/corporation/corp_base.html:253
+msgid "Assets"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_menu.html:43
+msgid "Finance"
+msgstr ""
+
+#: corptools/templates/corptools/character/char_menu.html:81
+#: corptools/templates/corptools/character/contacts.html:7
+#: corptools/templates/corptools/character/status.html:48
+msgid "Contacts"
+msgstr ""
+
+#: corptools/templates/corptools/character/clones.html:26
+msgid "ID"
+msgstr ""
+
+#: corptools/templates/corptools/character/clones.html:27
+#: corptools/templates/corptools/character/market.html:35
+#: corptools/templates/corptools/character/market.html:65
+msgid "Location"
+msgstr ""
+
+#: corptools/templates/corptools/character/clones.html:28
+msgid "Implants"
+msgstr ""
+
+#: corptools/templates/corptools/character/clones.html:35
+msgid "None"
+msgstr ""
+
+#: corptools/templates/corptools/character/clones.html:39
+msgid "No Clones"
+msgstr ""
+
+#: corptools/templates/corptools/character/contacts.html:12
+msgid "Name"
+msgstr ""
+
+#: corptools/templates/corptools/character/contacts.html:13
+msgid "Standing"
+msgstr ""
+
+#: corptools/templates/corptools/character/contacts.html:14
+msgid "Labels"
+msgstr ""
+
+#: corptools/templates/corptools/character/contacts.html:15
+#: corptools/templates/corptools/character/contacts.html:17
+msgid "Blocked"
+msgstr ""
+
+#: corptools/templates/corptools/character/contacts.html:16
+#: corptools/templates/corptools/character/contacts.html:18
+msgid "Watched"
+msgstr ""
+
+#: corptools/templates/corptools/character/contacts.html:19
+msgid "Owner"
+msgstr ""
+
+#: corptools/templates/corptools/character/contacts.html:49
+#: corptools/templates/corptools/character/contacts.html:57
+msgid "Yes"
+msgstr ""
+
+#: corptools/templates/corptools/character/contacts.html:51
+#: corptools/templates/corptools/character/contacts.html:59
+msgid "No"
+msgstr ""
+
+#: corptools/templates/corptools/character/doctrine_upload.html:4
+msgid "Upload"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:11
+msgid "Sell Order Total"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:19
+msgid "Buy Order Total"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:27
+msgid "Active Orders"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:31
+#: corptools/templates/corptools/character/market.html:60
+#: corptools/templates/corptools/character/notifications.html:13
+#: corptools/templates/corptools/character/wallet.html:13
+msgid "Date"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:32
+#: corptools/templates/corptools/character/market.html:62
+msgid "Item"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:33
+#: corptools/templates/corptools/character/market.html:63
+msgid "Item Price"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:36
+#: corptools/templates/corptools/character/market.html:66
+#: corptools/templates/corptools/character/wallet.html:20
+msgid "Character Filter"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:37
+#: corptools/templates/corptools/character/market.html:67
+msgid "Buy/Sell"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:42
+#: corptools/templates/corptools/character/market.html:72
+msgid "day"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:45
+#: corptools/templates/corptools/character/market.html:76
+msgid "of"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:48
+#: corptools/templates/corptools/character/market.html:79
+msgid "Buy"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:48
+#: corptools/templates/corptools/character/market.html:79
+msgid "Sell"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:56
+msgid "Completed Orders"
+msgstr ""
+
+#: corptools/templates/corptools/character/market.html:61
+msgid "State"
+msgstr ""
+
+#: corptools/templates/corptools/character/notifications.html:9
+#: corptools/templates/corptools/character/wallet.html:9
+#: corptools/templates/corptools/corporation/corp_base.html:253
+msgid "Wallets"
+msgstr ""
+
+#: corptools/templates/corptools/character/notifications.html:15
+msgid "Type"
+msgstr ""
+
+#: corptools/templates/corptools/character/notifications.html:16
+msgid "Text"
+msgstr ""
+
+#: corptools/templates/corptools/character/notifications.html:17
+msgid "Read"
+msgstr ""
+
+#: corptools/templates/corptools/character/public.html:15
+#: corptools/templates/corptools/character/skills.html:37
+#: corptools/templates/corptools/character/status.html:20
+msgid "Total SP"
+msgstr ""
+
+#: corptools/templates/corptools/character/public.html:16
+#: corptools/templates/corptools/character/status.html:21
+msgid "Isk"
+msgstr ""
+
+#: corptools/templates/corptools/character/public.html:25
+msgid "Joined"
+msgstr ""
+
+#: corptools/templates/corptools/character/public.html:42
+msgid "No Data"
+msgstr ""
+
+#: corptools/templates/corptools/character/public.html:43
+msgid "You probably need to load a token, or wait for an update to run"
+msgstr ""
+
+#: corptools/templates/corptools/character/roles.html:11
+msgid "Character Roles"
+msgstr ""
+
+#: corptools/templates/corptools/character/roles.html:15
+#: corptools/templates/corptools/corp_menu.html:46
+#: corptools/templates/corptools/menu.html:50
+msgid "Corporation"
+msgstr ""
+
+#: corptools/templates/corptools/character/roles.html:16
+msgid "Director"
+msgstr ""
+
+#: corptools/templates/corptools/character/roles.html:17
+msgid "Accountant"
+msgstr ""
+
+#: corptools/templates/corptools/character/roles.html:18
+msgid "Station Manager"
+msgstr ""
+
+#: corptools/templates/corptools/character/roles.html:19
+msgid "Personnel Manager"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:23
+msgid "Doctrine Checker"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:32
+msgid "No Doctrines Loaded"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:38
+msgid "Unallocated SP"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:39
+msgid "Estimated Clone State"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:39
+msgid "Omega"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:39
+msgid "Alpha"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:44
+#: corptools/templates/corptools/character/skills.html:63
+msgid "Skill"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:45
+#: corptools/templates/corptools/character/skills.html:64
+msgid "Level"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:46
+msgid "Group"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:60
+msgid "Queue"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:65
+msgid "Completion"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:66
+msgid "item"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:79
+msgid "Not Training"
+msgstr ""
+
+#: corptools/templates/corptools/character/skills.html:95
+msgid "Account Checks"
+msgstr ""
+
+#: corptools/templates/corptools/character/status.html:27
+msgid "Dataset"
+msgstr ""
+
+#: corptools/templates/corptools/character/status.html:28
+msgid "Last Update"
+msgstr ""
+
+#: corptools/templates/corptools/character/status.html:34
+#: corptools/templates/corptools/character/status.html:38
+#: corptools/templates/corptools/character/status.html:43
+#: corptools/templates/corptools/character/status.html:48
+#: corptools/templates/corptools/character/status.html:53
+#: corptools/templates/corptools/character/status.html:58
+#: corptools/templates/corptools/character/status.html:63
+#: corptools/templates/corptools/character/status.html:68
+#: corptools/templates/corptools/character/status.html:70
+#: corptools/templates/corptools/character/status.html:75
+#: corptools/templates/corptools/character/status.html:78
+#: corptools/templates/corptools/character/status.html:83
+#: corptools/templates/corptools/corporation/corp_base.html:253
+msgid "ago"
+msgstr ""
+
+#: corptools/templates/corptools/character/status.html:53
+msgid "Orders"
+msgstr ""
+
+#: corptools/templates/corptools/character/status.html:63
+msgid "Mails"
+msgstr ""
+
+#: corptools/templates/corptools/character/status.html:70
+msgid "Titles"
+msgstr ""
+
+#: corptools/templates/corptools/character/status.html:78
+#: corptools/templates/corptools/corporation/corp_base.html:253
+msgid "Skill Que"
+msgstr ""
+
+#: corptools/templates/corptools/character/wallet.html:14
+msgid "From"
+msgstr ""
+
+#: corptools/templates/corptools/character/wallet.html:15
+msgid "To"
+msgstr ""
+
+#: corptools/templates/corptools/character/wallet.html:16
+msgid "Amount"
+msgstr ""
+
+#: corptools/templates/corptools/character/wallet.html:17
+msgid "Balance"
+msgstr ""
+
+#: corptools/templates/corptools/character/wallet.html:18
+msgid "Reason"
+msgstr ""
+
+#: corptools/templates/corptools/character/wallet.html:19
+msgid "Ref Type"
+msgstr ""
+
+#: corptools/templates/corptools/character/wallet.html:47
+msgid "Interaction Map"
+msgstr ""
+
+#: corptools/templates/corptools/character/wallet.html:51
+msgid "Toggle to"
+msgstr ""
+
+#: corptools/templates/corptools/character/wallet.html:51
+msgid "Isk Amount"
+msgstr ""
+
+#: corptools/templates/corptools/corp_menu.html:21
+#: corptools/templates/corptools/menu.html:20
+msgid "DB Admin"
+msgstr ""
+
+#: corptools/templates/corptools/corp_menu.html:47
+#: corptools/templates/corptools/menu.html:51
+msgid "Alliance"
+msgstr ""
+
+#: corptools/templates/corptools/corp_menu.html:48
+msgid "Wallet Updates"
+msgstr ""
+
+#: corptools/templates/corptools/corp_menu.html:49
+msgid "Asset Updates"
+msgstr ""
+
+#: corptools/templates/corptools/corp_menu.html:50
+msgid "Structure Updates"
+msgstr ""
+
+#: corptools/templates/corptools/corporation/corp_base.html:253
+msgid "title"
+msgstr ""
+
+#: corptools/templates/corptools/corporation/react_base.html:3
+msgid "Corporation Audit"
+msgstr ""
+
+#: corptools/templates/corptools/dashboard.corptools.status.html:10
+msgid "Add Character"
+msgstr ""
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:80
+msgid "No Structures Available"
+msgstr ""
+
+#: corptools/templates/corptools/fittings/characters.html:3
+msgid "Character Skill Checks"
+msgstr ""
+
+#: corptools/templates/corptools/fittings/characters.html:27
+msgid "Skills Required"
+msgstr ""
+
+#: corptools/templates/corptools/fittings/characters.html:31
+msgid "Basic skills required to"
+msgstr ""
+
+#: corptools/templates/corptools/fittings/characters.html:31
+msgid "sit in the hull"
+msgstr ""
+
+#: corptools/templates/corptools/fittings/characters.html:31
+msgid "and"
+msgstr ""
+
+#: corptools/templates/corptools/fittings/characters.html:31
+msgid "fit the modules"
+msgstr ""
+
+#: corptools/templates/corptools/fittings/characters.html:31
+msgid "Extra skills may be required to use this fitting in fleets"
+msgstr ""
+
+#: corptools/templates/corptools/menu.html:49
+msgid "Main Character"
+msgstr ""
+
+#: corptools/templates/corptools/menu.html:52
+msgid "Alts"
+msgstr ""
+
+#: corptools/validators.py:12
+msgid "This is not valid JSON, please check it and try again."
+msgstr ""

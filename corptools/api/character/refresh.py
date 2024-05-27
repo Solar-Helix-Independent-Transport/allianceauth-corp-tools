@@ -1,6 +1,10 @@
-from allianceauth.eveonline.tasks import \
-    update_character as eve_character_update
 from ninja import NinjaAPI
+
+from django.utils.translation import gettext_lazy as _
+
+from allianceauth.eveonline.tasks import (
+    update_character as eve_character_update,
+)
 
 from corptools import app_settings, models, tasks
 from corptools.api import schema
@@ -39,7 +43,7 @@ class RefreshApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 

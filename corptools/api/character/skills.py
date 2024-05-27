@@ -2,6 +2,8 @@ from typing import List
 
 from ninja import NinjaAPI
 
+from django.utils.translation import gettext_lazy as _
+
 from corptools import models, providers
 from corptools.api import schema
 from corptools.api.helpers import get_alts_queryset, get_main_character
@@ -24,7 +26,7 @@ class SkillApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -72,7 +74,7 @@ class SkillApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -109,7 +111,7 @@ class SkillApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -155,7 +157,7 @@ class SkillApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 

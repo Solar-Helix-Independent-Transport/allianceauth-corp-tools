@@ -1,31 +1,31 @@
 import datetime
 import json
-import logging
-import os
 from collections import defaultdict
 
-from allianceauth.authentication.models import CharacterOwnership, UserProfile
-from allianceauth.eveonline.evelinks import eveimageserver
-from allianceauth.eveonline.models import (EveAllianceInfo, EveCharacter,
-                                           EveCorporationInfo)
-from allianceauth.notifications import notify
+from model_utils import Choices
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
-from django.db.models import Count, Max
+from django.db.models import Max
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from esi.errors import TokenError
-from esi.models import Token
-from model_utils import Choices
-from pyexpat import model
+
+from allianceauth.authentication.models import CharacterOwnership
+from allianceauth.eveonline.evelinks import eveimageserver
+from allianceauth.eveonline.models import (
+    EveAllianceInfo, EveCharacter, EveCorporationInfo,
+)
+from allianceauth.services.hooks import get_extension_logger
 
 from . import app_settings, providers, validators
-from .managers import (AuditCharacterManager, AuditCorporationManager,
-                       EveCategoryManager, EveGroupManager, EveItemTypeManager,
-                       EveMoonManager, EveNameManager, EvePlanetManager)
+from .managers import (
+    AuditCharacterManager, AuditCorporationManager, EveCategoryManager,
+    EveGroupManager, EveItemTypeManager, EveMoonManager, EveNameManager,
+    EvePlanetManager,
+)
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 class CorptoolsConfiguration(models.Model):
@@ -125,7 +125,7 @@ class CharacterAudit(models.Model):
         null=True, default=None, blank=True)
 
     def __str__(self):
-        return "{}'s Character Data".format(self.character.character_name)
+        return f"{self.character.character_name}'s Character Data"
 
     class Meta:
         permissions = (('corp_hr', 'Can access other character\'s data for own corp.'),
@@ -170,7 +170,7 @@ class CharacterAudit(models.Model):
                 self.save()
 
             return is_active
-        except:
+        except Exception:
             return False
 
 
@@ -220,7 +220,7 @@ class CorporationAudit(models.Model):
         null=True, default=None, blank=True)
 
     def __str__(self):
-        return "{}'s Corporation Data".format(self.corporation.corporation_name)
+        return f"{self.corporation.corporation_name}'s Corporation Data"
 
     class Meta:
         permissions = (
@@ -509,7 +509,7 @@ class SkillTotalHistory(models.Model):
 
     @property
     def sp(self):
-        return self.total_sp+self.unallocated_sp
+        return self.total_sp + self.unallocated_sp
 
 
 class Skill(models.Model):
@@ -1027,7 +1027,7 @@ class Structure(models.Model):
             last_ozone = BridgeOzoneLevel.objects.filter(
                 station_id=self.structure_id).order_by('-date')[:1][0].quantity
             return last_ozone
-        except:
+        except Exception:
             return False
 
     @property
@@ -1093,7 +1093,7 @@ class Poco(models.Model):
             corps_holding = CorptoolsConfiguration.objects.get(
                 id=1).holding_corp_qs()
             corps_vis = corps_vis | corps_holding
-        #update_time_filter = timezone.now() - datetime.timedelta(days=7)
+        # update_time_filter = timezone.now() - datetime.timedelta(days=7)
         # , corporation__last_update_pocos__gte=update_time_filter)
         return cls.objects.filter(corporation__in=corps_vis)
 
@@ -1249,7 +1249,7 @@ class CharacterContactLabel(ContactLabel):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
 
     def build_id(self):
-        self.id = int(str(self.character_id)+str(self.label_id))
+        self.id = int(str(self.character_id) + str(self.label_id))
         return self.id
 
 
@@ -1264,7 +1264,7 @@ class CharacterContact(Contact):
     labels = models.ManyToManyField(CharacterContactLabel)
 
     def build_id(self):
-        self.id = int(str(self.character_id)+str(self.contact_id))
+        self.id = int(str(self.character_id) + str(self.contact_id))
         return self.id
 
 
@@ -1686,7 +1686,7 @@ class Skillfilter(FilterBase):
                     for d_name, d_list in skill_list_base.items():
                         if len(skill_tables[char]["doctrines"][d_name]) == 0:
                             skill_list_base[d_name]['pass'] = True
-                            message.append("{}: {}".format(char, d_name))
+                            message.append(f"{char}: {d_name}")
 
                 if req_one.count() > 0:
                     single_pass = False
@@ -1694,7 +1694,7 @@ class Skillfilter(FilterBase):
                         for d_name, d_list in skill_list_single.items():
                             if len(skill_tables[char]["doctrines"][d_name]) == 0:
                                 single_pass = True
-                                message.append("{}: {}".format(char, d_name))
+                                message.append(f"{char}: {d_name}")
                                 break
 
                 result = True

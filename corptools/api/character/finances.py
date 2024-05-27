@@ -1,13 +1,16 @@
 from typing import List
 
-from django.db.models import Count, F, Sum
 from ninja import NinjaAPI
 from ninja.pagination import paginate
 
+from django.db.models import Count, F, Sum
+from django.utils.translation import gettext_lazy as _
+
 from corptools import models
 from corptools.api import schema
-from corptools.api.helpers import (Paginator, get_alts_queryset,
-                                   get_main_character)
+from corptools.api.helpers import (
+    Paginator, get_alts_queryset, get_main_character,
+)
 
 
 class FinancesApiEndpoints:
@@ -28,7 +31,7 @@ class FinancesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -48,7 +51,7 @@ class FinancesApiEndpoints:
                             "name": w.first_party_name.name,
                             "cat": w.first_party_name.category,
                         },
-                        "second_party":  {
+                        "second_party": {
                             "id": w.second_party_id,
                             "name": w.second_party_name.name,
                             "cat": w.second_party_name.category,
@@ -72,7 +75,7 @@ class FinancesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -117,7 +120,7 @@ class FinancesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -133,7 +136,7 @@ class FinancesApiEndpoints:
             output = {"active": [], "expired": [],
                       "total_active": 0, "total_expired": 0}
             for w in market_data_current:
-                output['total_active'] += w.price*w.volume_remain
+                output['total_active'] += w.price * w.volume_remain
                 o = {
                     "character": w.character.character,
                     "date": w.issued,
@@ -157,7 +160,7 @@ class FinancesApiEndpoints:
                 output["active"].append(o)
 
             for w in market_data_old:
-                output['total_expired'] += w.price*w.volume_total
+                output['total_expired'] += w.price * w.volume_total
                 o = {
                     "character": w.character.character,
                     "date": w.issued,
@@ -187,10 +190,10 @@ class FinancesApiEndpoints:
             tags=self.tags
         )
         def get_character_wallet_activity(request, character_id: int):
-            if not (request.user.has_perm("corptools.global_corp_manager") or
-                    request.user.has_perm("corptools.state_corp_manager") or
-                    request.user.has_perm("corptools.alliance_corp_manager") or
-                    request.user.has_perm("corptools.own_corp_manager")):
+            if not (request.user.has_perm("corptools.global_corp_manager")
+                    or request.user.has_perm("corptools.state_corp_manager")
+                    or request.user.has_perm("corptools.alliance_corp_manager")
+                    or request.user.has_perm("corptools.own_corp_manager")):
                 return []
 
             if character_id == 0:
@@ -198,7 +201,7 @@ class FinancesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
             ref_types = ["player_donation", "player_trading",
@@ -261,7 +264,7 @@ class FinancesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -296,7 +299,6 @@ class FinancesApiEndpoints:
                     "price": c.price or 0,
                     "reward": c.reward or 0,
                     "volume": c.volume or 0,
-                    "days_to_complete": c.days_to_complete,
                     "start_location_id": c.start_location_id,
                     "end_location_id": c.end_location_id,
                     "for_corporation": c.for_corporation,
@@ -325,7 +327,7 @@ class FinancesApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 

@@ -1,7 +1,9 @@
 from typing import List
 
-from django.db.models import F, Q, Sum
 from ninja import NinjaAPI
+
+from django.db.models import F, Q, Sum
+from django.utils.translation import gettext_lazy as _
 
 from corptools import models
 from corptools.api import schema
@@ -25,7 +27,7 @@ class AssetsApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -34,8 +36,8 @@ class AssetsApiEndpoints:
             asset_locs = models.EveLocation.objects.filter(
                 location_id__in=asset_locs).order_by('location_name')
 
-            asset_locations = [{"label": "Everywhere", "value": 0},
-                               {"label": "AssetSafety", "value": 2004}, ]
+            asset_locations = [{"label": _("Everywhere"), "value": 0},
+                               {"label": _("AssetSafety"), "value": 2004}, ]
             for loc in asset_locs:
                 asset_locations.append({
                     "label": loc.location_name,
@@ -57,7 +59,7 @@ class AssetsApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -116,7 +118,7 @@ class AssetsApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -165,7 +167,7 @@ class AssetsApiEndpoints:
             response, main = get_main_character(request, character_id)
 
             if not response:
-                return 403, "Permission Denied"
+                return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
 
@@ -222,16 +224,16 @@ class AssetsApiEndpoints:
                     remaining_asset_groups.append(_grp)
 
             return [
-                {"name": "Capital Ships",
+                {"name": _("Capital Ships"),
                  "items": capital_asset_groups},
-                {"name": "Subcaps Ships",
+                {"name": _("Subcaps Ships"),
                  "items": subcap_asset_groups},
-                {"name": "Noteable Assets",
+                {"name": _("Noteable Assets"),
                  "items": noteable_asset_groups},
-                {"name": "Structures",
+                {"name": _("Structures"),
                  "items": structure_asset_groups},
-                {"name": "BPO",
+                {"name": _("BPO"),
                  "items": bpo_asset_groups},
-                {"name": "Remaining",
+                {"name": _("Remaining"),
                  "items": remaining_asset_groups},
             ]
