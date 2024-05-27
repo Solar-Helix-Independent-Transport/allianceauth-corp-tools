@@ -208,7 +208,7 @@ class assetFilterAdmin(admin.ModelAdmin):
 
 class CurrentShipFilterAdmin(admin.ModelAdmin):
 
-    list_display = ['__str__', '_types', '_groups', '_cats',
+    list_display = ['__str__', '_types', '_groups',
                     '_systems', '_constellations', '_regions']
 
     def _list_2_html_w_tooltips(self, my_items: list, max_items: int) -> str:
@@ -251,17 +251,6 @@ class CurrentShipFilterAdmin(admin.ModelAdmin):
         )
 
     @admin.display(
-        description='categories'
-    )
-    def _cats(self, obj):
-        my_cats = [x.name for x in obj.categories.order_by('name')]
-
-        return self._list_2_html_w_tooltips(
-            my_cats,
-            10
-        )
-
-    @admin.display(
         description='systems'
     )
     def _systems(self, obj):
@@ -296,7 +285,6 @@ class CurrentShipFilterAdmin(admin.ModelAdmin):
 
     filter_horizontal = ["types",
                          "groups",
-                         "categories",
                          "systems",
                          "constellations",
                          "regions"]
