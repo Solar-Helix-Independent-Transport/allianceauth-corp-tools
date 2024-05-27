@@ -1,6 +1,8 @@
-{% extends 'allianceauth/base-bs5.html' %}
+{% extends "allianceauth/base-bs5.html" %}
 {% load i18n %}
-{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_title %}
+    {{ page_title }}
+{% endblock page_title %}
 {% block extra_css %}
     <style>
         .flex-container-main {
@@ -105,7 +107,7 @@
             }
         }
     </style>
-{% endblock %}
+{% endblock extra_css %}
 {% block extra_javascript %}
     <script type="text/javascript">
         var BASE_URL = '/static/{{app_name}}/';

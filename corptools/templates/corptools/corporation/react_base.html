@@ -1,8 +1,8 @@
-{% extends 'allianceauth/base.html' %}
+{% extends "allianceauth/base.html" %}
 {% load i18n %}
 {% block page_title %}
     {% translate "Corporation Audit" %}
-{% endblock %}
+{% endblock page_title %}
 {% block extra_css %}
     <style type="text/css">
         .lds-ripple,
@@ -54,7 +54,7 @@
             align-items: center;
         }
     </style>
-{% endblock %}
+{% endblock extra_css %}
 {% block extra_javascript %}
     <script type="text/javascript">
         var BASE_URL = '/static/corptools/corp/';

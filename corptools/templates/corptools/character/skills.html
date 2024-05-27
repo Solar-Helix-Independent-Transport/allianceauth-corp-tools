@@ -1,4 +1,4 @@
-{% extends 'corptools/character/char_base.html' %}
+{% extends "corptools/character/char_base.html" %}
 {% load humanize %}
 {% load i18n %}
 {% load evelinks %}
@@ -127,9 +127,9 @@
 </div>
 </div>
 
-{% endblock %}
+{% endblock ct_block %}
 {% block extra_javascript %}
-    {% include 'bundles/datatables-js.html' %}
+    {% include "bundles/datatables-js.html" %}
     <script>
         ! function(t) {
             function e(t) {
@@ -202,7 +202,7 @@
         }(jQuery);
     </script>
 
-{% endblock %}
+{% endblock extra_javascript %}
 {% block ct_extra_script %}
     var groupColumn = 2;
 
@@ -301,4 +301,4 @@
     $("#modal-main").modal();
     });
 
-{% endblock %}
+{% endblock ct_extra_script %}

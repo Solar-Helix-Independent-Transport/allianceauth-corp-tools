@@ -1,4 +1,4 @@
-{% extends 'corptools/character/char_base.html' %}
+{% extends "corptools/character/char_base.html" %}
 {% load colors %}
 {% load l10n %}
 {% load i18n %}
@@ -58,9 +58,9 @@
             {% endif %}
         </div>
 
-    {% endblock %}
+    {% endblock ct_block %}
     {% block extra_javascript %}
-        {% include 'bundles/datatables-js.html' %}
+        {% include "bundles/datatables-js.html" %}
 
         <script src="https://www.amcharts.com/lib/4/core.js"></script>
         <script src="https://www.amcharts.com/lib/4/charts.js"></script>
@@ -139,7 +139,7 @@
                 })
             }(jQuery);
         </script>
-    {% endblock %}
+    {% endbloc extra_javascriptk %}
     {% block ct_extra_script %}
 
         $(document).ready(function() {
@@ -400,4 +400,4 @@
         chart_polar.cursor.lineX.fillOpacity = 0.1;
         chart_polar.cursor.lineX.fill = am4core.color("#000000");
         }); // end am4core.ready()
-    {% endblock %}
+    {% endblock ct_extra_script %}

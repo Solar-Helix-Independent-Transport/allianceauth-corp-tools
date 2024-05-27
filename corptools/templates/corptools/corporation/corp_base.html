@@ -1,12 +1,12 @@
-{% extends 'allianceauth/base.html' %}
+{% extends "allianceauth/base.html" %}
 {% load i18n %}
 {% load humanize %}
 {% load helpers %}
 {% block page_title %}
     {% app_name %}
-{% endblock %}
+{% endblock page_title %}
 {% block extra_css %}
-    {% include 'bundles/datatables-css.html' %}
+    {% include "bundles/datatables-css.html" %}
 
     <style>
         .noheader thead {
@@ -296,15 +296,17 @@
                             </div>
                         </div>
                     </div>
-                    {% block ct_block %}{% endblock %}
+                    {% block ct_block %}
+                    {% endblock ct_block %}
                 </div>
-            {% endblock %}
+            {% endblock content %}
 
             {% block extra_script %}
                 $(document).ready(function() {
                 $("[rel='tooltip']").tooltip();
                 }
                 )
-                {% block ct_extra_script %}{% endblock %}
+                {% block ct_extra_script %}
+                {% endblock ct_extra_script %}
 
-            {% endblock %}
+            {% endblock extra_script %}

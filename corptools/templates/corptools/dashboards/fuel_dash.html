@@ -1,4 +1,4 @@
-{% extends 'allianceauth/base-bs5.html' %}
+{% extends "allianceauth/base-bs5.html" %}
 {% load i18n %}
 {% load static %}
 {% load humanize %}
@@ -105,12 +105,12 @@
 {% else %}
 <div class="alert alert-warning text-center">{% translate "No Structures Available" %}</div>
 {% endif %}
-{% endblock %}
+{% endblock content %}
 {% block extra_javascript %}
-    {% include 'bundles/datatables-js-bs5.html' %}
-    <script src="{% static 'allianceauth/js/filterDropDown/filterDropDown.min.js' %}"></script>
+    {% include "bundles/datatables-js-bs5.html" %}
+    {% include "bundles/filterdropdown-js.html" %}
 
-{% endblock %}
+{% endblock extra_javascript %}
 {% block extra_script %}
     function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -228,12 +228,12 @@
     fuelInput.addEventListener('input', inputHandler);
 
     });
-{% endblock %}
+{% endblock extra_script %}
 {% block extra_css %}
     <style>
         body {
             table-layout: fixed;
         }
     </style>
-    {% include 'bundles/datatables-css-bs5.html' %}
-{% endblock %}
+    {% include "bundles/datatables-css-bs5.html" %}
+{% endblock extra_css %}

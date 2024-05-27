@@ -1,4 +1,4 @@
-{% extends 'corptools/base.html' %}
+{% extends "corptools/base.html" %}
 {% load i18n %}
 <!-- TODO Make this nicer in some way... -->
 {% block ct_block %}
@@ -89,9 +89,9 @@
                     </table>
                 </div>
 
-            {% endblock %}
+            {% endblock ct_block %}
             {% block extra_javascript %}
-                {% include 'bundles/datatables-js.html' %}
+                {% include "bundles/datatables-js.html" %}
                 <script>
                     ! function(t) {
                         function e(t) {
@@ -163,7 +163,7 @@
                         })
                     }(jQuery);
                 </script>
-            {% endblock %}
+            {% endblock extra_javascript %}
             {% block extra_script %}
                 $(document).ready(function() {
                 $('#characters').DataTable({
@@ -185,4 +185,4 @@
                 "pageLength": 25
                 });
                 });
-            {% endblock %}
+            {% endblock extra_script %}
