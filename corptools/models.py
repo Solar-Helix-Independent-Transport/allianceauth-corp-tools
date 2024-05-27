@@ -1599,6 +1599,118 @@ class AssetsFilter(FilterBase):
         return output
 
 
+class CurrentShipFilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: The Current Ship being Flown"
+        verbose_name_plural = verbose_name
+    count_message_only = models.BooleanField(default=False)
+
+    types = models.ManyToManyField(EveItemType, blank=True,
+                                   help_text="Filter on Asset Types.")
+    groups = models.ManyToManyField(EveItemGroup, blank=True,
+                                    help_text="Filter on Asset Groups.")
+    categories = models.ManyToManyField(EveItemCategory, blank=True,
+                                        help_text="Filter on Asset Categories.")
+
+    systems = models.ManyToManyField(MapSystem, blank=True,
+                                     help_text="Limit filter to specific systems")
+    constellations = models.ManyToManyField(MapConstellation, blank=True,
+                                            help_text="Limit filter to specific constellations")
+    regions = models.ManyToManyField(MapRegion, blank=True,
+                                     help_text="Limit filter to specific regions")
+
+    def filter_query(self, users):
+        character_list = CharacterOwnership.objects.filter(user__in=users) \
+            .select_related('character', "character__characteraudit")
+        cnt_types = self.types.all().count()
+        cnt_groups = self.groups.all().count()
+        cnt_cats = self.categories.all().count()
+
+        character_count = CharacterLocation.objects.filter(
+            character__character__in=character_list.values_list('character'))
+        output = []
+
+        if cnt_types > 0:
+            output.append(models.Q(current_ship__in=self.types.all()))
+
+        if cnt_groups > 0:
+            output.append(models.Q(current_ship__group__in=self.groups.all()))
+
+        if cnt_cats > 0:
+            output.append(
+                models.Q(current_ship__group__category__in=self.categories.all()))
+
+        if len(output) == 0:
+            return False
+
+        query = output.pop()
+        for _q in output:
+            query |= _q
+        character_count = character_count.filter(query)
+
+        output = []
+
+        if self.systems.all().count() > 0:
+            output.append(models.Q(current_location__system__in=self.systems.all()))
+            output.append(models.Q(current_location__system_id=self.systems.all().values_list('system_id', flat=True)))
+        if self.constellations.all().count() > 0:
+            output.append(models.Q(current_location__system__constellation__in=self.constellations.all()))
+            output.append(models.Q(current_location__system_id=MapSystem.objects.filter(
+                constellation__in=self.constellations.all()).values_list('system_id', flat=True)))
+        if self.regions.all().count() > 0:
+            output.append(models.Q(current_location__system__constellation__region__in=self.regions.all()))
+            output.append(models.Q(current_location__system_id=MapSystem.objects.filter(
+                constellation__region__in=self.regions.all()).values_list('system_id', flat=True)))
+
+        if len(output) > 0:
+            query = output.pop()
+            for _q in output:
+                query |= _q
+            character_count = character_count.filter(query)
+        return character_count
+
+    def process_filter(self, user: User):
+        try:
+            co = self.filter_query([user])
+            # print(character_count.query)
+            if co.count() > 0:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False
+
+    def audit_filter(self, users):
+        co = self.filter_query(users).values("character__character__character_ownership__user", "character__character__character_name", "current_ship_name")
+        chars = defaultdict(dict)
+        for c in co:
+            uid = c["character__character__character_ownership__user"]
+            char_name = c["character__character__character_name"]
+            asset_type = c['current_ship_name']
+            if char_name not in chars[uid]:
+                chars[uid][char_name] = []
+            chars[uid][char_name].append(asset_type)
+
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for u in users:
+            if len(chars[u.id]) > 0:
+                dread_count = 0
+                out_message = []
+                for char, char_items in chars[u.id].items():
+                    dread_count += len(char_items)
+                    out_message.append(
+                        f"{char}: {', '.join(list(set(char_items)))}")
+                if self.count_message_only:
+                    output[u.id] = {"message": dread_count, "check": True}
+                else:
+                    output[u.id] = {"message": "<br>".join(
+                        out_message), "check": True}
+            else:
+                output[u.id] = {"message": "", "check": False}
+        return output
+
+
 class Skillfilter(FilterBase):
     class Meta:
         verbose_name = "Smart Filter: Skill list checks"

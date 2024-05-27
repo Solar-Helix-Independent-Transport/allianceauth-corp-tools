@@ -206,6 +206,102 @@ class assetFilterAdmin(admin.ModelAdmin):
                          "regions"]
 
 
+class CurrentShipFilterAdmin(admin.ModelAdmin):
+
+    list_display = ['__str__', '_types', '_groups', '_cats',
+                    '_systems', '_constellations', '_regions']
+
+    def _list_2_html_w_tooltips(self, my_items: list, max_items: int) -> str:
+        """converts list of strings into HTML with cutoff and tooltip"""
+        items_truncated_str = ', '.join(my_items[:max_items])
+        if not my_items:
+            result = None
+        elif len(my_items) <= max_items:
+            result = items_truncated_str
+        else:
+            items_truncated_str += ', (...)'
+            items_all_str = ', '.join(my_items)
+            result = format_html(
+                '<span data-tooltip="{}" class="tooltip">{}</span>',
+                items_all_str,
+                items_truncated_str
+            )
+        return result
+
+    @admin.display(
+        description='types'
+    )
+    def _types(self, obj):
+        my_types = [x.name for x in obj.types.order_by('name')]
+
+        return self._list_2_html_w_tooltips(
+            my_types,
+            10
+        )
+
+    @admin.display(
+        description='groups'
+    )
+    def _groups(self, obj):
+        my_groups = [x.name for x in obj.groups.order_by('name')]
+
+        return self._list_2_html_w_tooltips(
+            my_groups,
+            10
+        )
+
+    @admin.display(
+        description='categories'
+    )
+    def _cats(self, obj):
+        my_cats = [x.name for x in obj.categories.order_by('name')]
+
+        return self._list_2_html_w_tooltips(
+            my_cats,
+            10
+        )
+
+    @admin.display(
+        description='systems'
+    )
+    def _systems(self, obj):
+        my_systems = [x.name for x in obj.systems.order_by('name')]
+
+        return self._list_2_html_w_tooltips(
+            my_systems,
+            10
+        )
+
+    @admin.display(
+        description='constellations'
+    )
+    def _constellations(self, obj):
+        my_constels = [x.name for x in obj.constellations.order_by('name')]
+
+        return self._list_2_html_w_tooltips(
+            my_constels,
+            10
+        )
+
+    @admin.display(
+        description='regions'
+    )
+    def _regions(self, obj):
+        my_regions = [x.name for x in obj.regions.order_by('name')]
+
+        return self._list_2_html_w_tooltips(
+            my_regions,
+            10
+        )
+
+    filter_horizontal = ["types",
+                         "groups",
+                         "categories",
+                         "systems",
+                         "constellations",
+                         "regions"]
+
+
 class skillsFilterAdmin(admin.ModelAdmin):
 
     list_display = ['__str__', '_required_skill_lists',
@@ -295,6 +391,8 @@ if 'securegroups' in settings.INSTALLED_APPS:
     admin.site.register(models.TimeInCorpFilter, TimeInCorpFilterAdmin)
     if app_settings.CT_CHAR_ASSETS_MODULE:
         admin.site.register(models.AssetsFilter, assetFilterAdmin)
+    if app_settings.CT_CHAR_LOCATIONS_MODULE:
+        admin.site.register(models.CurrentShipFilter, CurrentShipFilterAdmin)
     if app_settings.CT_CHAR_SKILLS_MODULE:
         admin.site.register(models.Skillfilter, skillsFilterAdmin)
     if app_settings.CT_CHAR_ROLES_MODULE:
