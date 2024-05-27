@@ -1,20 +1,21 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
+requires = [
+    "flit_core<4,>=3.2",
+]
 
 [project]
 name = "allianceauth-corp-tools"
-dynamic = ["version", "description" ]
 readme = "README.md"
-license = {file = "LICENSE"}
-requires-python = ">=3.8"
-authors = [
-    { name = "AaronKable", email = "aaronkable@gmail.com" },
-]
 keywords = [
     "allianceauth",
     "eveonline",
 ]
+license = {file = "LICENSE"}
+authors = [
+    { name = "AaronKable", email = "aaronkable@gmail.com" },
+]
+requires-python = ">=3.8"
 classifiers = [
     "Environment :: Web Environment",
     "Framework :: Celery",
@@ -25,7 +26,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -33,18 +34,21 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Internet :: WWW/HTTP",
-    "Topic :: Internet :: WWW/HTTP :: Dynamic Content"
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+]
+dynamic = [
+    "description",
+    "version",
 ]
 dependencies = [
-    "allianceauth>=3.0.0,<5.0.0",
-    'django-ninja>=0.19.1'
+    "allianceauth<5.0.0,>=3",
+    "django-ninja>=0.19.1",
+    "networkx",
 ]
-
 [project.optional-dependencies]
 test = [
-    "allianceauth-securegroups"
+    "allianceauth-securegroups",
 ]
-
 [project.urls]
 Homepage = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools"
 Source = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools"
