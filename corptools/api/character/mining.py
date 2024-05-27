@@ -1,12 +1,12 @@
 from datetime import timedelta
 from typing import List, Optional
 
-from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI
 
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
 from corptools import models
-from corptools.api import schema
 from corptools.api.helpers import get_alts_queryset, get_main_character
 
 
@@ -71,7 +71,7 @@ class MiningApiEndpoints:
             t_val = 0
             t_vol = 0
             output = {}
-            for t in [(timezone.now() - timedelta(days=i)).date() for i in range(look_back+1)]:
+            for t in [(timezone.now() - timedelta(days=i)).date() for i in range(look_back + 1)]:
                 output[str(t)] = {
                     "date": str(t),
                     "ores": {},
@@ -85,7 +85,7 @@ class MiningApiEndpoints:
                 all_ores.add(w.type_name.name)
                 all_groups.add(w.type_name.group.name)
                 all_systems.add(w.system.name)
-                vol = w.quantity*w.type_name.volume
+                vol = w.quantity * w.type_name.volume
                 t_vol += vol
 
                 if w.type_name.type_id not in output[_d]["ores"]:

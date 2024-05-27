@@ -1,22 +1,24 @@
 import bz2
-import json
-import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
 from bravado.exception import HTTPForbidden
+
 from django.core.cache import cache
+
+from allianceauth.services.hooks import get_extension_logger
 from esi.models import Token
 
 from corptools import providers
-from corptools.models import (EveItemCategory, EveItemDogmaAttribute,
-                              EveItemGroup, EveItemType, EveLocation,
-                              InvTypeMaterials, MapConstellation, MapRegion,
-                              MapSystem, MapSystemGate)
+from corptools.models import (
+    EveItemCategory, EveItemDogmaAttribute, EveItemGroup, EveItemType,
+    EveLocation, InvTypeMaterials, MapConstellation, MapRegion, MapSystem,
+    MapSystemGate,
+)
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
-#from celery.utils.debug import sample_mem, memdump
+# from celery.utils.debug import sample_mem, memdump
 
 
 def process_map_from_esi():
@@ -139,7 +141,7 @@ def process_map_from_esi():
 
 def update_ore_comp_table_from_fuzzworks():
     # prime the provider or th ram will go bye bye
-    status = providers.esi.client.Status.get_status().result()
+    providers.esi.client.Status.get_status().result()
     # Get needed SDE file
     inv_url = 'https://www.fuzzwork.co.uk/dump/latest/invTypeMaterials.csv.bz2'
 
@@ -155,7 +157,7 @@ def update_ore_comp_table_from_fuzzworks():
     # Parse file(s) and Update names object(s)
     ore_details = []  # new stuff
     mets = set()  # new stuff
-    with open('invTypeMaterials.csv', 'r', encoding='UTF-8') as iN:
+    with open('invTypeMaterials.csv', encoding='UTF-8') as iN:
         csv_list = iN.read().split('\n')
         for row in csv_list[1:]:
             spl = row.split(',')
@@ -170,7 +172,7 @@ def update_ore_comp_table_from_fuzzworks():
                     met_type_id=spl[1]
                 ))
 
-    ids = process_bulk_types_from_esi(mets)
+    process_bulk_types_from_esi(mets)
     # delete it all and start again
     InvTypeMaterials.objects.all().delete()
     InvTypeMaterials.objects.bulk_create(

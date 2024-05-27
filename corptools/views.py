@@ -1,29 +1,36 @@
 import json
-import logging
 import xml.etree.ElementTree as ET
 
-from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
+from django_celery_beat.models import CrontabSchedule, PeriodicTask
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.shortcuts import redirect, render
 from django.template import TemplateDoesNotExist
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
-from django_celery_beat.models import CrontabSchedule, PeriodicTask
+
+from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
+from allianceauth.services.hooks import get_extension_logger
 from esi.decorators import _check_callback, token_required
 from esi.views import sso_redirect
 
 from . import __version__, app_settings
 from .forms import UploadForm
-from .models import *
-from .tasks import (check_account, clear_all_etags, update_all_characters,
-                    update_all_corps, update_all_eve_names,
-                    update_all_locations, update_character, update_corp,
-                    update_or_create_map)
+from .models import (
+    CharacterAudit, CorporationAudit, EveItemCategory, EveItemDogmaAttribute,
+    EveItemGroup, EveItemType, EveLocation, EveName, InvTypeMaterials,
+    MapConstellation, MapJumpBridge, MapRegion, MapSystem, MapSystemGate,
+    SkillList, Structure,
+)
+from .tasks import (
+    check_account, clear_all_etags, update_all_characters, update_all_corps,
+    update_all_eve_names, update_all_locations, update_character, update_corp,
+    update_or_create_map,
+)
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 CORP_REQUIRED_SCOPES = [
 
@@ -266,7 +273,7 @@ def admin_create_tasks(request):
                                                              timezone='UTC'
                                                              )
 
-    task_char = PeriodicTask.objects.update_or_create(
+    PeriodicTask.objects.update_or_create(
         task='corptools.tasks.update_subset_of_characters',
         defaults={
             'crontab': schedule_char,
@@ -279,7 +286,7 @@ def admin_create_tasks(request):
     # else:
     #    messages.info(request, "Reset Character Task to defaults")
 
-    task_corp = PeriodicTask.objects.update_or_create(
+    PeriodicTask.objects.update_or_create(
         task='corptools.tasks.update_all_corps',
         defaults={
             'crontab': schedule_corp,
@@ -381,11 +388,11 @@ def react_corp(request):
 
 @login_required
 def fuel_levels(request):
-    if not (request.user.has_perm('corptools.own_corp_manager') or
-            request.user.has_perm('corptools.alliance_corp_manager') or
-            request.user.has_perm('corptools.state_corp_manager') or
-            request.user.has_perm('corptools.global_corp_manager') or
-            request.user.has_perm('corptools.holding_corp_structures')):
+    if not (request.user.has_perm('corptools.own_corp_manager')
+            or request.user.has_perm('corptools.alliance_corp_manager')
+            or request.user.has_perm('corptools.state_corp_manager')
+            or request.user.has_perm('corptools.global_corp_manager')
+            or request.user.has_perm('corptools.holding_corp_structures')):
         raise PermissionDenied("No perms to view")
 
     # hourly fuel reqs [ cit, eng, ref, flex ]
@@ -444,13 +451,13 @@ def fuel_levels(request):
         hours = 0
 
         if s.fuel_expires is not None:
-            hours = (s.fuel_expires - timezone.now()).total_seconds()//3600
+            hours = (s.fuel_expires - timezone.now()).total_seconds() // 3600
 
         structure_tree.append(
             {'structure': s,
              'fuel_req': structure_hourly_fuel,
-             "current_blocks": int(hours*structure_hourly_fuel),
-             "90day": max(int((structure_hourly_fuel*90*24)-(hours*structure_hourly_fuel)), 0)}
+             "current_blocks": int(hours * structure_hourly_fuel),
+             "90day": max(int((structure_hourly_fuel * 90 * 24) - (hours * structure_hourly_fuel)), 0)}
         )
 
     context = {

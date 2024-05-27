@@ -3,10 +3,12 @@ from typing import List
 
 from ninja import NinjaAPI
 
+from allianceauth.services.hooks import get_extension_logger
+
 from corptools import models
 from corptools.api import schema
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 class FinancesApiEndpoints:
@@ -20,11 +22,11 @@ class FinancesApiEndpoints:
         )
         def get_corporation_wallet_types(request):
             perms = (
-                request.user.has_perm('corptools.own_corp_manager') |
-                request.user.has_perm('corptools.alliance_corp_manager') |
-                request.user.has_perm('corptools.state_corp_manager') |
-                request.user.has_perm('corptools.global_corp_manager') |
-                request.user.has_perm('corptools.holding_corp_wallets')
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_wallets')
             )
 
             if not perms:
@@ -44,11 +46,11 @@ class FinancesApiEndpoints:
         )
         def get_corporation_wallet(request, corporation_id: int, type_refs: str = "", page: int = 1):
             perms = (
-                request.user.has_perm('corptools.own_corp_manager') |
-                request.user.has_perm('corptools.alliance_corp_manager') |
-                request.user.has_perm('corptools.state_corp_manager') |
-                request.user.has_perm('corptools.global_corp_manager') |
-                request.user.has_perm('corptools.holding_corp_wallets')
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_wallets')
             )
 
             if not perms:
@@ -61,8 +63,8 @@ class FinancesApiEndpoints:
                 .select_related('first_party_name', 'second_party_name', 'division')\
                 .order_by("-date")
 
-            start_count = (page-1)*10000
-            end_count = page*10000
+            start_count = (page - 1) * 10000
+            end_count = page * 10000
 
             if type_refs:
                 refs = type_refs.split(",")
@@ -84,7 +86,7 @@ class FinancesApiEndpoints:
                             "name": w.first_party_name.name,
                             "cat": w.first_party_name.category,
                         },
-                        "second_party":  {
+                        "second_party": {
                             "id": w.second_party_id,
                             "name": w.second_party_name.name,
                             "cat": w.second_party_name.category,

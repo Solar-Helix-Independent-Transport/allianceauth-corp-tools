@@ -1,15 +1,17 @@
-import logging
 from typing import List
 
-from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI
+
+from django.utils.translation import gettext_lazy as _
+
+from allianceauth.services.hooks import get_extension_logger
 
 from corptools import models
 from corptools.api import schema
 from corptools.api.helpers import get_alts_queryset, get_main_character
 from corptools.task_helpers.char_tasks import update_character_mail_body
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 class InteractionApiEndpoints:
@@ -135,7 +137,7 @@ class InteractionApiEndpoints:
                     msg = update_character_mail_body(
                         character_id=character_id, mail_message=msg)
                     msg.save()
-                except Exception as e:
+                except Exception:
                     logger.error("failed to fetch mail")
             return 200, {"body": msg.body.replace("size=", "_size_=").replace("color=", "_color_=")}
 

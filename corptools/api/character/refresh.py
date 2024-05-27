@@ -1,7 +1,10 @@
-from allianceauth.eveonline.tasks import \
-    update_character as eve_character_update
-from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI
+
+from django.utils.translation import gettext_lazy as _
+
+from allianceauth.eveonline.tasks import (
+    update_character as eve_character_update,
+)
 
 from corptools import app_settings, models, tasks
 from corptools.api import schema

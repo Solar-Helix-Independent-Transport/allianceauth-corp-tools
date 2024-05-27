@@ -1,12 +1,12 @@
 import json
 from hashlib import md5
 
-from allianceauth.authentication.models import CharacterOwnership
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.utils import timezone
 
-SKILL_CACHE_TIMEOUT_SECONDS = 60*60*48  # 24h
+from allianceauth.authentication.models import CharacterOwnership
+
+SKILL_CACHE_TIMEOUT_SECONDS = 60 * 60 * 48  # 24h
 SKILL_CACHE_HEADERS_KEY = "CT_SKILL_HEADER"
 SKILL_CACHE_USER_KEY = "SKILL_LISTS_{}"
 

@@ -1,12 +1,14 @@
-import logging
 import time
 
 from bravado.exception import HTTPNotModified
+
 from django.core.cache import cache
 
-MAX_ETAG_LIFE = 60*60*24*7  # 7 Days
+from allianceauth.services.hooks import get_extension_logger
 
-logger = logging.getLogger(__name__)
+MAX_ETAG_LIFE = 60 * 60 * 24 * 7  # 7 Days
+
+logger = get_extension_logger(__name__)
 
 
 class NotModifiedError(Exception):
@@ -124,7 +126,7 @@ def etag_results(operation, token, force_refresh=False):
                     current_page = 1  # reset to page 1 and fetch everything, we should not get here
                     results = list()
 
-            except (NotModifiedError) as e:  # etag is match in cache
+            except NotModifiedError:  # etag is match in cache
                 logger.debug(
                     f"ESI_TIME: PAGE {time.perf_counter()-_pg_tm} {operation.operation.operation_id} {stringify_params(operation)}")
                 total_pages = int(headers.headers['X-Pages'])

@@ -3,11 +3,13 @@ from typing import List
 
 from ninja import NinjaAPI
 
+from allianceauth.services.hooks import get_extension_logger
+
 from corptools import models
 from corptools.api import schema
 from corptools.api.helpers import round_or_null
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 class StructureApiEndpoints:
@@ -22,11 +24,11 @@ class StructureApiEndpoints:
         )
         def get_visible_structures(request):
             perms = (
-                request.user.has_perm('corptools.own_corp_manager') |
-                request.user.has_perm('corptools.alliance_corp_manager') |
-                request.user.has_perm('corptools.state_corp_manager') |
-                request.user.has_perm('corptools.global_corp_manager') |
-                request.user.has_perm('corptools.holding_corp_structures')
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_structures')
             )
 
             if not perms:
@@ -76,11 +78,11 @@ class StructureApiEndpoints:
         )
         def get_visible_pocos(request):
             perms = (
-                request.user.has_perm('corptools.own_corp_manager') |
-                request.user.has_perm('corptools.alliance_corp_manager') |
-                request.user.has_perm('corptools.state_corp_manager') |
-                request.user.has_perm('corptools.global_corp_manager') |
-                request.user.has_perm('corptools.holding_corp_structures')
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_structures')
             )
 
             if not perms:

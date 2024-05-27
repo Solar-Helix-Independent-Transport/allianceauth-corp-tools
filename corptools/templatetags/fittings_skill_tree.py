@@ -1,7 +1,6 @@
-import logging
-
 from django import template
-from django.db.models import Q
+
+from allianceauth.services.hooks import get_extension_logger
 
 from corptools.models import EveItemDogmaAttribute, EveItemType, SkillList
 
@@ -9,7 +8,7 @@ from ..task_helpers.skill_helpers import SkillListCache
 
 register = template.Library()
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 @register.inclusion_tag('corptools/fittings/characters.html', takes_context=True)
@@ -25,9 +24,9 @@ def character_skill_overview(context) -> dict:
     _level_ids = [277, 278, 279, 1286, 1287, 1288]
 
     _types = EveItemDogmaAttribute.objects.filter(
-        eve_type_id__in=_items, attribute_id__in=_skill_ids+_level_ids)
+        eve_type_id__in=_items, attribute_id__in=_skill_ids + _level_ids)
     _types = _types | EveItemDogmaAttribute.objects.filter(
-        eve_type_id=_fit.ship_type_type_id, attribute_id__in=_skill_ids+_level_ids)
+        eve_type_id=_fit.ship_type_type_id, attribute_id__in=_skill_ids + _level_ids)
 
     required = {}
     skills = {}

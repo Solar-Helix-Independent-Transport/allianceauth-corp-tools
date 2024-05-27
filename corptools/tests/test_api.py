@@ -1,11 +1,11 @@
 from unittest import mock
-from urllib.robotparser import RequestRate
+
+from django.contrib.auth.models import Permission
+from django.test import TestCase
 
 from allianceauth.authentication.models import CharacterOwnership
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.tests.auth_utils import AuthUtils
-from django.contrib.auth.models import Permission
-from django.test import TestCase
 
 from ..api import helpers
 from ..models import CharacterAudit

@@ -1,9 +1,11 @@
-from allianceauth.authentication.models import CharacterOwnership
-from allianceauth.eveonline.models import (EveAllianceInfo, EveCharacter,
-                                           EveCorporationInfo)
-from allianceauth.tests.auth_utils import AuthUtils
 from django.contrib.auth.models import Permission
 from django.test import TestCase
+
+from allianceauth.authentication.models import CharacterOwnership
+from allianceauth.eveonline.models import (
+    EveAllianceInfo, EveCharacter, EveCorporationInfo,
+)
+from allianceauth.tests.auth_utils import AuthUtils
 
 from corptools.models import CharacterAudit, CorporationAudit
 

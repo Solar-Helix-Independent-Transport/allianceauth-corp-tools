@@ -1,9 +1,9 @@
-import json
 from datetime import timedelta
 
 import yaml
-from django.utils import timezone
 from ninja import NinjaAPI
+
+from django.utils import timezone
 
 from ... import models
 
@@ -36,7 +36,7 @@ class CloneDeathApiEndpoints:
                 if len(ny["typeIDs"]) and ny['locationID'] == location_id:
                     try:
                         mc = n.character.character.character_ownership.user.profile.main_character.character_name
-                    except:
+                    except Exception:
                         continue
                     cc = n.character.character.character_name
                     if mc not in out["m"]:

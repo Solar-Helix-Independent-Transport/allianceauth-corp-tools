@@ -1,6 +1,5 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
-from corptools.models import OreTaxRates
 from corptools.tasks import update_category
 
 

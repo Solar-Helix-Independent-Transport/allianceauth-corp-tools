@@ -1,15 +1,16 @@
-import logging
-
-from allianceauth.eveonline.models import EveCharacter
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import QuerySet
 from ninja import Field, Schema
 from ninja.pagination import LimitOffsetPagination
 from ninja.types import DictStrAny
 
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import QuerySet
+
+from allianceauth.eveonline.models import EveCharacter
+from allianceauth.services.hooks import get_extension_logger
+
 from .. import app_settings, models
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 class Paginator(LimitOffsetPagination):
@@ -28,7 +29,7 @@ class Paginator(LimitOffsetPagination):
         return {
             "items": queryset[offset: offset + limit],
             "count": self._items_count(queryset),
-        }  # noqa: E203
+        }
 
 
 def get_main_character(request, character_id):

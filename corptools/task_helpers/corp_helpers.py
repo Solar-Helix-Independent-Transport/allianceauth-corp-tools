@@ -1,16 +1,16 @@
-import logging
 import re
-import time
-from locale import currency
 
 import requests
-from allianceauth.eveonline.models import EveCharacter
-from allianceauth.services.tasks import QueueOnce
 from celery import chain, shared_task
+
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db.models import F, Q
 from django.db.models.aggregates import Sum
 from django.utils import timezone
+
+from allianceauth.eveonline.models import EveCharacter
+from allianceauth.services.hooks import get_extension_logger
+from allianceauth.services.tasks import QueueOnce
 from esi.errors import TokenError
 from esi.models import Token
 
@@ -18,14 +18,15 @@ from corptools.task_helpers.etag_helpers import NotModifiedError, etag_results
 from corptools.task_helpers.update_tasks import fetch_location_name
 
 from .. import providers
-from ..models import (BridgeOzoneLevel, CharacterAudit, CorpAsset,
-                      CorporateContract, CorporateContractItem,
-                      CorporationAudit, CorporationWalletDivision,
-                      CorporationWalletJournalEntry, EveItemType, EveLocation,
-                      EveName, MapJumpBridge, MapSystem, MapSystemPlanet, Poco,
-                      Structure, StructureCelestial, StructureService)
+from ..models import (
+    BridgeOzoneLevel, CharacterAudit, CorpAsset, CorporateContract,
+    CorporateContractItem, CorporationAudit, CorporationWalletDivision,
+    CorporationWalletJournalEntry, EveItemType, EveLocation, EveName,
+    MapJumpBridge, MapSystem, MapSystemPlanet, Poco, Structure,
+    StructureCelestial, StructureService,
+)
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 def get_corp_token(corp_id, scopes, req_roles):
@@ -200,25 +201,24 @@ def update_corporation_transactions(corp_id, wallet_division, full_update=False)
         journal_items = etag_results(
             journal_items_ob, token, force_refresh=full_update)
 
-        _current_journal = CharacterWalletJournalEntry.objects.filter(
-            character=audit_char,
+        _current_journal = CorporationWalletJournalEntry.objects.filter(
+            character=audit_corp,
             context_id_type="market_transaction_id",
             reason__exact="").values_list('context_id', flat=True)[:2500]  # Max items from ESI
 
-        _new_names = []
+        # _new_names = []
 
-        items = []
+        # items = []
         for item in journal_items:
             if item.get('transaction_id') in _current_journal:
                 type_name, _ = EveItemType.objects.get_or_create_from_esi(
                     item.get('type_id'))
 
     except NotModifiedError:
-        logger.info("CT: No New market transaction data for: {}".format(
-            audit_char.character.character_name))
+        logger.info(f"CT: No New market transaction data for: {audit_corp.corporation.corporation_name}")
         pass
 
-    return "CT: Finished market transactions for: {}".format(audit_char.character.character_name)
+    return f"CT: Finished market transactions for: {audit_corp.corporation.corporation_name}"
 
 
 def update_corporation_pocos(corp_id, full_update=False):
@@ -315,7 +315,7 @@ def update_corporation_pocos(corp_id, full_update=False):
             audit_corp.corporation.corporation_name))
         pass
 
-    return "CT: Finished Pocos for: {}".format(audit_corp.corporation.corporation_name)
+    return f"CT: Finished Pocos for: {audit_corp.corporation.corporation_name}"
 
 
 def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
@@ -360,7 +360,7 @@ def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
     audit_corp.last_update_wallet = timezone.now()
     audit_corp.save()
 
-    return "Finished wallet divs for: {0}".format(audit_corp.corporation.corporation_name)
+    return f"Finished wallet divs for: {audit_corp.corporation.corporation_name}"
 
 
 def update_corp_structures(corp_id):  # pagnated results
@@ -426,9 +426,9 @@ def update_corp_structures(corp_id):  # pagnated results
                             structure_id=_structure.get('structure_id'),
                             celestial_name=fuzz_result.get('itemName')
                         )
-                except ObjectDoesNotExist as e:
+                except ObjectDoesNotExist:
                     celestial = None
-                except:
+                except Exception:
                     # logging.exception("Messsage")
                     celestial = None
             else:
@@ -490,13 +490,13 @@ def update_corp_structures(corp_id):  # pagnated results
     except NotModifiedError:
         _corporation.last_update_structures = timezone.now()
         _corporation.save()
-        return "No New structure data for: {0}".format(_corporation)
+        return f"No New structure data for: {_corporation}"
 
     for structure in structures:
         try:
             structure_info = fetch_location_name(structure.get(
                 'structure_id'), 'solar_system', token.character_id)
-        except:  # if bad screw it...
+        except Exception:  # if bad screw it...
             structure_info = False
 
         try:
@@ -523,7 +523,7 @@ def update_corp_structures(corp_id):  # pagnated results
     _corporation.last_update_structures = timezone.now()
     _corporation.save()
 
-    return "Updated structures for: {0}".format(_corporation)
+    return f"Updated structures for: {_corporation}"
 
 
 def update_character_logins_from_corp(corp_id):
@@ -564,7 +564,7 @@ def update_character_logins_from_corp(corp_id):
         character__corporation_id=corp_id)
     all_chars.update(last_update_login=timezone.now())
 
-    return "Finished Logins for: {}".format(audit_corp.corporation)
+    return f"Finished Logins for: {audit_corp.corporation}"
 
 
 def update_corp_assets(corp_id):
@@ -623,7 +623,7 @@ def update_corp_assets(corp_id):
                                 'location_id')
                         else:
                             failed_locations.append(item.get('location_id'))
-                except:
+                except Exception:
                     pass  # TODO
             else:
                 asset_item.location_name_id = item.get('location_id')
@@ -651,7 +651,7 @@ def update_corp_assets(corp_id):
     audit_corp.last_update_assets = timezone.now()
     audit_corp.save()
 
-    return "Finished assets for: {}".format(audit_corp.corporation)
+    return f"Finished assets for: {audit_corp.corporation}"
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -673,14 +673,14 @@ def run_ozone_levels(self, corp_id):
                 station_id=structure.structure_id).order_by('-date')[:1][0].quantity
             delta = last_ozone - _quantity
             _used = (delta if _quantity < last_ozone else 0)
-        except:
+        except Exception:
             pass
         try:
             BridgeOzoneLevel.objects.create(
                 station_id=structure.structure_id, quantity=_quantity, used=_used)
-        except:
+        except Exception:
             pass  # dont fail for now
-    return "Finished Ozone for: {}".format(_corporation.corporation)
+    return f"Finished Ozone for: {_corporation.corporation}"
 
 
 def chunks(lst, n):
@@ -771,8 +771,8 @@ def build_managed_asset_locations(self, corp_id):
     # get Containers in office folders and assign the names
 
     containers = CorpAsset.objects.filter(
-        (Q(type_name__group_id__in=grp_ids) | Q(
-            type_name__group__category_id__in=cat_ids))
+        Q(type_name__group_id__in=grp_ids) | Q(
+            type_name__group__category_id__in=cat_ids)
     ).filter(
         corporation=_corporation,
         singleton=True,
@@ -823,7 +823,7 @@ def build_managed_asset_locations(self, corp_id):
             updates, ["location_name", "managed", "managed_corp"])
 
     EveLocation.objects.filter(managed=True, managed_corp=_corporation).exclude(
-        location_id__in=current+hangar_ids).delete()
+        location_id__in=current + hangar_ids).delete()
 
     CorpAsset.objects.filter(location_id__in=current).update(
         location_name_id=F("location_id"))
@@ -835,7 +835,7 @@ def build_jb_network(self):
         "corporation__corporation", "system_name"
     ).prefetch_related('structureservice_set')
 
-    second_systems = set()
+    # second_systems = set()
     output = {}
     regex = r"^(.*) » ([^ - ]*) - (.*)"
     for s in structures:
@@ -993,7 +993,7 @@ def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=Fa
                 raise e
             except Exception as e:
                 if e.status_code == 404:
-                    logger.warning("CT: Contract items %s (%s) NOT FOUND ERROR" % (
+                    logger.warning("CT: Contract items {} ({}) NOT FOUND ERROR".format(
                         str(_corporation.corporation.corporation_name), str(contract_id)))
                     return
                 else:
@@ -1017,8 +1017,8 @@ def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=Fa
             CorporateContractItem.objects.bulk_create(
                 contract_models_new, batch_size=1000, ignore_conflicts=True)
         except NotModifiedError:
-            logger.info("CT: No New Corporate Contract items for: {} ({})".format(
-                _corporation.corporation.corporation_name), contract_id)
+            logger.info(
+                f"CT: No New Corporate Contract items {str(_corporation.corporation.corporation_name)} ({str(contract_id)})")
             pass
 
-    return "CT: Completed Corporate Contract items %s (%s)" % (str(_corporation.corporation.corporation_name), str(contract_id))
+    return f"CT: Completed Corporate Contract items {str(_corporation.corporation.corporation_name)} ({str(contract_id)})"

@@ -1,11 +1,11 @@
-from typing import List, Optional
+from typing import List
+
+from ninja import NinjaAPI
 
 from django.utils.translation import gettext_lazy as _
-from ninja import Field, Form, NinjaAPI
 
-from ... import app_settings, models
+from ... import app_settings
 from .. import schema
-from ..helpers import get_alts_queryset, get_main_character
 
 
 class MenuApiEndpoints:
@@ -60,10 +60,10 @@ class MenuApiEndpoints:
                     "name": _("Wallet"),
                     "link": "account/wallet"
                 })
-                if (request.user.has_perm("corptools.global_corp_manager") or
-                    request.user.has_perm("corptools.state_corp_manager") or
-                    request.user.has_perm("corptools.alliance_corp_manager") or
-                        request.user.has_perm("corptools.own_corp_manager")):
+                if (request.user.has_perm("corptools.global_corp_manager")
+                    or request.user.has_perm("corptools.state_corp_manager")
+                    or request.user.has_perm("corptools.alliance_corp_manager")
+                        or request.user.has_perm("corptools.own_corp_manager")):
                     _finance["links"].append({
                         "name": _("Wallet Activity"),
                         "link": "account/walletactivity"

@@ -1,7 +1,9 @@
 import re
 
 import networkx as nx
+
 from django.utils import timezone
+
 from esi.clients import EsiClientProvider
 
 from .task_helpers.skill_helpers import SkillListCache
@@ -189,7 +191,7 @@ class EveRouter():
 
     def bulid_graph(self):
         self.G.clear()
-        #logger.debug("Graph cleared.")
+        # logger.debug("Graph cleared.")
         from .models import MapJumpBridge, MapSystem, MapSystemGate
 
         systems = MapSystem.objects.values_list('system_id', flat=True)
@@ -212,8 +214,8 @@ class EveRouter():
         from .models import MapJumpBridge, MapSystem
 
         # logger.debug("----------")
-        #logger.debug(f"Source: {source_id}")
-        #logger.debug(f"Destination: {destination_id}")
+        # logger.debug(f"Source: {source_id}")
+        # logger.debug(f"Destination: {destination_id}")
 
         if not self.last_update:
             self.bulid_graph()
@@ -226,7 +228,7 @@ class EveRouter():
                 pass
 
         path = nx.shortest_path(self.G, source_id, destination_id)
-        path_length = len(path)-1
+        path_length = len(path) - 1
         systems = MapSystem.objects.filter(system_id__in=path)
         system_map = {}
 
@@ -240,18 +242,18 @@ class EveRouter():
         dotlan_path = output[0].replace(" ", "_")
         message_path = "`" + output[0].replace(" ", "_") + "`"
         esi_points = []
-        for i in range(len(path)-1):
-            if self.G.get_edge_data(path[i], path[i+1])['type'] == 'bridge':
-                message_path += "  >B>  `" + output[i+1] + "`"
-                bridged_path = '::' + output[i+1].replace(" ", "_")
+        for i in range(len(path) - 1):
+            if self.G.get_edge_data(path[i], path[i + 1])['type'] == 'bridge':
+                message_path += "  >B>  `" + output[i + 1] + "`"
+                bridged_path = '::' + output[i + 1].replace(" ", "_")
                 dotlan_path += bridged_path
                 esi_points.append(self.bridges[path[i]])
             else:
-                message_path += "  >G>  `" + output[i+1] + "`"
-                gated_path = ':' + output[i+1].replace(" ", "_")
+                message_path += "  >G>  `" + output[i + 1] + "`"
+                gated_path = ':' + output[i + 1].replace(" ", "_")
                 dotlan_path += gated_path
         dotlan_path = re.sub(r'(?<!:)(:[^:\s]+)(?=:)(?!::)', '', dotlan_path)
-        esi_points.append(path[len(path)-1])
+        esi_points.append(path[len(path) - 1])
         result = {'path': output, 'esi': esi_points, 'path_message': message_path,
                   'dotlan': dotlan_path, 'length': path_length}
 

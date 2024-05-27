@@ -1,9 +1,8 @@
-
 from typing import List
 
-from django.db.models import F
-from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI
+
+from django.db.models import F
 
 from corptools import models
 from corptools.api import schema
@@ -86,7 +85,7 @@ class ListApiEndpoints:
                             "active": active
                         }
                     )
-                except:
+                except Exception:
                     main = char.character
                     active = False
                     try:

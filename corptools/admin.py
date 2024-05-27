@@ -1,4 +1,3 @@
-from celery import app
 from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
@@ -23,7 +22,7 @@ class SystemAdmin(admin.ModelAdmin):
         return obj.constellation.name
 
     def get_queryset(self, request):
-        return super(SystemAdmin, self).get_queryset(request).select_related('constellation', 'constellation__region')
+        return super().get_queryset(request).select_related('constellation', 'constellation__region')
 
     def get_model_perms(self, request):
         return {}
@@ -47,7 +46,7 @@ class MapConstellationAdmin(admin.ModelAdmin):
         return obj.region.name
 
     def get_queryset(self, request):
-        return super(MapConstellationAdmin, self).get_queryset(request).select_related('region')
+        return super().get_queryset(request).select_related('region')
 
     def get_model_perms(self, request):
         return {}
@@ -69,7 +68,7 @@ class MapSystemMoonAdmin(admin.ModelAdmin):
         return obj.system.name
 
     def get_queryset(self, request):
-        return super(MapSystemMoonAdmin, self).get_queryset(request).select_related('system__constellation__region', 'system__constellation', 'system')
+        return super().get_queryset(request).select_related('system__constellation__region', 'system__constellation', 'system')
 
     def get_model_perms(self, request):
         return {}
@@ -133,6 +132,9 @@ class assetFilterAdmin(admin.ModelAdmin):
             )
         return result
 
+    @admin.display(
+        description='types'
+    )
     def _types(self, obj):
         my_types = [x.name for x in obj.types.order_by('name')]
 
@@ -140,8 +142,10 @@ class assetFilterAdmin(admin.ModelAdmin):
             my_types,
             10
         )
-    _types.short_description = 'types'
 
+    @admin.display(
+        description='groups'
+    )
     def _groups(self, obj):
         my_groups = [x.name for x in obj.groups.order_by('name')]
 
@@ -149,8 +153,10 @@ class assetFilterAdmin(admin.ModelAdmin):
             my_groups,
             10
         )
-    _groups.short_description = 'groups'
 
+    @admin.display(
+        description='categories'
+    )
     def _cats(self, obj):
         my_cats = [x.name for x in obj.categories.order_by('name')]
 
@@ -158,8 +164,10 @@ class assetFilterAdmin(admin.ModelAdmin):
             my_cats,
             10
         )
-    _cats.short_description = 'categories'
 
+    @admin.display(
+        description='systems'
+    )
     def _systems(self, obj):
         my_systems = [x.name for x in obj.systems.order_by('name')]
 
@@ -167,8 +175,10 @@ class assetFilterAdmin(admin.ModelAdmin):
             my_systems,
             10
         )
-    _systems.short_description = 'systems'
 
+    @admin.display(
+        description='constellations'
+    )
     def _constellations(self, obj):
         my_constels = [x.name for x in obj.constellations.order_by('name')]
 
@@ -176,8 +186,10 @@ class assetFilterAdmin(admin.ModelAdmin):
             my_constels,
             10
         )
-    _constellations.short_description = 'constellations'
 
+    @admin.display(
+        description='regions'
+    )
     def _regions(self, obj):
         my_regions = [x.name for x in obj.regions.order_by('name')]
 
@@ -185,7 +197,6 @@ class assetFilterAdmin(admin.ModelAdmin):
             my_regions,
             10
         )
-    _regions.short_description = 'regions'
 
     filter_horizontal = ["types",
                          "groups",
@@ -219,6 +230,9 @@ class skillsFilterAdmin(admin.ModelAdmin):
             )
         return result
 
+    @admin.display(
+        description='Require One'
+    )
     def _single_req_skill_lists(self, obj):
         my_single_req_skill_lists = [
             x.name for x in obj.single_req_skill_lists.order_by('name')]
@@ -227,8 +241,10 @@ class skillsFilterAdmin(admin.ModelAdmin):
             my_single_req_skill_lists,
             10
         )
-    _single_req_skill_lists.short_description = 'Require One'
 
+    @admin.display(
+        description='Required'
+    )
     def _required_skill_lists(self, obj):
         my_required_skill_lists = [
             x.name for x in obj.required_skill_lists.order_by('name')]
@@ -237,7 +253,6 @@ class skillsFilterAdmin(admin.ModelAdmin):
             my_required_skill_lists,
             10
         )
-    _required_skill_lists.short_description = 'Required'
 
 
 class TimeInCorpFilterAdmin(admin.ModelAdmin):

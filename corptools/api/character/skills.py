@@ -1,7 +1,8 @@
 from typing import List
 
-from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI
+
+from django.utils.translation import gettext_lazy as _
 
 from corptools import models, providers
 from corptools.api import schema

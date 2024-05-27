@@ -1,13 +1,13 @@
-import logging
-from typing import List
-
-from django.db.models import F, Q, Sum
 from ninja import NinjaAPI
+
+from django.db.models import Q
+
+from allianceauth.services.hooks import get_extension_logger
 
 from corptools import models
 from corptools.api import schema
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 class AssetPingApiEndpoints:
@@ -20,8 +20,7 @@ class AssetPingApiEndpoints:
             ammo_exclusions_cat = [8]
             filter_charges = True
             assets = models.CharacterAsset.objects.filter(
-                Q(location_name_id__in=systems +
-                  structures) | Q(location_name__system_id__in=systems+structures)
+                Q(location_name_id__in=systems + structures) | Q(location_name__system_id__in=systems + structures)
             ).exclude(
                 type_name__group_id__in=ignore_groups
             ).select_related(
@@ -64,7 +63,7 @@ class AssetPingApiEndpoints:
                     if a.type_name.name not in pingers[uid]["a"]:
                         pingers[uid]["a"].append(a.type_name.name)
                     pingers[uid]["s"].add(a.location_name.location_name)
-                except:
+                except Exception:
                     pass
 
             return pingers

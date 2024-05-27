@@ -1,14 +1,16 @@
-import logging
 from typing import List
 
-from django.db.models import F, Q, Sum
-from django.utils.translation import gettext_lazy as _
 from ninja import NinjaAPI
+
+from django.db.models import F
+from django.utils.translation import gettext_lazy as _
+
+from allianceauth.services.hooks import get_extension_logger
 
 from corptools import models
 from corptools.api import schema
 
-logger = logging.getLogger(__name__)
+logger = get_extension_logger(__name__)
 
 
 class SearchApiEndpoints:

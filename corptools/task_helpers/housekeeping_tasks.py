@@ -1,11 +1,12 @@
-import logging
 from datetime import timedelta
 
 from django.utils import timezone
 
-from corptools.models import CharacterMarketOrder, Notification
+from allianceauth.services.hooks import get_extension_logger
 
-logger = logging.getLogger(__name__)
+from corptools.models import Notification
+
+logger = get_extension_logger(__name__)
 
 NOTIFICAITON_PURGE_TYPES = [
     "AcceptedAlly",
@@ -94,5 +95,5 @@ def remove_old_notifications():
     step = 50000
 
     qs_ids = list(get_qs()[:step].values_list("id", flat=True))
-    deleted = Notification.objects.filter(pk__in=qs_ids).delete()
+    Notification.objects.filter(pk__in=qs_ids).delete()
     return f"Deleted {len(qs_ids)} Notifications"

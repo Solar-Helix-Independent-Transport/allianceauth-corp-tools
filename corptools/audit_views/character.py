@@ -1,25 +1,19 @@
-import copy
-import csv
-import os
-import re
-
-from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
-from bravado.exception import HTTPError
-from django.contrib import messages
-from django.contrib.auth.decorators import (login_required,
-                                            permission_required,
-                                            user_passes_test)
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db import IntegrityError
-from django.db.models import Count, F, FloatField, Max, Q, Sum
-from django.db.models.query import prefetch_related_objects
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.translation import gettext_lazy as _
-from esi.decorators import token_required
+from django.db.models import F, FloatField, Q, Sum
+from django.shortcuts import render
+
+from allianceauth.eveonline.models import EveCharacter
+from allianceauth.services.hooks import get_extension_logger
 
 from .. import providers
-from ..models import *
+from ..models import (
+    CharacterAsset, CharacterAudit, CharacterContact, CharacterMarketOrder,
+    CharacterRoles, CharacterWalletJournalEntry, CorporationHistory,
+    EveLocation, JumpClone, Notification, Skill, SkillQueue, SkillTotals,
+)
+
+logger = get_extension_logger(__name__)
 
 
 def get_alts(request, character_id):
@@ -62,7 +56,7 @@ def get_alts(request, character_id):
     for character in characters:
         try:
             net_worth += character.characteraudit.balance
-        except:
+        except Exception:
             pass
     return main_char, characters, net_worth
 
@@ -231,7 +225,7 @@ def status(request, character_id=None):
         .annotate(char=F('character__character__character_name'))\
         .annotate(total_sp=Sum('skillpoints_in_skill'))
 
-    bios = None
+    # bios = None
 
     table_data = {}
     for char in characters:
@@ -266,7 +260,7 @@ def pub_data(request, character_id=None):
         .annotate(char=F('character__character__character_name'))\
         .annotate(total_sp=Sum('skillpoints_in_skill'))
 
-    bios = None
+    # bios = None
 
     table_data = {}
     for char in characters:
@@ -347,9 +341,9 @@ def clones(request, character_id=None):
     jump_clones = JumpClone.objects\
         .filter(character__character__character_id__in=character_ids)\
         .select_related('character__character', 'location_name').prefetch_related('implant_set', 'implant_set__type_name')
-    clones = Clone.objects\
-        .filter(character__character__character_id__in=character_ids)\
-        .select_related('character__character')
+    # clones = Clone.objects\
+    #     .filter(character__character__character_id__in=character_ids)\
+    #     .select_related('character__character')
 
     table_data = {}
     for char in characters:
@@ -410,9 +404,9 @@ def market(request, character_id=None):
         .exclude(state="active")
 
     total_buy = market_data_current.filter(is_buy_order=True).aggregate(
-        total_buy=Sum(F('price')*F('volume_remain'), output_field=FloatField()))
+        total_buy=Sum(F('price') * F('volume_remain'), output_field=FloatField()))
     total_sell = market_data_current.filter(is_buy_order=None).aggregate(
-        total_sell=Sum(F('price')*F('volume_remain'), output_field=FloatField()))
+        total_sell=Sum(F('price') * F('volume_remain'), output_field=FloatField()))
 
     context = {
         "main_char": main_char,

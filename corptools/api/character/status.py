@@ -1,8 +1,9 @@
-from typing import List, Optional
+from typing import List
+
+from ninja import NinjaAPI
 
 from django.db.models import F, Sum
 from django.utils.translation import gettext_lazy as _
-from ninja import Field, Form, NinjaAPI
 
 from corptools import app_settings, models
 from corptools.api import schema

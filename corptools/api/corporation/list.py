@@ -1,9 +1,10 @@
-
 from typing import List
 
-from django.db.models import Q
-from esi.models import Token
 from ninja import NinjaAPI
+
+from django.db.models import Q
+
+from esi.models import Token
 
 from corptools import app_settings, models
 from corptools.api import schema
@@ -22,9 +23,9 @@ class ListApiEndpoints:
         def get_visible_corporation_status(request):
             corps = models.CorporationAudit.objects.visible_to(request.user)
 
-            if (request.user.has_perm("corptools.holding_corp_wallets") or
-                request.user.has_perm("corptools.holding_corp_assets") or
-                    request.user.has_perm("corptools.holding_corp_structures")):
+            if (request.user.has_perm("corptools.holding_corp_wallets")
+                or request.user.has_perm("corptools.holding_corp_assets")
+                    or request.user.has_perm("corptools.holding_corp_structures")):
                 corps_holding = models.CorptoolsConfiguration.objects.get(
                     id=1).holding_corp_qs()
                 corps = corps | corps_holding
@@ -32,9 +33,9 @@ class ListApiEndpoints:
             chars = models.CharacterAudit.objects.filter(
                 character__corporation_id__in=corps.values_list("corporation__corporation_id", flat=True), active=True)
             chars = chars.select_related("characterroles", "character").filter(
-                Q(characterroles__accountant=True) or
-                Q(characterroles__director=True) or
-                Q(characterroles__station_manager=True)
+                Q(characterroles__accountant=True)
+                or Q(characterroles__director=True)
+                or Q(characterroles__station_manager=True)
             )
 
             corp_chars = {}
@@ -87,16 +88,16 @@ class ListApiEndpoints:
                     corp_chars[_c[t.character_id]][grp]["t"] += 1
 
             a_tokens = token_scope_filter(
-                tokens, app_settings._corp_scopes_base+app_settings._corp_scopes_assets)
+                tokens, app_settings._corp_scopes_base + app_settings._corp_scopes_assets)
             filter_token(a_tokens, "a")
             w_tokens = token_scope_filter(
-                tokens, app_settings._corp_scopes_base+app_settings._corp_scopes_wallets)
+                tokens, app_settings._corp_scopes_base + app_settings._corp_scopes_wallets)
             filter_token(w_tokens, "w")
             s_tokens = token_scope_filter(
-                tokens, app_settings._corp_scopes_base+app_settings._corp_scopes_structures)
+                tokens, app_settings._corp_scopes_base + app_settings._corp_scopes_structures)
             filter_token(s_tokens, "s")
             m_tokens = token_scope_filter(
-                tokens, app_settings._corp_scopes_base+app_settings._corp_scopes_moons)
+                tokens, app_settings._corp_scopes_base + app_settings._corp_scopes_moons)
             filter_token(m_tokens, "m")
 
             output = []

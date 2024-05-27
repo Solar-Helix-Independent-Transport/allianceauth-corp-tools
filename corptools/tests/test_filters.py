@@ -1,14 +1,14 @@
 from datetime import timedelta
-from unittest import mock
 
-from allianceauth.authentication.models import CharacterOwnership
-from allianceauth.eveonline.models import (EveAllianceInfo, EveCharacter,
-                                           EveCorporationInfo)
-from allianceauth.tests.auth_utils import AuthUtils
 from django.contrib.auth.models import Group, User
-from django.core.cache import cache
 from django.test import TestCase
 from django.utils import timezone
+
+from allianceauth.authentication.models import CharacterOwnership
+from allianceauth.eveonline.models import (
+    EveAllianceInfo, EveCharacter, EveCorporationInfo,
+)
+from allianceauth.tests.auth_utils import AuthUtils
 
 from corptools import models as ct_models
 
@@ -60,13 +60,13 @@ class TestSecGroupBotFilters(TestCase):
         # add some extra characters to users in 2 corps/alliance
         for uid in range(0, 5):  # test corp 2
             character = EveCharacter.objects.create(character_name=f'Alt {uid}',
-                                                    character_id=11+uid,
+                                                    character_id=11 + uid,
                                                     corporation_name='Test Corp 2',
                                                     corporation_id=2,
                                                     corporation_ticker='TST2')
             CharacterOwnership.objects.create(character=character,
                                               user=users[uid],
-                                              owner_hash=f'ownalt{11+uid}')
+                                              owner_hash=f'ownalt{11 + uid}')
             characters.append(character)
 
         cls.c2t1 = ct_models.CharacterTitle.objects.create(corporation_id=2,
@@ -81,7 +81,7 @@ class TestSecGroupBotFilters(TestCase):
 
         for uid in range(5, 10):  # Test alliance 1
             character = EveCharacter.objects.create(character_name=f'Alt {uid}',
-                                                    character_id=11+uid,
+                                                    character_id=11 + uid,
                                                     corporation_name='Test Corp 3',
                                                     corporation_id=3,
                                                     corporation_ticker='TST3',
@@ -1101,7 +1101,7 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[9]['check'])
         self.assertFalse(tests[10]['check'])
 
-    def test_user_has_title_1(self):
+    def test_user_has_title_2(self):
         _filter = ct_models.Titlefilter.objects.create(name="Title Test2",
                                                        description="Something to tell user",
                                                        titles=self.c2t1)
@@ -1144,14 +1144,10 @@ class TestSecGroupBotFilters(TestCase):
                                                            description="Something to tell user",
                                                            days_since_login=30)
 
-        c1 = ct_models.CharacterAudit.objects.filter(
-            character__character_ownership__user_id=1)
-        c1.update(last_known_login=timezone.now() -
-                  timedelta(days=60), last_update_login=timezone.now())
-        c2 = ct_models.CharacterAudit.objects.filter(
-            character__character_ownership__user_id=2)
-        c2.update(last_known_login=timezone.now() -
-                  timedelta(days=15), last_update_login=timezone.now())
+        c1 = ct_models.CharacterAudit.objects.filter(character__character_ownership__user_id=1)
+        c1.update(last_known_login=timezone.now() - timedelta(days=60), last_update_login=timezone.now())
+        c2 = ct_models.CharacterAudit.objects.filter(character__character_ownership__user_id=2)
+        c2.update(last_known_login=timezone.now() - timedelta(days=15), last_update_login=timezone.now())
 
         users = []
         for user in ct_models.CharacterAudit.objects.all():
@@ -1174,14 +1170,10 @@ class TestSecGroupBotFilters(TestCase):
                                                            description="Something to tell user",
                                                            days_since_login=30)
 
-        c1 = ct_models.CharacterAudit.objects.filter(
-            character__character_ownership__user_id=1)
-        c1.update(last_known_login=timezone.now() -
-                  timedelta(days=60), last_update_login=timezone.now())
-        c2 = ct_models.CharacterAudit.objects.filter(
-            character__character_ownership__user_id=2)
-        c2.update(last_known_login=timezone.now() -
-                  timedelta(days=15), last_update_login=timezone.now())
+        c1 = ct_models.CharacterAudit.objects.filter(character__character_ownership__user_id=1)
+        c1.update(last_known_login=timezone.now() - timedelta(days=60), last_update_login=timezone.now())
+        c2 = ct_models.CharacterAudit.objects.filter(character__character_ownership__user_id=2)
+        c2.update(last_known_login=timezone.now() - timedelta(days=15), last_update_login=timezone.now())
 
         users = []
         for user in ct_models.CharacterAudit.objects.all():
@@ -1207,14 +1199,10 @@ class TestSecGroupBotFilters(TestCase):
                                                            days_since_login=30,
                                                            no_data_pass=True)
 
-        c1 = ct_models.CharacterAudit.objects.filter(
-            character__character_ownership__user_id=1)
-        c1.update(last_known_login=timezone.now() -
-                  timedelta(days=60), last_update_login=timezone.now())
-        c2 = ct_models.CharacterAudit.objects.filter(
-            character__character_ownership__user_id=2)
-        c2.update(last_known_login=timezone.now() -
-                  timedelta(days=15), last_update_login=timezone.now())
+        c1 = ct_models.CharacterAudit.objects.filter(character__character_ownership__user_id=1)
+        c1.update(last_known_login=timezone.now() - timedelta(days=60), last_update_login=timezone.now())
+        c2 = ct_models.CharacterAudit.objects.filter(character__character_ownership__user_id=2)
+        c2.update(last_known_login=timezone.now() - timedelta(days=15), last_update_login=timezone.now())
 
         users = []
         for user in ct_models.CharacterAudit.objects.all():
@@ -1238,14 +1226,10 @@ class TestSecGroupBotFilters(TestCase):
                                                            days_since_login=30,
                                                            no_data_pass=True)
 
-        c1 = ct_models.CharacterAudit.objects.filter(
-            character__character_ownership__user_id=1)
-        c1.update(last_known_login=timezone.now() -
-                  timedelta(days=60), last_update_login=timezone.now())
-        c2 = ct_models.CharacterAudit.objects.filter(
-            character__character_ownership__user_id=2)
-        c2.update(last_known_login=timezone.now() -
-                  timedelta(days=15), last_update_login=timezone.now())
+        c1 = ct_models.CharacterAudit.objects.filter(character__character_ownership__user_id=1)
+        c1.update(last_known_login=timezone.now() - timedelta(days=60), last_update_login=timezone.now())
+        c2 = ct_models.CharacterAudit.objects.filter(character__character_ownership__user_id=2)
+        c2.update(last_known_login=timezone.now() - timedelta(days=15), last_update_login=timezone.now())
 
         users = []
         for user in ct_models.CharacterAudit.objects.all():
@@ -1272,14 +1256,10 @@ class TestSecGroupBotFilters(TestCase):
                                                            days_since_login=30,
                                                            main_corp_only=True)
 
-        c1 = ct_models.CharacterAudit.objects.filter(
-            id__gte=11)  # All the alts
-        c1.update(last_known_login=timezone.now() -
-                  timedelta(days=15), last_update_login=timezone.now())
-        c2 = ct_models.CharacterAudit.objects.filter(
-            character__character_ownership__user_id=2)
-        c2.update(last_known_login=timezone.now() -
-                  timedelta(days=15), last_update_login=timezone.now())
+        c1 = ct_models.CharacterAudit.objects.filter(id__gte=11)  # All the alts
+        c1.update(last_known_login=timezone.now() - timedelta(days=15), last_update_login=timezone.now())
+        c2 = ct_models.CharacterAudit.objects.filter(character__character_ownership__user_id=2)
+        c2.update(last_known_login=timezone.now() - timedelta(days=15), last_update_login=timezone.now())
 
         print(c1)
         print(c2)

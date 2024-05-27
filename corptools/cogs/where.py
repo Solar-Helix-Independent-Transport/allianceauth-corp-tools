@@ -1,18 +1,14 @@
-# Cog Stuff
 import logging
 
-# AA-Discordbot
 from aadiscordbot.cogs.utils.decorators import has_any_perm
-from allianceauth.eveonline.evelinks import evewho
-from allianceauth.eveonline.models import EveCharacter
-from allianceauth.services.modules.discord.models import DiscordUser
-from discord import AutocompleteContext, Interaction, option
-from discord.colour import Color
+from discord import AutocompleteContext, option
 from discord.embeds import Embed
 from discord.ext import commands
-# AA Contexts
+
 from django.conf import settings
 from django.db.models import Q
+
+from allianceauth.services.modules.discord.models import DiscordUser
 
 from corptools.models import CharacterAsset, EveItemType, MapSystem
 
@@ -80,13 +76,9 @@ class WhereStuff(commands.Cog):
                     )
                     if system:
                         items = items.filter(
-                            (
-                                Q(location_name__location_name=system) |
-                                Q(location_name__system__name=system)
-                            )
-                        )
+                            Q(location_name__location_name=system) | Q(location_name__system__name=system))
                     if not items.exists():
-                        return await ctx.respond(f"Found no items. Do you actually have some?", ephemeral=True)
+                        return await ctx.respond("Found no items. Do you actually have some?", ephemeral=True)
                     output = {}
                     for i in items:
                         cn = i.character.character.character_name
