@@ -1,89 +1,31 @@
 {
-  "_@charts-C3Dl4GiH.js": {
-    "file": "assets/@charts-C3Dl4GiH.js",
+  "_@charts-C4xQ0T1A.js": {
+    "file": "assets/@charts-C4xQ0T1A.js",
     "name": "@charts"
   },
-  "_@components-!~{003}~.js": {
-    "file": "assets/@components-ot5XAcJT.css",
-    "src": "_@components-!~{003}~.js"
+  "_@libs-5gesxeNa.js": {
+    "file": "assets/@libs-5gesxeNa.js",
+    "name": "@libs"
   },
-  "_@components-Bg3uNnqV.js": {
-    "file": "assets/@components-Bg3uNnqV.js",
-    "name": "@components",
-    "imports": [
-      "_@libs-DJfEVPp0.js",
-      "_@react-router-DM7ld1zS.js",
-      "_@graph-components-0SN7Yl3C.js",
-      "_@tanstack-ClzYG_z1.js",
-      "_@charts-C3Dl4GiH.js",
-      "_@skill-components-FiO6bQSv.js"
-    ],
-    "css": [
-      "assets/@components-ot5XAcJT.css"
-    ]
-  },
-  "_@graph-components-0SN7Yl3C.js": {
-    "file": "assets/@graph-components-0SN7Yl3C.js",
-    "name": "@graph-components",
-    "imports": [
-      "_@components-Bg3uNnqV.js",
-      "_@charts-C3Dl4GiH.js"
-    ]
-  },
-  "_@libs-DJfEVPp0.js": {
-    "file": "assets/@libs-DJfEVPp0.js",
-    "name": "@libs",
-    "imports": [
-      "_@components-Bg3uNnqV.js",
-      "_@graph-components-0SN7Yl3C.js"
-    ]
-  },
-  "_@react-router-DM7ld1zS.js": {
-    "file": "assets/@react-router-DM7ld1zS.js",
-    "name": "@react-router",
-    "imports": [
-      "_@components-Bg3uNnqV.js",
-      "_@graph-components-0SN7Yl3C.js"
-    ]
-  },
-  "_@skill-components-!~{008}~.js": {
-    "file": "assets/@skill-components-BZrkR5eJ.css",
-    "src": "_@skill-components-!~{008}~.js"
-  },
-  "_@skill-components-FiO6bQSv.js": {
-    "file": "assets/@skill-components-FiO6bQSv.js",
-    "name": "@skill-components",
-    "imports": [
-      "_@components-Bg3uNnqV.js",
-      "_@libs-DJfEVPp0.js"
-    ],
-    "css": [
-      "assets/@skill-components-BZrkR5eJ.css"
-    ]
-  },
-  "_@tanstack-ClzYG_z1.js": {
-    "file": "assets/@tanstack-ClzYG_z1.js",
+  "_@tanstack-CigJseIo.js": {
+    "file": "assets/@tanstack-CigJseIo.js",
     "name": "@tanstack",
     "imports": [
-      "_@components-Bg3uNnqV.js"
+      "_@libs-5gesxeNa.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-BRz66Efn.js",
+    "file": "assets/index-KauNpZ7M.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@components-Bg3uNnqV.js",
-      "_@libs-DJfEVPp0.js",
-      "_@react-router-DM7ld1zS.js",
-      "_@graph-components-0SN7Yl3C.js",
-      "_@skill-components-FiO6bQSv.js",
-      "_@tanstack-ClzYG_z1.js",
-      "_@charts-C3Dl4GiH.js"
+      "_@libs-5gesxeNa.js",
+      "_@tanstack-CigJseIo.js",
+      "_@charts-C4xQ0T1A.js"
     ],
     "css": [
-      "assets/index-CfUlwooz.css"
+      "assets/index-DABrfijg.css"
     ]
   }
 }
