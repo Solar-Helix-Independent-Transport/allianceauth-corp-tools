@@ -1623,7 +1623,6 @@ class CurrentShipFilter(FilterBase):
     def filter_query(self, users):
         character_list = CharacterOwnership.objects.filter(user__in=users) \
             .select_related('character', "character__characteraudit")
-
         cnt_types = self.types.all().count()
         cnt_groups = self.groups.all().count()
 
