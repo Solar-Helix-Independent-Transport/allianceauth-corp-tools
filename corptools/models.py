@@ -438,6 +438,9 @@ class EveLocation(models.Model):
     managed_char = models.ForeignKey(
         CharacterAudit, default=None, blank=True, null=True, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"{self.location_name}"
+
 
 class Asset(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -1599,6 +1602,145 @@ class AssetsFilter(FilterBase):
         return output
 
 
+class CurrentShipFilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: The Current Ship being Flown"
+        verbose_name_plural = verbose_name
+    count_message_only = models.BooleanField(default=False)
+
+    types = models.ManyToManyField(EveItemType, blank=True,
+                                   help_text="Filter on Ship Types.")
+    groups = models.ManyToManyField(EveItemGroup, blank=True,
+                                    help_text="Filter on Ship Groups.")
+
+    systems = models.ManyToManyField(MapSystem, blank=True,
+                                     help_text="Limit filter to specific systems")
+    constellations = models.ManyToManyField(MapConstellation, blank=True,
+                                            help_text="Limit filter to specific constellations")
+    regions = models.ManyToManyField(MapRegion, blank=True,
+                                     help_text="Limit filter to specific regions")
+
+    def filter_query(self, users):
+        character_list = CharacterOwnership.objects.filter(user__in=users) \
+            .select_related('character', "character__characteraudit")
+
+        cnt_types = self.types.all().count()
+        cnt_groups = self.groups.all().count()
+
+        character_count = CharacterLocation.objects.filter(
+            character__character__in=character_list.values_list('character'))
+        output = []
+
+        if cnt_types > 0:
+            output.append(models.Q(current_ship__in=self.types.all()))
+
+        if cnt_groups > 0:
+            output.append(models.Q(current_ship__group__in=self.groups.all()))
+
+        if len(output) == 0:
+            return False
+
+        query = output.pop()
+        for _q in output:
+            query |= _q
+        character_count = character_count.filter(query)
+
+        output = []
+
+        if self.systems.all().count() > 0:
+            output.append(
+                models.Q(
+                    current_location__system__in=self.systems.all()
+                )
+            )
+            output.append(
+                models.Q(
+                    current_location__location_id__in=self.systems.all(
+                    ).values_list('system_id', flat=True)
+                )
+            )
+        if self.constellations.all().count() > 0:
+            output.append(
+                models.Q(
+                    current_location__system__constellation__in=self.constellations.all()
+                )
+            )
+            output.append(
+                models.Q(
+                    current_location__location_id__in=MapSystem.objects.filter(
+                        constellation__in=self.constellations.all()
+                    ).values_list('system_id', flat=True)
+                )
+            )
+        if self.regions.all().count() > 0:
+            output.append(
+                models.Q(
+                    current_location__system__constellation__region__in=self.regions.all()
+                )
+            )
+            output.append(
+                models.Q(
+                    current_location__location_id__in=MapSystem.objects.filter(
+                        constellation__region__in=self.regions.all()
+                    ).values_list('system_id', flat=True)
+                )
+            )
+
+        if len(output) > 0:
+            query = output.pop()
+            for _q in output:
+                query |= _q
+            character_count = character_count.filter(query)
+        return character_count
+
+    def process_filter(self, user: User):
+        try:
+            co = self.filter_query([user])
+            # print(character_count.query)
+            if co.count() > 0:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False
+
+    def audit_filter(self, users):
+        co = self.filter_query(
+            users
+        ).values(
+            "character__character__character_ownership__user",
+            "character__character__character_name",
+            "current_ship_name"
+        )
+        chars = defaultdict(dict)
+        for c in co:
+            uid = c["character__character__character_ownership__user"]
+            char_name = c["character__character__character_name"]
+            ship_type = c['current_ship_name']
+            if char_name not in chars[uid]:
+                chars[uid][char_name] = []
+            chars[uid][char_name].append(ship_type)
+
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for u in users:
+            if len(chars[u.id]) > 0:
+                ship_count = 0
+                out_message = []
+                for char, char_items in chars[u.id].items():
+                    ship_count += len(char_items)
+                    out_message.append(
+                        f"{char}: {', '.join(list(set(char_items)))}")
+                if self.count_message_only:
+                    output[u.id] = {"message": ship_count, "check": True}
+                else:
+                    output[u.id] = {"message": "<br>".join(
+                        out_message), "check": True}
+            else:
+                output[u.id] = {"message": "", "check": False}
+        return output
+
+
 class Skillfilter(FilterBase):
     class Meta:
         verbose_name = "Smart Filter: Skill list checks"
@@ -1933,4 +2075,138 @@ class LastLoginfilter(FilterBase):
                 output[u.id] = {"message": f"{string_date} - {days_since} Days Ago",
                                 "check": False if days_since > self.days_since_login else True}
                 continue
+        return output
+
+
+class HomeStationFilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Home Station (Death Clone)"
+        verbose_name_plural = verbose_name
+
+    evelocation = models.ManyToManyField(
+        EveLocation, blank=True, help_text="Limit filter to specific Structures")
+
+    def filter_query(self, users):
+        character_list = CharacterOwnership.objects.filter(
+            user__in=users).select_related('character', "character__characteraudit")
+
+        character_count = Clone.objects.filter(
+            character__character__in=character_list.values_list('character'))
+
+        output = []
+
+        if self.evelocation.all().count() > 0:
+            output.append(models.Q(location_name__in=self.evelocation.all()))
+            output.append(models.Q(location_id__in=self.evelocation.all().values_list('location_id', flat=True)))
+
+        if len(output) > 0:
+            query = output.pop()
+            for _q in output:
+                query |= _q
+            character_count = character_count.filter(query)
+        return character_count
+
+    def process_filter(self, user: User):
+        try:
+            co = self.filter_query([user])
+            # print(character_count.query)
+            if co.count() > 0:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.exception(e)
+            return False
+
+    def audit_filter(self, users):
+        co = self.filter_query(users).values("character__character__character_ownership__user",
+                                             "character__character__character_name", "location_id")
+        chars = defaultdict(dict)
+        for c in co:
+            uid = c["character__character__character_ownership__user"]
+            char_name = c["character__character__character_name"]
+            # This might be able to be optimized during the query. But theres no FK to work with?
+            clone_location = EveLocation.objects.get(location_id=c['location_id']).location_name
+            if char_name not in chars[uid]:
+                chars[uid][char_name] = []
+            chars[uid][char_name].append(clone_location)
+
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for u in users:
+            if len(chars[u.id]) > 0:
+                ship_count = 0
+                out_message = []
+                for char, char_items in chars[u.id].items():
+                    ship_count += len(char_items)
+                    out_message.append(f"{char}: {', '.join(list(set(char_items)))}")
+                    output[u.id] = {"message": "<br>".join(out_message), "check": True}
+            else:
+                output[u.id] = {"message": "", "check": False}
+        return output
+
+
+class JumpCloneFilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Jump Clone"
+        verbose_name_plural = verbose_name
+
+    evelocation = models.ManyToManyField(
+        EveLocation, blank=True, help_text="Limit filter to specific Structures")
+
+    def filter_query(self, users):
+        character_list = CharacterOwnership.objects.filter(
+            user__in=users).select_related('character', "character__characteraudit")
+
+        character_count = JumpClone.objects.filter(
+            character__character__in=character_list.values_list('character'))
+
+        output = []
+
+        if self.evelocation.all().count() > 0:
+            output.append(models.Q(location_name__in=self.evelocation.all()))
+            output.append(models.Q(location_id__in=self.evelocation.all().values_list('location_id', flat=True)))
+
+        if len(output) > 0:
+            query = output.pop()
+            for _q in output:
+                query |= _q
+            character_count = character_count.filter(query)
+        return character_count
+
+    def process_filter(self, user: User):
+        try:
+            co = self.filter_query([user])
+            # print(character_count.query)
+            if co.count() > 0:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logger.exception(e)
+            return False
+
+    def audit_filter(self, users):
+        co = self.filter_query(users).values("character__character__character_ownership__user",
+                                             "character__character__character_name", "location_id")
+        chars = defaultdict(dict)
+        for c in co:
+            uid = c["character__character__character_ownership__user"]
+            char_name = c["character__character__character_name"]
+            # This might be able to be optimized during the query. But theres no FK to work with?
+            clone_location = EveLocation.objects.get(location_id=c['location_id']).location_name
+            if char_name not in chars[uid]:
+                chars[uid][char_name] = []
+            chars[uid][char_name].append(clone_location)
+
+        output = defaultdict(lambda: {"message": "", "check": False})
+        for u in users:
+            if len(chars[u.id]) > 0:
+                ship_count = 0
+                out_message = []
+                for char, char_items in chars[u.id].items():
+                    ship_count += len(char_items)
+                    out_message.append(f"{char}: {', '.join(list(set(char_items)))}")
+                    output[u.id] = {"message": "<br>".join(out_message), "check": True}
+            else:
+                output[u.id] = {"message": "", "check": False}
         return output
