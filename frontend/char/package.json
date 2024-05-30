@@ -2,6 +2,7 @@
   "name": "corptools",
   "version": "2.2.1",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@agney/react-loading": "^0.1.2",
     "@amcharts/amcharts5": "^5.1.12",

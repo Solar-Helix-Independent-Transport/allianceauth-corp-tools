@@ -391,15 +391,15 @@ def update_corp_structures(corp_id):  # pagnated results
             })
 
         if _structure_ob:
-            _asset = None
+            # _asset = None
             _location = None
             celestial = StructureCelestial.objects.filter(
                 structure_id=_structure.get('structure_id'))
 
             if not celestial.exists():
                 try:
-                    _asset = CorpAsset.objects.get(
-                        item_id=_structure.get('structure_id'), corp=_corporation)
+                    # _asset = CorpAsset.objects.get(
+                    #     item_id=_structure.get('structure_id'), corp=_corporation)
                     _req_scopes = ['esi-assets.read_corporation_assets.v1']
                     _req_roles = ['Director']
                     _token = get_corp_token(

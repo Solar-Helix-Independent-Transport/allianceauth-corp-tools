@@ -152,9 +152,9 @@ class AssetsApiEndpoints:
 
             output = []
             location_names = {}
-            for l in asset_locations:
-                if l.location_name:
-                    location_names[l.item_id] = l.location_name.location_name
+            for lo in asset_locations:
+                if lo.location_name:
+                    location_names[lo.item_id] = lo.location_name.location_name
 
             for a in assets:
                 loc = a.location_flag
