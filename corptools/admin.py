@@ -244,25 +244,25 @@ class CurrentShipFilterAdmin(admin.ModelAdmin):
 
     @admin.display(description='groups')
     def _groups(self, obj):
-        my_groups = [x.name for x in obj.types.order_by('name')]
+        my_groups = [x.name for x in obj.groups.order_by('name')]
 
         return self._list_2_html_w_tooltips(my_groups, 10)
 
     @admin.display(description='systems')
     def _systems(self, obj):
-        my_systems = [x.name for x in obj.types.order_by('name')]
+        my_systems = [x.name for x in obj.systems.order_by('name')]
 
         return self._list_2_html_w_tooltips(my_systems, 10)
 
     @admin.display(description='constellations')
     def _constellations(self, obj):
-        my_constellations = [x.name for x in obj.types.order_by('name')]
+        my_constellations = [x.name for x in obj.constellations.order_by('name')]
 
         return self._list_2_html_w_tooltips(my_constellations, 10)
 
     @admin.display(description='regions')
     def _regions(self, obj):
-        my_regions = [x.name for x in obj.types.order_by('name')]
+        my_regions = [x.name for x in obj.regions.order_by('name')]
 
         return self._list_2_html_w_tooltips(my_regions, 10)
 
