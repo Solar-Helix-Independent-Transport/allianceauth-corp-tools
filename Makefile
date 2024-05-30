@@ -29,16 +29,18 @@ deploy:
 
 buildjs:
 	cd frontend/corp;yarn install;yarn build
-	cd frontend/corp;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/corp\/static\/js\//g' {} \;
 	cd frontend/char;yarn install;yarn build
-	cd frontend/char;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/char\/static\/js\//g' {} \;
+	# cd frontend/frontend/;yarn install;yarn build
 
 package:
 	pip install -U hatch
 	cd frontend/corp;yarn install;yarn build
-	cd frontend/corp;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/corp\/static\/js\//g' {} \;
 	cd frontend/char;yarn install;yarn build
+<<<<<<< HEAD
 	cd frontend/char;find 'build/' -name '*.js' -exec sed -i -e 's/\/\/# sourceMappingURL=/\/\/# sourceMappingURL=\/static\/corptools\/char\/static\/js\//g' {} \;
+=======
+	# cd frontend/frontend/;yarn install;yarn build
+>>>>>>> 385a6fab698b4d6cf1cfbdbc1b50bc9da3f7d2f1
 	hatch build
 
 devcorp:

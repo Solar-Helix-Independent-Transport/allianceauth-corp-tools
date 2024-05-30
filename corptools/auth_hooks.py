@@ -70,7 +70,8 @@ def register_url():
 
 @hooks.register("secure_group_filters")
 def filters():
-    return [models.AssetsFilter, models.LastLoginfilter, models.FullyLoadedFilter, models.Skillfilter, models.TimeInCorpFilter, models.Rolefilter, models.Titlefilter, models.HighestSPFilter]
+    # Hey nerd, if you create a filter BEFORE its registered here. It wont appear until you edit and save it.
+    return [models.AssetsFilter, models.LastLoginfilter, models.FullyLoadedFilter, models.Skillfilter, models.TimeInCorpFilter, models.Rolefilter, models.Titlefilter, models.HighestSPFilter, models.CurrentShipFilter, models.HomeStationFilter, models.JumpCloneFilter]
 
 
 @hooks.register('discord_cogs_hook')
