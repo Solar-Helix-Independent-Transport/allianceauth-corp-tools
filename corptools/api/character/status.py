@@ -77,6 +77,10 @@ class StatusApiEndpoints:
                 except models.CharacterAudit.DoesNotExist:
                     pass
                 output["characters"].append(_o)
+
+            output["characters"] = sorted(
+                output["characters"], reverse=True, key=lambda d: d['sp']
+            )
             return 200, output
 
         @api.get(
@@ -97,7 +101,9 @@ class StatusApiEndpoints:
 
             corp_histories = models.CorporationHistory.objects\
                 .filter(character__character__in=characters)\
-                .select_related('character__character', 'corporation_name')
+                .select_related(
+                    'character__character', 'corporation_name'
+                ).order_by("record_id")
 
             histories = {}
             for h in corp_histories:
@@ -116,16 +122,6 @@ class StatusApiEndpoints:
                         "alliance_name": h.corporation_name.alliance.name,
                     })
                 histories[h.character.character_id].append(_h)
-            char_skill_total = models.Skill.objects\
-                .filter(character__character__in=characters)\
-                .values('character')\
-                .annotate(char=F('character__character__character_id'))\
-                .annotate(total_sp=Sum('skillpoints_in_skill'))
-
-            skills = {}
-
-            for c in char_skill_total:
-                skills[c.get('char')] = c.get('total_sp')
 
             characters = characters.select_related('characteraudit')
             output = []
