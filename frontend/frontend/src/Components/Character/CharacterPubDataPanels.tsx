@@ -1,6 +1,5 @@
 import { PortraitCard } from "../Cards/PortraitCard";
-import { CollapseBlock } from "../Helpers/CollapseBlock";
-import { Badge, Card, Table } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 
 const CharacterPubDataPanels = ({ data }: { data: any }) => {
   if (!data) return <p>Loading</p>;

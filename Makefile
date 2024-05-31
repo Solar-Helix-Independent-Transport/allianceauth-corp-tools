@@ -30,13 +30,13 @@ deploy:
 buildjs:
 	cd frontend/corp;yarn install;yarn build
 	cd frontend/char;yarn install;yarn build
-	# cd frontend/frontend/;yarn install;yarn build
+	cd frontend/frontend/;yarn install;yarn build
 
 package:
 	pip install -U hatch
 	cd frontend/corp;yarn install;yarn build
 	cd frontend/char;yarn install;yarn build
-	# cd frontend/frontend/;yarn install;yarn build
+	cd frontend/frontend/;yarn install;yarn build
 	hatch build
 
 devcorp:
