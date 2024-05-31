@@ -35,8 +35,13 @@ export function PortraitCard({
       bg={bg}
       border={border}
     >
-      <Card.Body className={"d-flex flex-column align-items-center"}>
-        <Card.Title className={"text-center w-100"}>
+      <Card.Body className={"d-flex flex-column align-items-center p-0"}>
+        <CharacterAllegiancePortrait
+          className="card-img-top"
+          size={350}
+          {...{ character, roundedImages }}
+        />
+        <Card.Title className={"text-center w-100 pt-2"}>
           <Row className="justify-content-between">
             <div className="w-auto">{headerIcon && <i className={`${headerIcon} fa-fw`} />}</div>
             <div className="w-auto">{heading}</div>
@@ -47,8 +52,6 @@ export function PortraitCard({
 
           {headerIcon && <></>}
         </Card.Title>
-        <CharacterAllegiancePortrait size={350} {...{ character, roundedImages }} />
-        <hr />
         {children}
       </Card.Body>
     </Card>

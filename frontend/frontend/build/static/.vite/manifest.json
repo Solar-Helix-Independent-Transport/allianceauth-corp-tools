@@ -1,0 +1,23 @@
+{
+  "_@libs-Bp1FXG-G.js": {
+    "file": "assets/@libs-Bp1FXG-G.js"
+  },
+  "_@react-router-B6MGdOy4.js": {
+    "file": "assets/@react-router-B6MGdOy4.js",
+    "imports": [
+      "_@libs-Bp1FXG-G.js"
+    ]
+  },
+  "index.html": {
+    "file": "assets/index-B7A0Ru3E.js",
+    "src": "index.html",
+    "isEntry": true,
+    "imports": [
+      "_@libs-Bp1FXG-G.js",
+      "_@react-router-B6MGdOy4.js"
+    ],
+    "css": [
+      "assets/index-DACG_kbJ.css"
+    ]
+  }
+}

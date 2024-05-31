@@ -9,6 +9,7 @@ export interface CharacterPortraitProps extends Partial<Element> {
   height?: number;
   width?: number;
   style?: Partial<React.CSSProperties>;
+  className?: string;
 }
 
 export const CharacterPortrait = (props: CharacterPortraitProps) => {
@@ -17,6 +18,7 @@ export const CharacterPortrait = (props: CharacterPortraitProps) => {
       height={props.height && props.height}
       width={props.width && props.width}
       style={props.style && props.style}
+      className={props.className && props.className}
       src={`https://images.evetech.net/characters/${props.character_id}/portrait?size=${props.size}`}
     />
   );
@@ -91,12 +93,18 @@ export interface PortraitProps extends Partial<Element> {
   size: number;
   rounded_images?: boolean;
   style?: Partial<React.CSSProperties>;
+  className?: string;
 }
 
 export const CharacterAllegiancePortrait = (props: PortraitProps) => {
-  const border = props.rounded_images ? "50%" : "0%";
+  const borderStyle = props.rounded_images
+    ? {
+        borderRadius: "50%",
+      }
+    : {};
   return (
     <div
+      className={props.className && props.className}
       style={{
         height: `${props.size}px`,
         width: `${props.size}px`,
@@ -104,20 +112,19 @@ export const CharacterAllegiancePortrait = (props: PortraitProps) => {
       }}
     >
       <CharacterPortrait
-        style={{
-          borderRadius: border,
-        }}
+        style={borderStyle}
         height={props.size}
         width={props.size}
         character_id={props.character.character_id}
         size={512}
+        className={props.className && props.className}
       />
       <CorporationLogo
         style={{
           position: "absolute",
           bottom: "0",
           left: "0",
-          borderRadius: border,
+          ...borderStyle,
         }}
         height={props.size / 4}
         width={props.size / 4}
@@ -130,7 +137,7 @@ export const CharacterAllegiancePortrait = (props: PortraitProps) => {
             position: "absolute",
             bottom: "0",
             right: "0",
-            borderRadius: border,
+            ...borderStyle,
           }}
           height={props.size / 4}
           width={props.size / 4}
@@ -144,7 +151,7 @@ export const CharacterAllegiancePortrait = (props: PortraitProps) => {
               position: "absolute",
               bottom: "0",
               right: "0",
-              borderRadius: border,
+              ...borderStyle,
             }}
             height={props.size / 4}
             width={props.size / 4}

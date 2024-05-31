@@ -5,7 +5,6 @@ import {
   CharacterPortrait,
   CorporationLogo,
 } from "@pvyparts/allianceauth-components";
-import React from "react";
 import { Badge, Card } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -19,8 +18,8 @@ function MyTooltip({ message }: { message: String }) {
 }
 
 const CharHeader = () => {
-  let { characterID } = useParams();
-  let style = {
+  const { characterID } = useParams();
+  const style = {
     borderRadius: `25%`,
   };
 
@@ -50,14 +49,14 @@ const CharHeader = () => {
     <Card>
       <div className="d-flex justify-content-start align-items-center flex-no-wrap">
         <CharacterPortrait
-          style={{ borderRadius: "0.375rem 0 0 0.375rem" }}
+          style={{ borderRadius: "0.375rem 0 0 0.375rem" } as CSSStyleDeclaration}
           className="m-0"
           character_id={data?.main.character_id}
           size={64}
         />
         <h4 className="m-1 mx-3">{data?.main.character_name}</h4>
         <CorporationLogo
-          style={style}
+          style={style as CSSStyleDeclaration}
           className="m-1 mx-3"
           corporation_id={data?.main.corporation_id}
           size={32}
@@ -66,7 +65,7 @@ const CharHeader = () => {
         {data?.main.alliance_id && (
           <>
             <AllianceLogo
-              style={style}
+              style={style as CSSStyleDeclaration}
               className="m-1 mx-3"
               alliance_id={data?.main.alliance_id}
               size={32}

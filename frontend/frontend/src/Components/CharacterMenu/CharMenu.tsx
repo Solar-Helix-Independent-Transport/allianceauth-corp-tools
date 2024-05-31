@@ -1,4 +1,3 @@
-import React from "react";
 import { Nav } from "react-bootstrap";
 import { NavDropdown } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
@@ -20,7 +19,7 @@ export interface CharMenuProps extends Partial<HTMLElement> {
   characterID: string;
 }
 
-const CharMenu = ({ isLoading = false, error = false, data, characterID }: CharMenuProps) => {
+const CharMenu = ({ data, characterID }: CharMenuProps) => {
   return (
     <>
       <Nav.Item>

@@ -5,9 +5,9 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 export const RefreshCharButton = () => {
-  let { characterID } = useParams();
+  const { characterID } = useParams();
 
-  const { data, isLoading, status, refetch, isFetching } = useQuery(
+  const { refetch, isFetching } = useQuery(
     "my_key",
     () => {
       return postAccountRefresh(characterID);

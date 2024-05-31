@@ -9,12 +9,30 @@ type Character = {
   corporation_name: string;
   alliance_name: string;
 };
+
+type UpdateType = Record<string, string>;
+
 type CharacterType = {
   character: Character;
   isk: number;
   sp: number;
   active: boolean;
-  last_updates: Array<any>;
+  last_updates: UpdateType;
+};
+
+const UpdateTableRows = ({ values }: { values: UpdateType }) => {
+  if (values) {
+    return Object.keys(values)?.map((h: string) => {
+      return (
+        <tr key={h}>
+          <td>{h}</td>
+          <td className="text-end">
+            {values ? values[h] ? <TimeAgo date={values[h]} /> : "Never" : "Never"}
+          </td>
+        </tr>
+      );
+    });
+  }
 };
 
 const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
@@ -79,25 +97,7 @@ const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boo
               <div>
                 <Table striped>
                   <tbody>
-                    {Object.keys(cell.getValue()).map((h) => {
-                      const CelArray = cell.getValue();
-                      return (
-                        <tr key={h}>
-                          <td>{h}</td>
-                          <td className="text-end">
-                            {CelArray ? (
-                              CelArray[h] ? (
-                                <TimeAgo date={CelArray[h]} />
-                              ) : (
-                                "Never"
-                              )
-                            ) : (
-                              "Never"
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    <UpdateTableRows values={cell.getValue()} />
                   </tbody>
                 </Table>
               </div>

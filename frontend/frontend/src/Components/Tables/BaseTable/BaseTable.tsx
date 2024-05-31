@@ -18,7 +18,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React, { useState } from "react";
 import {
   Button,
   ButtonGroup,
@@ -34,11 +33,11 @@ function MyTooltip(message: string) {
   return <Tooltip id="character_tooltip">{message}</Tooltip>;
 }
 
-function strToKey(keyString: string, ob: object) {
-  return keyString.split(".").reduce(function (p: any, prop: any) {
-    return p[prop];
-  }, ob);
-}
+// function strToKey(keyString: string, ob: object) {
+//   return keyString.split(".").reduce(function (p: any, prop: any) {
+//     return p[prop];
+//   }, ob);
+// }
 
 type tableInitialState = SortingTableState & VisibilityTableState & PaginationInitialTableState;
 
@@ -60,13 +59,13 @@ interface _BaseTableProps extends BaseTableProps {
 }
 
 const BaseTable = ({
-  isLoading = false,
+  // isLoading = false,
   isFetching = false,
   debugTable = false,
   data = [],
-  error = false,
+  // error = false,
   columns,
-  asyncExpandFunction = undefined,
+  // asyncExpandFunction = undefined,
   striped = false,
   hover = false,
   initialState = undefined,
@@ -84,7 +83,7 @@ const BaseTable = ({
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
     //
     debugTable: debugTable,
-    state: initialState,
+    // state: initialState,
   });
 
   return (
@@ -256,11 +255,10 @@ function _baseTable({
             >
               {[10, 50, 100, 1000000].map((_pageSize) => (
                 <Dropdown.Item
-                  id={_pageSize}
+                  id={`${_pageSize}`}
                   key={_pageSize}
                   eventKey={_pageSize}
-                  value={_pageSize}
-                  onSelect={(eventKey: any, event: Object) => {
+                  onSelect={(eventKey: any) => {
                     table.setPageSize(Number(eventKey));
                   }}
                 >

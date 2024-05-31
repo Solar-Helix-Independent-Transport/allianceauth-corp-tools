@@ -1,6 +1,6 @@
 import { PortraitCard } from "../Cards/PortraitCard";
 import { CollapseBlock } from "../Helpers/CollapseBlock";
-import { Badge, Card, Table } from "react-bootstrap";
+import { Badge, Button, ButtonGroup, Card, Table } from "react-bootstrap";
 import TimeAgo from "react-timeago";
 
 const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
@@ -17,11 +17,12 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
             roundedImages={"10"}
             isFetching={isFetching}
           >
-            <div style={{ width: "400px" }}>
-              <Card.Title className={"text-center"}>{char.character.corporation_name}</Card.Title>
-              <Card.Title className={"text-center"}>
+            <div className="mt-2" style={{ width: "350px" }}>
+              <Card.Text className={"text-center"}>
+                {char.character.corporation_name}
+                <br />
                 {char.character.alliance_name ? char.character.alliance_name : <br />}
-              </Card.Title>
+              </Card.Text>
 
               <Card.Text className={"text-center"}>
                 Skill Points:{" "}
@@ -38,8 +39,36 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                 <br />
                 <Badge className={"text-center"}>{char.ship ? char.ship : "Unknown Ship"}</Badge>
               </Card.Text>
-              <hr />
+              <Card.Text className={"text-center"}>
+                <ButtonGroup className="w-75">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    href={`https://zkillboard.com/character/${char.character.character_id}`}
+                  >
+                    zKill
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    href={`https://evewho.com/character/${char.character.character_id}`}
+                  >
+                    Eve Who
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    href={`https://evemaps.dotlan.net/corp/${char.character.corporation_name.replace(
+                      " ",
+                      "_"
+                    )}`}
+                  >
+                    DotLan
+                  </Button>
+                </ButtonGroup>
+              </Card.Text>
               <CollapseBlock
+                className="m-2"
                 id={`dropdown-status-${char.character.character_name}`}
                 heading={`Update Status`}
               >
@@ -52,7 +81,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                       </tr>
                     </thead>
                   </Table>
-                  <div style={{ width: "400px" }}>
+                  <div style={{ width: "350px" }}>
                     <Table striped>
                       <tbody>
                         {data?.headers.map((h: any) => {

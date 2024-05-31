@@ -1,5 +1,6 @@
 import CharacterAudit from "./Pages/Char/CharacterAudit";
 import CharacterStatus from "./Pages/Char/CharacterStatus";
+import CorporationAudit from "./Pages/Corp/CorporationAudit";
 import React from "react";
 import { Card } from "react-bootstrap";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -149,6 +150,73 @@ function App() {
                 element={
                   <Card>
                     <Card.Body className="text-center">This is account/list.</Card.Body>
+                  </Card>
+                }
+              />
+            </Route>
+            <Route path="audit/r/corp/" element={<CorporationAudit />}>
+              <Route index element={<Navigate to="structures" replace />} />
+              <Route
+                path="corporations"
+                element={
+                  <Card>
+                    <Card.Body className="text-center">This is Corp List.</Card.Body>
+                  </Card>
+                }
+              />
+              <Route
+                path="structures"
+                element={
+                  <Card>
+                    <Card.Body className="text-center">This is structures.</Card.Body>
+                  </Card>
+                }
+              />
+              <Route
+                path="wallets"
+                element={
+                  <Card>
+                    <Card.Body className="text-center">This is wallets.</Card.Body>
+                  </Card>
+                }
+              />
+              <Route
+                path="assetgroup"
+                element={
+                  <Card>
+                    <Card.Body className="text-center">This is assetgroup.</Card.Body>
+                  </Card>
+                }
+              />
+              <Route
+                path="assetlist"
+                element={
+                  <Card>
+                    <Card.Body className="text-center">This is assetlist.</Card.Body>
+                  </Card>
+                }
+              />
+              <Route
+                path="pocos"
+                element={
+                  <Card>
+                    <Card.Body className="text-center">This is pocos.</Card.Body>
+                  </Card>
+                }
+              />
+              <Route
+                path="bridges"
+                element={
+                  <Card>
+                    <Card.Body className="text-center">This is bridges.</Card.Body>
+                  </Card>
+                }
+              />
+              <Route
+                path="sov"
+                element={
+                  <Card>
+                    <Card.Body className="text-center">This is sov.</Card.Body>
                   </Card>
                 }
               />

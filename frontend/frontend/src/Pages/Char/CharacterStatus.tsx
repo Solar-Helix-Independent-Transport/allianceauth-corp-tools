@@ -2,7 +2,7 @@ import CharacterStatusPanels from "../../Components/Character/CharacterStatusPan
 import CharacterStatusTable from "../../Components/Character/CharacterStatusTable";
 import { loadCharacterStatus } from "../../api/character";
 import { useState } from "react";
-import { Card, Form, Row } from "react-bootstrap";
+import { Card, Form } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 

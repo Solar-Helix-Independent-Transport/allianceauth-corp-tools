@@ -65,7 +65,7 @@ export const BoolFilter = ({ column }: { column: Column<any, any> }) => {
     <Select
       styles={colourStyles}
       isClearable={true}
-      onChange={(newValue, action) => {
+      onChange={(newValue) => {
         column.setFilterValue(newValue ? newValue.value : "");
       }}
       onInputChange={(value, action) => {
@@ -106,7 +106,7 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
     <Select
       styles={colourStyles}
       isClearable={true}
-      onChange={(newValue, action) => {
+      onChange={(newValue) => {
         column.setFilterValue(newValue ? newValue.value : "");
       }}
       onInputChange={(value, action) => {

@@ -1,4 +1,5 @@
-import styles from "./CharMenu.module.css";
+import CorpAddToken from "./CorpAddToken";
+import styles from "./CorpMenu.module.css";
 import React from "react";
 import { Nav } from "react-bootstrap";
 import ReactDOM from "react-dom";
@@ -7,7 +8,7 @@ import { LinkContainer } from "react-router-bootstrap";
 
 const menuRoot = document.getElementById("nav-right");
 
-const CharMenuRight = () => {
+const CorpMenuRight = () => {
   const isLoading = useIsFetching();
   const [innerHtmlEmptied, setInnerHtmlEmptied] = React.useState(false);
 
@@ -35,16 +36,13 @@ const CharMenuRight = () => {
       ) : (
         <></>
       )}
-      <Nav.Link href="/audit/char/add/" key="Add Character">
-        Add Character
-      </Nav.Link>
-      <LinkContainer to={`account/list`}>
-        <Nav.Link key="Account List">Account List</Nav.Link>
+      <CorpAddToken />
+      <LinkContainer to={`corporations`}>
+        <Nav.Link key="corporation_list">Corporations</Nav.Link>
       </LinkContainer>
-      {/* TODO Check perms for this */}
-      <LinkContainer to={`/audit/r/corp`}>
-        <Nav.Link key="corp-swap">
-          <i className="fa-regular fa-building"></i>
+      <LinkContainer to={`audit/r/0`}>
+        <Nav.Link key="corporation_list">
+          <i className="fa-solid fa-users"></i>
         </Nav.Link>
       </LinkContainer>
     </>,
@@ -52,4 +50,4 @@ const CharMenuRight = () => {
   );
 };
 
-export { CharMenuRight };
+export { CorpMenuRight };

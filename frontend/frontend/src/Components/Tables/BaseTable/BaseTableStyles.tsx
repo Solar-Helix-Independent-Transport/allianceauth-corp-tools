@@ -1,5 +1,5 @@
 export const colourStyles = {
-  option: (styles) => {
+  option: (styles: any) => {
     return {
       ...styles,
       color: "black",

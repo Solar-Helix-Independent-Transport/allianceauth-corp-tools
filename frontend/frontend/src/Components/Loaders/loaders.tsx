@@ -1,5 +1,4 @@
 import styles from "./Loader.module.css";
-import React from "react";
 
 export interface LoaderProps extends Partial<HTMLElement> {
   message?: string;
