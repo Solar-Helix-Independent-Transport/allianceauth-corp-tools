@@ -86,6 +86,21 @@ def update_character_location(character_id, force_refresh=False):
         if _loc:
             _loc.save()
 
+        CharacterLocation.objects.update_or_create(
+            character=audit_char,
+            defaults={
+                "current_location": _loc if _loc else None
+            }
+        )
+        logger.debug(
+            f"CT_TIME: {time.perf_counter()-_st} update_character_location_location {character_id}")
+
+    except NotModifiedError:
+        logger.info("CT: No New Location data for: {}".format(
+            audit_char.character.character_name))
+        pass
+
+    try:
         ship_op = providers.esi.client.Location.get_characters_character_id_ship(
             character_id=character_id)
 
@@ -100,14 +115,13 @@ def update_character_location(character_id, force_refresh=False):
             defaults={
                 "current_ship": ship,
                 "current_ship_name": ship_data["ship_name"],
-                "current_location": _loc if _loc else None
             }
         )
         logger.debug(
-            f"CT_TIME: {time.perf_counter()-_st} update_character_location {character_id}")
+            f"CT_TIME: {time.perf_counter()-_st} update_character_location_ship {character_id}")
 
     except NotModifiedError:
-        logger.info("CT: No New Location data for: {}".format(
+        logger.info("CT: No New current ship data for: {}".format(
             audit_char.character.character_name))
         pass
 
