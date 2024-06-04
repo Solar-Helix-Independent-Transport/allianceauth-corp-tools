@@ -1,6 +1,7 @@
-import CharacterStatusPanels from "../../Components/Character/CharacterStatusPanels";
+// import CharacterStatusPanels from "../../Components/Character/CharacterStatusPanels";
 import CharacterStatusTable from "../../Components/Character/CharacterStatusTable";
 import { loadCharacterStatus } from "../../api/character";
+import CharacterAtAGlance from "./CharacterAtAGlance";
 import { useState } from "react";
 import { Card, Form } from "react-bootstrap";
 import { useQuery } from "react-query";
@@ -34,7 +35,10 @@ const CharacterStatus = () => {
       {table ? (
         <CharacterStatusTable {...{ isFetching }} data={data} />
       ) : (
-        <CharacterStatusPanels {...{ isFetching }} data={data} />
+        <>
+          <CharacterAtAGlance />
+          {/* <CharacterStatusPanels {...{ isFetching }} data={data} /> */}
+        </>
       )}
     </>
   );

@@ -57,11 +57,26 @@ if app_settings.CT_CHAR_CONTACTS_MODULE:
 urlpatterns = [
     path('', views.corptools_menu, name='view'),
     re_path(r'^api/', api.urls),
-    path('r/', views.react_menu, name='react'),
-    re_path(r'^r/(?P<character_id>(\d)*)/',
-            views.v3_ui_render, name='reactmain'),
-    # re_path(r'^r4/(?P<character_id>(\d)*)/',
-    #         views.react_main, name='reactmain_beta'),
+    path(
+        'r/',
+        views.react_menu,
+        name='react'
+    ),
+    re_path(
+        r'^r/(?P<character_id>(\d)*)/',
+        views.v3_ui_render,
+        name='reactmain'
+    ),
+    re_path(
+        r'^r_beta/(?P<character_id>(\d)*)/',
+        views.react_main,
+        name='reactbetamain'
+    ),
+    re_path(
+        'r_beta/',
+        views.react_menu_v4,
+        name='reactbeta'
+    ),
     re_path(r'^check_account/(?P<character_id>(\d)*)/$',
             views.update_account, name='update_account'),
     path('admin/', views.admin, name='admin'),

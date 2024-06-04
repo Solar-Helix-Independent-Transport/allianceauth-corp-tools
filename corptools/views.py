@@ -367,6 +367,11 @@ def react_menu(request):
 
 
 @login_required
+def react_menu_v4(request):
+    return redirect('corptools:reactbetamain', request.user.profile.main_character.character_id)
+
+
+@login_required
 def react_main(request, character_id):
     try:
         return render(request, 'corptools/base_bs5.html', context={"version": __version__, "app_name": "corptools/bs5", "page_title": "Audit"})

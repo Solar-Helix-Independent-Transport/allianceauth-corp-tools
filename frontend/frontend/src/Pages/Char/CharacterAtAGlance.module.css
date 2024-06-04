@@ -1,0 +1,17 @@
+.strikeOut {
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+}
+.strikeOut:before,
+.strikeOut:after {
+  content: "";
+  flex: 1 1;
+  border-bottom: 1px solid var(--bs-border-color);
+  margin: auto;
+}
+.strikeOut:before,
+.strikeOut:after {
+  margin-right: 10px;
+  margin-left: 10px;
+}

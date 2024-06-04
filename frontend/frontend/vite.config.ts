@@ -20,6 +20,15 @@ export default defineConfig({
     outDir: "build/static/",
     rollupOptions: {
       output: {
+        // this is to make sure our static files are in the write place when we build
+        assetFileNames: (assetInfo) => {
+          let extType = assetInfo.name.split(".").at(1);
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            extType = "img";
+          }
+          // fake the path, we copy them over properly later
+          return `static/corptools/bs5/statics/${extType}/[name]-[hash][extname]`;
+        },
         manualChunks(id) {
           // creating a chunk to react routes deps. Reducing the vendor chunk size
           if (id.includes("react-router-dom") || id.includes("react-router")) {

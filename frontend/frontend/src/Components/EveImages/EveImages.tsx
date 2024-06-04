@@ -4,7 +4,7 @@ import { Image } from "react-bootstrap";
 type Sizes = 32 | 64 | 128 | 256 | 512;
 
 export interface CharacterPortraitProps extends Partial<Element> {
-  character_id?: number;
+  character_id?: number | string | undefined;
   size: Sizes;
   height?: number;
   width?: number;
@@ -25,7 +25,7 @@ export const CharacterPortrait = (props: CharacterPortraitProps) => {
 };
 
 export interface CorporationLogoProps extends Partial<Element> {
-  corporation_id?: number;
+  corporation_id?: number | string | undefined;
   size: Sizes;
   height?: number;
   width?: number;
@@ -44,7 +44,7 @@ export const CorporationLogo = (props: CorporationLogoProps) => {
 };
 
 export interface AllianceLogoProps extends Partial<Element> {
-  alliance_id?: number;
+  alliance_id?: number | string | undefined;
   size: Sizes;
   height?: number;
   width?: number;
@@ -85,10 +85,10 @@ export const TypeIcon = (props: TypeIconProps) => {
 
 export interface PortraitProps extends Partial<Element> {
   character: {
-    character_id: number;
-    corporation_id: number;
-    alliance_id?: number;
-    faction_id?: number;
+    character_id: number | string | undefined;
+    corporation_id?: number | string | undefined;
+    alliance_id?: number | string | undefined;
+    faction_id?: number | string | undefined;
   };
   size: number;
   rounded_images?: boolean;
