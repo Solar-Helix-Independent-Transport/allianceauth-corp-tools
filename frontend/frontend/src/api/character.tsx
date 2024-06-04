@@ -36,6 +36,12 @@ export async function loadPubData(character_id: any) {
   return data;
 }
 
+export async function loadGlanceAssetData(character_id: any) {
+  const api = await axios.get(`/audit/api/account/${character_id}/glance/assets`);
+  console.log(`get glance/assets in api ${character_id}`);
+  return api.data;
+}
+
 export async function postAccountRefresh(character_id: any) {
   console.log(`sent account refresh ${character_id}`);
   const api = await axios.post(

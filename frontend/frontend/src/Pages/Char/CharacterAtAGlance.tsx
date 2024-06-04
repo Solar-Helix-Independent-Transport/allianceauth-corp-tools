@@ -2,41 +2,25 @@ import { IconStatusCard, IconStatusDiv } from "../../Components/Cards/IconStatus
 import { CharacterAllegiancePortrait } from "../../Components/EveImages/EveImages";
 import Amarr from "../../assets/amarr_128.png";
 import Asteroid from "../../assets/asteroid_64.png";
-import Battlecruiser from "../../assets/battleCruiser_32.png";
-import Battleship from "../../assets/battleship_32.png";
-import Blueprint from "../../assets/blueprint.png";
 import Cal from "../../assets/caldari_128.png";
-import Carrier from "../../assets/carrier_32.png";
-import Cruiser from "../../assets/cruiser_32.png";
-import Destroyer from "../../assets/destroyer_32.png";
-import Dreadnought from "../../assets/dreadnought_32.png";
-import Extractor from "../../assets/extractor_64.png";
-import Fax from "../../assets/forceAuxiliary_32.png";
-import Frieghter from "../../assets/freighter_32.png";
-import Frigate from "../../assets/frigate_32.png";
 import FW from "../../assets/fw_64.png";
 import Gal from "../../assets/gallente_128.png";
 import Gas from "../../assets/gas_64.png";
 import Ice from "../../assets/ice_64.png";
 import Sansha from "../../assets/incursion_2_64.png";
-import IndustrialCommand from "../../assets/industrialCommand_32.png";
-import Industrial from "../../assets/industrial_32.png";
 import Industry from "../../assets/industry_128.png";
 import Isk from "../../assets/isk_128.png";
 import Market from "../../assets/market_128.png";
-import MiningBarge from "../../assets/miningBarge_32.png";
 import Min from "../../assets/minmatar128.png";
 import Missions from "../../assets/missions_2_128.png";
 import Moons from "../../assets/moonAsteroid_JackpotR32.png";
 import NPC from "../../assets/npcbattleship_32.png";
 import Omega from "../../assets/omega_128.png";
 import Planet from "../../assets/planet_128.png";
-import Injector from "../../assets/skillInjector_64.png";
-import Supercarrier from "../../assets/superCarrier_32.png";
-import Titan from "../../assets/titan_32.png";
 import Triglavian from "../../assets/triglavian_128.png";
 import Unknowns from "../../assets/unknown_64.png";
 import styles from "./CharacterAtAGlance.module.css";
+import { GlancesAssets } from "./Glance/Assets";
 import { Card } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 
@@ -53,54 +37,7 @@ const CharacterAtAGlance = () => {
         size={256}
         rounded_images={true}
       />
-      <h3 className={`${styles.strikeOut} w-100 text-center`}>Assets</h3>
-      <div className="d-flex flex-wrap justify-content-center">
-        <Card className="m-2">
-          <div className="d-flex align-items-center">
-            <IconStatusDiv iconSrc={Frigate} textVariant="info" text={"198"} />
-            <IconStatusDiv iconSrc={Destroyer} textVariant="info" text={"300"} />
-            <IconStatusDiv iconSrc={Cruiser} textVariant="info" text={"16"} />
-            <IconStatusDiv iconSrc={Battlecruiser} textVariant="info" text={"198"} />
-            <IconStatusDiv iconSrc={Battleship} textVariant="info" text={"198"} />
-          </div>
-        </Card>
-        <Card className="m-2">
-          <div className="d-flex align-items-center">
-            <IconStatusDiv iconSrc={Carrier} textVariant="info" text={"2"} />
-            <IconStatusDiv iconSrc={Fax} textVariant="info" text={"1"} />
-            <IconStatusDiv iconSrc={Dreadnought} textVariant="info" text={"3"} />
-            <IconStatusDiv iconSrc={Supercarrier} textVariant="info" text={"1"} />
-            <IconStatusDiv iconSrc={Titan} textVariant="info" text={"1"} />
-          </div>
-        </Card>
-        <Card className="m-2">
-          <div className="d-flex align-items-center">
-            <IconStatusDiv iconSrc={MiningBarge} textVariant="warning" text={"-"} />
-            <IconStatusDiv iconSrc={Industrial} textVariant="warning" text={"-"} />
-            <IconStatusDiv
-              iconSrc={IndustrialCommand}
-              textVariant="warning"
-              text={"-"}
-              isLoading={true}
-            />
-            <IconStatusDiv iconSrc={Frieghter} textVariant="info" text={"1"} />
-          </div>
-        </Card>
-        <Card className="m-2">
-          <div className="d-flex align-items-center">
-            <IconStatusDiv iconSrc={Injector} textVariant="info" text={"53"} isLoading={true} />
-            <IconStatusDiv iconSrc={Extractor} textVariant="info" text={"5"} isLoading={true} />
-          </div>
-        </Card>
-        <Card className="m-2">
-          <div className="d-flex align-items-center">
-            <img src={Blueprint} height={32} width={32} className="m-2" />
-            <IconStatusDiv iconSrc={Titan} textVariant="info" text={"1"} />
-            <IconStatusDiv iconSrc={Supercarrier} textVariant="info" text={"2"} />
-            <IconStatusDiv iconSrc={Dreadnought} textVariant="info" text={"4"} />
-          </div>
-        </Card>
-      </div>
+      <GlancesAssets />
       <h3 className={`${styles.strikeOut} w-100 text-center`}>Activity</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <Card className="m-2">

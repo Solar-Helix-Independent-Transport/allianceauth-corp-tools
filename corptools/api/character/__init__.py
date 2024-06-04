@@ -1,4 +1,5 @@
 from .assets import AssetsApiEndpoints
+from .at_a_glance import GlanceApiEndpoints
 from .clones import CloneApiEndpoints
 from .finances import FinancesApiEndpoints
 from .industry import IndustryApiEndpoints
@@ -23,3 +24,4 @@ def setup(api):
     SkillApiEndpoints(api)
     StatusApiEndpoints(api)
     RefreshApiEndpoints(api)
+    GlanceApiEndpoints(api)
