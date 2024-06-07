@@ -1,6 +1,9 @@
+from datetime import timedelta
+
 from ninja import NinjaAPI
 
 from django.db.models import F, Q, Sum
+from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from allianceauth.services.hooks import get_extension_logger
@@ -10,6 +13,139 @@ from corptools import models
 from corptools.api.helpers import get_alts_queryset, get_main_character
 
 logger = get_extension_logger(__name__)
+
+
+def wallet_check(characters, types, first_parties=None, minimum_amount=None, look_back=30):
+    start_date = timezone.now() - timedelta(days=look_back)
+    if isinstance(types, str):
+        types = [types]
+
+    if isinstance(first_parties, str):
+        first_parties = [first_parties]
+
+    qry = models.CharacterWalletJournalEntry.objects.filter(
+        character__character__in=characters,
+        ref_type__in=types,
+        date__gte=start_date)
+
+    if first_parties:
+        qry = qry.filter(
+            first_party_id__in=first_parties
+        )
+
+    if minimum_amount:
+        qry = qry.filter(
+            amount__gte=minimum_amount
+        )
+
+    return qry.exists()
+
+
+def mining_check(characters, groups, look_back=30):
+    start_date = timezone.now() - timedelta(days=look_back)
+    return models.CharacterMiningLedger.objects.filter(
+        character__character__in=characters,
+        type_name__group_id__in=groups,
+        date__gte=start_date
+    ).exists()
+
+
+def glance_incursion_check(characters):
+    from_ids = [1000125]
+    types = ["corporate_reward_payout"]
+    return wallet_check(characters, types, first_parties=from_ids)
+
+
+def glances_missions_check(characters):
+    types = ["agent_mission_reward", "agent_mission_time_bonus_reward"]
+    return wallet_check(characters, types)
+
+
+def glances_ratting_check(characters):
+    types = ["bounty_prizes"]
+    min_amount = 5000000
+    # 5 mill ticks should cover gate rats etc. but still show passive ratting
+    return wallet_check(characters, types, minimum_amount=min_amount)
+
+
+def glances_pochven_check(characters):
+    from_ids = [1000298]
+    types = ["corporate_reward_payout"]
+    return wallet_check(characters, types, first_parties=from_ids)
+
+
+def glances_market_check(characters):
+    types = ["brokers_fee", "market_provider_tax"]
+    return wallet_check(characters, types)
+
+
+def glances_industry_check(characters):
+    types = ["industry_job_tax"]
+    return wallet_check(characters, types)
+
+
+def glances_pi_check(characters):
+    types = ["planetary_import_tax",
+             "planetary_export_tax", "planetary_construction"]
+    return wallet_check(characters, types)
+
+
+def glances_ore_check(characters):
+    group_ids = [
+        450,
+        451,
+        452,
+        453,
+        454,
+        455,
+        456,
+        457,
+        458,
+        459,
+        460,
+        461,
+        462,
+        467,
+        468,
+        469,
+        2024,
+        4029,
+        4030,
+        4031,
+        4513,
+        4514,
+        4515,
+        4516,
+        4568
+    ]
+
+    return mining_check(characters, group_ids)
+
+
+def glances_moon_check(characters):
+    group_ids = [
+        1884,
+        1920,
+        1921,
+        1922,
+        1920
+    ]
+
+    return mining_check(characters, group_ids)
+
+
+def glances_ice_check(characters):
+    group_ids = [
+        465,
+        903
+    ]
+
+    return mining_check(characters, group_ids)
+
+
+def glances_gas_check(characters):
+    group_ids = [711]
+    return mining_check(characters, group_ids)
 
 
 class GlanceApiEndpoints:
@@ -139,3 +275,38 @@ class GlanceApiEndpoints:
                     out_groups["extractor"] += group["grp_total"]
 
             return out_groups
+
+        @api.get(
+            "account/{character_id}/glance/activities",
+            response={200: dict, 403: str},
+            tags=self.tags
+        )
+        def get_glance_activities(request, character_id: int):
+            if character_id == 0:
+                character_id = request.user.profile.main_character.character_id
+
+            response, main = get_main_character(request, character_id)
+
+            if not response:
+                return 403, _("Permission Denied")
+
+            characters = get_alts_queryset(main)
+
+            output = {}
+
+            output["ratting"] = glances_ratting_check(characters)
+            output["incursion"] = glance_incursion_check(characters)
+            output["pochven"] = glances_pochven_check(characters)
+            output["mission"] = glances_missions_check(characters)
+
+            output["market"] = glances_market_check(characters)
+            output["industry"] = glances_industry_check(characters)
+
+            output["pi"] = glances_pi_check(characters)
+
+            output["mining_ore"] = glances_ore_check(characters)
+            output["mining_moon"] = glances_moon_check(characters)
+            output["mining_gas"] = glances_gas_check(characters)
+            output["mining_ice"] = glances_ice_check(characters)
+
+            return output
