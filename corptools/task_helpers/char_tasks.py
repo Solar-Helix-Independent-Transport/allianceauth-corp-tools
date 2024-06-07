@@ -106,6 +106,7 @@ def update_character_location(character_id, force_refresh=False):
 
         ship_data = etag_results(
             ship_op, token, force_refresh=force_refresh)
+        _st = time.perf_counter()
 
         ship, _ = EveItemType.objects.get_or_create_from_esi(
             ship_data["ship_type_id"])
