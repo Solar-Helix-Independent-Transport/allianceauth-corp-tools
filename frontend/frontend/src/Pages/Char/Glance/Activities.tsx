@@ -20,11 +20,11 @@ export const GlancesActivities = () => {
   const { characterID } = useParams();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["glances", "assets", characterID],
+    queryKey: ["glances", "activities", characterID],
     queryFn: () => loadGlanceActivityData(characterID),
     refetchOnWindowFocus: false,
   });
-  console.log(isLoading);
+  console.log(isLoading, data);
   return (
     <>
       <h3 className={`${styles.strikeOut} w-100 text-center`}>Activity</h3>
