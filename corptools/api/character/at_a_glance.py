@@ -268,7 +268,7 @@ class GlanceApiEndpoints:
             for sp_type in sp_assets:
                 _type = sp_type["type_name__type_id"]
                 if _type == 40519:
-                    out_groups["extractor"] += group["grp_total"]
+                    out_groups["extractor"] += sp_type["type_total"]
 
             return out_groups
 
