@@ -5,21 +5,13 @@ import Asteroid from "../../assets/asteroid_64.png";
 import Cal from "../../assets/caldari_128.png";
 import FW from "../../assets/fw_64.png";
 import Gal from "../../assets/gallente_128.png";
-import Gas from "../../assets/gas_64.png";
-import Ice from "../../assets/ice_64.png";
-import Sansha from "../../assets/incursion_2_64.png";
-import Industry from "../../assets/industry_128.png";
 import Isk from "../../assets/isk_128.png";
-import Market from "../../assets/market_128.png";
 import Min from "../../assets/minmatar128.png";
-import Missions from "../../assets/missions_2_128.png";
-import Moons from "../../assets/moonAsteroid_JackpotR32.png";
 import NPC from "../../assets/npcbattleship_32.png";
 import Omega from "../../assets/omega_128.png";
-import Planet from "../../assets/planet_128.png";
-import Triglavian from "../../assets/triglavian_128.png";
 import Unknowns from "../../assets/unknown_64.png";
 import styles from "./CharacterAtAGlance.module.css";
+import { GlancesActivities } from "./Glance/Activities";
 import { GlancesAssets } from "./Glance/Assets";
 import { Card } from "react-bootstrap";
 import { useParams } from "react-router-dom";
@@ -38,32 +30,10 @@ const CharacterAtAGlance = () => {
         rounded_images={true}
       />
       <GlancesAssets />
-      <h3 className={`${styles.strikeOut} w-100 text-center`}>Activity</h3>
-      <div className="d-flex flex-wrap justify-content-center">
-        <Card className="m-2">
-          <div className="d-flex">
-            <IconStatusCard iconSrc={Sansha} />
-            <IconStatusCard iconSrc={Triglavian} cardVariant="info" />
-            <IconStatusCard iconSrc={Missions} />
-          </div>
-        </Card>
-        <Card className="m-2">
-          <div className="d-flex">
-            <IconStatusCard iconSrc={Market} cardVariant="info" />
-            <IconStatusCard iconSrc={Industry} />
-          </div>
-        </Card>
-        <Card className="m-2">
-          <div className="d-flex">
-            <IconStatusCard iconSrc={Ice} cardVariant="info" />
-            <IconStatusCard iconSrc={Asteroid} />
-            <IconStatusCard iconSrc={Moons} cardVariant="info" />
-            <IconStatusCard iconSrc={Gas} />
-            <IconStatusCard iconSrc={Planet} cardVariant="info" />
-          </div>
-        </Card>
-        <h3 className={`${styles.strikeOut} w-100 text-center`}>Affiliations</h3>
+      <GlancesActivities />
 
+      <h3 className={`${styles.strikeOut} w-100 text-center`}>Affiliations</h3>
+      <div className="d-flex flex-wrap justify-content-center">
         <Card className="m-2">
           <Card.Header className="text-center">Detected Militia</Card.Header>
           <div className="d-flex">
