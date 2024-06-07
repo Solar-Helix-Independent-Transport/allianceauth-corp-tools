@@ -173,10 +173,8 @@ class GlanceApiEndpoints:
             injector_grp = 1739
 
             ship_assets = models.CharacterAsset.objects.filter(
-                (
-                    Q(type_name__group__category_id__in=ship_cat)
-                    or Q(type_name__group_id=injector_grp)
-                ),
+                Q(type_name__group__category_id__in=ship_cat)
+                | Q(type_name__group_id=injector_grp),
                 character__character__in=characters,
             ).values(
                 'type_name__group__group_id'
@@ -198,7 +196,7 @@ class GlanceApiEndpoints:
             cruiser_groups = [26, 358, 832, 833, 894, 906, 963, 1972]
             bc_groups = [419, 540, 1201]
             bs_groups = [27, 381, 898, 900]
-            indy_groups = [28, 380, 1202]
+            indy_groups = [28, 380, 1202, 941]
             dread_groups = [485, 4594]
             cap_indy_groups = [902, 513, 883]
 
@@ -249,8 +247,6 @@ class GlanceApiEndpoints:
                     out_groups["carrier"] += group["grp_total"]
                 elif grp == 1538:
                     out_groups["fax"] += group["grp_total"]
-                elif grp == 659:
-                    out_groups["supercarrier"] += group["grp_total"]
                 elif grp == 659:
                     out_groups["supercarrier"] += group["grp_total"]
                 elif grp == injector_grp:
