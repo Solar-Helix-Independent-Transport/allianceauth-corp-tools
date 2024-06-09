@@ -48,6 +48,12 @@ export async function loadGlanceActivityData(character_id: any) {
   return api.data;
 }
 
+export async function loadGlanceFactionData(character_id: any) {
+  const api = await axios.get(`/audit/api/account/${character_id}/glance/faction`);
+  console.log(`get glance/faction in api ${character_id}`);
+  return api.data;
+}
+
 export async function postAccountRefresh(character_id: any) {
   console.log(`sent account refresh ${character_id}`);
   const api = await axios.post(

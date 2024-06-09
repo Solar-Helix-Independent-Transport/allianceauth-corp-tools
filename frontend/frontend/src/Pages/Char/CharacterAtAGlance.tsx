@@ -13,6 +13,7 @@ import Unknowns from "../../assets/unknown_64.png";
 import styles from "./CharacterAtAGlance.module.css";
 import { GlancesActivities } from "./Glance/Activities";
 import { GlancesAssets } from "./Glance/Assets";
+import { GlancesFactions } from "./Glance/Factions";
 import { Card } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 
@@ -31,49 +32,8 @@ const CharacterAtAGlance = () => {
       />
       <GlancesAssets />
       <GlancesActivities />
+      <GlancesFactions />
 
-      <h3 className={`${styles.strikeOut} w-100 text-center`}>Affiliations</h3>
-      <div className="d-flex flex-wrap justify-content-center">
-        <Card className="m-2">
-          <Card.Header className="text-center">Detected Militia</Card.Header>
-          <div className="d-flex">
-            <IconStatusCard iconSrc={Amarr} />
-            <IconStatusCard cardVariant={"warning"} iconSrc={Gal} />
-            <IconStatusCard iconSrc={Min} />
-            <IconStatusCard cardVariant={"warning"} iconSrc={Cal} />
-            <IconStatusCard
-              cardVariant={"warning"}
-              iconSrc={"https://images.evetech.net/corporations/500011/logo?size=128"}
-            />
-            <IconStatusCard
-              iconSrc={"https://images.evetech.net/corporations/500010/logo?size=128"}
-            />
-          </div>
-        </Card>
-
-        <Card className="m-2">
-          <Card.Header className="text-center">Loyalty Points</Card.Header>
-
-          <div className="d-flex h-100 align-items-center">
-            <IconStatusDiv iconSrc={FW} text="4.6M" textVariant="info" />
-            <IconStatusDiv
-              iconSrc={"https://images.evetech.net/corporations/1000125/logo?size=128"}
-              text="2.6M"
-              textVariant="muted"
-            />
-            <IconStatusDiv
-              iconSrc={"https://images.evetech.net/corporations/500010/logo?size=128"}
-              text="1M"
-              textVariant="muted"
-            />
-            <IconStatusDiv
-              iconSrc={"https://images.evetech.net/corporations/500010/logo?size=128"}
-              text="1M"
-              textVariant="muted"
-            />
-          </div>
-        </Card>
-      </div>
       <h3 className={`${styles.strikeOut} w-100 text-center`}>Account at a Glance</h3>
       <div className="d-flex">
         <IconStatusCard

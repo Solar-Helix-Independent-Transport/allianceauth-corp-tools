@@ -38,7 +38,7 @@ def wallet_check(characters, types, first_parties=None, minimum_amount=None, loo
             amount__gte=minimum_amount
         )
 
-    return qry.exists()
+    return qry
 
 
 def mining_check(characters, groups, look_back=30):
@@ -47,47 +47,47 @@ def mining_check(characters, groups, look_back=30):
         character__character__in=characters,
         type_name__group_id__in=groups,
         date__gte=start_date
-    ).exists()
+    )
 
 
 def glance_incursion_check(characters):
     from_ids = [1000125]
     types = ["corporate_reward_payout"]
-    return wallet_check(characters, types, first_parties=from_ids)
+    return wallet_check(characters, types, first_parties=from_ids).exists()
 
 
 def glances_missions_check(characters):
     types = ["agent_mission_reward", "agent_mission_time_bonus_reward"]
-    return wallet_check(characters, types)
+    return wallet_check(characters, types).exists()
 
 
 def glances_ratting_check(characters):
     types = ["bounty_prizes"]
     min_amount = 5000000
     # 5 mill ticks should cover gate rats etc. but still show passive ratting
-    return wallet_check(characters, types, minimum_amount=min_amount)
+    return wallet_check(characters, types, minimum_amount=min_amount).exists()
 
 
 def glances_pochven_check(characters):
     from_ids = [1000298]
     types = ["corporate_reward_payout"]
-    return wallet_check(characters, types, first_parties=from_ids)
+    return wallet_check(characters, types, first_parties=from_ids).exists()
 
 
 def glances_market_check(characters):
     types = ["brokers_fee", "market_provider_tax"]
-    return wallet_check(characters, types)
+    return wallet_check(characters, types).exists()
 
 
 def glances_industry_check(characters):
     types = ["industry_job_tax"]
-    return wallet_check(characters, types)
+    return wallet_check(characters, types).exists()
 
 
 def glances_pi_check(characters):
     types = ["planetary_import_tax",
              "planetary_export_tax", "planetary_construction"]
-    return wallet_check(characters, types)
+    return wallet_check(characters, types).exists()
 
 
 def glances_ore_check(characters):
@@ -118,8 +118,7 @@ def glances_ore_check(characters):
         4516,
         4568
     ]
-
-    return mining_check(characters, group_ids)
+    return mining_check(characters, group_ids).exists()
 
 
 def glances_moon_check(characters):
@@ -130,8 +129,7 @@ def glances_moon_check(characters):
         1922,
         1920
     ]
-
-    return mining_check(characters, group_ids)
+    return mining_check(characters, group_ids).exists()
 
 
 def glances_ice_check(characters):
@@ -139,13 +137,12 @@ def glances_ice_check(characters):
         465,
         903
     ]
-
-    return mining_check(characters, group_ids)
+    return mining_check(characters, group_ids).exists()
 
 
 def glances_gas_check(characters):
     group_ids = [711]
-    return mining_check(characters, group_ids)
+    return mining_check(characters, group_ids).exists()
 
 
 class GlanceApiEndpoints:
@@ -304,5 +301,76 @@ class GlanceApiEndpoints:
             output["mining_moon"] = glances_moon_check(characters)
             output["mining_gas"] = glances_gas_check(characters)
             output["mining_ice"] = glances_ice_check(characters)
+
+            return output
+
+        @api.get(
+            "account/{character_id}/glance/faction",
+            response={200: dict, 403: str},
+            tags=self.tags
+        )
+        def get_glance_factions(request, character_id: int):
+            if character_id == 0:
+                character_id = request.user.profile.main_character.character_id
+
+            response, main = get_main_character(request, character_id)
+
+            if not response:
+                return 403, _("Permission Denied")
+
+            characters = get_alts_queryset(main)
+
+            output = {
+                "factions":{
+                    "amarr": False,
+                    "caldari": False,
+                    "gallente": False,
+                    "minmatar": False,
+                    "angel": False,
+                    "guristas": False,
+                },
+                "lp": {
+                    "total": 0,
+                    "top_five": []
+                }
+            }
+
+            # Check for any militia stuff
+            for character in characters:
+                if character.faction_id is not None:
+                    # check_faction
+                    if character.faction_id == 500003:
+                        output["factions"]["amarr"] = True
+                    elif character.faction_id == 500010:
+                        output["factions"]["guristas"] = True
+                    elif character.faction_id == 500004:
+                        output["factions"]["gallente"] = True
+                    elif character.faction_id == 500011:
+                        output["factions"]["angel"] = True
+                    elif character.faction_id == 500001:
+                        output["factions"]["caldari"] = True
+                    elif character.faction_id == 500002:
+                        output["factions"]["minmatar"] = True
+
+            account_lp = models.LoyaltyPoint.objects.filter(
+                character__character__in=characters,
+            ).values(
+                corp_id=F("corporation__eve_id")
+            ).annotate(
+                total_lp=Sum("amount")
+            ).annotate(
+                corp_name=F("corporation__name")
+            ).order_by("-total_lp")[:5]
+
+            for lp in account_lp:
+                output["lp"]["top_five"].append({
+                    "corp_id": lp.get("corp_id"),
+                    "lp": lp.get("total_lp"),
+                    "corp_name": lp.get("corp_name"),
+                })
+
+            output["lp"]["total"] = models.LoyaltyPoint.objects.filter(
+                character__character__in=characters,
+            ).aggregate(total_lp=Sum("amount"))["total_lp"]
 
             return output
