@@ -58,18 +58,18 @@ export const GlancesFactions = () => {
           <div className="d-flex h-100 align-items-center">
             <IconStatusDiv
               iconSrc={FW}
-              text={data?.lp?.total.toLocaleString("en-US", {
+              text={data?.lp?.total?.toLocaleString("en-US", {
                 maximumFractionDigits: 2,
                 notation: "compact",
                 compactDisplay: "short",
               })}
               textVariant="info"
             />
-            {data?.lp?.top_five.map((lp_data: any) => {
+            {data?.lp?.top_five?.map((lp_data: any) => {
               return (
                 <IconStatusDiv
                   iconSrc={`https://images.evetech.net/corporations/${lp_data.corp_id}/logo?size=128`}
-                  text={lp_data.lp.toLocaleString("en-US", {
+                  text={lp_data?.lp?.toLocaleString("en-US", {
                     maximumFractionDigits: 2,
                     notation: "compact",
                     compactDisplay: "short",
