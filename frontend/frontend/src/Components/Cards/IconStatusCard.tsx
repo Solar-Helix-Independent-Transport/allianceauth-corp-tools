@@ -50,7 +50,7 @@ export const IconStatusCard = ({
   isLoading,
 }: IconStatusCardProps) => {
   return (
-    <Card border={cardVariant} className={`m-2 ${text && "pt-2"}`}>
+    <Card border={cardVariant} className={`m-2 ${cardVariant && "border-4"} ${text && "pt-2"}`}>
       <IconStatusDiv
         iconSrc={iconSrc}
         text={text}
