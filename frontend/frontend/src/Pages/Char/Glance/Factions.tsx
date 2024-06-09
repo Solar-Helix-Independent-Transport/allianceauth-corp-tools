@@ -58,11 +58,15 @@ export const GlancesFactions = () => {
           <div className="d-flex h-100 align-items-center">
             <IconStatusDiv
               iconSrc={FW}
-              text={data?.lp?.total?.toLocaleString("en-US", {
-                maximumFractionDigits: 2,
-                notation: "compact",
-                compactDisplay: "short",
-              })}
+              text={
+                data?.lp?.total
+                  ? data?.lp?.total?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })
+                  : "0"
+              }
               textVariant="info"
             />
             {data?.lp?.top_five?.map((lp_data: any) => {
