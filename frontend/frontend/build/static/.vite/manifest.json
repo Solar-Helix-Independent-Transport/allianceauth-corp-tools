@@ -9,7 +9,7 @@
     ]
   },
   "index.html": {
-    "file": "assets/index-BQHVGWn0.js",
+    "file": "assets/index-CVyiTtab.js",
     "src": "index.html",
     "isEntry": true,
     "imports": [
@@ -20,11 +20,7 @@
       "static/corptools/bs5/statics/css/index-DGje4lAW.css"
     ],
     "assets": [
-      "static/corptools/bs5/statics/img/amarr_128-B9KvGWt4.png",
       "static/corptools/bs5/statics/img/asteroid_64-_mwThky8.png",
-      "static/corptools/bs5/statics/img/caldari_128-BSQ2VRRx.png",
-      "static/corptools/bs5/statics/img/gallente_128-oOYpsEmX.png",
-      "static/corptools/bs5/statics/img/minmatar128-BCerHXFk.png",
       "static/corptools/bs5/statics/img/npcbattleship_32-BFJ3Lc7-.png",
       "static/corptools/bs5/statics/img/omega_128-B8POqXI6.png",
       "static/corptools/bs5/statics/img/gas_64-lUUIHkb8.png",
@@ -37,7 +33,11 @@
       "static/corptools/bs5/statics/img/planet_128-BhhMKsyX.png",
       "static/corptools/bs5/statics/img/triglavian_128-RGqDm8eK.png",
       "static/corptools/bs5/statics/img/extractor_64-BQGwjQ_v.png",
-      "static/corptools/bs5/statics/img/skillInjector_64-CiNLYJYo.png"
+      "static/corptools/bs5/statics/img/skillInjector_64-CiNLYJYo.png",
+      "static/corptools/bs5/statics/img/amarr_128-B9KvGWt4.png",
+      "static/corptools/bs5/statics/img/caldari_128-BSQ2VRRx.png",
+      "static/corptools/bs5/statics/img/gallente_128-oOYpsEmX.png",
+      "static/corptools/bs5/statics/img/minmatar128-BCerHXFk.png"
     ]
   },
   "src/assets/amarr_128.png": {

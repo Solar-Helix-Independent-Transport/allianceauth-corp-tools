@@ -1,12 +1,7 @@
-import { IconStatusCard, IconStatusDiv } from "../../Components/Cards/IconStatusCard";
+import { IconStatusCard } from "../../Components/Cards/IconStatusCard";
 import { CharacterAllegiancePortrait } from "../../Components/EveImages/EveImages";
-import Amarr from "../../assets/amarr_128.png";
 import Asteroid from "../../assets/asteroid_64.png";
-import Cal from "../../assets/caldari_128.png";
-import FW from "../../assets/fw_64.png";
-import Gal from "../../assets/gallente_128.png";
 import Isk from "../../assets/isk_128.png";
-import Min from "../../assets/minmatar128.png";
 import NPC from "../../assets/npcbattleship_32.png";
 import Omega from "../../assets/omega_128.png";
 import Unknowns from "../../assets/unknown_64.png";
@@ -14,7 +9,6 @@ import styles from "./CharacterAtAGlance.module.css";
 import { GlancesActivities } from "./Glance/Activities";
 import { GlancesAssets } from "./Glance/Assets";
 import { GlancesFactions } from "./Glance/Factions";
-import { Card } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 
 const CharacterAtAGlance = () => {
