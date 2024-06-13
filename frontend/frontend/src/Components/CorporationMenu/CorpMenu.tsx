@@ -23,35 +23,35 @@ const CorpMenu = (props: CorpMenuProps) => {
   return (
     <>
       <Nav.Item>
-        <LinkContainer to={`/audit/r/corp/structures`}>
+        <LinkContainer to={`/audit/r_beta/corp/structures`}>
           <Nav.Link key="Structures">Structures</Nav.Link>
         </LinkContainer>
       </Nav.Item>
       <Nav.Item>
-        <LinkContainer to={`/audit/r/corp/wallets`}>
+        <LinkContainer to={`/audit/r_beta/corp/wallets`}>
           <Nav.Link key="Wallets">Wallets</Nav.Link>
         </LinkContainer>
       </Nav.Item>
       <Nav.Item>
-        <LinkContainer to={`/audit/r/corp/assetgroup`}>
+        <LinkContainer to={`/audit/r_beta/corp/assetgroup`}>
           <Nav.Link key="assetgroup">Asset Overview</Nav.Link>
         </LinkContainer>
       </Nav.Item>
       <Nav.Item>
-        <LinkContainer to={`/audit/r/corp/assetlist`}>
+        <LinkContainer to={`/audit/r_beta/corp/assetlist`}>
           <Nav.Link key="assetlist">Asset List</Nav.Link>
         </LinkContainer>
       </Nav.Item>
       <Nav.Item>
-        <LinkContainer to={`/audit/r/corp/pocos`}>
+        <LinkContainer to={`/audit/r_beta/corp/pocos`}>
           <Nav.Link key="pocos">Pocos</Nav.Link>
         </LinkContainer>
       </Nav.Item>
       <NavDropdown title="Dashboards">
-        <LinkContainer to={`/audit/r/corp/bridges`}>
+        <LinkContainer to={`/audit/r_beta/corp/bridges`}>
           <Nav.Link key="bridges">Bridges</Nav.Link>
         </LinkContainer>
-        <LinkContainer to={`/audit/r/corp/sov`}>
+        <LinkContainer to={`/audit/r_beta/corp/sov`}>
           <Nav.Link key="bridges">Sov Upgrades</Nav.Link>
         </LinkContainer>
       </NavDropdown>

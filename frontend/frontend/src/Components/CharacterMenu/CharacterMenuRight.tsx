@@ -42,7 +42,7 @@ const CharMenuRight = () => {
         <Nav.Link key="Account List">Account List</Nav.Link>
       </LinkContainer>
       {/* TODO Check perms for this */}
-      <LinkContainer to={`/audit/r/corp`}>
+      <LinkContainer to={`/audit/r_beta/corp`}>
         <Nav.Link key="corp-swap">
           <i className="fa-regular fa-building"></i>
         </Nav.Link>

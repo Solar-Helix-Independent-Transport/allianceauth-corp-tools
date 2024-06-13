@@ -23,17 +23,17 @@ const CharMenu = ({ data, characterID }: CharMenuProps) => {
   return (
     <>
       <Nav.Item>
-        <LinkContainer to={`/audit/r/${characterID}/account/overview`}>
+        <LinkContainer to={`/audit/r_beta/${characterID}/account/overview`}>
           <Nav.Link key="Overview">Overview</Nav.Link>
         </LinkContainer>
       </Nav.Item>
       <Nav.Item>
-        <LinkContainer to={`/audit/r/${characterID}/account/status`}>
+        <LinkContainer to={`/audit/r_beta/${characterID}/account/status`}>
           <Nav.Link key="Status">Status</Nav.Link>
         </LinkContainer>
       </Nav.Item>
       <Nav.Item>
-        <LinkContainer to={`/audit/r/${characterID}/account/pubdata`}>
+        <LinkContainer to={`/audit/r_beta/${characterID}/account/pubdata`}>
           <Nav.Link key="Public Data">Public Data</Nav.Link>
         </LinkContainer>
       </Nav.Item>
@@ -43,7 +43,7 @@ const CharMenu = ({ data, characterID }: CharMenuProps) => {
             <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
               {cat.links.map((link: any) => {
                 return (
-                  <LinkContainer to={`/audit/r/${characterID}/${link.link}`}>
+                  <LinkContainer to={`/audit/r_beta/${characterID}/${link.link}`}>
                     <NavDropdown.Item id={link.name} key={link.name}>
                       {link.name}
                     </NavDropdown.Item>
