@@ -32,7 +32,7 @@ export const GlancesAssets = () => {
 
   return (
     <>
-      <h3 className={`${styles.strikeOut} w-100 text-center`}>Assets</h3>
+      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Assets</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <Card className="m-2">
           <div className="d-flex align-items-center">

@@ -23,6 +23,7 @@ type IconStatusCardProps = {
     | "dark"
     | "light"
     | "muted";
+  borderVariant?: "thick";
   isLoading?: boolean;
 };
 
@@ -30,11 +31,11 @@ export const IconStatusDiv = ({ iconSrc, text, textVariant, isLoading }: IconSta
   return (
     <div
       className={`d-flex ${text ? "pt-2" : ""} flex-column align-items-center`}
-      style={{ width: "64px", height: "64px" }}
+      style={{ minWidth: "64px", height: "64px" }}
     >
-      <img src={iconSrc} height={text ? 32 : 64} width={text ? 32 : 64} />
+      <img src={iconSrc} height={text || isLoading ? 32 : 64} width={text || isLoading ? 32 : 64} />
       {!isLoading ? (
-        text && <h6 className={`text-${textVariant}`}>{text}</h6>
+        text && <h6 className={`text-${textVariant} text-nowrap mx-1`}>{text}</h6>
       ) : (
         <Spinner animation="border" size="sm" />
       )}
@@ -48,9 +49,15 @@ export const IconStatusCard = ({
   cardVariant,
   textVariant,
   isLoading,
+  borderVariant,
 }: IconStatusCardProps) => {
   return (
-    <Card border={cardVariant} className={`m-2 ${cardVariant && "border-4"} ${text && "pt-2"}`}>
+    <Card
+      border={cardVariant}
+      className={`m-2 ${borderVariant == "thick" ? "border-4" : "border-2"} ${
+        text || (isLoading && "pt-2")
+      }`}
+    >
       <IconStatusDiv
         iconSrc={iconSrc}
         text={text}

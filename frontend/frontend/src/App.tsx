@@ -1,4 +1,5 @@
 import CharacterAudit from "./Pages/Char/CharacterAudit";
+import CharacterOverview from "./Pages/Char/CharacterOverview";
 import CharacterStatus from "./Pages/Char/CharacterStatus";
 import CorporationAudit from "./Pages/Corp/CorporationAudit";
 import React from "react";
@@ -15,7 +16,8 @@ function App() {
         <Router>
           <Routes>
             <Route path="audit/r/:characterID/" element={<CharacterAudit />}>
-              <Route index element={<Navigate to="account/status" replace />} />
+              <Route index element={<Navigate to="account/overview" replace />} />
+              <Route path="account/overview" element={<CharacterOverview />} />
               <Route path="account/status" element={<CharacterStatus />} />
               <Route
                 path="account/assets"

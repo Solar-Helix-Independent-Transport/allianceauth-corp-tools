@@ -23,8 +23,13 @@ const CharMenu = ({ data, characterID }: CharMenuProps) => {
   return (
     <>
       <Nav.Item>
-        <LinkContainer to={`/audit/r/${characterID}/account/status`}>
+        <LinkContainer to={`/audit/r/${characterID}/account/overview`}>
           <Nav.Link key="Overview">Overview</Nav.Link>
+        </LinkContainer>
+      </Nav.Item>
+      <Nav.Item>
+        <LinkContainer to={`/audit/r/${characterID}/account/status`}>
+          <Nav.Link key="Status">Status</Nav.Link>
         </LinkContainer>
       </Nav.Item>
       <Nav.Item>

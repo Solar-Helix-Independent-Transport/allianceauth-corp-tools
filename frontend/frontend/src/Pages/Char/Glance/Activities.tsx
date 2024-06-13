@@ -27,7 +27,7 @@ export const GlancesActivities = () => {
   console.log(isLoading, data);
   return (
     <>
-      <h3 className={`${styles.strikeOut} w-100 text-center`}>Activity</h3>
+      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Activity</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <Card className="m-2">
           <div className="d-flex">
