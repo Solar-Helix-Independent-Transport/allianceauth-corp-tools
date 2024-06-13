@@ -9,7 +9,7 @@
     ]
   },
   "index.html": {
-    "file": "assets/index-CC1nQG09.js",
+    "file": "assets/index-Cbv0Q64x.js",
     "src": "index.html",
     "isEntry": true,
     "imports": [
@@ -17,12 +17,12 @@
       "_@react-router-DQ_G6aig.js"
     ],
     "css": [
-      "static/corptools/bs5/statics/css/index-DGje4lAW.css"
+      "static/corptools/bs5/statics/css/index-C-mlqMv_.css"
     ],
     "assets": [
-      "static/corptools/bs5/statics/img/asteroid_64-_mwThky8.png",
-      "static/corptools/bs5/statics/img/npcbattleship_32-BFJ3Lc7-.png",
       "static/corptools/bs5/statics/img/omega_128-B8POqXI6.png",
+      "static/corptools/bs5/statics/img/skillInjector_64-CiNLYJYo.png",
+      "static/corptools/bs5/statics/img/asteroid_64-_mwThky8.png",
       "static/corptools/bs5/statics/img/gas_64-lUUIHkb8.png",
       "static/corptools/bs5/statics/img/ice_64-C-X-JxCQ.png",
       "static/corptools/bs5/statics/img/incursion_2_64-CezWswVX.png",
@@ -30,10 +30,10 @@
       "static/corptools/bs5/statics/img/market_128-oRcbZRsd.png",
       "static/corptools/bs5/statics/img/missions_2_128-Dg_KBb12.png",
       "static/corptools/bs5/statics/img/moonAsteroid_JackpotR32-CbqQRgx1.png",
+      "static/corptools/bs5/statics/img/npcbattleship_32-BFJ3Lc7-.png",
       "static/corptools/bs5/statics/img/planet_128-BhhMKsyX.png",
       "static/corptools/bs5/statics/img/triglavian_128-RGqDm8eK.png",
       "static/corptools/bs5/statics/img/extractor_64-BQGwjQ_v.png",
-      "static/corptools/bs5/statics/img/skillInjector_64-CiNLYJYo.png",
       "static/corptools/bs5/statics/img/amarr_128-B9KvGWt4.png",
       "static/corptools/bs5/statics/img/caldari_128-BSQ2VRRx.png",
       "static/corptools/bs5/statics/img/gallente_128-oOYpsEmX.png",
