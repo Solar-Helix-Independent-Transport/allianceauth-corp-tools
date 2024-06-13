@@ -79,7 +79,7 @@
           });
           var scripts = [BASE_URL + data["index.html"].file];
           var cssFiles = data["index.html"].css?.map(function (file) {
-            return BASE_URL + file;
+            return "/" + file;
           });
 
           loadCss(cssFiles);
