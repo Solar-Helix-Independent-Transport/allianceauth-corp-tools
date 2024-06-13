@@ -14,7 +14,7 @@ export const GlancesAccount = () => {
   const { characterID } = useParams();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["glances", "activities", characterID],
+    queryKey: ["glances", "account", characterID],
     queryFn: () => loadCharacterStatus(characterID),
     refetchOnWindowFocus: false,
   });
