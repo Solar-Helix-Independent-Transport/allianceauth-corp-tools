@@ -53,25 +53,25 @@ def mining_check(characters, groups, look_back=30):
 def glance_incursion_check(characters):
     from_ids = [1000125]
     types = ["corporate_reward_payout"]
-    return wallet_check(characters, types, first_parties=from_ids).exists()
+    return wallet_check(characters, types, first_parties=from_ids).aggregate(total=Sum("amount"))["total"]
 
 
 def glances_missions_check(characters):
     types = ["agent_mission_reward", "agent_mission_time_bonus_reward"]
-    return wallet_check(characters, types).exists()
+    return wallet_check(characters, types).aggregate(total=Sum("amount"))["total"]
 
 
 def glances_ratting_check(characters):
     types = ["bounty_prizes"]
     min_amount = 5000000
     # 5 mill ticks should cover gate rats etc. but still show passive ratting
-    return wallet_check(characters, types, minimum_amount=min_amount).exists()
+    return wallet_check(characters, types, minimum_amount=min_amount).aggregate(total=Sum("amount"))["total"]
 
 
 def glances_pochven_check(characters):
     from_ids = [1000298]
     types = ["corporate_reward_payout"]
-    return wallet_check(characters, types, first_parties=from_ids).exists()
+    return wallet_check(characters, types, first_parties=from_ids).aggregate(total=Sum("amount"))["total"]
 
 
 def glances_market_check(characters):
@@ -118,7 +118,12 @@ def glances_ore_check(characters):
         4516,
         4568
     ]
-    return mining_check(characters, group_ids).exists()
+    return mining_check(
+        characters,
+        group_ids
+    ).aggregate(
+        total=Sum(F("quantity") * F("type_name__volume"))
+    )["total"]
 
 
 def glances_moon_check(characters):
@@ -129,7 +134,12 @@ def glances_moon_check(characters):
         1922,
         1920
     ]
-    return mining_check(characters, group_ids).exists()
+    return mining_check(
+        characters,
+        group_ids
+    ).aggregate(
+        total=Sum(F("quantity") * F("type_name__volume"))
+    )["total"]
 
 
 def glances_ice_check(characters):
@@ -137,12 +147,22 @@ def glances_ice_check(characters):
         465,
         903
     ]
-    return mining_check(characters, group_ids).exists()
+    return mining_check(
+        characters,
+        group_ids
+    ).aggregate(
+        total=Sum(F("quantity") * F("type_name__volume"))
+    )["total"]
 
 
 def glances_gas_check(characters):
     group_ids = [711]
-    return mining_check(characters, group_ids).exists()
+    return mining_check(
+        characters,
+        group_ids
+    ).aggregate(
+        total=Sum(F("quantity") * F("type_name__volume"))
+    )["total"]
 
 
 class GlanceApiEndpoints:
@@ -321,7 +341,7 @@ class GlanceApiEndpoints:
             characters = get_alts_queryset(main)
 
             output = {
-                "factions":{
+                "factions": {
                     "amarr": False,
                     "caldari": False,
                     "gallente": False,
