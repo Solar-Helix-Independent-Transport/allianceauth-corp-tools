@@ -34,15 +34,50 @@ export const GlancesActivities = () => {
             <IconStatusCard
               iconSrc={Sansha}
               cardVariant={data?.incursion ? "success" : undefined}
+              text={
+                data?.incursion &&
+                `+Ƶ${data?.incursion?.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                  notation: "compact",
+                  compactDisplay: "short",
+                })}`
+              }
             />
             <IconStatusCard
               iconSrc={Triglavian}
               cardVariant={data?.pochven ? "success" : undefined}
+              text={
+                data?.pochven &&
+                `+Ƶ${data?.pochven?.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                  notation: "compact",
+                  compactDisplay: "short",
+                })}`
+              }
             />
-            <IconStatusCard iconSrc={NPC} cardVariant={data?.ratting ? "success" : undefined} />
+            <IconStatusCard
+              iconSrc={NPC}
+              cardVariant={data?.ratting ? "success" : undefined}
+              text={
+                data?.ratting &&
+                `+Ƶ${data?.ratting?.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                  notation: "compact",
+                  compactDisplay: "short",
+                })}`
+              }
+            />
             <IconStatusCard
               iconSrc={Missions}
               cardVariant={data?.mission ? "success" : undefined}
+              text={
+                data?.mission &&
+                `+Ƶ${data?.mission?.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                  notation: "compact",
+                  compactDisplay: "short",
+                })}`
+              }
             />
           </div>
         </Card>
@@ -57,16 +92,54 @@ export const GlancesActivities = () => {
         </Card>
         <Card className="m-2">
           <div className="d-flex">
-            <IconStatusCard iconSrc={Ice} cardVariant={data?.mining_ice ? "success" : undefined} />
+            <IconStatusCard
+              iconSrc={Ice}
+              cardVariant={data?.mining_ice ? "success" : undefined}
+              text={
+                data?.mining_ice &&
+                `${data?.mining_ice?.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                  notation: "compact",
+                  compactDisplay: "short",
+                })} m3`
+              }
+            />
             <IconStatusCard
               iconSrc={Asteroid}
               cardVariant={data?.mining_ore ? "success" : undefined}
+              text={
+                data?.mining_ore &&
+                `${data?.mining_ore?.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                  notation: "compact",
+                  compactDisplay: "short",
+                })} m3`
+              }
             />
             <IconStatusCard
               iconSrc={Moons}
               cardVariant={data?.mining_moon ? "success" : undefined}
+              text={
+                data?.mining_moon &&
+                `${data?.mining_moon?.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                  notation: "compact",
+                  compactDisplay: "short",
+                })} m3`
+              }
             />
-            <IconStatusCard iconSrc={Gas} cardVariant={data?.mining_gas ? "success" : undefined} />
+            <IconStatusCard
+              iconSrc={Gas}
+              cardVariant={data?.mining_gas ? "success" : undefined}
+              text={
+                data?.mining_gas &&
+                `${data?.mining_gas?.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                  notation: "compact",
+                  compactDisplay: "short",
+                })} m3`
+              }
+            />
             <IconStatusCard iconSrc={Planet} cardVariant={data?.pi ? "success" : undefined} />
           </div>
         </Card>
