@@ -165,6 +165,13 @@ def glances_gas_check(characters):
     )["total"]
 
 
+def roundFloat(input):
+    if input:
+        return int(input)
+    else:
+        return input
+
+
 class GlanceApiEndpoints:
 
     tags = ["At a Glance"]
@@ -307,20 +314,20 @@ class GlanceApiEndpoints:
 
             output = {}
 
-            output["ratting"] = glances_ratting_check(characters)
-            output["incursion"] = glance_incursion_check(characters)
-            output["pochven"] = glances_pochven_check(characters)
-            output["mission"] = glances_missions_check(characters)
+            output["ratting"] = roundFloat(glances_ratting_check(characters))
+            output["incursion"] = roundFloat(glance_incursion_check(characters))
+            output["pochven"] = roundFloat(glances_pochven_check(characters))
+            output["mission"] = roundFloat(glances_missions_check(characters))
 
             output["market"] = glances_market_check(characters)
             output["industry"] = glances_industry_check(characters)
 
             output["pi"] = glances_pi_check(characters)
 
-            output["mining_ore"] = glances_ore_check(characters)
-            output["mining_moon"] = glances_moon_check(characters)
-            output["mining_gas"] = glances_gas_check(characters)
-            output["mining_ice"] = glances_ice_check(characters)
+            output["mining_ore"] = roundFloat(glances_ore_check(characters))
+            output["mining_moon"] = roundFloat(glances_moon_check(characters))
+            output["mining_gas"] = roundFloat(glances_gas_check(characters))
+            output["mining_ice"] = roundFloat(glances_ice_check(characters))
 
             return output
 
