@@ -27,20 +27,20 @@ const CharHeader = () => {
     refetchOnWindowFocus: false,
   });
 
-  const isk = data?.characters.reduce((p: number, c: any) => {
-    try {
-      return p + c.isk;
-    } catch (err) {
-      return p;
-    }
-  }, 0);
-  const sp = data?.characters.reduce((p: number, c: any) => {
-    try {
-      return p + c.sp;
-    } catch (err) {
-      return p;
-    }
-  }, 0);
+  // const isk = data?.characters.reduce((p: number, c: any) => {
+  //   try {
+  //     return p + c.isk;
+  //   } catch (err) {
+  //     return p;
+  //   }
+  // }, 0);
+  // const sp = data?.characters.reduce((p: number, c: any) => {
+  //   try {
+  //     return p + c.sp;
+  //   } catch (err) {
+  //     return p;
+  //   }
+  // }, 0);
   const bad_chars = data?.characters
     .filter((char: any) => !char.active)
     .map((char: any) => char.character.character_name);
