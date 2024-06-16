@@ -76,6 +76,22 @@ function App() {
                 }
               />
               <Route
+                path="account/mining"
+                element={
+                  <Card>
+                    <Card.Body className="text-center">This is account/mining.</Card.Body>
+                  </Card>
+                }
+              />
+              <Route
+                path="account/lp"
+                element={
+                  <Card>
+                    <Card.Body className="text-center">This is account/lp.</Card.Body>
+                  </Card>
+                }
+              />
+              <Route
                 path="account/walletactivity"
                 element={
                   <Card>

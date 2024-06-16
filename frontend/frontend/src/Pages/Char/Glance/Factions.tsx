@@ -73,11 +73,15 @@ export const GlancesFactions = () => {
               return (
                 <IconStatusDiv
                   iconSrc={`https://images.evetech.net/corporations/${lp_data.corp_id}/logo?size=128`}
-                  text={lp_data?.lp?.toLocaleString("en-US", {
-                    maximumFractionDigits: 2,
-                    notation: "compact",
-                    compactDisplay: "short",
-                  })}
+                  text={
+                    lp_data?.lp
+                      ? lp_data?.lp?.toLocaleString("en-US", {
+                          maximumFractionDigits: 2,
+                          notation: "compact",
+                          compactDisplay: "short",
+                        })
+                      : "?"
+                  }
                   textVariant="muted"
                 />
               );

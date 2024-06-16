@@ -5,7 +5,7 @@ import {
   CharacterPortrait,
   CorporationLogo,
 } from "@pvyparts/allianceauth-components";
-import { Badge, Card } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
@@ -73,7 +73,7 @@ const CharHeader = () => {
             <h5 className="m-1 mx-3">{data?.main.alliance_name}</h5>
           </>
         )}
-        <p className="m-1 ms-4 me-auto">
+        {/* <p className="m-1 ms-4">
           {sp ? (
             <>
               <Badge>Total SP: {sp.toLocaleString()}</Badge> <br />
@@ -88,8 +88,8 @@ const CharHeader = () => {
           ) : (
             <></>
           )}
-        </p>
-        <ButtonGroup className="me-3">
+        </p> */}
+        <ButtonGroup className="me-3 ms-auto">
           <RefreshCharButton />
           {data ? (
             bad_chars.length === 0 ? (
