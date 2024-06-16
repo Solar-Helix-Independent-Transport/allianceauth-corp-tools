@@ -55,7 +55,7 @@ export const GlancesFactions = () => {
         <Card className="m-2">
           <Card.Header className="text-center">Loyalty Points</Card.Header>
 
-          <div className="d-flex h-100 align-items-center">
+          <div className="d-flex h-100 align-items-center justify-content-center">
             <IconStatusDiv
               iconSrc={FW}
               text={

@@ -53,6 +53,7 @@ export const GlancesAccount = () => {
             compactDisplay: "short",
           })}`}
           isLoading={isLoading}
+          toolTipText="Total Liquid Isk across all characters"
         />
         <IconStatusCard
           cardVariant={sp < 1000000 ? "warning" : undefined}
@@ -64,12 +65,14 @@ export const GlancesAccount = () => {
             compactDisplay: "short",
           })} SP`}
           isLoading={isLoading}
+          toolTipText="Total SP across all characters"
         />
 
         <IconStatusCard
           iconSrc={Omega}
           text={total_chars?.toLocaleString()}
           isLoading={isLoading}
+          toolTipText="Count of all known alts"
         />
 
         <IconStatusCard
@@ -78,6 +81,7 @@ export const GlancesAccount = () => {
           textVariant={bad_chars > 0 ? "danger" : "success"}
           text={bad_chars?.toLocaleString()}
           isLoading={isLoading}
+          toolTipText="Count of all known alts not loading into audit"
         />
 
         {/* <IconStatusCard iconSrc={NPC} textVariant={"info"} text={"Ƶ1.5b"} isLoading={isLoading} />

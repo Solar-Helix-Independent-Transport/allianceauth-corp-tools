@@ -1,5 +1,7 @@
 import Card from "react-bootstrap/Card";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Spinner from "react-bootstrap/Spinner";
+import Tooltip from "react-bootstrap/Tooltip";
 
 type IconStatusCardProps = {
   iconSrc: string;
@@ -25,21 +27,44 @@ type IconStatusCardProps = {
     | "muted";
   borderVariant?: "thick";
   isLoading?: boolean;
+  toolTipText?: string;
 };
 
-export const IconStatusDiv = ({ iconSrc, text, textVariant, isLoading }: IconStatusCardProps) => {
+const showOverlay = (toolTipText: string | undefined) => {
+  return toolTipText ? (
+    <Tooltip placement={"top"} id={toolTipText}>
+      {toolTipText}
+    </Tooltip>
+  ) : (
+    <></>
+  );
+};
+
+export const IconStatusDiv = ({
+  iconSrc,
+  text,
+  textVariant,
+  isLoading,
+  toolTipText,
+}: IconStatusCardProps) => {
   return (
-    <div
-      className={`d-flex ${text ? "pt-2" : ""} flex-column align-items-center`}
-      style={{ minWidth: "64px", height: "64px" }}
-    >
-      <img src={iconSrc} height={text || isLoading ? 32 : 64} width={text || isLoading ? 32 : 64} />
-      {!isLoading ? (
-        text && <h6 className={`text-${textVariant} text-nowrap mx-1`}>{text}</h6>
-      ) : (
-        <Spinner animation="border" size="sm" />
-      )}
-    </div>
+    <OverlayTrigger trigger={"hover"} overlay={showOverlay(toolTipText)}>
+      <div
+        className={`d-flex m-1 ${text ? "pt-2" : ""} flex-column align-items-center`}
+        style={{ minWidth: "64px", height: "64px" }}
+      >
+        <img
+          src={iconSrc}
+          height={text || isLoading ? 32 : 64}
+          width={text || isLoading ? 32 : 64}
+        />
+        {!isLoading ? (
+          text && <h6 className={`text-${textVariant} text-nowrap mx-1`}>{text}</h6>
+        ) : (
+          <Spinner animation="border" size="sm" />
+        )}
+      </div>
+    </OverlayTrigger>
   );
 };
 
@@ -50,6 +75,7 @@ export const IconStatusCard = ({
   textVariant,
   isLoading,
   borderVariant,
+  toolTipText,
 }: IconStatusCardProps) => {
   return (
     <Card
@@ -63,6 +89,7 @@ export const IconStatusCard = ({
         text={text}
         textVariant={textVariant}
         isLoading={isLoading}
+        toolTipText={toolTipText}
       />
     </Card>
   );

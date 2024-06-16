@@ -42,6 +42,7 @@ export const GlancesActivities = () => {
                   compactDisplay: "short",
                 })}`
               }
+              toolTipText="Total Isk earned in Incursions in the last 30 Days"
             />
             <IconStatusCard
               iconSrc={Triglavian}
@@ -54,6 +55,7 @@ export const GlancesActivities = () => {
                   compactDisplay: "short",
                 })}`
               }
+              toolTipText="Total Isk earned in Pochven in the last 30 Days"
             />
             <IconStatusCard
               iconSrc={NPC}
@@ -66,6 +68,7 @@ export const GlancesActivities = () => {
                   compactDisplay: "short",
                 })}`
               }
+              toolTipText="Total Isk earned Ratting in the last 30 Days"
             />
             <IconStatusCard
               iconSrc={Missions}
@@ -78,6 +81,7 @@ export const GlancesActivities = () => {
                   compactDisplay: "short",
                 })}`
               }
+              toolTipText="Total Isk earned running missions in the last 30 Days"
             />
           </div>
         </Card>
@@ -87,6 +91,7 @@ export const GlancesActivities = () => {
             <IconStatusCard
               iconSrc={Industry}
               cardVariant={data?.industry ? "success" : undefined}
+              toolTipText="Industry activities such as manufacturing or reactions"
             />
           </div>
         </Card>
@@ -103,6 +108,7 @@ export const GlancesActivities = () => {
                   compactDisplay: "short",
                 })} m3`
               }
+              toolTipText="Total m3 of Ice mined in the last 30 Days"
             />
             <IconStatusCard
               iconSrc={Asteroid}
@@ -115,6 +121,7 @@ export const GlancesActivities = () => {
                   compactDisplay: "short",
                 })} m3`
               }
+              toolTipText="Total m3 of standard ore mined in the last 30 Days"
             />
             <IconStatusCard
               iconSrc={Moons}
@@ -127,6 +134,7 @@ export const GlancesActivities = () => {
                   compactDisplay: "short",
                 })} m3`
               }
+              toolTipText="Total m3 of moon ore mined in the last 30 Days"
             />
             <IconStatusCard
               iconSrc={Gas}
@@ -139,8 +147,13 @@ export const GlancesActivities = () => {
                   compactDisplay: "short",
                 })} m3`
               }
+              toolTipText="Total m3 of gas anomalies mined in the last 30 Days"
             />
-            <IconStatusCard iconSrc={Planet} cardVariant={data?.pi ? "success" : undefined} />
+            <IconStatusCard
+              iconSrc={Planet}
+              cardVariant={data?.pi ? "success" : undefined}
+              toolTipText="Planetary import/export seen in the last 30 Days"
+            />
           </div>
         </Card>
       </div>
