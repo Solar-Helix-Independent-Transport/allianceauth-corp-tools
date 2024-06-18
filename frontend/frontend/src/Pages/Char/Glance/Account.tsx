@@ -42,7 +42,7 @@ export const GlancesAccount = () => {
   return (
     <>
       <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Account at a Glance</h3>
-      <div className="d-flex">
+      <div className="d-flex flex-wrap justify-content-center">
         <IconStatusCard
           cardVariant={isk < 1000000 ? "warning" : undefined}
           iconSrc={Isk}

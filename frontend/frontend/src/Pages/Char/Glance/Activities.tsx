@@ -30,7 +30,9 @@ export const GlancesActivities = () => {
       <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Activity</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <Card className="m-2">
-          <div className="d-flex">
+          <Card.Header className="text-center">PvE</Card.Header>
+
+          <div className="d-flex flex-wrap justify-content-center">
             <IconStatusCard
               iconSrc={Sansha}
               cardVariant={data?.incursion ? "success" : undefined}
@@ -86,7 +88,9 @@ export const GlancesActivities = () => {
           </div>
         </Card>
         <Card className="m-2">
-          <div className="d-flex">
+          <Card.Header className="text-center">Economic</Card.Header>
+
+          <div className="d-flex flex-wrap justify-content-center">
             <IconStatusCard iconSrc={Market} cardVariant={data?.market ? "success" : undefined} />
             <IconStatusCard
               iconSrc={Industry}
@@ -96,7 +100,9 @@ export const GlancesActivities = () => {
           </div>
         </Card>
         <Card className="m-2">
-          <div className="d-flex">
+          <Card.Header className="text-center">Mining</Card.Header>
+
+          <div className="d-flex flex-wrap justify-content-center">
             <IconStatusCard
               iconSrc={Ice}
               cardVariant={data?.mining_ice ? "success" : undefined}

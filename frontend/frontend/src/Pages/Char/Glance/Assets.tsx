@@ -35,7 +35,9 @@ export const GlancesAssets = () => {
       <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Assets</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <Card className="m-2">
-          <div className="d-flex align-items-center">
+          <Card.Header className="text-center">Subcapital</Card.Header>
+
+          <div className="d-flex align-items-center flex-wrap justify-content-center">
             <IconStatusDiv
               iconSrc={Frigate}
               textVariant={data?.frigate ? "info" : "warning"}
@@ -69,7 +71,9 @@ export const GlancesAssets = () => {
           </div>
         </Card>
         <Card className="m-2">
-          <div className="d-flex align-items-center">
+          <Card.Header className="text-center">Capital</Card.Header>
+
+          <div className="d-flex align-items-center flex-wrap justify-content-center">
             <IconStatusDiv
               iconSrc={Carrier}
               textVariant={data?.carrier ? "info" : "warning"}
@@ -103,7 +107,9 @@ export const GlancesAssets = () => {
           </div>
         </Card>
         <Card className="m-2">
-          <div className="d-flex align-items-center">
+          <Card.Header className="text-center">Industrial</Card.Header>
+
+          <div className="d-flex align-items-center flex-wrap justify-content-center">
             <IconStatusDiv
               iconSrc={MiningBarge}
               textVariant={data?.mining ? "info" : "warning"}
@@ -131,6 +137,8 @@ export const GlancesAssets = () => {
           </div>
         </Card>
         <Card className="m-2">
+          <Card.Header className="text-center">Notable</Card.Header>
+
           <div className="d-flex align-items-center">
             <IconStatusDiv
               iconSrc={Injector}

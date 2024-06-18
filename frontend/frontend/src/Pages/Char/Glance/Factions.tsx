@@ -25,7 +25,7 @@ export const GlancesFactions = () => {
       <div className="d-flex flex-wrap justify-content-center">
         <Card className="m-2">
           <Card.Header className="text-center">Detected Militia</Card.Header>
-          <div className="d-flex">
+          <div className="d-flex flex-wrap justify-content-center">
             <IconStatusCard
               iconSrc={Amarr}
               cardVariant={data?.factions.amarr ? "success" : undefined}
@@ -55,7 +55,7 @@ export const GlancesFactions = () => {
         <Card className="m-2">
           <Card.Header className="text-center">Loyalty Points</Card.Header>
 
-          <div className="d-flex h-100 align-items-center justify-content-center">
+          <div className="d-flex h-100 align-items-center flex-wrap justify-content-center">
             <IconStatusDiv
               iconSrc={FW}
               text={
