@@ -48,7 +48,7 @@ export const IconStatusDiv = ({
   toolTipText,
 }: IconStatusCardProps) => {
   return (
-    <OverlayTrigger trigger={"hover"} overlay={showOverlay(toolTipText)}>
+    <OverlayTrigger trigger={["hover", "focus"]} overlay={showOverlay(toolTipText)}>
       <div
         className={`d-flex m-1 ${text ? "pt-2" : ""} flex-column align-items-center`}
         style={{ minWidth: "64px", height: "64px" }}

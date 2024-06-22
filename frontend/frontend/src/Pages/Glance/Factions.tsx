@@ -1,24 +1,17 @@
-import { IconStatusCard, IconStatusDiv } from "../../../Components/Cards/IconStatusCard";
-import { loadGlanceFactionData } from "../../../api/character";
-import Amarr from "../../../assets/amarr_128.png";
-import Cal from "../../../assets/caldari_128.png";
-import FW from "../../../assets/fw_64.png";
-import Gal from "../../../assets/gallente_128.png";
-import Min from "../../../assets/minmatar128.png";
-import styles from "../CharacterAtAGlance.module.css";
+import { IconStatusCard, IconStatusDiv } from "../../Components/Cards/IconStatusCard";
+import { loadGlanceFactionData } from "../../api/character";
+import { loadCorpGlanceFactionData } from "../../api/corporation";
+import Amarr from "../../assets/amarr_128.png";
+import Cal from "../../assets/caldari_128.png";
+import FW from "../../assets/fw_64.png";
+import Gal from "../../assets/gallente_128.png";
+import Min from "../../assets/minmatar128.png";
+import styles from "./AtAGlance.module.css";
 import Card from "react-bootstrap/Card";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
-export const GlancesFactions = () => {
-  const { characterID } = useParams();
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["glances", "faction", characterID],
-    queryFn: () => loadGlanceFactionData(characterID),
-    refetchOnWindowFocus: false,
-  });
-  console.log(isLoading, data);
+export const Factions = ({ data }: any) => {
   return (
     <>
       <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Affiliations</h3>
@@ -28,26 +21,26 @@ export const GlancesFactions = () => {
           <div className="d-flex flex-wrap justify-content-center">
             <IconStatusCard
               iconSrc={Amarr}
-              cardVariant={data?.factions.amarr ? "success" : undefined}
+              cardVariant={data?.factions?.amarr ? "success" : undefined}
             />
             <IconStatusCard
               iconSrc={Gal}
-              cardVariant={data?.factions.gallente ? "success" : undefined}
+              cardVariant={data?.factions?.gallente ? "success" : undefined}
             />
             <IconStatusCard
               iconSrc={Min}
-              cardVariant={data?.factions.minmatar ? "success" : undefined}
+              cardVariant={data?.factions?.minmatar ? "success" : undefined}
             />
             <IconStatusCard
               iconSrc={Cal}
-              cardVariant={data?.factions.caldari ? "success" : undefined}
+              cardVariant={data?.factions?.caldari ? "success" : undefined}
             />
             <IconStatusCard
-              cardVariant={data?.factions.angel ? "success" : undefined}
+              cardVariant={data?.factions?.angel ? "success" : undefined}
               iconSrc={"https://images.evetech.net/corporations/500011/logo?size=128"}
             />
             <IconStatusCard
-              cardVariant={data?.factions.guristas ? "success" : undefined}
+              cardVariant={data?.factions?.guristas ? "success" : undefined}
               iconSrc={"https://images.evetech.net/corporations/500010/logo?size=128"}
             />
           </div>
@@ -91,4 +84,24 @@ export const GlancesFactions = () => {
       </div>
     </>
   );
+};
+
+export const CharacterGlancesFactions = () => {
+  const { characterID } = useParams();
+
+  const { data } = useQuery({
+    queryKey: ["glances", "faction", characterID],
+    queryFn: () => loadGlanceFactionData(characterID),
+    refetchOnWindowFocus: false,
+  });
+  return <Factions {...{ data }} />;
+};
+
+export const CorporationGlancesFactions = () => {
+  const { data } = useQuery({
+    queryKey: ["glances", "corp", "faction", 0],
+    queryFn: () => loadCorpGlanceFactionData(0),
+    refetchOnWindowFocus: false,
+  });
+  return <Factions {...{ data }} />;
 };

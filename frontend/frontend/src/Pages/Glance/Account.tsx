@@ -1,16 +1,16 @@
-import { IconStatusCard } from "../../../Components/Cards/IconStatusCard";
-import { loadCharacterStatus } from "../../../api/character";
+import { IconStatusCard } from "../../Components/Cards/IconStatusCard";
+import { loadCharacterStatus } from "../../api/character";
 // import Asteroid from "../../../assets/asteroid_64.png";
 // import NPC from "../../../assets/npcbattleship_32.png";
-import Isk from "../../../assets/isk_128.png";
-import Omega from "../../../assets/omega_128.png";
-import Skills from "../../../assets/skillInjector_64.png";
-import Unknowns from "../../../assets/unknown_64.png";
-import styles from "../CharacterAtAGlance.module.css";
+import Isk from "../../assets/isk_128.png";
+import Omega from "../../assets/omega_128.png";
+import Skills from "../../assets/skillInjector_64.png";
+import Unknowns from "../../assets/unknown_64.png";
+import styles from "./AtAGlance.module.css";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
-export const GlancesAccount = () => {
+export const CharacterGlancesAccount = () => {
   const { characterID } = useParams();
 
   const { data, isLoading } = useQuery({

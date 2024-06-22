@@ -1,35 +1,28 @@
-import { IconStatusDiv } from "../../../Components/Cards/IconStatusCard";
-import { loadGlanceAssetData } from "../../../api/character";
-import Battlecruiser from "../../../assets/battleCruiser_32.png";
-import Battleship from "../../../assets/battleship_32.png";
-import Carrier from "../../../assets/carrier_32.png";
-import Cruiser from "../../../assets/cruiser_32.png";
-import Destroyer from "../../../assets/destroyer_32.png";
-import Dreadnought from "../../../assets/dreadnought_32.png";
-import Extractor from "../../../assets/extractor_64.png";
-import Fax from "../../../assets/forceAuxiliary_32.png";
-import Frieghter from "../../../assets/freighter_32.png";
-import Frigate from "../../../assets/frigate_32.png";
-import IndustrialCommand from "../../../assets/industrialCommand_32.png";
-import Industrial from "../../../assets/industrial_32.png";
-import MiningBarge from "../../../assets/miningBarge_32.png";
-import Injector from "../../../assets/skillInjector_64.png";
-import Supercarrier from "../../../assets/superCarrier_32.png";
-import Titan from "../../../assets/titan_32.png";
-import styles from "../CharacterAtAGlance.module.css";
+import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
+import { loadGlanceAssetData } from "../../api/character";
+import { loadCorpGlanceAssetData } from "../../api/corporation";
+import Battlecruiser from "../../assets/battleCruiser_32.png";
+import Battleship from "../../assets/battleship_32.png";
+import Carrier from "../../assets/carrier_32.png";
+import Cruiser from "../../assets/cruiser_32.png";
+import Destroyer from "../../assets/destroyer_32.png";
+import Dreadnought from "../../assets/dreadnought_32.png";
+import Extractor from "../../assets/extractor_64.png";
+import Fax from "../../assets/forceAuxiliary_32.png";
+import Frieghter from "../../assets/freighter_32.png";
+import Frigate from "../../assets/frigate_32.png";
+import IndustrialCommand from "../../assets/industrialCommand_32.png";
+import Industrial from "../../assets/industrial_32.png";
+import MiningBarge from "../../assets/miningBarge_32.png";
+import Injector from "../../assets/skillInjector_64.png";
+import Supercarrier from "../../assets/superCarrier_32.png";
+import Titan from "../../assets/titan_32.png";
+import styles from "./AtAGlance.module.css";
 import Card from "react-bootstrap/Card";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
-export const GlancesAssets = () => {
-  const { characterID } = useParams();
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["glances", "assets", characterID],
-    queryFn: () => loadGlanceAssetData(characterID),
-    refetchOnWindowFocus: false,
-  });
-
+export const Assets = ({ data, isLoading }: any) => {
   return (
     <>
       <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Assets</h3>
@@ -175,4 +168,26 @@ export const GlancesAssets = () => {
       </div>
     </>
   );
+};
+
+export const CharacterGlancesAssets = () => {
+  const { characterID } = useParams();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["glances", "assets", characterID],
+    queryFn: () => loadGlanceAssetData(characterID),
+    refetchOnWindowFocus: false,
+  });
+  console.log(data, isLoading);
+  return <Assets {...{ data, isLoading }} />;
+};
+
+export const CorporationGlancesAssets = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ["glances", "corp", "assets", 0],
+    queryFn: () => loadCorpGlanceAssetData(0),
+    refetchOnWindowFocus: false,
+  });
+
+  return <Assets {...{ data, isLoading }} />;
 };

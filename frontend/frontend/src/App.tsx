@@ -1,6 +1,7 @@
 import CharacterAudit from "./Pages/Char/CharacterAudit";
 import CharacterOverview from "./Pages/Char/CharacterOverview";
 import CharacterStatus from "./Pages/Char/CharacterStatus";
+import CorporationAtAGlance from "./Pages/Corp/CorporationAtAGlance";
 import CorporationAudit from "./Pages/Corp/CorporationAudit";
 import React from "react";
 import { Card } from "react-bootstrap";
@@ -173,7 +174,7 @@ function App() {
               />
             </Route>
             <Route path="audit/r_beta/corp/" element={<CorporationAudit />}>
-              <Route index element={<Navigate to="structures" replace />} />
+              <Route index element={<Navigate to="glance" replace />} />
               <Route
                 path="corporations"
                 element={
@@ -182,6 +183,7 @@ function App() {
                   </Card>
                 }
               />
+              <Route path="glance" element={<CorporationAtAGlance />} />
               <Route
                 path="structures"
                 element={

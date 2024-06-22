@@ -1,7 +1,7 @@
-import { GlancesAccount } from "./Glance/Account";
-import { GlancesActivities } from "./Glance/Activities";
-import { GlancesAssets } from "./Glance/Assets";
-import { GlancesFactions } from "./Glance/Factions";
+import { CharacterGlancesAccount } from "../Glance/Account";
+import { CharacterGlancesActivities } from "../Glance/Activities";
+import { CharacterGlancesAssets } from "../Glance/Assets";
+import { CharacterGlancesFactions } from "../Glance/Factions";
 
 const CharacterAtAGlance = () => {
   return (
@@ -15,10 +15,10 @@ const CharacterAtAGlance = () => {
         size={256}
         rounded_images={true}
       /> */}
-      <GlancesAccount />
-      <GlancesAssets />
-      <GlancesActivities />
-      <GlancesFactions />
+      <CharacterGlancesAccount />
+      <CharacterGlancesAssets />
+      <CharacterGlancesActivities />
+      <CharacterGlancesFactions />
 
       {/* <h3 className={`${styles.strikeOut} mt-4 w-100 text-center`}>Character Status</h3> */}
     </div>

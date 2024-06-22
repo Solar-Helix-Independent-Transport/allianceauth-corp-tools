@@ -23,6 +23,11 @@ const CorpMenu = (props: CorpMenuProps) => {
   return (
     <>
       <Nav.Item>
+        <LinkContainer to={`/audit/r_beta/corp/glance`}>
+          <Nav.Link key="Glance">Overview</Nav.Link>
+        </LinkContainer>
+      </Nav.Item>
+      <Nav.Item>
         <LinkContainer to={`/audit/r_beta/corp/structures`}>
           <Nav.Link key="Structures">Structures</Nav.Link>
         </LinkContainer>
