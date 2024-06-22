@@ -1,4 +1,5 @@
 from .assets import AssetsApiEndpoints
+from .at_a_glance import CorpGlanceApiEndpoints
 from .dashboards import DashboardApiEndpoints
 from .finances import FinancesApiEndpoints
 from .list import ListApiEndpoints
@@ -13,3 +14,4 @@ def setup(api):
     StatusApiEndpoints(api)
     DashboardApiEndpoints(api)
     StructureApiEndpoints(api)
+    CorpGlanceApiEndpoints(api)

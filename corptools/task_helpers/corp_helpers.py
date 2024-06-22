@@ -434,9 +434,13 @@ def update_corp_structures(corp_id):  # pagnated results
             else:
                 celestial = celestial[0]
 
-            if celestial is not None:
-                _structure_ob.closest_celestial = celestial
-                _structure_ob.save()
+            # TODO fix this all up.
+            if isinstance(celestial, StructureCelestial):
+                if celestial is not None:
+                    _structure_ob.closest_celestial = celestial
+                    _structure_ob.save()
+            else:
+                celestial = None
 
             if _structure.get('services'):
                 db_services = StructureService.objects.filter(

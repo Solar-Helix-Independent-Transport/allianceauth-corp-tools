@@ -1069,9 +1069,15 @@ def update_character_notifications(character_id, force_refresh=False):
     try:
         notifications_op = providers.esi.client.Character.get_characters_character_id_notifications(
             character_id=character_id)
+        notifications_op.operation.swagger_spec.config["validate_responses"] = False
+        try:
+            notifications = etag_results(
+                notifications_op, token, force_refresh=force_refresh)
+        except Exception as e:
+            raise e
+        finally:
+            notifications_op.operation.swagger_spec.config["validate_responses"] = True
 
-        notifications = etag_results(
-            notifications_op, token, force_refresh=force_refresh)
         _st = time.perf_counter()
 
         last_five_hundred = list(

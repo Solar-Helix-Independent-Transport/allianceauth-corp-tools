@@ -6,40 +6,35 @@ from django.utils.translation import gettext as _
 from allianceauth.services.hooks import get_extension_logger
 
 from corptools import models
-from corptools.api.helpers import (
-    get_alts_queryset, get_main_character, glance_incursion_check,
-    glances_gas_check, glances_ice_check, glances_industry_check,
-    glances_market_check, glances_missions_check, glances_moon_check,
-    glances_ore_check, glances_pi_check, glances_pochven_check,
-    glances_ratting_check, roundFloat,
-)
-
 # from corptools.api import schema
-
+from corptools.api.helpers import (
+    get_corporation_characters, glance_incursion_check, glances_gas_check,
+    glances_ice_check, glances_industry_check, glances_market_check,
+    glances_missions_check, glances_moon_check, glances_ore_check,
+    glances_pi_check, glances_pochven_check, glances_ratting_check, roundFloat,
+)
 
 logger = get_extension_logger(__name__)
 
 
-class GlanceApiEndpoints:
+class CorpGlanceApiEndpoints:
 
-    tags = ["Character At a Glance"]
+    tags = ["Corporation At a Glance"]
 
     def __init__(self, api: NinjaAPI):
         @api.get(
-            "account/{character_id}/glance/assets",
+            "corporation/{corporation_id}/glance/assets",
             response={200: dict, 403: str},
             tags=self.tags
         )
-        def get_glance_assets(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
+        def get_glance_assets_corp(request, corporation_id: int):
+            if corporation_id == 0:
+                corporation_id = request.user.profile.main_character.corporation_id
 
-            response, main = get_main_character(request, character_id)
+            characters = get_corporation_characters(request, corporation_id)
 
-            if not response:
+            if not characters.count():
                 return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
 
             ship_cat = [6]
             injector_grp = 1739
@@ -145,20 +140,18 @@ class GlanceApiEndpoints:
             return out_groups
 
         @api.get(
-            "account/{character_id}/glance/activities",
+            "corporation/{corporation_id}/glance/activities",
             response={200: dict, 403: str},
             tags=self.tags
         )
-        def get_glance_activities(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
+        def get_glance_activities(request, corporation_id: int):
+            if corporation_id == 0:
+                corporation_id = request.user.profile.main_character.corporation_id
 
-            response, main = get_main_character(request, character_id)
+            characters = get_corporation_characters(request, corporation_id)
 
-            if not response:
+            if not characters.count():
                 return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
 
             output = {}
 
@@ -181,20 +174,18 @@ class GlanceApiEndpoints:
             return output
 
         @api.get(
-            "account/{character_id}/glance/faction",
+            "corporation/{corporation_id}/glance/faction",
             response={200: dict, 403: str},
             tags=self.tags
         )
-        def get_glance_factions(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
+        def get_glance_factions(request, corporation_id: int):
+            if corporation_id == 0:
+                corporation_id = request.user.profile.main_character.corporation_id
 
-            response, main = get_main_character(request, character_id)
+            characters = get_corporation_characters(request, corporation_id)
 
-            if not response:
+            if not characters.count():
                 return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
 
             output = {
                 "factions": {

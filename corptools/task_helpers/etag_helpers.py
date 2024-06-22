@@ -62,6 +62,8 @@ def etag_results(operation, token, force_refresh=False):
     _start_tm = time.perf_counter()
     results = list()
     # override to always get the raw response for expiry header
+    # print("******************", operation.operation.swagger_spec.config["validate_responses"])
+
     operation.request_config.also_return_response = True
     if token:
         operation.future.request.headers["Authorization"] = "Bearer " + \
