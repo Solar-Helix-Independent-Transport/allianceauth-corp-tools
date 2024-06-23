@@ -15,7 +15,7 @@ export const CorporationGlancesInfo = () => {
 
   return (
     <>
-      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Account at a Glance</h3>
+      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Corporation Members</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <IconStatusCard
           cardVariant={data?.characters?.liquid < 1000000 ? "warning" : undefined}

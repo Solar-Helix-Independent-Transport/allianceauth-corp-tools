@@ -128,7 +128,7 @@ class StructureApiEndpoints:
         )
         def get_jb_link(request):
             output = []
-            for s in models.Structure.filter(
+            for s in models.Structure.objects.filter(
                 type_id=35841
             ):
                 id = s.structure_id
