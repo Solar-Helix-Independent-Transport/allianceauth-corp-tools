@@ -3,6 +3,8 @@ from typing import List
 
 from ninja import NinjaAPI
 
+from django.http import HttpResponse
+
 from allianceauth.services.hooks import get_extension_logger
 
 from corptools import models
@@ -138,4 +140,4 @@ class StructureApiEndpoints:
                 to_sys = split[1].split(" - ")[0]
 
                 output.append(f"{id} {from_sys} --> {to_sys}")
-            return "\n".join(output)
+            return HttpResponse("\n".join(output))
