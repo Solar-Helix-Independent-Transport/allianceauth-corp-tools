@@ -120,3 +120,22 @@ class StructureApiEndpoints:
                 }
                 output.append(_s)
             return list(output)
+
+        @api.get(
+            "extra/jb/export",
+            response={200: str, 403: str},
+            tags=["Extras"]
+        )
+        def get_jb_link(request):
+            output = []
+            for s in models.Structure.filter(
+                type_id=35841
+            ):
+                id = s.structure_id
+                split = s.name.split(" » ")
+
+                from_sys = split[0]
+                to_sys = split[1].split(" - ")[0]
+
+                output.append(f"{id} {from_sys} --> {to_sys}")
+            return "\n".join(output)

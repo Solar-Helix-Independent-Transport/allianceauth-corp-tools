@@ -1,5 +1,6 @@
 import { CorporationGlancesActivities } from "../Glance/Activities";
 import { CorporationGlancesAssets } from "../Glance/Assets";
+import { CorporationGlancesInfo } from "../Glance/Corporation";
 import { CorporationGlancesFactions } from "../Glance/Factions";
 
 const CorporationAtAGlance = () => {
@@ -14,6 +15,7 @@ const CorporationAtAGlance = () => {
         size={256}
         rounded_images={true}
       /> */}
+      <CorporationGlancesInfo />
       <CorporationGlancesActivities />
       <CorporationGlancesAssets />
       <CorporationGlancesFactions />

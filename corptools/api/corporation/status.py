@@ -1,9 +1,11 @@
 from ninja import NinjaAPI
 
+from django.utils.translation import gettext as _
+
 from allianceauth.services.hooks import get_extension_logger
 
 from corptools import app_settings, models
-from corptools.api import schema
+from corptools.api import helpers, schema
 
 logger = get_extension_logger(__name__)
 
@@ -44,3 +46,60 @@ class StatusApiEndpoints:
                         "last_updates": _updates}
                 return 200, _out
             return 403, "Not Found"
+
+        @api.get(
+            "corporation/{corporation_id}/character/status",
+            response={200: dict, 403: str},
+            tags=self.tags
+        )
+        def get_corporation_character_status(request, corporation_id: int):
+            if not corporation_id:
+                corporation_id = request.user.profile.main_character.corporation_id
+
+            corp = models.CorporationAudit.objects.visible_to(
+                request.user
+            ).get(
+                corporation__corporation_id=corporation_id
+            )
+
+            if not corp:
+                return 403, _("Permission Denied")
+
+            characters = helpers.get_corporation_characters(
+                request, corporation_id)
+
+            characters = characters.select_related(
+                'characteraudit'
+            )
+
+            output = {
+                "characters": {
+                    "known_and_alts": 0,
+                    "known_in_corp": 0,
+                    "bad": 0,
+                    "in_corp": corp.corporation.member_count,
+                    "liquid": 0
+                },
+                "corporation": {
+                    'id': corp.corporation.corporation_id,
+                    'name': corp.corporation.corporation_name,
+                }
+            }
+
+            for character in characters:
+                output["characters"]["known_and_alts"] += 1
+                if character.corporation_id == corporation_id:
+                    output["characters"]["known_in_corp"] += 1
+
+                try:
+                    output["characters"]["liquid"] += character.characteraudit.balance
+                    if not character.characteraudit.is_active():
+                        output["characters"]["bad"] += 1
+                except models.CharacterAudit.DoesNotExist:
+                    output["characters"]["bad"] += 1
+
+            output["characters"]["liquid"] = helpers.roundFloat(
+                output["characters"]["liquid"]
+            )
+
+            return 200, output

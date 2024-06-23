@@ -14,6 +14,12 @@ export async function loadCorpGlanceAssetData(corporation_id: any) {
   return api.data;
 }
 
+export async function loadCorpGlanceStatusData(corporation_id: any) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/character/status`);
+  console.log(`get glance/assets in api ${corporation_id}`);
+  return api.data;
+}
+
 export async function loadCorpGlanceActivityData(corporation_id: any) {
   const api = await axios.get(`/audit/api/corporation/${corporation_id}/glance/activities`);
   console.log(`get glance/activities in api ${corporation_id}`);
