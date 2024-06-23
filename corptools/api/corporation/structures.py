@@ -140,4 +140,4 @@ class StructureApiEndpoints:
                 to_sys = split[1].split(" - ")[0]
 
                 output.append(f"{id} {from_sys} --> {to_sys}")
-            return HttpResponse("\n".join(output))
+            return HttpResponse("\n".join(output), content_type="text/plain")
