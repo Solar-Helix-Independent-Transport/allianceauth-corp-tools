@@ -1,23 +1,23 @@
 {
-  "_@libs-CL5_lZKS.js": {
-    "file": "assets/@libs-CL5_lZKS.js"
+  "_@libs-BwDEfZOQ.js": {
+    "file": "assets/@libs-BwDEfZOQ.js"
   },
-  "_@react-router-DQ_G6aig.js": {
-    "file": "assets/@react-router-DQ_G6aig.js",
+  "_@react-router-Bvkr4sF6.js": {
+    "file": "assets/@react-router-Bvkr4sF6.js",
     "imports": [
-      "_@libs-CL5_lZKS.js"
+      "_@libs-BwDEfZOQ.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-BUfWRj4a.js",
+    "file": "assets/index-7zvkdnP0.js",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@libs-CL5_lZKS.js",
-      "_@react-router-DQ_G6aig.js"
+      "_@libs-BwDEfZOQ.js",
+      "_@react-router-Bvkr4sF6.js"
     ],
     "css": [
-      "static/corptools/bs5/statics/css/index-t8BwvBia.css"
+      "static/corptools/bs5/statics/css/index-DGje4lAW.css"
     ],
     "assets": [
       "static/corptools/bs5/statics/img/omega_128-B8POqXI6.png",

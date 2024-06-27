@@ -254,7 +254,7 @@ function _baseTable({
               </Button>
             </OverlayTrigger>
           )}
-          <Button active variant="primary" onClick={() => exportToCSV(table, fileName)}>
+          <Button active variant="primary" onClick={() => exportToCSV(table, fileName as string)}>
             Export Table to CSV
           </Button>{" "}
         </ButtonGroup>
