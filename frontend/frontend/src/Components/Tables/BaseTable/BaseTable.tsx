@@ -6,6 +6,7 @@ import {
   HeaderGroup,
   PaginationInitialTableState,
   Table as ReactTable,
+  RowModel,
   SortingTableState,
   VisibilityTableState,
   flexRender,
@@ -18,6 +19,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { stringify } from "csv-stringify/browser/esm/sync";
 import {
   Button,
   ButtonGroup,
@@ -28,10 +30,46 @@ import {
   Table,
   Tooltip,
 } from "react-bootstrap";
+import { useLocation, useParams } from "react-router-dom";
 
 function MyTooltip(message: string) {
   return <Tooltip id="character_tooltip">{message}</Tooltip>;
 }
+
+const exportToCSV = (table: ReactTable<any>, exportFileName: string) => {
+  const { rows } = table.getCoreRowModel();
+
+  const headerRows = table.getHeaderGroups().map((headerGroup: HeaderGroup<any>) => {
+    return headerGroup.headers.map((header: Header<any, any>) => {
+      return header.column.columnDef.header;
+    });
+  });
+
+  const csvData = rows.map((row: any) => {
+    return row.getVisibleCells().map((cell: any) => {
+      return cell.getValue();
+    });
+  });
+  console.log(headerRows, csvData);
+  const csv = stringify([...headerRows, ...csvData]);
+  const fileType = "csv";
+  const blob = new Blob([csv], {
+    type: `text/${fileType};charset=utf8;`,
+  });
+
+  // spoof a download
+  const link = document.createElement("a");
+  link.download = exportFileName;
+  link.href = URL.createObjectURL(blob);
+
+  // Ensure the link isn't visible to the user or cause layout shifts.
+  link.setAttribute("visibility", "hidden");
+
+  // Add to document body, click and remove it.
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
 // function strToKey(keyString: string, ob: object) {
 //   return keyString.split(".").reduce(function (p: any, prop: any) {
@@ -52,6 +90,7 @@ export interface BaseTableProps extends Partial<HTMLElement> {
   columns: ColumnDef<any, any>[];
   asyncExpandFunction?: any;
   initialState?: tableInitialState;
+  exportFileName?: String;
 }
 
 interface _BaseTableProps extends BaseTableProps {
@@ -69,6 +108,7 @@ const BaseTable = ({
   striped = false,
   hover = false,
   initialState = undefined,
+  exportFileName = undefined,
 }: BaseTableProps) => {
   const table = useReactTable({
     data,
@@ -97,6 +137,7 @@ const BaseTable = ({
         initialState,
         striped,
         hover,
+        exportFileName,
       }}
     />
   );
@@ -108,8 +149,12 @@ function _baseTable({
   striped = false,
   hover = false,
   debugTable = false,
+  exportFileName = undefined,
 }: _BaseTableProps) {
   const { rows } = table.getRowModel();
+  const location = useLocation();
+  const fileName =
+    typeof exportFileName !== "undefined" ? exportFileName : `ExportedData_${location.pathname}`;
   return (
     <>
       <Table {...{ striped, hover }}>
@@ -188,7 +233,7 @@ function _baseTable({
                 {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
               </>
             }
-          </Button>{" "}
+          </Button>
           {isFetching ? (
             <OverlayTrigger
               placement="bottom"
@@ -210,6 +255,9 @@ function _baseTable({
               </Button>
             </OverlayTrigger>
           )}
+          <Button active variant="primary" onClick={() => exportToCSV(table, fileName)}>
+            Export Table to CSV
+          </Button>{" "}
         </ButtonGroup>
 
         <ButtonToolbar>
@@ -258,8 +306,9 @@ function _baseTable({
                   id={`${_pageSize}`}
                   key={_pageSize}
                   eventKey={_pageSize}
-                  onSelect={(eventKey: any) => {
-                    table.setPageSize(Number(eventKey));
+                  onClick={(eventKey: any) => {
+                    console.log(eventKey.target.id);
+                    table.setPageSize(Number(eventKey.target.id));
                   }}
                 >
                   Show {_pageSize}

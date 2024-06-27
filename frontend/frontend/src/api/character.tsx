@@ -63,3 +63,18 @@ export async function postAccountRefresh(character_id: any) {
   );
   return api.data;
 }
+
+export async function loadAssetList(
+  character_id: number | undefined,
+  location_id: number | undefined
+) {
+  const api = await axios.get(`/audit/api/account/${character_id}/asset/${location_id}/list`);
+  console.log(`get asset list in api ${character_id} ${location_id}`);
+  return api.data;
+}
+
+export async function loadAssetLocations(character_id: number | undefined) {
+  const api = await axios.get(`/audit/api/account/${character_id}/asset/locations`);
+  console.log(`get asset locations in api ${character_id}`);
+  return api.data;
+}

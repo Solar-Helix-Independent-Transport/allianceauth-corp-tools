@@ -1,5 +1,7 @@
+import CharacterAssets from "./Pages/Char/CharacterAssetsList";
 import CharacterAudit from "./Pages/Char/CharacterAudit";
 import CharacterOverview from "./Pages/Char/CharacterOverview";
+import CharacterPubData from "./Pages/Char/CharacterPubData";
 import CharacterStatus from "./Pages/Char/CharacterStatus";
 import CorporationAtAGlance from "./Pages/Corp/CorporationAtAGlance";
 import CorporationAudit from "./Pages/Corp/CorporationAudit";
@@ -28,22 +30,8 @@ function App() {
                   </Card>
                 }
               />
-              <Route
-                path="account/listassets"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/listassets.</Card.Body>
-                  </Card>
-                }
-              />
-              <Route
-                path="account/pubdata"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/pubdata.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/listassets" element={<CharacterAssets />} />
+              <Route path="account/pubdata" element={<CharacterPubData />} />
               <Route
                 path="account/clones"
                 element={

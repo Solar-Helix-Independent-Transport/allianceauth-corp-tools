@@ -1,17 +1,17 @@
 import { PortraitCard } from "../Cards/PortraitCard";
 import { Table } from "react-bootstrap";
 
-const CharacterPubDataPanels = ({ data }: { data: any }) => {
+const CharacterPubDataPanels = ({ isFetching, data }: { isFetching: boolean; data: any }) => {
   if (!data) return <p>Loading</p>;
 
   return (
-    <div className="d-flex justify-content-center align-items-center flex-row flex-wrap">
+    <div className="d-flex justify-content-around align-items-center flex-row flex-wrap">
       {data?.characters.map((char: any) => {
         const char_status = char.active ? "success" : "warning";
         return (
           <PortraitCard
             border={char_status}
-            //isFetching={isFetching}
+            isFetching={isFetching}
             character={char.character}
             heading={char.character.character_name}
             roundedImages={"10"}
@@ -21,25 +21,19 @@ const CharacterPubDataPanels = ({ data }: { data: any }) => {
                 <Table striped style={{ marginBottom: 0 }}>
                   <thead>
                     <tr key={`head-${char.character}`}>
-                      <th>Update</th>
-                      <th className="text-end">Last Run</th>
+                      <th>Corporation</th>
+                      <th className="text-end">Joined</th>
                     </tr>
                   </thead>
                 </Table>
-                <div style={{ width: "350px" }}>
+                <div style={{ width: "350px", height: "250px", overflowY: "auto" }}>
                   <Table striped>
                     <tbody>
-                      {data?.headers.map((h: any) => {
+                      {char.history?.map((h: any) => {
                         return (
-                          <tr key={h}>
-                            <td>{h}</td>
-                            <td className="text-end">
-                              {char.last_updates
-                                ? char.last_updates[h]
-                                  ? `${Date.parse(char.last_updates[h])}`
-                                  : "Never"
-                                : "Never"}
-                            </td>
+                          <tr key={h.start}>
+                            <td>{h.corporation.corporation_name}</td>
+                            <td className="text-end text-nowrap">{h.start.slice(0, 10)}</td>
                           </tr>
                         );
                       })}

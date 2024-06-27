@@ -4,16 +4,18 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterPubData = () => {
-  let { characterID } = useParams();
+  const { characterID } = useParams();
 
-  const { data, isFetching } = useQuery(["status", characterID], () => loadPubData(characterID), {
+  const { data, isFetching } = useQuery(["pubdata", characterID], () => loadPubData(characterID), {
     refetchOnWindowFocus: false,
   });
+
+  console.log(data);
 
   return (
     <>
       {/* <CharacterStatusPanels {...{ isFetching }} data={data} /> */}
-      <CharacterPubDataPanels {...{ isFetching }} data={data} />
+      <CharacterPubDataPanels {...{ isFetching, data }} />
     </>
   );
 };
