@@ -22,7 +22,10 @@ const CharacterAssets = () => {
     <>
       <Card.Title className="mt-3 text-center">Location Filter</Card.Title>
       <div className="m-3">
-        <CharacterAssetLocationSelect {...{ characterID, setLocation }} />
+        <CharacterAssetLocationSelect
+          character_id={characterID ? Number(characterID) : 0}
+          {...{ setLocation }}
+        />
       </div>
       <CharacterAssetTable {...{ isFetching, data }} />
     </>

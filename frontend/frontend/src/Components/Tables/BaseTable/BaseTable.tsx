@@ -6,7 +6,6 @@ import {
   HeaderGroup,
   PaginationInitialTableState,
   Table as ReactTable,
-  RowModel,
   SortingTableState,
   VisibilityTableState,
   flexRender,
@@ -30,7 +29,7 @@ import {
   Table,
   Tooltip,
 } from "react-bootstrap";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 function MyTooltip(message: string) {
   return <Tooltip id="character_tooltip">{message}</Tooltip>;

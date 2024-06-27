@@ -29,7 +29,7 @@ const CharacterAssetLocationSelect = ({
       isLoading={isLoading}
       styles={colourStyles}
       options={data}
-      onChange={(e) => setLocation(e.value)}
+      onChange={(e: any) => setLocation(e.value)}
     />
   );
 };
