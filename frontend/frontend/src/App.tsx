@@ -3,12 +3,17 @@ import CharacterAudit from "./Pages/Char/CharacterAudit";
 import CharacterOverview from "./Pages/Char/CharacterOverview";
 import CharacterPubData from "./Pages/Char/CharacterPubData";
 import CharacterStatus from "./Pages/Char/CharacterStatus";
-import CorporationAtAGlance from "./Pages/Corp/CorporationAtAGlance";
-import CorporationAudit from "./Pages/Corp/CorporationAudit";
+import CorporationAtAGlance from "./Pages/Corp/AtAGlance";
+import CorporationAudit from "./Pages/Corp/Audit";
+import Structures from "./Pages/Corp/Structures";
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
 import React from "react";
 import { Card } from "react-bootstrap";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+
+TimeAgo.addDefaultLocale(en);
 
 const queryClient = new QueryClient();
 
@@ -172,14 +177,7 @@ function App() {
                 }
               />
               <Route path="glance" element={<CorporationAtAGlance />} />
-              <Route
-                path="structures"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is structures.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="structures" element={<Structures />} />
               <Route
                 path="wallets"
                 element={

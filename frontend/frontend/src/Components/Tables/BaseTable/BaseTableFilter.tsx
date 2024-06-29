@@ -1,9 +1,15 @@
 import { colourStyles } from "./BaseTableStyles";
-import { Column, Table as ReactTable } from "@tanstack/react-table";
+import { Column, Table as ReactTable, Row } from "@tanstack/react-table";
 import { Form, OverlayTrigger, Popover } from "react-bootstrap";
 import Select from "react-select";
 
 const isHTML = RegExp.prototype.test.bind(/(<([^>]+)>)/i);
+
+export const NameObjectArrayFilterFn = (row: Row<any>, columnId: string, filterValue: any) => {
+  const data: any = row.getValue(columnId);
+  const _svrs = data.reduce((o: string, r: any) => (o += `|${r.name}`), "");
+  return _svrs.toLowerCase().includes(filterValue.toLowerCase());
+};
 
 export const NumberFilter = ({ column }: { column: Column<any, any> }) => {
   const columnFilterValue = column.getFilterValue();
