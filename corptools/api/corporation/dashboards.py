@@ -50,35 +50,39 @@ class DashboardApiEndpoints:
             now = timezone.now()
             for s in structures:
                 matches = re.findall(regex, s.name)
-                matches = matches[0]
-                days = 0
-                if s.fuel_expires:
-                    days = (s.fuel_expires - now).days
-                active = False
-                for ss in s.structureservice_set.all():
-                    if ss.name == "Jump Gate Access" and ss.state == "online":
-                        active = True
-
-                if matches[0] in second_systems:
-                    output[matches[1]]["end"] = {"system_name": s.system_name.name,
-                                                 "system_id": s.system_name_id,
-                                                 "ozone": s.ozone_level,
-                                                 "known": True,
-                                                 "active": active,
-                                                 "expires": days,
-                                                 "name": s.name}
-                else:
-                    output[matches[0]] = {}
-                    output[matches[0]]["start"] = {"system_name": s.system_name.name,
-                                                   "system_id": s.system_name_id,
-                                                   "ozone": s.ozone_level,
-                                                   "known": True,
-                                                   "active": active,
-                                                   "expires": days,
-                                                   "name": s.name}
-                    output[matches[0]]["end"] = {
-                        "known": False, "active": False}
-                    second_systems.add(matches[1])
+                if len(matches):
+                    matches = matches[0]
+                    days = 0
+                    if s.fuel_expires:
+                        days = (s.fuel_expires - now).days
+                    active = False
+                    for ss in s.structureservice_set.all():
+                        if ss.name == "Jump Gate Access" and ss.state == "online":
+                            active = True
+                    if matches[0] in second_systems:
+                        output[matches[1]]["end"] = {
+                            "system_name": s.system_name.name,
+                            "system_id": s.system_name_id,
+                            "ozone": s.ozone_level,
+                            "known": True,
+                            "active": active,
+                            "expires": days,
+                            "name": s.name
+                        }
+                    else:
+                        output[matches[0]] = {}
+                        output[matches[0]]["start"] = {
+                            "system_name": s.system_name.name,
+                            "system_id": s.system_name_id,
+                            "ozone": s.ozone_level,
+                            "known": True,
+                            "active": active,
+                            "expires": days,
+                            "name": s.name
+                        }
+                        output[matches[0]]["end"] = {
+                            "known": False, "active": False}
+                        second_systems.add(matches[1])
 
             return list(output.values())
 
