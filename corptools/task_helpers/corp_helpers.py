@@ -497,26 +497,42 @@ def update_corp_structures(corp_id):  # pagnated results
         return f"No New structure data for: {_corporation}"
 
     for structure in structures:
-        try:
-            structure_info = fetch_location_name(structure.get(
-                'structure_id'), 'solar_system', token.character_id)
-        except Exception:  # if bad screw it...
-            structure_info = False
+        name = str(structure.get('structure_id'))
+        if structure.get('name'):
+            name = structure.get('name')
+            EveLocation.objects.update_or_create(
+                location_id=structure.get('structure_id'),
+                defaults={
+                    "location_name": structure.get('name')
+                }
+            )
+        else:
+            try:
+                structure_info = fetch_location_name(structure.get(
+                    'structure_id'), 'solar_system', token.character_id)
+
+            except Exception:
+                structure_info = False
+            if structure_info:
+                name = structure_info.location_name
 
         try:
-            structure_ob, created = _structures_db_update(_corporation,
-                                                          structure,
-                                                          structure_info.location_name if structure_info else str(
-                                                              structure.get('structure_id')))
+            structure_ob, created = _structures_db_update(
+                _corporation,
+                structure,
+                name
+            )
+
         except MultipleObjectsReturned:
             id_of_first = Structure.objects.filter(
                 structure_id=structure.get('structure_id')).order_by("id")[0].id
             Structure.objects.filter(structure_id=structure.get(
                 'structure_id')).exclude(id=id_of_first).delete()
-            structure_ob, created = _structures_db_update(_corporation,
-                                                          structure,
-                                                          structure_info.location_name if structure_info else str(
-                                                              structure.get('structure_id')))
+            structure_ob, created = _structures_db_update(
+                _corporation,
+                structure,
+                name
+            )
 
         structure_ids.append(structure_ob.structure_id)
 
