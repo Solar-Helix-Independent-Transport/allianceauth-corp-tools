@@ -73,6 +73,8 @@ def etag_results(operation, token, force_refresh=False, disable_verification=Fal
 
     if disable_verification:
         operation.operation.swagger_spec.config["validate_responses"] = False
+    else:
+        operation.operation.swagger_spec.config["validate_responses"] = True
 
     try:
         logger.debug(f"ETAG Validate Override: {operation.operation.swagger_spec.config['validate_responses']}")
@@ -191,8 +193,8 @@ def etag_results(operation, token, force_refresh=False, disable_verification=Fal
         # Re-raise everything
         raise
     finally:
-        # only after we do the reset on the verification
-        if disable_verification:
+        # reset the validation.
+        if not disable_verification:
             operation.operation.swagger_spec.config["validate_responses"] = True
         try:
             logger.debug(f"ETAG Validate Post: {operation.operation.swagger_spec.config['validate_responses']}")
