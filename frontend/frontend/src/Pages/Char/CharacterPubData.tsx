@@ -6,9 +6,13 @@ import { useParams } from "react-router-dom";
 const CharacterPubData = () => {
   const { characterID } = useParams();
 
-  const { data, isFetching } = useQuery(["pubdata", characterID], () => loadPubData(characterID), {
-    refetchOnWindowFocus: false,
-  });
+  const { data, isFetching } = useQuery(
+    ["pubdata", characterID],
+    () => loadPubData(characterID ? Number(characterID) : 0),
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
 
   console.log(data);
 

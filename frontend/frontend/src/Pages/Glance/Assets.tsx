@@ -175,7 +175,7 @@ export const CharacterGlancesAssets = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "assets", characterID],
-    queryFn: () => loadGlanceAssetData(characterID),
+    queryFn: () => loadGlanceAssetData(characterID ? Number(characterID) : 0),
     refetchOnWindowFocus: false,
   });
   console.log(data, isLoading);

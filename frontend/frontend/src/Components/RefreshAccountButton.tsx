@@ -10,7 +10,7 @@ export const RefreshCharButton = () => {
   const { refetch, isFetching } = useQuery(
     "my_key",
     () => {
-      return postAccountRefresh(characterID);
+      return postAccountRefresh(characterID ? Number(characterID) : 0);
     },
     {
       refetchOnWindowFocus: false,

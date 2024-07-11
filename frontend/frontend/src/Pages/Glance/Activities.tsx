@@ -165,7 +165,7 @@ export const CharacterGlancesActivities = () => {
 
   const { data } = useQuery({
     queryKey: ["glances", "activities", characterID],
-    queryFn: () => loadGlanceActivityData(characterID),
+    queryFn: () => loadGlanceActivityData(characterID ? Number(characterID) : 0),
     refetchOnWindowFocus: false,
   });
 

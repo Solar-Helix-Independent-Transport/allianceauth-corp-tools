@@ -91,7 +91,7 @@ export const CharacterGlancesFactions = () => {
 
   const { data } = useQuery({
     queryKey: ["glances", "faction", characterID],
-    queryFn: () => loadGlanceFactionData(characterID),
+    queryFn: () => loadGlanceFactionData(characterID ? Number(characterID) : 0),
     refetchOnWindowFocus: false,
   });
   return <Factions {...{ data }} />;

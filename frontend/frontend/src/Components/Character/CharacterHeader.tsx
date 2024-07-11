@@ -23,9 +23,13 @@ const CharHeader = () => {
     borderRadius: `25%`,
   };
 
-  const { data } = useQuery(["status", characterID], () => loadCharacterStatus(characterID), {
-    refetchOnWindowFocus: false,
-  });
+  const { data } = useQuery(
+    ["status", characterID],
+    () => loadCharacterStatus(characterID ? Number(characterID) : 0),
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
 
   // const isk = data?.characters.reduce((p: number, c: any) => {
   //   try {

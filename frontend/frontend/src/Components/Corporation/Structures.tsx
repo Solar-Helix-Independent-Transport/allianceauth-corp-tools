@@ -3,10 +3,10 @@ import { TimeTill } from "../Helpers/TimeTill";
 import BaseTable from "../Tables/BaseTable/BaseTable";
 import { NameObjectArrayFilterFn } from "../Tables/BaseTable/BaseTableFilter";
 import { createColumnHelper } from "@tanstack/react-table";
-import { Badge, Figure } from "react-bootstrap";
-import ReactTimeAgo from "react-time-ago";
+import { Badge } from "react-bootstrap";
 
 type Corporation = {
+  corporation_id: number;
   corporation_name: string;
   alliance_name: string;
 };

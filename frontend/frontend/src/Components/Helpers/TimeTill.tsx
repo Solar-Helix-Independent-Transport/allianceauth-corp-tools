@@ -9,7 +9,11 @@ export declare interface TimeTillProps {
 https://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript
 */
 function isValidDate(d: Date | number) {
-  return d instanceof Date && !isNaN(d);
+  let numberCheck = d instanceof Number;
+  if (numberCheck) {
+    numberCheck = !isNaN(d as number);
+  }
+  return d instanceof Date && numberCheck;
 }
 
 export function TimeTill({ date }: TimeTillProps) {
