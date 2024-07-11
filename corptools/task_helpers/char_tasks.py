@@ -16,10 +16,12 @@ from ..models import (
     CharacterIndustryJob, CharacterLocation, CharacterMarketOrder,
     CharacterMiningLedger, CharacterRoles, CharacterTitle,
     CharacterWalletJournalEntry, Clone, Contract, ContractItem,
-    CorporationHistory, EveItemType, EveLocation, EveName, Implant, JumpClone,
-    LoyaltyPoint, MailLabel, MailMessage, MailRecipient, Notification,
-    NotificationText, Skill, SkillQueue, SkillTotalHistory, SkillTotals,
+    CorporationHistory, CorptoolsConfiguration, EveItemType, EveLocation,
+    EveName, Implant, JumpClone, LoyaltyPoint, MailLabel, MailMessage,
+    MailRecipient, Notification, NotificationText, Skill, SkillQueue,
+    SkillTotalHistory, SkillTotals,
 )
+from . import sanitize_location_flag, sanitize_notification_type
 from .etag_helpers import NotModifiedError, etag_results
 
 logger = get_extension_logger(__name__)
@@ -307,7 +309,12 @@ def update_character_assets(character_id, force_refresh=False):
         assets_op = providers.esi.client.Assets.get_characters_character_id_assets(
             character_id=character_id)
 
-        assets = etag_results(assets_op, token, force_refresh=force_refresh)
+        assets = etag_results(
+            assets_op,
+            token,
+            force_refresh=force_refresh,
+            disable_verification=CorptoolsConfiguration.skip_verify_assets()
+        )
 
         _st = time.perf_counter()
         location_names = list(
@@ -324,8 +331,9 @@ def update_character_assets(character_id, force_refresh=False):
                                             'is_blueprint_copy'),
                                         singleton=item.get('is_singleton'),
                                         item_id=item.get('item_id'),
-                                        location_flag=item.get(
-                                            'location_flag'),
+                                        location_flag=sanitize_location_flag(
+                                            item.get('location_flag')
+                                        ),
                                         location_id=item.get('location_id'),
                                         location_type=item.get(
                                             'location_type'),
@@ -1069,14 +1077,13 @@ def update_character_notifications(character_id, force_refresh=False):
     try:
         notifications_op = providers.esi.client.Character.get_characters_character_id_notifications(
             character_id=character_id)
-        notifications_op.operation.swagger_spec.config["validate_responses"] = False
-        try:
-            notifications = etag_results(
-                notifications_op, token, force_refresh=force_refresh)
-        except Exception as e:
-            raise e
-        finally:
-            notifications_op.operation.swagger_spec.config["validate_responses"] = True
+
+        notifications = etag_results(
+            notifications_op,
+            token,
+            force_refresh=force_refresh,
+            disable_verification=CorptoolsConfiguration.skip_verify_notifications()
+        )
 
         _st = time.perf_counter()
 
@@ -1089,18 +1096,21 @@ def update_character_notifications(character_id, force_refresh=False):
         _create_notifs = []
         for note in notifications:
             if not note.get('notification_id') in last_five_hundred:
-                _creates.append(Notification(character=audit_char,
-                                             notification_id=note.get(
-                                                 'notification_id'),
-                                             sender_id=note.get('sender_id'),
-                                             sender_type=note.get(
-                                                 'sender_type'),
-                                             notification_text_id=note.get(
-                                                 'notification_id'),
-                                             timestamp=note.get('timestamp'),
-                                             notification_type=note.get(
-                                                 'type'),
-                                             is_read=note.get('is_read')))
+                _creates.append(
+                    Notification(
+                        character=audit_char,
+                        notification_id=note.get('notification_id'),
+                        sender_id=note.get('sender_id'),
+                        sender_type=note.get('sender_type'),
+                        notification_text_id=note.get('notification_id'),
+                        timestamp=note.get('timestamp'),
+                        notification_type=sanitize_notification_type(
+                            note.get('type')
+                        ),
+                        is_read=note.get('is_read')
+                    )
+
+                )
                 _create_notifs.append(NotificationText(
                     notification_id=note.get('notification_id'),
                     notification_text=note.get('text')

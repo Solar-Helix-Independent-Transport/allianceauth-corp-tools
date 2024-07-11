@@ -21,10 +21,11 @@ from .. import providers
 from ..models import (
     BridgeOzoneLevel, CharacterAudit, CorpAsset, CorporateContract,
     CorporateContractItem, CorporationAudit, CorporationWalletDivision,
-    CorporationWalletJournalEntry, EveItemType, EveLocation, EveName,
-    MapJumpBridge, MapSystem, MapSystemPlanet, Poco, Structure,
-    StructureCelestial, StructureService,
+    CorporationWalletJournalEntry, CorptoolsConfiguration, EveItemType,
+    EveLocation, EveName, MapJumpBridge, MapSystem, MapSystemPlanet, Poco,
+    Structure, StructureCelestial, StructureService,
 )
+from . import sanitize_location_flag
 
 logger = get_extension_logger(__name__)
 
@@ -215,7 +216,8 @@ def update_corporation_transactions(corp_id, wallet_division, full_update=False)
                     item.get('type_id'))
 
     except NotModifiedError:
-        logger.info(f"CT: No New market transaction data for: {audit_corp.corporation.corporation_name}")
+        logger.info(
+            f"CT: No New market transaction data for: {audit_corp.corporation.corporation_name}")
         pass
 
     return f"CT: Finished market transactions for: {audit_corp.corporation.corporation_name}"
@@ -605,11 +607,14 @@ def update_corp_assets(corp_id):
         failed_locations = []
 
         assets_op = providers.esi.client.Assets.get_corporations_corporation_id_assets(
-            corporation_id=corp_id)
-        assets = etag_results(assets_op, token)
+            corporation_id=corp_id
+        )
+
+        assets = etag_results(assets_op, token, disable_verification=CorptoolsConfiguration.skip_verify_assets())
 
         location_names = list(
-            EveLocation.objects.all().values_list('location_id', flat=True))
+            EveLocation.objects.all().values_list('location_id', flat=True)
+        )
         _current_type_ids = []
         item_ids = []
         items = []
@@ -622,8 +627,9 @@ def update_corp_assets(corp_id):
                                        'is_blueprint_copy'),
                                    singleton=item.get('is_singleton'),
                                    item_id=item.get('item_id'),
-                                   location_flag=item.get(
-                                       'location_flag'),
+                                   location_flag=sanitize_location_flag(
+                                       item.get('location_flag')
+                                   ),
                                    location_id=item.get('location_id'),
                                    location_type=item.get(
                                        'location_type'),

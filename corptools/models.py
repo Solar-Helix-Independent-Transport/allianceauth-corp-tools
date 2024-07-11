@@ -31,6 +31,16 @@ logger = get_extension_logger(__name__)
 class CorptoolsConfiguration(models.Model):
     holding_corps = models.ManyToManyField(EveCorporationInfo)
 
+    disable_verification_assets = models.BooleanField(
+        default=False,
+        help_text="Allow ESI to provide data that does not match the ESI Assets Spec"
+    )
+
+    disable_verification_notifications = models.BooleanField(
+        default=False,
+        help_text="Allow ESI to provide data that does not match the ESI Notification Spec"
+    )
+
     class Meta:
         permissions = (
             ('holding_corp_structures',
@@ -43,6 +53,23 @@ class CorptoolsConfiguration(models.Model):
 
     def holding_corp_qs(self):
         return CorporationAudit.objects.filter(corporation__in=self.holding_corps.all())
+
+    @classmethod
+    def skip_verify_assets(cls):
+        try:
+            return cls.objects.all().first().disable_verification_assets
+        except Exception as e:
+            logger.error(e)
+            return True
+
+    @classmethod
+    def skip_verify_notifications(cls):
+        try:
+
+            return cls.objects.all().first().disable_verification_notifications
+        except Exception as e:
+            logger.error(e)
+            return True
 
     def save(self, *args, **kwargs):
         if not self.pk and CorptoolsConfiguration.objects.exists():
