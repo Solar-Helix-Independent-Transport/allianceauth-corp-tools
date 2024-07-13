@@ -405,10 +405,10 @@ def fuel_levels(request):
 
     # hourly fuel reqs [ cit, eng, ref, flex ]
     citadel_service_mods = {
-        'Clone Bay': [8, 10, 10, 10],
+        'Clone Bay': [7.5, 10, 10, 10],
         'Market': [30, 40, 40, 40],
         'Manufacturing (Capitals)': [24, 18, 24, 24],
-        'Standup Hyasyoda Research Lab': [10, 8, 10, 10],  # how to detect this
+        'Standup Hyasyoda Research Lab': [10, 7.5, 10, 10],  # how to detect this
         'Invention': [12, 9, 12, 12],
         'Manufacturing (Standard)': [12, 9, 12, 12],
         'Blueprint Copying': [12, 9, 12, 12],
@@ -419,7 +419,7 @@ def fuel_levels(request):
         'Hybrid Reactions': [15, 15, 12, 15],
         'Moon Drilling': [5, 5, 5, 5],
         'Biochemical Reactions': [15, 15, 12, 15],
-        'Reprocessing': [10, 10, 8, 10],
+        'Reprocessing': [10, 10, 7.5, 10],
         'Jump Access': [0, 0, 0, 15],  # large to show errors
         'Cynosural Jammer': [0, 0, 0, 40],
         'Jump Gate Access': [0, 0, 0, 30],
