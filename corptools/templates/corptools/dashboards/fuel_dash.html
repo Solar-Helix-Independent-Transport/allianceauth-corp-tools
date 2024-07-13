@@ -67,35 +67,52 @@
                             </td>
                             <td>
                                 {{ structure.structure.name }}
-                            </br />
-                            <span class="badge bg-secondary">{{ structure.structure.type_name.name }}</span>
-                        </br />
-                        <span class="badge bg-primary">{{ structure.structure.corporation.corporation.corporation_name }}</span>
-                    </td>
-                    <td class="text-center">{% widthratio structure.fuel_req 1 720 %}</td>
-                    <td class="text-center">
-                        {{ structure.structure.fuel_expires|date:"Y-m-d" }}
-                    </br />
-                    <span class="badge bg-secondary">{{ structure.structure.fuel_expires|timeuntil }}</span>
-                </td>
-                <td class="text-center blocks-till" start_blocks="{{ structure.current_blocks }}" hourly="{{ structure.fuel_req }}">
-                    {{ structure.90day }}
-                </td>
-                <td class="text-center">
-                    {% for service in structure.structure.structureservice_set.all %}
-                        {% if service.state == 'online' %}
-                            <span class="badge bg-primary">{{ service.name }}</span>
-                        {% else %}
-                            <span class="badge bg-danger">{{ service.name }}</span>
-                        {% endif %}
-                    {% endfor %}
-                </td>
-                <th>{{ structure.structure.system_name.name }}</th>
-                <th>{{ structure.structure.system_name.constellation.name }}</th>
-                <th>{{ structure.structure.system_name.constellation.region.name }}</th>
-                <th>{{ structure.structure.corporation.corporation.corporation_name }}</th>
-                <th>{{ structure.structure.type_name.name }}</th>
-            </tr>
+                                </br />
+                                <span class="badge bg-secondary">{{ structure.structure.type_name.name }}</span>
+                                </br />
+                                <span class="badge bg-primary">{{ structure.structure.corporation.corporation.corporation_name }}</span>
+                            </td>
+                            <td class="text-center">{% widthratio structure.fuel_req 1 720 %}</td>
+                            <td class="text-center">
+                                {% if structure.extra_fuel_info %}
+                                    {% if structure.structure.fuel_expires < structure.extra_fuel_info.expires %}
+                                        {{ structure.structure.fuel_expires|date:"Y-m-d" }}
+                                        <br/>
+                                        <span class="badge bg-secondary">Blocks: {{ structure.structure.fuel_expires|timeuntil }}</span>
+                                        <br/>
+                                        <span class="badge bg-secondary">{{ structure.extra_fuel_info.name }}: {{ ft.extra_fuel_info.expires|timeuntil }}</span>
+                                    {% else %}
+                                        {{ structure.extra_fuel_info.expires|date:"Y-m-d" }}
+                                        <br/>
+                                        <span class="badge bg-secondary">{{ structure.extra_fuel_info.name }}: {{ structure.extra_fuel_info.expires|timeuntil }}</span>
+                                        <br/>
+                                        <span class="badge bg-secondary">Blocks: {{ structure.structure.fuel_expires|timeuntil }}</span>
+                                    {% endif %}
+                                {% else %}
+                                    {{ structure.structure.fuel_expires|date:"Y-m-d" }}
+                                    <br/>
+                                    <span class="badge bg-secondary">Blocks: {{ structure.structure.fuel_expires|timeuntil }}</span>
+                                {% endif %}
+
+                            </td>
+                            <td class="text-center blocks-till" start_blocks="{{ structure.current_blocks }}" hourly="{{ structure.fuel_req }}">
+                                {{ structure.90day }}
+                            </td>
+                            <td class="text-center">
+                                {% for service in structure.structure.structureservice_set.all %}
+                                    {% if service.state == 'online' %}
+                                        <span class="badge bg-primary">{{ service.name }}</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">{{ service.name }}</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <th>{{ structure.structure.system_name.name }}</th>
+                            <th>{{ structure.structure.system_name.constellation.name }}</th>
+                            <th>{{ structure.structure.system_name.constellation.region.name }}</th>
+                            <th>{{ structure.structure.corporation.corporation.corporation_name }}</th>
+                            <th>{{ structure.structure.type_name.name }}</th>
+                </tr>
         {% empty %}
 
         {% endfor %}

@@ -1,5 +1,6 @@
 import json
 import xml.etree.ElementTree as ET
+from datetime import timedelta
 
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
@@ -19,10 +20,10 @@ from esi.views import sso_redirect
 from . import __version__, app_settings
 from .forms import UploadForm
 from .models import (
-    CharacterAudit, CorporationAudit, EveItemCategory, EveItemDogmaAttribute,
-    EveItemGroup, EveItemType, EveLocation, EveName, InvTypeMaterials,
-    MapConstellation, MapJumpBridge, MapRegion, MapSystem, MapSystemGate,
-    SkillList, Structure,
+    CharacterAudit, CorpAsset, CorporationAudit, EveItemCategory,
+    EveItemDogmaAttribute, EveItemGroup, EveItemType, EveLocation, EveName,
+    InvTypeMaterials, MapConstellation, MapJumpBridge, MapRegion, MapSystem,
+    MapSystemGate, SkillList, Structure,
 )
 from .tasks import (
     check_account, clear_all_etags, update_all_characters, update_all_corps,
@@ -416,18 +417,21 @@ def fuel_levels(request):
         'Manufacturing (Super Capitals)': [36, 27, 36, 36],
         'Composite Reactions': [15, 15, 12, 15],
         'Hybrid Reactions': [15, 15, 12, 15],
-        'Moon Drilling': [5, 5, 4, 5],
+        'Moon Drilling': [5, 5, 5, 5],
         'Biochemical Reactions': [15, 15, 12, 15],
         'Reprocessing': [10, 10, 8, 10],
-        'Jump Access': [9999, 9999, 9999, 15],  # large to show errors
-        'Cynosural Jammer': [9999, 9999, 9999, 40],
-        'Jump Gate Access': [9999, 9999, 9999, 30]
+        'Jump Access': [0, 0, 0, 15],  # large to show errors
+        'Cynosural Jammer': [0, 0, 0, 40],
+        'Jump Gate Access': [0, 0, 0, 30],
+        'Automatic Moon Drilling': [0, 0, 0, 5]
     }
 
     cit = [35833, 47516, 47512, 47513, 47514, 47515, 35832, 35834]
     eng = [35827, 35826, 35825]
     ref = [35835, 35836]
-    fle = [37534, 35841, 35840]
+    fle = [37534, 35841, 35840, 81826]
+
+    flex_fuel_types = [81143]
 
     all_structures = Structure.get_visible(request.user).select_related(
         'corporation', 'corporation__corporation', 'system_name', 'type_name',
@@ -460,11 +464,39 @@ def fuel_levels(request):
         if s.fuel_expires is not None:
             hours = (s.fuel_expires - timezone.now()).total_seconds() // 3600
 
+        extras = None
+
+        if s.type_id == 81826:
+            fuels = CorpAsset.objects.filter(
+                type_id__in=flex_fuel_types,
+                location_id=s.structure_id
+            ).select_related(
+                'type_name'
+            )
+            out = {
+                "qty": 0,
+            }
+            for itm in fuels:
+                out["name"] = itm.type_name.name
+                out["qty"] += itm.quantity
+
+            out["expires"] = timezone.now() + timedelta(hours=out["qty"] / 55)
+            if out['qty'] > 0:
+                extras = out
+
         structure_tree.append(
-            {'structure': s,
-             'fuel_req': structure_hourly_fuel,
-             "current_blocks": int(hours * structure_hourly_fuel),
-             "90day": max(int((structure_hourly_fuel * 90 * 24) - (hours * structure_hourly_fuel)), 0)}
+            {
+                'structure': s,
+                'fuel_req': structure_hourly_fuel,
+                "current_blocks": int(hours * structure_hourly_fuel),
+                "extra_fuel_info": extras,
+                "90day": max(
+                    int(
+                        (structure_hourly_fuel * 90 * 24) - (hours * structure_hourly_fuel)
+                    ),
+                    0
+                )
+            }
         )
 
     context = {
