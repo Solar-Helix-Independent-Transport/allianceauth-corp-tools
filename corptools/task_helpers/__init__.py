@@ -11,7 +11,9 @@ NOTIFICATION_TYPE_REPLACEMENTS = {
     "unknown notification type (282)": "SkyhookLostShields",
     "unknown notification type (283)": "SkyhookUnderAttack",
     "unknown notification type (284)": "SkyhookDestroyed",
-    "unknown notification type (285)": "SkyhookDeployed"
+    "unknown notification type (285)": "SkyhookDeployed",
+    "unknown notification type (6040)": "StructureLowReagentsAlert",
+    "unknown notification type (6041)": "StructureNoReagentsAlert"
 }
 
 
