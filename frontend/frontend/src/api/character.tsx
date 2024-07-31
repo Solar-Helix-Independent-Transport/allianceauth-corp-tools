@@ -131,3 +131,35 @@ export async function getCharacterNotifications(characterID: number) {
     return data;
   }
 }
+
+export async function getCharacterClones(characterID: number) {
+  const { GET } = getCatApi();
+
+  const { data, error } = await GET("/audit/api/account/{character_id}/clones", {
+    params: {
+      path: { character_id: characterID },
+    },
+  });
+  if (error) {
+    console.log(error);
+  } else {
+    console.log(data);
+    return data;
+  }
+}
+
+export async function getCharacterRoles(characterID: number) {
+  const { GET } = getCatApi();
+
+  const { data, error } = await GET("/audit/api/account/{character_id}/roles", {
+    params: {
+      path: { character_id: characterID },
+    },
+  });
+  if (error) {
+    console.log(error);
+  } else {
+    console.log(data);
+    return data;
+  }
+}

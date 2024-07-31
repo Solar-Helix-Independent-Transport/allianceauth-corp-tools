@@ -168,7 +168,7 @@ class InteractionApiEndpoints:
                     "notification_text": n.notification_text.notification_text,
                     "notification_type": n.notification_type,
                     "timestamp": n.timestamp,
-                    "is_read": n.is_read,
+                    "is_read": True if n.is_read else False,
                 })
 
             return output

@@ -1,8 +1,9 @@
 import { PortraitCard } from "../Cards/PortraitCard";
+import { PanelLoader } from "../Loaders/loaders";
 import { Table } from "react-bootstrap";
 
 const CharacterPubDataPanels = ({ isFetching, data }: { isFetching: boolean; data: any }) => {
-  if (!data) return <p>Loading</p>;
+  if (!data) return <PanelLoader />;
 
   return (
     <div className="d-flex justify-content-around align-items-center flex-row flex-wrap">

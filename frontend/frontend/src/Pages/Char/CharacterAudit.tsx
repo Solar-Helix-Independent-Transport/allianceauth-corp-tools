@@ -11,9 +11,9 @@ const CharacterAudit = () => {
       <CharMenuRight />
       <CharHeader />
       <Col>
-        <Card className="mt-4">
+        <div className="mt-4">
           <Outlet /> {/* Render the Children here */}
-        </Card>
+        </div>
       </Col>
     </>
   );

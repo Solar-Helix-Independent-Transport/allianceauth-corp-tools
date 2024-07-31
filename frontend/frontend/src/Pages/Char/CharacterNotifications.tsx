@@ -1,3 +1,4 @@
+import { BooleanCheckBox } from "../../Components/BooleanCheckbox";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
 import { getCharacterNotifications } from "../../api/character";
@@ -9,7 +10,7 @@ const CharacterNotifications = () => {
   const { characterID } = useParams();
 
   const { data, isFetching } = useQuery({
-    queryKey: ["wallet", characterID],
+    queryKey: ["notification", characterID],
     queryFn: () => getCharacterNotifications(Number(characterID)),
     refetchOnWindowFocus: false,
   });
@@ -18,6 +19,12 @@ const CharacterNotifications = () => {
   const columns = [
     columnHelper.accessor("character.character_name", {
       header: "Character",
+    }),
+    columnHelper.accessor("is_read", {
+      header: "Is Read",
+      cell: (props) => {
+        return <BooleanCheckBox checked={props.getValue() ? true : false} />;
+      },
     }),
     columnHelper.accessor("timestamp", {
       header: "Date",

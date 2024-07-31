@@ -9,7 +9,7 @@ const CharacterContacts = () => {
   const { characterID } = useParams();
 
   const { data, isFetching } = useQuery({
-    queryKey: ["wallet", characterID],
+    queryKey: ["contacts", characterID],
     queryFn: () => getCharacterContacts(Number(characterID)),
     refetchOnWindowFocus: false,
   });

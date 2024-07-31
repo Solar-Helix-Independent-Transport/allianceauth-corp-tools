@@ -1,9 +1,11 @@
 import CharacterAssets from "./Pages/Char/CharacterAssetsList";
 import CharacterAudit from "./Pages/Char/CharacterAudit";
+import CharacterClones from "./Pages/Char/CharacterClones";
 import CharacterContacts from "./Pages/Char/CharacterContacts";
 import CharacterNotifications from "./Pages/Char/CharacterNotifications";
 import CharacterOverview from "./Pages/Char/CharacterOverview";
 import CharacterPubData from "./Pages/Char/CharacterPubData";
+import CharacterRoles from "./Pages/Char/CharacterRoles";
 import CharacterStatus from "./Pages/Char/CharacterStatus";
 import CharacterWallet from "./Pages/Char/CharacterWallet";
 import CorporationAtAGlance from "./Pages/Corp/AtAGlance";
@@ -40,22 +42,8 @@ function App() {
               />
               <Route path="account/listassets" element={<CharacterAssets />} />
               <Route path="account/pubdata" element={<CharacterPubData />} />
-              <Route
-                path="account/clones"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/clones.</Card.Body>
-                  </Card>
-                }
-              />
-              <Route
-                path="account/roles"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/roles.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/clones" element={<CharacterClones />} />
+              <Route path="account/roles" element={<CharacterRoles />} />
               <Route path="account/wallet" element={<CharacterWallet />} />
               <Route
                 path="account/mail"
