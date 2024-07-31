@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 const menuRoot = document.getElementById("nav-left");
 
 const CharMenuAsync = () => {
-  let { characterID } = useParams();
+  const { characterID } = useParams();
   const { isLoading, error, data } = useQuery({
     queryKey: ["Menu"],
     queryFn: async () => {

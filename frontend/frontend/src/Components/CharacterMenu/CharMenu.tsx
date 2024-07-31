@@ -32,11 +32,11 @@ const CharMenu = ({ data, characterID }: CharMenuProps) => {
           <Nav.Link key="Status">Status</Nav.Link>
         </LinkContainer>
       </Nav.Item>
-      <Nav.Item>
+      {/* <Nav.Item>
         <LinkContainer to={`/audit/r_beta/${characterID}/account/pubdata`}>
           <Nav.Link key="Public Data">Public Data</Nav.Link>
         </LinkContainer>
-      </Nav.Item>
+      </Nav.Item> */}
       {data &&
         data.map((cat: any) => {
           return (
