@@ -1,3 +1,4 @@
+import { getCatApi } from "./Api";
 import axios from "axios";
 import Cookies from "js-cookie";
 
@@ -84,7 +85,7 @@ export async function loadNotifications(character_id: number) {
 export async function loadWallet(character_id: number) {
   const api = await axios.get(`/audit/api/account/${character_id}/wallet`);
   console.log(`get wallet in api ${character_id}`);
-  return api.data;
+  return api.data["items"];
 }
 
 export async function loadMarket(character_id: number) {
@@ -97,4 +98,36 @@ export async function loadWalletActivity(character_id: number) {
   const api = await axios.get(`/audit/api/account/${character_id}/wallet/activity`);
   console.log(`get wallet activity in api ${character_id}`);
   return api.data;
+}
+
+export async function getCharacterContacts(characterID: number) {
+  const { GET } = getCatApi();
+
+  const { data, error } = await GET("/audit/api/account/{character_id}/contacts", {
+    params: {
+      path: { character_id: characterID },
+    },
+  });
+  if (error) {
+    console.log(error);
+  } else {
+    console.log(data);
+    return data;
+  }
+}
+
+export async function getCharacterNotifications(characterID: number) {
+  const { GET } = getCatApi();
+
+  const { data, error } = await GET("/audit/api/account/{character_id}/notifications", {
+    params: {
+      path: { character_id: characterID },
+    },
+  });
+  if (error) {
+    console.log(error);
+  } else {
+    console.log(data);
+    return data;
+  }
 }

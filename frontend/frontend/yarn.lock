@@ -5777,6 +5777,18 @@ onetime@^6.0.0:
   dependencies:
     mimic-fn "^4.0.0"
 
+openapi-fetch@^0.10.4:
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/openapi-fetch/-/openapi-fetch-0.10.4.tgz#bd4d4615fa3513930f3f294ad4bc51c257c2493d"
+  integrity sha512-HmnJNF3zDKPUwu2YKjm06roQ0MwSnT01x+QPQU6nLqiurE1YnRZhgJlBABEcW2PV+sTtMYbXbO7lRbKZMKvT1Q==
+  dependencies:
+    openapi-typescript-helpers "^0.0.11"
+
+openapi-typescript-helpers@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/openapi-typescript-helpers/-/openapi-typescript-helpers-0.0.11.tgz#d05e88216b8f3771d5df41c863ebc5c9d10e2954"
+  integrity sha512-xofUHlVFq+BMquf3nh9I8N2guHckW6mrDO/F3kaFgrL7MGbjldDnQ9TIT+rkH/+H0LiuO+RuZLnNmsJwsjwUKg==
+
 optionator@^0.9.3:
   version "0.9.3"
   resolved "https://registry.yarnpkg.com/optionator/-/optionator-0.9.3.tgz#007397d44ed1872fdc6ed31360190f81814e2c64"

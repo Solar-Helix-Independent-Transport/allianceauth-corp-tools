@@ -1,26 +1,11 @@
+import { components } from "../../api/CtApi";
 import { CollapseBlock } from "../Helpers/CollapseBlock";
 import BaseTable from "../Tables/BaseTable/BaseTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Button, Table } from "react-bootstrap";
 import TimeAgo from "react-timeago";
 
-type Character = {
-  character_name: string;
-  corporation_name: string;
-  alliance_name: string;
-};
-
-type UpdateType = Record<string, string>;
-
-type CharacterType = {
-  character: Character;
-  isk: number;
-  sp: number;
-  active: boolean;
-  last_updates: UpdateType;
-};
-
-const UpdateTableRows = ({ values }: { values: UpdateType }) => {
+const UpdateTableRows = ({ values }: { values: Record<string, never> | null | undefined }) => {
   if (values) {
     return Object.keys(values)?.map((h: string) => {
       return (
@@ -36,7 +21,7 @@ const UpdateTableRows = ({ values }: { values: UpdateType }) => {
 };
 
 const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
-  const columnHelper = createColumnHelper<CharacterType>();
+  const columnHelper = createColumnHelper<components["schemas"]["CharacterStatus"]>();
 
   const columns = [
     columnHelper.accessor("character.character_name", {
@@ -51,13 +36,13 @@ const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boo
     columnHelper.accessor("isk", {
       header: "Isk",
       cell: (cell) => {
-        return cell.getValue().toLocaleString();
+        return cell.getValue()?.toLocaleString();
       },
     }),
     columnHelper.accessor("sp", {
       header: "SP",
       cell: (cell) => {
-        return cell.getValue().toLocaleString();
+        return cell.getValue()?.toLocaleString();
       },
     }),
     columnHelper.accessor("active", {

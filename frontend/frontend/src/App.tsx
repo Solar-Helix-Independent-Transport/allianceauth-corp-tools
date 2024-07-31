@@ -1,8 +1,11 @@
 import CharacterAssets from "./Pages/Char/CharacterAssetsList";
 import CharacterAudit from "./Pages/Char/CharacterAudit";
+import CharacterContacts from "./Pages/Char/CharacterContacts";
+import CharacterNotifications from "./Pages/Char/CharacterNotifications";
 import CharacterOverview from "./Pages/Char/CharacterOverview";
 import CharacterPubData from "./Pages/Char/CharacterPubData";
 import CharacterStatus from "./Pages/Char/CharacterStatus";
+import CharacterWallet from "./Pages/Char/CharacterWallet";
 import CorporationAtAGlance from "./Pages/Corp/AtAGlance";
 import CorporationAudit from "./Pages/Corp/Audit";
 import Structures from "./Pages/Corp/Structures";
@@ -53,14 +56,7 @@ function App() {
                   </Card>
                 }
               />
-              <Route
-                path="account/wallet"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/wallet.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/wallet" element={<CharacterWallet />} />
               <Route
                 path="account/mail"
                 element={
@@ -93,22 +89,8 @@ function App() {
                   </Card>
                 }
               />
-              <Route
-                path="account/notifications"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/notifications.</Card.Body>
-                  </Card>
-                }
-              />
-              <Route
-                path="account/contact"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/contact.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/notifications" element={<CharacterNotifications />} />
+              <Route path="account/contact" element={<CharacterContacts />} />
               <Route
                 path="account/contract"
                 element={

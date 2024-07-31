@@ -1,8 +1,9 @@
 import CharacterAssetLocationSelect from "../../Components/Character/CharacterAssetLocationSelect";
-import CharacterAssetTable from "../../Components/Character/CharacterAssetsTable";
+import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
+import { components } from "../../api/CtApi";
 import { loadAssetList } from "../../api/character";
+import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
-import { Card } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
@@ -18,16 +19,38 @@ const CharacterAssets = () => {
     initialData: { characters: [], main: undefined, headers: [] },
   });
 
+  const columnHelper = createColumnHelper<components["schemas"]["CharacterAssetItem"]>();
+
+  const columns = [
+    columnHelper.accessor("character.character_name", {
+      header: "Character",
+    }),
+    columnHelper.accessor("item.name", {
+      header: "Type",
+    }),
+    columnHelper.accessor("item.cat", {
+      header: "Category",
+    }),
+    columnHelper.accessor("quantity", {
+      header: "Quantity",
+    }),
+    columnHelper.accessor("location.name", {
+      header: "Location",
+    }),
+  ];
+
   return (
     <>
-      <Card.Title className="mt-3 text-center">Location Filter</Card.Title>
-      <div className="m-3">
-        <CharacterAssetLocationSelect
-          characterID={characterID ? Number(characterID) : 0}
-          {...{ setLocation }}
-        />
+      <div className="m-3 d-flex align-items-center">
+        <h5 className="me-1">Location Filter</h5>
+        <div className="flex-grow-1">
+          <CharacterAssetLocationSelect
+            characterID={characterID ? Number(characterID) : 0}
+            {...{ setLocation }}
+          />
+        </div>
       </div>
-      <CharacterAssetTable {...{ isFetching, data }} />
+      <TableWrapper {...{ isFetching, data, columns }} />
     </>
   );
 };

@@ -1,0 +1,2556 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "CorpTools API", "version": "0.0.1", "description": "" },
+  "paths": {
+    "/audit/api/account/menu": {
+      "get": {
+        "operationId": "corptools_api_core_menu_get_character_menu",
+        "summary": "Get Character Menu",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/MenuCategory" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Menus"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/search/system/{search_text}": {
+      "get": {
+        "operationId": "corptools_api_core_search_get_system_search",
+        "summary": "Get System Search",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "search_text",
+            "schema": { "title": "Search Text", "type": "string" },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": { "default": 10, "title": "Limit", "type": "integer" },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/EveName" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Search"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/search/location/{search_text}": {
+      "get": {
+        "operationId": "corptools_api_core_search_get_location_search",
+        "summary": "Get Location Search",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "search_text",
+            "schema": { "title": "Search Text", "type": "string" },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": { "default": 10, "title": "Limit", "type": "integer" },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/EveName" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Search"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/search/item/group/{search_text}": {
+      "get": {
+        "operationId": "corptools_api_core_search_get_group_search",
+        "summary": "Get Group Search",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "search_text",
+            "schema": { "title": "Search Text", "type": "string" },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": { "default": 10, "title": "Limit", "type": "integer" },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/EveName" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Search"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/asset/locations": {
+      "get": {
+        "operationId": "corptools_api_character_assets_get_character_asset_locations",
+        "summary": "Get Character Asset Locations",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/ValueLabel" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Assets"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/asset/{location_id}/list": {
+      "get": {
+        "operationId": "corptools_api_character_assets_get_character_asset_list",
+        "summary": "Get Character Asset List",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "location_id",
+            "schema": { "title": "Location Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterAssetItem" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Assets"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/asset/{item_id}/contents": {
+      "get": {
+        "operationId": "corptools_api_character_assets_get_character_asset_contents",
+        "summary": "Get Character Asset Contents",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "item_id",
+            "schema": { "title": "Item Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterAssetItem" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Assets"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/asset/{location_id}/groups": {
+      "get": {
+        "operationId": "corptools_api_character_assets_get_character_asset_groups",
+        "summary": "Get Character Asset Groups",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "location_id",
+            "schema": { "title": "Location Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterAssetGroups" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Assets"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/clones": {
+      "get": {
+        "operationId": "corptools_api_character_clones_get_character_clones",
+        "summary": "Get Character Clones",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterClones" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/wallet": {
+      "get": {
+        "operationId": "corptools_api_character_finances_get_character_wallet",
+        "summary": "Get Character Wallet",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": { "default": 30000, "minimum": 1, "title": "Limit", "type": "integer" },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": { "default": 0, "minimum": 0, "title": "Offset", "type": "integer" },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PagedCharacterWalletEvent" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Finances"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/orders": {
+      "get": {
+        "operationId": "corptools_api_character_finances_get_character_orders",
+        "summary": "Get Character Orders",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterOrder" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Finances"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/market": {
+      "get": {
+        "operationId": "corptools_api_character_finances_get_character_market",
+        "summary": "Get Character Market",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CharacterMarket" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Finances"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/wallet/activity": {
+      "get": {
+        "operationId": "corptools_api_character_finances_get_character_wallet_activity",
+        "summary": "Get Character Wallet Activity",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "tags": ["Finances"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/contracts": {
+      "get": {
+        "operationId": "corptools_api_character_finances_get_character_contracts",
+        "summary": "Get Character Contracts",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "items": {}, "title": "Response", "type": "array" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Finances"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/loyalty": {
+      "get": {
+        "operationId": "corptools_api_character_finances_get_character_loyalty_Points",
+        "summary": "Get Character Loyalty Points",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/LoyaltyPoints" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Finances"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/contacts": {
+      "get": {
+        "operationId": "corptools_api_character_interactions_get_character_contacts",
+        "summary": "Get Character Contacts",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/Contact" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/mail": {
+      "get": {
+        "operationId": "corptools_api_character_interactions_get_character_mail",
+        "summary": "Get Character Mail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "items": {}, "title": "Response", "type": "array" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/mail/{mail_id}": {
+      "get": {
+        "operationId": "corptools_api_character_interactions_get_mail_message_request",
+        "summary": "Get Mail Message Request",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "mail_id",
+            "schema": { "title": "Mail Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "object" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/notifications": {
+      "get": {
+        "operationId": "corptools_api_character_interactions_get_character_notifications",
+        "summary": "Get Character Notifications",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterNotification" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/list": {
+      "get": {
+        "operationId": "corptools_api_character_list_get_account_list",
+        "summary": "Get Account List",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/AccountStatus" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/mining/chars": {
+      "get": {
+        "operationId": "corptools_api_character_mining_get_all_characters_character_mining",
+        "summary": "Get All Characters Character Mining",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "object" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/mining": {
+      "get": {
+        "operationId": "corptools_api_character_mining_get_character_mining",
+        "summary": "Get Character Mining",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "look_back",
+            "schema": {
+              "anyOf": [{ "type": "integer" }, { "type": "null" }],
+              "default": 90,
+              "title": "Look Back"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "object" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [{ "items": { "type": "integer" }, "type": "array" }, { "type": "null" }],
+                "default": [],
+                "title": "Filter Characters"
+              }
+            }
+          },
+          "required": false
+        },
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/roles": {
+      "get": {
+        "operationId": "corptools_api_character_roles_get_character_roles",
+        "summary": "Get Character Roles",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterRoles" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/skills": {
+      "get": {
+        "operationId": "corptools_api_character_skills_get_character_skills",
+        "summary": "Get Character Skills",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterSkills" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/skill/history": {
+      "get": {
+        "operationId": "corptools_api_character_skills_get_character_skill_history",
+        "summary": "Get Character Skill History",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterSkillHistory" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/skillqueues": {
+      "get": {
+        "operationId": "corptools_api_character_skills_get_character_skillqueues",
+        "summary": "Get Character Skillqueues",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterQueue" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/doctrines": {
+      "get": {
+        "operationId": "corptools_api_character_skills_get_character_doctrines",
+        "summary": "Get Character Doctrines",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterDoctrines" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/status": {
+      "get": {
+        "operationId": "corptools_api_character_status_get_character_status",
+        "summary": "Get Character Status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/AccountStatus" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/pubdata": {
+      "get": {
+        "operationId": "corptools_api_character_status_get_character_pubdata",
+        "summary": "Get Character Pubdata",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterHistory" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/characters/refresh": {
+      "post": {
+        "operationId": "corptools_api_character_refresh_post_characters_refresh",
+        "summary": "Post Characters Refresh",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Message" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Characters"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/refresh": {
+      "post": {
+        "operationId": "corptools_api_character_refresh_post_account_refresh",
+        "summary": "Post Account Refresh",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Message" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Characters"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/glance/assets": {
+      "get": {
+        "operationId": "corptools_api_character_at_a_glance_get_glance_assets",
+        "summary": "Get Glance Assets",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "object" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Character At a Glance"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/glance/activities": {
+      "get": {
+        "operationId": "corptools_api_character_at_a_glance_get_glance_activities",
+        "summary": "Get Glance Activities",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "object" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Character At a Glance"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/account/{character_id}/glance/faction": {
+      "get": {
+        "operationId": "corptools_api_character_at_a_glance_get_glance_factions",
+        "summary": "Get Glance Factions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "object" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Character At a Glance"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corporation/{corporation_id}/asset/locations": {
+      "get": {
+        "operationId": "corptools_api_corporation_assets_get_corporation_asset_locations",
+        "summary": "Get Corporation Asset Locations",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": { "title": "Corporation Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/ValueLabel" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Message" } }
+            }
+          }
+        },
+        "tags": ["Assets"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corporation/{corporation_id}/asset/{location_id}/list": {
+      "get": {
+        "operationId": "corptools_api_corporation_assets_get_corporation_asset_list",
+        "summary": "Get Corporation Asset List",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": { "title": "Corporation Id", "type": "integer" },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "location_id",
+            "schema": { "title": "Location Id", "type": "integer" },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "new_asset_tree",
+            "schema": { "default": false, "title": "New Asset Tree", "type": "boolean" },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CorporationAssetItem" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Message" } }
+            }
+          }
+        },
+        "tags": ["Assets"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corporation/asset/{item_id}/contents": {
+      "get": {
+        "operationId": "corptools_api_corporation_assets_get_corporation_asset_contents",
+        "summary": "Get Corporation Asset Contents",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "schema": { "title": "Item Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CorporationAssetItem" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Message" } }
+            }
+          }
+        },
+        "tags": ["Assets"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corporation/{corporation_id}/asset/{location_id}/groups": {
+      "get": {
+        "operationId": "corptools_api_corporation_assets_get_corporation_asset_groups",
+        "summary": "Get Corporation Asset Groups",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": { "title": "Corporation Id", "type": "integer" },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "location_id",
+            "schema": { "title": "Location Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterAssetGroups" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Message" } }
+            }
+          }
+        },
+        "tags": ["Assets"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corporation/wallettypes": {
+      "get": {
+        "operationId": "corptools_api_corporation_finances_get_corporation_wallet_types",
+        "summary": "Get Corporation Wallet Types",
+        "parameters": [],
+        "responses": { "200": { "description": "OK" } },
+        "tags": ["Finances"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corporation/{corporation_id}/wallet": {
+      "get": {
+        "operationId": "corptools_api_corporation_finances_get_corporation_wallet",
+        "summary": "Get Corporation Wallet",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": { "title": "Corporation Id", "type": "integer" },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "type_refs",
+            "schema": { "default": "", "title": "Type Refs", "type": "string" },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": { "default": 1, "title": "Page", "type": "integer" },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CorporationWalletEvent" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Finances"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corp/list": {
+      "get": {
+        "operationId": "corptools_api_corporation_list_get_visible_corporation_status",
+        "summary": "Get Visible Corporation Status",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CorpStatus" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Corporation"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corp/{corporation_id}/status": {
+      "get": {
+        "operationId": "corptools_api_corporation_status_get_corporation_status",
+        "summary": "Get Corporation Status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": { "title": "Corporation Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CorpStatus" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Corporation"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corporation/{corporation_id}/character/status": {
+      "get": {
+        "operationId": "corptools_api_corporation_status_get_corporation_character_status",
+        "summary": "Get Corporation Character Status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": { "title": "Corporation Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "object" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Corporation"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/dashboard/gates": {
+      "get": {
+        "operationId": "corptools_api_corporation_dashboards_get_dashboard_gates",
+        "summary": "Get Dashboard Gates",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "items": {}, "title": "Response", "type": "array" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Message" } }
+            }
+          }
+        },
+        "tags": ["Dashboards"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/dashboard/sov": {
+      "get": {
+        "operationId": "corptools_api_corporation_dashboards_get_dashboard_sov",
+        "summary": "Get Dashboard Sov",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "items": {}, "title": "Response", "type": "array" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Dashboards"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corp/structures": {
+      "get": {
+        "operationId": "corptools_api_corporation_structures_get_visible_structures",
+        "summary": "Get Visible Structures",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/Structure" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Structures"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corp/structures/{structure_id}": {
+      "get": {
+        "operationId": "corptools_api_corporation_structures_get_corporation_structure_fitting",
+        "summary": "Get Corporation Structure Fitting",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "corporation_id",
+            "schema": { "title": "Corporation Id", "type": "string" },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "structure_id",
+            "schema": { "title": "Structure Id", "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/FittingItem" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Structures"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corp/pocos": {
+      "get": {
+        "operationId": "corptools_api_corporation_structures_get_visible_pocos",
+        "summary": "Get Visible Pocos",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "items": {}, "title": "Response", "type": "array" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Structures"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/extra/jb/export": {
+      "get": {
+        "operationId": "corptools_api_corporation_structures_get_jb_link",
+        "summary": "Get Jb Link",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Extras"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corporation/{corporation_id}/glance/assets": {
+      "get": {
+        "operationId": "corptools_api_corporation_at_a_glance_get_glance_assets_corp",
+        "summary": "Get Glance Assets Corp",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": { "title": "Corporation Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "object" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Corporation At a Glance"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corporation/{corporation_id}/glance/activities": {
+      "get": {
+        "operationId": "corptools_api_corporation_at_a_glance_get_glance_activities",
+        "summary": "Get Glance Activities",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": { "title": "Corporation Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "object" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Corporation At a Glance"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/corporation/{corporation_id}/glance/faction": {
+      "get": {
+        "operationId": "corptools_api_corporation_at_a_glance_get_glance_factions",
+        "summary": "Get Glance Factions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": { "title": "Corporation Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "object" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Corporation At a Glance"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/extras/fit2skills/{fit_id}": {
+      "get": {
+        "operationId": "corptools_api_extras_fittings_get_fit_skills",
+        "summary": "Get Fit Skills",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "fit_id",
+            "schema": { "title": "Fit Id", "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "object" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "description": "Turn a Fitting into a skill list json.",
+        "tags": ["Fittings"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/pingbot/assets/send": {
+      "post": {
+        "operationId": "corptools_api_extras_asset_pinger_post_send_pings_assets",
+        "summary": "Post Send Pings Assets",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "message",
+            "schema": { "title": "Message", "type": "string" },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "systems",
+            "schema": { "default": "", "title": "Systems", "type": "string" },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "structures",
+            "schema": { "default": "", "title": "Structures", "type": "string" },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "ignore_groups",
+            "schema": { "default": "", "title": "Ignore Groups", "type": "string" },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "filter_charges",
+            "schema": { "default": false, "title": "Filter Charges", "type": "boolean" },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "ships_only",
+            "schema": { "default": false, "title": "Ships Only", "type": "boolean" },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "capitals_only",
+            "schema": { "default": false, "title": "Capitals Only", "type": "boolean" },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Message" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Pinger"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/pingbot/assets/counts": {
+      "post": {
+        "operationId": "corptools_api_extras_asset_pinger_post_test_pings_assets",
+        "summary": "Post Test Pings Assets",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "systems",
+            "schema": { "default": "", "title": "Systems", "type": "string" },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "structures",
+            "schema": { "default": "", "title": "Structures", "type": "string" },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "ignore_groups",
+            "schema": { "default": "", "title": "Ignore Groups", "type": "string" },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "filter_charges",
+            "schema": { "default": false, "title": "Filter Charges", "type": "boolean" },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "ships_only",
+            "schema": { "default": false, "title": "Ships Only", "type": "boolean" },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "capitals_only",
+            "schema": { "default": false, "title": "Capitals Only", "type": "boolean" },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/PingStats" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Pinger"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/extras/clone_death/{location_id}/{look_back}/": {
+      "get": {
+        "operationId": "corptools_api_extras_clone_deaths_get_dead_clones_in_location",
+        "summary": "Get Dead Clones In Location",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "location_id",
+            "schema": { "title": "Location Id", "type": "integer" },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "look_back",
+            "schema": { "title": "Look Back", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "object" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "description": "Find Dead Clones :pepewhy:",
+        "tags": ["Extras"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MenuCategory": {
+        "properties": {
+          "name": { "title": "Name", "type": "string" },
+          "links": {
+            "items": { "$ref": "#/components/schemas/MenuLink" },
+            "title": "Links",
+            "type": "array"
+          }
+        },
+        "required": ["name"],
+        "title": "MenuCategory",
+        "type": "object"
+      },
+      "MenuLink": {
+        "properties": {
+          "name": { "title": "Name", "type": "string" },
+          "link": { "title": "Link", "type": "string" }
+        },
+        "required": ["name", "link"],
+        "title": "MenuLink",
+        "type": "object"
+      },
+      "EveName": {
+        "properties": {
+          "id": { "title": "Id", "type": "integer" },
+          "name": { "title": "Name", "type": "string" },
+          "cat": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Cat" }
+        },
+        "required": ["id", "name"],
+        "title": "EveName",
+        "type": "object"
+      },
+      "ValueLabel": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "integer" },
+              { "type": "number" },
+              { "type": "boolean" }
+            ],
+            "title": "Value"
+          },
+          "label": { "title": "Label", "type": "string" }
+        },
+        "required": ["value", "label"],
+        "title": "ValueLabel",
+        "type": "object"
+      },
+      "Character": {
+        "properties": {
+          "character_name": { "title": "Character Name", "type": "string" },
+          "character_id": { "title": "Character Id", "type": "integer" },
+          "corporation_id": { "title": "Corporation Id", "type": "integer" },
+          "corporation_name": { "title": "Corporation Name", "type": "string" },
+          "alliance_id": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Alliance Id"
+          },
+          "alliance_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Alliance Name"
+          }
+        },
+        "required": ["character_name", "character_id", "corporation_id", "corporation_name"],
+        "title": "Character",
+        "type": "object"
+      },
+      "CharacterAssetItem": {
+        "properties": {
+          "id": { "title": "Id", "type": "integer" },
+          "character": { "$ref": "#/components/schemas/Character" },
+          "item": { "$ref": "#/components/schemas/EveName" },
+          "quantity": { "default": 0, "title": "Quantity", "type": "integer" },
+          "location": { "allOf": [{ "$ref": "#/components/schemas/EveName" }] },
+          "expand": { "title": "Expand", "type": "boolean" }
+        },
+        "required": ["id", "character", "item"],
+        "title": "CharacterAssetItem",
+        "type": "object"
+      },
+      "CharacterAssetGroups": {
+        "properties": {
+          "name": { "title": "Name", "type": "string" },
+          "items": {
+            "items": { "$ref": "#/components/schemas/ValueLabel" },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": ["name"],
+        "title": "CharacterAssetGroups",
+        "type": "object"
+      },
+      "CharacterClone": {
+        "properties": {
+          "name": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Name" },
+          "location": { "anyOf": [{ "$ref": "#/components/schemas/EveName" }, { "type": "null" }] },
+          "implants": {
+            "items": { "$ref": "#/components/schemas/EveName" },
+            "title": "Implants",
+            "type": "array"
+          }
+        },
+        "title": "CharacterClone",
+        "type": "object"
+      },
+      "CharacterClones": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "clones": {
+            "items": { "$ref": "#/components/schemas/CharacterClone" },
+            "title": "Clones",
+            "type": "array"
+          },
+          "home": { "allOf": [{ "$ref": "#/components/schemas/EveName" }] },
+          "last_station_change": {
+            "anyOf": [{ "format": "date-time", "type": "string" }, { "type": "null" }],
+            "title": "Last Station Change"
+          },
+          "last_clone_jump": {
+            "anyOf": [{ "format": "date-time", "type": "string" }, { "type": "null" }],
+            "title": "Last Clone Jump"
+          }
+        },
+        "required": ["character"],
+        "title": "CharacterClones",
+        "type": "object"
+      },
+      "Input": {
+        "properties": {
+          "limit": { "default": 30000, "minimum": 1, "title": "Limit", "type": "integer" },
+          "offset": { "default": 0, "minimum": 0, "title": "Offset", "type": "integer" }
+        },
+        "title": "Input",
+        "type": "object"
+      },
+      "CharacterWalletEvent": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "id": { "title": "Id", "type": "integer" },
+          "date": { "format": "date-time", "title": "Date", "type": "string" },
+          "first_party": { "$ref": "#/components/schemas/EveName" },
+          "second_party": { "$ref": "#/components/schemas/EveName" },
+          "ref_type": { "title": "Ref Type", "type": "string" },
+          "balance": { "title": "Balance", "type": "number" },
+          "amount": { "title": "Amount", "type": "number" },
+          "reason": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Reason" }
+        },
+        "required": [
+          "character",
+          "id",
+          "date",
+          "first_party",
+          "second_party",
+          "ref_type",
+          "balance",
+          "amount"
+        ],
+        "title": "CharacterWalletEvent",
+        "type": "object"
+      },
+      "PagedCharacterWalletEvent": {
+        "properties": {
+          "items": {
+            "items": { "$ref": "#/components/schemas/CharacterWalletEvent" },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": { "title": "Count", "type": "integer" }
+        },
+        "required": ["items", "count"],
+        "title": "PagedCharacterWalletEvent",
+        "type": "object"
+      },
+      "CharacterOrder": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "date": { "format": "date-time", "title": "Date", "type": "string" },
+          "duration": { "title": "Duration", "type": "integer" },
+          "volume_min": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Volume Min"
+          },
+          "volume_remain": { "title": "Volume Remain", "type": "integer" },
+          "volume_total": { "title": "Volume Total", "type": "integer" },
+          "item": { "$ref": "#/components/schemas/EveName" },
+          "price": { "title": "Price", "type": "number" },
+          "escrow": { "anyOf": [{ "type": "number" }, { "type": "null" }], "title": "Escrow" },
+          "buy_order": {
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
+            "title": "Buy Order"
+          },
+          "location": { "anyOf": [{ "$ref": "#/components/schemas/EveName" }, { "type": "null" }] }
+        },
+        "required": [
+          "character",
+          "date",
+          "duration",
+          "volume_remain",
+          "volume_total",
+          "item",
+          "price"
+        ],
+        "title": "CharacterOrder",
+        "type": "object"
+      },
+      "CharacterMarket": {
+        "properties": {
+          "expired": {
+            "items": { "$ref": "#/components/schemas/CharacterOrder" },
+            "title": "Expired",
+            "type": "array"
+          },
+          "active": {
+            "items": { "$ref": "#/components/schemas/CharacterOrder" },
+            "title": "Active",
+            "type": "array"
+          },
+          "total_active": { "title": "Total Active", "type": "integer" },
+          "total_expired": { "title": "Total Expired", "type": "integer" }
+        },
+        "required": ["total_active", "total_expired"],
+        "title": "CharacterMarket",
+        "type": "object"
+      },
+      "LoyaltyPoints": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "corporation": { "$ref": "#/components/schemas/EveName" },
+          "amount": { "title": "Amount", "type": "integer" }
+        },
+        "required": ["character", "corporation", "amount"],
+        "title": "LoyaltyPoints",
+        "type": "object"
+      },
+      "Contact": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "contact": { "$ref": "#/components/schemas/EveName" },
+          "standing": { "title": "Standing", "type": "number" },
+          "labels": {
+            "items": { "$ref": "#/components/schemas/ValueLabel" },
+            "title": "Labels",
+            "type": "array"
+          },
+          "blocked": { "title": "Blocked", "type": "boolean" },
+          "watched": { "title": "Watched", "type": "boolean" }
+        },
+        "required": ["character", "contact", "standing", "blocked", "watched"],
+        "title": "Contact",
+        "type": "object"
+      },
+      "CharacterNotification": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "notification_text": { "title": "Notification Text", "type": "string" },
+          "notification_type": { "title": "Notification Type", "type": "string" },
+          "timestamp": { "format": "date-time", "title": "Timestamp", "type": "string" },
+          "is_read": { "anyOf": [{ "type": "boolean" }, { "type": "null" }], "title": "Is Read" }
+        },
+        "required": ["character", "notification_text", "notification_type", "timestamp"],
+        "title": "CharacterNotification",
+        "type": "object"
+      },
+      "AccountStatus": {
+        "properties": {
+          "characters": {
+            "items": { "$ref": "#/components/schemas/CharacterStatus" },
+            "title": "Characters",
+            "type": "array"
+          },
+          "main": { "$ref": "#/components/schemas/Character" },
+          "orphan": { "default": false, "title": "Orphan", "type": "boolean" }
+        },
+        "required": ["main"],
+        "title": "AccountStatus",
+        "type": "object"
+      },
+      "CharacterStatus": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "isk": { "anyOf": [{ "type": "number" }, { "type": "null" }], "title": "Isk" },
+          "sp": { "anyOf": [{ "type": "integer" }, { "type": "null" }], "title": "Sp" },
+          "location": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Location" },
+          "ship": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Ship" },
+          "active": { "title": "Active", "type": "boolean" },
+          "last_updates": {
+            "anyOf": [{ "type": "object" }, { "type": "null" }],
+            "title": "Last Updates"
+          }
+        },
+        "required": ["character", "active"],
+        "title": "CharacterStatus",
+        "type": "object"
+      },
+      "CharacterRoles": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "director": { "title": "Director", "type": "boolean" },
+          "station_manager": { "title": "Station Manager", "type": "boolean" },
+          "personnel_manager": { "title": "Personnel Manager", "type": "boolean" },
+          "accountant": { "title": "Accountant", "type": "boolean" },
+          "titles": {
+            "anyOf": [
+              { "items": { "$ref": "#/components/schemas/EveName" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Titles"
+          }
+        },
+        "required": ["character", "director", "station_manager", "personnel_manager", "accountant"],
+        "title": "CharacterRoles",
+        "type": "object"
+      },
+      "CharacterSkills": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "skills": {
+            "anyOf": [
+              { "items": { "$ref": "#/components/schemas/Skill" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Skills"
+          },
+          "total_sp": { "title": "Total Sp", "type": "integer" },
+          "unallocated_sp": { "title": "Unallocated Sp", "type": "integer" }
+        },
+        "required": ["character", "total_sp", "unallocated_sp"],
+        "title": "CharacterSkills",
+        "type": "object"
+      },
+      "Skill": {
+        "properties": {
+          "group": { "title": "Group", "type": "string" },
+          "skill": { "title": "Skill", "type": "string" },
+          "sp": { "title": "Sp", "type": "integer" },
+          "level": { "title": "Level", "type": "integer" },
+          "active": { "title": "Active", "type": "integer" }
+        },
+        "required": ["group", "skill", "sp", "level", "active"],
+        "title": "Skill",
+        "type": "object"
+      },
+      "CharacterSkillHistory": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "history": {
+            "anyOf": [
+              { "items": { "$ref": "#/components/schemas/SkillHistory" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "History"
+          }
+        },
+        "required": ["character"],
+        "title": "CharacterSkillHistory",
+        "type": "object"
+      },
+      "SkillHistory": {
+        "properties": {
+          "date": { "format": "date-time", "title": "Date", "type": "string" },
+          "total_sp": { "title": "Total Sp", "type": "integer" },
+          "unallocated_sp": { "title": "Unallocated Sp", "type": "integer" },
+          "sp": { "title": "Sp", "type": "integer" }
+        },
+        "required": ["date", "total_sp", "unallocated_sp", "sp"],
+        "title": "SkillHistory",
+        "type": "object"
+      },
+      "CharacterQueue": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "queue": {
+            "anyOf": [
+              { "items": { "$ref": "#/components/schemas/CharacterQueueItem" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Queue"
+          }
+        },
+        "required": ["character"],
+        "title": "CharacterQueue",
+        "type": "object"
+      },
+      "CharacterQueueItem": {
+        "properties": {
+          "skill": { "title": "Skill", "type": "string" },
+          "group": { "title": "Group", "type": "string" },
+          "end_level": { "title": "End Level", "type": "integer" },
+          "position": { "title": "Position", "type": "integer" },
+          "current_level": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "default": 0,
+            "title": "Current Level"
+          },
+          "current_sp": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "default": 0,
+            "title": "Current Sp"
+          },
+          "start_sp": { "title": "Start Sp", "type": "integer" },
+          "end_sp": { "title": "End Sp", "type": "integer" },
+          "start": {
+            "anyOf": [{ "format": "date-time", "type": "string" }, { "type": "null" }],
+            "title": "Start"
+          },
+          "end": {
+            "anyOf": [{ "format": "date-time", "type": "string" }, { "type": "null" }],
+            "title": "End"
+          }
+        },
+        "required": ["skill", "group", "end_level", "position", "start_sp", "end_sp"],
+        "title": "CharacterQueueItem",
+        "type": "object"
+      },
+      "CharacterDoctrines": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "doctrines": { "title": "Doctrines", "type": "object" },
+          "skills": { "title": "Skills", "type": "object" }
+        },
+        "required": ["character", "doctrines", "skills"],
+        "title": "CharacterDoctrines",
+        "type": "object"
+      },
+      "CharacterHistory": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "history": {
+            "items": { "$ref": "#/components/schemas/CorpHistory" },
+            "title": "History",
+            "type": "array"
+          }
+        },
+        "required": ["character"],
+        "title": "CharacterHistory",
+        "type": "object"
+      },
+      "CorpHistory": {
+        "properties": {
+          "start": { "format": "date-time", "title": "Start", "type": "string" },
+          "corporation": { "$ref": "#/components/schemas/Corporation" }
+        },
+        "required": ["start", "corporation"],
+        "title": "CorpHistory",
+        "type": "object"
+      },
+      "Corporation": {
+        "properties": {
+          "corporation_id": { "title": "Corporation Id", "type": "integer" },
+          "corporation_name": { "title": "Corporation Name", "type": "string" },
+          "alliance_id": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Alliance Id"
+          },
+          "alliance_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Alliance Name"
+          }
+        },
+        "required": ["corporation_id", "corporation_name"],
+        "title": "Corporation",
+        "type": "object"
+      },
+      "Message": {
+        "properties": { "message": { "title": "Message", "type": "string" } },
+        "required": ["message"],
+        "title": "Message",
+        "type": "object"
+      },
+      "CorporationAssetItem": {
+        "properties": {
+          "id": { "title": "Id", "type": "integer" },
+          "item": { "$ref": "#/components/schemas/EveName" },
+          "quantity": { "default": 0, "title": "Quantity", "type": "integer" },
+          "location": { "allOf": [{ "$ref": "#/components/schemas/EveName" }] },
+          "expand": { "title": "Expand", "type": "boolean" }
+        },
+        "required": ["id", "item"],
+        "title": "CorporationAssetItem",
+        "type": "object"
+      },
+      "CorporationWalletEvent": {
+        "properties": {
+          "division": { "title": "Division", "type": "string" },
+          "id": { "title": "Id", "type": "integer" },
+          "date": { "format": "date-time", "title": "Date", "type": "string" },
+          "first_party": { "$ref": "#/components/schemas/EveName" },
+          "second_party": { "$ref": "#/components/schemas/EveName" },
+          "ref_type": { "title": "Ref Type", "type": "string" },
+          "balance": { "title": "Balance", "type": "number" },
+          "amount": { "title": "Amount", "type": "number" },
+          "reason": { "anyOf": [{ "type": "string" }, { "type": "null" }], "title": "Reason" }
+        },
+        "required": [
+          "division",
+          "id",
+          "date",
+          "first_party",
+          "second_party",
+          "ref_type",
+          "balance",
+          "amount"
+        ],
+        "title": "CorporationWalletEvent",
+        "type": "object"
+      },
+      "CorpStatus": {
+        "properties": {
+          "corporation": { "$ref": "#/components/schemas/Corporation" },
+          "characters": { "title": "Characters", "type": "integer" },
+          "active": { "title": "Active", "type": "boolean" },
+          "last_updates": {
+            "anyOf": [{ "type": "object" }, { "type": "null" }],
+            "title": "Last Updates"
+          }
+        },
+        "required": ["corporation", "characters", "active"],
+        "title": "CorpStatus",
+        "type": "object"
+      },
+      "Structure": {
+        "properties": {
+          "id": { "title": "Id", "type": "integer" },
+          "owner": { "$ref": "#/components/schemas/Corporation" },
+          "name": { "title": "Name", "type": "string" },
+          "type": { "$ref": "#/components/schemas/EveName" },
+          "services": {
+            "anyOf": [
+              { "items": { "$ref": "#/components/schemas/StructureService" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Services"
+          },
+          "location": { "$ref": "#/components/schemas/EveName" },
+          "celestial": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Celestial"
+          },
+          "fuel_expiry": {
+            "anyOf": [{ "format": "date-time", "type": "string" }, { "type": "null" }],
+            "title": "Fuel Expiry"
+          },
+          "state": { "title": "State", "type": "string" },
+          "state_expiry": {
+            "anyOf": [{ "format": "date-time", "type": "string" }, { "type": "null" }],
+            "title": "State Expiry"
+          }
+        },
+        "required": ["id", "owner", "name", "type", "location"],
+        "title": "Structure",
+        "type": "object"
+      },
+      "StructureService": {
+        "properties": {
+          "name": { "title": "Name", "type": "string" },
+          "state": { "title": "State", "type": "string" }
+        },
+        "required": ["name", "state"],
+        "title": "StructureService",
+        "type": "object"
+      },
+      "FittingItem": {
+        "properties": {
+          "type": { "$ref": "#/components/schemas/EveName" },
+          "location": { "title": "Location", "type": "string" }
+        },
+        "required": ["type", "location"],
+        "title": "FittingItem",
+        "type": "object"
+      },
+      "PingStats": {
+        "properties": {
+          "members": { "title": "Members", "type": "integer" },
+          "structures": { "items": { "type": "string" }, "title": "Structures", "type": "array" }
+        },
+        "required": ["members"],
+        "title": "PingStats",
+        "type": "object"
+      }
+    },
+    "securitySchemes": { "SessionAuth": { "type": "apiKey", "in": "cookie", "name": "sessionid" } }
+  },
+  "servers": []
+}
