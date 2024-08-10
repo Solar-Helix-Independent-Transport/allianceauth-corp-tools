@@ -1,5 +1,4 @@
 import logging
-import re
 from typing import List
 
 from ninja import NinjaAPI
@@ -46,43 +45,42 @@ class DashboardApiEndpoints:
 
             second_systems = set()
             output = {}
-            regex = r"^(.*) » ([^ - ]*) - (.*)"
             now = timezone.now()
             for s in structures:
-                matches = re.findall(regex, s.name)
-                if len(matches):
-                    matches = matches[0]
-                    days = 0
-                    if s.fuel_expires:
-                        days = (s.fuel_expires - now).days
-                    active = False
-                    for ss in s.structureservice_set.all():
-                        if ss.name == "Jump Gate Access" and ss.state == "online":
-                            active = True
-                    if matches[0] in second_systems:
-                        output[matches[1]]["end"] = {
-                            "system_name": s.system_name.name,
-                            "system_id": s.system_name_id,
-                            "ozone": s.ozone_level,
-                            "known": True,
-                            "active": active,
-                            "expires": days,
-                            "name": s.name
-                        }
-                    else:
-                        output[matches[0]] = {}
-                        output[matches[0]]["start"] = {
-                            "system_name": s.system_name.name,
-                            "system_id": s.system_name_id,
-                            "ozone": s.ozone_level,
-                            "known": True,
-                            "active": active,
-                            "expires": days,
-                            "name": s.name
-                        }
-                        output[matches[0]]["end"] = {
-                            "known": False, "active": False}
-                        second_systems.add(matches[1])
+                split = s.name.split(" » ")
+                from_sys = split[0]
+                to_sys = split[1].split(" - ")[0]
+                days = 0
+                if s.fuel_expires:
+                    days = (s.fuel_expires - now).days
+                active = False
+                for ss in s.structureservice_set.all():
+                    if ss.name == "Jump Gate Access" and ss.state == "online":
+                        active = True
+                if from_sys in second_systems:
+                    output[to_sys]["end"] = {
+                        "system_name": s.system_name.name,
+                        "system_id": s.system_name_id,
+                        "ozone": s.ozone_level,
+                        "known": True,
+                        "active": active,
+                        "expires": days,
+                        "name": s.name
+                    }
+                else:
+                    output[from_sys] = {}
+                    output[from_sys]["start"] = {
+                        "system_name": s.system_name.name,
+                        "system_id": s.system_name_id,
+                        "ozone": s.ozone_level,
+                        "known": True,
+                        "active": active,
+                        "expires": days,
+                        "name": s.name
+                    }
+                    output[from_sys]["end"] = {
+                        "known": False, "active": False}
+                    second_systems.add(to_sys)
 
             return list(output.values())
 
