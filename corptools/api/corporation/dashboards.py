@@ -50,6 +50,7 @@ class DashboardApiEndpoints:
                 split = s.name.split(" » ")
                 from_sys = split[0]
                 to_sys = split[1].split(" - ")[0]
+                logger.warning(f"CT_JB: `{from_sys}` `{to_sys}`")
                 days = 0
                 if s.fuel_expires:
                     days = (s.fuel_expires - now).days
