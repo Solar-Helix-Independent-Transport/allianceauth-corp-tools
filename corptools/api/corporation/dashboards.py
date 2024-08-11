@@ -3,6 +3,7 @@ from typing import List
 
 from ninja import NinjaAPI
 
+from django.db.models import Sum
 from django.utils import timezone
 
 from allianceauth.services.hooks import get_extension_logger
@@ -43,6 +44,16 @@ class DashboardApiEndpoints:
                 "corporation__corporation", "system_name"
             ).prefetch_related('structureservice_set').filter(type_id=35841)
 
+            ozone = models.CorpAsset.objects.filter(
+                type_id=16273,
+                location_flag="StructureFuel"
+            ).values("location_id").annotate(total=Sum('quantity'))
+            levels = {}
+            for o in ozone:
+                if o["location_id"] not in levels:
+                    levels[o["location_id"]] = 0
+                levels[o["location_id"]] += o["total"]
+
             second_systems = set()
             output = {}
             now = timezone.now()
@@ -62,7 +73,7 @@ class DashboardApiEndpoints:
                     output[to_sys]["end"] = {
                         "system_name": s.system_name.name,
                         "system_id": s.system_name_id,
-                        "ozone": s.ozone_level,
+                        "ozone": levels.get(s.structure_id),
                         "known": True,
                         "active": active,
                         "expires": days,
@@ -73,7 +84,7 @@ class DashboardApiEndpoints:
                     output[from_sys]["start"] = {
                         "system_name": s.system_name.name,
                         "system_id": s.system_name_id,
-                        "ozone": s.ozone_level,
+                        "ozone": levels.get(s.structure_id),
                         "known": True,
                         "active": active,
                         "expires": days,
