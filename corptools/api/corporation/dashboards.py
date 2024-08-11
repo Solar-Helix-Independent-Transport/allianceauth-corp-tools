@@ -61,7 +61,7 @@ class DashboardApiEndpoints:
                 split = s.name.split(" » ")
                 from_sys = split[0]
                 to_sys = split[1].split(" - ")[0]
-                logger.warning(f"CT_JB: `{from_sys}` `{to_sys}`")
+                reverse_connection = f"{to_sys}{from_sys}"
                 days = 0
                 if s.fuel_expires:
                     days = (s.fuel_expires - now).days
@@ -69,7 +69,7 @@ class DashboardApiEndpoints:
                 for ss in s.structureservice_set.all():
                     if ss.name == "Jump Gate Access" and ss.state == "online":
                         active = True
-                if from_sys in second_systems:
+                if reverse_connection in second_systems:
                     output[to_sys]["end"] = {
                         "system_name": s.system_name.name,
                         "system_id": s.system_name_id,
@@ -92,7 +92,7 @@ class DashboardApiEndpoints:
                     }
                     output[from_sys]["end"] = {
                         "known": False, "active": False}
-                    second_systems.add(to_sys)
+                    second_systems.add(reverse_connection)
 
             return list(output.values())
 
