@@ -61,6 +61,7 @@ class DashboardApiEndpoints:
                 split = s.name.split(" » ")
                 from_sys = split[0]
                 to_sys = split[1].split(" - ")[0]
+                connection = f"{from_sys}{to_sys}"
                 reverse_connection = f"{to_sys}{from_sys}"
                 days = 0
                 if s.fuel_expires:
@@ -92,7 +93,7 @@ class DashboardApiEndpoints:
                     }
                     output[from_sys]["end"] = {
                         "known": False, "active": False}
-                    second_systems.add(reverse_connection)
+                    second_systems.add(connection)
 
             return list(output.values())
 
