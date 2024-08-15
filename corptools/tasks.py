@@ -766,7 +766,7 @@ def update_corp_logins(self, corp_id):
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_corp_contracts(self, corp_id, force_refresh=True):
+def update_corp_contracts(self, corp_id, force_refresh=False):
     _, ids = corp_helpers.update_corporate_contracts(
         corp_id, force_refresh=force_refresh)
 
