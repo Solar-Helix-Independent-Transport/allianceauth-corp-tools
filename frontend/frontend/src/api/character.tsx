@@ -23,6 +23,10 @@ export async function getCharacterContacts(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/contacts", characterID);
 }
 
+export async function getCharacterLP(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/loyalty", characterID);
+}
+
 export async function getCharacterNotifications(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/notifications", characterID);
 }
@@ -45,6 +49,40 @@ export async function loadGlanceActivityData(characterID: number) {
 
 export async function loadGlanceFactionData(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/glance/faction", characterID);
+}
+
+export async function getCharacterList() {
+  const { GET } = getCatApi();
+
+  const { data, error } = await GET(`/audit/api/account/list`);
+  if (error) {
+    console.log(error);
+  } else {
+    console.log(data);
+    return data;
+  }
+}
+
+export async function getAssetGroups(characterID: number, locationID: number) {
+  const { GET } = getCatApi();
+
+  const { data, error } = await GET(
+    `/audit/api/account/{character_id}/asset/{location_id}/groups`,
+    {
+      params: {
+        path: {
+          character_id: characterID,
+          location_id: locationID,
+        },
+      },
+    }
+  );
+  if (error) {
+    console.log(error);
+  } else {
+    console.log(data);
+    return data;
+  }
 }
 
 export async function loadCharacterStatus(character_id: number) {

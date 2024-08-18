@@ -1,23 +1,23 @@
 {
-  "_@libs-BNmPRTWc.js": {
-    "file": "assets/@libs-BNmPRTWc.js"
+  "_@libs-BhVKESFe.js": {
+    "file": "assets/@libs-BhVKESFe.js"
   },
-  "_@react-router-CmxWc-6V.js": {
-    "file": "assets/@react-router-CmxWc-6V.js",
+  "_@react-router-DG-kUzyH.js": {
+    "file": "assets/@react-router-DG-kUzyH.js",
     "imports": [
-      "_@libs-BNmPRTWc.js"
+      "_@libs-BhVKESFe.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-CyEvLB1w.js",
+    "file": "assets/index-B7N1CUtv.js",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@libs-BNmPRTWc.js",
-      "_@react-router-CmxWc-6V.js"
+      "_@libs-BhVKESFe.js",
+      "_@react-router-DG-kUzyH.js"
     ],
     "css": [
-      "static/corptools/bs5/statics/css/index-zq3enSb-.css"
+      "static/corptools/bs5/statics/css/index-DrstnHBG.css"
     ],
     "assets": [
       "static/corptools/bs5/statics/img/omega_128-B8POqXI6.png",

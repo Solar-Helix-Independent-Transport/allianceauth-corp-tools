@@ -1,4 +1,4 @@
-import CharacterAtAGlance from "./CharacterAtAGlance";
+import CharacterAtAGlance from "./AtAGlance";
 
 const CharacterOverview = () => {
   return (

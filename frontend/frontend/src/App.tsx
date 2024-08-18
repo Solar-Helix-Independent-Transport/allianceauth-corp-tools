@@ -1,13 +1,16 @@
-import CharacterAssets from "./Pages/Char/CharacterAssetsList";
-import CharacterAudit from "./Pages/Char/CharacterAudit";
-import CharacterClones from "./Pages/Char/CharacterClones";
-import CharacterContacts from "./Pages/Char/CharacterContacts";
-import CharacterNotifications from "./Pages/Char/CharacterNotifications";
-import CharacterOverview from "./Pages/Char/CharacterOverview";
-import CharacterPubData from "./Pages/Char/CharacterPubData";
-import CharacterRoles from "./Pages/Char/CharacterRoles";
-import CharacterStatus from "./Pages/Char/CharacterStatus";
-import CharacterWallet from "./Pages/Char/CharacterWallet";
+import AccountList from "./Pages/Char/AccountList";
+import CharacterAssetGroups from "./Pages/Char/AssetsGroups";
+import CharacterAssets from "./Pages/Char/AssetsList";
+import CharacterAudit from "./Pages/Char/Audit";
+import CharacterClones from "./Pages/Char/Clones";
+import CharacterContacts from "./Pages/Char/Contacts";
+import CharacterLP from "./Pages/Char/LoyaltyPoints";
+import CharacterNotifications from "./Pages/Char/Notifications";
+import CharacterOverview from "./Pages/Char/Overview";
+import CharacterPubData from "./Pages/Char/PubData";
+import CharacterRoles from "./Pages/Char/Roles";
+import CharacterStatus from "./Pages/Char/Status";
+import CharacterWallet from "./Pages/Char/Wallet";
 import CorporationAtAGlance from "./Pages/Corp/AtAGlance";
 import CorporationAudit from "./Pages/Corp/Audit";
 import Structures from "./Pages/Corp/Structures";
@@ -32,14 +35,7 @@ function App() {
               <Route index element={<Navigate to="account/overview" replace />} />
               <Route path="account/overview" element={<CharacterOverview />} />
               <Route path="account/status" element={<CharacterStatus />} />
-              <Route
-                path="account/assets"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/assets.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/assets" element={<CharacterAssetGroups />} />
               <Route path="account/listassets" element={<CharacterAssets />} />
               <Route path="account/pubdata" element={<CharacterPubData />} />
               <Route path="account/clones" element={<CharacterClones />} />
@@ -61,14 +57,7 @@ function App() {
                   </Card>
                 }
               />
-              <Route
-                path="account/lp"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/lp.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/lp" element={<CharacterLP />} />
               <Route
                 path="account/walletactivity"
                 element={
@@ -127,14 +116,7 @@ function App() {
                   </Card>
                 }
               />
-              <Route
-                path="account/list"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/list.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/list" element={<AccountList />} />
             </Route>
             <Route path="audit/r_beta/corp/" element={<CorporationAudit />}>
               <Route index element={<Navigate to="glance" replace />} />
