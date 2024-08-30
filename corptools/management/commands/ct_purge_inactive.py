@@ -3,6 +3,8 @@ from datetime import timedelta
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
+from allianceauth.authentication.models import State
+
 from corptools.app_settings import CT_CHAR_NOTIFICATIONS_MODULE
 from corptools.models import CharacterAudit
 
@@ -12,10 +14,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--purge_guest",
-            action='store_true',
+            "--purge",
+            type=str,
             help='Remove all guest state audits, regardless of if they are active or not.'
         )
+
         parser.add_argument(
             '--purge_inactive',
             action='store_true',
@@ -26,7 +29,7 @@ class Command(BaseCommand):
         self.stdout.write("Cleaning up CT Audits, this may take a while.")
         # self.stdout.write(f"{options}")
 
-        if options["purge_guest"]:
+        if "purge" in options:
             _c = CharacterAudit.objects.filter(
                 character__character_ownership__isnull=True
             )
@@ -34,13 +37,21 @@ class Command(BaseCommand):
             for _d in _c:
                 pass
                 _d.delete()
+            try:
+                _s = State.objects.get(name=options["purge"])
+            except State.DoesNotExist:
+                self.stdout.write(f"`{options['purge']}` state not found!")
             _c = CharacterAudit.objects.filter(
-                character__character_ownership__user__profile__state__name="Guest"
+                character__character_ownership__user__profile__state=_s
             )
-            self.stdout.write(f"Purging {_c.count()} Guest Characters")
-            for _d in _c:
-                pass
-                _d.delete()
+            self.stdout.write(f"This will purge {_c.count()} Characters in the {options['purge']} State")
+            _in = input("Are you sure you want to continue? type `yes` to continue: ")
+            if _in.lower() == "yes":
+                for _d in _c:
+                    pass
+                    _d.delete()
+            else:
+                self.stdout.write("Skipped delete!")
 
         if options["purge_inactive"]:
             if CT_CHAR_NOTIFICATIONS_MODULE:
