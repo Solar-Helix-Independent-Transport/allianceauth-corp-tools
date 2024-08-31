@@ -76,7 +76,7 @@ const exportToCSV = (table: ReactTable<any>, exportFileName: string) => {
 //   }, ob);
 // }
 
-type tableInitialState = SortingTableState & VisibilityTableState & PaginationInitialTableState;
+type tableInitialState = SortingTableState | VisibilityTableState | PaginationInitialTableState;
 
 export interface BaseTableProps extends Partial<HTMLElement> {
   isLoading?: boolean;
@@ -89,7 +89,7 @@ export interface BaseTableProps extends Partial<HTMLElement> {
   columns: ColumnDef<any, any>[];
   asyncExpandFunction?: any;
   initialState?: tableInitialState;
-  exportFileName?: String;
+  exportFileName?: string;
 }
 
 interface _BaseTableProps extends BaseTableProps {
@@ -109,6 +109,14 @@ const BaseTable = ({
   initialState = undefined,
   exportFileName = undefined,
 }: BaseTableProps) => {
+  let initState: tableInitialState = {
+    pagination: {
+      pageSize: 15, //custom default page size
+    },
+  };
+  if (initialState !== undefined) {
+    initState = initialState;
+  }
   const table = useReactTable({
     data,
     columns,
@@ -123,6 +131,7 @@ const BaseTable = ({
     //
     debugTable: debugTable,
     // state: initialState,
+    initialState: initState,
   });
 
   return (
@@ -300,7 +309,7 @@ function _baseTable({
               variant="success"
               title={table.getState().pagination.pageSize}
             >
-              {[10, 50, 100, 1000000].map((_pageSize) => (
+              {[15, 30, 60, 100, 1000000].map((_pageSize) => (
                 <Dropdown.Item
                   id={`${_pageSize}`}
                   key={_pageSize}
