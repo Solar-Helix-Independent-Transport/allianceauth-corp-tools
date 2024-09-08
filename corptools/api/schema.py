@@ -252,10 +252,24 @@ class Structure(Schema):
     type: EveName
     services: Optional[List[StructureService]] = None
     location: EveName
+    constellation: Optional[EveName] = None
+    region: Optional[EveName] = None
     celestial: Optional[str] = None
     fuel_expiry: Optional[datetime] = None
     state: str = None
     state_expiry: Optional[datetime] = None
+
+
+class OreValue(Schema):
+    type: EveName
+    quantity: int
+    value: float
+
+
+class Metenox(Schema):
+    structure: Structure
+    contents: List[OreValue]
+    total: int
 
 
 class FittingItem(Schema):

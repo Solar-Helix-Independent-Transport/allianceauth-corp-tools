@@ -1139,7 +1139,7 @@ class StructureService(models.Model):
 # Market History ( GMetrics )
 
 
-class OrePrice(models.Model):
+class TypePrice(models.Model):
     item = models.ForeignKey(EveItemType, on_delete=models.DO_NOTHING)
     price = models.DecimalField(max_digits=20, decimal_places=2)
     last_update = models.DateTimeField(auto_now=True)

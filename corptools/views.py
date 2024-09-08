@@ -18,6 +18,7 @@ from esi.decorators import _check_callback, token_required
 from esi.views import sso_redirect
 
 from . import __version__, app_settings
+from .api.corporation import dashboards
 from .forms import UploadForm
 from .models import (
     CharacterAudit, CorpAsset, CorporationAudit, EveItemCategory,
@@ -504,3 +505,18 @@ def fuel_levels(request):
         'total_hourly_fuel': total_hourly_fuel,
     }
     return render(request, 'corptools/dashboards/fuel_dash.html', context=context)
+
+
+@login_required
+def metenox_levels(request):
+    if not (request.user.has_perm('corptools.own_corp_manager')
+            or request.user.has_perm('corptools.alliance_corp_manager')
+            or request.user.has_perm('corptools.state_corp_manager')
+            or request.user.has_perm('corptools.global_corp_manager')
+            or request.user.has_perm('corptools.holding_corp_structures')):
+        raise PermissionDenied("No perms to view")
+
+    context = {
+        'structures': dashboards.DashboardApiEndpoints.get_dashboard_drills_levels(request),
+    }
+    return render(request, 'corptools/dashboards/metenox_dash.html', context=context)

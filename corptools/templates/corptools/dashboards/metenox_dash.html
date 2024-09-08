@@ -1,0 +1,141 @@
+{% extends "allianceauth/base-bs5.html" %}
+{% load i18n %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+{% if structures %}
+<h2 class="text-center">Metenox Stats</h2>
+<hr />
+<div id="chart_info" class="mx-auto">
+  <div class="text-center">
+    <h4 class="text-center">Filtered Stats</h4>
+    <p>Structures Matching Filter <span id="total_str" class="badge bg-primary"></span></p>
+    <p>Total Value in Drills <span id="total_value" class="badge bg-primary"></span></p>
+    <p>Filtered System Count <span id="total_system" class="badge bg-primary"></span></p>
+    <p>Filtered Constellation Count <span id="total_const" class="badge bg-primary"></span></p>
+    <p>Filtered Region Count <span id="total_region" class="badge bg-primary"></span></p>
+  </div>
+</div>
+<hr />
+  <table id="table-structs" class="table table-responsive">
+    <thead>
+      <tr>
+        <th>Structure</th>
+        <th>Owner</th>
+        <th>System</th>
+        <th>Constellation</th>
+        <th>Region</th>
+        <th>Value</th>
+        <th>Contents</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for structure in structures %}
+      <tr class="align-middle" >
+        <td>{{ structure.structure.name }}</td>
+        <td>{{ structure.structure.owner.corporation_name }}</td>
+        <td>{{ structure.structure.location.name }}</td>
+        <td>{{ structure.structure.constellation.name }}</td>
+        <td>{{ structure.structure.region.name }}</td>
+        <td class="blocks-till" total_values="{{ structure.total }}">
+          {{ structure.total|intcomma }}
+        </td>
+        <td>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Type</th>
+                        <th>Qty</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for o in structure.contents %}
+                        <tr>
+                            <td><img src="https://image.eveonline.com/Type/{{o.type.id}}_32.png" width="32" height="32" itemprop="image"></td>
+                            <td>{{ o.type.name }}</td>
+                            <td>{{ o.quantity|intcomma }}</td>
+                            <td>{{ o.value|intcomma }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </td>
+
+      </tr>
+      {% empty %}
+      {% endfor %}
+    </tbody>
+</div>
+{% else %}
+<div class="alert alert-warning text-center">{% translate "No Structures Available" %}</div>
+{% endif %}
+{% endblock content %}
+{% block extra_javascript %}
+<script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.1.3/js/dataTables.bootstrap5.js"></script>
+{% include "bundles/filterdropdown-js.html" %}
+    <script>
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        $(document).ready(function () {
+            $("#table-structs").DataTable({
+                filterDropDown: {
+                    columns: [
+                        {
+                            idx: 1,
+                        },
+                        {
+                            idx: 2,
+                        },
+                        {
+                            idx: 3,
+                        },
+                        {
+                            idx: 4,
+                        },
+                    ],
+                    bootstrap: true,
+                    bootstrap_version: 5
+                },
+                columnDefs: [
+                    // { searchable: false, targets: [2,3,4,5] },
+                    { sortable: false, targets: [6] },
+                ],
+                order: [[5, "desc"]],
+                paging: false,
+                responsive: true,
+                pageLength: -1,
+                footerCallback: function (row, data, start, end, display) {
+                    var api = this.api(),
+                    data;
+
+                    var pageTotal = api
+                    .column(5, { page: "current" })
+                    .data()
+                    .reduce(function (a, b) {
+                        return Number(a) + Number(b.replace(/,/g, ''));
+                    }, 0);
+
+                    var total_count = api.column(1, { page: "current" }).data().count();
+                    var systems = api.column(2, { page: "current" }).data().unique().count();
+                    var constel = api.column(3, { page: "current" }).data().unique().count();
+                    var region = api.column(4, { page: "current" }).data().unique().count();
+
+                    $("#total_value").html(numberWithCommas(pageTotal));
+                    $("#total_str").html(numberWithCommas(total_count));
+                    $("#total_system").html(numberWithCommas(systems));
+                    $("#total_const").html(numberWithCommas(constel));
+                    $("#total_region").html(numberWithCommas(region));
+                },
+            });
+        });
+    </script>
+{% endblock extra_javascript %}
+{% block extra_script %}
+{% endblock extra_script %}
+{% block extra_css %}
+{% endblock extra_css %}

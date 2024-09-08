@@ -3,7 +3,9 @@ from typing import List
 
 from ninja import NinjaAPI
 
-from django.db.models import Sum
+from django.db.models import (
+    ExpressionWrapper, FloatField, OuterRef, Subquery, Sum,
+)
 from django.utils import timezone
 
 from allianceauth.services.hooks import get_extension_logger
@@ -118,7 +120,6 @@ class DashboardApiEndpoints:
                 type_id__in=types,
                 location_type="solar_system").select_related(
                 "type_name",
-                "location_name",
                 "location_name__system",
                 "location_name__system__constellation",
                 "location_name__system__constellation__region",
@@ -156,3 +157,105 @@ class DashboardApiEndpoints:
                 })
 
             return list(location_names.values())
+
+        @api.get(
+            "dashboard/metenox",
+            response={200: List[schema.Metenox], 403: str},
+            tags=self.tags
+        )
+        def get_dashboard_drills(request):
+            return self.get_dashboard_drills_levels(request)
+
+    def get_dashboard_drills_levels(request):
+        perms = (
+            request.user.has_perm('corptools.own_corp_manager')
+            | request.user.has_perm('corptools.alliance_corp_manager')
+            | request.user.has_perm('corptools.state_corp_manager')
+            | request.user.has_perm('corptools.global_corp_manager')
+            | request.user.has_perm('corptools.holding_corp_structures')
+        )
+
+        if not perms:
+            logging.error(
+                f"Permission Denied for {request.user} to view Metenox!")
+            return 403, "Permission Denied!"
+
+        types = [81826]  # metenox drills
+
+        drills = models.Structure.get_visible(request.user).filter(
+            type_id__in=types
+        ).select_related(
+            "type_name",
+            "system_name",
+            "system_name__constellation",
+            "system_name__constellation__region",
+        )
+
+        output = {}
+
+        for d in drills:
+            output[d.structure_id] = {
+                "structure": {
+                    "id": d.structure_id,
+                    "owner": d.corporation.corporation,
+                    "name": d.name,
+                    "type": {
+                        "id": d.type_name.type_id,
+                        "name": d.type_name.name
+                    },
+                    "location": {
+                        "id": d.system_name.system_id,
+                        "name": d.system_name.name
+                    },
+                    "constellation": {
+                        "id": d.system_name.constellation.constellation_id,
+                        "name": d.system_name.constellation.name
+                    },
+                    "region": {
+                        "id": d.system_name.constellation.region.region_id,
+                        "name": d.system_name.constellation.region.name
+                    },
+                },
+                "contents": {},
+                "total": 0
+            }
+
+        type_price = models.TypePrice.objects.filter(
+            item_id=OuterRef('type_id')
+        )
+
+        asset_contents = models.CorpAsset.objects.filter(
+            location_id__in=drills.values("structure_id"),
+            location_flag="MoonMaterialBay"
+        ).select_related(
+            "type_name"
+        ).annotate(
+            value=ExpressionWrapper(
+                Subquery(type_price.values('price')) * Sum('quantity'),
+                output_field=FloatField()
+            )
+        )
+
+        for a in asset_contents:
+            _lid = a.location_id
+            _tid = a.type_id
+
+            if _tid not in output[_lid]["contents"]:
+                output[_lid]["contents"][_tid] = {
+                    "type": {
+                        "id": a.type_name.type_id,
+                        "name": a.type_name.name
+                    },
+                    "quantity": 0,
+                    "value": 0
+                }
+
+            output[_lid]["contents"][_tid]["quantity"] += a.quantity
+            output[_lid]["contents"][_tid]["value"] += a.value
+            output[_lid]["total"] += a.value
+
+        for k, i in output.items():
+            i["contents"] = list(i["contents"].values())
+            i["total"] = int(i["total"])
+
+        return list(output.values())

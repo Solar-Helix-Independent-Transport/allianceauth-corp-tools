@@ -2,6 +2,7 @@ import datetime
 import json
 from functools import wraps
 
+import requests
 from celery import chain as Chain, shared_task, signature
 from celery_once import AlreadyQueued
 
@@ -22,7 +23,7 @@ from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
 from . import app_settings, providers
 from .models import (
     CharacterAsset, CharacterAudit, CharacterMarketOrder, Clone,
-    CorporationAudit, EveLocation, EveName, JumpClone,
+    CorporationAudit, EveItemType, EveLocation, EveName, JumpClone, TypePrice,
 )
 from .task_helpers import corp_helpers
 from .task_helpers.char_tasks import (
@@ -807,3 +808,34 @@ def run_housekeeping():
     notifs = remove_old_notifications()
 
     return notifs
+
+
+@shared_task
+def update_all_raw_minerals():
+    _types = EveItemType.objects.filter(group__category_id=4)
+    return update_prices_for_types(list(_types.values_list("type_id", flat=True)))
+
+
+@shared_task
+def update_prices_for_types(type_ids: list):
+    logger.info(
+        "Pulling values from Jita @`buy`-`weightedAverage`"
+    )
+    _str = str(type_ids.pop())
+    for i in type_ids:
+        _str += f",{i}"
+    url = f"https://market.fuzzwork.co.uk/aggregates/?station=60003760&types={_str}"
+    response = requests.get(url)
+    price_data = response.json()
+    price_cache = {}
+    for key, item in price_data.items():
+        obj, _ = EveItemType.objects.get_or_create_from_esi(key)
+
+        ob, _ = TypePrice.objects.update_or_create(
+            item=obj,
+            defaults={
+                "price": float(item['buy']["weightedAverage"])
+            }
+        )
+        price_cache[obj.name] = float(item['buy']["weightedAverage"])
+    return json.dumps(price_cache, indent=2)

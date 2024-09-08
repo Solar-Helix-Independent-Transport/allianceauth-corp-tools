@@ -92,5 +92,6 @@ urlpatterns = [
         path('add_options/', views.add_corp_section,
              name='add_corp_options'),
         re_path(r'^dashboard/fuel', views.fuel_levels, name='fuel_dashboard'),
+        re_path(r'^dashboard/metenox', views.metenox_levels, name='drill_dashboard'),
     ])),
 ]
