@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "flit_core.buildapi"
 requires = [
-    "flit_core<4,>=3.2",
+    "flit-core<4,>=3.2",
 ]
 
 [project]
@@ -11,7 +11,7 @@ keywords = [
     "allianceauth",
     "eveonline",
 ]
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 authors = [
     { name = "AaronKable", email = "aaronkable@gmail.com" },
 ]
@@ -41,19 +41,17 @@ dynamic = [
     "version",
 ]
 dependencies = [
-    "allianceauth<5.0.0,>=3",
+    "allianceauth<5,>=3",
     "django-model-utils",
-    "django-ninja<2.0.0,>=1.0.1",
+    "django-ninja<2,>=1.0.1",
     "networkx",
 ]
-[project.optional-dependencies]
-test = [
+optional-dependencies.test = [
     "allianceauth-securegroups",
 ]
-[project.urls]
-Homepage = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools"
-Source = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools"
-Tracker = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools/issues"
+urls.Homepage = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools"
+urls.Source = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools"
+urls.Tracker = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools/issues"
 
 [tool.flit.module]
 name = "corptools"
@@ -67,19 +65,19 @@ sections = [
     "DJANGO",
     "ALLIANCEAUTH",
     "FIRSTPARTY",
-    "LOCALFOLDER"
+    "LOCALFOLDER",
 ]
-known_allianceauth = ["allianceauth", "esi"]
-known_django = ["django"]
+known_allianceauth = [ "allianceauth", "esi" ]
+known_django = [ "django" ]
 skip_gitignore = true
 
 [tool.flake8]
-exclude = [".git", "*migrations*", ".tox", "dist", "htmlcov"]
+exclude = [ ".git", "*migrations*", ".tox", "dist", "htmlcov" ]
 max-line-length = 119
-select = ["C", "E", "F", "W", "B", "B950"]
-ignore = ['E203', 'E231', 'E501', 'W503', 'W291', 'W293']
+select = [ "C", "E", "F", "W", "B", "B950" ]
+ignore = [ 'E203', 'E231', 'E501', 'W503', 'W291', 'W293' ]
 
 [tool.djlint]
-max_attribute_length=119
-max_line_length=119
-max_blank_lines=1
+max_attribute_length = 119
+max_line_length = 119
+max_blank_lines = 1
