@@ -33,7 +33,7 @@ const CharacterSkills = () => {
       obj.character.character_id === char_id ? Number(char_id) : 0
     );
 
-    let skill_data = char_data?.[0].skills;
+    let skill_data = char_data?.[0]?.skills;
 
     if (group_filter !== "" && group_filter !== "All") {
       skill_data = skill_data?.filter((o: any) =>
