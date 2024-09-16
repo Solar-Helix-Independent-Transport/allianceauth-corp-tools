@@ -1,27 +1,30 @@
 import { ErrorLoader } from "../Loaders/loaders";
-import React from "react";
+import React, { Component, ErrorInfo } from "react";
 
-class ErrorBoundary extends React.Component {
-  constructor(props: any) {
+interface Props {
+  children: React.ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+}
+
+class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
     super(props);
-    this.state = { error: null, errorInfo: null };
+    this.state = { hasError: false };
   }
 
-  componentDidCatch(error: any, errorInfo: any) {
-    // Catch errors in any components below and re-render with error message
-    this.setState({
-      error: error,
-      errorInfo: errorInfo,
-    });
-    // You can also log error messages to an error reporting service here
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("ErrorBoundary caught an error: ", error, errorInfo);
+    this.setState({ hasError: true });
   }
 
   render() {
-    if (this.state.errorInfo) {
-      // Error path
+    if (this.state.hasError) {
       return <ErrorLoader />;
     }
-    // Normally, just render children
+
     return this.props.children;
   }
 }
