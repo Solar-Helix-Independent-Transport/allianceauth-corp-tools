@@ -90,7 +90,7 @@ const CharacterSkills = () => {
 
     const groupOptions = new Set();
 
-    char_data[0].skills?.forEach((skill: any) => {
+    char_data?.[0]?.skills?.forEach((skill: any) => {
       groupOptions.add(skill.group);
     });
 
