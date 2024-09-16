@@ -1,4 +1,5 @@
 import re
+from typing import Union
 
 import requests
 from celery import chain, shared_task
@@ -30,43 +31,57 @@ from . import sanitize_location_flag
 logger = get_extension_logger(__name__)
 
 
-def get_corp_token(corp_id, scopes, req_roles):
+def get_corp_token(corp_id: int, scopes: list, req_roles: Union[list, None, False]):
     """
-    Helper method to get a token for a specific character from a specific corp with specific scopes
+    Helper method to get a token for a specific character from a specific corp with specific scopes, where
+    a character has specific in game roles.
     :param corp_id: Corp to filter on.
-    :param scopes: array of ESI scope strings to search for.
-    :param req_roles: roles required on the character.
-    :return: :class:esi.models.Token or False
+    :param scopes: array of ESI scope strings required on the token
+    :param req_roles: array of roles, one of which is required on the character.
+    :return: :class:esi.models.Token or None
     """
+
+    # always add roles scope as a requirement.
     if 'esi-characters.read_corporation_roles.v1' not in scopes:
         scopes.append("esi-characters.read_corporation_roles.v1")
 
+    # Find all characters in the corporation known to auth.
     char_ids = EveCharacter.objects.filter(
         corporation_id=corp_id).values('character_id')
-    tokens = Token.objects \
-        .filter(character_id__in=char_ids) \
-        .require_scopes(scopes)
 
+    # find all tokens for the corp, with the scopes.
+    tokens = Token.objects.filter(
+        character_id__in=char_ids
+    ).require_scopes(scopes)
+
+    # loop to check the roles and break on first correct match
     for token in tokens:
         try:
             if req_roles:  # There are endpoints with no requirements
-                roles = providers.esi.client.Character.get_characters_character_id_roles(character_id=token.character_id,
-                                                                                         token=token.valid_access_token()).result()
+                roles = providers.esi.client.Character.get_characters_character_id_roles(
+                    character_id=token.character_id,
+                    token=token.valid_access_token()
+                ).result()
+
                 has_roles = False
+
+                # do we have the roles.
                 for role in roles.get('roles', []):
                     if role in req_roles:
                         has_roles = True
+                        break
 
                 if has_roles:
-                    return token
+                    return token  # return the token
                 else:
-                    pass  # TODO Maybe remove token?
+                    pass  # next! TODO should we flag this character?
             else:
-                return token
+                return token  # no roles check needed return the token
         except TokenError as e:
-            logger.error(f"Token ID: {token.pk} ({e})")
+            #  I've had invalid tokens in auth that refresh but don't actually work
+            logger.error(f"Token Error ID: {token.pk} ({e})")
 
-    return False
+    return None
 
 
 # pagnated results
