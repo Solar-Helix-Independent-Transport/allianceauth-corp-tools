@@ -29,8 +29,8 @@ const CharacterSkills = () => {
     setCharacter(data[0].character.character_id);
     return <PanelLoader />;
   } else {
-    const char_data = data.filter((obj: any) =>
-      obj.character.character_id === char_id ? Number(char_id) : 0
+    const char_data = data.filter(
+      (obj: any) => obj.character.character_id === Number(char_id ? char_id : 0)
     );
 
     let skill_data = char_data?.[0]?.skills;
