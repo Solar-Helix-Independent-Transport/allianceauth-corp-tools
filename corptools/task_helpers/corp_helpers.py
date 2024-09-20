@@ -31,7 +31,7 @@ from . import sanitize_location_flag
 logger = get_extension_logger(__name__)
 
 
-def get_corp_token(corp_id: int, scopes: list, req_roles: Union[list, None, False]):
+def get_corp_token(corp_id: int, scopes: list, req_roles: Union[list, None, bool]):
     """
     Helper method to get a token for a specific character from a specific corp with specific scopes, where
     a character has specific in game roles.
