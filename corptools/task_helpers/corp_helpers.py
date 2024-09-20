@@ -380,7 +380,7 @@ def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
     return f"Finished wallet divs for: {audit_corp.corporation.corporation_name}"
 
 
-def update_corp_structures(corp_id):  # pagnated results
+def update_corp_structures(corp_id, force_refresh=False):  # pagnated results
     # logger.debug("Started structures for: %s" % (str(character_id)))
 
     def _structures_db_update(_corporation, _structure, _name):
@@ -507,7 +507,7 @@ def update_corp_structures(corp_id):  # pagnated results
     operation = providers.esi.client.Corporation.get_corporations_corporation_id_structures(
         corporation_id=_corporation.corporation.corporation_id)
     try:
-        structures = etag_results(operation, token)
+        structures = etag_results(operation, token, force_refresh=force_refresh)
     except NotModifiedError:
         _corporation.last_update_structures = timezone.now()
         _corporation.save()

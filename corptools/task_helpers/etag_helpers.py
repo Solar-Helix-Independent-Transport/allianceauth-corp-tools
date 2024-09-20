@@ -111,6 +111,8 @@ def etag_results(operation, token, force_refresh=False, disable_verification=Fal
 
                     result, headers = operation.result()
                     total_pages = int(headers.headers['X-Pages'])
+                    logger.warning(get_etag_header(operation))
+                    logger.warning(headers.headers.get('ETag'))
 
                     if get_etag_header(operation) == headers.headers.get('ETag') and not force_refresh and not etags_incomplete:
                         # if django esi is returning our cache check it manualy.
@@ -149,7 +151,7 @@ def etag_results(operation, token, force_refresh=False, disable_verification=Fal
 
                 except NotModifiedError:  # etag is match in cache
                     logger.debug(
-                        f"ESI_TIME: PAGE {time.perf_counter()-_pg_tm} {operation.operation.operation_id} {stringify_params(operation)}")
+                        f"ESI_TIME: PAGE {time.perf_counter() - _pg_tm} {operation.operation.operation_id} {stringify_params(operation)}")
                     total_pages = int(headers.headers['X-Pages'])
 
                     if not etags_incomplete:
@@ -157,6 +159,7 @@ def etag_results(operation, token, force_refresh=False, disable_verification=Fal
                     else:
                         current_page = 1  # reset to page 1 and fetch everything, we should not get here
                         results = list()
+
                 logger.debug(
                     f"ETag: No Etag {operation.operation.operation_id} - {stringify_params(operation)}")
 
@@ -202,5 +205,5 @@ def etag_results(operation, token, force_refresh=False, disable_verification=Fal
             logger.warning("Post operation.operation.swagger_spec.config['validate_responses'] not checkable")
 
     logger.debug(
-        f"ESI_TIME: OVERALL {time.perf_counter()-_start_tm} {operation.operation.operation_id} {stringify_params(operation)}")
+        f"ESI_TIME: OVERALL {time.perf_counter() - _start_tm} {operation.operation.operation_id} {stringify_params(operation)}")
     return results

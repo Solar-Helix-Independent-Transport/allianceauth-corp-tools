@@ -1,9 +1,12 @@
 import datetime
 import json
 from functools import wraps
+from random import random
 
 import requests
+from bravado.exception import HTTPError
 from celery import chain as Chain, shared_task, signature
+from celery.exceptions import Retry
 from celery_once import AlreadyQueued
 
 from django.core.cache import cache
@@ -225,7 +228,7 @@ def check_account(character_id):
         update_character.apply_async(args=[cid], priority=6)
 
 
-def enqueue_next_task(chain):
+def enqueue_next_task(chain, delay=1):
     """
         Queue next task, and attach the rest of the chain to it.
     """
@@ -234,12 +237,51 @@ def enqueue_next_task(chain):
         _t = signature(_t)
         _t.kwargs.update({"chain": chain})
         try:
-            _t.apply_async(priority=9)
+            _t.apply_async(priority=9, countdown=delay)
         except AlreadyQueued:
             # skip this task as it is already in the queue
-            print(f"Skipping task as its already queued {_t}")
+            logger.warning(f"Skipping task as its already queued {_t}")
             continue
         break
+
+
+def set_error_flag(timeout):
+    tout = timezone.now() + datetime.timedelta(seconds=timeout)
+    cache.set("esi_error_timeout", tout, timeout=timeout + 1)
+
+
+def get_error_flag():
+    return cache.get("esi_error_timeout", default=timezone.now())
+
+
+def clear_error_flag():
+    cache.delete("esi_error_timeout")
+
+
+def esi_error_retry(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        _ret = None
+
+        if get_error_flag() >= timezone.now():
+            logger.warning("Hit ESI error limit! will retry tasks!")
+            args[0].retry(countdown=61)
+        else:
+            clear_error_flag()
+        try:
+            _ret = func(*args, **kwargs)
+        except Exception as e:
+            if isinstance(e, (HTTPError)):
+                code = e.status_code
+                if code == 420:
+                    logger.warning(f"Hit ESI error limit! Pausing Tasks! {e}")
+                    set_error_flag(60)
+                    args[0].retry(countdown=61)
+            elif isinstance(e, (OSError)):
+                logger.warning(f"Hit ESI error limit! Pausing Tasks! {e}")
+            raise e
+        return _ret
+    return wrapper
 
 
 def no_fail_chain(func):
@@ -256,7 +298,8 @@ def no_fail_chain(func):
             excp = e
         finally:
             _chn = kwargs.get("chain", [])
-            enqueue_next_task(_chn)
+            if not isinstance(excp, Retry):
+                enqueue_next_task(_chn)
             if excp:
                 raise excp
         return _ret
@@ -289,10 +332,11 @@ def update_character(self, char_id, force_refresh=False):
 
     # TODO review this later
     if force_refresh:
-        que.append(update_char_corp_history.si(
-            character.character.character_id,
-            force_refresh=force_refresh
-        )
+        que.append(
+            update_char_corp_history.si(
+                character.character.character_id,
+                force_refresh=force_refresh
+            )
         )
 
     mindt = timezone.now() - datetime.timedelta(days=90)
@@ -386,40 +430,68 @@ def update_character(self, char_id, force_refresh=False):
             except ObjectDoesNotExist:
                 pass
 
-    enqueue_next_task(que)
+    delay = random() * app_settings.CT_TASK_SPREAD_DELAY  # Spread out updates over 10 min to try be nice to ESI?
+    if force_refresh:
+        delay = 1  # If forced GO NOW!
 
-    logger.info("Queued {} Updates for {}".format(
-        len(que) + 1,
-        character.character.character_name)
+    enqueue_next_task(que, delay=delay)
+
+    logger.info(
+        "Queued {} Updates for {} in {} seconds".format(
+            len(que) + 1,
+            character.character.character_name,
+            delay
+        )
     )
 
 
-@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_corp_history")
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    once={
+        'graceful': False,
+        "keys": ["character_id"]
+    },
+    name="corptools.tasks.update_char_corp_history"
+)
 @no_fail_chain
+@esi_error_retry
 def update_char_corp_history(self, character_id, force_refresh=False, chain=[]):
     return update_corp_history(character_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_roles")
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    once={
+        'graceful': False,
+        "keys": ["character_id"]
+    },
+    name="corptools.tasks.update_char_roles"
+)
 @no_fail_chain
+@esi_error_retry
 def update_char_roles(self, character_id, force_refresh=False, chain=[]):
     return update_character_roles(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_skill_list")
 @no_fail_chain
+@esi_error_retry
 def update_char_skill_list(self, character_id, force_refresh=False, chain=[]):
     return update_character_skill_list(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_location")
 @no_fail_chain
+@esi_error_retry
 def update_char_location(self, character_id, force_refresh=False, chain=[]):
     return update_character_location(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={"keys": ["user_id"]}, name="corptools.tasks.cache_user_skill_list")
 @no_fail_chain
+@esi_error_retry
 def cache_user_skill_list(self, user_id, force_refresh=False, chain=[]):
     providers.skills.get_and_cache_user(
         user_id, force_rebuild=force_refresh)
@@ -427,30 +499,35 @@ def cache_user_skill_list(self, user_id, force_refresh=False, chain=[]):
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_industry_jobs")
 @no_fail_chain
+@esi_error_retry
 def update_char_industry_jobs(self, character_id, force_refresh=False, chain=[]):
     return update_character_industry_jobs(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_skill_queue")
 @no_fail_chain
+@esi_error_retry
 def update_char_skill_queue(self, character_id, force_refresh=False, chain=[]):
     return update_character_skill_queue(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_mining_ledger")
 @no_fail_chain
+@esi_error_retry
 def update_char_mining_ledger(self, character_id, force_refresh=False, chain=[]):
     return update_character_mining(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_notifications")
 @no_fail_chain
+@esi_error_retry
 def update_char_notifications(self, character_id, force_refresh=False, chain=[]):
     return update_character_notifications(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_assets")
 @no_fail_chain
+@esi_error_retry
 def update_char_assets(self, character_id, force_refresh=False, chain=[]):
     return update_character_assets(
         character_id, force_refresh=force_refresh)
@@ -458,36 +535,42 @@ def update_char_assets(self, character_id, force_refresh=False, chain=[]):
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_wallet")
 @no_fail_chain
+@esi_error_retry
 def update_char_wallet(self, character_id, force_refresh=False, chain=[]):
     return update_character_wallet(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_contacts")
 @no_fail_chain
+@esi_error_retry
 def update_char_contacts(self, character_id, force_refresh=False, chain=[]):
     return update_character_contacts(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_orders")
 @no_fail_chain
+@esi_error_retry
 def update_char_orders(self, character_id, force_refresh=False, chain=[]):
     return update_character_orders(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_transactions")
 @no_fail_chain
+@esi_error_retry
 def update_char_transactions(self, character_id, force_refresh=False, chain=[]):
     return update_character_transactions(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_titles")
 @no_fail_chain
+@esi_error_retry
 def update_char_titles(self, character_id, force_refresh=False, chain=[]):
     return update_character_titles(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_mail")
 @no_fail_chain
+@esi_error_retry
 def update_char_mail(self, character_id, force_refresh=False, chain=[]):
     update_character_mail_headers(
         character_id, force_refresh=force_refresh)
@@ -502,6 +585,7 @@ def update_char_contract_items(self, character_id, contract_id, force_refresh=Fa
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_contracts")
 @no_fail_chain
+@esi_error_retry
 def update_char_contracts(self, character_id, force_refresh=False, chain=[]):
     _, ids = update_character_contracts(
         character_id, force_refresh=force_refresh)
@@ -517,12 +601,14 @@ def update_char_contracts(self, character_id, force_refresh=False, chain=[]):
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_order_history")
 @no_fail_chain
+@esi_error_retry
 def update_char_order_history(self, character_id, force_refresh=False, chain=[]):
     return update_character_order_history(character_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_clones")
 @no_fail_chain
+@esi_error_retry
 def update_clones(self, character_id, force_refresh=False, chain=[]):
     return update_character_clones(
         character_id, force_refresh=force_refresh)
@@ -530,6 +616,7 @@ def update_clones(self, character_id, force_refresh=False, chain=[]):
 
 @shared_task(bind=True, base=QueueOnce, once={'graceful': False, "keys": ["character_id"]}, name="corptools.tasks.update_char_loyaltypoints")
 @no_fail_chain
+@esi_error_retry
 def update_char_loyaltypoints(self, character_id, force_refresh=False, chain=[]):
     return update_character_loyaltypoints(
         character_id, force_refresh=force_refresh)
@@ -592,6 +679,7 @@ def location_set(location_id, character_id):
 
 
 @shared_task(bind=True, base=QueueOnce, max_retries=None)
+@esi_error_retry
 def update_citadel_names(self):
     citadels = EveLocation.objects.filter(location_id__gte=64000000)
     for c in citadels:
@@ -603,6 +691,7 @@ def update_citadel_names(self):
 
 
 @shared_task(bind=True, base=QueueOnce, max_retries=None)
+@esi_error_retry
 def update_location(self, location_id, force_citadel=False):
     if get_error_count_flag():
         self.retry(countdown=300)
@@ -732,7 +821,7 @@ def update_all_locations(self, force_citadels=False):
 
     all_locations = set(queryset1 + queryset2 + queryset3 + queryset4 + queryset5 + queryset6)
     # print(all_locations)
-    print(f"{len(all_locations)} Locations to find")
+    logger.warning(f"{len(all_locations)} Locations to find")
     count = 0
     for location in all_locations:
         if not get_location_cooloff(location):
@@ -742,31 +831,37 @@ def update_all_locations(self, force_citadels=False):
 
 
 @shared_task(bind=True, base=QueueOnce)
+@esi_error_retry
 def update_corp_wallet(self, corp_id, full_update=False):
     return corp_helpers.update_corp_wallet_division(corp_id, full_update=full_update)
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_corp_structures(self, corp_id):
-    return corp_helpers.update_corp_structures(corp_id)
+@esi_error_retry
+def update_corp_structures(self, corp_id, force_refresh=False):
+    return corp_helpers.update_corp_structures(corp_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce)
+@esi_error_retry
 def update_corp_assets(self, corp_id):
     return corp_helpers.update_corp_assets(corp_id)
 
 
 @shared_task(bind=True, base=QueueOnce)
+@esi_error_retry
 def update_corp_pocos(self, corp_id):
     return corp_helpers.update_corporation_pocos(corp_id)
 
 
 @shared_task(bind=True, base=QueueOnce)
+@esi_error_retry
 def update_corp_logins(self, corp_id):
     return corp_helpers.update_character_logins_from_corp(corp_id)
 
 
 @shared_task(bind=True, base=QueueOnce)
+@esi_error_retry
 def update_corp_contracts(self, corp_id, force_refresh=False):
     _, ids = corp_helpers.update_corporate_contracts(
         corp_id, force_refresh=force_refresh)
@@ -782,13 +877,13 @@ def update_corp_contracts(self, corp_id, force_refresh=False):
 
 
 @shared_task
-def update_corp(corp_id):
+def update_corp(corp_id, force_refresh=False):
     corp = CorporationAudit.objects.get(corporation__corporation_id=corp_id)
     logger.info("Starting Updates for {}".format(
         corp.corporation.corporation_name))
     que = []
     que.append(update_corp_wallet.si(corp_id))
-    que.append(update_corp_structures.si(corp_id))
+    que.append(update_corp_structures.si(corp_id, force_refresh=force_refresh))
     que.append(update_corp_assets.si(corp_id))
     que.append(update_corp_pocos.si(corp_id))
     que.append(update_corp_contracts.si(corp_id))
@@ -797,10 +892,13 @@ def update_corp(corp_id):
 
 
 @shared_task
-def update_all_corps():
+def update_all_corps(force_refresh=False):
     corps = CorporationAudit.objects.all().select_related('corporation')
     for corp in corps:
-        update_corp.apply_async(args=[corp.corporation.corporation_id])
+        update_corp.apply_async(
+            args=[corp.corporation.corporation_id],
+            kwargs={"force_refresh": force_refresh}
+        )
 
 
 @shared_task
