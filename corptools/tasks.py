@@ -186,14 +186,16 @@ def update_all_characters():
 def update_subset_of_characters(self, subset=48, min_runs=5, force=False):
     amount_of_updates = max(
         CharacterAudit.objects.all().count() / subset, min_runs)
-    characters = CharacterAudit.objects.all().order_by(
-        'last_update_pub_data')[:amount_of_updates]
+    characters = CharacterAudit.get_oldest_qs()[:amount_of_updates]
     char_ids = []
     for char in characters:
         char_ids.append(char.character.character_id)
         update_character.apply_async(args=[char.character.character_id], kwargs={"force_refresh": force})
+
     update_all_eve_names.apply_async(priority=7, kwargs={"chunk": 5000})
+
     process_corp_histories.apply_async(args=[char_ids], priority=6)
+
     return f"Queued {len(characters)} Character Updates"
 
 

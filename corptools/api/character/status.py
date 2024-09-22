@@ -91,12 +91,13 @@ class StatusApiEndpoints:
             if not request.user.is_superuser:
                 return 403, _("Permission Denied")
             q = models.CharacterAudit.get_oldest_qs()
+
             out = []
-            for q in q[:total]:
+            for s in q[:total]:
                 out.append(
                     {
-                        "Character": q.character.character_name,
-                        "avg_date": q.avg_date
+                        "Character": s.character.character_name,
+                        "avg_date": s.avg_date
                     }
                 )
 
