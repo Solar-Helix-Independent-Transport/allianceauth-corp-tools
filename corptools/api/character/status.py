@@ -84,6 +84,25 @@ class StatusApiEndpoints:
             return 200, output
 
         @api.get(
+            "account/{character_id}/qs",
+            tags=self.tags
+        )
+        def get_qs_test(request, character_id: int, total=500):
+            if not request.user.is_superuser:
+                return 403, _("Permission Denied")
+            q = models.CharacterAudit.get_oldest_qs()
+            out = []
+            for q in q[:total]:
+                out.append(
+                    {
+                        "Character": q.character.character_name,
+                        "avg_date": q.avg_date
+                    }
+                )
+
+            return out
+
+        @api.get(
             "account/{character_id}/pubdata",
             response={200: List[schema.CharacterHistory], 403: str},
             tags=self.tags

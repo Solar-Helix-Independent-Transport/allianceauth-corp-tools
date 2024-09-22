@@ -7,7 +7,7 @@ from model_utils import Choices
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
-from django.db.models import Max
+from django.db.models import ExpressionWrapper, F, Func, Max
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -199,6 +199,56 @@ class CharacterAudit(models.Model):
             return is_active
         except Exception:
             return False
+
+    @classmethod
+    def get_oldest_qs(cls):
+        time_ref = timezone.now() - datetime.timedelta(
+            days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS * 3
+        )
+
+        qs = []
+        if app_settings.CT_CHAR_ASSETS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE:
+            qs.append(Func(F('last_update_assets'), function='UNIX_TIMESTAMP'))
+        if app_settings.CT_CHAR_CLONES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE:
+            qs.append(Func(F('last_update_clones'), function='UNIX_TIMESTAMP'))
+        if app_settings.CT_CHAR_SKILLS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE:
+            qs.append(Func(F('last_update_skills'), function='UNIX_TIMESTAMP'))
+            qs.append(Func(F('last_update_skill_que'), function='UNIX_TIMESTAMP'))
+        if app_settings.CT_CHAR_WALLET_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE:
+            qs.append(Func(F('last_update_wallet'), function='UNIX_TIMESTAMP'))
+            qs.append(Func(F('last_update_orders'), function='UNIX_TIMESTAMP'))
+        if app_settings.CT_CHAR_NOTIFICATIONS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_NOTIFICATIONS_MODULE:
+            qs.append(Func(F('last_update_notif'), function='UNIX_TIMESTAMP'))
+        if app_settings.CT_CHAR_ROLES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE:
+            qs.append(Func(F('last_update_roles'), function='UNIX_TIMESTAMP'))
+        if app_settings.CT_CHAR_MAIL_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE:
+            qs.append(Func(F('last_update_mails'), function='UNIX_TIMESTAMP'))
+        if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE:
+            qs.append(Func(F('last_update_loyaltypoints'), function='UNIX_TIMESTAMP'))
+        if app_settings.CT_CHAR_MINING_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE:
+            qs.append(Func(F('last_update_mining'), function='UNIX_TIMESTAMP'))
+
+        tot = len(qs)
+
+        qout = qs.pop()
+
+        for q in qs:
+            qout = qout + q
+
+        query = cls.objects.annotate(
+            avg_date=Func(
+                ExpressionWrapper(
+                    qout / tot,
+                    output_field=models.BigIntegerField()
+                ),
+                function='FROM_UNIXTIME',
+                output_field=models.DateTimeField()
+            )
+        ).filter(
+            avg_date__gte=time_ref
+        ).order_by("avg_date")
+
+        return query
 
 
 class CorporationAudit(models.Model):
