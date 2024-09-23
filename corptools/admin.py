@@ -4,9 +4,13 @@ from django.utils.html import format_html
 
 from . import app_settings, models
 
-admin.site.register(models.CorptoolsConfiguration)
 admin.site.register(models.CharacterAudit)
 admin.site.register(models.CorporationAudit)
+
+
+@admin.register(models.CorptoolsConfiguration)
+class ConfigAdmin(admin.ModelAdmin):
+    filter_horizontal = ["holding_corps"]
 
 
 @admin.register(models.MapSystem)

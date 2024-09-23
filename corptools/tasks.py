@@ -26,7 +26,8 @@ from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
 from . import app_settings, providers
 from .models import (
     CharacterAsset, CharacterAudit, CharacterMarketOrder, Clone,
-    CorporationAudit, EveItemType, EveLocation, EveName, JumpClone, TypePrice,
+    CorporationAudit, CorptoolsConfiguration, EveItemType, EveLocation,
+    EveName, JumpClone, TypePrice,
 )
 from .task_helpers import corp_helpers
 from .task_helpers.char_tasks import (
@@ -194,25 +195,24 @@ def update_subset_of_characters(self, subset=48, min_runs=5, force=False):
 
     update_all_eve_names.apply_async(priority=7, kwargs={"chunk": 5000})
 
-    process_corp_histories.apply_async(args=[char_ids], priority=6)
+    process_corp_histories.apply_async(priority=6)
 
     return f"Queued {len(characters)} Character Updates"
 
 
 @shared_task()
 def re_que_corp_histories(character_ids):
-    process_corp_histories.apply_async(args=[character_ids], priority=6)
+    process_corp_histories.apply_async(priority=6)
 
 
 @shared_task(bind=True, base=QueueOnce)
-def process_corp_histories(self, character_ids):
-    if len(character_ids):
-        cid = character_ids.pop()
-        update_char_corp_history(cid)
-        re_que_corp_histories.apply_async(args=[character_ids], countdown=1)
-        return f"{len(character_ids)} Character histories still to Fetch"
-    else:
-        return "Completed"
+def process_corp_histories(self):
+    cid = CharacterAudit.objects.objects.all().order_by(
+        'last_update_pub_data'
+    ).first().chracter.character_id
+    update_char_corp_history(cid)
+    re_que_corp_histories.apply_async(countdown=2)
+    return f"{(cid)} Character historys Updated"
 
 
 @shared_task
@@ -343,7 +343,9 @@ def update_character(self, char_id, force_refresh=False):
 
     mindt = timezone.now() - datetime.timedelta(days=90)
 
-    if app_settings.CT_CHAR_ROLES_MODULE:
+    ct_conf = CorptoolsConfiguration.get_settings()
+
+    if app_settings.CT_CHAR_ROLES_MODULE and not ct_conf.disable_update_roles:
         if (character.last_update_roles or mindt) <= skip_date or force_refresh:
             que.append(update_char_roles.si(
                 character.character.character_id,
@@ -354,17 +356,17 @@ def update_character(self, char_id, force_refresh=False):
             que.append(update_char_titles.si(
                 character.character.character_id, force_refresh=force_refresh))
 
-    if app_settings.CT_CHAR_NOTIFICATIONS_MODULE:
+    if app_settings.CT_CHAR_NOTIFICATIONS_MODULE and not ct_conf.disable_update_notif:
         if (character.last_update_notif or mindt) <= skip_date or force_refresh:
             que.append(update_char_notifications.si(
                 character.character.character_id, force_refresh=force_refresh))
 
-    if app_settings.CT_CHAR_ASSETS_MODULE:
+    if app_settings.CT_CHAR_ASSETS_MODULE and not ct_conf.disable_update_assets:
         if (character.last_update_assets or mindt) <= skip_date or force_refresh:
             que.append(update_char_assets.si(
                 character.character.character_id, force_refresh=force_refresh))
 
-    if app_settings.CT_CHAR_SKILLS_MODULE:
+    if app_settings.CT_CHAR_SKILLS_MODULE and not ct_conf.disable_update_skills:
 
         if (character.last_update_skills or mindt) <= skip_date or force_refresh:
             que.append(update_char_skill_list.si(
@@ -374,22 +376,22 @@ def update_character(self, char_id, force_refresh=False):
             que.append(update_char_skill_queue.si(
                 character.character.character_id, force_refresh=force_refresh))
 
-    if app_settings.CT_CHAR_CLONES_MODULE:
+    if app_settings.CT_CHAR_CLONES_MODULE and not ct_conf.disable_update_clones:
         if (character.last_update_clones or mindt) <= skip_date or force_refresh:
             que.append(update_clones.si(
                 character.character.character_id, force_refresh=force_refresh))
 
-    if app_settings.CT_CHAR_CONTACTS_MODULE:
+    if app_settings.CT_CHAR_CONTACTS_MODULE and not ct_conf.disable_update_contacts:
         if (character.last_update_contacts or mindt) <= skip_date or force_refresh:
             que.append(update_char_contacts.si(
                 character.character.character_id, force_refresh=force_refresh))
 
-    if app_settings.CT_CHAR_MINING_MODULE:
+    if app_settings.CT_CHAR_MINING_MODULE and not ct_conf.disable_update_mining:
         if (character.last_update_mining or mindt) <= skip_date or force_refresh:
             que.append(update_char_mining_ledger.si(
                 character.character.character_id, force_refresh=force_refresh))
 
-    if app_settings.CT_CHAR_WALLET_MODULE:
+    if app_settings.CT_CHAR_WALLET_MODULE and not ct_conf.disable_update_wallet:
         if (character.last_update_wallet or mindt) <= skip_date or force_refresh:
             que.append(update_char_wallet.si(
                 character.character.character_id, force_refresh=force_refresh))
@@ -405,23 +407,23 @@ def update_character(self, char_id, force_refresh=False):
                 que.append(update_char_contracts.si(
                     character.character.character_id, force_refresh=force_refresh))
 
-    if app_settings.CT_CHAR_LOCATIONS_MODULE:
+    if app_settings.CT_CHAR_LOCATIONS_MODULE and not ct_conf.disable_update_location:
         que.append(update_char_location.si(
             character.character.character_id, force_refresh=force_refresh))
 
-    if app_settings.CT_CHAR_MAIL_MODULE:
+    if app_settings.CT_CHAR_MAIL_MODULE and not ct_conf.disable_update_mails:
         que.append(update_char_mail.si(
             character.character.character_id, force_refresh=force_refresh))
 
-    if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE:
+    if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not ct_conf.disable_update_loyaltypoints:
         que.append(update_char_loyaltypoints.si(
             character.character.character_id, force_refresh=force_refresh))
 
-    if app_settings.CT_CHAR_INDUSTRY_MODULE:
+    if app_settings.CT_CHAR_INDUSTRY_MODULE and not ct_conf.disable_update_indy:
         que.append(update_char_industry_jobs.si(
             character.character.character_id, force_refresh=force_refresh))
 
-    if app_settings.CT_CHAR_SKILLS_MODULE:
+    if app_settings.CT_CHAR_SKILLS_MODULE and not ct_conf.disable_update_skills:
         # Must be last due to this being not a user level queue, Celery once will stall the queue here if characters on an account block.
         # TODO: make this better
         if (character.last_update_skills or mindt) <= skip_date or force_refresh:

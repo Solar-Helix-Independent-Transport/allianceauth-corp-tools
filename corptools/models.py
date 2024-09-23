@@ -29,7 +29,7 @@ logger = get_extension_logger(__name__)
 
 
 class CorptoolsConfiguration(models.Model):
-    holding_corps = models.ManyToManyField(EveCorporationInfo)
+    holding_corps = models.ManyToManyField(EveCorporationInfo, blank=True)
 
     disable_verification_assets = models.BooleanField(
         default=False,
@@ -39,6 +39,89 @@ class CorptoolsConfiguration(models.Model):
     disable_verification_notifications = models.BooleanField(
         default=False,
         help_text="Allow ESI to provide data that does not match the ESI Notification Spec"
+    )
+
+    disable_update_pub_data = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Pulic History Data"
+    )
+
+    disable_update_skills = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character SKill Data"
+    )
+
+    disable_update_clones = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Clone Data"
+    )
+
+    disable_update_contacts = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Contact Data"
+    )
+
+    disable_update_contracts = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Contracts Data"
+    )
+    disable_update_assets = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Asset Data"
+    )
+
+    disable_update_wallet = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Wallet Data"
+    )
+
+    disable_update_notif = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Notification Data"
+    )
+
+    disable_update_roles = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Roles Data"
+    )
+
+    disable_update_mails = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Mail Data"
+    )
+
+    disable_update_location = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Location Data"
+    )
+
+    disable_update_loyaltypoints = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Loyalty Point Data"
+    )
+
+    disable_update_mining = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Mining Data"
+    )
+
+    disable_update_indy = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character industry Job Data"
     )
 
     class Meta:
@@ -70,6 +153,14 @@ class CorptoolsConfiguration(models.Model):
         except Exception as e:
             logger.error(e)
             return True
+
+    @classmethod
+    def get_settings(cls):
+        try:
+            return cls.objects.all().first()
+        except Exception as e:
+            logger.error(e)
+            return None
 
     def save(self, *args, **kwargs):
         if not self.pk and CorptoolsConfiguration.objects.exists():
