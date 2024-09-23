@@ -297,26 +297,54 @@ class CharacterAudit(models.Model):
             days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS * 3
         )
 
+        ct_conf = CorptoolsConfiguration.get_settings()
         qs = []
-        if app_settings.CT_CHAR_ASSETS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE:
+
+        if app_settings.CT_CHAR_ASSETS_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE or ct_conf.disable_update_assets
+        ):
             qs.append(Func(F('last_update_assets'), function='UNIX_TIMESTAMP'))
-        if app_settings.CT_CHAR_CLONES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE:
+
+        if app_settings.CT_CHAR_CLONES_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE or ct_conf.disable_update_clones
+        ):
             qs.append(Func(F('last_update_clones'), function='UNIX_TIMESTAMP'))
-        if app_settings.CT_CHAR_SKILLS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE:
+
+        if app_settings.CT_CHAR_SKILLS_MODULE and not (
+           app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE or ct_conf.disable_update_skills
+        ):  # NOQA E124
             qs.append(Func(F('last_update_skills'), function='UNIX_TIMESTAMP'))
             qs.append(Func(F('last_update_skill_que'), function='UNIX_TIMESTAMP'))
-        if app_settings.CT_CHAR_WALLET_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE:
+
+        if app_settings.CT_CHAR_WALLET_MODULE and not (
+           app_settings.CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE or ct_conf.disable_update_wallet
+        ):  # NOQA E124
             qs.append(Func(F('last_update_wallet'), function='UNIX_TIMESTAMP'))
             qs.append(Func(F('last_update_orders'), function='UNIX_TIMESTAMP'))
-        if app_settings.CT_CHAR_NOTIFICATIONS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_NOTIFICATIONS_MODULE:
+
+        if app_settings.CT_CHAR_NOTIFICATIONS_MODULE and not (
+           app_settings.CT_CHAR_ACTIVE_IGNORE_NOTIFICATIONS_MODULE or ct_conf.disable_update_notif
+        ):  # NOQA E124
             qs.append(Func(F('last_update_notif'), function='UNIX_TIMESTAMP'))
-        if app_settings.CT_CHAR_ROLES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE:
+
+        if app_settings.CT_CHAR_ROLES_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE or ct_conf.disable_update_roles
+        ):
             qs.append(Func(F('last_update_roles'), function='UNIX_TIMESTAMP'))
-        if app_settings.CT_CHAR_MAIL_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE:
+
+        if app_settings.CT_CHAR_MAIL_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE or ct_conf.disable_update_mails
+        ):
             qs.append(Func(F('last_update_mails'), function='UNIX_TIMESTAMP'))
-        if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE:
+
+        if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE or ct_conf.disable_update_loyaltypoints
+        ):
             qs.append(Func(F('last_update_loyaltypoints'), function='UNIX_TIMESTAMP'))
-        if app_settings.CT_CHAR_MINING_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE:
+
+        if app_settings.CT_CHAR_MINING_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE or ct_conf.disable_update_mining
+        ):
             qs.append(Func(F('last_update_mining'), function='UNIX_TIMESTAMP'))
 
         tot = len(qs)
