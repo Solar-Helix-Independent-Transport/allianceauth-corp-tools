@@ -209,7 +209,7 @@ def re_que_corp_histories(character_ids):
 def process_corp_histories(self):
     cid = CharacterAudit.objects.all().order_by(
         'last_update_pub_data'
-    ).first().chracter.character_id
+    ).first().character.character_id
     update_char_corp_history(cid)
     re_que_corp_histories.apply_async(countdown=2)
     return f"{(cid)} Character historys Updated"
