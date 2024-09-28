@@ -198,6 +198,7 @@ def admin(request):
     bridges = MapJumpBridge.objects.all().count()
 
     characters = CharacterAudit.objects.all().count()
+    actives = CharacterAudit.get_oldest_qs().count()
     skilllists = SkillList.objects.all().count()
     corpations = CorporationAudit.objects.all().count()
 
@@ -213,6 +214,7 @@ def admin(request):
         "groups": groups,
         "categorys": categorys,
         "characters": characters,
+        "active_chars": actives,
         "skilllists": skilllists,
         "corpations": corpations,
         "type_mets": type_mets,
@@ -411,7 +413,8 @@ def fuel_levels(request):
         'Clone Bay': [7.5, 10, 10, 10],
         'Market': [30, 40, 40, 40],
         'Manufacturing (Capitals)': [24, 18, 24, 24],
-        'Standup Hyasyoda Research Lab': [10, 7.5, 10, 10],  # how to detect this
+        # how to detect this
+        'Standup Hyasyoda Research Lab': [10, 7.5, 10, 10],
         'Invention': [12, 9, 12, 12],
         'Manufacturing (Standard)': [12, 9, 12, 12],
         'Blueprint Copying': [12, 9, 12, 12],
@@ -495,7 +498,11 @@ def fuel_levels(request):
                 "extra_fuel_info": extras,
                 "90day": max(
                     int(
-                        (structure_hourly_fuel * 90 * 24) - (hours * structure_hourly_fuel)
+                        (
+                            structure_hourly_fuel * 90 * 24
+                        ) - (
+                            hours * structure_hourly_fuel
+                        )
                     ),
                     0
                 )
