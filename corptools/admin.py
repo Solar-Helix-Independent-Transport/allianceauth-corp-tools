@@ -1,3 +1,5 @@
+from solo.admin import SingletonModelAdmin
+
 from django.apps import apps
 from django.contrib import admin
 from django.utils.html import format_html
@@ -9,7 +11,7 @@ admin.site.register(models.CorporationAudit)
 
 
 @admin.register(models.CorptoolsConfiguration)
-class ConfigAdmin(admin.ModelAdmin):
+class ConfigAdmin(SingletonModelAdmin):
     filter_horizontal = ["holding_corps"]
 
 

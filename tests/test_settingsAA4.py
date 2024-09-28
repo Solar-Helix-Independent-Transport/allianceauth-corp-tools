@@ -53,3 +53,5 @@ CACHES = {
         }
     }
 }
+
+SOLO_CACHE = 'default'

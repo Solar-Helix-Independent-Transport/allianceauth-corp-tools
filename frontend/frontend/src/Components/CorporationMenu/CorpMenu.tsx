@@ -1,5 +1,5 @@
-import { Nav } from "react-bootstrap";
-import { NavDropdown } from "react-bootstrap";
+import Nav from "react-bootstrap/Nav";
+import NavDropdown from "react-bootstrap/NavDropdown";
 import { LinkContainer } from "react-router-bootstrap";
 
 export interface MenuItemProps {
@@ -27,40 +27,45 @@ const CorpMenu = (props: CorpMenuProps) => {
           <Nav.Link key="Glance">Overview</Nav.Link>
         </LinkContainer>
       </Nav.Item>
-      <Nav.Item>
+      <NavDropdown title="Structures">
         <LinkContainer to={`/audit/r_beta/corp/structures`}>
           <Nav.Link key="Structures">Structures</Nav.Link>
         </LinkContainer>
-      </Nav.Item>
+        <LinkContainer to={`/audit/r_beta/corp/bridges`}>
+          <Nav.Link key="bridges">Bridges</Nav.Link>
+        </LinkContainer>
+        <LinkContainer to={`/audit/r_beta/corp/fuel`}>
+          <Nav.Link key="bridges">Fuel</Nav.Link>
+        </LinkContainer>
+        <LinkContainer to={`/audit/r_beta/corp/metenox`}>
+          <Nav.Link key="bridges">Metenox</Nav.Link>
+        </LinkContainer>
+        <LinkContainer to={`/audit/r_beta/corp/pocos`}>
+          <Nav.Link key="pocos">Pocos</Nav.Link>
+        </LinkContainer>
+      </NavDropdown>
       <Nav.Item>
         <LinkContainer to={`/audit/r_beta/corp/wallets`}>
           <Nav.Link key="Wallets">Wallets</Nav.Link>
         </LinkContainer>
       </Nav.Item>
-      <Nav.Item>
-        <LinkContainer to={`/audit/r_beta/corp/assetgroup`}>
-          <Nav.Link key="assetgroup">Asset Overview</Nav.Link>
-        </LinkContainer>
-      </Nav.Item>
-      <Nav.Item>
-        <LinkContainer to={`/audit/r_beta/corp/assetlist`}>
-          <Nav.Link key="assetlist">Asset List</Nav.Link>
-        </LinkContainer>
-      </Nav.Item>
-      <Nav.Item>
-        <LinkContainer to={`/audit/r_beta/corp/pocos`}>
-          <Nav.Link key="pocos">Pocos</Nav.Link>
-        </LinkContainer>
-      </Nav.Item>
-      <NavDropdown title="Dashboards">
-        <LinkContainer to={`/audit/r_beta/corp/bridges`}>
-          <Nav.Link key="bridges">Bridges</Nav.Link>
-        </LinkContainer>
-        <LinkContainer to={`/audit/r_beta/corp/sov`}>
-          <Nav.Link key="bridges">Sov Upgrades</Nav.Link>
-        </LinkContainer>
+      <NavDropdown title="Assets">
+        <Nav.Item>
+          <LinkContainer to={`/audit/r_beta/corp/assetgroup`}>
+            <Nav.Link key="assetgroup">Asset Overview</Nav.Link>
+          </LinkContainer>
+        </Nav.Item>
+        <Nav.Item>
+          <LinkContainer to={`/audit/r_beta/corp/assetlist`}>
+            <Nav.Link key="assetlist">Asset List</Nav.Link>
+          </LinkContainer>
+        </Nav.Item>
       </NavDropdown>
-
+      <Nav.Item>
+        <LinkContainer to={`/audit/r_beta/corp/sov`}>
+          <Nav.Link key="bridges">Sov</Nav.Link>
+        </LinkContainer>
+      </Nav.Item>
       {/* {data &&
         data.map((cat: CategoryProps) => {
           return (

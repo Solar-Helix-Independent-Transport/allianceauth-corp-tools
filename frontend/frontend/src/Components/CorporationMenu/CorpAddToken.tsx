@@ -11,7 +11,7 @@ function CorpAddToken() {
 
   return (
     <>
-      <NavDropdown title="Add Corporate Token" id="add-token">
+      <NavDropdown title="Add Token" id="add-token">
         {/* <NavDropdown.Item> */}
         <form
           action="/audit/corp/add_options"

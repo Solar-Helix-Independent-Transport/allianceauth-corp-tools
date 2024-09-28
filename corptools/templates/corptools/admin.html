@@ -1,232 +1,559 @@
-{% extends "corptools/base.html" %}
+{% extends 'allianceauth/base-bs5.html' %}
 {% load i18n %}
-{% block ct_block %}
-    <h2 class="text-center">{% translate "Admin Info" %}!</h2>
-    <div class="col-md-4">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center">{% translate "DataBase" %}</div>
-            <div class="panel-body">
-                <h4>{% translate "EvE Models" %}</h4>
+{% block page_title %}{{page_title}}{% endblock %}
+{% block content %}
+<h2 class="text-center">{% translate "Corptools Configuration Info" %}</h2>
+<div class="d-flex flex-wrap" >
+    <form action="{% url 'corptools:run_tasks' %}" method="post" class="card m-2 flex-grow-1">
+        <!-- <div class="card m-2 flex-grow-1" style="min-width: 350px;"> -->
+            <div class="card-body">
+                <h5 class="card-title text-center">
+                    Manual Task Run
+                </h5>
+                <hr>
+                {% csrf_token %}
+                <div class="form-check">
+                    <input type="checkbox" name="run_clear_etag" class="form-check-input" id="run_clear_etag" />
+                    <label class="form-check-label" for="run_universe">{% translate "Clear all cached Etags" %}</label>
+                </div>
+                <figcaption class="figure-caption">Wipe all the etags from cache to force new data pulls</figcaption>
+                <br/>
+                <div class="form-check">
+                    <input type="checkbox" name="run_universe" class="form-check-input" id="run_universe" />
+                    <label class="form-check-label" for="run_universe">{% translate "Update EvE Map Data" %}</label>
+                </div>
+                <figcaption class="figure-caption">Force a full map update from ESI</figcaption>
+                <br/>
+                <div class="form-check">
+                    <input type="checkbox" name="run_locations" class="form-check-input" id="run_locations" />
+                    <label for="run_universe">{% translate "Force update all Citadel Locations" %}</label>
+                </div>
+                <figcaption class="figure-caption">Attempt to update all Citadel names from ESI</figcaption>
+                <br/>
+                <div class="form-check">
+                    <input type="checkbox" name="run_update_all" class="form-check-input" id="run_update_all" />
+                    <label for="run_update_all">{% translate "Force all character updates" %}</label>
+                </div>
+                <figcaption class="figure-caption">Force updates to ALL Character Audits</figcaption>
+                <br/>
+                <div class="form-check">
+                    <input type="checkbox" name="run_corp_updates" class="form-check-input" id="run_corp_updates" />
+                    <label for="run_corp_updates">{% translate "Force all corp updates" %}</label>
+                </div>
+                <figcaption class="figure-caption">Force updates to ALL Corporation Audits</figcaption>
+                <br/>
+                <div class="form-check">
+                    <input type="checkbox" name="run_update_eve_models" class="form-check-input" id="run_update_eve_models" />
+                    <label for="run_update_eve_models">{% translate "Update Eve Entirty Models" %}</label>
+                </div>
+                <figcaption class="figure-caption">Force updates to ALL Eve Entity Names</figcaption>
+            </div>
+            <div class="card-footer">
+                <input type="submit" value="{% translate "Submit" %}" class="btn btn-primary w-100 mt-auto" />
+            </div>
+        <!-- </div> -->
+    </form>
+    <div class="card m-2 flex-grow-1">
+        <div class="card-body">
+            <h5 class="card-title text-center">
+                Corptools Module Configuration
+            </h5>
+            <div>
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Module</th>
+                        <th>Enabled</th>
+                        <th>Include in Active</th>
+                        <th>Temp Disabled</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Assets
+                                {% if ct_config.disable_verification_assets %}
+                                    <span class="text-danger">( Validation Disabled )</span>
+                                {% else %}
+                                    <span class="text-success">( Validation Enabled )</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_ASSETS_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if not app_settings.CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE  %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if ct_config.disable_update_assets  %}
+                                    <i class="fas fa-check-circle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-success"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <!-- <tr>
+                            <td>Standings</td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_STANDINGS_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_ACTIVE_IGNORE_STANDINGS_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if ct_config.disable_update_assets  %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                        </tr> -->
+                        <tr>
+                            <td>Contacts</td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_CONTACTS_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if not app_settings.CT_CHAR_ACTIVE_IGNORE_CONTACTS_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if ct_config.disable_update_contacts %}
+                                    <i class="fas fa-check-circle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-success"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Notifications
+                                {% if ct_config.disable_verification_notifications %}
+                                    <span class="text-danger">( Validation Disabled )</span>
+                                {% else %}
+                                    <span class="text-success">( Validation Enabled )</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_NOTIFICATIONS_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if not app_settings.CT_CHAR_ACTIVE_IGNORE_NOTIFICATIONS_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if ct_config.disable_update_notif %}
+                                    <i class="fas fa-check-circle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-success"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Roles</td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_ROLES_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if not app_settings.CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if ct_config.disable_update_roles %}
+                                    <i class="fas fa-check-circle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-success"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Industry</td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_INDUSTRY_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if not app_settings.CT_CHAR_ACTIVE_IGNORE_INDUSTRY_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if ct_config.disable_update_indy %}
+                                    <i class="fas fa-check-circle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-success"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Mining</td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_MINING_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if not app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if ct_config.disable_update_mining %}
+                                    <i class="fas fa-check-circle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-success"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Wallets/Markets/Contracts</td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_WALLET_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if not app_settings.CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if ct_config.disable_update_wallet %}
+                                    <i class="fas fa-check-circle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-success"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Skills</td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_SKILLS_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if not app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if ct_config.disable_update_skills %}
+                                    <i class="fas fa-check-circle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-success"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Clones</td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_CLONES_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if not app_settings.CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if ct_config.disable_update_clones %}
+                                    <i class="fas fa-check-circle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-success"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Mail</td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_MAIL_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if not app_settings.CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if ct_config.disable_update_mails %}
+                                    <i class="fas fa-check-circle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-success"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Loyalty Points</td>
+                            <td class="text-center">
+                                {% if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if not app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-warning"></i>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if ct_config.disable_update_loyaltypoints %}
+                                    <i class="fas fa-check-circle text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-success"></i>
+                                {% endif %}
+                            </td>
+                      </tr>
+                    </tbody>
+                  </table>
+            </div>
+        </div>
+    </div>
+    <div class="card m-2 flex-grow-1" style="min-width: 350px;">
+        <div class="card-body">
+            <h5 class="card-title text-center">
+                Eve Models
+            </h5>
+            <hr>
+            <div>
                 <table class="table">
                     <tr>
-                        <td class="">{% translate "Names" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ names }}</span>
+                        <td class="">{% translate "Entity Names" %}</td>
+                        <td class="text-end">
+                            {{ names }}
                         </td>
                     </tr>
                     <tr>
                         <td class="">{% translate "Structure Names" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ location }}</span>
+                        <td class="text-end">
+                            {{ location }}
                         </td>
                     </tr>
                     <tr>
                         <td class="">{% translate "Categories" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ categorys }}</span>
+                        <td class="text-end">
+                            {{ categorys }}
                         </td>
                     </tr>
                     <tr>
                         <td class="">{% translate "Groups" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ groups }}</span>
+                        <td class="text-end">
+                            {{ groups }}
                         </td>
                     </tr>
                     <tr>
                         <td class="">{% translate "Types" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ types }}</span>
+                        <td class="text-end">
+                            {{ types }}
                         </td>
                     </tr>
                     <tr>
                         <td class="">{% translate "Dogma Attributes" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ dogma }}</span>
+                        <td class="text-end">
+                            {{ dogma }}
                         </td>
                     </tr>
                     <tr>
-                        <td class="">{% translate "Type Material Outputs" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ type_mets }}</span>
+                        <td class="">{% translate "Type Refine Material Outputs" %}</td>
+                        <td class="text-end">
+                            {{ type_mets }}
                         </td>
                     </tr>
                 </table>
-                <h4>{% translate "EvE Map" %}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="card m-2 flex-grow-1" style="min-width: 350px;">
+        <div class="card-body">
+            <h5 class="card-title text-center">
+                Eve Universe Models
+            </h5>
+            <hr>
+            <div>
                 <table class="table">
                     <tr>
                         <td class="">{% translate "Regions" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ regions }}/106</span>
+                        <td class="text-end">
+                            {{ regions }}/112
                         </td>
                     </tr>
                     <tr>
                         <td class="">{% translate "Constellations" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ constellations }}/1146</span>
+                        <td class="text-end">
+                            {{ constellations }}/1174
                         </td>
                     </tr>
                     <tr>
                         <td class="">{% translate "Systems" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ systems }}/8285</span>
+                        <td class="text-end">
+                            {{ systems }}/8436
                         </td>
                     </tr>
                     <tr>
                         <td class="">{% translate "Gate Links" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ gates }}/6913</span>
+                        <td class="text-end">
+                            {{ gates }}/6888
                         </td>
                     </tr>
                     <tr>
                         <td class="">{% translate "Jump Bridge Links" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ bridges }}</span>
+                        <td class="text-end">
+                            {{ bridges }}
                         </td>
                     </tr>
                 </table>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center">{% translate "DataBase" %}</div>
-            <div class="panel-body">
-                <h4>{% translate "Corporate" %}</h4>
+    <div class="card m-2 flex-grow-1" style="min-width: 350px;">
+        <div class="card-body">
+            <h5 class="card-title text-center">
+                Audit Models
+            </h5>
+            <hr>
+            <div>
                 <table class="table">
                     <tr>
                         <td class="">{% translate "Corporation Audits" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ corpations }}</span>
+                        <td class="text-end">
+                            {{ corpations }}
                         </td>
                     </tr>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center">{% translate "DataBase" %}</div>
-            <div class="panel-body">
-                <h4>{% translate "Character" %}</h4>
-                <table class="table">
                     <tr>
                         <td class="">{% translate "Character Audits" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ characters }}</span>
+                        <td class="text-end">
+                            {{ characters }}
                         </td>
                     </tr>
                     <tr>
                         <td class="">{% translate "Skill Lists" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ skilllists }}</span>
+                        <td class="text-end">
+                            {{ skilllists }}
                         </td>
                     </tr>
                 </table>
             </div>
+            <h5 class="card-title text-center">
+                Audit Tasks
+            </h5>
+            <hr>
+            <table class="table">
+                <tr>
+                    <td>{% translate "Character Task" %}</td>
+                    <td class="text-end">
+                        <span class="badge">{{ char_tasks }}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>{% translate "Corporation Task" %}</td>
+                    <td class="text-end">
+                        <span class="badge">{{ corp_tasks }}</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="card-footer">
+            <a class="btn w-100 btn-primary" href="{% url 'corptools:admin_create_tasks' %}">{% translate "Create or Update Periodic Tasks" %}</a>
         </div>
     </div>
-
-    <div class="col-md-4">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center">{% translate "Periodic Tasks" %}!</div>
-            <div class="panel-body text-center">
-                <h4>{% translate "Tasks" %}</h4>
-                <table class="table">
-                    <tr>
-                        <td class="text-left">{% translate "Character Task" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ char_tasks }}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="text-left">{% translate "Corporation Task" %}</td>
-                        <td class="text-right">
-                            <span class="badge">{{ corp_tasks }}</span>
-                        </td>
-                    </tr>
-                </table>
-                <a class="btn col-md-12 btn-primary" href="{% url 'corptools:admin_create_tasks' %}">{% translate "Create or Update Periodic Tasks" %}</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center">{% translate "Task Helper" %}!</div>
-            <div class="panel-body text-center">
-                <form action="{% url 'corptools:run_tasks' %}" method="post">
-                    <br />
-                    {% csrf_token %}
-                    <span class="label label-info">
-                        <label for="run_universe">{% translate "Clear all cached Etags" %}:</label>
-                        <input type="checkbox" name="run_clear_etag" class="form-check" id="run_clear_etag" />
-                    </span>
-                    <br />
-                    <br />
-                    <span class="label label-info">
-                        <label for="run_universe">{% translate "Update Map Data" %}:</label>
-                        <input type="checkbox" name="run_universe" class="form-check" id="run_universe" />
-                    </span>
-                    <br />
-                    <br />
-                    <span class="label label-info">
-                        <label for="run_universe">{% translate "Update all locations" %}:</label>
-                        <input type="checkbox" name="run_locations" class="form-check" id="run_locations" />
-                    </span>
-                    <br />
-                    <br />
-                    <span class="label label-info">
-                        <label for="run_update_all">{% translate "Force Character Update" %}:</label>
-                        <input type="checkbox" name="run_update_all" class="form-check" id="run_update_all" />
-                    </span>
-                    <br />
-                    <br />
-                    <span class="label label-info">
-                        <label for="run_update_eve_models">{% translate "Update Eve Models" %}:</label>
-                        <input type="checkbox" name="run_update_eve_models" class="form-check" id="run_update_eve_models" />
-                    </span>
-                    <br />
-                    <br />
-                    <span class="label label-info">
-                        <label for="run_corp_updates">{% translate "Update Corp Updates" %}:</label>
-                        <input type="checkbox" name="run_corp_updates" class="form-check" id="run_corp_updates" />
-                    </span>
-                    <br />
-                    <br />
-                    <input type="submit" value="{% translate "Submit" %}" class="btn col-md-12 btn-primary" />
-                    <br />
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="panel panel-primary">
-            <div class="panel-heading text-center">{% translate "Skill Lists" %}</div>
-            <div class="panel-body text-center">
-                <form method="post" action="{% url 'corptools:admin_add_pyfa_xml' %}" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="name">{% translate "Skill List Description" %}</label>
-                        <input type="text" class="form-control" name="name" placeholder="Enter Description" />
-                        <small id="nameHelp" class="form-text text-muted">{% translate "This will show as the name of the Skill List" %}.</small>
-                    </div>
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class='form-control' id="upload-file-info"></span>
-                            <span class="input-group-btn">
-                                <label class="btn btn-default" for="file">
-                                    <input id="file" name="file" type="file" style="display:none" onchange="$('#upload-file-info').html(this.files[0].name)" />
-                                    {% translate "Browse" %}
-                                </label>
-                            </div>
-                            <small id="descriptionHelp" class="form-text text-muted">{% translate "PYFA XML Skills required list" %}.</small>
-
+    <form class="card m-2 flex-grow-1"method="post" action="{% url 'corptools:admin_add_pyfa_xml' %}" enctype="multipart/form-data">
+        <div class="card-body">
+            <h5 class="card-title text-center">
+                {% translate "Skill Lists" %}
+            </h5>
+            <hr>
+            <div>
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">{% translate "Skill List Description" %}</label>
+                    <input type="text" class="form-control" name="name" placeholder="Enter Description" />
+                    <small id="nameHelp" class="form-text text-muted">{% translate "This will show as the name of the Skill List" %}.</small>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class='form-control' id="upload-file-info"></span>
+                        <span class="input-group-btn">
+                            <label class="btn btn-default" for="file">
+                                <input id="file" name="file" type="file" style="display:none" onchange="$('#upload-file-info').html(this.files[0].name)" />
+                                {% translate "Browse" %}
+                            </label>
                         </div>
-                        <input type="submit" class="btn col-md-12 btn-primary" />
-                    </form>
+                        <small id="descriptionHelp" class="form-text text-muted">{% translate "PYFA XML Skills required list" %}.</small>
+
                 </div>
             </div>
         </div>
+        <div class="card-footer">
+            <input type="submit" class="btn w-100 btn-primary" />
+        </div>
+    </form>
+</div>
+{% endblock content %}
 
-    {% endblock ct_block %}
+{% block extra_javascript %}
+{% endblock extra_javascript %}

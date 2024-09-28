@@ -34,10 +34,16 @@ class MenuApiEndpoints:
             }
             _char = {
                 "name": _("Characters"),
-                "links": [{
-                    "name": _("Corp History"),
-                    "link": "account/pubdata"
-                }]
+                "links": [
+                    {
+                        "name": _("Status"),
+                        "link": "account/status"
+                    },
+                    {
+                        "name": _("Corp History"),
+                        "link": "account/pubdata"
+                    }
+                ]
             }
 
             if app_settings.CT_CHAR_CONTACTS_MODULE:

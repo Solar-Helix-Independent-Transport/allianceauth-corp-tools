@@ -3,9 +3,10 @@ import json
 from collections import defaultdict
 
 from model_utils import Choices
+from solo.models import SingletonModel
 
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import ExpressionWrapper, F, Func, Max
 from django.utils import timezone
@@ -28,7 +29,7 @@ from .managers import (
 logger = get_extension_logger(__name__)
 
 
-class CorptoolsConfiguration(models.Model):
+class CorptoolsConfiguration(SingletonModel):
     holding_corps = models.ManyToManyField(EveCorporationInfo, blank=True)
 
     disable_verification_assets = models.BooleanField(
@@ -134,13 +135,16 @@ class CorptoolsConfiguration(models.Model):
 
         default_permissions = []
 
+    def __str__(self) -> str:
+        return "Corptools Configuration"
+
     def holding_corp_qs(self):
         return CorporationAudit.objects.filter(corporation__in=self.holding_corps.all())
 
     @classmethod
     def skip_verify_assets(cls):
         try:
-            return cls.objects.all().first().disable_verification_assets
+            return cls.get_solo().disable_verification_assets
         except Exception as e:
             logger.error(e)
             return True
@@ -149,26 +153,10 @@ class CorptoolsConfiguration(models.Model):
     def skip_verify_notifications(cls):
         try:
 
-            return cls.objects.all().first().disable_verification_notifications
+            return cls.get_solo().disable_verification_notifications
         except Exception as e:
             logger.error(e)
             return True
-
-    @classmethod
-    def get_settings(cls):
-        try:
-            return cls.objects.all().first()
-        except Exception as e:
-            logger.error(e)
-            return None
-
-    def save(self, *args, **kwargs):
-        if not self.pk and CorptoolsConfiguration.objects.exists():
-            # Force a single object
-            raise ValidationError(
-                'Only one Settings Model can there be at a time! No Sith Lords there are here!')
-        self.pk = self.id = 1  # If this happens to be deleted and recreated, force it to be 1
-        return super().save(*args, **kwargs)
 
 
 class CharacterAudit(models.Model):
@@ -297,7 +285,7 @@ class CharacterAudit(models.Model):
             days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS * 3
         )
 
-        ct_conf = CorptoolsConfiguration.get_settings()
+        ct_conf = CorptoolsConfiguration.get_solo()
         qs = []
 
         if app_settings.CT_CHAR_ASSETS_MODULE and not (
@@ -675,8 +663,7 @@ class CorpAsset(Asset):
     def get_visible(cls, user):
         corps_vis = CorporationAudit.objects.visible_to(user)
         if user.has_perm("corptools.holding_corp_assets"):
-            corps_holding = CorptoolsConfiguration.objects.get(
-                id=1).holding_corp_qs()
+            corps_holding = CorptoolsConfiguration.get_solo.holding_corp_qs()
             corps_vis = corps_vis | corps_holding
 
         return cls.objects.filter(corporation__in=corps_vis)
@@ -863,8 +850,7 @@ class CorporationWalletJournalEntry(WalletJournalEntry):
     def get_visible(cls, user):
         corps_vis = CorporationAudit.objects.visible_to(user)
         if user.has_perm("corptools.holding_corp_wallets"):
-            corps_holding = CorptoolsConfiguration.objects.get(
-                id=1).holding_corp_qs()
+            corps_holding = CorptoolsConfiguration.get_solo().holding_corp_qs()
             corps_vis = corps_vis | corps_holding
 
         return cls.objects.filter(division__corporation__in=corps_vis)
@@ -1243,8 +1229,7 @@ class Structure(models.Model):
     def get_visible(cls, user):
         corps_vis = CorporationAudit.objects.visible_to(user)
         if user.has_perm("corptools.holding_corp_structures"):
-            corps_holding = CorptoolsConfiguration.objects.get(
-                id=1).holding_corp_qs()
+            corps_holding = CorptoolsConfiguration.get_solo().holding_corp_qs()
             corps_vis = corps_vis | corps_holding
         update_time_filter = timezone.now() - datetime.timedelta(days=7)
         return cls.objects.filter(corporation__in=corps_vis, corporation__last_update_structures__gte=update_time_filter)
@@ -1289,8 +1274,7 @@ class Poco(models.Model):
     def get_visible(cls, user):
         corps_vis = CorporationAudit.objects.visible_to(user)
         if user.has_perm("corptools.holding_corp_structures"):
-            corps_holding = CorptoolsConfiguration.objects.get(
-                id=1).holding_corp_qs()
+            corps_holding = CorptoolsConfiguration.get_solo().holding_corp_qs()
             corps_vis = corps_vis | corps_holding
         # update_time_filter = timezone.now() - datetime.timedelta(days=7)
         # , corporation__last_update_pocos__gte=update_time_filter)

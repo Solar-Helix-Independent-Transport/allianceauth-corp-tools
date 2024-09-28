@@ -207,7 +207,7 @@ def re_que_corp_histories(character_ids):
 
 @shared_task(bind=True, base=QueueOnce)
 def process_corp_histories(self):
-    cid = CharacterAudit.objects.objects.all().order_by(
+    cid = CharacterAudit.objects.all().order_by(
         'last_update_pub_data'
     ).first().chracter.character_id
     update_char_corp_history(cid)
@@ -343,7 +343,7 @@ def update_character(self, char_id, force_refresh=False):
 
     mindt = timezone.now() - datetime.timedelta(days=90)
 
-    ct_conf = CorptoolsConfiguration.get_settings()
+    ct_conf = CorptoolsConfiguration.get_solo()
 
     if app_settings.CT_CHAR_ROLES_MODULE and not ct_conf.disable_update_roles:
         if (character.last_update_roles or mindt) <= skip_date or force_refresh:

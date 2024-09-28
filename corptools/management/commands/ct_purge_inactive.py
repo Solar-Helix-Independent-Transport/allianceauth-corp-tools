@@ -35,7 +35,6 @@ class Command(BaseCommand):
             )
             self.stdout.write(f"Purging {_c.count()} Unlinked Characters")
             for _d in _c:
-                pass
                 _d.delete()
             try:
                 _s = State.objects.get(name=options["purge"])
@@ -48,7 +47,6 @@ class Command(BaseCommand):
             _in = input("Are you sure you want to continue? type `yes` to continue: ")
             if _in.lower() == "yes":
                 for _d in _c:
-                    pass
                     _d.delete()
             else:
                 self.stdout.write("Skipped delete!")
@@ -61,7 +59,6 @@ class Command(BaseCommand):
                 )
                 self.stdout.write(f"Purging {_c.count()} inactive Characters")
                 for _d in _c:
-                    pass
                     _d.delete()
             else:
                 self.stdout.write("Notification module not active need to use other")

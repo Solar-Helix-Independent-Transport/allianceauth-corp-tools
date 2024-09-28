@@ -11,34 +11,35 @@ https://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-insta
 function isValidDate(d: Date | number) {
   let numberCheck = d instanceof Number;
   if (numberCheck) {
-    numberCheck = !isNaN(d as number);
+    numberCheck = isNaN(d as number);
   }
-  return d instanceof Date && numberCheck;
+  return Object.prototype.toString.call(d) === "[object Date]" && !numberCheck;
 }
 
 export function TimeTill({ date }: TimeTillProps) {
   const dateObj = new Date(date);
-
   // maybe just build my own dates. ISO or bust...
   const browserLocale = navigator.language || (navigator.languages || ["en"])[0];
 
-  return isValidDate(dateObj) ? (
-    <>
-      <ReactTimeAgo date={dateObj} />
-      <br />
-      <Figure.Caption>
-        {dateObj.toLocaleString(browserLocale, {
-          timeZone: "UTC",
-          hour12: false,
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </Figure.Caption>
-    </>
-  ) : (
-    <></>
-  );
+  if (isValidDate(dateObj)) {
+    return (
+      <>
+        <ReactTimeAgo date={dateObj} />
+        <br />
+        <Figure.Caption>
+          {dateObj.toLocaleString(browserLocale, {
+            timeZone: "UTC",
+            hour12: false,
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </Figure.Caption>
+      </>
+    );
+  } else {
+    return <>blah</>;
+  }
 }

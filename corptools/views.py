@@ -21,10 +21,10 @@ from . import __version__, app_settings
 from .api.corporation import dashboards
 from .forms import UploadForm
 from .models import (
-    CharacterAudit, CorpAsset, CorporationAudit, EveItemCategory,
-    EveItemDogmaAttribute, EveItemGroup, EveItemType, EveLocation, EveName,
-    InvTypeMaterials, MapConstellation, MapJumpBridge, MapRegion, MapSystem,
-    MapSystemGate, SkillList, Structure,
+    CharacterAudit, CorpAsset, CorporationAudit, CorptoolsConfiguration,
+    EveItemCategory, EveItemDogmaAttribute, EveItemGroup, EveItemType,
+    EveLocation, EveName, InvTypeMaterials, MapConstellation, MapJumpBridge,
+    MapRegion, MapSystem, MapSystemGate, SkillList, Structure,
 )
 from .tasks import (
     check_account, clear_all_etags, update_all_characters, update_all_corps,
@@ -225,6 +225,8 @@ def admin(request):
         "char_tasks": char_tasks,
         "corp_tasks": corp_tasks,
         "form": UploadForm(),
+        "ct_config": CorptoolsConfiguration.get_solo(),
+        "app_settings": app_settings
     }
 
     return render(request, 'corptools/admin.html', context=context)
