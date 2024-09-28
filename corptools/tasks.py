@@ -201,7 +201,7 @@ def update_subset_of_characters(self, subset=48, min_runs=5, force=False):
 
 
 @shared_task()
-def re_que_corp_histories(character_ids):
+def re_que_corp_histories():
     process_corp_histories.apply_async(priority=6)
 
 
