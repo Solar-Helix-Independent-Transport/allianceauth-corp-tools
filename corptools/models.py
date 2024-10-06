@@ -302,7 +302,8 @@ class CharacterAudit(models.Model):
            app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE or ct_conf.disable_update_skills
         ):  # NOQA E124
             qs.append(Func(F('last_update_skills'), function='UNIX_TIMESTAMP'))
-            qs.append(Func(F('last_update_skill_que'), function='UNIX_TIMESTAMP'))
+            qs.append(Func(F('last_update_skill_que'),
+                      function='UNIX_TIMESTAMP'))
 
         if app_settings.CT_CHAR_WALLET_MODULE and not (
            app_settings.CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE or ct_conf.disable_update_wallet
@@ -328,7 +329,8 @@ class CharacterAudit(models.Model):
         if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not (
             app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE or ct_conf.disable_update_loyaltypoints
         ):
-            qs.append(Func(F('last_update_loyaltypoints'), function='UNIX_TIMESTAMP'))
+            qs.append(Func(F('last_update_loyaltypoints'),
+                      function='UNIX_TIMESTAMP'))
 
         if app_settings.CT_CHAR_MINING_MODULE and not (
             app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE or ct_conf.disable_update_mining
@@ -663,7 +665,7 @@ class CorpAsset(Asset):
     def get_visible(cls, user):
         corps_vis = CorporationAudit.objects.visible_to(user)
         if user.has_perm("corptools.holding_corp_assets"):
-            corps_holding = CorptoolsConfiguration.get_solo.holding_corp_qs()
+            corps_holding = CorptoolsConfiguration.get_solo().holding_corp_qs()
             corps_vis = corps_vis | corps_holding
 
         return cls.objects.filter(corporation__in=corps_vis)
@@ -2241,7 +2243,8 @@ class LastLoginfilter(FilterBase):
 
             if c.character.characteraudit.last_known_login:  # Login as Logoff in not always accurate
                 chars[c.user_id].append(
-                    c.character.characteraudit.last_known_login)  # Login as Logoff in not always accurate
+                    # Login as Logoff in not always accurate
+                    c.character.characteraudit.last_known_login)
 
         output = defaultdict(
             lambda: {"message": "No Data", "check": self.no_data_pass})
@@ -2276,7 +2279,8 @@ class HomeStationFilter(FilterBase):
 
         if self.evelocation.all().count() > 0:
             output.append(models.Q(location_name__in=self.evelocation.all()))
-            output.append(models.Q(location_id__in=self.evelocation.all().values_list('location_id', flat=True)))
+            output.append(models.Q(
+                location_id__in=self.evelocation.all().values_list('location_id', flat=True)))
 
         if len(output) > 0:
             query = output.pop()
@@ -2305,7 +2309,8 @@ class HomeStationFilter(FilterBase):
             uid = c["character__character__character_ownership__user"]
             char_name = c["character__character__character_name"]
             # This might be able to be optimized during the query. But theres no FK to work with?
-            clone_location = EveLocation.objects.get(location_id=c['location_id']).location_name
+            clone_location = EveLocation.objects.get(
+                location_id=c['location_id']).location_name
             if char_name not in chars[uid]:
                 chars[uid][char_name] = []
             chars[uid][char_name].append(clone_location)
@@ -2317,8 +2322,10 @@ class HomeStationFilter(FilterBase):
                 out_message = []
                 for char, char_items in chars[u.id].items():
                     ship_count += len(char_items)
-                    out_message.append(f"{char}: {', '.join(list(set(char_items)))}")
-                    output[u.id] = {"message": "<br>".join(out_message), "check": True}
+                    out_message.append(
+                        f"{char}: {', '.join(list(set(char_items)))}")
+                    output[u.id] = {"message": "<br>".join(
+                        out_message), "check": True}
             else:
                 output[u.id] = {"message": "", "check": False}
         return output
@@ -2343,7 +2350,8 @@ class JumpCloneFilter(FilterBase):
 
         if self.evelocation.all().count() > 0:
             output.append(models.Q(location_name__in=self.evelocation.all()))
-            output.append(models.Q(location_id__in=self.evelocation.all().values_list('location_id', flat=True)))
+            output.append(models.Q(
+                location_id__in=self.evelocation.all().values_list('location_id', flat=True)))
 
         if len(output) > 0:
             query = output.pop()
@@ -2372,7 +2380,8 @@ class JumpCloneFilter(FilterBase):
             uid = c["character__character__character_ownership__user"]
             char_name = c["character__character__character_name"]
             # This might be able to be optimized during the query. But theres no FK to work with?
-            clone_location = EveLocation.objects.get(location_id=c['location_id']).location_name
+            clone_location = EveLocation.objects.get(
+                location_id=c['location_id']).location_name
             if char_name not in chars[uid]:
                 chars[uid][char_name] = []
             chars[uid][char_name].append(clone_location)
@@ -2384,8 +2393,10 @@ class JumpCloneFilter(FilterBase):
                 out_message = []
                 for char, char_items in chars[u.id].items():
                     ship_count += len(char_items)
-                    out_message.append(f"{char}: {', '.join(list(set(char_items)))}")
-                    output[u.id] = {"message": "<br>".join(out_message), "check": True}
+                    out_message.append(
+                        f"{char}: {', '.join(list(set(char_items)))}")
+                    output[u.id] = {"message": "<br>".join(
+                        out_message), "check": True}
             else:
                 output[u.id] = {"message": "", "check": False}
         return output
