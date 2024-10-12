@@ -7,6 +7,7 @@ from discord.embeds import Embed
 from discord.ext import commands
 
 from django.db.models import Q
+from django.db.models.functions import Length
 
 from allianceauth.services.modules.discord.models import DiscordUser
 
@@ -28,6 +29,8 @@ class WhereStuff(commands.Cog):
         return list(
             EveItemType.objects.filter(
                 name__icontains=ctx.value
+            ).order_by(
+                Length('name').asc()
             ).values_list(
                 'name',
                 flat=True
