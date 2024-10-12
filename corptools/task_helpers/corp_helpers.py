@@ -521,9 +521,10 @@ def update_corp_structures(corp_id, force_refresh=False):  # pagnated results
             name = structure.get('name')
             EveLocation.objects.update_or_create(
                 location_id=structure.get('structure_id'),
-                system_id=structure.get('system_id'),
                 defaults={
                     "location_name": structure.get('name'),
+                    "system_id": structure.get('system_id'),
+
                 }
             )
         else:
