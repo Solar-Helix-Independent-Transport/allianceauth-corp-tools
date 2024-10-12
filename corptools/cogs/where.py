@@ -1,11 +1,11 @@
 import logging
 
+from aadiscordbot.app_settings import get_all_servers
 from aadiscordbot.cogs.utils.decorators import has_any_perm
 from discord import AutocompleteContext, option
 from discord.embeds import Embed
 from discord.ext import commands
 
-from django.conf import settings
 from django.db.models import Q
 
 from allianceauth.services.modules.discord.models import DiscordUser
@@ -45,7 +45,7 @@ class WhereStuff(commands.Cog):
             ).distinct()[:10]
         )
 
-    @commands.slash_command(name='where_is', guild_ids=[int(settings.DISCORD_GUILD_ID)])
+    @commands.slash_command(name='where_is', guild_ids=get_all_servers())
     @option("system", description="Search in this System!", autocomplete=search_systems)
     @option("item", description="Search for this Item!", autocomplete=search_items)
     async def slash_where_is(

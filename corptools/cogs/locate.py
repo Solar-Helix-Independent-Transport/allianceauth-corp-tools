@@ -1,5 +1,6 @@
 import logging
 
+from aadiscordbot.app_settings import get_all_servers
 from aadiscordbot.cogs.utils.decorators import (
     has_any_perm, in_channels, sender_has_perm,
 )
@@ -154,7 +155,7 @@ class Locator(commands.Cog):
         """Returns a list of colors that begin with the characters entered so far."""
         return list(EveCharacter.objects.filter(character_name__icontains=ctx.value).values_list('character_name', flat=True)[:10])
 
-    @commands.slash_command(name='locate', guild_ids=[int(settings.DISCORD_GUILD_ID)])
+    @commands.slash_command(name='locate', guild_ids=get_all_servers())
     @option("character", description="Search for a Character!", autocomplete=search_characters)
     async def slash_locate(self, ctx, character: str,):
         try:
