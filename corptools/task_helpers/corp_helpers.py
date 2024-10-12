@@ -220,7 +220,8 @@ def update_corporation_transactions(corp_id, wallet_division, full_update=False)
         _current_journal = CorporationWalletJournalEntry.objects.filter(
             character=audit_corp,
             context_id_type="market_transaction_id",
-            reason__exact="").values_list('context_id', flat=True)[:2500]  # Max items from ESI
+            # Max items from ESI
+            reason__exact="").values_list('context_id', flat=True)[:2500]
 
         # _new_names = []
 
@@ -507,7 +508,8 @@ def update_corp_structures(corp_id, force_refresh=False):  # pagnated results
     operation = providers.esi.client.Corporation.get_corporations_corporation_id_structures(
         corporation_id=_corporation.corporation.corporation_id)
     try:
-        structures = etag_results(operation, token, force_refresh=force_refresh)
+        structures = etag_results(
+            operation, token, force_refresh=force_refresh)
     except NotModifiedError:
         _corporation.last_update_structures = timezone.now()
         _corporation.save()
@@ -519,8 +521,9 @@ def update_corp_structures(corp_id, force_refresh=False):  # pagnated results
             name = structure.get('name')
             EveLocation.objects.update_or_create(
                 location_id=structure.get('structure_id'),
+                system_id=structure.get('system_id'),
                 defaults={
-                    "location_name": structure.get('name')
+                    "location_name": structure.get('name'),
                 }
             )
         else:
@@ -625,7 +628,8 @@ def update_corp_assets(corp_id):
             corporation_id=corp_id
         )
 
-        assets = etag_results(assets_op, token, disable_verification=CorptoolsConfiguration.skip_verify_assets())
+        assets = etag_results(
+            assets_op, token, disable_verification=CorptoolsConfiguration.skip_verify_assets())
 
         location_names = list(
             EveLocation.objects.all().values_list('location_id', flat=True)
