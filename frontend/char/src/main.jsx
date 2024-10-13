@@ -20,6 +20,7 @@ import PubData from "./pages/PubData";
 import CharRoles from "./pages/Roles";
 import CharSkillQueue from "./pages/SkillQueue";
 import CharSkills from "./pages/Skills";
+// import CharSkillQueues from "./pages/SkillQueues";
 import CharStatus from "./pages/Status";
 import CharWallet from "./pages/Wallet";
 import CharWalletActivity from "./pages/WalletActivity";

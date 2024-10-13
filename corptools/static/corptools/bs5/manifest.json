@@ -9,7 +9,7 @@
     ]
   },
   "index.html": {
-    "file": "assets/index-CP5s1qfE.js",
+    "file": "assets/index-D5GUnyJu.js",
     "src": "index.html",
     "isEntry": true,
     "imports": [
@@ -17,7 +17,7 @@
       "_@react-router-DG-kUzyH.js"
     ],
     "css": [
-      "static/corptools/bs5/statics/css/index-DrstnHBG.css"
+      "static/corptools/bs5/statics/css/index-CBz0oyYz.css"
     ],
     "assets": [
       "static/corptools/bs5/statics/img/omega_128-B8POqXI6.png",

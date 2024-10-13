@@ -110,7 +110,7 @@ const CharacterSkills = () => {
           options={charOptions}
           labelText="Character Select:"
         />
-        <div className="d-flex justify-content-between">
+        <div className="d-flex justify-content-between mb-3">
           <SelectFilter setFilter={setLevel} options={levelOptions} labelText="Level Filter:" />
           <SelectFilter setFilter={setGroup} options={groups} labelText="Group Filter:" />
           <TextFilter setFilterText={setFilter} labelText={"Skill Filter:"} />

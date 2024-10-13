@@ -4,14 +4,14 @@ export const SkillLevelBlock = ({
   trained = 0,
 }: {
   level: number;
-  active: number;
-  trained: number;
+  active?: number;
+  trained?: number;
 }) => {
   const trained_inactive = trained - active;
   const inactive = level - active - trained_inactive;
   const remain = 5 - Math.max(level, active, trained);
   return (
-    <div>
+    <div className=" text-no-wrap">
       {Array.from(Array(active)).map((_) => {
         return <i className="fas fa-circle"></i>;
       })}

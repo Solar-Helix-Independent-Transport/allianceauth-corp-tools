@@ -9,6 +9,7 @@ import CharacterNotifications from "./Pages/Char/Notifications";
 import CharacterOverview from "./Pages/Char/Overview";
 import CharacterPubData from "./Pages/Char/PubData";
 import CharacterRoles from "./Pages/Char/Roles";
+import CharacterSkillQueues from "./Pages/Char/SkillQueue";
 import CharacterSkills from "./Pages/Char/Skills";
 import CharacterStatus from "./Pages/Char/Status";
 import CharacterWallet from "./Pages/Char/Wallet";
@@ -78,14 +79,7 @@ function App() {
                 }
               />
               <Route path="account/skills" element={<CharacterSkills />} />
-              <Route
-                path="account/skillqueue"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/skillqueue.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/skillqueue" element={<CharacterSkillQueues />} />
               <Route
                 path="account/doctrines"
                 element={

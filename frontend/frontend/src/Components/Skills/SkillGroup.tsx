@@ -4,7 +4,18 @@ import { Accordion } from "react-bootstrap";
 export const SkillGroup = ({ group, skills }: { group: string; skills: Array<any> }) => {
   return (
     <Accordion.Item eventKey={`${group}`}>
-      <Accordion.Header>{group}</Accordion.Header>
+      <Accordion.Header>
+        <span className="flex-grow-1">{group}</span>
+        <span className="badge bg-secondary me-2">
+          {skills
+            .reduce((p, c) => {
+              p += c.sp;
+              return p;
+            }, 0)
+            .toLocaleString()}{" "}
+          Filtered SP
+        </span>
+      </Accordion.Header>
       <Accordion.Body className="d-flex flex-wrap ">
         {skills
           .sort(function (a: any, b: any) {
@@ -23,6 +34,7 @@ export const SkillGroup = ({ group, skills }: { group: string; skills: Array<any
                 level={skill.level}
                 active={skill.active}
                 trained={skill.active}
+                sp={skill.sp}
               />
             );
           })}

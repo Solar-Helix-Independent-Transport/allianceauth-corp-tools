@@ -1,0 +1,11 @@
+.skillBlock {
+  width: 100%;
+  /* media queries */
+  @media (min-width: 1000px) {
+    width: 50%;
+  }
+
+  @media (min-width: 1400px) {
+    width: 33%;
+  }
+}
