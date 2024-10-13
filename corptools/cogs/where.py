@@ -26,8 +26,8 @@ class WhereStuff(commands.Cog):
 
     async def search_items(ctx: AutocompleteContext):
         """Returns a list of items that begin with the characters entered so far."""
-        return list(
-            EveItemType.objects.filter(
+        return [
+            a async for a in EveItemType.objects.filter(
                 name__icontains=ctx.value
             ).order_by(
                 Length('name').asc()
@@ -35,18 +35,19 @@ class WhereStuff(commands.Cog):
                 'name',
                 flat=True
             ).distinct()[:10]
-        )
+        ]
 
     async def search_systems(ctx: AutocompleteContext):
         """Returns a list of systems that begin with the characters entered so far."""
-        return list(
-            MapSystem.objects.filter(
+
+        return [
+            a async for a in MapSystem.objects.filter(
                 name__icontains=ctx.value
             ).values_list(
                 'name',
                 flat=True
             ).distinct()[:10]
-        )
+        ]
 
     @commands.slash_command(name='where_is', guild_ids=get_all_servers())
     @option("system", description="Search in this System!", autocomplete=search_systems)
@@ -65,7 +66,7 @@ class WhereStuff(commands.Cog):
             )
 
             try:
-                du = DiscordUser.objects.get(uid=ctx.user.id)
+                du = DiscordUser.objects.aget(uid=ctx.user.id)
                 chars = du.user.character_ownerships.all(
                 ).values_list(
                     "character__character_id",
@@ -80,10 +81,10 @@ class WhereStuff(commands.Cog):
                     if system:
                         items = items.filter(
                             Q(location_name__location_name=system) | Q(location_name__system__name=system))
-                    if not items.exists():
+                    if not items.aexists():
                         return await ctx.respond("Found no items. Do you actually have some?", ephemeral=True)
                     output = {}
-                    for i in items:
+                    async for i in items:
                         cn = i.character.character.character_name
                         if cn not in output:
                             output[cn] = set()

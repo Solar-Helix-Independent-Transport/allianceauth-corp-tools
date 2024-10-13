@@ -1,10 +1,11 @@
 import logging
 
 from aadiscordbot.app_settings import get_all_servers
+from aadiscordbot.cogs.utils.autocompletes import search_characters
 from aadiscordbot.cogs.utils.decorators import (
     has_any_perm, in_channels, sender_has_perm,
 )
-from discord import AutocompleteContext, option
+from discord import option
 from discord.embeds import Embed
 from discord.ext import commands
 from pendulum.datetime import DateTime
@@ -150,10 +151,6 @@ class Locator(commands.Cog):
                 return await ctx.message.reply(f"Character **{input_name}** Unlinked in auth")
         except EveCharacter.DoesNotExist:
             return await ctx.message.reply(f"Character **{input_name}** does not exist in our Auth system")
-
-    async def search_characters(ctx: AutocompleteContext):
-        """Returns a list of colors that begin with the characters entered so far."""
-        return list(EveCharacter.objects.filter(character_name__icontains=ctx.value).values_list('character_name', flat=True)[:10])
 
     @commands.slash_command(name='locate', guild_ids=get_all_servers())
     @option("character", description="Search for a Character!", autocomplete=search_characters)
