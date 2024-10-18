@@ -2,6 +2,7 @@ import logging
 
 from aadiscordbot.app_settings import get_all_servers
 from aadiscordbot.cogs.utils.decorators import has_any_perm
+from aadiscordbot.utils.auth import get_auth_user
 from discord import AutocompleteContext, option
 from discord.embeds import Embed
 from discord.ext import commands
@@ -66,8 +67,8 @@ class WhereStuff(commands.Cog):
             )
 
             try:
-                du = DiscordUser.objects.aget(uid=ctx.user.id)
-                chars = du.user.character_ownerships.all(
+                du = get_auth_user(ctx.author, guild=ctx.guild)
+                chars = du.character_ownerships.all(
                 ).values_list(
                     "character__character_id",
                     flat=True
