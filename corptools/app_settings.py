@@ -367,4 +367,4 @@ CT_USERS_CAN_FORCE_REFRESH = getattr(
     settings, 'CT_USERS_CAN_FORCE_REFRESH', False)
 
 CT_TASK_SPREAD_DELAY = getattr(
-    settings, 'CT_TASK_SPREAD_DELAY', 1)
+    settings, 'CT_TASK_SPREAD_DELAY', 1200)  # Default 20 minute spread

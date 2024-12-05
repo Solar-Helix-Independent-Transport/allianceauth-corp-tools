@@ -4,7 +4,9 @@ LOCATION_FLAG_REPLACEMENTS = {
 }
 
 NOTIFICATION_TYPE_REPLACEMENTS = {
-    "unknown notification type (275)": "LPAutoRedeemed",
+    "unknown notification type (263)": "CorporationGoalNameChange",
+    "unknown notification type (264)": "CorporationGoalExpired",
+    "unknown notification type (265)": "CorporationGoalLimitReached",
     "unknown notification type (276)": "SPAutoRedeemed",
     "unknown notification type (280)": "SkinSequencingCompleted",
     "unknown notification type (281)": "SkyhookOnline",
@@ -12,6 +14,9 @@ NOTIFICATION_TYPE_REPLACEMENTS = {
     "unknown notification type (283)": "SkyhookUnderAttack",
     "unknown notification type (284)": "SkyhookDestroyed",
     "unknown notification type (285)": "SkyhookDeployed",
+    "unknown notification type (286)": "MercenaryDenReinforced",
+    "unknown notification type (287)": "MercenaryDenAttacked",
+    "unknown notification type (6013)": "DailyItemRewardAutoClaimed",
     "unknown notification type (6040)": "StructureLowReagentsAlert",
     "unknown notification type (6041)": "StructureNoReagentsAlert"
 }
