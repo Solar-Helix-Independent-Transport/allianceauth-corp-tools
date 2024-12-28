@@ -1,115 +1,115 @@
 {
-  "_@libs-BhVKESFe.js": {
-    "file": "assets/@libs-BhVKESFe.js"
+  "_@libs-CEzrdXGo.js": {
+    "file": "assets/@libs-CEzrdXGo.js"
   },
-  "_@react-router-DG-kUzyH.js": {
-    "file": "assets/@react-router-DG-kUzyH.js",
+  "_@react-router-DFHYOdBm.js": {
+    "file": "assets/@react-router-DFHYOdBm.js",
     "imports": [
-      "_@libs-BhVKESFe.js"
+      "_@libs-CEzrdXGo.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-D5GUnyJu.js",
+    "file": "assets/index-CJ1F98WI.js",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@libs-BhVKESFe.js",
-      "_@react-router-DG-kUzyH.js"
+      "_@libs-CEzrdXGo.js",
+      "_@react-router-DFHYOdBm.js"
     ],
     "css": [
-      "static/corptools/bs5/statics/css/index-CBz0oyYz.css"
+      "static/corptools/bs5/static/css/index-MpvbYUBF.css"
     ],
     "assets": [
-      "static/corptools/bs5/statics/img/omega_128-B8POqXI6.png",
-      "static/corptools/bs5/statics/img/skillInjector_64-CiNLYJYo.png",
-      "static/corptools/bs5/statics/img/asteroid_64-_mwThky8.png",
-      "static/corptools/bs5/statics/img/gas_64-lUUIHkb8.png",
-      "static/corptools/bs5/statics/img/ice_64-C-X-JxCQ.png",
-      "static/corptools/bs5/statics/img/incursion_2_64-CezWswVX.png",
-      "static/corptools/bs5/statics/img/industry_128-DM0mBaQY.png",
-      "static/corptools/bs5/statics/img/market_128-oRcbZRsd.png",
-      "static/corptools/bs5/statics/img/missions_2_128-Dg_KBb12.png",
-      "static/corptools/bs5/statics/img/moonAsteroid_JackpotR32-CbqQRgx1.png",
-      "static/corptools/bs5/statics/img/npcbattleship_32-BFJ3Lc7-.png",
-      "static/corptools/bs5/statics/img/planet_128-BhhMKsyX.png",
-      "static/corptools/bs5/statics/img/triglavian_128-RGqDm8eK.png",
-      "static/corptools/bs5/statics/img/extractor_64-BQGwjQ_v.png",
-      "static/corptools/bs5/statics/img/amarr_128-B9KvGWt4.png",
-      "static/corptools/bs5/statics/img/caldari_128-BSQ2VRRx.png",
-      "static/corptools/bs5/statics/img/gallente_128-oOYpsEmX.png",
-      "static/corptools/bs5/statics/img/minmatar128-BCerHXFk.png"
+      "static/corptools/bs5/static/img/omega_128-B8POqXI6.png",
+      "static/corptools/bs5/static/img/skillInjector_64-CiNLYJYo.png",
+      "static/corptools/bs5/static/img/asteroid_64-_mwThky8.png",
+      "static/corptools/bs5/static/img/gas_64-lUUIHkb8.png",
+      "static/corptools/bs5/static/img/ice_64-C-X-JxCQ.png",
+      "static/corptools/bs5/static/img/incursion_2_64-CezWswVX.png",
+      "static/corptools/bs5/static/img/industry_128-DM0mBaQY.png",
+      "static/corptools/bs5/static/img/market_128-oRcbZRsd.png",
+      "static/corptools/bs5/static/img/missions_2_128-Dg_KBb12.png",
+      "static/corptools/bs5/static/img/moonAsteroid_JackpotR32-CbqQRgx1.png",
+      "static/corptools/bs5/static/img/npcbattleship_32-BFJ3Lc7-.png",
+      "static/corptools/bs5/static/img/planet_128-BhhMKsyX.png",
+      "static/corptools/bs5/static/img/triglavian_128-RGqDm8eK.png",
+      "static/corptools/bs5/static/img/extractor_64-BQGwjQ_v.png",
+      "static/corptools/bs5/static/img/amarr_128-B9KvGWt4.png",
+      "static/corptools/bs5/static/img/caldari_128-BSQ2VRRx.png",
+      "static/corptools/bs5/static/img/gallente_128-oOYpsEmX.png",
+      "static/corptools/bs5/static/img/minmatar128-BCerHXFk.png"
     ]
   },
   "src/assets/amarr_128.png": {
-    "file": "static/corptools/bs5/statics/img/amarr_128-B9KvGWt4.png",
+    "file": "static/corptools/bs5/static/img/amarr_128-B9KvGWt4.png",
     "src": "src/assets/amarr_128.png"
   },
   "src/assets/asteroid_64.png": {
-    "file": "static/corptools/bs5/statics/img/asteroid_64-_mwThky8.png",
+    "file": "static/corptools/bs5/static/img/asteroid_64-_mwThky8.png",
     "src": "src/assets/asteroid_64.png"
   },
   "src/assets/caldari_128.png": {
-    "file": "static/corptools/bs5/statics/img/caldari_128-BSQ2VRRx.png",
+    "file": "static/corptools/bs5/static/img/caldari_128-BSQ2VRRx.png",
     "src": "src/assets/caldari_128.png"
   },
   "src/assets/extractor_64.png": {
-    "file": "static/corptools/bs5/statics/img/extractor_64-BQGwjQ_v.png",
+    "file": "static/corptools/bs5/static/img/extractor_64-BQGwjQ_v.png",
     "src": "src/assets/extractor_64.png"
   },
   "src/assets/gallente_128.png": {
-    "file": "static/corptools/bs5/statics/img/gallente_128-oOYpsEmX.png",
+    "file": "static/corptools/bs5/static/img/gallente_128-oOYpsEmX.png",
     "src": "src/assets/gallente_128.png"
   },
   "src/assets/gas_64.png": {
-    "file": "static/corptools/bs5/statics/img/gas_64-lUUIHkb8.png",
+    "file": "static/corptools/bs5/static/img/gas_64-lUUIHkb8.png",
     "src": "src/assets/gas_64.png"
   },
   "src/assets/ice_64.png": {
-    "file": "static/corptools/bs5/statics/img/ice_64-C-X-JxCQ.png",
+    "file": "static/corptools/bs5/static/img/ice_64-C-X-JxCQ.png",
     "src": "src/assets/ice_64.png"
   },
   "src/assets/incursion_2_64.png": {
-    "file": "static/corptools/bs5/statics/img/incursion_2_64-CezWswVX.png",
+    "file": "static/corptools/bs5/static/img/incursion_2_64-CezWswVX.png",
     "src": "src/assets/incursion_2_64.png"
   },
   "src/assets/industry_128.png": {
-    "file": "static/corptools/bs5/statics/img/industry_128-DM0mBaQY.png",
+    "file": "static/corptools/bs5/static/img/industry_128-DM0mBaQY.png",
     "src": "src/assets/industry_128.png"
   },
   "src/assets/market_128.png": {
-    "file": "static/corptools/bs5/statics/img/market_128-oRcbZRsd.png",
+    "file": "static/corptools/bs5/static/img/market_128-oRcbZRsd.png",
     "src": "src/assets/market_128.png"
   },
   "src/assets/minmatar128.png": {
-    "file": "static/corptools/bs5/statics/img/minmatar128-BCerHXFk.png",
+    "file": "static/corptools/bs5/static/img/minmatar128-BCerHXFk.png",
     "src": "src/assets/minmatar128.png"
   },
   "src/assets/missions_2_128.png": {
-    "file": "static/corptools/bs5/statics/img/missions_2_128-Dg_KBb12.png",
+    "file": "static/corptools/bs5/static/img/missions_2_128-Dg_KBb12.png",
     "src": "src/assets/missions_2_128.png"
   },
   "src/assets/moonAsteroid_JackpotR32.png": {
-    "file": "static/corptools/bs5/statics/img/moonAsteroid_JackpotR32-CbqQRgx1.png",
+    "file": "static/corptools/bs5/static/img/moonAsteroid_JackpotR32-CbqQRgx1.png",
     "src": "src/assets/moonAsteroid_JackpotR32.png"
   },
   "src/assets/npcbattleship_32.png": {
-    "file": "static/corptools/bs5/statics/img/npcbattleship_32-BFJ3Lc7-.png",
+    "file": "static/corptools/bs5/static/img/npcbattleship_32-BFJ3Lc7-.png",
     "src": "src/assets/npcbattleship_32.png"
   },
   "src/assets/omega_128.png": {
-    "file": "static/corptools/bs5/statics/img/omega_128-B8POqXI6.png",
+    "file": "static/corptools/bs5/static/img/omega_128-B8POqXI6.png",
     "src": "src/assets/omega_128.png"
   },
   "src/assets/planet_128.png": {
-    "file": "static/corptools/bs5/statics/img/planet_128-BhhMKsyX.png",
+    "file": "static/corptools/bs5/static/img/planet_128-BhhMKsyX.png",
     "src": "src/assets/planet_128.png"
   },
   "src/assets/skillInjector_64.png": {
-    "file": "static/corptools/bs5/statics/img/skillInjector_64-CiNLYJYo.png",
+    "file": "static/corptools/bs5/static/img/skillInjector_64-CiNLYJYo.png",
     "src": "src/assets/skillInjector_64.png"
   },
   "src/assets/triglavian_128.png": {
-    "file": "static/corptools/bs5/statics/img/triglavian_128-RGqDm8eK.png",
+    "file": "static/corptools/bs5/static/img/triglavian_128-RGqDm8eK.png",
     "src": "src/assets/triglavian_128.png"
   }
 }
