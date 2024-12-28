@@ -27,7 +27,7 @@ export default defineConfig({
             extType = "img";
           }
           // fake the path, we copy them over properly later
-          return `static/corptools/bs5/statics/${extType}/[name]-[hash][extname]`;
+          return `static/corptools/bs5/static/${extType}/[name]-[hash][extname]`;
         },
         manualChunks(id) {
           // creating a chunk to react routes deps. Reducing the vendor chunk size
