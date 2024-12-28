@@ -159,6 +159,12 @@ class CorptoolsConfiguration(SingletonModel):
             return True
 
 
+def check_date(last_update, time_ref):
+    date = last_update if last_update is not None else timezone.now() - \
+        datetime.timedelta(days=99)
+    return date > time_ref
+
+
 class CharacterAudit(models.Model):
 
     objects = AuditCharacterManager()
@@ -243,40 +249,52 @@ class CharacterAudit(models.Model):
 
     def is_active(self):
         time_ref = timezone.now() - datetime.timedelta(days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS)
+        ct_conf = CorptoolsConfiguration.get_solo()
+
         try:
             is_active = True
-            if app_settings.CT_CHAR_ACTIVE_IGNORE_CORP_HISTORY:
-                is_active = is_active and (
-                    self.last_update_pub_data > time_ref)
-            if app_settings.CT_CHAR_ASSETS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE:
-                is_active = is_active and (self.last_update_assets > time_ref)
-            if app_settings.CT_CHAR_CLONES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE:
-                is_active = is_active and (self.last_update_clones > time_ref)
-            if app_settings.CT_CHAR_SKILLS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE:
-                is_active = is_active and (self.last_update_skills > time_ref)
-                is_active = is_active and (
-                    self.last_update_skill_que > time_ref)
-            if app_settings.CT_CHAR_WALLET_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE:
-                is_active = is_active and (self.last_update_wallet > time_ref)
-                is_active = is_active and (self.last_update_orders > time_ref)
-            if app_settings.CT_CHAR_NOTIFICATIONS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_NOTIFICATIONS_MODULE:
-                is_active = is_active and (self.last_update_notif > time_ref)
-            if app_settings.CT_CHAR_ROLES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE:
-                is_active = is_active and (self.last_update_roles > time_ref)
-            if app_settings.CT_CHAR_MAIL_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE:
-                is_active = is_active and (self.last_update_mails > time_ref)
-            if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE:
-                is_active = is_active and (
-                    self.last_update_loyaltypoints > time_ref)
-            if app_settings.CT_CHAR_MINING_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE:
-                is_active = is_active and (self.last_update_mining > time_ref)
+            if app_settings.CT_CHAR_ACTIVE_IGNORE_CORP_HISTORY and not ct_conf.disable_update_pub_data:
+                is_active = is_active and check_date(
+                    self.last_update_pub_data, time_ref)
+            if app_settings.CT_CHAR_ASSETS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE and not ct_conf.disable_update_assets:
+                is_active = is_active and check_date(
+                    self.last_update_assets, time_ref)
+            if app_settings.CT_CHAR_CLONES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE and not ct_conf.disable_update_clones:
+                is_active = is_active and check_date(
+                    self.last_update_clones, time_ref)
+            if app_settings.CT_CHAR_SKILLS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE and not ct_conf.disable_update_skills:
+                is_active = is_active and check_date(
+                    self.last_update_skills, time_ref)
+                is_active = is_active and check_date(
+                    self.last_update_skill_que, time_ref)
+            if app_settings.CT_CHAR_WALLET_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE and not ct_conf.disable_update_wallet:
+                is_active = is_active and check_date(
+                    self.last_update_wallet, time_ref)
+                is_active = is_active and check_date(
+                    self.last_update_orders, time_ref)
+            if app_settings.CT_CHAR_NOTIFICATIONS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_NOTIFICATIONS_MODULE and not ct_conf.disable_update_notif:
+                is_active = is_active and check_date(
+                    self.last_update_notif, time_ref)
+            if app_settings.CT_CHAR_ROLES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE and not ct_conf.disable_update_roles:
+                is_active = is_active and check_date(
+                    self.last_update_roles, time_ref)
+            if app_settings.CT_CHAR_MAIL_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE and not ct_conf.disable_update_mails:
+                is_active = is_active and check_date(
+                    self.last_update_mails, time_ref)
+            if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE and not ct_conf.disable_update_loyaltypoints:
+                is_active = is_active and check_date(
+                    self.last_update_loyaltypoints, time_ref)
+            if app_settings.CT_CHAR_MINING_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE and not ct_conf.disable_update_mining:
+                is_active = is_active and check_date(
+                    self.last_update_mining, time_ref)
 
             if self.active != is_active:
                 self.active = is_active
                 self.save()
 
             return is_active
-        except Exception:
+        except Exception as e:
+            logger.error(e, exc_info=True)
             return False
 
     @classmethod
