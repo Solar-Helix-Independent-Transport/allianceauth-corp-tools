@@ -1,7 +1,7 @@
 [build-system]
-build-backend = "flit_core.buildapi"
+build-backend = "hatchling.build"
 requires = [
-    "flit-core<4,>=3.2",
+    "hatchling",
 ]
 
 [project]
@@ -52,6 +52,12 @@ optional-dependencies.test = [
 urls.Homepage = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools"
 urls.Source = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools"
 urls.Tracker = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools/issues"
+
+[tool.hatch.version]
+path = "corptools/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = [ "corptools" ]
 
 [tool.flit.module]
 name = "corptools"
