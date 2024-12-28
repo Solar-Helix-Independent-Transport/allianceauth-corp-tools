@@ -19,6 +19,19 @@ export interface CharMenuProps extends Partial<HTMLElement> {
   characterID: string;
 }
 
+function urlify(path: string, characterID: string) {
+  console.log(path);
+  if (path.startsWith("/")) {
+    console.log("simple");
+
+    return path;
+  } else {
+    console.log("rewrite");
+
+    return `/audit/r_beta/${characterID}/${path}`;
+  }
+}
+
 const CharMenu = ({ data, characterID }: CharMenuProps) => {
   return (
     <>
@@ -39,9 +52,10 @@ const CharMenu = ({ data, characterID }: CharMenuProps) => {
       </Nav.Item> */}
       {data &&
         data.map((cat: any) => {
-          return (
+          console.log(cat.name);
+          return cat.links ? (
             <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
-              {cat.links.map((link: any) => {
+              {cat.links?.map((link: any) => {
                 return (
                   <LinkContainer to={`/audit/r_beta/${characterID}/${link.link}`}>
                     <NavDropdown.Item id={link.name} key={link.name}>
@@ -51,6 +65,20 @@ const CharMenu = ({ data, characterID }: CharMenuProps) => {
                 );
               })}
             </NavDropdown>
+          ) : (
+            <>
+              {cat.link.startsWith("/") ? (
+                <Nav.Link id={cat.name} key={cat.name} href={cat.link}>
+                  <>{cat.name}</>
+                </Nav.Link>
+              ) : (
+                <Nav.Link id={cat.name} key={cat.name}>
+                  <LinkContainer to={`/audit/r_beta/${characterID}/${cat.link}`}>
+                    <>{cat.name}</>
+                  </LinkContainer>
+                </Nav.Link>
+              )}
+            </>
           );
         })}
     </>
