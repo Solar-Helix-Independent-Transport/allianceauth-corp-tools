@@ -237,9 +237,9 @@ export const TextFilter = ({ column }: { column: Column<any, any> }) => {
   );
 };
 
-function setSearchItems(allItems: any) {
-  return allItems;
-}
+// function setSearchItems(allItems: any) {
+//   return allItems;
+// }
 export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
   const sortedUniqueValues = Array.from(column.getFacetedUniqueValues().keys()).sort();
   const currentFilterValue = column.getFilterValue() as string;

@@ -19,18 +19,18 @@ export interface CharMenuProps extends Partial<HTMLElement> {
   characterID: string;
 }
 
-function urlify(path: string, characterID: string) {
-  console.log(path);
-  if (path.startsWith("/")) {
-    console.log("simple");
+// function urlify(path: string, characterID: string) {
+//   console.log(path);
+//   if (path.startsWith("/")) {
+//     console.log("simple");
 
-    return path;
-  } else {
-    console.log("rewrite");
+//     return path;
+//   } else {
+//     console.log("rewrite");
 
-    return `/audit/r_beta/${characterID}/${path}`;
-  }
-}
+//     return `/audit/r_beta/${characterID}/${path}`;
+//   }
+// }
 
 const CharMenu = ({ data, characterID }: CharMenuProps) => {
   return (
