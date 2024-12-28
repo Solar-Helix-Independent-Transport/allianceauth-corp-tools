@@ -140,6 +140,10 @@ class MenuApiEndpoints:
                     "name": _("Skill List Checks"),
                     "link": "account/doctrines"
                 })
+            admin = {
+                "name": _("Admin"),
+                "link": "/audit/admin"
+            }
             out = []
             if len(_char['links']):
                 out.append(_char)
@@ -152,5 +156,8 @@ class MenuApiEndpoints:
 
             if len(_inter['links']):
                 out.append(_inter)
+
+            if request.user.is_superuser:
+                out.append(admin)
 
             return out

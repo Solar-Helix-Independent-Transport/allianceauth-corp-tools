@@ -31,11 +31,10 @@ class Corporation(Schema):
 
 class MenuLink(Schema):
     name: str
-    link: str
+    link: str = None
 
 
-class MenuCategory(Schema):
-    name: str
+class MenuCategory(MenuLink):
     links: List[MenuLink] = None
 
 
