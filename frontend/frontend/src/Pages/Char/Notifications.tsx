@@ -34,6 +34,9 @@ const CharacterNotifications = () => {
     }),
     columnHelper.accessor("notification_text", {
       header: "Text",
+      cell: (props) => {
+        return <pre>{props.getValue()}</pre>;
+      },
     }),
   ];
 
