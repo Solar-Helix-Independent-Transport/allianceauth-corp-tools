@@ -247,7 +247,6 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
     isHTML(sortedUniqueValues?.[0]) || typeof sortedUniqueValues?.[0] === "object";
 
   const selectOptions = sortedUniqueValues
-    .slice(0, 10)
     .reduce((previousValue: Array<any>, currentValue: any) => {
       if (typeof currentValue != "undefined") {
         if (!isObjectorHTML) {
@@ -257,7 +256,9 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
         }
       }
       return previousValue;
-    }, []);
+    }, [])
+    .slice(0, 10);
+
   return (
     <OverlayTrigger
       trigger="click"
