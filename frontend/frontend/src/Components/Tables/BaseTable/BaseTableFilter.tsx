@@ -250,7 +250,10 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
     .reduce((previousValue: Array<any>, currentValue: any) => {
       if (typeof currentValue != "undefined") {
         if (!isObjectorHTML) {
-          if (currentValue?.toLowerCase().includes(currentFilterValue?.toLowerCase())) {
+          if (
+            currentFilterValue === undefined ||
+            currentValue?.toLowerCase().includes(currentFilterValue?.toLowerCase())
+          ) {
             previousValue.push({ value: currentValue, label: currentValue });
           }
         }

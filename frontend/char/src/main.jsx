@@ -89,6 +89,6 @@ const CorptoolsCharacterView = () => {
     </QueryClientProvider>
   );
 };
-
+console.log("Loaded");
 const appDiv = document.getElementById("root");
 render(<CorptoolsCharacterView />, appDiv);

@@ -28,6 +28,10 @@ const CharacterNotifications = () => {
     }),
     columnHelper.accessor("timestamp", {
       header: "Date",
+      cell: (props) => {
+        return <>{new Date(props.getValue()).toUTCString()}</>;
+      },
+      enableColumnFilter: false,
     }),
     columnHelper.accessor("notification_type", {
       header: "Type",
@@ -37,6 +41,7 @@ const CharacterNotifications = () => {
       cell: (props) => {
         return <pre>{props.getValue()}</pre>;
       },
+      enableColumnFilter: false,
     }),
   ];
 

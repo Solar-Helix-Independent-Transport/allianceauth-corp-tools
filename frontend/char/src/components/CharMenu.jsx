@@ -40,9 +40,9 @@ const CharMenu = () => {
             ) : (
               <>
                 {data.map((cat) => {
-                  return (
+                  return cat.links ? (
                     <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
-                      {cat.links.map((link) => {
+                      {cat.links?.map((link) => {
                         return (
                           <LinkContainer
                             activeClassName={"active"}
@@ -55,6 +55,20 @@ const CharMenu = () => {
                         );
                       })}
                     </NavDropdown>
+                  ) : (
+                    <>
+                      {cat.link.startsWith("/") ? (
+                        <NavItem id={cat.name} key={cat.name} href={cat.link}>
+                          <>{cat.name}</>
+                        </NavItem>
+                      ) : (
+                        <NavItem id={cat.name} key={cat.name}>
+                          <LinkContainer to={`/audit/r_beta/${characterID}/${cat.link}`}>
+                            <>{cat.name}</>
+                          </LinkContainer>
+                        </NavItem>
+                      )}
+                    </>
                   );
                 })}
               </>
@@ -71,8 +85,8 @@ const CharMenu = () => {
               </>
             ) : (
               <>
-                <NavItem key="Legacy UI" href={`/audit/`}>
-                  Legacy UI
+                <NavItem key="Beta UI" href={`/audit/r_beta`}>
+                  Beta UI
                 </NavItem>
                 <LinkContainer to={`account/list`}>
                   <NavItem key="Account List">Account List</NavItem>
