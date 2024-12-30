@@ -24,15 +24,15 @@ const CharacterSkillQueues = () => {
 
   if (error) return <ErrorLoader />;
 
-  const handleActive = (e) => {
+  const handleActive = (e: any) => {
     setActive(e.currentTarget.checked);
   };
 
-  const handlePaused = (e) => {
+  const handlePaused = (e: any) => {
     setPaused(e.currentTarget.checked);
   };
 
-  const handleEmpty = (e) => {
+  const handleEmpty = (e: any) => {
     setEmpty(e.currentTarget.checked);
   };
 
