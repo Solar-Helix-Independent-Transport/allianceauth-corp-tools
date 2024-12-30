@@ -153,6 +153,14 @@ function App() {
                 }
               />
               <Route
+                path="bridges"
+                element={
+                  <Card>
+                    <Card.Body className="text-center">This is fuel.</Card.Body>
+                  </Card>
+                }
+              />
+              <Route
                 path="sov"
                 element={
                   <Card>

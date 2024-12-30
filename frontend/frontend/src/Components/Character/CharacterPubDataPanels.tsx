@@ -27,7 +27,10 @@ const CharacterPubDataPanels = ({ isFetching, data }: { isFetching: boolean; dat
                     </tr>
                   </thead>
                 </Table>
-                <div style={{ width: "350px", height: "250px", overflowY: "auto" }}>
+                <div
+                  style={{ width: "350px", height: "250px", overflowY: "auto" }}
+                  className="card-img-bottom"
+                >
                   <Table striped>
                     <tbody>
                       {char.history?.map((h: any) => {

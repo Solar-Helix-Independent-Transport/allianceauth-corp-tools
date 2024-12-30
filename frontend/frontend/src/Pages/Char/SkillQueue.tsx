@@ -120,11 +120,15 @@ const CharacterSkillQueues = () => {
                       <tbody>
                         {char.queue?.map((s: any) => {
                           return (
-                            <tr key={s.skill}>
+                            <tr key={`${char.character.character_name}${s.skill}${s.end_level}`}>
                               <td className="no-margin">
                                 <div className="d-flex justify-content-between">
                                   <p className="m-0">{s.skill}</p>
-                                  <SkillLevelBlock level={s.end_level} active={s.current_level} />
+                                  <SkillLevelBlock
+                                    level={s.end_level}
+                                    trained={s.current_level}
+                                    active={s.current_level}
+                                  />
                                 </div>
                                 <div className="d-flex justify-content-between">
                                   {s.end ? (

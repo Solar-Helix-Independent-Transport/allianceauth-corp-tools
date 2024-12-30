@@ -118,6 +118,16 @@ class SkillApiEndpoints:
             skills = models.SkillQueue.objects.filter(character__character__in=characters)\
                 .select_related('character__character', 'skill_name', "skill_name__group")
 
+            skill_totals = models.Skill.objects.filter(character__character__in=characters)\
+                .select_related('character__character', 'skill_name', "skill_name__group")
+
+            skl_ttl = {}
+
+            for s in skill_totals:
+                if s.character_id not in skl_ttl:
+                    skl_ttl[s.character_id] = {}
+                skl_ttl[s.character_id][s.skill_name.name] = s.trained_skill_level
+
             output = {}
             for c in characters:
                 output[c.character_id] = {
@@ -141,6 +151,7 @@ class SkillApiEndpoints:
                         "end_sp": s.level_end_sp,
                         "start": s.start_date,
                         "end": s.finish_date,
+                        "current_level": skl_ttl.get(s.character.character_id, {}).get(s.skill_name.name, 0)
                     }
                 )
 
