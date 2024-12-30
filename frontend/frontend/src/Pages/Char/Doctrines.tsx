@@ -81,7 +81,7 @@ const CharacterDoctrine = () => {
                 </span>
               </h6>
             </Card.Header>
-            <Card.Body className="d-flex align-items-center">
+            <Card.Body className="d-flex align-items-center flex-wrap">
               <div className="flex-one m-2">
                 <CharacterAllegiancePortrait size={128} character={char.character} />
               </div>
