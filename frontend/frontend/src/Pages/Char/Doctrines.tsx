@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 const CharacterDoctrine = () => {
   const { characterID } = useParams();
 
-  const { data, isFetching } = useQuery({
+  const { data } = useQuery({
     queryKey: ["doctrines", characterID],
     queryFn: () => getAccountDoctrines(Number(characterID)),
     refetchOnWindowFocus: false,

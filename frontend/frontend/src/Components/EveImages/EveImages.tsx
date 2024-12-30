@@ -25,7 +25,7 @@ export const CharacterPortrait = (props: CharacterPortraitProps) => {
 };
 
 export interface CorporationLogoProps extends Partial<Element> {
-  corporation_id?: number | string | undefined;
+  corporation_id?: number | string | null | undefined;
   size: Sizes;
   height?: number;
   width?: number;
