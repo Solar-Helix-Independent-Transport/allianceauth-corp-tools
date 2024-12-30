@@ -86,9 +86,9 @@ export const TypeIcon = (props: TypeIconProps) => {
 export interface PortraitProps extends Partial<Element> {
   character: {
     character_id: number | string | undefined;
-    corporation_id?: number | string | undefined;
-    alliance_id?: number | string | undefined;
-    faction_id?: number | string | undefined;
+    corporation_id?: number | string | null | undefined;
+    alliance_id?: number | string | null | undefined;
+    faction_id?: number | string | null | undefined;
   };
   size: number;
   rounded_images?: boolean;

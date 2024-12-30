@@ -1,18 +1,20 @@
 export const SkillBlockKey = () => {
   return (
-    <div className="">
+    <div className="d-flex flex-column w-100">
       <h5 className="text-center">Key</h5>
-      <div className={`flex-skill-block full-width`}>
-        <p>Trained Level</p>
-        <i className="fas fa-circle"></i>
-      </div>
-      <div className={`flex-skill-block full-width`}>
-        <p>Omega Restricted</p>
-        <i className="fas fa-circle" style={{ color: "grey" }}></i>
-      </div>
-      <div className={`flex-skill-block full-width`}>
-        <p>Missing Level</p>
-        <i className="fas fa-circle" style={{ color: "orange" }}></i>
+      <div className="d-flex text-center justify-content-center">
+        <div className="m-3">
+          <p>Trained Level</p>
+          <i className="fas fa-circle"></i>
+        </div>
+        <div className="m-3">
+          <p>Omega Restricted</p>
+          <i className="fas fa-circle" style={{ color: "grey" }}></i>
+        </div>
+        <div className="m-3">
+          <p>Missing Level</p>
+          <i className="fas fa-circle" style={{ color: "orange" }}></i>
+        </div>
       </div>
     </div>
   );

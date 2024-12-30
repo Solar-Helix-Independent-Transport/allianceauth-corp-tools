@@ -59,6 +59,10 @@ export async function getCharacterSkillQueues(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/skillqueues", characterID);
 }
 
+export async function getAccountDoctrines(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/doctrines", characterID);
+}
+
 export async function getCharacterList() {
   const { GET } = getCatApi();
 

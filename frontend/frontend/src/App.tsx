@@ -4,6 +4,7 @@ import CharacterAssets from "./Pages/Char/AssetsList";
 import CharacterAudit from "./Pages/Char/Audit";
 import CharacterClones from "./Pages/Char/Clones";
 import CharacterContacts from "./Pages/Char/Contacts";
+import CharacterDoctrine from "./Pages/Char/Doctrines";
 import CharacterLP from "./Pages/Char/LoyaltyPoints";
 import CharacterNotifications from "./Pages/Char/Notifications";
 import CharacterOverview from "./Pages/Char/Overview";
@@ -80,14 +81,7 @@ function App() {
               />
               <Route path="account/skills" element={<CharacterSkills />} />
               <Route path="account/skillqueue" element={<CharacterSkillQueues />} />
-              <Route
-                path="account/doctrines"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/doctrines.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/doctrines" element={<CharacterDoctrine />} />
               <Route
                 path="account/market"
                 element={
