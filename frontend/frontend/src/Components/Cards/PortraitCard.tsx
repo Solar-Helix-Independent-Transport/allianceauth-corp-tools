@@ -14,6 +14,7 @@ export declare interface PortraitCardProps {
   headerIcon?: string;
   roundedImages?: string;
   character: any; //todo type from api?
+  portaitSize?: number;
 }
 
 export function PortraitCard({
@@ -26,6 +27,7 @@ export function PortraitCard({
   headerIcon,
   heading,
   roundedImages,
+  portaitSize = 350,
 }: PortraitCardProps) {
   return (
     <Card
@@ -38,7 +40,7 @@ export function PortraitCard({
       <Card.Body className={"d-flex flex-column align-items-center p-0"}>
         <CharacterAllegiancePortrait
           className="card-img-top"
-          size={350}
+          size={portaitSize}
           {...{ character, roundedImages }}
         />
         <Card.Title className={"text-center w-100 pt-2"}>
