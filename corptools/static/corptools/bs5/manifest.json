@@ -1,20 +1,20 @@
 {
-  "_@libs-CEzrdXGo.js": {
-    "file": "assets/@libs-CEzrdXGo.js"
+  "_@libs-BCfgtq-S.js": {
+    "file": "assets/@libs-BCfgtq-S.js"
   },
-  "_@react-router-DFHYOdBm.js": {
-    "file": "assets/@react-router-DFHYOdBm.js",
+  "_@react-router-DgP_4-oX.js": {
+    "file": "assets/@react-router-DgP_4-oX.js",
     "imports": [
-      "_@libs-CEzrdXGo.js"
+      "_@libs-BCfgtq-S.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-C1jlYwZ5.js",
+    "file": "assets/index-rmLy-Scj.js",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@libs-CEzrdXGo.js",
-      "_@react-router-DFHYOdBm.js"
+      "_@libs-BCfgtq-S.js",
+      "_@react-router-DgP_4-oX.js"
     ],
     "css": [
       "static/corptools/bs5/static/css/index-C3MTBa14.css"
