@@ -81,11 +81,11 @@ const CharacterDoctrine = () => {
                 </span>
               </h6>
             </Card.Header>
-            <Card.Body className="d-flex align-items-center flex-wrap">
+            <Card.Body className="d-flex align-items-center">
               <div className="flex-one m-2">
                 <CharacterAllegiancePortrait size={128} character={char.character} />
               </div>
-              <div className="d-flex flex-grow-1 justify-content-center">
+              <div className="d-flex flex-grow-1 justify-content-center flex-wrap">
                 {Object.entries(char.doctrines).length > 0 ? (
                   <>
                     {Object.entries(char.doctrines).map(([k, v]) => {
