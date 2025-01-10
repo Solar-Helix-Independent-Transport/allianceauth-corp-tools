@@ -480,6 +480,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/account/{character_id}/qs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Qs Test */
+    get: operations["corptools_api_character_status_get_qs_test"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/account/{character_id}/pubdata": {
     parameters: {
       query?: never;
@@ -769,6 +786,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/dashboard/metenox": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Dashboard Drills */
+    get: operations["corptools_api_corporation_dashboards_get_dashboard_drills"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/corp/structures": {
     parameters: {
       query?: never;
@@ -970,6 +1004,8 @@ export interface components {
     MenuCategory: {
       /** Name */
       name: string;
+      /** Link */
+      link?: string;
       /** Links */
       links?: components["schemas"]["MenuLink"][];
     };
@@ -978,7 +1014,7 @@ export interface components {
       /** Name */
       name: string;
       /** Link */
-      link: string;
+      link?: string;
     };
     /** EveName */
     EveName: {
@@ -1128,6 +1164,89 @@ export interface components {
       total_active: number;
       /** Total Expired */
       total_expired: number;
+    };
+    /** CharacterContract */
+    CharacterContract: {
+      /** Character */
+      character: string | components["schemas"]["Character"];
+      /** Id */
+      id?: number | null;
+      /** Contract */
+      contract?: number | null;
+      /**
+       * Items
+       * @default []
+       */
+      items: components["schemas"]["ContractItems"][] | null;
+      /** Contract Type */
+      contract_type: string;
+      /** Availbility */
+      availbility?: string | null;
+      /** Tittle */
+      tittle?: string | null;
+      /** Acceptor */
+      acceptor?: string | null;
+      /** Assignee */
+      assignee?: string | null;
+      /** Issuer */
+      issuer?: string | null;
+      /** Issuer Corporation Id */
+      issuer_corporation_id?: string | null;
+      /** Days To Complete */
+      days_to_complete: number;
+      /** Collateral */
+      collateral: number;
+      /** Buyout */
+      buyout: number;
+      /** Price */
+      price: number;
+      /** Reward */
+      reward: number;
+      /** Volume */
+      volume: number;
+      /** Status */
+      status: string;
+      /** Start Location Id */
+      start_location_id?: number | null;
+      /** End Location Id */
+      end_location_id?: number | null;
+      /** For Corporation */
+      for_corporation: boolean;
+      /**
+       * Date Accepted
+       * Format: date-time
+       */
+      date_accepted: string;
+      /**
+       * Date Completed
+       * Format: date-time
+       */
+      date_completed: string;
+      /**
+       * Date Expired
+       * Format: date-time
+       */
+      date_expired: string;
+      /**
+       * Date Issued
+       * Format: date-time
+       */
+      date_issued: string;
+    };
+    /** ContractItems */
+    ContractItems: {
+      /** Is Included */
+      is_included: boolean;
+      /** Is Singleton */
+      is_singleton: boolean;
+      /** Quantity */
+      quantity?: number | null;
+      /** Raw Quantity */
+      raw_quantity?: number | null;
+      /** Record Id */
+      record_id: number;
+      /** Type Name */
+      type_name: string;
     };
     /** LoyaltyPoints */
     LoyaltyPoints: {
@@ -1368,6 +1487,22 @@ export interface components {
       /** Last Updates */
       last_updates?: Record<string, never> | null;
     };
+    /** Metenox */
+    Metenox: {
+      structure: components["schemas"]["Structure"];
+      /** Contents */
+      contents: components["schemas"]["OreValue"][];
+      /** Total */
+      total: number;
+    };
+    /** OreValue */
+    OreValue: {
+      type: components["schemas"]["EveName"];
+      /** Quantity */
+      quantity: number;
+      /** Value */
+      value: number;
+    };
     /** Structure */
     Structure: {
       /** Id */
@@ -1379,6 +1514,8 @@ export interface components {
       /** Services */
       services?: components["schemas"]["StructureService"][] | null;
       location: components["schemas"]["EveName"];
+      constellation?: components["schemas"]["EveName"] | null;
+      region?: components["schemas"]["EveName"] | null;
       /** Celestial */
       celestial?: string | null;
       /** Fuel Expiry */
@@ -1800,7 +1937,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown[];
+          "application/json": components["schemas"]["CharacterContract"][];
         };
       };
       /** @description Forbidden */
@@ -2250,6 +2387,28 @@ export interface operations {
         content: {
           "application/json": string;
         };
+      };
+    };
+  };
+  corptools_api_character_status_get_qs_test: {
+    parameters: {
+      query?: {
+        total?: number;
+      };
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
@@ -2755,6 +2914,35 @@ export interface operations {
         };
         content: {
           "application/json": unknown[];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_dashboards_get_dashboard_drills: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Metenox"][];
         };
       };
       /** @description Forbidden */

@@ -4,8 +4,10 @@ import CharacterAssets from "./Pages/Char/AssetsList";
 import CharacterAudit from "./Pages/Char/Audit";
 import CharacterClones from "./Pages/Char/Clones";
 import CharacterContacts from "./Pages/Char/Contacts";
+import CharacterContracts from "./Pages/Char/Contracts";
 import CharacterDoctrine from "./Pages/Char/Doctrines";
 import CharacterLP from "./Pages/Char/LoyaltyPoints";
+import Market from "./Pages/Char/Market";
 import CharacterNotifications from "./Pages/Char/Notifications";
 import CharacterOverview from "./Pages/Char/Overview";
 import CharacterPubData from "./Pages/Char/PubData";
@@ -71,25 +73,11 @@ function App() {
               />
               <Route path="account/notifications" element={<CharacterNotifications />} />
               <Route path="account/contact" element={<CharacterContacts />} />
-              <Route
-                path="account/contract"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/contract.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/contract" element={<CharacterContracts />} />
               <Route path="account/skills" element={<CharacterSkills />} />
               <Route path="account/skillqueue" element={<CharacterSkillQueues />} />
               <Route path="account/doctrines" element={<CharacterDoctrine />} />
-              <Route
-                path="account/market"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/market.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/market" element={<Market />} />
               <Route
                 path="account/standings"
                 element={

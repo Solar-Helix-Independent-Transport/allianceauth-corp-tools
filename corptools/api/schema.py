@@ -209,6 +209,49 @@ class CorporationWalletEvent(Schema):
     reason: Optional[str] = None
 
 
+class ContractItems(Schema):
+    is_included: bool
+    is_singleton: bool
+    quantity: Optional[int] = None
+    raw_quantity: Optional[int] = None
+    record_id: int
+    type_name: str
+
+
+class CharacterContract(Schema):
+    character: str | Character
+    id: Optional[int] = None
+    contract: Optional[int] = None
+    items: Optional[list[ContractItems]] = []
+    contract_type: str
+    availbility: Optional[str] = None
+    tittle: Optional[str] = None
+
+    acceptor: Optional[str] = None
+    assignee: Optional[str] = None
+    issuer: Optional[str] = None
+
+    issuer_corporation_id: Optional[str] = None
+
+    days_to_complete: int
+    collateral: float
+    buyout: float
+    price: float
+    reward: float
+    volume: float
+    status: str
+
+    start_location_id: Optional[int] = None
+    end_location_id: Optional[int] = None
+
+    for_corporation: bool
+
+    date_accepted: datetime
+    date_completed: datetime
+    date_expired: datetime
+    date_issued: datetime
+
+
 class CharacterOrder(Schema):
     character: Character
     date: datetime

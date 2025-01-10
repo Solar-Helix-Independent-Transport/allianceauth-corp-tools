@@ -380,6 +380,11 @@ def react_menu_v4(request):
 
 
 @login_required
+def react_corp_beta(request):
+    return render(request, 'corptools/base_bs5.html', context={"version": __version__, "app_name": "corptools/bs5", "page_title": "Audit"})
+
+
+@login_required
 def react_main(request, character_id):
     try:
         return render(request, 'corptools/base_bs5.html', context={"version": __version__, "app_name": "corptools/bs5", "page_title": "Audit"})

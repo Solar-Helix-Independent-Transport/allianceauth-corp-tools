@@ -150,7 +150,7 @@ class FinancesApiEndpoints:
                     },
                     "price": w.price,
                     "escrow": w.escrow,
-                    "buy_order": w.is_buy_order,
+                    "buy_order": True if w.is_buy_order else False,
                 }
                 if w.location_name:
                     o['location'] = {
@@ -174,7 +174,7 @@ class FinancesApiEndpoints:
                     },
                     "price": w.price,
                     "escrow": w.escrow,
-                    "buy_order": w.is_buy_order,
+                    "buy_order": True if w.is_buy_order else False,
                 }
                 if w.location_name:
                     o['location'] = {
@@ -255,7 +255,7 @@ class FinancesApiEndpoints:
 
         @api.get(
             "account/{character_id}/contracts",
-            response={200: List, 403: str},
+            response={200: List[schema.CharacterContract], 403: str},
             tags=self.tags
         )
         def get_character_contracts(request, character_id: int):

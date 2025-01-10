@@ -1,15 +1,13 @@
-import React from "react";
-
-export function StrToFields({ strValue, text, valuePre = "", valuePost = "", children }) {
+export function StrToFields({ strValue, text, valuePre = "", valuePost = "", children }: any) {
   //console.log("StrToFields", strValue, text);
   return strValue || children ? (
-    <tr>
-      <td>
-        <p className="text-right">{text}</p>
+    <tr className="m-0">
+      <td className="m-0">
+        <p className="text-end m-0 py-0">{text}</p>
       </td>
-      <td style={{ paddingLeft: "10px" }}>
+      <td style={{ paddingLeft: "10px" }} className="m-0">
         {strValue && (
-          <p>
+          <p className="m-0 py-0">
             {valuePre} {strValue} {valuePost}
           </p>
         )}
@@ -21,7 +19,7 @@ export function StrToFields({ strValue, text, valuePre = "", valuePost = "", chi
   );
 }
 
-export function DateToFields({ dateStrValue, text, valuePre = "", valuePost = "" }) {
+export function DateToFields({ dateStrValue, text, valuePre = "", valuePost = "" }: any) {
   //console.log("IntToFields", intValue, text);
   return dateStrValue ? (
     <StrToFields
@@ -35,7 +33,7 @@ export function DateToFields({ dateStrValue, text, valuePre = "", valuePost = ""
   );
 }
 
-export function IntToFields({ intValue, text, valuePre = "", valuePost = "" }) {
+export function IntToFields({ intValue, text, valuePre = "", valuePost = "" }: any) {
   //console.log("IntToFields", intValue, text);
   return intValue !== 0 ? (
     <StrToFields
@@ -49,7 +47,7 @@ export function IntToFields({ intValue, text, valuePre = "", valuePost = "" }) {
   );
 }
 
-export function StrIntToFields({ strValue, text, valuePre = "", valuePost = "" }) {
+export function StrIntToFields({ strValue, text, valuePre = "", valuePost = "" }: any) {
   //console.log("StrIntToFields", strValue, text);
   let intValue = parseInt(strValue);
   return strValue ? (

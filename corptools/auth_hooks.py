@@ -32,7 +32,7 @@ class MemberAudit(MenuItemHook):
         return ''
 
 
-class Structures(MenuItemHook):
+class CorporationAudit(MenuItemHook):
     def __init__(self):
 
         MenuItemHook.__init__(self,
@@ -60,7 +60,7 @@ def register_menu():
 
 @hooks.register('menu_item_hook')
 def register_corp():
-    return Structures()
+    return CorporationAudit()
 
 
 @hooks.register('url_hook')

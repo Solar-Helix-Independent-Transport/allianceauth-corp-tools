@@ -51,6 +51,14 @@ export async function loadGlanceFactionData(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/glance/faction", characterID);
 }
 
+export async function getCharacterMarket(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/market", characterID);
+}
+
+export async function getCharacterContracts(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/contracts", characterID);
+}
+
 export async function getCharacterSkills(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/skills", characterID);
 }

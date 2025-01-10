@@ -68,20 +68,27 @@ urlpatterns = [
         name='reactmain'
     ),
     re_path(
-        r'^r_beta/(?P<character_id>(\d)*)/',
-        views.react_main,
-        name='reactbetamain'
+        'r_beta/corp',
+        views.react_corp_beta,
+        name='corp_beta_react'
     ),
-    re_path(
+    path(
         'r_beta/',
         views.react_menu_v4,
         name='reactbeta'
     ),
+    re_path(
+        r'^r_beta/(?P<character_id>(\d)*)/',
+        views.react_main,
+        name='reactbetamain'
+    ),
     re_path(r'^check_account/(?P<character_id>(\d)*)/$',
             views.update_account, name='update_account'),
     path('admin/', views.admin, name='admin'),
-    path('admin_add_pyfa_xml/', views.admin_add_pyfa_xml, name='admin_add_pyfa_xml'),
-    path('admin_create_tasks/', views.admin_create_tasks, name='admin_create_tasks'),
+    path('admin_add_pyfa_xml/', views.admin_add_pyfa_xml,
+         name='admin_add_pyfa_xml'),
+    path('admin_create_tasks/', views.admin_create_tasks,
+         name='admin_create_tasks'),
     path('run_tasks/', views.admin_run_tasks, name='run_tasks'),
     path('char/add/', views.add_char, name='add_char'),
     re_path(r'^char/(?P<character_id>(\d)*)/', include(_character_ulrs)),
@@ -92,6 +99,7 @@ urlpatterns = [
         path('add_options/', views.add_corp_section,
              name='add_corp_options'),
         re_path(r'^dashboard/fuel', views.fuel_levels, name='fuel_dashboard'),
-        re_path(r'^dashboard/metenox', views.metenox_levels, name='drill_dashboard'),
+        re_path(r'^dashboard/metenox', views.metenox_levels,
+                name='drill_dashboard'),
     ])),
 ]
