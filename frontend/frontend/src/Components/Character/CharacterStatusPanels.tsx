@@ -16,8 +16,9 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
             heading={char.character.character_name}
             roundedImages={"10"}
             isFetching={isFetching}
+            portaitSize={450}
           >
-            <div className="mt-2" style={{ width: "350px" }}>
+            <div className="mt-2" style={{ width: "450px" }}>
               <Card.Text className={"text-center"}>
                 {char.character.corporation_name}
                 <br />
@@ -65,6 +66,13 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                   >
                     DotLan
                   </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    href={`https://www.eve411.com/character/${char.character.character_id}`}
+                  >
+                    Eve411
+                  </Button>
                 </ButtonGroup>
               </Card.Text>
               <CollapseBlock
@@ -81,7 +89,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                       </tr>
                     </thead>
                   </Table>
-                  <div style={{ width: "350px" }}>
+                  <div style={{ width: "450px" }}>
                     <Table striped>
                       <tbody>
                         {data?.headers.map((h: any) => {
