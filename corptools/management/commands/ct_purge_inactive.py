@@ -15,6 +15,12 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             "--purge",
+            action='store_true',
+            help='Remove all detatched characters.'
+        )
+
+        parser.add_argument(
+            "--purge_guest",
             type=str,
             help='Remove all guest state audits, regardless of if they are active or not.'
         )
@@ -27,15 +33,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write("Cleaning up CT Audits, this may take a while.")
-        # self.stdout.write(f"{options}")
-
-        if "purge" in options:
+        if options["purge_inactive"]:
             _c = CharacterAudit.objects.filter(
                 character__character_ownership__isnull=True
             )
             self.stdout.write(f"Purging {_c.count()} Unlinked Characters")
             for _d in _c:
                 _d.delete()
+
+        if "purge" in options:
             try:
                 _s = State.objects.get(name=options["purge"])
             except State.DoesNotExist:
@@ -43,8 +49,10 @@ class Command(BaseCommand):
             _c = CharacterAudit.objects.filter(
                 character__character_ownership__user__profile__state=_s
             )
-            self.stdout.write(f"This will purge {_c.count()} Characters in the {options['purge']} State")
-            _in = input("Are you sure you want to continue? type `yes` to continue: ")
+            self.stdout.write(
+                f"This will purge {_c.count()} Characters in the {options['purge']} State")
+            _in = input(
+                "Are you sure you want to continue? type `yes` to continue: ")
             if _in.lower() == "yes":
                 for _d in _c:
                     _d.delete()
@@ -61,4 +69,5 @@ class Command(BaseCommand):
                 for _d in _c:
                     _d.delete()
             else:
-                self.stdout.write("Notification module not active need to use other")
+                self.stdout.write(
+                    "Notification module not active need to use other")
