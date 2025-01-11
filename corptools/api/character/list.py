@@ -19,7 +19,7 @@ class ListApiEndpoints:
             response={200: List[schema.AccountStatus], 403: str},
             tags=self.tags
         )
-        def get_account_list(request, orphans=True):
+        def get_account_list(request, orphans=False):
             characters = models.CharacterAudit.objects.visible_to(
                 request.user).filter(character=F("character__character_ownership__user__profile__main_character"))\
                 .select_related('character__character_ownership',
