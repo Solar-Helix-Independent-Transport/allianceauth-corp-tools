@@ -246,10 +246,10 @@ class CharacterContract(Schema):
 
     for_corporation: bool
 
-    date_accepted: datetime
-    date_completed: datetime
-    date_expired: datetime
-    date_issued: datetime
+    date_accepted: Optional[datetime] = None
+    date_completed: Optional[datetime] = None
+    date_expired: Optional[datetime] = None
+    date_issued: Optional[datetime] = None
 
 
 class CharacterOrder(Schema):
