@@ -269,8 +269,8 @@ class CharacterOrder(Schema):
 class CharacterMarket(Schema):
     expired: List[CharacterOrder] = None
     active: List[CharacterOrder] = None
-    total_active: int
-    total_expired: int
+    total_active: float
+    total_expired: float
 
 
 class Contact(Schema):
