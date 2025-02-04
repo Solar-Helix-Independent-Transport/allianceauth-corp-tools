@@ -93,7 +93,7 @@ def process_ores_from_esi():
 
 @shared_task
 def update_all_eve_names(chunk=False):
-    needs_update = timezone.now() - datetime.timedelta(days=7)
+    needs_update = timezone.now() - datetime.timedelta(days=30)
     en = EveName.objects.filter(last_update__lte=needs_update)
     if chunk:
         en = en[:chunk]
@@ -191,9 +191,10 @@ def update_subset_of_characters(self, subset=48, min_runs=5, force=False):
     char_ids = []
     for char in characters:
         char_ids.append(char.character.character_id)
-        update_character.apply_async(args=[char.character.character_id], kwargs={"force_refresh": force})
+        update_character.apply_async(args=[char.character.character_id], kwargs={
+                                     "force_refresh": force})
 
-    update_all_eve_names.apply_async(priority=7, kwargs={"chunk": 5000})
+    update_all_eve_names.apply_async(priority=7, kwargs={"chunk": 500})
 
     process_corp_histories.apply_async(priority=6)
 
@@ -434,7 +435,8 @@ def update_character(self, char_id, force_refresh=False):
             except ObjectDoesNotExist:
                 pass
 
-    delay = random() * app_settings.CT_TASK_SPREAD_DELAY  # Spread out updates over 10 min to try be nice to ESI?
+    # Spread out updates over 10 min to try be nice to ESI?
+    delay = random() * app_settings.CT_TASK_SPREAD_DELAY
     if force_refresh:
         delay = 1  # If forced GO NOW!
 
@@ -823,7 +825,8 @@ def update_all_locations(self, force_citadels=False):
     queryset6 = list(CharacterMarketOrder.objects.filter(
         location_name_id__isnull=True).values_list('location_id', flat=True))
 
-    all_locations = set(queryset1 + queryset2 + queryset3 + queryset4 + queryset5 + queryset6)
+    all_locations = set(queryset1 + queryset2 + queryset3 +
+                        queryset4 + queryset5 + queryset6)
     # print(all_locations)
     logger.warning(f"{len(all_locations)} Locations to find")
     count = 0

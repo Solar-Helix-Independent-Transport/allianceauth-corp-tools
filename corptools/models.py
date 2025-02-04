@@ -529,7 +529,7 @@ class EveName(models.Model):
             return eveimageserver.corporation_logo_url(self.eve_id)
 
     def needs_update(self):
-        return self.last_update + datetime.timedelta(days=7) < timezone.now()
+        return self.last_update + datetime.timedelta(days=30) < timezone.now()
 
 
 class MapRegion(models.Model):
