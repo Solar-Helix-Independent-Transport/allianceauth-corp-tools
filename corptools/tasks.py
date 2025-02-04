@@ -98,7 +98,11 @@ def update_all_eve_names(chunk=False):
     if chunk:
         en = en[:chunk]
     for e in en:
-        update_eve_name.apply_async(args=[e.eve_id], priority=7)
+        update_eve_name.apply_async(
+            args=[e.eve_id],
+            priority=7,
+            countdown=random() * app_settings.CT_TASK_SPREAD_DELAY
+        )
 
 
 @shared_task(bind=True, base=QueueOnce, max_retries=None)
@@ -904,7 +908,8 @@ def update_all_corps(force_refresh=False):
     for corp in corps:
         update_corp.apply_async(
             args=[corp.corporation.corporation_id],
-            kwargs={"force_refresh": force_refresh}
+            kwargs={"force_refresh": force_refresh},
+            countdown=random()*app_settings.CT_TASK_SPREAD_DELAY*2
         )
 
 
