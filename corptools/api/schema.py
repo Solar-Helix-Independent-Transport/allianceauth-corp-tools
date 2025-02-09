@@ -60,6 +60,7 @@ class CharacterStatus(Schema):
     sp: Optional[int] = None
     location: Optional[str] = None
     ship: Optional[str] = None
+    ship_name: Optional[str] = None
     active: bool
     last_updates: Optional[Dict] = None
 

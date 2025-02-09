@@ -37,8 +37,18 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                 <Badge className={"text-center"}>
                   {char.location ? char.location : "Unknown Location"}
                 </Badge>
-                <br />
-                <Badge className={"text-center"}>{char.ship ? char.ship : "Unknown Ship"}</Badge>
+                {char.ship && (
+                  <>
+                    <br />
+                    <Badge className={"text-center"}>{char.ship}</Badge>
+                  </>
+                )}
+                {char.ship_name && (
+                  <>
+                    <br />
+                    <Badge className={"text-center"}>{char.ship_name}</Badge>
+                  </>
+                )}
               </Card.Text>
               <Card.Text className={"text-center"}>
                 <ButtonGroup className="w-75">

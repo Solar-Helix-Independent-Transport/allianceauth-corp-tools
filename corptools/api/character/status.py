@@ -53,6 +53,7 @@ class StatusApiEndpoints:
                     "isk": 0,
                     "location": "Unknown",
                     "ship": "Unknown",
+                    "ship_name": "Unknown",
                     "sp": skills.get(character.character_id, 0),
                     "active": False,
                     "last_updates": None
@@ -70,7 +71,8 @@ class StatusApiEndpoints:
                     try:
                         _o.update({
                             "location": character.characteraudit.location.current_location.location_name,
-                            "ship": f"{character.characteraudit.location.current_ship_name} ({character.characteraudit.location.current_ship.name})"
+                            "ship": f"{character.characteraudit.location.current_ship.name}",
+                            "ship_name": f"{character.characteraudit.location.current_ship_name}"
                         })
                     except Exception:
                         pass
