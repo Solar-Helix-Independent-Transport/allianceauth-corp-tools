@@ -5,25 +5,25 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { Button, Table } from "react-bootstrap";
 import TimeAgo from "react-timeago";
 
-const UpdateTableRows = ({ values }: { values: Record<string, never> | null | undefined }) => {
-  if (values) {
-    return Object.keys(values)?.map((h: string) => {
-      return (
-        <tr key={h}>
-          <td>{h}</td>
-          <td className="text-end">
-            {values ? values[h] ? <TimeAgo date={values[h]} /> : "Never" : "Never"}
-          </td>
-        </tr>
-      );
-    });
-  }
-};
+// const UpdateTableRows = ({ values }: { values: Record<string, never> | null | undefined }) => {
+//   if (values) {
+//     return Object.keys(values)?.map((h: string) => {
+//       return (
+//         <tr key={h}>
+//           <td>{h}</td>
+//           <td className="text-end">
+//             {values ? values[h] ? <TimeAgo date={values[h]} /> : "Never" : "Never"}
+//           </td>
+//         </tr>
+//       );
+//     });
+//   }
+// };
 
 const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
   const columnHelper = createColumnHelper<components["schemas"]["CharacterStatus"]>();
 
-  const columns = [
+  let columns = [
     columnHelper.accessor("character.character_name", {
       header: "Character",
     }),
@@ -62,36 +62,22 @@ const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boo
         );
       },
     }),
-    columnHelper.accessor("last_updates", {
-      header: "Updates",
-      cell: (cell) => {
-        return (
-          <CollapseBlock
-            id={`dropdown-status-${cell.row.original.character.character_name}`}
-            heading={"Update Status"}
-          >
-            <>
-              <Table striped style={{ marginBottom: 0 }}>
-                <thead>
-                  <tr>
-                    <th>Update</th>
-                    <th className="text-end">Last Run</th>
-                  </tr>
-                </thead>
-              </Table>
-              <div>
-                <Table striped>
-                  <tbody>
-                    <UpdateTableRows values={cell.getValue()} />
-                  </tbody>
-                </Table>
-              </div>
-            </>
-          </CollapseBlock>
-        );
-      },
-    }),
   ];
+  console.log(data?.last_updates);
+  if (data?.characters[0]?.last_updates) {
+    Object.keys(data?.characters[0]?.last_updates)?.map((h: string) => {
+      console.log(h);
+      columns.push(
+        // @ts-expect-error
+        columnHelper.accessor(`last_updates.${h}`, {
+          header: h,
+          cell: (cell) => {
+            return cell.getValue() ? <TimeAgo date={cell.getValue()} /> : "Never";
+          },
+        })
+      );
+    });
+  }
 
   return <BaseTable data={data?.characters} {...{ isFetching, columns }} />;
 };

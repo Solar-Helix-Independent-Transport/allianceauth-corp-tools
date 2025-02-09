@@ -1,9 +1,11 @@
 import { PortraitCard } from "../Cards/PortraitCard";
-import { CollapseBlock } from "../Helpers/CollapseBlock";
-import { Badge, Button, ButtonGroup, Card, Table } from "react-bootstrap";
+import React from "react";
+import { Badge, Button, ButtonGroup, Card, Modal, Table } from "react-bootstrap";
 import TimeAgo from "react-timeago";
 
 const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
+  const [openModal, setOpenModal] = React.useState(false);
+  const [modalData, setModalData] = React.useState(null as any);
   return (
     <div className="d-flex justify-content-around align-items-center flex-row flex-wrap">
       {data?.characters.map((char: any) => {
@@ -37,18 +39,16 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                 <Badge className={"text-center"}>
                   {char.location ? char.location : "Unknown Location"}
                 </Badge>
-                {char.ship && (
-                  <>
-                    <br />
-                    <Badge className={"text-center"}>{char.ship}</Badge>
-                  </>
-                )}
-                {char.ship_name && (
-                  <>
-                    <br />
-                    <Badge className={"text-center"}>{char.ship_name}</Badge>
-                  </>
-                )}
+                <br />
+                <Badge className={"text-center"} className="m-1">
+                  {char.ship_name && <>{char.ship_name}</>}
+                  {char.ship && (
+                    <>
+                      <br />
+                      {char.ship}
+                    </>
+                  )}
+                </Badge>
               </Card.Text>
               <Card.Text className={"text-center"}>
                 <ButtonGroup className="w-75">
@@ -84,51 +84,90 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                     Eve411
                   </Button>
                 </ButtonGroup>
+                <Button
+                  variant={char_status}
+                  size="sm"
+                  className="w-100 mt-2"
+                  style={{
+                    borderTopLeftRadius: 0,
+                    borderTopRightRadius: 0,
+                  }}
+                  onClick={() => {
+                    setModalData(char);
+                    setOpenModal(true);
+                  }}
+                >
+                  Show Update Status
+                </Button>
               </Card.Text>
-              <CollapseBlock
-                className="m-2"
-                id={`dropdown-status-${char.character.character_name}`}
-                heading={`Update Status`}
-              >
-                <div>
-                  <Table striped style={{ marginBottom: 0 }}>
-                    <thead>
-                      <tr key={`head-${char.character}`}>
-                        <th>Update</th>
-                        <th className="text-end">Last Run</th>
-                      </tr>
-                    </thead>
-                  </Table>
-                  <div style={{ width: "450px" }}>
-                    <Table striped>
-                      <tbody>
-                        {data?.headers.map((h: any) => {
-                          return (
-                            <tr key={h}>
-                              <td>{h}</td>
-                              <td className="text-end">
-                                {char.last_updates ? (
-                                  char.last_updates[h] ? (
-                                    <TimeAgo date={char.last_updates[h]} />
-                                  ) : (
-                                    "Never"
-                                  )
-                                ) : (
-                                  "Never"
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </Table>
-                  </div>
-                </div>
-              </CollapseBlock>
             </div>
           </PortraitCard>
         );
       })}
+      {modalData?.character && (
+        <Modal
+          show={openModal}
+          onHide={() => {
+            setOpenModal(false);
+          }}
+        >
+          <Modal.Header>
+            {modalData?.character.character_name} Update Status{" "}
+            <Button
+              variant="secondary"
+              className="float-end"
+              onClick={() => {
+                setOpenModal(false);
+              }}
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </Button>
+          </Modal.Header>
+          <Modal.Body>
+            <div>
+              <Table striped style={{ marginBottom: 0 }}>
+                <thead>
+                  <tr key={`head-${modalData?.character}`}>
+                    <th>Update</th>
+                    <th className="text-end">Last Run</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data?.headers.map((h: any) => {
+                    return (
+                      <tr key={h}>
+                        <td>{h}</td>
+                        <td className="text-end">
+                          {modalData?.last_updates ? (
+                            modalData?.last_updates[h] ? (
+                              <TimeAgo date={modalData?.last_updates[h]} />
+                            ) : (
+                              "Never"
+                            )
+                          ) : (
+                            "Never"
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              className="w-100"
+              onClick={() => {
+                setOpenModal(false);
+              }}
+            >
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </div>
   );
 };
