@@ -32,7 +32,11 @@ import {
 import { useLocation } from "react-router-dom";
 
 function MyTooltip(message: string) {
-  return <Tooltip id="character_tooltip">{message}</Tooltip>;
+  return (
+    <Tooltip id="character_tooltip" style={{ position: "fixed" }}>
+      {message}
+    </Tooltip>
+  );
 }
 
 const exportToCSV = (table: ReactTable<any>, exportFileName: string) => {

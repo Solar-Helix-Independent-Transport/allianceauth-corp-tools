@@ -32,7 +32,7 @@ type IconStatusCardProps = {
 
 const showOverlay = (toolTipText: string | undefined) => {
   return toolTipText ? (
-    <Tooltip placement={"top"} id={toolTipText}>
+    <Tooltip placement={"top"} id={toolTipText} style={{ position: "fixed" }}>
       {toolTipText}
     </Tooltip>
   ) : (

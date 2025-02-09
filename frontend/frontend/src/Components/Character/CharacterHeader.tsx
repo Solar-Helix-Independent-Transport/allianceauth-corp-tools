@@ -14,7 +14,11 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 function MyTooltip({ message }: { message: String }) {
-  return <Tooltip id="character_tooltip">{message}</Tooltip>;
+  return (
+    <Tooltip id="character_tooltip" style={{ position: "fixed" }}>
+      {message}
+    </Tooltip>
+  );
 }
 
 const CharHeader = () => {

@@ -111,17 +111,8 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
             setOpenModal(false);
           }}
         >
-          <Modal.Header>
+          <Modal.Header closeButton>
             {modalData?.character.character_name} Update Status{" "}
-            <Button
-              variant="secondary"
-              className="float-end"
-              onClick={() => {
-                setOpenModal(false);
-              }}
-            >
-              <i className="fa-solid fa-xmark"></i>
-            </Button>
           </Modal.Header>
           <Modal.Body>
             <div>
