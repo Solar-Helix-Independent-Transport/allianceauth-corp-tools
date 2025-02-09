@@ -4,6 +4,7 @@ from datetime import timedelta
 from celery import shared_task
 
 from django.utils import timezone
+from django.utils.html import strip_tags
 
 from allianceauth.services.hooks import get_extension_logger
 from esi.models import Token
@@ -623,7 +624,8 @@ def update_character_wallet(character_id, force_refresh=False):
 
         _st = time.perf_counter()
         _current_journal = CharacterWalletJournalEntry.objects.filter(
-            character=audit_char).values_list('entry_id', flat=True)  # TODO add time filter
+            # TODO add time filter
+            character=audit_char).values_list('entry_id', flat=True)
         _current_eve_ids = list(
             EveName.objects.all().values_list('eve_id', flat=True))
 
@@ -721,7 +723,8 @@ def update_character_transactions(character_id, force_refresh=False):
         _current_journal = CharacterWalletJournalEntry.objects.filter(
             character=audit_char,
             context_id_type="market_transaction_id",
-            reason__exact="").values_list('context_id', flat=True)[:2500]  # Max items from ESI
+            # Max items from ESI
+            reason__exact="").values_list('context_id', flat=True)[:2500]
 
         # _new_names = []
 
@@ -859,7 +862,8 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
                 lp.get('corporation_id'))
 
             if lp.get('corporation_id') in existing_lp_corps:
-                existing = LoyaltyPoint.objects.get(character=audit_char, corporation=lp_corp)
+                existing = LoyaltyPoint.objects.get(
+                    character=audit_char, corporation=lp_corp)
                 existing.amount = lp.get('loyalty_points')
                 _bulkupdate.append(existing)
             else:
@@ -1277,7 +1281,8 @@ def update_character_mail_headers(character_id, force_refresh=False):
                     break
                 continue
 
-            id_k = int(str(audit_char.character.character_id) + str(msg.get('mail_id')))
+            id_k = int(str(audit_char.character.character_id) +
+                       str(msg.get('mail_id')))
             if msg.get('from', 0) not in _current_eve_ids:
                 if msg.get('from', 0) not in failed_ids:
                     try:
@@ -1490,7 +1495,7 @@ def update_character_titles(character_id, force_refresh=False):
                 corporation_name=audit_char.character.corporation_name,
                 title_id=t.get('title_id'),
                 defaults={
-                    "title": t.get('name')
+                    "title": strip_tags(t.get('name'))
                 }
             )
 
@@ -1596,7 +1601,7 @@ def update_character_contracts(character_id, force_refresh=False):
                                                  'assignee_name', 'acceptor_name', 'issuer_corporation_name', 'issuer_name'])
 
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_titles {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_character_contracts {character_id}")
 
         new_contract_ids = [c.contract_id for c in contract_models_new]
         if force_refresh:
