@@ -12,6 +12,8 @@
     "buildApiTypes": "npx openapi-typescript ./openapi.json -o ./src/api/CtApi.d.ts"
   },
   "dependencies": {
+    "@nivo/bar": "^0.88.0",
+    "@nivo/core": "^0.88.0",
     "@pvyparts/allianceauth-components": "^1.1.3",
     "@tanstack/react-table": "^8.12.0",
     "@types/js-cookie": "^3.0.6",

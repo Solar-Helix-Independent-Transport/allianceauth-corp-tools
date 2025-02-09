@@ -40,7 +40,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                   {char.location ? char.location : "Unknown Location"}
                 </Badge>
                 <br />
-                <Badge className={"text-center"} className="m-1">
+                <Badge className="text-center m-1">
                   {char.ship_name && <>{char.ship_name}</>}
                   {char.ship && (
                     <>

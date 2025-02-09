@@ -1,8 +1,7 @@
 import { components } from "../../api/CtApi";
-import { CollapseBlock } from "../Helpers/CollapseBlock";
 import BaseTable from "../Tables/BaseTable/BaseTable";
 import { createColumnHelper } from "@tanstack/react-table";
-import { Button, Table } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import TimeAgo from "react-timeago";
 
 // const UpdateTableRows = ({ values }: { values: Record<string, never> | null | undefined }) => {
@@ -68,13 +67,12 @@ const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boo
     Object.keys(data?.characters[0]?.last_updates)?.map((h: string) => {
       console.log(h);
       columns.push(
-        // @ts-expect-error
         columnHelper.accessor(`last_updates.${h}`, {
           header: h,
           cell: (cell) => {
             return cell.getValue() ? <TimeAgo date={cell.getValue()} /> : "Never";
           },
-        })
+        }) as any
       );
     });
   }
