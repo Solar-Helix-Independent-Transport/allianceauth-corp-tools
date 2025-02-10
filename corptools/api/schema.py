@@ -107,7 +107,7 @@ class CharacterClone(Schema):
 class CharacterClones(Schema):
     character: Character
     clones: List[CharacterClone] = None
-    home: EveName = None
+    home: Optional[EveName] = None
     last_station_change: Optional[datetime] = None
     last_clone_jump: Optional[datetime] = None
 
