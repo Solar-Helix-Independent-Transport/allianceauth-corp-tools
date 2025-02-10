@@ -7,6 +7,7 @@ import CharacterContacts from "./Pages/Char/Contacts";
 import CharacterContracts from "./Pages/Char/Contracts";
 import CharacterDoctrine from "./Pages/Char/Doctrines";
 import CharacterLP from "./Pages/Char/LoyaltyPoints";
+import CharacterMail from "./Pages/Char/Mail";
 import Market from "./Pages/Char/Market";
 import CharacterNotifications from "./Pages/Char/Notifications";
 import CharacterOverview from "./Pages/Char/Overview";
@@ -46,14 +47,7 @@ function App() {
               <Route path="account/clones" element={<CharacterClones />} />
               <Route path="account/roles" element={<CharacterRoles />} />
               <Route path="account/wallet" element={<CharacterWallet />} />
-              <Route
-                path="account/mail"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/mail.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/mail" element={<CharacterMail />} />
               <Route
                 path="account/mining"
                 element={

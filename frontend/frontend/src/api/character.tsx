@@ -138,6 +138,23 @@ export async function loadPubData(character_id: number) {
   return data;
 }
 
+export async function loadMail(character_id: number) {
+  const api = await axios.get(`/audit/api/account/${character_id}/mail`);
+  console.log(`get Contracts in api ${character_id}`);
+  return api.data;
+}
+
+export async function getMailBody(character_id: Number, mail_id: Number) {
+  console.log(`sent postMailBody ${character_id}, ${mail_id}`);
+  if (!character_id && !mail_id) {
+    return {};
+  }
+  const api = await axios.get(`/audit/api/account/${character_id}/mail/${mail_id}`);
+  console.log(`search mail body in api ${character_id}, ${mail_id}`);
+
+  return api.data;
+}
+
 // export async function loadGlanceAssetData(character_id: number) {
 //   const api = await axios.get(`/audit/api/account/${character_id}/glance/assets`);
 //   console.log(`get glance/assets in api ${character_id}`);
