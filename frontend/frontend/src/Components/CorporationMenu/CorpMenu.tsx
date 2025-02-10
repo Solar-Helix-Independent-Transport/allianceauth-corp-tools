@@ -29,29 +29,29 @@ const CorpMenu = (props: CorpMenuProps) => {
       </Nav.Item>
       <NavDropdown as={"li"} title="Structures">
         <Nav.Item as={"li"}>
-          <Nav.Link as={Link} to={`/audit/r_beta/corp/structures`} key="Structures">
+          <NavDropdown.Item as={Link} to={`/audit/r_beta/corp/structures`} key="Structures">
             Structures
-          </Nav.Link>
+          </NavDropdown.Item>
         </Nav.Item>
         <Nav.Item as={"li"}>
-          <Nav.Link as={Link} to={`/audit/r_beta/corp/bridges`} key="bridges">
+          <NavDropdown.Item as={Link} to={`/audit/r_beta/corp/bridges`} key="bridges">
             Bridges
-          </Nav.Link>
+          </NavDropdown.Item>
         </Nav.Item>
         <Nav.Item as={"li"}>
-          <Nav.Link as={Link} to={`/audit/r_beta/corp/fuel`} key="bridges">
+          <NavDropdown.Item as={Link} to={`/audit/r_beta/corp/fuel`} key="bridges">
             Fuel
-          </Nav.Link>
+          </NavDropdown.Item>
         </Nav.Item>
         <Nav.Item as={"li"}>
-          <Nav.Link as={Link} to={`/audit/r_beta/corp/metenox`} key="bridges">
+          <NavDropdown.Item as={Link} to={`/audit/r_beta/corp/metenox`} key="bridges">
             Metenox
-          </Nav.Link>
+          </NavDropdown.Item>
         </Nav.Item>
         <Nav.Item as={"li"}>
-          <Nav.Link as={Link} to={`/audit/r_beta/corp/pocos`} key="pocos">
+          <NavDropdown.Item as={Link} to={`/audit/r_beta/corp/pocos`} key="pocos">
             Pocos
-          </Nav.Link>
+          </NavDropdown.Item>
         </Nav.Item>
       </NavDropdown>
       <Nav.Item as={"li"}>
@@ -61,14 +61,14 @@ const CorpMenu = (props: CorpMenuProps) => {
       </Nav.Item>
       <NavDropdown as={"li"} title="Assets">
         <Nav.Item as={"li"}>
-          <Nav.Link as={Link} to={`/audit/r_beta/corp/assetgroup`} key="assetgroup">
+          <NavDropdown.Item as={Link} to={`/audit/r_beta/corp/assetgroup`} key="assetgroup">
             Asset Overview
-          </Nav.Link>
+          </NavDropdown.Item>
         </Nav.Item>
         <Nav.Item as={"li"}>
-          <Nav.Link as={Link} to={`/audit/r_beta/corp/assetlist`} key="assetlist">
+          <NavDropdown.Item as={Link} to={`/audit/r_beta/corp/assetlist`} key="assetlist">
             Asset List
-          </Nav.Link>
+          </NavDropdown.Item>
         </Nav.Item>
       </NavDropdown>
       <Nav.Item as={"li"}>
