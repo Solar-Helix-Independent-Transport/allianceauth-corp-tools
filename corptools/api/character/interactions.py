@@ -79,10 +79,15 @@ class InteractionApiEndpoints:
 
             characters = get_alts_queryset(main)
 
-            mail = models.MailMessage.objects\
-                .filter(character__character__in=characters)\
-                .select_related('character__character', 'from_name')\
-                .prefetch_related("labels", "recipients").order_by("-timestamp")
+            mail = models.MailMessage.objects.filter(
+                character__character__in=characters
+            ).select_related(
+                'character__character', 'from_name'
+            ).prefetch_related(
+                "labels",
+                "recipients",
+                "recipients__recipient_name"
+            ).order_by("-timestamp")
 
             output = []
 
@@ -98,7 +103,8 @@ class InteractionApiEndpoints:
                 _l = []
                 _from_ret = m.from_name.name if m.from_name else m.from_id
                 for __l in m.labels.all():
-                    _l.append(__l.label_name if __l.label_name else __l.label_id)
+                    _l.append(
+                        __l.label_name if __l.label_name else __l.label_id)
 
                 _m = {
                     "character": m.character.character.character_name,
