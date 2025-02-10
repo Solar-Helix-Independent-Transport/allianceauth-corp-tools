@@ -31,8 +31,16 @@ class ListApiEndpoints:
                 corps = corps | corps_holding
 
             chars = models.CharacterAudit.objects.filter(
-                character__corporation_id__in=corps.values_list("corporation__corporation_id", flat=True), active=True)
-            chars = chars.select_related("characterroles", "character").filter(
+                character__corporation_id__in=corps.values_list(
+                    "corporation__corporation_id",
+                    flat=True
+                ),
+                active=True
+            )
+            chars = chars.select_related(
+                "characterroles",
+                "character"
+            ).filter(
                 Q(characterroles__accountant=True)
                 or Q(characterroles__director=True)
                 or Q(characterroles__station_manager=True)
@@ -75,50 +83,58 @@ class ListApiEndpoints:
                         corp_chars[c.character.corporation_id]["w"]["c"] += 1
                         corp_chars[c.character.corporation_id]["m"]["c"] += 1
 
-            tokens = Token.objects.filter(character_id__in=chars.values_list(
-                "character__character_id", flat=True))
+            # TODO rethink how we do this Issue #121
 
-            def token_scope_filter(qs, scopes):
-                for s in scopes:
-                    qs = qs.filter(scopes__name=s)
-                return qs
+            # tokens = Token.objects.filter(character_id__in=chars.values_list(
+            #     "character__character_id", flat=True))
 
-            def filter_token(qs, grp):
-                for t in qs:
-                    corp_chars[_c[t.character_id]][grp]["t"] += 1
+            # def token_scope_filter(qs, scopes):
+            #     for s in scopes:
+            #         qs = qs.filter(scopes__name=s)
+            #     return qs
 
-            a_tokens = token_scope_filter(
-                tokens, app_settings._corp_scopes_base + app_settings._corp_scopes_assets)
-            filter_token(a_tokens, "a")
-            w_tokens = token_scope_filter(
-                tokens, app_settings._corp_scopes_base + app_settings._corp_scopes_wallets)
-            filter_token(w_tokens, "w")
-            s_tokens = token_scope_filter(
-                tokens, app_settings._corp_scopes_base + app_settings._corp_scopes_structures)
-            filter_token(s_tokens, "s")
-            m_tokens = token_scope_filter(
-                tokens, app_settings._corp_scopes_base + app_settings._corp_scopes_moons)
-            filter_token(m_tokens, "m")
+            # def filter_token(qs, grp):
+            #     for t in qs:
+            #         corp_chars[_c[t.character_id]][grp]["t"] += 1
+
+            # a_tokens = token_scope_filter(
+            #     tokens, app_settings._corp_scopes_base + app_settings._corp_scopes_assets)
+            # filter_token(a_tokens, "a")
+            # w_tokens = token_scope_filter(
+            #     tokens, app_settings._corp_scopes_base + app_settings._corp_scopes_wallets)
+            # filter_token(w_tokens, "w")
+            # s_tokens = token_scope_filter(
+            #     tokens, app_settings._corp_scopes_base + app_settings._corp_scopes_structures)
+            # filter_token(s_tokens, "s")
+            # m_tokens = token_scope_filter(
+            #     tokens, app_settings._corp_scopes_base + app_settings._corp_scopes_moons)
+            # filter_token(m_tokens, "m")
 
             output = []
             for c in corps:
                 _updates = {}
                 for grp in app_settings.get_corp_update_attributes():
-                    _updates[grp[0]] = {"update": getattr(c, grp[1]),
-                                        "chars": corp_chars[c.corporation.corporation_id][grp[2]]["c"],
-                                        "tokens": corp_chars[c.corporation.corporation_id][grp[2]]["t"]}
+                    _updates[grp[0]] = {
+                        "update": getattr(c, grp[1]),
+                        "chars": corp_chars[c.corporation.corporation_id][grp[2]]["c"],
+                        "tokens": corp_chars[c.corporation.corporation_id][grp[2]]["t"]
+                    }
                 all_id = None
                 all_nm = None
                 if c.corporation.alliance:
                     all_id = c.corporation.alliance.alliance_id
                     all_nm = c.corporation.alliance.alliance_name
 
-                _out = {"corporation": {"corporation_id": c.corporation.corporation_id,
-                                        "corporation_name": c.corporation.corporation_name,
-                                        "alliance_id": all_id,
-                                        "alliance_name": all_nm},
-                        "characters": c.corporation.member_count,
-                        "active": True,
-                        "last_updates": _updates}
+                _out = {
+                    "corporation": {
+                        "corporation_id": c.corporation.corporation_id,
+                        "corporation_name": c.corporation.corporation_name,
+                        "alliance_id": all_id,
+                        "alliance_name": all_nm
+                    },
+                    "characters": c.corporation.member_count,
+                    "active": True,
+                    "last_updates": _updates
+                }
                 output.append(_out)
             return output
