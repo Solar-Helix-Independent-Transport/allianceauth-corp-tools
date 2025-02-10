@@ -5,6 +5,7 @@ import { Nav } from "react-bootstrap";
 import ReactDOM from "react-dom";
 import { useIsFetching } from "react-query";
 import { LinkContainer } from "react-router-bootstrap";
+import { Link } from "react-router-dom";
 
 const menuRoot = document.getElementById("nav-right");
 
@@ -37,14 +38,12 @@ const CorpMenuRight = () => {
         <></>
       )}
       <CorpAddToken />
-      <LinkContainer to={`corporations`}>
-        <Nav.Link key="corporation_list">Corporations</Nav.Link>
-      </LinkContainer>
-      <LinkContainer to={`audit/r/0`}>
-        <Nav.Link key="corporation_list">
-          <i className="fa-solid fa-users"></i>
-        </Nav.Link>
-      </LinkContainer>
+      <Nav.Link as={Link} to={`corporations`} key="corporation_list">
+        Corporations
+      </Nav.Link>
+      <Nav.Link as={Link} to={`audit/r/0`} key="corporation_list">
+        <i className="fa-solid fa-users"></i>
+      </Nav.Link>
     </>,
     menuRoot
   );

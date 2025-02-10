@@ -1,6 +1,6 @@
 import { Nav } from "react-bootstrap";
-import { NavDropdown } from "react-bootstrap";
-import { LinkContainer } from "react-router-bootstrap";
+import NavDropdown from "react-bootstrap/NavDropdown";
+import { Link } from "react-router-dom";
 
 export interface CharMenuItemProps {
   name: string;
@@ -35,48 +35,50 @@ export interface CharMenuProps extends Partial<HTMLElement> {
 const CharMenu = ({ data, characterID }: CharMenuProps) => {
   return (
     <>
-      <Nav.Item>
-        <LinkContainer to={`/audit/r_beta/${characterID}/account/overview`}>
-          <Nav.Link key="Overview">Overview</Nav.Link>
-        </LinkContainer>
+      <Nav.Item as="li">
+        <Nav.Link as={Link} to={`/audit/r_beta/${characterID}/account/overview`} key="Overview">
+          Overview
+        </Nav.Link>
       </Nav.Item>
-      {/* <Nav.Item>
-        <LinkContainer to={`/audit/r_beta/${characterID}/account/status`}>
-          <Nav.Link key="Status">Status</Nav.Link>
-        </LinkContainer>
-      </Nav.Item> */}
-      {/* <Nav.Item>
-        <LinkContainer to={`/audit/r_beta/${characterID}/account/pubdata`}>
-          <Nav.Link key="Public Data">Public Data</Nav.Link>
-        </LinkContainer>
-      </Nav.Item> */}
       {data &&
         data.map((cat: any) => {
           console.log(cat.name);
           return cat.links ? (
-            <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
+            <NavDropdown as={"li"} id={cat.name} title={cat.name} key={cat.name}>
               {cat.links?.map((link: any) => {
                 return (
-                  <LinkContainer to={`/audit/r_beta/${characterID}/${link.link}`}>
-                    <NavDropdown.Item id={link.name} key={link.name}>
+                  <Nav.Item as="li">
+                    <NavDropdown.Item
+                      as={Link}
+                      to={`/audit/r_beta/${characterID}/${link.link}`}
+                      id={link.name}
+                      key={link.name}
+                    >
                       {link.name}
                     </NavDropdown.Item>
-                  </LinkContainer>
+                  </Nav.Item>
                 );
               })}
             </NavDropdown>
           ) : (
             <>
               {cat.link.startsWith("/") ? (
-                <Nav.Link id={cat.name} key={cat.name} href={cat.link}>
-                  <>{cat.name}</>
-                </Nav.Link>
-              ) : (
-                <Nav.Link id={cat.name} key={cat.name}>
-                  <LinkContainer to={`/audit/r_beta/${characterID}/${cat.link}`}>
+                <Nav.Item as="li">
+                  <Nav.Link id={cat.name} key={cat.name} href={cat.link}>
                     <>{cat.name}</>
-                  </LinkContainer>
-                </Nav.Link>
+                  </Nav.Link>
+                </Nav.Item>
+              ) : (
+                <Nav.Item as="li">
+                  <Nav.Link
+                    as={Link}
+                    to={`/audit/r_beta/${characterID}/${cat.link}`}
+                    id={cat.name}
+                    key={cat.name}
+                  >
+                    <>{cat.name}</>
+                  </Nav.Link>
+                </Nav.Item>
               )}
             </>
           );
