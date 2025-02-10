@@ -69,7 +69,7 @@ const CharacterContacts = () => {
             type="switch"
             id="custom-switch"
             label="Show NPC Contacts"
-            onChange={(event) => {
+            onChange={(event: any) => {
               setShowNPC(event.target.checked);
             }}
             defaultChecked={showNPC}
