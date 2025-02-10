@@ -3,7 +3,7 @@ import CharMailModal from "../../Components/Mail/MailModal";
 import BaseTable from "../../Components/Tables/BaseTable/BaseTable";
 import { loadMail } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Badge, Button } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
@@ -22,73 +22,6 @@ const CharacterMail = () => {
     }
   );
 
-  const columns1 = React.useMemo(
-    () => [
-      {
-        Header: "Character",
-        accessor: "character",
-      },
-      {
-        Header: "From",
-        accessor: "from",
-      },
-      {
-        Header: "Labels",
-        accessor: "labels",
-        Cell: (props: any) => (
-          <p>
-            {props.value.map((name: any) => (
-              <Badge style={{ marginLeft: "5px" }}>{name}</Badge>
-            ))}
-          </p>
-        ),
-      },
-      {
-        Header: "To",
-        accessor: "recipients",
-        Cell: (props: any) =>
-          props.value.length > 2 ? (
-            <p>
-              <Badge bg="warning">+ {props.value.length} Recipients</Badge>
-            </p>
-          ) : (
-            <p>
-              {props.value.map((name: any) => (
-                <Badge style={{ marginLeft: "5px" }} bg="info">
-                  {name}
-                </Badge>
-              ))}
-            </p>
-          ),
-      },
-      {
-        Header: "Date",
-        accessor: "timestamp",
-        Cell: (props: any) => <div>{new Date(props.value).toLocaleString()}</div>,
-      },
-      {
-        Header: "subject",
-        accessor: "subject",
-      },
-      {
-        Header: "Details",
-        Cell: (props: any) => (
-          <>
-            {" "}
-            <Button
-              onClick={() => {
-                setData(props.row.original);
-                setModal(true);
-              }}
-            >
-              Show Detail
-            </Button>
-          </>
-        ),
-      },
-    ],
-    [setModal, setData]
-  );
   const columnHelper = createColumnHelper<any>();
 
   const columns = [

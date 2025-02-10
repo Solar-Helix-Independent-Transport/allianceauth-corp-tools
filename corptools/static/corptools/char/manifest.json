@@ -3,25 +3,25 @@
     "file": "assets/@charts-C4xQ0T1A.js",
     "name": "@charts"
   },
-  "_@libs-4tbAwyv3.js": {
-    "file": "assets/@libs-4tbAwyv3.js",
+  "_@libs-C96G7N1Z.js": {
+    "file": "assets/@libs-C96G7N1Z.js",
     "name": "@libs"
   },
-  "_@tanstack-mn9kvwZq.js": {
-    "file": "assets/@tanstack-mn9kvwZq.js",
+  "_@tanstack-CKXw38Nu.js": {
+    "file": "assets/@tanstack-CKXw38Nu.js",
     "name": "@tanstack",
     "imports": [
-      "_@libs-4tbAwyv3.js"
+      "_@libs-C96G7N1Z.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-CoJMb5sT.js",
+    "file": "assets/index-CB-_4MrB.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@libs-4tbAwyv3.js",
-      "_@tanstack-mn9kvwZq.js",
+      "_@libs-C96G7N1Z.js",
+      "_@tanstack-CKXw38Nu.js",
       "_@charts-C4xQ0T1A.js"
     ],
     "css": [

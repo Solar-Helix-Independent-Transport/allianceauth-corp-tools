@@ -2,19 +2,19 @@
   "_@libs-BCfgtq-S.js": {
     "file": "assets/@libs-BCfgtq-S.js"
   },
-  "_@react-router-DgP_4-oX.js": {
-    "file": "assets/@react-router-DgP_4-oX.js",
+  "_@react-router-BF21kupu.js": {
+    "file": "assets/@react-router-BF21kupu.js",
     "imports": [
       "_@libs-BCfgtq-S.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-c2-q4t1v.js",
+    "file": "assets/index-BRNl_JCL.js",
     "src": "index.html",
     "isEntry": true,
     "imports": [
       "_@libs-BCfgtq-S.js",
-      "_@react-router-DgP_4-oX.js"
+      "_@react-router-BF21kupu.js"
     ],
     "css": [
       "static/corptools/bs5/static/css/index-MpvbYUBF.css"
