@@ -125,7 +125,7 @@ class StatusApiEndpoints:
                 .filter(character__character__in=characters)\
                 .select_related(
                     'character__character', 'corporation_name'
-                ).order_by("record_id")
+                ).order_by("-record_id")
 
             histories = {}
             for h in corp_histories:
