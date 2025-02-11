@@ -465,6 +465,34 @@ class TestSecGroupBotFilters(TestCase):
 
         ct_models.Skill.objects.filter(
             character=audits[0]).update(active_skill_level=5)
+        en = ct_models.EveName.objects.create(
+            eve_id=12345678,
+            name="blah"
+        )
+        for i in range(0, 9):
+            ct_models.CorporationHistory.objects.create(
+                character=audits[i],
+                corporation_id=1,
+                corporation_name=en,
+                record_id=1,
+                start_date=timezone.now()-timedelta(days=60)
+            )
+        for i in range(0, 4):
+            ct_models.CorporationHistory.objects.create(
+                character=audits[i],
+                corporation_id=1,
+                corporation_name=en,
+                record_id=2,
+                start_date=timezone.now()-timedelta(days=14)
+            )
+        for i in range(5, 9):
+            ct_models.CorporationHistory.objects.create(
+                character=audits[i],
+                corporation_id=1,
+                corporation_name=en,
+                record_id=2,
+                start_date=timezone.now()-timedelta(days=30)
+            )
 
     def test_user_loaded_fully(self):
         _filter = ct_models.FullyLoadedFilter.objects.create(name="Fully Loaded Test",
@@ -1515,3 +1543,113 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[7])
         self.assertFalse(tests[8])
         self.assertFalse(tests[9])
+
+    def test_user_time_in_corp_p(self):
+        _filter = ct_models.TimeInCorpFilter.objects.create(
+            name="Time in Corp > 20d",
+            description="Something to tell user",
+            days_in_corp=20
+        )
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k, u in users.items():
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        print("**********")
+        print(tests)
+
+        self.assertFalse(tests[1])
+        self.assertFalse(tests[2])
+        self.assertFalse(tests[3])
+        self.assertFalse(tests[4])
+        self.assertTrue(tests[5])
+        self.assertTrue(tests[6])
+        self.assertTrue(tests[7])
+        self.assertTrue(tests[8])
+        self.assertTrue(tests[9])
+
+    def test_user_time_in_corp_rev_p(self):
+        _filter = ct_models.TimeInCorpFilter.objects.create(
+            name="Time in Corp > 20d",
+            description="Something to tell user",
+            days_in_corp=20,
+            reversed_logic=True
+        )
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k, u in users.items():
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        print("**********")
+        print(tests)
+
+        self.assertTrue(tests[1])
+        self.assertTrue(tests[2])
+        self.assertTrue(tests[3])
+        self.assertTrue(tests[4])
+        self.assertFalse(tests[5])
+        self.assertFalse(tests[6])
+        self.assertFalse(tests[7])
+        self.assertFalse(tests[8])
+        self.assertFalse(tests[9])
+
+    def test_user_time_in_corp_a(self):
+        _filter = ct_models.TimeInCorpFilter.objects.create(
+            name="Time in Corp > 20d",
+            description="Something to tell user",
+            days_in_corp=20
+        )
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=users))
+
+        print("**********")
+        print(tests)
+
+        self.assertFalse(tests[1]["check"])
+        self.assertFalse(tests[2]["check"])
+        self.assertFalse(tests[3]["check"])
+        self.assertFalse(tests[4]["check"])
+        self.assertTrue(tests[5]["check"])
+        self.assertTrue(tests[6]["check"])
+        self.assertTrue(tests[7]["check"])
+        self.assertTrue(tests[8]["check"])
+        self.assertTrue(tests[9]["check"])
+
+    def test_user_time_in_corp_rev_a(self):
+        _filter = ct_models.TimeInCorpFilter.objects.create(
+            name="Time in Corp > 20d",
+            description="Something to tell user",
+            days_in_corp=20,
+            reversed_logic=True
+        )
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=users))
+
+        print("**********")
+        print(tests)
+
+        self.assertTrue(tests[1]["check"])
+        self.assertTrue(tests[2]["check"])
+        self.assertTrue(tests[3]["check"])
+        self.assertTrue(tests[4]["check"])
+        self.assertFalse(tests[5]["check"])
+        self.assertFalse(tests[6]["check"])
+        self.assertFalse(tests[7]["check"])
+        self.assertFalse(tests[8]["check"])
+        self.assertFalse(tests[9]["check"])

@@ -1661,7 +1661,7 @@ class TimeInCorpFilter(FilterBase):
             else:
                 return logic
         except Exception as e:
-            logger.error(e, exc_info=1)
+            # logger.error(e, exc_info=1)
             return False
 
     def audit_filter(self, users):
@@ -1670,7 +1670,7 @@ class TimeInCorpFilter(FilterBase):
             max_timestamp=Max(
                 'profile__main_character__characteraudit__corporationhistory__start_date')
         ).values("id", "max_timestamp")
-        chars = defaultdict(lambda: None)
+        chars = defaultdict(lambda: {})
         for c in co:
             if c['max_timestamp']:
                 days = timezone.now() - c['max_timestamp']
