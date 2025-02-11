@@ -89,16 +89,13 @@ const CharacterDoctrine = () => {
       </div>
       {data?.map((char: components["schemas"]["CharacterDoctrines"]) => {
         const doctrineCount = Object.entries(char.doctrines).length;
-        const filtered_doctrines =
-          doctrineCount > 0
-            ? Object.entries(char.doctrines).reduce((output, [k, v]) => {
-                return (
-                  output ||
-                  ((!hideFailures || Object.entries(v).length === 0) &&
-                    (filter.length == 0 || k.toLowerCase().includes(filter.toLocaleLowerCase())))
-                );
-              }, false)
-            : false;
+        const filtered_doctrines = Object.entries(char.doctrines).reduce((output, [k, v]) => {
+          return (
+            output ||
+            ((!hideFailures || Object.entries(v).length === 0) &&
+              (filter.length == 0 || k.toLowerCase().includes(filter.toLocaleLowerCase())))
+          );
+        }, false);
         return (
           filtered_doctrines && (
             <Card className="my-2">
