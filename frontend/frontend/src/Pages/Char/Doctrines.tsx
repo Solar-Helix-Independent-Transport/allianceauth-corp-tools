@@ -12,7 +12,7 @@ import { useParams } from "react-router-dom";
 const CharacterDoctrine = () => {
   const { characterID } = useParams();
   const [filter, setDoctrineFilter] = useState("");
-  const [hideFailures, setHideFailures] = useState(true);
+  const [hideFailures, setHideFailures] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["doctrines", characterID],
@@ -84,15 +84,19 @@ const CharacterDoctrine = () => {
           onChange={(event: any) => {
             setHideFailures(event.target.checked);
           }}
-          defaultChecked={true}
+          defaultChecked={hideFailures}
         />
       </div>
       {data?.map((char: components["schemas"]["CharacterDoctrines"]) => {
         const doctrineCount = Object.entries(char.doctrines).length;
         const filtered_doctrines =
           doctrineCount > 0
-            ? Object.entries(char.doctrines).reduce((output, [_, v]) => {
-                return output || Object.entries(v).length === 0;
+            ? Object.entries(char.doctrines).reduce((output, [k, v]) => {
+                return (
+                  output ||
+                  ((!hideFailures || Object.entries(v).length === 0) &&
+                    (filter.length == 0 || k.toLowerCase().includes(filter.toLocaleLowerCase())))
+                );
               }, false)
             : false;
         return (
