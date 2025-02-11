@@ -1643,7 +1643,13 @@ class TimeInCorpFilter(FilterBase):
 
     days_in_corp = models.IntegerField(default=30)
 
+    reversed_logic = models.BooleanField(
+        default=False,
+        help_text="If set all members less than the days in corp will pass the test."
+    )
+
     def process_filter(self, user: User):
+        logic = self.reversed_logic
         try:
             main_character = user.profile.main_character.characteraudit
             histories = CorporationHistory.objects.filter(
@@ -1651,14 +1657,15 @@ class TimeInCorpFilter(FilterBase):
 
             days = timezone.now() - histories.start_date
             if days.days >= self.days_in_corp:
-                return True
+                return not logic
             else:
-                return False
+                return logic
         except Exception as e:
             logger.error(e, exc_info=1)
             return False
 
     def audit_filter(self, users):
+        logic = self.reversed_logic
         co = users.annotate(
             max_timestamp=Max(
                 'profile__main_character__characteraudit__corporationhistory__start_date')
@@ -1672,12 +1679,12 @@ class TimeInCorpFilter(FilterBase):
                 days = -1
             chars[c['id']] = days
 
-        output = defaultdict(lambda: {"message": "", "check": False})
+        output = defaultdict(lambda: {"message": "", "check": logic})
         for c, char_list in chars.items():
             if char_list >= self.days_in_corp:
-                check = True
+                check = not logic
             else:
-                check = False
+                check = logic
             if char_list < 0:
                 msg = "No Audit"
             else:
