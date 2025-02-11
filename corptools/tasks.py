@@ -188,7 +188,7 @@ def update_all_characters():
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_subset_of_characters(self, subset=48, min_runs=5, force=False):
+def update_subset_of_characters(self, subset=48, min_runs=15, force=False):
     amount_of_updates = max(
         CharacterAudit.objects.all().count() / subset, min_runs)
     characters = CharacterAudit.get_oldest_qs()[:amount_of_updates]

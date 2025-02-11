@@ -372,6 +372,7 @@ class CharacterAudit(models.Model):
                 output_field=models.DateTimeField()
             )
         ).filter(
+            character__character_ownership__isnull=False,
             avg_date__gte=time_ref
         ).order_by("avg_date")
 
