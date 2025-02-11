@@ -64,7 +64,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                     size="sm"
                     href={`https://evewho.com/character/${char.character.character_id}`}
                   >
-                    Eve Who
+                    EVE Who
                   </Button>
                   <Button
                     variant="secondary"
@@ -81,7 +81,26 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                     size="sm"
                     href={`https://www.eve411.com/character/${char.character.character_id}`}
                   >
-                    Eve411
+                    EVE411
+                  </Button>
+                </ButtonGroup>
+                <ButtonGroup className="w-75 mt-1">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    href={`https://forums.eveonline.com/u/${char.character.character_name.replace(
+                      " ",
+                      "_"
+                    )}/summary`}
+                  >
+                    EVE Forums
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    href={`https://eve-search.com/search/author/${char.character.character_name}`}
+                  >
+                    EVE Search
                   </Button>
                 </ButtonGroup>
                 <Button
