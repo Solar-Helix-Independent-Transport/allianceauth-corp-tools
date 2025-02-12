@@ -2,8 +2,8 @@ import { CharacterPortrait, CorporationLogo } from "../../Components/EveImages/E
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
 import { getCharacterList } from "../../api/character";
-import { Row, createColumnHelper } from "@tanstack/react-table";
-import { Badge, Button } from "react-bootstrap";
+import { createColumnHelper } from "@tanstack/react-table";
+import { Badge } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
