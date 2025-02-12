@@ -1,10 +1,11 @@
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
 import { getCharacterList } from "../../api/character";
-import { createColumnHelper } from "@tanstack/react-table";
-import { Badge } from "react-bootstrap";
+import { Row, createColumnHelper } from "@tanstack/react-table";
+import { Badge, Button } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const AccountList = () => {
   const { characterID } = useParams();
@@ -39,18 +40,34 @@ const AccountList = () => {
         ) : (
           <></>
         ),
-      // filterFn: (row: Row<components["schemas"]["AccountStatus"]>, columnId, filterValue) => {
-      //   if (!filterValue) {
-      //     return true;
-      //   } else {
-      //     let rowValue = row.getValue()[id].reduce((p, c) => {
-      //       return p + "  " + c.character.character_name;
-      //     }, "");
-      //     return rowValue
-      //       ? rowValue.toLowerCase().includes(filterValue.toLowerCase())
-      //       : false;
-      //   }
-      // },
+      filterFn: (row, _, filterValue) => {
+        if (!filterValue) {
+          return true;
+        } else {
+          let rowValue = row.original?.characters?.reduce((p: any, c: any) => {
+            return p + "  " + c.character.character_name;
+          }, "");
+          return rowValue ? rowValue.toLowerCase().includes(filterValue.toLowerCase()) : false;
+        }
+      },
+    }),
+    columnHelper.accessor("main", {
+      header: "",
+      enableColumnFilter: false,
+      enableSorting: false,
+      cell: (cell) =>
+        cell.getValue() ? (
+          <Link
+            className="btn btn-info"
+            to={{
+              pathname: `audit/r_beta/${cell.getValue().character_id}/`,
+            }}
+          >
+            <i className="fas fa-external-link" aria-hidden="true"></i>
+          </Link>
+        ) : (
+          <></>
+        ),
     }),
   ];
 
