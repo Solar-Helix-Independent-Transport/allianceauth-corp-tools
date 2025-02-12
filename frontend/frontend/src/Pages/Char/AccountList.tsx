@@ -1,3 +1,4 @@
+import { CharacterPortrait, CorporationLogo } from "../../Components/EveImages/EveImages";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
 import { getCharacterList } from "../../api/character";
@@ -18,8 +19,20 @@ const AccountList = () => {
   const columnHelper = createColumnHelper<components["schemas"]["AccountStatus"]>();
 
   const columns = [
+    columnHelper.accessor("main.character_id", {
+      header: "",
+      enableColumnFilter: false,
+      enableSorting: false,
+      cell: (cell) => <CharacterPortrait size={32} character_id={cell.getValue()} />,
+    }),
     columnHelper.accessor("main.character_name", {
       header: "Character",
+    }),
+    columnHelper.accessor("main.corporation_id", {
+      header: "",
+      enableColumnFilter: false,
+      enableSorting: false,
+      cell: (cell) => <CorporationLogo size={32} corporation_id={cell.getValue()} />,
     }),
     columnHelper.accessor("main.corporation_name", {
       header: "Corporation",
@@ -58,7 +71,7 @@ const AccountList = () => {
       cell: (cell) =>
         cell.getValue() ? (
           <Link
-            className="btn btn-info"
+            className="btn btn-primary"
             to={{
               pathname: `audit/r_beta/${cell.getValue().character_id}/`,
             }}
