@@ -6,8 +6,10 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { Table } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const CharacterClones = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
 
   const { data, isFetching } = useQuery({
@@ -19,25 +21,25 @@ const CharacterClones = () => {
 
   const columns = [
     columnHelper.accessor("character.character_name", {
-      header: "Character",
+      header: t("Main Character"),
     }),
     columnHelper.accessor("home.name", {
-      header: "Home",
+      header: t("Home"),
     }),
     columnHelper.accessor("last_clone_jump", {
-      header: "Last Jump",
+      header: t("Last Jump"),
     }),
     columnHelper.accessor("last_station_change", {
-      header: "Last Station Change",
+      header: t("Last Station Change"),
     }),
     columnHelper.accessor("clones", {
-      header: "Clones",
+      header: t("Clones"),
       cell: (props) => {
         return (
           <Table>
             <thead>
-              <th>Location</th>
-              <th className="text-end">Implants</th>
+              <th>{t("Location")}</th>
+              <th className="text-end">{t("Implants")}</th>
             </thead>
             <tbody>
               {props.getValue()?.map((d: components["schemas"]["CharacterClone"]) => {

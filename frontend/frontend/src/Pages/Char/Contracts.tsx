@@ -5,10 +5,12 @@ import { getCharacterContracts } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
 import { Button } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterContracts = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
   const [showModal, setModal] = useState(false);
   const [modalData, setData] = useState(null as components["schemas"]["CharacterContract"] | null);
@@ -22,28 +24,28 @@ const CharacterContracts = () => {
 
   const columns = [
     columnHelper.accessor("character", {
-      header: "Character",
+      header: t("Main Character"),
     }),
     columnHelper.accessor("date_issued", {
-      header: "Date Created",
+      header: t("Date Created"),
     }),
     columnHelper.accessor("contract_type", {
-      header: "Type",
+      header: t("Type"),
     }),
     columnHelper.accessor("status", {
-      header: "Status",
+      header: t("Status"),
     }),
     columnHelper.accessor("assignee", {
-      header: "Assignee",
+      header: t("Assignee"),
     }),
     columnHelper.accessor("price", {
-      header: "Price",
+      header: t("Price"),
     }),
     columnHelper.accessor("tittle", {
-      header: "Tittle",
+      header: t("Tittle"),
     }),
     columnHelper.accessor("items", {
-      header: "Details",
+      header: t("Details"),
       cell: (cell) => (
         <>
           <Button
@@ -53,7 +55,7 @@ const CharacterContracts = () => {
               setModal(true);
             }}
           >
-            Show Detail
+            {t("Show Detail")}
           </Button>
         </>
       ),

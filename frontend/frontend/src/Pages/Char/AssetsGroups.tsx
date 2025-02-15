@@ -3,10 +3,13 @@ import { PanelLoader } from "../../Components/Loaders/loaders";
 import { getAssetGroups } from "../../api/character";
 import { useState } from "react";
 import { Card, Table } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterAssetGroups = () => {
+  const { t } = useTranslation();
+
   const { characterID } = useParams();
 
   const [LocationID, setLocation] = useState<number>(0);
@@ -22,7 +25,7 @@ const CharacterAssetGroups = () => {
   return (
     <>
       <div className="m-3 d-flex align-items-center">
-        <h5 className="me-1">Location Filter</h5>
+        <h5 className="me-1">{t("Location Filter")}</h5>
         <div className="flex-grow-1">
           <CharacterAssetLocationSelect
             characterID={characterID ? Number(characterID) : 0}
@@ -31,7 +34,7 @@ const CharacterAssetGroups = () => {
         </div>
       </div>
       {isFetching ? (
-        <PanelLoader title="Loading" message="Please Wait!" />
+        <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />
       ) : (
         <div className="d-flex flex-wrap justify-content-evenly">
           {data?.map((group) => {
@@ -44,8 +47,8 @@ const CharacterAssetGroups = () => {
                   <Table striped style={{ marginBottom: 0, minWidth: "400px" }}>
                     <thead>
                       <tr key={"head " + group.name}>
-                        <th>Group</th>
-                        <th className="text-end">Count</th>
+                        <th>{t("Group")}</th>
+                        <th className="text-end">{t("Count")}</th>
                       </tr>
                     </thead>
                   </Table>

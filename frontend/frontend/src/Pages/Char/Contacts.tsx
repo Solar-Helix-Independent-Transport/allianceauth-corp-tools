@@ -5,10 +5,12 @@ import { getCharacterContacts } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
 import { Badge, Card, Form } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterContacts = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
   const [showNPC, setShowNPC] = useState(true);
 
@@ -21,10 +23,10 @@ const CharacterContacts = () => {
 
   const columns = [
     columnHelper.accessor("character.character_name", {
-      header: "Character",
+      header: t("Main Character"),
     }),
     columnHelper.accessor("contact.name", {
-      header: "Contact",
+      header: t("Contact"),
       cell: (cell) => {
         return (
           <>
@@ -34,13 +36,13 @@ const CharacterContacts = () => {
       },
     }),
     columnHelper.accessor("blocked", {
-      header: "Blocked",
+      header: t("Blocked"),
       cell: (props) => {
         return <BooleanCheckBox checked={props.getValue()} />;
       },
     }),
     columnHelper.accessor("watched", {
-      header: "Watching",
+      header: t("Watching"),
       cell: (props) => {
         return <BooleanCheckBox checked={props.getValue()} />;
       },

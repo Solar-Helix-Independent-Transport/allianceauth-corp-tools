@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import CharacterAssetLocationSelect from "../../Components/Character/CharacterAssetLocationSelect";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
@@ -8,6 +9,7 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterAssets = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
 
   const [location_id, setLocation] = useState<number>(0);
@@ -23,26 +25,26 @@ const CharacterAssets = () => {
 
   const columns = [
     columnHelper.accessor("character.character_name", {
-      header: "Character",
+      header: t("Main Character"),
     }),
     columnHelper.accessor("item.name", {
-      header: "Type",
+      header: t("Item Type"),
     }),
     columnHelper.accessor("item.cat", {
-      header: "Category",
+      header: t("Category"),
     }),
     columnHelper.accessor("quantity", {
-      header: "Quantity",
+      header: t("Quantity"),
     }),
     columnHelper.accessor("location.name", {
-      header: "Location",
+      header: t("Location"),
     }),
   ];
 
   return (
     <>
       <div className="m-3 d-flex align-items-center">
-        <h5 className="me-1">Location Filter</h5>
+        <h5 className="me-1">{t("Location Filter")}</h5>
         <div className="flex-grow-1">
           <CharacterAssetLocationSelect
             characterID={characterID ? Number(characterID) : 0}

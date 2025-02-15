@@ -9,8 +9,11 @@ import { Form } from "react-bootstrap";
 import Card from "react-bootstrap/Card";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const CharacterDoctrine = () => {
+  const { t } = useTranslation();
+
   const { characterID } = useParams();
   const [filter, setDoctrineFilter] = useState("");
   const [hideFailures, setHideFailures] = useState(false);
@@ -23,7 +26,7 @@ const CharacterDoctrine = () => {
 
   return (
     <>
-      <h5 className="text-center">Status Key</h5>
+      <h5 className="text-center">{t("Status Key")}</h5>
       <div className="d-flex justify-content-center align-items-center flex-column">
         <table className="table">
           <tr className="row align-items-center">
@@ -31,13 +34,13 @@ const CharacterDoctrine = () => {
               <DoctrineCheck name="Passed" skill_reqs={[]} skill_list={{}} />
             </td>
             <td className="col align-items-center">
-              <p className="m-0">All Skills Trained</p>
+              <p className="m-0">{t("All Skills Trained")}</p>
             </td>
           </tr>
           <tr className="row align-items-center">
             <td className="col align-items-center text-end">
               <DoctrineCheck
-                name="Alpha Restricted"
+                name={t("Alpha Restricted")}
                 skill_reqs={{ "Some Skill Trained But Limited": 5 }}
                 skill_list={{
                   "Some Skill Trained But Limited": {
@@ -49,9 +52,9 @@ const CharacterDoctrine = () => {
             </td>
             <td className="col align-items-center">
               <p className="m-0 text-nowrap">
-                Some Skills Restricted by Alpha State
+                {t("Some Skills Restricted by Alpha State")}
                 <br />
-                Click to Show More
+                {t("Click to Show More")}
               </p>
             </td>
           </tr>
@@ -65,11 +68,11 @@ const CharacterDoctrine = () => {
             </td>
             <td className="col align-items-center">
               <p className="m-0 text-nowrap">
-                Some Missing Skills
+                {t("Some Missing Skills")}
                 <br />
-                Click to Show More
+                {t("Click to Show More")}
                 <br />
-                Click Copy for easy import in game
+                {t("Click Copy for easy import in game")}
               </p>
             </td>
           </tr>
@@ -77,11 +80,11 @@ const CharacterDoctrine = () => {
             <td colSpan={2}></td>
           </tr>
         </table>
-        <TextFilter setFilterText={setDoctrineFilter} labelText="Search:" />
+        <TextFilter setFilterText={setDoctrineFilter} labelText={t("Search:")} />
         <Form.Check
           type="switch"
           id="custom-switch"
-          label="Hide Failures"
+          label={t("Hide Failures")}
           onChange={(event: any) => {
             setHideFailures(event.target.checked);
           }}
@@ -128,7 +131,7 @@ const CharacterDoctrine = () => {
                         })}
                       </>
                     ) : (
-                      <p>No Tokens</p>
+                      <p>{t("No Tokens")}</p>
                     )}
                   </div>
                 </Card.Body>
@@ -137,7 +140,7 @@ const CharacterDoctrine = () => {
           );
         })
       ) : (
-        <PanelLoader title="Loading Data" message="Please Wait" />
+        <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />
       )}
     </>
   );

@@ -4,11 +4,14 @@ import { components } from "../../api/CtApi";
 import { getCharacterList } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Badge } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 const AccountList = () => {
+  const { t } = useTranslation();
+
   const { characterID } = useParams();
 
   const { data, isFetching } = useQuery({
@@ -26,7 +29,7 @@ const AccountList = () => {
       cell: (cell) => <CharacterPortrait size={32} character_id={cell.getValue()} />,
     }),
     columnHelper.accessor("main.character_name", {
-      header: "Character",
+      header: t("Main Character"),
     }),
     columnHelper.accessor("main.corporation_id", {
       header: "",
@@ -35,10 +38,10 @@ const AccountList = () => {
       cell: (cell) => <CorporationLogo size={32} corporation_id={cell.getValue()} />,
     }),
     columnHelper.accessor("main.corporation_name", {
-      header: "Corporation",
+      header: t("Main Corporation"),
     }),
     columnHelper.accessor("characters", {
-      header: "Characters",
+      header: t("Characters"),
       cell: (props) =>
         props.getValue() ? (
           <div className="flex-container text-center">
