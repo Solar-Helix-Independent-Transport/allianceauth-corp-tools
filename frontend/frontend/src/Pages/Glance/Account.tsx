@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { IconStatusCard } from "../../Components/Cards/IconStatusCard";
 import { loadCharacterStatus } from "../../api/character";
 // import Asteroid from "../../../assets/asteroid_64.png";
@@ -11,6 +12,7 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 export const CharacterGlancesAccount = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
 
   const { data, isLoading } = useQuery({
@@ -41,7 +43,8 @@ export const CharacterGlancesAccount = () => {
 
   return (
     <>
-      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Account at a Glance</h3>
+      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Account at a Glance")}</h3>
+
       <div className="d-flex flex-wrap justify-content-center">
         <IconStatusCard
           cardVariant={isk < 1000000 ? "warning" : undefined}
@@ -53,8 +56,9 @@ export const CharacterGlancesAccount = () => {
             compactDisplay: "short",
           })}`}
           isLoading={isLoading}
-          toolTipText="Total Liquid Isk across all characters"
+          toolTipText={t("Total Liquid Isk across all characters")}
         />
+
         <IconStatusCard
           cardVariant={sp < 1000000 ? "warning" : undefined}
           iconSrc={Skills}
@@ -65,14 +69,14 @@ export const CharacterGlancesAccount = () => {
             compactDisplay: "short",
           })} SP`}
           isLoading={isLoading}
-          toolTipText="Total SP across all characters"
+          toolTipText={t("Total SP across all characters")}
         />
 
         <IconStatusCard
           iconSrc={Omega}
           text={total_chars?.toLocaleString()}
           isLoading={isLoading}
-          toolTipText="Count of all known alts"
+          toolTipText={t("Count of all known alts")}
         />
 
         <IconStatusCard
@@ -81,16 +85,8 @@ export const CharacterGlancesAccount = () => {
           textVariant={bad_chars > 0 ? "danger" : "success"}
           text={bad_chars?.toLocaleString()}
           isLoading={isLoading}
-          toolTipText="Count of all known alts not loading into audit"
+          toolTipText={t("Count of all known alts not loading into audit")}
         />
-
-        {/* <IconStatusCard iconSrc={NPC} textVariant={"info"} text={"Ƶ1.5b"} isLoading={isLoading} />
-        <IconStatusCard
-          iconSrc={Asteroid}
-          textVariant={"info"}
-          text={"15M m3"}
-          isLoading={isLoading}
-        /> */}
       </div>
     </>
   );

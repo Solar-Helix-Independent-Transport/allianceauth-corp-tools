@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { IconStatusCard } from "../../Components/Cards/IconStatusCard";
 import { loadGlanceActivityData } from "../../api/character";
 import { loadCorpGlanceActivityData } from "../../api/corporation";
@@ -18,13 +19,16 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const Activities = ({ data }: any) => {
+  const { t } = useTranslation();
+
   return (
     <>
       <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Activity</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <Card className="m-2">
-          <Card.Header className="text-center">PvE</Card.Header>
-
+          <Card.Header className="text-center">
+            <Card.Title>{t("PvE")}</Card.Title>
+          </Card.Header>
           <div className="d-flex flex-wrap justify-content-center">
             <IconStatusCard
               iconSrc={Sansha}
@@ -37,7 +41,7 @@ const Activities = ({ data }: any) => {
                   compactDisplay: "short",
                 })}`
               }
-              toolTipText="Total Isk earned in Incursions in the last 30 Days"
+              toolTipText={t("Total Isk earned in Incursions in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={Triglavian}
@@ -50,7 +54,7 @@ const Activities = ({ data }: any) => {
                   compactDisplay: "short",
                 })}`
               }
-              toolTipText="Total Isk earned in Pochven in the last 30 Days"
+              toolTipText={t("Total Isk earned in Pochven in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={NPC}
@@ -63,7 +67,7 @@ const Activities = ({ data }: any) => {
                   compactDisplay: "short",
                 })}`
               }
-              toolTipText="Total Isk earned Ratting in the last 30 Days"
+              toolTipText={t("Total Isk earned Ratting in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={Missions}
@@ -76,25 +80,27 @@ const Activities = ({ data }: any) => {
                   compactDisplay: "short",
                 })}`
               }
-              toolTipText="Total Isk earned running missions in the last 30 Days"
+              toolTipText={t("Total Isk earned running missions in the last 30 Days")}
             />
           </div>
         </Card>
         <Card className="m-2">
-          <Card.Header className="text-center">Economic</Card.Header>
-
+          <Card.Header className="text-center">
+            <Card.Title>{t("Economic")}</Card.Title>
+          </Card.Header>
           <div className="d-flex flex-wrap justify-content-center">
             <IconStatusCard iconSrc={Market} cardVariant={data?.market ? "success" : undefined} />
             <IconStatusCard
               iconSrc={Industry}
               cardVariant={data?.industry ? "success" : undefined}
-              toolTipText="Industry activities such as manufacturing or reactions"
+              toolTipText={t("Industry activities such as manufacturing or reactions")}
             />
           </div>
         </Card>
         <Card className="m-2">
-          <Card.Header className="text-center">Mining</Card.Header>
-
+          <Card.Header className="text-center">
+            <Card.Title>{t("Mining")}</Card.Title>
+          </Card.Header>
           <div className="d-flex flex-wrap justify-content-center">
             <IconStatusCard
               iconSrc={Ice}
@@ -107,7 +113,7 @@ const Activities = ({ data }: any) => {
                   compactDisplay: "short",
                 })} m3`
               }
-              toolTipText="Total m3 of Ice mined in the last 30 Days"
+              toolTipText={t("Total m3 of Ice mined in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={Asteroid}
@@ -120,7 +126,7 @@ const Activities = ({ data }: any) => {
                   compactDisplay: "short",
                 })} m3`
               }
-              toolTipText="Total m3 of standard ore mined in the last 30 Days"
+              toolTipText={t("Total m3 of standard ore mined in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={Moons}
@@ -133,7 +139,7 @@ const Activities = ({ data }: any) => {
                   compactDisplay: "short",
                 })} m3`
               }
-              toolTipText="Total m3 of moon ore mined in the last 30 Days"
+              toolTipText={t("Total m3 of moon ore mined in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={Gas}
@@ -146,12 +152,12 @@ const Activities = ({ data }: any) => {
                   compactDisplay: "short",
                 })} m3`
               }
-              toolTipText="Total m3 of gas anomalies mined in the last 30 Days"
+              toolTipText={t("Total m3 of gas anomalies mined in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={Planet}
               cardVariant={data?.pi ? "success" : undefined}
-              toolTipText="Planetary import/export seen in the last 30 Days"
+              toolTipText={t("Planetary import/export seen in the last 30 Days")}
             />
           </div>
         </Card>

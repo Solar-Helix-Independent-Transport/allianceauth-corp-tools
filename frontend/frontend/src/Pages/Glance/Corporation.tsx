@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { IconStatusCard } from "../../Components/Cards/IconStatusCard";
 import { loadCorpGlanceStatusData } from "../../api/corporation";
 import Isk from "../../assets/isk_128.png";
@@ -7,6 +8,8 @@ import styles from "./AtAGlance.module.css";
 import { useQuery } from "react-query";
 
 export const CorporationGlancesInfo = () => {
+  const { t } = useTranslation();
+
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "corporation", "status", 0],
     queryFn: () => loadCorpGlanceStatusData(0),
@@ -15,7 +18,7 @@ export const CorporationGlancesInfo = () => {
 
   return (
     <>
-      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Corporation Members</h3>
+      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>"{t("Corporation Members")}"</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <IconStatusCard
           cardVariant={data?.characters?.liquid < 1000000 ? "warning" : undefined}
@@ -27,14 +30,14 @@ export const CorporationGlancesInfo = () => {
             compactDisplay: "short",
           })}`}
           isLoading={isLoading}
-          toolTipText="Total Liquid Isk across all characters and alts in corporation"
+          toolTipText={t("Total Liquid Isk across all characters and alts in corporation")}
         />
 
         <IconStatusCard
           iconSrc={Omega}
           text={data?.characters?.known_and_alts?.toLocaleString()}
           isLoading={isLoading}
-          toolTipText="Count of all known Characters and Alts"
+          toolTipText={t("Count of all known Characters and Alts")}
         />
 
         <IconStatusCard
@@ -47,7 +50,7 @@ export const CorporationGlancesInfo = () => {
           iconSrc={Omega}
           text={`${data?.characters?.known_in_corp?.toLocaleString()}/${data?.characters?.in_corp?.toLocaleString()}`}
           isLoading={isLoading}
-          toolTipText="Count of all known Characters in Corp"
+          toolTipText={t("Count of all known Characters in Corp")}
         />
 
         <IconStatusCard
@@ -56,16 +59,8 @@ export const CorporationGlancesInfo = () => {
           textVariant={data?.characters?.bad > 0 ? "danger" : "success"}
           text={data?.characters?.bad?.toLocaleString()}
           isLoading={isLoading}
-          toolTipText="Count of all known characters or alts not loading into audit"
+          toolTipText={t("Count of all known characters or alts not loading into audit")}
         />
-
-        {/* <IconStatusCard iconSrc={NPC} textVariant={"info"} text={"Ƶ1.5b"} isLoading={isLoading} />
-        <IconStatusCard
-          iconSrc={Asteroid}
-          textVariant={"info"}
-          text={"15M m3"}
-          isLoading={isLoading}
-        /> */}
       </div>
     </>
   );
