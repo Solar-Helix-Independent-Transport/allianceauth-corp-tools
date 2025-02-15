@@ -1,3 +1,4 @@
+import { PanelLoader } from "@pvyparts/allianceauth-components";
 import { CharacterAllegiancePortrait } from "../../Components/EveImages/EveImages";
 import { TextFilter } from "../../Components/Helpers/TextFilter";
 import { DoctrineCheck } from "../../Components/Skills/DoctrineCheck";
@@ -87,53 +88,57 @@ const CharacterDoctrine = () => {
           defaultChecked={hideFailures}
         />
       </div>
-      {data?.map((char: components["schemas"]["CharacterDoctrines"]) => {
-        const doctrineCount = Object.entries(char.doctrines).length;
-        const filtered_doctrines = Object.entries(char.doctrines).reduce((output, [k, v]) => {
+      {data ? (
+        data.map((char: components["schemas"]["CharacterDoctrines"]) => {
+          const doctrineCount = Object.entries(char.doctrines).length;
+          const filtered_doctrines = Object.entries(char.doctrines).reduce((output, [k, v]) => {
+            return (
+              output ||
+              ((!hideFailures || Object.entries(v).length === 0) &&
+                (filter.length == 0 || k.toLowerCase().includes(filter.toLocaleLowerCase())))
+            );
+          }, false);
           return (
-            output ||
-            ((!hideFailures || Object.entries(v).length === 0) &&
-              (filter.length == 0 || k.toLowerCase().includes(filter.toLocaleLowerCase())))
+            filtered_doctrines && (
+              <Card className="my-2">
+                <Card.Header>
+                  <h6 className="m-0">
+                    {char.character.character_name}{" "}
+                    <span className="float-end">
+                      {char.character.corporation_name}
+                      {char.character.alliance_name && ` (${char.character.alliance_name})`}
+                    </span>
+                  </h6>
+                </Card.Header>
+                <Card.Body className="d-flex align-items-center">
+                  <div className="flex-one m-2">
+                    <CharacterAllegiancePortrait size={128} character={char.character} />
+                  </div>
+                  <div className="d-flex flex-grow-1 justify-content-center flex-wrap">
+                    {doctrineCount > 0 ? (
+                      <>
+                        {Object.entries(char.doctrines).map(([k, v]) => {
+                          return (
+                            (!hideFailures || Object.entries(v).length === 0) &&
+                            (filter.length == 0 ||
+                              k.toLowerCase().includes(filter.toLocaleLowerCase())) && (
+                              <DoctrineCheck name={k} skill_reqs={v} skill_list={char.skills} />
+                            )
+                          );
+                        })}
+                      </>
+                    ) : (
+                      <p>No Tokens</p>
+                    )}
+                  </div>
+                </Card.Body>
+              </Card>
+            )
           );
-        }, false);
-        return (
-          filtered_doctrines && (
-            <Card className="my-2">
-              <Card.Header>
-                <h6 className="m-0">
-                  {char.character.character_name}{" "}
-                  <span className="float-end">
-                    {char.character.corporation_name}
-                    {char.character.alliance_name && ` (${char.character.alliance_name})`}
-                  </span>
-                </h6>
-              </Card.Header>
-              <Card.Body className="d-flex align-items-center">
-                <div className="flex-one m-2">
-                  <CharacterAllegiancePortrait size={128} character={char.character} />
-                </div>
-                <div className="d-flex flex-grow-1 justify-content-center flex-wrap">
-                  {doctrineCount > 0 ? (
-                    <>
-                      {Object.entries(char.doctrines).map(([k, v]) => {
-                        return (
-                          (!hideFailures || Object.entries(v).length === 0) &&
-                          (filter.length == 0 ||
-                            k.toLowerCase().includes(filter.toLocaleLowerCase())) && (
-                            <DoctrineCheck name={k} skill_reqs={v} skill_list={char.skills} />
-                          )
-                        );
-                      })}
-                    </>
-                  ) : (
-                    <p>No Tokens</p>
-                  )}
-                </div>
-              </Card.Body>
-            </Card>
-          )
-        );
-      })}
+        })
+      ) : (
+        <PanelLoader title="Loading Data" message="Please Wait" />
+      )}
     </>
   );
 };
