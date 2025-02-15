@@ -37,6 +37,7 @@ package:
 	cd frontend/corp;yarn install;yarn build
 	cd frontend/char;yarn install;yarn build
 	cd frontend/frontend/;yarn install;yarn build
+	cp -r frontend/frontend/i18n corptools/static/i18n
 	hatch build
 
 devcorp:

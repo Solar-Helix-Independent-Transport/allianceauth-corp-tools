@@ -27,9 +27,34 @@ import { Card } from "react-bootstrap";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import Backend from "i18next-http-backend";
+import LanguageDetector from "i18next-browser-languagedetector";
+
 TimeAgo.addDefaultLocale(en);
 
 const queryClient = new QueryClient();
+
+i18n
+  .use(Backend)
+  .use(initReactI18next)
+  .use(LanguageDetector)
+  .init({
+    detection: {
+      htmlTag: window.document ? window.document.head : undefined,
+    },
+    fallbackLng: "en",
+    interpolation: {
+      escapeValue: false, // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
+    },
+    react: {
+      useSuspense: false, //   <---- this will do the magic
+    },
+    backend: {
+      loadPath: "/static/corptools/i18n/{{lng}}/{{ns}}.json",
+    },
+  });
 
 function App() {
   return (
