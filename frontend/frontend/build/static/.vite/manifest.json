@@ -8,13 +8,23 @@
       "_@libs-BCfgtq-S.js"
     ]
   },
+  "_browser-ponyfill-DTq1s2jB.js": {
+    "file": "assets/browser-ponyfill-DTq1s2jB.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_@libs-BCfgtq-S.js"
+    ]
+  },
   "index.html": {
-    "file": "assets/index-BVQm7nry.js",
+    "file": "assets/index-Dcw56osE.js",
     "src": "index.html",
     "isEntry": true,
     "imports": [
       "_@libs-BCfgtq-S.js",
       "_@react-router-BF21kupu.js"
+    ],
+    "dynamicImports": [
+      "_browser-ponyfill-DTq1s2jB.js"
     ],
     "css": [
       "static/corptools/bs5/static/css/index-MpvbYUBF.css"
