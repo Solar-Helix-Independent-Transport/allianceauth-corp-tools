@@ -39,7 +39,7 @@ const CharMenu = ({ data, characterID }: CharMenuProps) => {
   return (
     <>
       <Nav.Item as="li">
-        <Nav.Link as={Link} to={`/audit/r_beta/${characterID}/account/overview`} key="Overview">
+        <Nav.Link as={Link} to={`/audit/r/${characterID}/account/overview`} key="Overview">
           {t("Overview")}
         </Nav.Link>
       </Nav.Item>
@@ -53,7 +53,7 @@ const CharMenu = ({ data, characterID }: CharMenuProps) => {
                   <Nav.Item as="li">
                     <NavDropdown.Item
                       as={Link}
-                      to={`/audit/r_beta/${characterID}/${link.link}`}
+                      to={`/audit/r/${characterID}/${link.link}`}
                       id={link.name}
                       key={link.name}
                     >
@@ -75,7 +75,7 @@ const CharMenu = ({ data, characterID }: CharMenuProps) => {
                 <Nav.Item as="li">
                   <Nav.Link
                     as={Link}
-                    to={`/audit/r_beta/${characterID}/${cat.link}`}
+                    to={`/audit/r/${characterID}/${cat.link}`}
                     id={cat.name}
                     key={cat.name}
                   >

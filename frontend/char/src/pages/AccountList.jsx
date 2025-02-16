@@ -16,7 +16,7 @@ const AccountList = () => {
     {
       initialData: [],
       refetchOnWindowFocus: false,
-    }
+    },
   );
 
   const columns = React.useMemo(
@@ -31,9 +31,9 @@ const AccountList = () => {
                 className="flex-container flex-wide"
                 bsStyle="success"
                 id={props.value.character_id}
-                //href={"/audit/r/" + props.value.character_id + "/"}
+                //href={"/audit/r_legacy/" + props.value.character_id + "/"}
                 onClick={(e) => {
-                  navigate(`/audit/r/${props.value.character_id}/`);
+                  navigate(`/audit/r_legacy/${props.value.character_id}/`);
                 }}
               >
                 <span>{props.value.character_name}</span>
@@ -97,7 +97,7 @@ const AccountList = () => {
         },
       },
     ],
-    [navigate]
+    [navigate],
   );
 
   const filterOptions = [
@@ -115,7 +115,7 @@ const AccountList = () => {
 
   if (!isLoading && filter_inactive) {
     tableData = tableData.filter(
-      (acct) => !acct.characters.reduce((result, char) => result && char.active, true)
+      (acct) => !acct.characters.reduce((result, char) => result && char.active, true),
     );
   }
 

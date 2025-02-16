@@ -59,12 +59,12 @@ urlpatterns = [
     re_path(r'^api/', api.urls),
     path(
         'r/',
-        views.react_menu,
+        views.react_menu_v4,
         name='react'
     ),
     re_path(
         r'^r/(?P<character_id>(\d)*)/',
-        views.v3_ui_render,
+        views.react_main,
         name='reactmain'
     ),
     re_path(
@@ -73,14 +73,14 @@ urlpatterns = [
         name='corp_beta_react'
     ),
     path(
-        'r_beta/',
-        views.react_menu_v4,
-        name='reactbeta'
+        'r_legacy/',
+        views.react_menu,
+        name='reactlegacy'
     ),
     re_path(
-        r'^r_beta/(?P<character_id>(\d)*)/',
-        views.react_main,
-        name='reactbetamain'
+        r'^r_legacy/(?P<character_id>(\d)*)/',
+        views.v3_ui_render,
+        name='reactlegacymain'
     ),
     re_path(r'^check_account/(?P<character_id>(\d)*)/$',
             views.update_account, name='update_account'),

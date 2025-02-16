@@ -54,7 +54,7 @@ function CharActiveBadge({ characters, character_id }) {
           <Button
             className="btn-danger"
             onClick={(e) => {
-              navigate(`/audit/r/${character_id}/`);
+              navigate(`/audit/r_legacy/${character_id}/`);
             }}
           >
             {bad_chars.length}

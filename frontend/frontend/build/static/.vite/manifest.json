@@ -1,30 +1,30 @@
 {
-  "_@libs-BCfgtq-S.js": {
-    "file": "assets/@libs-BCfgtq-S.js"
+  "_@libs-DsDdirnI.js": {
+    "file": "assets/@libs-DsDdirnI.js"
   },
-  "_@react-router-BF21kupu.js": {
-    "file": "assets/@react-router-BF21kupu.js",
+  "_@react-router-DqDt1vCS.js": {
+    "file": "assets/@react-router-DqDt1vCS.js",
     "imports": [
-      "_@libs-BCfgtq-S.js"
+      "_@libs-DsDdirnI.js"
     ]
   },
-  "_browser-ponyfill-DTq1s2jB.js": {
-    "file": "assets/browser-ponyfill-DTq1s2jB.js",
+  "_browser-ponyfill-ToTdgQUL.js": {
+    "file": "assets/browser-ponyfill-ToTdgQUL.js",
     "isDynamicEntry": true,
     "imports": [
-      "_@libs-BCfgtq-S.js"
+      "_@libs-DsDdirnI.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-Dcw56osE.js",
+    "file": "assets/index-Cz-8HxaL.js",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@libs-BCfgtq-S.js",
-      "_@react-router-BF21kupu.js"
+      "_@libs-DsDdirnI.js",
+      "_@react-router-DqDt1vCS.js"
     ],
     "dynamicImports": [
-      "_browser-ponyfill-DTq1s2jB.js"
+      "_browser-ponyfill-ToTdgQUL.js"
     ],
     "css": [
       "static/corptools/bs5/static/css/index-MpvbYUBF.css"

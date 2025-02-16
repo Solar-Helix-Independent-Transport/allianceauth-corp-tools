@@ -62,7 +62,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <Router>
           <Routes>
-            <Route path="audit/r_beta/:characterID/" element={<CharacterAudit />}>
+            <Route path="audit/r/:characterID/" element={<CharacterAudit />}>
               <Route index element={<Navigate to="account/overview" replace />} />
               <Route path="account/overview" element={<CharacterOverview />} />
               <Route path="account/status" element={<CharacterStatus />} />
@@ -176,7 +176,7 @@ function App() {
                 }
               />
             </Route>
-            <Route path="*" element={<Navigate to="audit/r_beta/0" replace />} />
+            <Route path="*" element={<Navigate to="audit/r/0" replace />} />
           </Routes>
         </Router>
       </QueryClientProvider>

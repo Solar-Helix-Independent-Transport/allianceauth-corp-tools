@@ -23,12 +23,18 @@ const CharMenu = () => {
       </Navbar.Header>
       <Navbar.Collapse>
         <Nav>
-          <LinkContainer activeClassName={"active"} to={`/audit/r/${characterID}/account/status`}>
+          <LinkContainer
+            activeClassName={"active"}
+            to={`/audit/r_legacy/${characterID}/account/status`}
+          >
             <NavItem key="Overview" to={`account/status`}>
               Overview
             </NavItem>
           </LinkContainer>
-          <LinkContainer activeClassName={"active"} to={`/audit/r/${characterID}/account/pubdata`}>
+          <LinkContainer
+            activeClassName={"active"}
+            to={`/audit/r_legacy/${characterID}/account/pubdata`}
+          >
             <NavItem key="Public Data" to={`account/status`}>
               Public Data
             </NavItem>
@@ -46,7 +52,7 @@ const CharMenu = () => {
                         return (
                           <LinkContainer
                             activeClassName={"active"}
-                            to={`/audit/r/${characterID}/${link.link}`}
+                            to={`/audit/r_legacy/${characterID}/${link.link}`}
                           >
                             <NavItem to={`${link.link}`} id={link.name} key={link.name}>
                               {link.name}
@@ -63,7 +69,7 @@ const CharMenu = () => {
                         </NavItem>
                       ) : (
                         <NavItem id={cat.name} key={cat.name}>
-                          <LinkContainer to={`/audit/r_beta/${characterID}/${cat.link}`}>
+                          <LinkContainer to={`/audit/r_legacy/${characterID}/${cat.link}`}>
                             <>{cat.name}</>
                           </LinkContainer>
                         </NavItem>
@@ -85,7 +91,7 @@ const CharMenu = () => {
               </>
             ) : (
               <>
-                <NavItem key="Beta UI" href={`/audit/r_beta`}>
+                <NavItem key="Beta UI" href={`/audit/r`}>
                   Beta UI
                 </NavItem>
                 <LinkContainer to={`account/list`}>

@@ -55,7 +55,7 @@ const CorptoolsCharacterView = () => {
         <br />
         <Router>
           <Routes>
-            <Route path="audit/r/:characterID/" element={<CharacterAudit />}>
+            <Route path="audit/r_legacy/:characterID/" element={<CharacterAudit />}>
               <Route index element={<Navigate to="account/status" replace />} />
               <Route path="account/status" element={<CharStatus />} />
               <Route path="account/assets" element={<CharAssets />} />
@@ -81,7 +81,7 @@ const CorptoolsCharacterView = () => {
               <Route path="ping/assets" element={<PingAssets />} />
             </Route>
             {/* if no route re-route to the main page, this is mainly for dev work */}
-            <Route path="*" element={<Navigate to="audit/r/0" replace />} />
+            <Route path="*" element={<Navigate to="audit/r_legacy/0" replace />} />
             <Route path="audit/admin/" element={<AuditAdmin />} />
           </Routes>
         </Router>

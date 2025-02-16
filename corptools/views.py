@@ -369,14 +369,14 @@ def update_account(request, character_id):
 
 @login_required
 def react_menu(request):
-    return redirect('corptools:reactmain', request.user.profile.main_character.character_id)
+    return redirect('corptools:reactlegacymain', request.user.profile.main_character.character_id)
 
 
 @login_required
 def react_menu_v4(request):
     if request.path.startswith('/audit/r_beta/corp/glance'):
         return render(request, 'corptools/base_bs5.html', context={"version": __version__, "app_name": "corptools/bs5", "page_title": "Audit"})
-    return redirect('corptools:reactbetamain', request.user.profile.main_character.character_id)
+    return redirect('corptools:reactmain', request.user.profile.main_character.character_id)
 
 
 @login_required

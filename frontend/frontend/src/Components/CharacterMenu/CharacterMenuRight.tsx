@@ -4,7 +4,7 @@ import { Nav } from "react-bootstrap";
 import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useIsFetching } from "react-query";
-import { LinkContainer } from "react-router-bootstrap";
+import { Link } from "react-router-dom";
 
 const menuRoot = document.getElementById("nav-right");
 
@@ -38,18 +38,22 @@ const CharMenuRight = () => {
       ) : (
         <></>
       )}
-      <Nav.Link href="/audit/char/add/" key="Add Character">
-        {t("Add Character")}
-      </Nav.Link>
-      <LinkContainer to={`account/list`}>
-        <Nav.Link key="Account List">{t("Account List")}</Nav.Link>
-      </LinkContainer>
+      <Nav.Item as="li">
+        <Nav.Link href="/audit/char/add/" key="Add Character">
+          {t("Add Character")}
+        </Nav.Link>
+      </Nav.Item>
+      <Nav.Item as="li">
+        <Nav.Link as={Link} to={`account/list`} key="Account List">
+          {t("Account List")}
+        </Nav.Link>
+      </Nav.Item>
       {/* TODO Check perms for this */}
-      <LinkContainer to={`/audit/r_beta/corp`}>
-        <Nav.Link key="corp-swap">
+      {/* <Nav.Item as="li">
+        <Nav.Link as={Link} to={`/audit/r_beta/corp`} key="corp-swap">
           <i className="fa-regular fa-building"></i>
         </Nav.Link>
-      </LinkContainer>
+      </Nav.Item> */}
     </>,
     menuRoot,
   );
