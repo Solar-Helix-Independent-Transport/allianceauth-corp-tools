@@ -189,6 +189,7 @@ class CharacterWalletEvent(Schema):
     ref_type: str
     balance: float
     amount: float
+    own_account: Optional[bool] = True
     reason: Optional[str] = None
 
 

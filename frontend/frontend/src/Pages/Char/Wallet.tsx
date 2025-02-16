@@ -5,10 +5,13 @@ import { loadWallet } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
+import { useState } from "react";
+import { Form } from "react-bootstrap";
 
 const CharacterWallet = () => {
   const { t } = useTranslation();
   const { characterID } = useParams();
+  const [showAll, setShowAll] = useState(true);
 
   const { data, isFetching } = useQuery({
     queryKey: ["wallet", characterID],
@@ -44,9 +47,27 @@ const CharacterWallet = () => {
     }),
   ];
 
+  const data_out = data?.filter((row: any) => {
+    if (showAll) {
+      return true;
+    } else {
+      return !row.own_account;
+    }
+  });
   return (
     <>
-      <TableWrapper {...{ data, isFetching, columns }} />
+      <Form.Check
+        type="switch"
+        id="custom-switch"
+        label={t("Show Own Account Activity")}
+        className="float-end"
+        onChange={(event: any) => {
+          setShowAll(event.target.checked);
+        }}
+        defaultChecked={showAll}
+      />
+
+      <TableWrapper data={data_out} {...{ isFetching, columns }} />
     </>
   );
 };

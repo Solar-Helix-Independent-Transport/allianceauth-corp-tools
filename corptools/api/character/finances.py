@@ -34,6 +34,8 @@ class FinancesApiEndpoints:
                 return 403, _("Permission Denied")
 
             characters = get_alts_queryset(main)
+            character_list = list(
+                characters.values_list("character_id", flat=True))
 
             wallet_journal = models.CharacterWalletJournalEntry.objects\
                 .filter(character__character__in=characters)\
@@ -41,6 +43,10 @@ class FinancesApiEndpoints:
 
             output = []
             for w in wallet_journal:
+                own_account = False
+                if (w.second_party_id in character_list and w.first_party_id in character_list):
+                    own_account = True
+
                 output.append(
                     {
                         "character": w.character.character,
@@ -60,6 +66,7 @@ class FinancesApiEndpoints:
                         "amount": w.amount,
                         "balance": w.balance,
                         "reason": w.reason,
+                        "own_account": own_account
                     })
 
             return output
