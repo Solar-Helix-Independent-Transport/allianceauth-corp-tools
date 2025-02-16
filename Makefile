@@ -6,9 +6,10 @@ help:
 	@echo "  dev        install all deps for dev environment"
 	@echo "  clean      remove all old packages"
 	@echo "  test       run tests"
+	@echo "  buildjs    Build all JS projects"
 	@echo "  deploy     Configure the PyPi config file in CI"
-	@echo "  packagejs  Build the React Project"
-	@echo "  packagepy  Build the PyPi package"
+	@echo "  package    Build the Project"
+	@echo "  transkate  Build/update the translation files"
 
 clean:
 	rm -rf dist/*
@@ -39,12 +40,6 @@ package:
 	cd frontend/frontend/;yarn install;yarn build
 	cp -r frontend/frontend/i18n corptools/static/i18n
 	hatch build
-
-devcorp:
-	cd frontend/corp;yarn install;yarn start
-
-devchar:
-	cd frontend/char;yarn install;yarn start
 
 translate:
 	django-admin makemessages -l en
