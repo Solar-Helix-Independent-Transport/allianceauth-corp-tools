@@ -33,7 +33,7 @@ export const DoctrineCheck = ({ name, skill_reqs, skill_list }: any) => {
             </Button>
             {!alpha_check ? (
               <CopyToClipboard text={clipboard_text}>
-                <Button size="sm" variant="none" className="border-danger">
+                <Button size="sm" variant="danger">
                   <i className="fa-solid fa-copy"></i>
                 </Button>
               </CopyToClipboard>
