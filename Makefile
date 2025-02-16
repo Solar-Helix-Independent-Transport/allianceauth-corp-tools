@@ -45,3 +45,7 @@ devcorp:
 
 devchar:
 	cd frontend/char;yarn install;yarn start
+
+translate:
+    django-admin makemessages -l en
+    cd frontend/frontend/;yarn buildTranslations
