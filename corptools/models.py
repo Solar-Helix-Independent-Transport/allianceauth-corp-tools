@@ -1556,6 +1556,9 @@ class FullyLoadedFilter(FilterBase):
             logger.error(e, exc_info=1)
             return False
 
+    def process_field(self, users):
+        return self.audit_filter(users)
+
     def audit_filter(self, users):
         logic = self.reversed_logic
         co = CharacterOwnership.objects.filter(user__in=users).select_related(
