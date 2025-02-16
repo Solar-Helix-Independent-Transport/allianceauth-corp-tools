@@ -7,6 +7,12 @@ from django.db.models import F
 from corptools import models
 from corptools.api import schema
 
+# from ninja.decorators import decorate_view
+
+# from django.views.decorators.cache import cache_page
+
+# from corptools.api.decorators import cache_page_data
+
 
 class ListApiEndpoints:
 
@@ -19,6 +25,7 @@ class ListApiEndpoints:
             response={200: List[schema.AccountStatus], 403: str},
             tags=self.tags
         )
+        # @decorate_view(cache_page(300))
         def get_account_list(request, orphans=False):
             characters = models.CharacterAudit.objects.visible_to(
                 request.user).filter(character=F("character__character_ownership__user__profile__main_character"))\
