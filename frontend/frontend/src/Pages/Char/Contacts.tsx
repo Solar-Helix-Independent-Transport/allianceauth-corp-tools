@@ -23,7 +23,7 @@ const CharacterContacts = () => {
 
   const columns = [
     columnHelper.accessor("character.character_name", {
-      header: t("Main Character"),
+      header: t("Character"),
     }),
     columnHelper.accessor("contact.name", {
       header: t("Contact"),

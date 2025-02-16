@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { BooleanCheckBox } from "../../Components/BooleanCheckbox";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
@@ -8,6 +9,7 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterRoles = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
 
   const { data, isFetching } = useQuery({
@@ -19,37 +21,37 @@ const CharacterRoles = () => {
 
   const columns = [
     columnHelper.accessor("character.character_name", {
-      header: "Character",
+      header: t("Character"),
     }),
     columnHelper.accessor("character.corporation_name", {
-      header: "Corporation",
+      header: t("Corporation"),
     }),
     columnHelper.accessor("director", {
-      header: "Director",
+      header: t("Director"),
       cell: (props) => {
         return <BooleanCheckBox checked={props.getValue()} />;
       },
     }),
     columnHelper.accessor("station_manager", {
-      header: "Station Manager",
+      header: t("Station Manager"),
       cell: (props) => {
         return <BooleanCheckBox checked={props.getValue()} />;
       },
     }),
     columnHelper.accessor("personnel_manager", {
-      header: "Personnel Manager",
+      header: t("Personnel Manager"),
       cell: (props) => {
         return <BooleanCheckBox checked={props.getValue()} />;
       },
     }),
     columnHelper.accessor("accountant", {
-      header: "Accountant",
+      header: t("Accountant"),
       cell: (props) => {
         return <BooleanCheckBox checked={props.getValue()} />;
       },
     }),
     columnHelper.accessor("titles", {
-      header: "Titles",
+      header: t("Titles"),
       cell: (props) => {
         return props.getValue()?.map((title) => {
           return <Badge bg="secondary">{title.name}</Badge>;

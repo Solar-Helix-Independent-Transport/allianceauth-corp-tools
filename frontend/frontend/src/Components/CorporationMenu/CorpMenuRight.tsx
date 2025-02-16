@@ -3,12 +3,15 @@ import styles from "./CorpMenu.module.css";
 import React from "react";
 import { Nav } from "react-bootstrap";
 import ReactDOM from "react-dom";
+import { useTranslation } from "react-i18next";
 import { useIsFetching } from "react-query";
 import { Link } from "react-router-dom";
 
 const menuRoot = document.getElementById("nav-right");
 
 const CorpMenuRight = () => {
+  const { t } = useTranslation();
+
   const isLoading = useIsFetching();
   const [innerHtmlEmptied, setInnerHtmlEmptied] = React.useState(false);
 
@@ -38,13 +41,13 @@ const CorpMenuRight = () => {
       )}
       <CorpAddToken />
       <Nav.Link as={Link} to={`corporations`} key="corporation_list">
-        Corporations
+        {t("Corporations")}
       </Nav.Link>
       <Nav.Link as={Link} to={`audit/r/0`} key="corporation_list">
         <i className="fa-solid fa-users"></i>
       </Nav.Link>
     </>,
-    menuRoot
+    menuRoot,
   );
 };
 

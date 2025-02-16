@@ -1,9 +1,12 @@
 import { PortraitCard } from "../Cards/PortraitCard";
 import React from "react";
 import { Badge, Button, ButtonGroup, Card, Modal, Table } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import TimeAgo from "react-timeago";
 
 const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
+  const { t } = useTranslation();
+
   const [openModal, setOpenModal] = React.useState(false);
   const [modalData, setModalData] = React.useState(null as any);
   return (
@@ -28,16 +31,16 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
               </Card.Text>
 
               <Card.Text className={"text-center"}>
-                Skill Points:{" "}
+                {t("Skill Points")}:{" "}
                 <Badge className={"text-center"}>{char.sp && char.sp.toLocaleString()}</Badge>
                 <br />
-                Isk:{" "}
+                {t("Isk")}:{" "}
                 <Badge className={"text-center"}>${char.isk && char.isk.toLocaleString()}</Badge>
               </Card.Text>
-              <Card.Title className={"text-center"}>Location</Card.Title>
+              <Card.Title className={"text-center"}>{t("Location")}</Card.Title>
               <Card.Text className={"text-center"}>
                 <Badge className={"text-center"}>
-                  {char.location ? char.location : "Unknown Location"}
+                  {char.location ? char.location : t("Unknown Location")}
                 </Badge>
                 <br />
                 <Badge className="text-center m-1">
@@ -71,7 +74,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                     size="sm"
                     href={`https://evemaps.dotlan.net/corp/${char.character.corporation_name.replace(
                       " ",
-                      "_"
+                      "_",
                     )}`}
                   >
                     DotLan
@@ -90,7 +93,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                     size="sm"
                     href={`https://forums.eveonline.com/u/${char.character.character_name.replace(
                       " ",
-                      "_"
+                      "_",
                     )}/summary`}
                   >
                     EVE Forums
@@ -116,7 +119,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                     setOpenModal(true);
                   }}
                 >
-                  Show Update Status
+                  {t("Show Update Status")}
                 </Button>
               </Card.Text>
             </div>
@@ -131,15 +134,15 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
           }}
         >
           <Modal.Header closeButton>
-            {modalData?.character.character_name} Update Status{" "}
+            {t(`${modalData?.character.character_name} Update Status`)}
           </Modal.Header>
           <Modal.Body>
             <div>
               <Table striped style={{ marginBottom: 0 }}>
                 <thead>
                   <tr key={`head-${modalData?.character}`}>
-                    <th>Update</th>
-                    <th className="text-end">Last Run</th>
+                    <th>{t("Update")}</th>
+                    <th className="text-end">{t("Last Run")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -152,10 +155,10 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                             modalData?.last_updates[h] ? (
                               <TimeAgo date={modalData?.last_updates[h]} />
                             ) : (
-                              "Never"
+                              t("Never")
                             )
                           ) : (
-                            "Never"
+                            t("Never")
                           )}
                         </td>
                       </tr>
@@ -173,7 +176,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                 setOpenModal(false);
               }}
             >
-              Close
+              {t("Close")}
             </Button>
           </Modal.Footer>
         </Modal>

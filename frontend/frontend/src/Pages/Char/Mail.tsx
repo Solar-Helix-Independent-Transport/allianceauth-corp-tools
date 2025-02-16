@@ -5,10 +5,12 @@ import { loadMail } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
 import { Badge, Button } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterMail = () => {
+  const { t } = useTranslation();
   let { characterID } = useParams();
   const [showModal, setModal] = useState(false);
   const [modalData, setData] = useState(null);
@@ -19,20 +21,20 @@ const CharacterMail = () => {
     {
       initialData: [],
       refetchOnWindowFocus: false,
-    }
+    },
   );
 
   const columnHelper = createColumnHelper<any>();
 
   const columns = [
     columnHelper.accessor("character", {
-      header: "Character",
+      header: t("Character"),
     }),
     columnHelper.accessor("from", {
-      header: "From",
+      header: t("From"),
     }),
     columnHelper.accessor("labels", {
-      header: "Labels",
+      header: t("Labels"),
       cell: (cell) => (
         <p>
           {cell.getValue().map((name: any) => (
@@ -42,11 +44,13 @@ const CharacterMail = () => {
       ),
     }),
     columnHelper.accessor("recipients", {
-      header: "To",
+      header: t("To"),
       cell: (cell) =>
         cell.getValue().length > 2 ? (
           <p>
-            <Badge bg="warning">+ {cell.getValue().length} Recipients</Badge>
+            <Badge bg="warning">
+              + {cell.getValue().length} {t("Recipients")}
+            </Badge>
           </p>
         ) : (
           <p>
@@ -59,24 +63,23 @@ const CharacterMail = () => {
         ),
     }),
     columnHelper.accessor("timestamp", {
-      header: "Date",
+      header: t("Date"),
       cell: (cell) => <div>{new Date(cell.getValue()).toLocaleString()}</div>,
     }),
     columnHelper.accessor("subject", {
-      header: "Subject",
+      header: t("Subject"),
     }),
     columnHelper.accessor("subject", {
-      header: "Details",
+      header: t("Details"),
       cell: (cell) => (
         <>
-          {" "}
           <Button
             onClick={() => {
               setData(cell.row.original);
               setModal(true);
             }}
           >
-            Show Detail
+            {t("Show Detail")}
           </Button>
         </>
       ),

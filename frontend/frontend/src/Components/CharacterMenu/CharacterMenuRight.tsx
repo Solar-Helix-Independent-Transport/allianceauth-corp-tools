@@ -36,10 +36,10 @@ const CharMenuRight = () => {
         <></>
       )}
       <Nav.Link href="/audit/char/add/" key="Add Character">
-        Add Character
+        {t("Add Character")}
       </Nav.Link>
       <LinkContainer to={`account/list`}>
-        <Nav.Link key="Account List">Account List</Nav.Link>
+        <Nav.Link key="Account List">{t("Account List")}</Nav.Link>
       </LinkContainer>
       {/* TODO Check perms for this */}
       <LinkContainer to={`/audit/r_beta/corp`}>
@@ -48,7 +48,7 @@ const CharMenuRight = () => {
         </Nav.Link>
       </LinkContainer>
     </>,
-    menuRoot
+    menuRoot,
   );
 };
 

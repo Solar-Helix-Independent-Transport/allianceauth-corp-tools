@@ -25,7 +25,7 @@ const CharacterAssets = () => {
 
   const columns = [
     columnHelper.accessor("character.character_name", {
-      header: t("Main Character"),
+      header: t("Character"),
     }),
     columnHelper.accessor("item.name", {
       header: t("Item Type"),

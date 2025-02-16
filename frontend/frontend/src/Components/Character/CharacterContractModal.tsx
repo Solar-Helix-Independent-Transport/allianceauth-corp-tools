@@ -1,8 +1,10 @@
 import { DateToFields, StrIntToFields, StrToFields } from "../Modals/ModalFields";
 import CharacterContractModalTable from "./CharacterContractModalTable";
 import { Button, Modal } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 function CharacterContractModal({ data, shown, setShown }: any) {
+  const { t } = useTranslation();
   return (
     <Modal
       show={shown}
@@ -22,35 +24,35 @@ function CharacterContractModal({ data, shown, setShown }: any) {
             strValue={data?.acceptor === data?.assignee ? null : data?.acceptor}
             text={"Acceptor:"}
           />
-          <StrToFields strValue={data?.availability} text={"Availability:"} />
-          <StrToFields strValue={data?.status} text={"Status:"} />
-          <StrIntToFields strValue={data?.start_location_id} text={"Start Location:"} />
-          <StrIntToFields strValue={data?.end_location_id} text={"End Location:"} />
-          <DateToFields dateStrValue={data?.date_issued} text={"Issued:"} />
-          <DateToFields dateStrValue={data?.date_accepted} text={"Accepted:"} />
-          <DateToFields dateStrValue={data?.date_completed} text={"Completed:"} />
-          <DateToFields dateStrValue={data?.date_expired} text={"Expiry:"} />
-          <StrIntToFields strValue={data?.price} text={"Price:"} valuePre={"$"} />
-          <StrIntToFields strValue={data?.collateral} text={"Collateral:"} valuePre={"$"} />
-          <StrIntToFields strValue={data?.reward} text={"Reward:"} valuePre={"$"} />
-          <StrIntToFields strValue={data?.buyout} text={"Buyout:"} valuePre={"$"} />
-          <StrIntToFields strValue={data?.volume} text={"Volume:"} valuePost={"m3"} />
-          <StrIntToFields strValue={data?.days_to_complete} text={"Days to Complete:"} />
-          <StrToFields strValue={data?.title} text={"Description:"} />
+          <StrToFields strValue={data?.availability} text={t("Availability")} />
+          <StrToFields strValue={data?.status} text={t("Status")} />
+          <StrIntToFields strValue={data?.start_location_id} text={t("Start Location")} />
+          <StrIntToFields strValue={data?.end_location_id} text={t("End Location")} />
+          <DateToFields dateStrValue={data?.date_issued} text={t("Issued")} />
+          <DateToFields dateStrValue={data?.date_accepted} text={t("Accepted")} />
+          <DateToFields dateStrValue={data?.date_completed} text={t("Completed")} />
+          <DateToFields dateStrValue={data?.date_expired} text={"Expiry"} />
+          <StrIntToFields strValue={data?.price} text={t("Price")} valuePre={"$"} />
+          <StrIntToFields strValue={data?.collateral} text={t("Collateral")} valuePre={"$"} />
+          <StrIntToFields strValue={data?.reward} text={t("Reward")} valuePre={"$"} />
+          <StrIntToFields strValue={data?.buyout} text={t("Buyout")} valuePre={"$"} />
+          <StrIntToFields strValue={data?.volume} text={t("Volume")} valuePost={"m3"} />
+          <StrIntToFields strValue={data?.days_to_complete} text={t("Days to Complete")} />
+          <StrToFields strValue={data?.title} text={t("Description")} />
         </table>
 
         <CharacterContractModalTable
           data={data?.items?.filter((item: any) => item.is_included)}
-          header={"Items Received"}
+          header={t("Items Received")}
         />
         <CharacterContractModalTable
           data={data?.items?.filter((item: any) => !item.is_included)}
-          header={"Items Wanted"}
+          header={t("Items Wanted")}
         />
       </Modal.Body>
       <Modal.Footer>
         <Button className="w-100" onClick={() => setShown(false)}>
-          Close
+          {t("Close")}
         </Button>
       </Modal.Footer>
     </Modal>

@@ -1,7 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { SkillBlock } from "./SkillBlock";
 import { Accordion } from "react-bootstrap";
 
 export const SkillGroup = ({ group, skills }: { group: string; skills: Array<any> }) => {
+  const { t } = useTranslation();
+
   return (
     <Accordion.Item eventKey={`${group}`}>
       <Accordion.Header>
@@ -13,7 +16,7 @@ export const SkillGroup = ({ group, skills }: { group: string; skills: Array<any
               return p;
             }, 0)
             .toLocaleString()}{" "}
-          Filtered SP
+          {t("Filtered SP")}
         </span>
       </Accordion.Header>
       <Accordion.Body className="d-flex flex-wrap ">

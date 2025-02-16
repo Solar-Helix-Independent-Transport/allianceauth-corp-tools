@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { CorporationLogo, TypeIcon } from "../EveImages/EveImages";
 import { TimeTill } from "../Helpers/TimeTill";
 import BaseTable from "../Tables/BaseTable/BaseTable";
@@ -28,14 +29,16 @@ type StructureType = {
 };
 
 const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
+  const { t } = useTranslation();
+
   const columnHelper = createColumnHelper<StructureType>();
 
   const columns = [
     columnHelper.accessor("location.name", {
-      header: "System",
+      header: t("System"),
     }),
     columnHelper.accessor("name", {
-      header: "Structure",
+      header: t("Structure"),
     }),
     columnHelper.accessor("type.id", {
       header: "",
@@ -46,7 +49,7 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
     }),
 
     columnHelper.accessor("type.name", {
-      header: "Type",
+      header: t("Type"),
     }),
     columnHelper.accessor("owner.corporation_id", {
       header: "",
@@ -60,18 +63,18 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
         ),
     }),
     columnHelper.accessor("owner.corporation_name", {
-      header: "Owner",
+      header: t("Owner"),
     }),
     columnHelper.accessor("fuel_expiry", {
-      header: "Fuel Expiry",
+      header: t("Fuel Expiry"),
       enableColumnFilter: false,
       cell: (props) => <TimeTill date={props.getValue()} />,
     }),
     columnHelper.accessor("state", {
-      header: "State",
+      header: t("State"),
     }),
     columnHelper.accessor("services", {
-      header: "Services",
+      header: t("Services"),
       filterFn: NameObjectArrayFilterFn,
       cell: (props) =>
         props.getValue() ? (

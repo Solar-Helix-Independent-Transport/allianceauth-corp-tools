@@ -29,7 +29,7 @@ const AccountList = () => {
       cell: (cell) => <CharacterPortrait size={32} character_id={cell.getValue()} />,
     }),
     columnHelper.accessor("main.character_name", {
-      header: t("Main Character"),
+      header: t("Character"),
     }),
     columnHelper.accessor("main.corporation_id", {
       header: "",

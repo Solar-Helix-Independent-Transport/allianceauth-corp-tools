@@ -24,7 +24,7 @@ const CharacterContracts = () => {
 
   const columns = [
     columnHelper.accessor("character", {
-      header: t("Main Character"),
+      header: t("Character"),
     }),
     columnHelper.accessor("date_issued", {
       header: t("Date Created"),

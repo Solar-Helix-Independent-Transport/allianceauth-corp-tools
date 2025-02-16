@@ -21,7 +21,7 @@ const CharacterClones = () => {
 
   const columns = [
     columnHelper.accessor("character.character_name", {
-      header: t("Main Character"),
+      header: t("Character"),
     }),
     columnHelper.accessor("home.name", {
       header: t("Home"),

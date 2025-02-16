@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
 import { getCharacterMarket } from "../../api/character";
@@ -6,6 +7,7 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterMarket = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
 
   const { data, isFetching } = useQuery({
@@ -17,10 +19,10 @@ const CharacterMarket = () => {
 
   const columns = [
     columnHelper.accessor("character.character_name", {
-      header: "Character",
+      header: t("Character"),
     }),
     columnHelper.accessor("buy_order", {
-      header: "Buy Order",
+      header: t("Buy Order"),
       cell: (cell) => {
         return cell.getValue() === true ? (
           <i className="fa-solid fa-square-check text-success text-center w-100"></i>
@@ -30,22 +32,22 @@ const CharacterMarket = () => {
       },
     }),
     columnHelper.accessor("date", {
-      header: "Date",
+      header: t("Date"),
       cell: (row) => {
         return `${new Date(row.getValue()).toUTCString()}`;
       },
     }),
     columnHelper.accessor("item.name", {
-      header: "Type",
+      header: t("Item Type"),
     }),
     columnHelper.accessor("location.name", {
-      header: "Location",
+      header: t("Location"),
     }),
     columnHelper.accessor("price", {
-      header: "Price",
+      header: t("Price"),
     }),
     columnHelper.accessor("volume_remain", {
-      header: "Volume",
+      header: t("Volume"),
       cell: (cell) => {
         return `${cell.getValue()}/${cell.row.original.volume_total}`;
       },
@@ -54,9 +56,9 @@ const CharacterMarket = () => {
 
   return (
     <>
-      <h4 className="text-center">Active Orders</h4>
+      <h4 className="text-center">{t("Active Orders")}</h4>
       <TableWrapper data={data?.active} {...{ isFetching, columns }} />
-      <h4 className="text-center">Expired Orders</h4>
+      <h4 className="text-center">{t("Expired Orders")}</h4>
       <TableWrapper data={data?.expired} {...{ isFetching, columns }} />
     </>
   );

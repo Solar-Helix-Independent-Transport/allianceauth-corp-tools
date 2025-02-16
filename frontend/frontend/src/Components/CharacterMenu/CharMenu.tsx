@@ -1,5 +1,6 @@
 import { Nav } from "react-bootstrap";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 export interface CharMenuItemProps {
@@ -33,11 +34,13 @@ export interface CharMenuProps extends Partial<HTMLElement> {
 // }
 
 const CharMenu = ({ data, characterID }: CharMenuProps) => {
+  const { t } = useTranslation();
+
   return (
     <>
       <Nav.Item as="li">
         <Nav.Link as={Link} to={`/audit/r_beta/${characterID}/account/overview`} key="Overview">
-          Overview
+          {t("Overview")}
         </Nav.Link>
       </Nav.Item>
       {data &&

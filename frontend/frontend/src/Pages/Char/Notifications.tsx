@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { BooleanCheckBox } from "../../Components/BooleanCheckbox";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
@@ -7,6 +8,7 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterNotifications = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
 
   const { data, isFetching } = useQuery({
@@ -18,26 +20,26 @@ const CharacterNotifications = () => {
 
   const columns = [
     columnHelper.accessor("character.character_name", {
-      header: "Character",
+      header: t("Character"),
     }),
     columnHelper.accessor("is_read", {
-      header: "Is Read",
+      header: t("Is Read"),
       cell: (props) => {
         return <BooleanCheckBox checked={props.getValue() ? true : false} />;
       },
     }),
     columnHelper.accessor("timestamp", {
-      header: "Date",
+      header: t("Date"),
       cell: (props) => {
         return <>{new Date(props.getValue()).toUTCString()}</>;
       },
       enableColumnFilter: false,
     }),
     columnHelper.accessor("notification_type", {
-      header: "Type",
+      header: t("Type"),
     }),
     columnHelper.accessor("notification_text", {
-      header: "Text",
+      header: t("Text"),
       cell: (props) => {
         return <pre>{props.getValue()}</pre>;
       },

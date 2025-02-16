@@ -4,16 +4,18 @@ import { SkillLevelBlock } from "../../Components/Skills/SkillLevelBlock";
 import { getCharacterSkillQueues } from "../../api/character";
 import { useState } from "react";
 import { Form, FormGroup, Table } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import ReactTimeAgo from "react-time-ago";
 
 const CharacterSkillQueues = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
   const { isLoading, isFetching, error, data } = useQuery(
     ["skills", characterID],
     () => getCharacterSkillQueues(characterID ? Number(characterID) : 0),
-    { refetchOnWindowFocus: false }
+    { refetchOnWindowFocus: false },
   );
 
   const [activeFilter, setActive] = useState(true);
@@ -60,24 +62,24 @@ const CharacterSkillQueues = () => {
 
   return (
     <>
-      <h5 className="text-center">Filters</h5>
+      <h5 className="text-center">{t("Filters")}</h5>
       <FormGroup className="col-xs-12 text-center">
         <Form.Check
           defaultChecked={activeFilter}
           onChange={handleActive}
-          label={"Active"}
+          label={t("Active")}
           inline
         ></Form.Check>
         <Form.Check
           defaultChecked={pausedFilter}
           onChange={handlePaused}
-          label={"Paused"}
+          label={t("Paused")}
           inline
         ></Form.Check>
         <Form.Check
           defaultChecked={emptyFilter}
           onChange={handleEmpty}
-          label={"Empty"}
+          label={t("Empty")}
           inline
         ></Form.Check>
       </FormGroup>
@@ -107,8 +109,8 @@ const CharacterSkillQueues = () => {
                   <Table striped style={{ marginBottom: 0 }}>
                     <thead>
                       <tr key={`head-${char.character.character_name}`}>
-                        <th>Skill</th>
-                        <th className="text-end">Level</th>
+                        <th>{t("Skill")}</th>
+                        <th className="text-end">{t("Level")}</th>
                       </tr>
                     </thead>
                   </Table>

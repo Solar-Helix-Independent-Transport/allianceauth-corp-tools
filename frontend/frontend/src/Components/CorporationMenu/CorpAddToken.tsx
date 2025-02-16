@@ -4,9 +4,12 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import { useTranslation } from "react-i18next";
 import { useMutation } from "react-query";
 
 function CorpAddToken() {
+  const { t } = useTranslation();
+
   const { mutate } = useMutation(postCorporationRefresh);
 
   return (
@@ -21,7 +24,7 @@ function CorpAddToken() {
         >
           <Form>
             <Form.Check
-              label="Structures"
+              label={t("Structures")}
               type="checkbox"
               defaultChecked={true}
               inline={true}
@@ -35,9 +38,9 @@ function CorpAddToken() {
               //   inline={true}
               id="a"
               name="a"
-              label="Assets"
+              label={t("Assets")}
             />
-            <h6>Assets Enables LO Levels in Bridges</h6>
+            <h6>{t("Assets Enables LO Levels in Bridges")}</h6>
 
             <Form.Check
               type="checkbox"
@@ -45,9 +48,9 @@ function CorpAddToken() {
               //   inline={true}
               id="m"
               name="m"
-              label="Moons"
+              label={t("Moons")}
             />
-            <h6>Moons enable Active Observation Tracking</h6>
+            <h6>{t("Moons enable Active Observation Tracking")}</h6>
 
             <Form.Check
               type="checkbox"
@@ -55,9 +58,9 @@ function CorpAddToken() {
               //   inline={true}
               id="w"
               name="w"
-              label="Wallets"
+              label={t("Wallets")}
             />
-            <h6>Required for invoice module on holding corps</h6>
+            <h6>{t("Required for invoice module on holding corps")}</h6>
 
             <Form.Check
               type="checkbox"
@@ -65,9 +68,11 @@ function CorpAddToken() {
               //   inline={true}
               id="t"
               name="t"
-              label="Member Tracking"
+              label={t("Member Tracking")}
             />
-            <h6>Member Tracking enables the Last Login Tracking of characters for smart filters</h6>
+            <h6>
+              {t("Member Tracking enables the Last Login Tracking of characters for smart filters")}
+            </h6>
 
             <Form.Check
               type="checkbox"
@@ -75,13 +80,13 @@ function CorpAddToken() {
               //   inline={true}
               id="c"
               name="c"
-              label="Contracts"
+              label={t("Contracts")}
             />
 
             <br />
             <br />
             <Button variant="primary" type="submit">
-              Add Token
+              {t("Add Token")}
             </Button>
           </Form>
         </form>

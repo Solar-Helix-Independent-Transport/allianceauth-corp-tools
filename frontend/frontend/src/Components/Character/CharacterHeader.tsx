@@ -10,6 +10,7 @@ import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
@@ -22,6 +23,8 @@ function MyTooltip({ message }: { message: String }) {
 }
 
 const CharHeader = () => {
+  const { t } = useTranslation();
+
   const { characterID } = useParams();
   const style = {
     borderRadius: `25%`,
@@ -32,7 +35,7 @@ const CharHeader = () => {
     () => loadCharacterStatus(characterID ? Number(characterID) : 0),
     {
       refetchOnWindowFocus: false,
-    }
+    },
   );
 
   // const isk = data?.characters.reduce((p: number, c: any) => {
@@ -101,7 +104,10 @@ const CharHeader = () => {
           <RefreshCharButton />
           {data ? (
             bad_chars.length === 0 ? (
-              <OverlayTrigger placement="left" overlay={MyTooltip({ message: "No Account Flags" })}>
+              <OverlayTrigger
+                placement="left"
+                overlay={MyTooltip({ message: t("No Account Flags") })}
+              >
                 <Button className="btn-success">
                   <i className="fa-solid fa-check"></i>
                 </Button>
@@ -110,7 +116,7 @@ const CharHeader = () => {
               <OverlayTrigger
                 placement="left"
                 overlay={MyTooltip({
-                  message: `Character Flags: ${bad_chars.join(", ")}`,
+                  message: t(`Character Flags: ${bad_chars.join(", ")}`),
                 })}
               >
                 <Button className="btn-danger">{bad_chars.length}</Button>

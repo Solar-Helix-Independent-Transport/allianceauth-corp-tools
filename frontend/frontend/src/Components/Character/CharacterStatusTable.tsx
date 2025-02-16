@@ -2,50 +2,38 @@ import { components } from "../../api/CtApi";
 import BaseTable from "../Tables/BaseTable/BaseTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Button } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import TimeAgo from "react-timeago";
 
-// const UpdateTableRows = ({ values }: { values: Record<string, never> | null | undefined }) => {
-//   if (values) {
-//     return Object.keys(values)?.map((h: string) => {
-//       return (
-//         <tr key={h}>
-//           <td>{h}</td>
-//           <td className="text-end">
-//             {values ? values[h] ? <TimeAgo date={values[h]} /> : "Never" : "Never"}
-//           </td>
-//         </tr>
-//       );
-//     });
-//   }
-// };
-
 const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
+  const { t } = useTranslation();
+
   const columnHelper = createColumnHelper<components["schemas"]["CharacterStatus"]>();
 
   let columns = [
     columnHelper.accessor("character.character_name", {
-      header: "Character",
+      header: t("Character"),
     }),
     columnHelper.accessor("character.corporation_name", {
-      header: "Corporation",
+      header: t("Corporation"),
     }),
     columnHelper.accessor("character.alliance_name", {
-      header: "Alliance",
+      header: t("Alliance"),
     }),
     columnHelper.accessor("isk", {
-      header: "Isk",
+      header: t("Isk"),
       cell: (cell) => {
         return cell.getValue()?.toLocaleString();
       },
     }),
     columnHelper.accessor("sp", {
-      header: "SP",
+      header: t("SP"),
       cell: (cell) => {
         return cell.getValue()?.toLocaleString();
       },
     }),
     columnHelper.accessor("active", {
-      header: "Active",
+      header: t("Active"),
       cell: (cell) => {
         const isActive = cell.getValue();
         return (
@@ -70,9 +58,9 @@ const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boo
         columnHelper.accessor(`last_updates.${h}`, {
           header: h,
           cell: (cell) => {
-            return cell.getValue() ? <TimeAgo date={cell.getValue()} /> : "Never";
+            return cell.getValue() ? <TimeAgo date={cell.getValue()} /> : t("Never");
           },
-        }) as any
+        }) as any,
       );
     });
   }

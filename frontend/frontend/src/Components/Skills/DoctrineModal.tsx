@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { SkillBlock } from "./SkillBlock";
 import { SkillBlockKey } from "./SkillBlockKey";
 // import "./doctrine.css";
@@ -5,6 +6,8 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
 export const DoctrineModal = ({ show, setShow, name, skill_reqs, skill_list }: any) => {
+  const { t } = useTranslation();
+
   const toggleLevel = () => {
     setShow(!show);
   };
@@ -12,7 +15,9 @@ export const DoctrineModal = ({ show, setShow, name, skill_reqs, skill_list }: a
   return (
     <Modal show={show} onHide={() => toggleLevel()}>
       <Modal.Header closeButton>
-        <Modal.Title>{name} - Missing Skills</Modal.Title>
+        <Modal.Title>
+          {name} - {t("Missing Skills")}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {Object.entries(skill_reqs).map(([k, v]) => {
@@ -37,7 +42,7 @@ export const DoctrineModal = ({ show, setShow, name, skill_reqs, skill_list }: a
         <SkillBlockKey />
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => toggleLevel()}>Close</Button>
+        <Button onClick={() => toggleLevel()}>{t("Close")}</Button>
       </Modal.Footer>
     </Modal>
   );

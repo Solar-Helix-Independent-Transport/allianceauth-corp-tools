@@ -1,8 +1,11 @@
+import { useTranslation } from "react-i18next";
 import { PortraitCard } from "../Cards/PortraitCard";
 import { PanelLoader } from "../Loaders/loaders";
 import { Table } from "react-bootstrap";
 
 const CharacterPubDataPanels = ({ isFetching, data }: { isFetching: boolean; data: any }) => {
+  const { t } = useTranslation();
+
   if (!data) return <PanelLoader />;
 
   return (
@@ -22,8 +25,8 @@ const CharacterPubDataPanels = ({ isFetching, data }: { isFetching: boolean; dat
                 <Table striped style={{ marginBottom: 0 }}>
                   <thead>
                     <tr key={`head-${char.character}`}>
-                      <th>Corporation</th>
-                      <th className="text-end">Joined</th>
+                      <th>{t("Corporation")}</th>
+                      <th className="text-end">{t("Joined")}</th>
                     </tr>
                   </thead>
                 </Table>

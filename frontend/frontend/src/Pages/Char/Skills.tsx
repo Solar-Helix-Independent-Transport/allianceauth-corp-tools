@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import ErrorBoundary from "../../Components/Helpers/ErrorBoundary";
 import { SelectFilter } from "../../Components/Helpers/SelectFilter";
 import { TextFilter } from "../../Components/Helpers/TextFilter";
@@ -9,6 +10,7 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterSkills = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
   const [char_id, setCharacter] = useState(characterID);
   const [group_filter, setGroup] = useState("All");
@@ -18,26 +20,26 @@ const CharacterSkills = () => {
   const { isLoading, error, data } = useQuery(
     ["skills", characterID],
     () => getCharacterSkills(characterID ? Number(characterID) : 0),
-    { refetchOnWindowFocus: false }
+    { refetchOnWindowFocus: false },
   );
 
-  if (isLoading) return <PanelLoader />;
+  if (isLoading) return <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />;
 
   if (error) return <ErrorLoader />;
 
   if (char_id === "0") {
     setCharacter(data[0].character.character_id);
-    return <PanelLoader />;
+    return <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />;
   } else {
     const char_data = data.filter(
-      (obj: any) => obj.character.character_id === Number(char_id ? char_id : 0)
+      (obj: any) => obj.character.character_id === Number(char_id ? char_id : 0),
     );
 
     let skill_data = char_data?.[0]?.skills;
 
     if (group_filter !== "" && group_filter !== "All") {
       skill_data = skill_data?.filter((o: any) =>
-        o.group.toLowerCase().includes(group_filter.toLowerCase())
+        o.group.toLowerCase().includes(group_filter.toLowerCase()),
       );
     }
 
@@ -47,7 +49,7 @@ const CharacterSkills = () => {
 
     if (skill_filter !== "") {
       skill_data = skill_data?.filter((o: any) =>
-        o.skill.toLowerCase().includes(skill_filter.toLowerCase())
+        o.skill.toLowerCase().includes(skill_filter.toLowerCase()),
       );
     }
     const charOptions = data.map((char: any) => {
@@ -60,31 +62,31 @@ const CharacterSkills = () => {
     const levelOptions = [
       {
         value: -1,
-        label: "All",
+        label: t("All"),
       },
       {
         value: 0,
-        label: "0",
+        label: t("0"),
       },
       {
         value: 1,
-        label: "1",
+        label: t("1"),
       },
       {
         value: 2,
-        label: "2",
+        label: t("2"),
       },
       {
         value: 3,
-        label: "3",
+        label: t("3"),
       },
       {
         value: 4,
-        label: "4",
+        label: t("4"),
       },
       {
         value: 5,
-        label: "5",
+        label: t("5"),
       },
     ];
 
@@ -100,7 +102,7 @@ const CharacterSkills = () => {
           value: grp,
           label: grp,
         };
-      })
+      }),
     );
 
     return (
@@ -108,12 +110,16 @@ const CharacterSkills = () => {
         <SelectFilter
           setFilter={setCharacter}
           options={charOptions}
-          labelText="Character Select:"
+          labelText={t("Character Select:")}
         />
         <div className="d-flex justify-content-between mb-3">
-          <SelectFilter setFilter={setLevel} options={levelOptions} labelText="Level Filter:" />
-          <SelectFilter setFilter={setGroup} options={groups} labelText="Group Filter:" />
-          <TextFilter setFilterText={setFilter} labelText={"Skill Filter:"} />
+          <SelectFilter
+            setFilter={setLevel}
+            options={levelOptions}
+            labelText={t("Level Filter:")}
+          />
+          <SelectFilter setFilter={setGroup} options={groups} labelText={t("Group Filter:")} />
+          <TextFilter setFilterText={setFilter} labelText={t("Skill Filter:")} />
         </div>
 
         <CharSkillGroups data={skill_data} />

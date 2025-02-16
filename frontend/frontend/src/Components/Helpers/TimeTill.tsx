@@ -40,6 +40,6 @@ export function TimeTill({ date }: TimeTillProps) {
       </>
     );
   } else {
-    return <>blah</>;
+    return <></>;
   }
 }

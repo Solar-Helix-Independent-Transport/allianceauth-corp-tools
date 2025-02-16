@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
 import { getCharacterLP } from "../../api/character";
@@ -6,6 +7,7 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterLP = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
 
   const { data, isFetching } = useQuery({
@@ -17,16 +19,16 @@ const CharacterLP = () => {
 
   const columns = [
     columnHelper.accessor("character.character_name", {
-      header: "Character",
+      header: t("Character"),
     }),
     columnHelper.accessor("character.corporation_name", {
-      header: "Corporation",
+      header: t("Corporation"),
     }),
     columnHelper.accessor("corporation.name", {
-      header: "LP Corporation",
+      header: t("LP Corporation"),
     }),
     columnHelper.accessor("amount", {
-      header: "Amount",
+      header: t("Quantity"),
     }),
   ];
 

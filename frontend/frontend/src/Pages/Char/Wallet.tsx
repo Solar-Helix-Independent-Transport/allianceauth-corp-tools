@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
 import { loadWallet } from "../../api/character";
@@ -6,6 +7,7 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterWallet = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
 
   const { data, isFetching } = useQuery({
@@ -17,28 +19,28 @@ const CharacterWallet = () => {
 
   const columns = [
     columnHelper.accessor("character.character_name", {
-      header: "Character",
+      header: t("Character"),
     }),
     columnHelper.accessor("date", {
-      header: "Date",
+      header: t("Date"),
     }),
     columnHelper.accessor("ref_type", {
-      header: "Type",
+      header: t("Type"),
     }),
     columnHelper.accessor("first_party.name", {
-      header: "First Party",
+      header: t("First Party"),
     }),
     columnHelper.accessor("second_party.name", {
-      header: "Second Party",
+      header: t("Second Party"),
     }),
     columnHelper.accessor("amount", {
-      header: "Amount",
+      header: t("Amount"),
     }),
     columnHelper.accessor("balance", {
-      header: "Balance",
+      header: t("Balance"),
     }),
     columnHelper.accessor("reason", {
-      header: "Reason",
+      header: t("Reason"),
     }),
   ];
 

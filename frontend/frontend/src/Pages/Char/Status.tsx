@@ -3,10 +3,12 @@ import CharacterStatusTable from "../../Components/Character/CharacterStatusTabl
 import { loadCharacterStatus } from "../../api/character";
 import { useState } from "react";
 import { Card, Form } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterStatus = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
   const [table, setTable] = useState(false);
   const { data, isFetching } = useQuery({
@@ -23,7 +25,7 @@ const CharacterStatus = () => {
           <Form.Check // prettier-ignore
             type="switch"
             id="custom-switch"
-            label="Display in Table Format"
+            label={t("Display in Table Format")}
             onChange={(event) => {
               setTable(event.target.checked);
             }}
