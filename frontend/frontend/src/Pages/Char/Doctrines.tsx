@@ -105,13 +105,15 @@ const CharacterDoctrine = () => {
             filtered_doctrines && (
               <Card className="my-2">
                 <Card.Header>
-                  <h6 className="m-0">
-                    {char.character.character_name}{" "}
-                    <span className="float-end">
-                      {char.character.corporation_name}
-                      {char.character.alliance_name && ` (${char.character.alliance_name})`}
-                    </span>
-                  </h6>
+                  <Card.Title>
+                    <div className="m-0">
+                      {char.character.character_name}{" "}
+                      <span className="float-end">
+                        {char.character.corporation_name}
+                        {char.character.alliance_name && ` (${char.character.alliance_name})`}
+                      </span>
+                    </div>
+                  </Card.Title>
                 </Card.Header>
                 <Card.Body className="d-flex align-items-center">
                   <div className="flex-one m-2">

@@ -41,7 +41,7 @@ const CharacterAssetGroups = () => {
             return (
               <Card key={group.name} className="m-3">
                 <Card.Header>
-                  <h4 className={"text-center"}>{group.name}</h4>
+                  <Card.Title>{group.name}</Card.Title>
                 </Card.Header>
                 <Card.Body style={{ height: "500px", overflowY: "scroll" }}>
                   <Table striped style={{ marginBottom: 0, minWidth: "400px" }}>

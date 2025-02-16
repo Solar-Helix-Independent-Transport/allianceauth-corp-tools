@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { IconStatusCard, IconStatusDiv } from "../../Components/Cards/IconStatusCard";
 import { loadGlanceFactionData } from "../../api/character";
 import { loadCorpGlanceFactionData } from "../../api/corporation";
@@ -12,12 +13,16 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
 export const Factions = ({ data }: any) => {
+  const { t } = useTranslation();
+
   return (
     <>
       <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Affiliations</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <Card className="m-2">
-          <Card.Header className="text-center">Detected Militia</Card.Header>
+          <Card.Header className="text-center">
+            <Card.Title>{t("Detected Militia")}</Card.Title>
+          </Card.Header>
           <div className="d-flex flex-wrap justify-content-center">
             <IconStatusCard
               iconSrc={Amarr}
@@ -46,7 +51,9 @@ export const Factions = ({ data }: any) => {
           </div>
         </Card>
         <Card className="m-2">
-          <Card.Header className="text-center">Loyalty Points</Card.Header>
+          <Card.Header className="text-center">
+            <Card.Title>{t("Loyalty Points")}</Card.Title>
+          </Card.Header>
 
           <div className="d-flex h-100 align-items-center flex-wrap justify-content-center">
             <IconStatusDiv
