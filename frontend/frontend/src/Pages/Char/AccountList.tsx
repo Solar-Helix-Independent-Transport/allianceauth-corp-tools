@@ -76,7 +76,7 @@ const AccountList = () => {
           <Link
             className="btn btn-primary"
             to={{
-              pathname: `audit/r_beta/${cell.getValue().character_id}/`,
+              pathname: `audit/r/${cell.getValue().character_id}/`,
             }}
           >
             <i className="fas fa-external-link" aria-hidden="true"></i>
