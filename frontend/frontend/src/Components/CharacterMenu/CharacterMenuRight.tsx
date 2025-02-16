@@ -2,12 +2,15 @@ import styles from "./CharMenu.module.css";
 import React from "react";
 import { Nav } from "react-bootstrap";
 import ReactDOM from "react-dom";
+import { useTranslation } from "react-i18next";
 import { useIsFetching } from "react-query";
 import { LinkContainer } from "react-router-bootstrap";
 
 const menuRoot = document.getElementById("nav-right");
 
 const CharMenuRight = () => {
+  const { t } = useTranslation();
+
   const isLoading = useIsFetching();
   const [innerHtmlEmptied, setInnerHtmlEmptied] = React.useState(false);
 
