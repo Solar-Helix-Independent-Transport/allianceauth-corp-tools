@@ -103,7 +103,7 @@ class MenuApiEndpoints:
                     "link": "account/listassets"
                 })
 
-            if app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE:
+            if app_settings.CT_CHAR_MINING_MODULE:
                 _industry["links"].append({
                     "name": _("Mining Ledger"),
                     "link": "account/mining"

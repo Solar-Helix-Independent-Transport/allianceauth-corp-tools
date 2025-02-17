@@ -95,7 +95,7 @@ export async function getAssetGroups(characterID: number, locationID: number) {
           location_id: locationID,
         },
       },
-    }
+    },
   );
   if (error) {
     console.log(error);
@@ -116,8 +116,8 @@ export async function loadCharacterStatus(character_id: number) {
         } catch (err) {
           return p;
         }
-      }, [])
-    )
+      }, []),
+    ),
   );
   headers.sort();
 
@@ -155,6 +155,12 @@ export async function getMailBody(character_id: Number, mail_id: Number) {
   return api.data;
 }
 
+export async function loadMining(character_id: Number) {
+  const api = await axios.get(`/audit/api/account/${character_id}/mining?look_back=150`);
+  console.log(`get mining in api ${character_id}`);
+  return api.data;
+}
+
 // export async function loadGlanceAssetData(character_id: number) {
 //   const api = await axios.get(`/audit/api/account/${character_id}/glance/assets`);
 //   console.log(`get glance/assets in api ${character_id}`);
@@ -178,7 +184,7 @@ export async function postAccountRefresh(character_id: number) {
   const api = await axios.post(
     `/audit/api/account/refresh?character_id=${character_id}`,
     { character_id: character_id },
-    { headers: { "X-CSRFToken": Cookies.get("csrftoken") } }
+    { headers: { "X-CSRFToken": Cookies.get("csrftoken") } },
   );
   return api.data;
 }

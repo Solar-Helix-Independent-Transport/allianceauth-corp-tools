@@ -1,0 +1,49 @@
+:root {
+  --main-color: #eeeeee33;
+  --main-color-hover: rgb(104, 117, 217, 0.2);
+  --track-color: #ffffff33;
+}
+.horizontal-slider {
+  max-width: 100%;
+  /* Optional: Only If you want to center your slider in the page */
+  margin: auto;
+}
+.thumb.active {
+  background-color: grey;
+}
+.track.track {
+  /* color of the track before the thumb */
+  background: var(--track-color);
+  border: 1px solid #666;
+  height: 50px;
+}
+.track.track-1 {
+  /* color of the track before the thumb */
+  background: var(--track-color) !important;
+  z-index: 99999999 !important;
+  height: 50px !important;
+}
+.slider .track {
+  /* Top value to align your track to the center of your thumb */
+  /* thickness of the track */
+  height: 4px;
+  /* default color of your track */
+}
+.slider .thumb {
+  cursor: pointer;
+  /*color for the thumb */
+  background: var(--main-color);
+  /* shape of the thumb: circle */
+  width: 20px;
+  height: 50px;
+  border-radius: 0%;
+  border: 2px solid #fff;
+  /* remove default outline when selected */
+  outline: none;
+}
+.slider .thumb-0 {
+  border-right: 0;
+}
+.slider .thumb-1 {
+  border-left: 0;
+}

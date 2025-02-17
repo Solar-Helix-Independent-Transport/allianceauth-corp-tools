@@ -32,6 +32,7 @@ import { initReactI18next } from "react-i18next";
 import Backend from "i18next-http-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
 import CharacterWalletActivity from "./Pages/Char/WalletActivity";
+import CharacterMiningLedger from "./Pages/Char/MiningLedger";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -74,14 +75,7 @@ function App() {
               <Route path="account/roles" element={<CharacterRoles />} />
               <Route path="account/wallet" element={<CharacterWallet />} />
               <Route path="account/mail" element={<CharacterMail />} />
-              <Route
-                path="account/mining"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is account/mining.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="account/mining" element={<CharacterMiningLedger />} />
               <Route path="account/lp" element={<CharacterLP />} />
               <Route path="account/walletactivity" element={<CharacterWalletActivity />} />
               <Route path="account/notifications" element={<CharacterNotifications />} />
