@@ -147,7 +147,8 @@ const LedgerGraph = ({ data }: any) => {
               className="slider"
               thumbClassName="thumb"
               trackClassName="track"
-              //   defaultValue={[0, data.data.length - 1]}
+              // @ts-ignore:
+              defaultValue={[0, data.data.length - 1]}
               pearling
               minDistance={3}
               min={0}
