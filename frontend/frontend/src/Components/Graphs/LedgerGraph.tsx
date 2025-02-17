@@ -8,15 +8,15 @@ import { createColumnHelper } from "@tanstack/react-table";
 import TableWrapper from "../Tables/BaseTable/TableWrapper";
 import { useTranslation } from "react-i18next";
 
-function dateSort(a: any, b: any) {
-  if (a.date > b.date) {
-    return 1;
-  }
-  if (a.date < b.date) {
-    return -1;
-  }
-  return 0;
-}
+// function dateSort(a: any, b: any) {
+//   if (a.date > b.date) {
+//     return 1;
+//   }
+//   if (a.date < b.date) {
+//     return -1;
+//   }
+//   return 0;
+// }
 
 // Function to create js objects from python api data. types later...
 function apiDataToObject(input: any, dataKey = "volume") {
@@ -56,7 +56,7 @@ const LedgerGraph = ({ data }: any) => {
   const [slice, setSlice] = useState([0, data.data.length]);
 
   const graphData = apiDataToObject(
-    data.data.filter((e: any, index: any) => {
+    data.data.filter((_: any, index: any) => {
       let pass = slice[0] < index && index < slice[1];
       return pass;
     }),
@@ -71,7 +71,7 @@ const LedgerGraph = ({ data }: any) => {
   const totalData = apiDataToTotals(
     data.all_groups,
     data.all_ores,
-    data.data.filter((e: any, index: any) => {
+    data.data.filter((_: any, index: any) => {
       let pass = slice[0] < index && index < slice[1];
       return pass;
     }),
@@ -147,7 +147,7 @@ const LedgerGraph = ({ data }: any) => {
               className="slider"
               thumbClassName="thumb"
               trackClassName="track"
-              defaultValue={[0, data.data.length - 1]}
+              //   defaultValue={[0, data.data.length - 1]}
               pearling
               minDistance={3}
               min={0}

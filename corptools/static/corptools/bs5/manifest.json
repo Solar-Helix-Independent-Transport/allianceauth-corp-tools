@@ -1,33 +1,33 @@
 {
-  "_@libs-DsDdirnI.js": {
-    "file": "assets/@libs-DsDdirnI.js"
+  "_@libs-CaxxfjV3.js": {
+    "file": "assets/@libs-CaxxfjV3.js"
   },
-  "_@react-router-DqDt1vCS.js": {
-    "file": "assets/@react-router-DqDt1vCS.js",
+  "_@react-router-B4Q9Uprw.js": {
+    "file": "assets/@react-router-B4Q9Uprw.js",
     "imports": [
-      "_@libs-DsDdirnI.js"
+      "_@libs-CaxxfjV3.js"
     ]
   },
-  "_browser-ponyfill-ToTdgQUL.js": {
-    "file": "assets/browser-ponyfill-ToTdgQUL.js",
+  "_browser-ponyfill-C8cNHPFA.js": {
+    "file": "assets/browser-ponyfill-C8cNHPFA.js",
     "isDynamicEntry": true,
     "imports": [
-      "_@libs-DsDdirnI.js"
+      "_@libs-CaxxfjV3.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-PQyjuR6t.js",
+    "file": "assets/index-D7mFb3wH.js",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@libs-DsDdirnI.js",
-      "_@react-router-DqDt1vCS.js"
+      "_@libs-CaxxfjV3.js",
+      "_@react-router-B4Q9Uprw.js"
     ],
     "dynamicImports": [
-      "_browser-ponyfill-ToTdgQUL.js"
+      "_browser-ponyfill-C8cNHPFA.js"
     ],
     "css": [
-      "static/corptools/bs5/static/css/index-MpvbYUBF.css"
+      "static/corptools/bs5/static/css/index-NKXC22vu.css"
     ],
     "assets": [
       "static/corptools/bs5/static/img/omega_128-B8POqXI6.png",
