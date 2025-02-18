@@ -801,7 +801,7 @@ def update_missing_locations(location_id):
         end_location_name__isnull=True
     ).update(end_location_name_id=location_id)
 
-    logger.info(f"CT_LOCATIONS: Updated {count} models!")
+    logger.info(f"CT LOCATIONS: Updated {count} models!")
     return count
 
 
@@ -815,7 +815,7 @@ def update_location(self, location_id, character_ids=None, force_citadel=False):
         if force_citadel and location_id > 64000000:
             pass
         else:
-            return f"Cooloff on ID: {location_id}"
+            return f"CT LOCATIONS: Cooloff on ID: {location_id}"
 
     if location_id < 64000000:
         location = fetch_location_name(location_id, None, 0, update=True)
@@ -830,7 +830,7 @@ def update_location(self, location_id, character_ids=None, force_citadel=False):
 
     if len(char_ids) == 0:
         set_location_cooloff(location_id)
-        return f"No more Characters for Location_id: {location_id} cooling off for a while"
+        return f"CT LOCATIONS: No more Characters for Location_id: {location_id} cooling off for a while"
 
     for c_id in char_ids:
         location = fetch_location_name(location_id, None, c_id)
@@ -843,7 +843,7 @@ def update_location(self, location_id, character_ids=None, force_citadel=False):
                 self.retry(countdown=300)
 
     set_location_cooloff(location_id)
-    return f"No more Characters for Location_id: {location_id} cooling off for a while"
+    return f"CT LOCATIONS: No more Characters for Location_id: {location_id} cooling off for a while"
 
 
 @shared_task(bind=True, base=QueueOnce)
@@ -881,7 +881,8 @@ def update_all_locations(self, character_filter=None, force_citadels=False, upda
             character__in=char_filter
         ).values_list('location_id', flat=True)
     )
-    print(f"Assets {queryset1 + queryset5}")
+    logger.debug(
+        f"CT LOCATIONS: {character_filter} Assets {queryset1 + queryset5}")
     queryset3 = list(
         Clone.objects.filter(
             location_id__isnull=False,
@@ -889,7 +890,7 @@ def update_all_locations(self, character_filter=None, force_citadels=False, upda
             character__in=char_filter
         ).values_list('location_id', flat=True)
     )
-    print(f"Clone {queryset3}")
+    logger.debug(f"CT LOCATIONS: {character_filter} Clone {queryset3}")
 
     queryset4 = list(
         JumpClone.objects.filter(
@@ -898,7 +899,7 @@ def update_all_locations(self, character_filter=None, force_citadels=False, upda
             character__in=char_filter
         ).values_list('location_id', flat=True)
     )
-    print(f"JumpClone {queryset4}")
+    logger.debug(f"CT LOCATIONS: {character_filter} JumpClone {queryset4}")
 
     queryset6 = list(
         CharacterMarketOrder.objects.filter(
@@ -909,7 +910,8 @@ def update_all_locations(self, character_filter=None, force_citadels=False, upda
             flat=True
         )
     )
-    print(f"CharacterMarketOrder {queryset6}")
+    logger.debug(
+        f"CT LOCATIONS: {character_filter} CharacterMarketOrder {queryset6}")
 
     queryset7 = list(
         Contract.objects.filter(
@@ -918,7 +920,7 @@ def update_all_locations(self, character_filter=None, force_citadels=False, upda
             character__in=char_filter
         ).values_list('start_location_id', flat=True)
     )
-    print(f"Contract {queryset7}")
+    logger.debug(f"CT LOCATIONS: {character_filter} Contract {queryset7}")
 
     queryset8 = list(
         Contract.objects.filter(
@@ -927,14 +929,15 @@ def update_all_locations(self, character_filter=None, force_citadels=False, upda
             character__in=char_filter
         ).values_list('end_location_id', flat=True)
     )
-    print(f"Contract {queryset8}")
+    logger.debug(f"CT LOCATIONS: {character_filter} Contract {queryset8}")
 
     all_locations = set(
         queryset1 + queryset3 + queryset8 +
         queryset4 + queryset5 + queryset6 +
         queryset7
     )
-    print(f"all_locations {all_locations}")
+    logger.debug(
+        f"CT LOCATIONS: {character_filter} all_locations {all_locations}")
 
     if update_all:
         clones_all = list(
@@ -969,16 +972,21 @@ def update_all_locations(self, character_filter=None, force_citadels=False, upda
 
         all_locations += set(queryset2)
 
-    logger.warning(f"{len(all_locations)} Locations to find")
+    logger.info(f"CT LOCATIONS: {len(all_locations)} Locations to find")
 
     count = 0
     for location in all_locations:
         if not get_location_cooloff(location):
-            update_location.apply_async(args=[location], kwargs={
-                                        "force_citadel": force_citadels}, priority=8)
+            update_location.apply_async(
+                args=[location],
+                kwargs={
+                    "force_citadel": force_citadels
+                },
+                priority=8
+            )
             count += 1
 
-    return f"Sent {count} location_update tasks"
+    return f"CT LOCATIONS: {character_filter} Sent {count} location_update tasks"
 
 
 @shared_task(bind=True, base=QueueOnce)
