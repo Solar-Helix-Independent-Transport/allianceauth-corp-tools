@@ -25,9 +25,9 @@ from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
 
 from . import app_settings, providers
 from .models import (
-    CharacterAsset, CharacterAudit, CharacterMarketOrder, Clone,
-    CorporationAudit, CorptoolsConfiguration, EveItemType, EveLocation,
-    EveName, JumpClone, TypePrice,
+    CharacterAsset, CharacterAudit, CharacterMarketOrder, Clone, Contract,
+    CorpAsset, CorporateContract, CorporationAudit, CorptoolsConfiguration,
+    EveItemType, EveLocation, EveName, JumpClone, TypePrice,
 )
 from .task_helpers import corp_helpers
 from .task_helpers.char_tasks import (
@@ -428,6 +428,13 @@ def update_character(self, char_id, force_refresh=False):
         que.append(update_char_industry_jobs.si(
             character.character.character_id, force_refresh=force_refresh))
 
+    # We've updated this character, lets get all the missing locations.
+    que.append(
+        update_all_locations.s(
+            character_filter=[character.character.character_id]
+        )
+    )
+
     if app_settings.CT_CHAR_SKILLS_MODULE and not ct_conf.disable_update_skills:
         # Must be last due to this being not a user level queue, Celery once will stall the queue here if characters on an account block.
         # TODO: make this better
@@ -665,6 +672,9 @@ def location_get(location_id):
     return data
 
 
+CACHE_TIMEOUT = 60*60*24*30
+
+
 def location_set(location_id, character_id):
     cache_tag = build_location_cache_tag(location_id)
     date = timezone.now() - datetime.timedelta(days=7)
@@ -672,17 +682,20 @@ def location_set(location_id, character_id):
     if data.get('date') is not False:
         if data.get('date') > date:
             data.get('characters').append(character_id)
-            cache.set(cache_tag, json.dumps(data, cls=DjangoJSONEncoder), None)
+            cache.set(cache_tag, json.dumps(
+                data, cls=DjangoJSONEncoder), CACHE_TIMEOUT)
             return True
         else:
             data['date'] = timezone.now().strftime(TZ_STRING)
             data['characters'] = [character_id]
-            cache.set(cache_tag, json.dumps(data, cls=DjangoJSONEncoder), None)
+            cache.set(cache_tag, json.dumps(
+                data, cls=DjangoJSONEncoder), CACHE_TIMEOUT)
 
     if character_id not in data.get('characters'):
         data.get('characters').append(character_id)
         data['date'] = timezone.now().strftime(TZ_STRING)
-        cache.set(cache_tag, json.dumps(data, cls=DjangoJSONEncoder), None)
+        cache.set(cache_tag, json.dumps(
+            data, cls=DjangoJSONEncoder), CACHE_TIMEOUT)
         return True
 
     return False
@@ -700,21 +713,11 @@ def update_citadel_names(self):
         )
 
 
-@shared_task(bind=True, base=QueueOnce, max_retries=None)
-@esi_error_retry
-def update_location(self, location_id, force_citadel=False):
-    if get_error_count_flag():
-        self.retry(countdown=300)
-
-    if get_location_cooloff(location_id):
-        if force_citadel and location_id > 64000000:
-            pass
-        else:
-            return f"Cooloff on ID: {location_id}"
-
+def get_character_lists(location_id):
     cached_data = location_get(location_id)
 
     date = timezone.now() - datetime.timedelta(days=7)
+
     asset = CharacterAsset.objects.filter(
         location_id=location_id).select_related('character__character')
     clone = Clone.objects.filter(
@@ -749,24 +752,81 @@ def update_location(self, location_id, force_citadel=False):
         char_ids += list(marketorder.values_list(
             'character__character__character_id', flat=True))
 
-    char_ids = set(char_ids)
+    return set(char_ids)
+
+
+def update_missing_locations(location_id):
+    count = CharacterAsset.objects.filter(
+        location_id=location_id,
+        location_name__isnull=True
+    ).update(location_name_id=location_id)
+
+    count = CorpAsset.objects.filter(
+        location_id=location_id,
+        location_name__isnull=True
+    ).update(location_name_id=location_id)
+
+    count += Clone.objects.filter(
+        location_id=location_id,
+        location_name__isnull=True
+    ).update(location_name_id=location_id)
+
+    count += JumpClone.objects.filter(
+        location_id=location_id,
+        location_name__isnull=True
+    ).update(location_name_id=location_id)
+
+    count += CharacterMarketOrder.objects.filter(
+        location_id=location_id,
+        location_name__isnull=True
+    ).update(location_name_id=location_id)
+
+    count += Contract.objects.filter(
+        start_location_id=location_id,
+        start_location_name__isnull=True
+    ).update(start_location_name_id=location_id)
+
+    count += CorporateContract.objects.filter(
+        start_location_id=location_id,
+        start_location_name__isnull=True
+    ).update(start_location_name_id=location_id)
+
+    count += Contract.objects.filter(
+        end_location_id=location_id,
+        end_location_name__isnull=True
+    ).update(end_location_name_id=location_id)
+
+    count += CorporateContract.objects.filter(
+        end_location_id=location_id,
+        end_location_name__isnull=True
+    ).update(end_location_name_id=location_id)
+
+    logger.info(f"CT_LOCATIONS: Updated {count} models!")
+    return count
+
+
+@shared_task(bind=True, base=QueueOnce, max_retries=None)
+@esi_error_retry
+def update_location(self, location_id, character_ids=None, force_citadel=False):
+    if get_error_count_flag():
+        self.retry(countdown=300)
+
+    if get_location_cooloff(location_id):
+        if force_citadel and location_id > 64000000:
+            pass
+        else:
+            return f"Cooloff on ID: {location_id}"
 
     if location_id < 64000000:
         location = fetch_location_name(location_id, None, 0, update=True)
         if location is not None:
             location.save()
-            count = CharacterAsset.objects.filter(
-                location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
-            count += Clone.objects.filter(location_id=location_id,
-                                          location_name__isnull=True).update(location_name_id=location_id)
-            count += JumpClone.objects.filter(location_id=location_id,
-                                              location_name__isnull=True).update(location_name_id=location_id)
-            count += CharacterMarketOrder.objects.filter(
-                location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
-            return count
+            return update_missing_locations(location_id)
         else:
             if get_error_count_flag():
                 self.retry(countdown=300)
+
+    char_ids = get_character_lists(location_id)
 
     if len(char_ids) == 0:
         set_location_cooloff(location_id)
@@ -776,15 +836,7 @@ def update_location(self, location_id, force_citadel=False):
         location = fetch_location_name(location_id, None, c_id)
         if location is not None:
             location.save()
-            count = CharacterAsset.objects.filter(
-                location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
-            count += Clone.objects.filter(location_id=location_id,
-                                          location_name__isnull=True).update(location_name_id=location_id)
-            count += JumpClone.objects.filter(location_id=location_id,
-                                              location_name__isnull=True).update(location_name_id=location_id)
-            count += CharacterMarketOrder.objects.filter(
-                location_id=location_id, location_name__isnull=True).update(location_name_id=location_id)
-            return count
+            return update_missing_locations(location_id)
         else:
             location_set(location_id, c_id)
             if get_error_count_flag():
@@ -795,49 +847,137 @@ def update_location(self, location_id, force_citadel=False):
 
 
 @shared_task(bind=True, base=QueueOnce)
-def update_all_locations(self, force_citadels=False):
-    location_flags = ['Deliveries',
-                      'Hangar',
-                      'HangarAll']
+@no_fail_chain
+def update_all_locations(self, character_filter=None, force_citadels=False, update_all=False, chain=[]):
+    location_flags = [
+        'Deliveries',
+        'Hangar',
+        'HangarAll'
+    ]
 
-    expire = timezone.now() - datetime.timedelta(days=7)  # 1 week refresh
+    expire = timezone.now() - datetime.timedelta(days=30)  # 1 week refresh
 
     asset_tops = CharacterAsset.objects.all().values_list("item_id", flat=True)
+    char_filter = CharacterAudit.objects.all()
 
-    queryset1 = list(CharacterAsset.objects.filter(location_flag__in=location_flags,
-                                                   location_name=None).exclude(location_id__in=asset_tops).values_list('location_id', flat=True))
+    if character_filter:
+        char_filter = char_filter.filter(
+            character__character_id__in=character_filter)
 
-    queryset5 = list(CharacterAsset.objects.filter(location_flag='AssetSafety',
-                                                   location_name=None).values_list('location_id', flat=True))
+    queryset1 = list(
+        CharacterAsset.objects.filter(
+            location_flag__in=location_flags,
+            location_name=None,
+            character__in=char_filter
+        ).exclude(
+            location_id__in=asset_tops
+        ).values_list('location_id', flat=True)
+    )
 
-    queryset3 = list(Clone.objects.filter(location_id__isnull=False,
-                                          location_name_id__isnull=True).values_list('location_id', flat=True))
+    queryset5 = list(
+        CharacterAsset.objects.filter(
+            location_flag='AssetSafety',
+            location_name=None,
+            character__in=char_filter
+        ).values_list('location_id', flat=True)
+    )
+    print(f"Assets {queryset1 + queryset5}")
+    queryset3 = list(
+        Clone.objects.filter(
+            location_id__isnull=False,
+            location_name_id__isnull=True,
+            character__in=char_filter
+        ).values_list('location_id', flat=True)
+    )
+    print(f"Clone {queryset3}")
 
-    queryset4 = list(JumpClone.objects.filter(location_id__isnull=False,
-                                              location_name_id__isnull=True).values_list('location_id', flat=True))
+    queryset4 = list(
+        JumpClone.objects.filter(
+            location_id__isnull=False,
+            location_name_id__isnull=True,
+            character__in=char_filter
+        ).values_list('location_id', flat=True)
+    )
+    print(f"JumpClone {queryset4}")
 
-    clones_all = list(Clone.objects.all().values_list(
-        'location_id', flat=True))
-    jump_clones_all = list(
-        Clone.objects.all().values_list('location_id', flat=True))
-    asset_all = list(CharacterAsset.objects.all(
-    ).values_list('location_id', flat=True))
+    queryset6 = list(
+        CharacterMarketOrder.objects.filter(
+            location_name_id__isnull=True,
+            character__in=char_filter
+        ).values_list(
+            'location_id',
+            flat=True
+        )
+    )
+    print(f"CharacterMarketOrder {queryset6}")
 
-    queryset2 = list(EveLocation.objects.filter(last_update__lte=expire,
-                                                location_id__in=set(clones_all + jump_clones_all + asset_all)).values_list('location_id', flat=True))
+    queryset7 = list(
+        Contract.objects.filter(
+            start_location_name=None,
+            start_location_id__isnull=False,
+            character__in=char_filter
+        ).values_list('start_location_id', flat=True)
+    )
+    print(f"Contract {queryset7}")
 
-    queryset6 = list(CharacterMarketOrder.objects.filter(
-        location_name_id__isnull=True).values_list('location_id', flat=True))
+    queryset8 = list(
+        Contract.objects.filter(
+            end_location_name=None,
+            end_location_id__isnull=False,
+            character__in=char_filter
+        ).values_list('end_location_id', flat=True)
+    )
+    print(f"Contract {queryset8}")
 
-    all_locations = set(queryset1 + queryset2 + queryset3 +
-                        queryset4 + queryset5 + queryset6)
-    # print(all_locations)
+    all_locations = set(
+        queryset1 + queryset3 + queryset8 +
+        queryset4 + queryset5 + queryset6 +
+        queryset7
+    )
+    print(f"all_locations {all_locations}")
+
+    if update_all:
+        clones_all = list(
+            Clone.objects.all().values_list(
+                'location_id',
+                flat=True
+            )
+        )
+
+        jump_clones_all = list(
+            Clone.objects.all().values_list(
+                'location_id',
+                flat=True
+            )
+        )
+
+        asset_all = list(
+            CharacterAsset.objects.all().values_list(
+                'location_id',
+                flat=True
+            )
+        )
+
+        queryset2 = list(
+            EveLocation.objects.filter(
+                last_update__lte=expire,
+                location_id__in=set(
+                    clones_all + jump_clones_all + asset_all
+                )
+            ).values_list('location_id', flat=True)
+        )
+
+        all_locations += set(queryset2)
+
     logger.warning(f"{len(all_locations)} Locations to find")
+
     count = 0
     for location in all_locations:
         if not get_location_cooloff(location):
-            update_location.apply_async(args=[location], priority=8)
+            update_location.apply_async(args=[location], kwargs={
+                                        "force_citadel": force_citadels}, priority=8)
             count += 1
+
     return f"Sent {count} location_update tasks"
 
 

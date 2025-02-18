@@ -524,7 +524,6 @@ def update_corp_structures(corp_id, force_refresh=False):  # pagnated results
                 defaults={
                     "location_name": structure.get('name'),
                     "system_id": structure.get('system_id'),
-
                 }
             )
         else:
@@ -535,6 +534,7 @@ def update_corp_structures(corp_id, force_refresh=False):  # pagnated results
             except Exception:
                 structure_info = False
             if structure_info:
+                structure_info.save()
                 name = structure_info.location_name
 
         try:
