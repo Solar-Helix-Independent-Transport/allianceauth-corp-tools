@@ -327,6 +327,25 @@ class FinancesApiEndpoints:
                     "title": c.title,
                     "items": _i
                 }
+                if c.start_location_name:
+                    _c.update(
+                        {
+                            "start_location": {
+                                "id": c.start_location_name.location_id,
+                                "name": c.start_location_name.location_name
+                            }
+                        }
+                    )
+                if c.end_location_name:
+                    _c.update(
+                        {
+                            "end_location": {
+                                "id": c.end_location_name.location_id,
+                                "name": c.end_location_name.location_name
+                            }
+                        }
+                    )
+
                 output.append(_c)
 
             return output

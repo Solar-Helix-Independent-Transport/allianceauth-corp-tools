@@ -246,6 +246,9 @@ class CharacterContract(Schema):
     start_location_id: Optional[int] = None
     end_location_id: Optional[int] = None
 
+    start_location: Optional[EveName] = None
+    end_location: Optional[EveName] = None
+
     for_corporation: bool
 
     date_accepted: Optional[datetime] = None

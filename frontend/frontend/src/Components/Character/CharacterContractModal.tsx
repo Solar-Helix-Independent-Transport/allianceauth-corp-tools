@@ -26,8 +26,16 @@ function CharacterContractModal({ data, shown, setShown }: any) {
           />
           <StrToFields strValue={data?.availability} text={t("Availability")} />
           <StrToFields strValue={data?.status} text={t("Status")} />
-          <StrIntToFields strValue={data?.start_location_id} text={t("Start Location")} />
-          <StrIntToFields strValue={data?.end_location_id} text={t("End Location")} />
+          {data?.start_location ? (
+            <StrToFields strValue={data?.start_location.name} text={t("Start Location")} />
+          ) : (
+            <StrIntToFields strValue={data?.start_location_id} text={t("Start Location")} />
+          )}
+          {data?.end_location ? (
+            <StrToFields strValue={data?.end_location.name} text={t("End Location")} />
+          ) : (
+            <StrIntToFields strValue={data?.end_location_id} text={t("End Location")} />
+          )}
           <DateToFields dateStrValue={data?.date_issued} text={t("Issued")} />
           <DateToFields dateStrValue={data?.date_accepted} text={t("Accepted")} />
           <DateToFields dateStrValue={data?.date_completed} text={t("Completed")} />
