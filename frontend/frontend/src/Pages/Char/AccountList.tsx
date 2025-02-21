@@ -3,7 +3,6 @@ import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
 import { getCharacterList } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
-import { Badge } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
