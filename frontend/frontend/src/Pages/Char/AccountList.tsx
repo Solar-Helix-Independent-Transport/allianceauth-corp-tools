@@ -22,34 +22,38 @@ const AccountList = () => {
   const columnHelper = createColumnHelper<components["schemas"]["AccountStatus"]>();
 
   const columns = [
-    columnHelper.accessor("main.character_id", {
-      header: "",
-      enableColumnFilter: false,
-      enableSorting: false,
-      cell: (cell) => <CharacterPortrait size={32} character_id={cell.getValue()} />,
-    }),
     columnHelper.accessor("main.character_name", {
       header: t("Character"),
-    }),
-    columnHelper.accessor("main.corporation_id", {
-      header: "",
-      enableColumnFilter: false,
-      enableSorting: false,
-      cell: (cell) => <CorporationLogo size={32} corporation_id={cell.getValue()} />,
+      cell: (cell) => (
+        <div className="text-nowrap">
+          <CharacterPortrait size={32} character_id={cell.row.original.main.character_id} />{" "}
+          {cell.getValue()}
+        </div>
+      ),
     }),
     columnHelper.accessor("main.corporation_name", {
       header: t("Main Corporation"),
+      cell: (cell) => (
+        <div className="text-nowrap">
+          <CorporationLogo size={32} corporation_id={cell.row.original.main.corporation_id} />{" "}
+          {cell.getValue()}
+        </div>
+      ),
     }),
     columnHelper.accessor("characters", {
       header: t("Characters"),
       cell: (props) =>
         props.getValue() ? (
-          <div className="flex-container text-center">
+          <div className="d-flex flex-wrap text-center justify-content-evenly">
             {props?.getValue()?.map((char) => {
               return (
-                <Badge className="padded-label" bg={char.active ? "primary" : "danger"}>
+                <span
+                  className={`badge mx-1 my-1 text-body padded-label aa-callout-sm aa-callout aa-callout-${
+                    char.active ? "success" : "danger"
+                  }`}
+                >
                   {char.character.character_name}
-                </Badge>
+                </span>
               );
             })}
           </div>
