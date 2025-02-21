@@ -13,79 +13,103 @@ This module is the core of the CorpTools Ecosystem, this includes;
 
 Included `Bits and Bobs`:
 
-- Character Audit
+- Modular Character Audit with selectable scopes. ( See Settings section below. )
 
   - Assets
-  - Roles
+  - Clones
+    - Implants
   - Contacts
-  - Notifications
-  - Standings
+  - Contracts
+  - Corporation History
+  - Location and Active Ship
+  - Loyalty Points
   - Markets
+  - Mining Ledger
+  - Notifications
+  - Roles
   - Skills
     - List
     - Queue
     - Audit/Export
+  - Standings
   - Wallet
     - Activity Analysis
-  - History
-  - Clones
-    - Implants
+  - At a Glance of all above data across all characters on a members
 
 - Corp Audit
 
   - Wallets
   - Structures
+    - Fuel Dashboard
+    - Metenox Dashboard
+    - Jump Bridge Dashboard
+    - Sov Dashboard
   - Assets
 
 - [Sec Group](https://github.com/Solar-Helix-Independent-Transport/allianceauth-secure-groups) Filters
-  - Audit Fully Loaded
   - Assets
     - Location
     - Type
     - Group
-  - Skill List
+  - Audit Fully Loaded
   - Corporate Roles
   - Corporate Title
+  - Highest SP on Account
+  - Home Station / Death Clone Location
+  - Jump Clone Location
+  - Last Login
   - Main time in corp
+  - Skill List
+  - Current Ship
 
-Active Devs:
+## Contributors
 
-- [AaronKable](https://github.com/pvyParts)
+Thankyou to all our [contributors](https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools/graphs/contributors)!
+
+Please consider helping with [Translations](https://app.transifex.com/alliance-auth/allianceauth-corp-tools/dashboard/)!
+
+![contributors](https://contrib.rocks/image?repo=Solar-Helix-Independent-Transport/allianceauth-corp-tools)
 
 ## Installation
 
-1.  Install the Repo from git `pip install -U git+https://github.com/pvyParts/allianceauth-corp-tools.git`
-2.  Add `'corptools',` to your `INSTALLED_APPS` in your projects `local.py`
-3.  run migrations, collectstatic and restart auth
-4.  run the corp tools setup managemnt command `python manage.py ct_setup`
-5.  setup your perms as documented below
-6.  add characters and corp tokens as required.
+### Bare Metal
 
-## Set Corp Tools Name
+1.  Install the application `pip install -U allianceauth-corp-tools`
+1.  Add `'corptools',` to your `INSTALLED_APPS` in your projects `local.py`
+1.  run migrations, collectstatic and restart auth
+1.  run the corp tools setup managemnt command `python manage.py ct_setup`
+1.  Continue with the Common section
 
-Add the below lines to your `local.py` settings file, Changing the contexts to yours.
+### Docker
 
-You can optionally se the name of the app in the ui by setting this setting
+1.  add the application to your `conf/requirments.txt` `allianceauth-corp-tools==2.8.10`
+1.  Add `'corptools',` to your `INSTALLED_APPS` in your projects `conf/local.py`
+1.  Build auth, and restart your containers
+1.  enter a container `docker compose exec allianceauth_gunicorn bash` and run migrations, collectstatic, and configure corptools.
+    - `auth collectstatic`
+    - `auth migrate`
+    - `auth ct_setup`
+1.  Continue with the Common section
 
-```python
-## name for Corp Tools
-CORPTOOLS_APP_NAME = "Character Audit"
-```
+### Common
+
+1.  setup your perms as documented below
+1.  add characters and corp tokens as required.
 
 ## Usage
 
-### Seting up automatic updates
+### adjusting automatic updates
 
-This will show how to do daily updates.
+This will show how to setup/modify daily updates.
 
 Currently this is:
 
 - 2 times an hour ( minute 15, and 45) 1/48th of the total character updates, for at worst 1 update per character per day
 - Corp update run on all corps hourly at minute 30
 
-1. Got Audit Admin
-2. Click `Create or Update Periodic Tasks`
-3. you can edit the schedules to work more inline with your group as required.
+1. Got Audit Admin `https://your.url/audit/admin/`
+1. Click `Create or Update Periodic Tasks`
+1. you can edit the schedules to work more inline with your group as required in auth admin periodic tasks
 
 ## Permissions
 
@@ -159,11 +183,12 @@ If `Assets`, `Clones`, `Wallets` or `Minning` are enabled these extra spoces are
 - 'esi-universe.read_structures.v1'
 - 'esi-search.search_structures.v1'
 
+this is to be able to lookup location names.
+
 ### Other Settings
 
 | Setting                      | Default                                              | Description                                                                                                                                                   |
 | ---------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CORPTOOLS_APP_NAME`         | "Character Audit"                                    | Name on the menu for Character Audit                                                                                                                          |
 | `CT_CHAR_MAX_INACTIVE_DAYS`  | 3                                                    | Days till data is considered Stale                                                                                                                            |
 | `CORPTOOLS_DISCORD_BOT_COGS` | `["corptools.cogs.routes", "corptools.cogs.locate"]` | Discord bot cogs to enable/disable                                                                                                                            |
 | `CT_PAGINATION_SIZE`         | 30000                                                | Max items per page of data in the UI                                                                                                                          |
