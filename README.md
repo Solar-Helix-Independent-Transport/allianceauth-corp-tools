@@ -74,7 +74,7 @@ Please consider helping with [Translations](https://app.transifex.com/alliance-a
 
 ### Bare Metal
 
-1.  Install the application `pip install -U allianceauth-corp-tools`
+1.  Install the application `pip install -U allianceauth-corptools`
 1.  Add `'corptools',` to your `INSTALLED_APPS` in your projects `local.py`
 1.  run migrations, collectstatic and restart auth
 1.  run the corp tools setup managemnt command `python manage.py ct_setup`
@@ -82,7 +82,7 @@ Please consider helping with [Translations](https://app.transifex.com/alliance-a
 
 ### Docker
 
-1.  add the application to your `conf/requirments.txt` `allianceauth-corp-tools==2.8.10`
+1.  add the application to your `conf/requirments.txt` `allianceauth-corptools==2.8.10`
 1.  Add `'corptools',` to your `INSTALLED_APPS` in your projects `conf/local.py`
 1.  Build auth, and restart your containers
 1.  enter a container `docker compose exec allianceauth_gunicorn bash` and run migrations, collectstatic, and configure corptools.
