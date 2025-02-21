@@ -38,9 +38,11 @@ const CharacterWallet = () => {
     }),
     columnHelper.accessor("amount", {
       header: t("Amount"),
+      cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
     columnHelper.accessor("balance", {
       header: t("Balance"),
+      cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
     columnHelper.accessor("reason", {
       header: t("Reason"),

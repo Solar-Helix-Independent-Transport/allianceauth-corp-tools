@@ -29,6 +29,7 @@ const CharacterLP = () => {
     }),
     columnHelper.accessor("amount", {
       header: t("Quantity"),
+      cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
   ];
 

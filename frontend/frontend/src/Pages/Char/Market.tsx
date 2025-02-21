@@ -45,11 +45,12 @@ const CharacterMarket = () => {
     }),
     columnHelper.accessor("price", {
       header: t("Price"),
+      cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
     columnHelper.accessor("volume_remain", {
       header: t("Volume"),
       cell: (cell) => {
-        return `${cell.getValue()}/${cell.row.original.volume_total}`;
+        return `${cell.getValue().toLocaleString()}/${cell.row.original.volume_total.toLocaleString()}`;
       },
     }),
   ];

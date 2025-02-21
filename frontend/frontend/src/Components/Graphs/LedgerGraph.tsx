@@ -113,7 +113,7 @@ const LedgerGraph = ({ data }: any) => {
         cell.getValue()?.map((d: any) => {
           return (
             <>
-              {`${d.name}: ${~~d.volume}`}
+              {`${d.name}: ${(~~d.volume).toLocaleString()}`}
               <br />
             </>
           );

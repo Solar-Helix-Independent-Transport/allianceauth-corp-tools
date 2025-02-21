@@ -35,6 +35,7 @@ const CharacterAssets = () => {
     }),
     columnHelper.accessor("quantity", {
       header: t("Quantity"),
+      cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
     columnHelper.accessor("location.name", {
       header: t("Location"),
