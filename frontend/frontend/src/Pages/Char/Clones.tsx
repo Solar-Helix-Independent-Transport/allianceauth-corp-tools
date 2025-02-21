@@ -43,9 +43,11 @@ const CharacterClones = () => {
           <>
             <Table>
               <thead>
-                <th>{t("Location")}</th>
-                <th className="text-end pe-2">{t("Implants")}</th>
-                <th style={{ width: "45px" }}></th>
+                <tr>
+                  <th>{t("Location")}</th>
+                  <th className="text-end pe-2">{t("Implants")}</th>
+                  <th style={{ width: "45px" }}></th>
+                </tr>
               </thead>
               <tbody>
                 {data?.map((d: components["schemas"]["CharacterClone"]) => {
