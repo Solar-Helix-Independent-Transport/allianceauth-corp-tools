@@ -10,11 +10,12 @@ const colourStyles = {
       color: "black",
     };
   },
+  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
 };
 
 const CharAssetLocSelect = ({ corporation_id, setLocation }) => {
   const { isLoading, data } = useQuery(["asset_loc", corporation_id], () =>
-    loadAssetLocations(corporation_id)
+    loadAssetLocations(corporation_id),
   );
 
   return (

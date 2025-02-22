@@ -10,6 +10,7 @@ const colourStyles = {
       color: "black",
     };
   },
+  menuList: (base) => ({ ...base, zIndex: 9999 }),
 };
 
 const CorpSelect = ({ setCorporation }) => {
