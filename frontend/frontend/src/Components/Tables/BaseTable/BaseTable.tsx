@@ -238,7 +238,7 @@ function _baseTable({
         </tbody>
       </Table>
       <div className="d-flex justify-content-between">
-        <ButtonGroup>
+        <ButtonGroup style={{ zIndex: -1 }}>
           <Button active variant="info">
             {
               <>
@@ -273,7 +273,7 @@ function _baseTable({
         </ButtonGroup>
 
         <ButtonToolbar>
-          <ButtonGroup>
+          <ButtonGroup style={{ zIndex: -1 }}>
             <Button
               variant="success"
               onClick={() => table.setPageIndex(0)}
@@ -304,7 +304,7 @@ function _baseTable({
             </Button>
           </ButtonGroup>
 
-          <ButtonGroup className="ms-1">
+          <ButtonGroup style={{ zIndex: -1 }} className="ms-1">
             <Button active variant="success">
               {"Page Size:"}
             </Button>{" "}
