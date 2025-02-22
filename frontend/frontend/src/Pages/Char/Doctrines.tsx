@@ -1,4 +1,4 @@
-import { PanelLoader } from "@pvyparts/allianceauth-components";
+import { PanelLoader } from "../../Components/Loaders/loaders";
 import { CharacterAllegiancePortrait } from "../../Components/EveImages/EveImages";
 import { TextFilter } from "../../Components/Helpers/TextFilter";
 import { DoctrineCheck } from "../../Components/Skills/DoctrineCheck";

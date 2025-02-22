@@ -1,33 +1,54 @@
 {
-  "_@libs-CaxxfjV3.js": {
-    "file": "assets/@libs-CaxxfjV3.js"
+  "_@app-libs-CplkXEOv.js": {
+    "file": "assets/@app-libs-CplkXEOv.js",
+    "name": "@app-libs"
   },
-  "_@react-router-B4Q9Uprw.js": {
-    "file": "assets/@react-router-B4Q9Uprw.js",
+  "_@bootstrap-libs-Dd_AcEr9.js": {
+    "file": "assets/@bootstrap-libs-Dd_AcEr9.js",
+    "name": "@bootstrap-libs",
     "imports": [
-      "_@libs-CaxxfjV3.js"
+      "_@app-libs-CplkXEOv.js"
     ]
   },
-  "_browser-ponyfill-C8cNHPFA.js": {
-    "file": "assets/browser-ponyfill-C8cNHPFA.js",
+  "_@lang-libs-BujMiMKP.js": {
+    "file": "assets/@lang-libs-BujMiMKP.js",
+    "name": "@lang-libs",
+    "imports": [
+      "_@app-libs-CplkXEOv.js"
+    ],
+    "dynamicImports": [
+      "_browser-ponyfill-CwUmXqjf.js"
+    ]
+  },
+  "_@react-libs-tZKpKlaV.js": {
+    "file": "assets/@react-libs-tZKpKlaV.js",
+    "name": "@react-libs",
+    "imports": [
+      "_@app-libs-CplkXEOv.js",
+      "_@bootstrap-libs-Dd_AcEr9.js"
+    ]
+  },
+  "_browser-ponyfill-CwUmXqjf.js": {
+    "file": "assets/browser-ponyfill-CwUmXqjf.js",
+    "name": "browser-ponyfill",
     "isDynamicEntry": true,
     "imports": [
-      "_@libs-CaxxfjV3.js"
+      "_@app-libs-CplkXEOv.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-BMqMY83U.js",
+    "file": "assets/index-Cev1mOEl.js",
+    "name": "index",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@libs-CaxxfjV3.js",
-      "_@react-router-B4Q9Uprw.js"
-    ],
-    "dynamicImports": [
-      "_browser-ponyfill-C8cNHPFA.js"
+      "_@app-libs-CplkXEOv.js",
+      "_@bootstrap-libs-Dd_AcEr9.js",
+      "_@react-libs-tZKpKlaV.js",
+      "_@lang-libs-BujMiMKP.js"
     ],
     "css": [
-      "static/corptools/bs5/static/css/index-NKXC22vu.css"
+      "static/corptools/bs5/static/css/index-BvnbU6Gy.css"
     ],
     "assets": [
       "static/corptools/bs5/static/img/omega_128-B8POqXI6.png",

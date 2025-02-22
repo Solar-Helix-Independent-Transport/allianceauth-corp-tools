@@ -36,15 +36,34 @@ export default defineConfig({
         },
         manualChunks(id) {
           // creating a chunk to react routes deps. Reducing the vendor chunk size
-          if (id.includes("react-router-dom") || id.includes("react-router")) {
-            return "@react-router";
+          if (
+            id.includes("react-router-dom") ||
+            id.includes("react-router") ||
+            id.includes("react-select") ||
+            id.includes("react-slider") ||
+            id.includes("react-copy-to-clipboard")
+          ) {
+            return "@react-libs";
           }
           if (
             id.includes("react-query") ||
-            id.includes("react-select") ||
-            id.includes("javascript-time-ago")
+            id.includes("javascript-time-ago") ||
+            id.includes("@nivo/bar") ||
+            id.includes("@nivo/core") ||
+            id.includes("recharts")
           ) {
-            return "@libs";
+            return "@app-libs";
+          }
+          if (id.includes("react-bootstrap") || id.includes("bootstrap")) {
+            return "@bootstrap-libs";
+          }
+          if (
+            id.includes("i18next") ||
+            id.includes("i18next-http-backend") ||
+            id.includes("i18next-browser-languagedetector") ||
+            id.includes("react-i18next")
+          ) {
+            return "@lang-libs";
           }
         },
       },
