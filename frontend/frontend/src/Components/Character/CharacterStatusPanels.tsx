@@ -59,6 +59,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                     variant="secondary"
                     size="sm"
                     href={`https://zkillboard.com/character/${char.character.character_id}`}
+                    target="_blank"
                   >
                     zKill
                   </Button>
@@ -66,6 +67,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                     variant="secondary"
                     size="sm"
                     href={`https://evewho.com/character/${char.character.character_id}`}
+                    target="_blank"
                   >
                     EVE Who
                   </Button>
@@ -76,6 +78,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                       " ",
                       "_",
                     )}`}
+                    target="_blank"
                   >
                     DotLan
                   </Button>
@@ -83,6 +86,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                     variant="secondary"
                     size="sm"
                     href={`https://www.eve411.com/character/${char.character.character_id}`}
+                    target="_blank"
                   >
                     EVE411
                   </Button>
@@ -95,6 +99,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                       " ",
                       "_",
                     )}/summary`}
+                    target="_blank"
                   >
                     EVE Forums
                   </Button>
@@ -102,6 +107,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                     variant="secondary"
                     size="sm"
                     href={`https://eve-search.com/search/author/${char.character.character_name}`}
+                    target="_blank"
                   >
                     EVE Search
                   </Button>
