@@ -10,7 +10,6 @@ const colourStyles = {
   menu: (base: any) => ({ ...base, zIndex: 9999 }),
   menuList: (base: any) => ({ ...base, zIndex: 9999 }),
   menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
-  valueContainer: (base: any) => ({ ...base, zIndex: 9999 }),
 };
 
 export const SelectFilter = ({ setFilter, options, labelText }: any) => {
