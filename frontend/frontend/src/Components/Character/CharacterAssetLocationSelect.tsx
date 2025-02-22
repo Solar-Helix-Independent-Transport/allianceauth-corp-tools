@@ -9,6 +9,9 @@ const colourStyles = {
       color: "black",
     };
   },
+  menu: (base: any) => ({ ...base, zIndex: 9999 }),
+  menuList: (base: any) => ({ ...base, zIndex: 9999 }),
+  menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
 };
 
 const CharacterAssetLocationSelect = ({
@@ -21,7 +24,7 @@ const CharacterAssetLocationSelect = ({
   const { isLoading, data } = useQuery(
     ["asset_loc", characterID],
     () => loadAssetLocations(characterID),
-    { refetchOnWindowFocus: false }
+    { refetchOnWindowFocus: false },
   );
 
   return (
