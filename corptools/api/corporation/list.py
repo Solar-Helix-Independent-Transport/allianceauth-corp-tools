@@ -21,7 +21,11 @@ class ListApiEndpoints:
             tags=self.tags
         )
         def get_visible_corporation_status(request):
-            corps = models.CorporationAudit.objects.visible_to(request.user)
+            corps = models.CorporationAudit.objects.visible_to(
+                request.user
+            ).filter(
+                corporation__corporation_id__gte=2000000
+            )
 
             if (request.user.has_perm("corptools.holding_corp_wallets")
                 or request.user.has_perm("corptools.holding_corp_assets")
