@@ -457,12 +457,6 @@ class TestSecGroupBotFilters(TestCase):
             character=audits[17], personnel_manager=True)
         u16.titles.add(cls.c2t1)
 
-        # print("**************************")
-        # print(u1.character.character.character_ownership.user.id)
-        # print(u15.character.character.character_ownership.user.id)
-        # print(u16.character.character.character_ownership.user.id)
-        # print("**************************")
-
         ct_models.Skill.objects.filter(
             character=audits[0]).update(active_skill_level=5)
         en = ct_models.EveName.objects.create(
@@ -519,7 +513,6 @@ class TestSecGroupBotFilters(TestCase):
         tests = {}
         tests = _filter.audit_filter(
             User.objects.filter(id__in=list(users.keys())))
-        # print(tests)
 
         self.assertTrue(tests[1]["check"])
         self.assertTrue(tests[2]["check"])
@@ -543,7 +536,7 @@ class TestSecGroupBotFilters(TestCase):
         tests = {}
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
-        # print(tests)
+
         self.assertFalse(tests[1])
         self.assertFalse(tests[2])
         self.assertFalse(tests[3])
@@ -558,7 +551,7 @@ class TestSecGroupBotFilters(TestCase):
         tests = {}
         tests = _filter.audit_filter(
             User.objects.filter(id__in=list(users.keys())))
-        # print(tests)
+
         self.assertFalse(tests[1]["check"])
         self.assertFalse(tests[2]["check"])
         self.assertFalse(tests[3]["check"])
@@ -759,8 +752,7 @@ class TestSecGroupBotFilters(TestCase):
         tests = {}
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1])
         self.assertFalse(tests[2])
         self.assertFalse(tests[3])
@@ -787,8 +779,7 @@ class TestSecGroupBotFilters(TestCase):
         tests = {}
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1])
         self.assertFalse(tests[2])
         self.assertFalse(tests[3])
@@ -813,8 +804,7 @@ class TestSecGroupBotFilters(TestCase):
             users.append(user.character.character_ownership.user.id)
 
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -828,8 +818,7 @@ class TestSecGroupBotFilters(TestCase):
 
         # run again and confirm cache
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -854,8 +843,7 @@ class TestSecGroupBotFilters(TestCase):
         tests = {}
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1])
         self.assertFalse(tests[2])
         self.assertFalse(tests[3])
@@ -878,8 +866,7 @@ class TestSecGroupBotFilters(TestCase):
             users.append(user.character.character_ownership.user.id)
 
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -893,8 +880,7 @@ class TestSecGroupBotFilters(TestCase):
 
         # run again and confirm cache
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -916,8 +902,7 @@ class TestSecGroupBotFilters(TestCase):
             users.append(user.character.character_ownership.user.id)
 
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -931,8 +916,7 @@ class TestSecGroupBotFilters(TestCase):
 
         # run again and confirm cache
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -955,8 +939,7 @@ class TestSecGroupBotFilters(TestCase):
             users.append(user.character.character_ownership.user.id)
 
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -970,8 +953,7 @@ class TestSecGroupBotFilters(TestCase):
 
         # run again and confirm cache
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -993,8 +975,7 @@ class TestSecGroupBotFilters(TestCase):
             users.append(user.character.character_ownership.user.id)
 
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1008,8 +989,7 @@ class TestSecGroupBotFilters(TestCase):
 
         # run again and confirm cache
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1032,8 +1012,7 @@ class TestSecGroupBotFilters(TestCase):
             users.append(user.character.character_ownership.user.id)
 
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1047,8 +1026,7 @@ class TestSecGroupBotFilters(TestCase):
 
         # run again and confirm cache
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1072,8 +1050,7 @@ class TestSecGroupBotFilters(TestCase):
             users.append(user.character.character_ownership.user.id)
 
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertFalse(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1087,8 +1064,7 @@ class TestSecGroupBotFilters(TestCase):
 
         # run again and confirm cache
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertFalse(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1112,8 +1088,7 @@ class TestSecGroupBotFilters(TestCase):
             users.append(user.character.character_ownership.user.id)
 
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertFalse(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1127,8 +1102,7 @@ class TestSecGroupBotFilters(TestCase):
 
         # run again and confirm cache
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertFalse(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1150,8 +1124,7 @@ class TestSecGroupBotFilters(TestCase):
             users.append(user.character.character_ownership.user.id)
 
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1165,8 +1138,7 @@ class TestSecGroupBotFilters(TestCase):
 
         # run again and confirm cache
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertTrue(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1188,8 +1160,7 @@ class TestSecGroupBotFilters(TestCase):
             users.append(user.character.character_ownership.user.id)
 
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertFalse(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1203,8 +1174,7 @@ class TestSecGroupBotFilters(TestCase):
 
         # run again and confirm cache
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-        # print("**********")
-        # print(tests)
+
         self.assertFalse(tests[1]['check'])
         self.assertFalse(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1266,7 +1236,7 @@ class TestSecGroupBotFilters(TestCase):
 
         tests = {u: {"check": _filter.process_filter(
             User.objects.get(id=u))} for u in users}
-        print(tests)
+
         self.assertFalse(tests[1]['check'])
         self.assertTrue(tests[2]['check'])
         self.assertFalse(tests[3]['check'])
@@ -1330,7 +1300,6 @@ class TestSecGroupBotFilters(TestCase):
 
         tests = {u: {"check": _filter.process_filter(
             User.objects.get(id=u))} for u in users}
-        print(tests)
 
         self.assertFalse(tests[1]['check'])
         self.assertTrue(tests[2]['check'])
@@ -1391,9 +1360,6 @@ class TestSecGroupBotFilters(TestCase):
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
 
-        # print("**********")
-        # print(tests)
-
         self.assertTrue(tests[1])
         self.assertTrue(tests[2])
         self.assertFalse(tests[3])
@@ -1419,9 +1385,6 @@ class TestSecGroupBotFilters(TestCase):
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
 
-        # print("**********")
-        # print(tests)
-
         self.assertFalse(tests[1])
         self.assertFalse(tests[2])
         self.assertTrue(tests[3])
@@ -1436,8 +1399,6 @@ class TestSecGroupBotFilters(TestCase):
         _filter = ct_models.CurrentShipFilter.objects.create(name="Ship in Location Test",
                                                              description="Something to tell user")
         _filter.types.add(ct_models.EveItemType.objects.get(type_id=10))
-        # _filter.systems.add(
-        #     ct_models.MapSystem.objects.get(name="Test System 1"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -1446,9 +1407,6 @@ class TestSecGroupBotFilters(TestCase):
         tests = {}
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
-
-        # print("**********")
-        # print(tests)
 
         self.assertTrue(tests[1])
         self.assertTrue(tests[2])
@@ -1475,9 +1433,6 @@ class TestSecGroupBotFilters(TestCase):
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
 
-        # print("**********")
-        # print(tests)
-
         self.assertFalse(tests[1])
         self.assertFalse(tests[2])
         self.assertTrue(tests[3])
@@ -1502,9 +1457,6 @@ class TestSecGroupBotFilters(TestCase):
         tests = {}
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
-
-        # print("**********")
-        # print(tests)
 
         self.assertFalse(tests[1])
         self.assertFalse(tests[2])
@@ -1531,9 +1483,6 @@ class TestSecGroupBotFilters(TestCase):
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
 
-        # print("**********")
-        # print(tests)
-
         self.assertFalse(tests[1])
         self.assertFalse(tests[2])
         self.assertFalse(tests[3])
@@ -1558,9 +1507,6 @@ class TestSecGroupBotFilters(TestCase):
         tests = {}
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
-
-        print("**********")
-        print(tests)
 
         self.assertFalse(tests[1])
         self.assertFalse(tests[2])
@@ -1588,9 +1534,6 @@ class TestSecGroupBotFilters(TestCase):
         for k, u in users.items():
             tests[k] = _filter.process_filter(User.objects.get(id=k))
 
-        print("**********")
-        print(tests)
-
         self.assertTrue(tests[1])
         self.assertTrue(tests[2])
         self.assertTrue(tests[3])
@@ -1613,9 +1556,6 @@ class TestSecGroupBotFilters(TestCase):
             users[user.character.character_ownership.user.id] = None
 
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
-
-        print("**********")
-        print(tests)
 
         self.assertFalse(tests[1]["check"])
         self.assertFalse(tests[2]["check"])
@@ -1641,9 +1581,6 @@ class TestSecGroupBotFilters(TestCase):
 
         tests = _filter.audit_filter(User.objects.filter(id__in=users))
 
-        print("**********")
-        print(tests)
-
         self.assertTrue(tests[1]["check"])
         self.assertTrue(tests[2]["check"])
         self.assertTrue(tests[3]["check"])
@@ -1653,3 +1590,26 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[7]["check"])
         self.assertFalse(tests[8]["check"])
         self.assertFalse(tests[9]["check"])
+
+    def test_user_time_in_corp_no_audit_rev(self):
+        _filter = ct_models.TimeInCorpFilter.objects.create(
+            name="Time in Corp > 20d",
+            description="Something to tell user",
+            days_in_corp=20,
+            reversed_logic=True
+        )
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=[11]))
+
+        self.assertFalse(tests[1]["check"])
+
+    def test_user_time_in_corp_no_audit(self):
+        _filter = ct_models.TimeInCorpFilter.objects.create(
+            name="Time in Corp > 20d",
+            description="Something to tell user",
+            days_in_corp=20
+        )
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=[11]))
+
+        self.assertFalse(tests[1]["check"])

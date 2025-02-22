@@ -1682,7 +1682,7 @@ class TimeInCorpFilter(FilterBase):
                 days = -1
             chars[c['id']] = days
 
-        output = defaultdict(lambda: {"message": "", "check": logic})
+        output = defaultdict(lambda: {"message": "", "check": False})
         for c, char_list in chars.items():
             if char_list >= self.days_in_corp:
                 check = not logic
@@ -1690,6 +1690,7 @@ class TimeInCorpFilter(FilterBase):
                 check = logic
             if char_list < 0:
                 msg = "No Audit"
+                check = False
             else:
                 msg = str(char_list) + " Days"
             output[c] = {"message": msg, "check": check}
