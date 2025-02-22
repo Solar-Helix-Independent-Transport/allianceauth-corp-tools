@@ -2,12 +2,10 @@ import CharMenu from "./CharMenu";
 import axios from "axios";
 import ReactDOM from "react-dom";
 import { useQuery } from "react-query";
-import { useParams } from "react-router-dom";
 
 const menuRoot = document.getElementById("nav-left");
 
 const CharMenuAsync = () => {
-  const { characterID } = useParams();
   const { isLoading, error, data } = useQuery({
     queryKey: ["Menu"],
     queryFn: async () => {
@@ -20,12 +18,8 @@ const CharMenuAsync = () => {
     return <></>;
   }
   return ReactDOM.createPortal(
-    <CharMenu
-      error={error ? true : false}
-      characterID={String(characterID)}
-      {...{ isLoading, data }}
-    />,
-    menuRoot
+    <CharMenu error={error ? true : false} {...{ isLoading, data }} />,
+    menuRoot,
   );
 };
 

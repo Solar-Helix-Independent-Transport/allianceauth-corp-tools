@@ -33,6 +33,7 @@ import Backend from "i18next-http-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
 import CharacterWalletActivity from "./Pages/Char/WalletActivity";
 import CharacterMiningLedger from "./Pages/Char/MiningLedger";
+import { ErrorLoader } from "./Components/Loaders/loaders";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -94,6 +95,15 @@ function App() {
                 }
               />
               <Route path="account/list" element={<AccountList />} />
+              <Route
+                path="*"
+                element={
+                  <ErrorLoader
+                    title="Error 404"
+                    message="This is not the path you are looking for! Page not found."
+                  />
+                }
+              />
             </Route>
             <Route path="audit/r_beta/corp/" element={<CorporationAudit />}>
               <Route index element={<Navigate to="glance" replace />} />

@@ -4,7 +4,7 @@ import { Nav } from "react-bootstrap";
 import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useIsFetching } from "react-query";
-import { Link } from "react-router-dom";
+import { MenuItem } from "./MenuParts";
 
 const menuRoot = document.getElementById("nav-right");
 
@@ -22,6 +22,11 @@ const CharMenuRight = () => {
       }
     }
   }, [innerHtmlEmptied]);
+
+  const menuListLink = {
+    link: "account/list",
+    name: t("Account List"),
+  };
 
   if (!innerHtmlEmptied) return null;
   if (!menuRoot) {
@@ -43,11 +48,7 @@ const CharMenuRight = () => {
           {t("Add Character")}
         </Nav.Link>
       </Nav.Item>
-      <Nav.Item as="li">
-        <Nav.Link as={Link} to={`account/list`} key="Account List">
-          {t("Account List")}
-        </Nav.Link>
-      </Nav.Item>
+      <MenuItem link={menuListLink} />
       {/* TODO Check perms for this */}
       {/* <Nav.Item as="li">
         <Nav.Link as={Link} to={`/audit/r_beta/corp`} key="corp-swap">
