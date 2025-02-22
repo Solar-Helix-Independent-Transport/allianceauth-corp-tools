@@ -173,6 +173,15 @@ function App() {
                   </Card>
                 }
               />
+              <Route
+                path="*"
+                element={
+                  <ErrorLoader
+                    title="Error 404"
+                    message="This is not the path you are looking for! Page not found."
+                  />
+                }
+              />
             </Route>
             <Route path="*" element={<Navigate to="audit/r/0" replace />} />
           </Routes>
