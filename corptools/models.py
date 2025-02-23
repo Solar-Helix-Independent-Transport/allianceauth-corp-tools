@@ -6,7 +6,7 @@ from model_utils import Choices
 from solo.models import SingletonModel
 
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.db.models import ExpressionWrapper, F, Func, Max
 from django.utils import timezone
@@ -987,11 +987,34 @@ class CharacterIndustryJob(models.Model):
 # ************************ Fit Models
 
 
+def valid_skills(value):
+    try:
+        data = json.loads(value)
+        for skill, level in data.items():
+            if not EveItemType.objects.filter(name=skill).exists():
+                raise ValidationError(
+                    _(f'Please enter a valid skill name for `{skill}`. Hint: character must have trained the skill for auth to know about it.')
+                )
+            lvl = -1
+            try:
+                lvl = int(level)
+            except ValueError:
+                pass
+            if lvl > 5 or lvl < 0:
+                raise ValidationError(
+                    _(f'Please enter a valid skill level for `{skill}`. Hint: between 0 and 5.')
+                )
+    except ValueError:
+        raise ValidationError(
+            _('Please check fromat for valid JSON. Hint: ["skill name": 4, "skill name 2": 1]')
+        )
+
+
 class SkillList(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=500, null=True, default=None)
     skill_list = models.TextField(
-        null=True, default="", validators=[validators.valid_json])
+        null=True, default="", validators=[valid_skills])
     show_on_audit = models.BooleanField(default=True)
     order_weight = models.IntegerField(default=0)
 
