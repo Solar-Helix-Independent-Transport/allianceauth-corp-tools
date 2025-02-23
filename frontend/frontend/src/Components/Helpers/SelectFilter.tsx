@@ -7,6 +7,7 @@ const colourStyles = {
       color: "black",
     };
   },
+  container: (base: any) => ({ ...base, zIndex: 0 }),
   menu: (base: any) => ({ ...base, zIndex: 9999 }),
   menuList: (base: any) => ({ ...base, zIndex: 9999 }),
   menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
@@ -14,7 +15,7 @@ const colourStyles = {
 
 export const SelectFilter = ({ setFilter, options, labelText }: any) => {
   return (
-    <div className="flex-grow-1 flex-even d-flex text-nowrap" style={{ zIndex: 9999 }}>
+    <div className="flex-grow-1 flex-even d-flex text-nowrap">
       <div className="my-auto mx-2">
         <h6>{labelText}</h6>
       </div>
@@ -24,6 +25,8 @@ export const SelectFilter = ({ setFilter, options, labelText }: any) => {
         options={options}
         onChange={(e) => setFilter(e.value)}
         defaultValue={options[0]}
+        menuPortalTarget={document.body}
+        menuPosition="fixed"
       />
     </div>
   );
