@@ -7,11 +7,17 @@ from . import app_settings, models, urls
 class MemberAudit(MenuItemHook):
     def __init__(self):
 
-        MenuItemHook.__init__(self,
-                              app_settings.CORPTOOLS_APP_NAME,
-                              'far fa-eye fa-fw',
-                              'corptools:react',
-                              navactive=['corptools:react', 'corptools:view'])
+        MenuItemHook.__init__(
+            self,
+            app_settings.CORPTOOLS_APP_NAME,
+            'far fa-eye fa-fw',
+            'corptools:react',
+            navactive=[
+                'corptools:reactmain',
+                'corptools:view',
+                'corptools:react',
+            ]
+        )
 
     def render(self, request):
         if request.user.has_perm('corptools.view_characteraudit'):
