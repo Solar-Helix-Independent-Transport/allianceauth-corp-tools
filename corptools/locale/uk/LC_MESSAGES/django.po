@@ -55,7 +55,7 @@ msgstr "Всюди"
 
 #: corptools/api/character/assets.py:40
 msgid "AssetSafety"
-msgstr ""
+msgstr "Система захисту активів"
 
 #: corptools/api/character/assets.py:227
 #: corptools/templates/corptools/character/assets_lists.html:5
@@ -601,7 +601,7 @@ msgstr "Сума CП"
 #: corptools/templates/corptools/character/public.html:18
 #: corptools/templates/corptools/character/status.html:25
 msgid "Isk"
-msgstr ""
+msgstr "ISK"
 
 #: corptools/templates/corptools/character/public.html:27
 msgid "Joined"
