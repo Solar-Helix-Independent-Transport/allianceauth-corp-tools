@@ -993,7 +993,7 @@ def valid_skills(value):
         for skill, level in data.items():
             if not EveItemType.objects.filter(name=skill).exists():
                 raise ValidationError(
-                    _(f'Please enter a valid skill name for `{skill}`. Hint: character must have trained the skill for auth to know about it.')
+                    _(f'Please enter a valid skill name for `{skill}`. Hint: a known character must have trained the skill for auth to know about it.')
                 )
             lvl = -1
             try:
@@ -1006,7 +1006,7 @@ def valid_skills(value):
                 )
     except ValueError:
         raise ValidationError(
-            _('Please check fromat for valid JSON. Hint: ["skill name": 4, "skill name 2": 1]')
+            _('Please check format for valid JSON. Hint: ["skill name": 4, "skill name 2": 1]')
         )
 
 
