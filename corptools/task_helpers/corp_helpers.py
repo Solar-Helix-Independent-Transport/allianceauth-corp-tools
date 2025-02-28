@@ -20,11 +20,12 @@ from corptools.task_helpers.update_tasks import fetch_location_name
 
 from .. import providers
 from ..models import (
-    BridgeOzoneLevel, CharacterAudit, CorpAsset, CorporateContract,
-    CorporateContractItem, CorporationAudit, CorporationWalletDivision,
-    CorporationWalletJournalEntry, CorptoolsConfiguration, EveItemType,
-    EveLocation, EveName, MapJumpBridge, MapSystem, MapSystemPlanet, Poco,
-    Structure, StructureCelestial, StructureService,
+    AssetCoordiante, BridgeOzoneLevel, CharacterAudit, CorpAsset,
+    CorporateContract, CorporateContractItem, CorporationAudit,
+    CorporationWalletDivision, CorporationWalletJournalEntry,
+    CorptoolsConfiguration, EveItemType, EveLocation, EveName, MapJumpBridge,
+    MapSystem, MapSystemPlanet, Poco, Structure, StructureCelestial,
+    StructureService,
 )
 from . import sanitize_location_flag
 
@@ -682,7 +683,8 @@ def update_corp_assets(corp_id):
             corporation=audit_corp)  # Flush Assets
         if delete_query.exists():
             # speed and we are not caring about f-keys or signals on these models
-            delete_query._raw_delete(delete_query.db)
+            # delete_query._raw_delete(delete_query.db)
+            delete_query.delete()  # with coords we need to care about the fkeys/signals
 
         CorpAsset.objects.bulk_create(items)
         que = []
@@ -1068,3 +1070,133 @@ def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=Fa
             pass
 
     return f"CT: Completed Corporate Contract items {str(_corporation.corporation.corporation_name)} ({str(contract_id)})"
+
+
+@shared_task(bind=True, base=QueueOnce)
+def fetch_coordiantes(self, corp_id):
+    _corporation = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+
+    logger.info(
+        f"CT: Starting Coords for {_corporation.corporation.corporation_name}")
+
+    catagories = [
+        23,  # Starbases
+        65,  # Structures
+        40,  # Sov
+    ]
+
+    # These must be in space
+    max_location_id = 35000000
+    min_location_id = 30000000
+
+    assets = CorpAsset.objects.filter(
+        corporation=_corporation,
+        type_name__group__category_id__in=catagories,
+        location_id__gte=min_location_id,
+        location_id__lte=max_location_id
+    )
+
+    logger.info(f"CT: COORDS {assets.count()} Assets found.")
+
+    _req_scopes = ['esi-assets.read_corporation_assets.v1']
+    _req_roles = ['Director']
+    _token = get_corp_token(
+        _corporation.corporation.corporation_id,
+        _req_scopes,
+        _req_roles
+    )
+
+    locations = providers.esi.client.Assets.post_corporations_corporation_id_assets_locations(
+        corporation_id=_corporation.corporation.corporation_id,
+        item_ids=list(
+            assets.values_list("item_id", flat=True)
+        ),
+        token=_token.valid_access_token()
+    ).result()
+
+    logger.info(locations)
+
+    new_coords = {}
+    for loc in locations:
+        new_coords[loc['item_id']] = loc["position"]
+
+    new_models = []
+    for a in assets:
+        if a.item_id in new_coords:
+            new_models.append(
+                AssetCoordiante(
+                    item=a,
+                    x=new_coords[a.item_id]['x'],
+                    y=new_coords[a.item_id]['y'],
+                    z=new_coords[a.item_id]['z']
+                )
+            )
+            logger.info(
+                f"CT: COORD - {a.type_name.name} {new_coords[a.item_id]}")
+    AssetCoordiante.objects.bulk_create(new_models, ignore_conflicts=True)
+
+
+@shared_task(bind=True, base=QueueOnce)
+def fetch_starbases(self, corp_id):
+    _corporation = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+
+    logger.info(
+        f"CT: Starting Starbases for {_corporation.corporation.corporation_name}")
+
+    _req_scopes = ['esi-corporations.read_starbases.v1']
+    _req_roles = ['Director']
+    _token = get_corp_token(
+        _corporation.corporation.corporation_id,
+        _req_scopes,
+        _req_roles
+    )
+
+    starbases = providers.esi.client.Corporation.get_corporations_corporation_id_starbases(
+        corporation_id=_corporation.corporation.corporation_id,
+        token=_token.valid_access_token()
+    ).result()
+
+    logger.info(f"CT: STARBASES {starbases}")
+
+    ids = []
+    for sb in starbases:
+        ids.append(sb['starbase_id'])
+
+    for id in ids:
+        get_local_assets(id)
+
+
+def get_local_assets(item_id):
+    from django.db.models import F
+    from django.db.models.functions import Power, Sqrt
+
+    from corptools.models import CorpAsset
+
+    parent = CorpAsset.objects.filter(
+        item_id=item_id
+    ).first()
+
+    logger.warning(f"Tower - {parent.type_name.name}")
+    distances = CorpAsset.objects.filter(
+        coordinate__isnull=False
+    ).annotate(
+        distance=Sqrt(
+            Power(
+                parent.coordinate.x - F("coordinate__x"),
+                2
+            ) + Power(
+                parent.coordinate.y - F("coordinate__y"),
+                2
+            ) + Power(
+                parent.coordinate.z - F("coordinate__z"),
+                2
+            )
+        )
+    ).filter(
+        distance__lte=100000
+    )
+
+    for d in distances:
+        logger.info(f"      - {d.type_name.name} @ {d.distance/1000:,.2f}Km")

@@ -324,6 +324,7 @@ _corp_scopes_structures = [
     'esi-planets.read_customs_offices.v1',
     'esi-corporations.read_starbases.v1',
     'esi-corporations.read_structures.v1',
+    'esi-corporations.read_starbases.v1',
 ]
 
 # moons

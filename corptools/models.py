@@ -697,6 +697,18 @@ class CharacterAsset(Asset):
         return '{2} {0}x{1} ({3} / {4})'.format(self.type_id, self.quantity, self.character,
                                                 self.location_id, self.location_type)
 
+
+class AssetCoordiante(models.Model):
+    item = models.OneToOneField(
+        CorpAsset,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        related_name="coordinate"
+    )
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
+
 # ************************ Character Models
 # Character Skill
 
