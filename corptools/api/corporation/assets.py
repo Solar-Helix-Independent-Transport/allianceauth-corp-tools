@@ -4,6 +4,7 @@ from typing import List
 from ninja import NinjaAPI
 
 from django.db.models import F, Q, Sum
+from django.db.models.functions import Length
 
 from allianceauth.services.hooks import get_extension_logger
 
@@ -23,7 +24,7 @@ class AssetsApiEndpoints:
             response={200: List[schema.ValueLabel], 403: schema.Message},
             tags=self.tags
         )
-        def get_corporation_asset_locations(request, corporation_id: int):
+        def get_corporation_asset_locations(request, corporation_id: int, top_level_only: bool = True):
             perms = (
                 request.user.has_perm('corptools.own_corp_manager')
                 | request.user.has_perm('corptools.alliance_corp_manager')
@@ -37,11 +38,14 @@ class AssetsApiEndpoints:
                     f"Permission Denied for {request.user} to view wallets!")
                 return 403, "Permission Denied!"
 
-            asset_locs = models.CorpAsset.get_visible(request.user).filter(corporation__corporation__corporation_id=corporation_id,
-                                                                           location_name__isnull=False).values_list('location_name').distinct()
+            asset_locs = models.CorpAsset.get_visible(request.user).filter(
+                corporation__corporation__corporation_id=corporation_id,
+                location_name__isnull=False).values_list('location_name').distinct()
             asset_locs = models.EveLocation.objects.filter(
-                location_id__in=asset_locs).order_by('location_name')
-
+                location_id__in=asset_locs,
+            ).order_by('location_name')
+            if top_level_only:
+                asset_locs = asset_locs.filter(managed=False)
             asset_locations = [{"label": "Everywhere", "value": 0},
                                {"label": "AssetSafety", "value": 2004}, ]
             for loc in asset_locs:
@@ -117,7 +121,8 @@ class AssetsApiEndpoints:
                         "location": {
                             "id": a.location_id,
                             "name": loc
-                        }
+                        },
+
                     })
 
                 return output

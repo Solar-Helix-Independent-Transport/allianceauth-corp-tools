@@ -104,10 +104,10 @@ export const CharacterGlancesFactions = () => {
   return <Factions {...{ data }} />;
 };
 
-export const CorporationGlancesFactions = () => {
+export const CorporationGlancesFactions = ({ corporationID = 0 }) => {
   const { data } = useQuery({
-    queryKey: ["glances", "corp", "faction", 0],
-    queryFn: () => loadCorpGlanceFactionData(0),
+    queryKey: ["glances", "corp", "faction", corporationID],
+    queryFn: () => loadCorpGlanceFactionData(corporationID),
     refetchOnWindowFocus: false,
   });
   return <Factions {...{ data }} />;

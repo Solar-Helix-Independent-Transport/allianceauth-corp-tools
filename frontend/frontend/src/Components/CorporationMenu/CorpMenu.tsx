@@ -42,12 +42,12 @@ const CorpMenu = (props: CorpMenuProps) => {
           </NavDropdown.Item>
         </Nav.Item>
         <Nav.Item as={"li"}>
-          <NavDropdown.Item as={Link} to={`/audit/r_beta/corp/fuel`} key="bridges">
+          <NavDropdown.Item as={Link} to={`/audit/corp/dashboard/fuel`} key="fuel">
             {t("Fuel")}
           </NavDropdown.Item>
         </Nav.Item>
         <Nav.Item as={"li"}>
-          <NavDropdown.Item as={Link} to={`/audit/r_beta/corp/metenox`} key="bridges">
+          <NavDropdown.Item as={Link} to={`/audit/corp/dashboard/metenox`} key="metenox">
             {t("Metenox")}
           </NavDropdown.Item>
         </Nav.Item>
@@ -56,6 +56,11 @@ const CorpMenu = (props: CorpMenuProps) => {
             {t("Pocos")}
           </NavDropdown.Item>
         </Nav.Item>
+        {/* <Nav.Item as={"li"}>
+          <NavDropdown.Item as={Link} to={`/audit/r_beta/corp/pos`} key="pocos">
+            {t("POSs")}
+          </NavDropdown.Item>
+        </Nav.Item> */}
       </NavDropdown>
       <Nav.Item as={"li"}>
         <Nav.Link as={Link} to={`/audit/r_beta/corp/wallets`} key="Wallets">
@@ -74,27 +79,12 @@ const CorpMenu = (props: CorpMenuProps) => {
           </NavDropdown.Item>
         </Nav.Item>
       </NavDropdown>
-      <Nav.Item as={"li"}>
+      {/* SOV is dead in ESI ATM... */}
+      {/* <Nav.Item as={"li"}>
         <Nav.Link as={Link} to={`/audit/r_beta/corp/sov`} key="bridges">
           {t("Sov")}
         </Nav.Link>
-      </Nav.Item>
-      {/* {data &&
-        data.map((cat: CategoryProps) => {
-          return (
-            <NavDropdown id={cat.name} title={cat.name} key={cat.name}>
-              {cat.links.map((link: MenuItemProps) => {
-                return (
-                  <LinkContainer to={`/audit/r/${characterID}/${link.link}`}>
-                    <NavDropdown.Item id={link.name} key={link.name}>
-                      {link.name}
-                    </NavDropdown.Item>
-                  </LinkContainer>
-                );
-              })}
-            </NavDropdown>
-          );
-        })} */}
+      </Nav.Item> */}
     </>
   );
 };

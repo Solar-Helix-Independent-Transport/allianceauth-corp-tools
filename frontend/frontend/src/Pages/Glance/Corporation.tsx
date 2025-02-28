@@ -7,18 +7,18 @@ import Unknowns from "../../assets/unknown_64.png";
 import styles from "./AtAGlance.module.css";
 import { useQuery } from "react-query";
 
-export const CorporationGlancesInfo = () => {
+export const CorporationGlancesInfo = ({ corporationID = 0 }) => {
   const { t } = useTranslation();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["glances", "corporation", "status", 0],
-    queryFn: () => loadCorpGlanceStatusData(0),
+    queryKey: ["glances", "corporation", "status", corporationID],
+    queryFn: () => loadCorpGlanceStatusData(corporationID),
     refetchOnWindowFocus: false,
   });
 
   return (
     <>
-      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>"{t("Corporation Members")}"</h3>
+      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Corporation Members")}</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <IconStatusCard
           cardVariant={data?.characters?.liquid < 1000000 ? "warning" : undefined}

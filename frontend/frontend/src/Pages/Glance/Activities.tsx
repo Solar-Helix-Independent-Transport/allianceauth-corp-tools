@@ -178,10 +178,10 @@ export const CharacterGlancesActivities = () => {
   return <Activities data={data} />;
 };
 
-export const CorporationGlancesActivities = () => {
+export const CorporationGlancesActivities = ({ corporationID = 0 }) => {
   const { data } = useQuery({
-    queryKey: ["glances", "corp", "activities", 0],
-    queryFn: () => loadCorpGlanceActivityData(0),
+    queryKey: ["glances", "corp", "activities", corporationID],
+    queryFn: () => loadCorpGlanceActivityData(corporationID),
     refetchOnWindowFocus: false,
   });
 

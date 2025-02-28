@@ -9,9 +9,7 @@ const CharacterAudit = () => {
       <CorpMenuPortal />
       <CorpMenuRight />
       <Col>
-        <Card className="mt-4">
-          <Outlet /> {/* Render the Children here */}
-        </Card>
+        <Outlet /> {/* Render the Children here */}
       </Col>
     </>
   );

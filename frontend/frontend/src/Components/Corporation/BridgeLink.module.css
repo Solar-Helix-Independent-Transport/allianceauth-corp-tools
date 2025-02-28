@@ -1,0 +1,54 @@
+.start {
+  border-right: 3px dotted;
+  padding: 15px;
+  margin: 5px;
+  width: 325px;
+  text-align: right;
+}
+
+@media only screen and (max-width: 1250px) {
+  .start {
+    width: 100%;
+    border-left: 3px dotted;
+    border-right: none;
+    text-align: left;
+  }
+}
+
+.end {
+  border-left: 3px dotted;
+  padding: 15px;
+  margin: 5px;
+  width: 325px;
+  text-align: left;
+}
+
+@media only screen and (max-width: 1250px) {
+  .end {
+    width: 100%;
+    border-right: 3px dotted;
+    border-left: none;
+    text-align: right;
+  }
+}
+
+.gate-active {
+  border-color: aqua !important;
+}
+
+.gate-inactive {
+  border-color: red !important;
+}
+
+.gate-unknown {
+  border-color: orange !important;
+}
+
+.link-line {
+  border-top: 2px dashed grey;
+  margin: 0px 20px 0px 20px;
+}
+
+.bridge-div {
+  margin: 15px;
+}

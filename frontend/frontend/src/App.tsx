@@ -34,6 +34,10 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import CharacterWalletActivity from "./Pages/Char/WalletActivity";
 import CharacterMiningLedger from "./Pages/Char/MiningLedger";
 import { ErrorLoader } from "./Components/Loaders/loaders";
+import Bridges from "./Pages/Corp/Bridges";
+import CorporationAssetGroups from "./Pages/Corp/AssetsGroups";
+import CorporationAssets from "./Pages/Corp/AssetsList";
+import CorporationWallets from "./Pages/Corp/Wallet";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -117,30 +121,9 @@ function App() {
               />
               <Route path="glance" element={<CorporationAtAGlance />} />
               <Route path="structures" element={<Structures />} />
-              <Route
-                path="wallets"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is wallets.</Card.Body>
-                  </Card>
-                }
-              />
-              <Route
-                path="assetgroup"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is assetgroup.</Card.Body>
-                  </Card>
-                }
-              />
-              <Route
-                path="assetlist"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is assetlist.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="wallets" element={<CorporationWallets />} />
+              <Route path="assetgroup" element={<CorporationAssetGroups />} />
+              <Route path="assetlist" element={<CorporationAssets />} />
               <Route
                 path="pocos"
                 element={
@@ -150,14 +133,16 @@ function App() {
                 }
               />
               <Route
-                path="bridges"
+                path="pos"
                 element={
                   <Card>
-                    <Card.Body className="text-center">This is bridges.</Card.Body>
+                    <Card.Body className="text-center">This is POSs.</Card.Body>
                   </Card>
                 }
               />
-              <Route
+              <Route path="bridges" element={<Bridges />} />
+              {/* <Route path="fuel" element={<Bridges />} /> */}
+              {/* <Route
                 path="bridges"
                 element={
                   <Card>
@@ -172,7 +157,7 @@ function App() {
                     <Card.Body className="text-center">This is sov.</Card.Body>
                   </Card>
                 }
-              />
+              /> */}
               <Route
                 path="*"
                 element={

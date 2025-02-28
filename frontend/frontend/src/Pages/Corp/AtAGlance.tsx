@@ -1,27 +1,38 @@
+import { useTranslation } from "react-i18next";
 import { CorporationGlancesActivities } from "../Glance/Activities";
 import { CorporationGlancesAssets } from "../Glance/Assets";
 import { CorporationGlancesInfo } from "../Glance/Corporation";
 import { CorporationGlancesFactions } from "../Glance/Factions";
+import { useState } from "react";
+import CorpSelect from "../../Components/Corporation/CorporationSelect";
+import { CorpLoader } from "../../Components/Loaders/loaders";
 
 const CorporationAtAGlance = () => {
-  return (
-    <div className="d-flex flex-column align-items-center">
-      {/* <CharacterAllegiancePortrait
-        character={{
-          character_id: characterID,
-          corporation_id: 1,
-          alliance_id: 1,
-        }}
-        size={256}
-        rounded_images={true}
-      /> */}
-      <CorporationGlancesInfo />
-      <CorporationGlancesActivities />
-      <CorporationGlancesAssets />
-      <CorporationGlancesFactions />
+  const { t } = useTranslation();
 
-      {/* <h3 className={`${styles.strikeOut} mt-4 w-100 text-center`}>Character Status</h3> */}
-    </div>
+  const [corporationID, setCorporation] = useState<number>(0);
+
+  return (
+    <>
+      <div className="m-3 d-flex align-items-center my-1">
+        <h6 className="me-1">{t("Corporation Selection")}</h6>
+        <div className="flex-grow-1">
+          <CorpSelect {...{ setCorporation }} />
+        </div>
+      </div>
+      <div className="d-flex flex-column align-items-center w-100">
+        {corporationID > 0 ? (
+          <>
+            <CorporationGlancesInfo {...{ corporationID }} />
+            <CorporationGlancesActivities {...{ corporationID }} />
+            <CorporationGlancesAssets {...{ corporationID }} />
+            <CorporationGlancesFactions {...{ corporationID }} />
+          </>
+        ) : (
+          <CorpLoader />
+        )}
+      </div>
+    </>
   );
 };
 
