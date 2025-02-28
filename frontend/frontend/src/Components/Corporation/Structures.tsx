@@ -22,6 +22,8 @@ type StructureType = {
   owner: Corporation;
   type: BaseItemType;
   location: BaseItemType;
+  constellation: BaseItemType;
+  region: BaseItemType;
   name: string;
   state: string;
   fuel_expiry: string;
@@ -37,33 +39,35 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
     columnHelper.accessor("location.name", {
       header: t("System"),
     }),
+    columnHelper.accessor("constellation.name", {
+      header: t("Constellation"),
+    }),
+    columnHelper.accessor("region.name", {
+      header: t("Region"),
+    }),
     columnHelper.accessor("name", {
       header: t("Structure"),
     }),
-    columnHelper.accessor("type.id", {
-      header: "",
-      enableColumnFilter: false,
-      enableSorting: false,
-      cell: (props) =>
-        props.getValue() ? <TypeIcon type_id={props.getValue()} size={32}></TypeIcon> : <></>,
-    }),
-
     columnHelper.accessor("type.name", {
       header: t("Type"),
-    }),
-    columnHelper.accessor("owner.corporation_id", {
-      header: "",
-      enableColumnFilter: false,
-      enableSorting: false,
-      cell: (props) =>
-        props.getValue() ? (
-          <CorporationLogo corporation_id={props.getValue()} size={32}></CorporationLogo>
-        ) : (
-          <></>
-        ),
+      cell: (cell) => (
+        <>
+          <TypeIcon type_id={cell.row.original.type.id} size={32}></TypeIcon>,
+          <span className="ms-2">{cell.row.original.type.name}</span>
+        </>
+      ),
     }),
     columnHelper.accessor("owner.corporation_name", {
       header: t("Owner"),
+      cell: (cell) => (
+        <>
+          <CorporationLogo
+            corporation_id={cell.row.original.owner.corporation_id}
+            size={32}
+          ></CorporationLogo>
+          <span className="ms-2">{cell.row.original.owner.corporation_name}</span>
+        </>
+      ),
     }),
     columnHelper.accessor("fuel_expiry", {
       header: t("Fuel Expiry"),

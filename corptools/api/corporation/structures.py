@@ -57,6 +57,10 @@ class StructureApiEndpoints:
                     "services": _ss,
                     "location": {"id": s.system_name.system_id,
                                  "name": s.system_name.name},
+                    "constellation": {"id": s.system_name.constellation.constellation_id,
+                                      "name": s.system_name.constellation.name},
+                    "region": {"id": s.system_name.constellation.region.region_id,
+                               "name": s.system_name.constellation.region.name},
                     "fuel_expiry": s.fuel_expires,
                     "state": s.state,
                     "state_expiry": s.state_timer_end
