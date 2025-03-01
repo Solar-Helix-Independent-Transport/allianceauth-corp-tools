@@ -38,12 +38,31 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
   const columns = [
     columnHelper.accessor("location.name", {
       header: t("System"),
+      cell: (cell) => (
+        <a href={`https://evemaps.dotlan.net/system/${cell.getValue().replace(" ", "_")}`}>
+          {cell.getValue()}
+        </a>
+      ),
     }),
     columnHelper.accessor("constellation.name", {
       header: t("Constellation"),
+      cell: (cell) => (
+        <a
+          href={`https://evemaps.dotlan.net/map/${cell.row.original.region.name.replace(" ", "_")}/${cell.getValue().replace(" ", "_")}`}
+        >
+          {cell.getValue()}
+        </a>
+      ),
     }),
     columnHelper.accessor("region.name", {
       header: t("Region"),
+      cell: (cell) => (
+        <a
+          href={`https://evemaps.dotlan.net/map/${cell.row.original.region.name.replace(" ", "_")}`}
+        >
+          {cell.getValue()}
+        </a>
+      ),
     }),
     columnHelper.accessor("name", {
       header: t("Structure"),

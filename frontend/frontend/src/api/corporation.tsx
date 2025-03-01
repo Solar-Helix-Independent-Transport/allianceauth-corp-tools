@@ -61,6 +61,12 @@ export async function loadAllStructures() {
   return api.data;
 }
 
+export async function loadAllPocos() {
+  const api = await axios.get(`/audit/api/corp/pocos`);
+  console.log(`get pocos in api 1`);
+  return api.data;
+}
+
 export async function loadBridges() {
   const api = await axios.get(`/audit/api/dashboard/gates`);
   console.log(`get bridges in api`);

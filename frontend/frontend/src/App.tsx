@@ -38,6 +38,7 @@ import Bridges from "./Pages/Corp/Bridges";
 import CorporationAssetGroups from "./Pages/Corp/AssetsGroups";
 import CorporationAssets from "./Pages/Corp/AssetsList";
 import CorporationWallets from "./Pages/Corp/Wallet";
+import CorporationPocos from "./Pages/Corp/Pocos";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -124,14 +125,7 @@ function App() {
               <Route path="wallets" element={<CorporationWallets />} />
               <Route path="assetgroup" element={<CorporationAssetGroups />} />
               <Route path="assetlist" element={<CorporationAssets />} />
-              <Route
-                path="pocos"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is pocos.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="pocos" element={<CorporationPocos />} />
               <Route
                 path="pos"
                 element={

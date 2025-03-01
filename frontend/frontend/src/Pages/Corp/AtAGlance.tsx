@@ -29,7 +29,7 @@ const CorporationAtAGlance = () => {
             <CorporationGlancesFactions {...{ corporationID }} />
           </>
         ) : (
-          <CorpLoader />
+          <CorpLoader title={t("Select Corporation")} />
         )}
       </div>
     </>
