@@ -46,7 +46,7 @@ export const ErrorLoader = (props: LoaderProps = { title: "Error Loading Compone
   );
 };
 
-export const CorpLoader = () => {
+export const CorpLoader = (props: LoaderProps = { title: "Select Corporation" }) => {
   return (
     <div className={styles.flexContainer}>
       <div className="text-center">
@@ -65,7 +65,8 @@ export const CorpLoader = () => {
             />
           </svg>
         </div>
-        <h3 className="text-margin">Please Select Corporation</h3>
+        <h3>{props.title && props.title}</h3>
+        <p>{props.message && props.message}</p>
       </div>
     </div>
   );

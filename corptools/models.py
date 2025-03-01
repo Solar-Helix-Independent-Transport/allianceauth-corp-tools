@@ -862,6 +862,15 @@ class CorporationWalletDivision(models.Model):
     balance = models.DecimalField(max_digits=20, decimal_places=2)
     division = models.IntegerField()
 
+    @classmethod
+    def get_visible(cls, user):
+        corps_vis = CorporationAudit.objects.visible_to(user)
+        if user.has_perm("corptools.holding_corp_wallets"):
+            corps_holding = CorptoolsConfiguration.get_solo().holding_corp_qs()
+            corps_vis = corps_vis | corps_holding
+
+        return cls.objects.filter(corporation__in=corps_vis)
+
 
 class CorporationWalletJournalEntry(WalletJournalEntry):
     division = models.ForeignKey(

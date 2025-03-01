@@ -98,3 +98,39 @@ class FinancesApiEndpoints:
                     })
 
             return output
+
+        @api.get(
+            "corporation/{corporation_id}/divisions",
+            response={200: List, 403: str},
+            tags=self.tags
+        )
+        def get_corporation_divisions(request, corporation_id: int, type_refs: str = "", page: int = 1):
+            perms = (
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_wallets')
+            )
+
+            if not perms:
+                logging.error(
+                    f"Permission Denied for {request.user} to view wallets!")
+                return 403, "Permission Denied!"
+
+            wallet_divisions = models.CorporationWalletDivision.get_visible(
+                request.user
+            ).filter(
+                corporation__corporation__corporation_id=corporation_id
+            ).order_by("division")
+
+            output = []
+            for w in wallet_divisions:
+                output.append(
+                    {
+                        "division": f"{w.division}",
+                        "name": f"{w.name}",
+                        "balance": w.balance,
+                    })
+
+            return output

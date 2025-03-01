@@ -5,6 +5,7 @@ import RefTypeSelect from "../../Components/Corporation/RefTypeSelect";
 import CorporationWalletTable from "../../Components/Corporation/WalletTable";
 import { CorpLoader } from "../../Components/Loaders/loaders";
 import { Card } from "react-bootstrap";
+import CorpDivisions from "../../Components/Corporation/Divisions";
 
 const CorporationWallets = () => {
   const { t } = useTranslation();
@@ -21,23 +22,28 @@ const CorporationWallets = () => {
 
   return (
     <>
-      <Card>
-        <div className="m-3 d-flex align-items-center my-1">
-          <h6 className="me-1">{t("Corporation Filter")}</h6>
-          <div className="flex-grow-1">
-            <CorpSelect {...{ setCorporation }} />
-          </div>
+      <div className="m-3 d-flex align-items-center my-1">
+        <h6 className="me-1">{t("Corporation Filter")}</h6>
+        <div className="flex-grow-1">
+          <CorpSelect {...{ setCorporation }} />
         </div>
-        <Card.Body className="text-center">This where the division balances will go</Card.Body>
-      </Card>
+      </div>
       <div className="m-3 d-flex align-items-center my-1">
         <h6 className="me-1">{t("Ref Type Filter")}</h6>
         <div className="flex-grow-1">
           <RefTypeSelect setFilter={RefsToState} />
         </div>
       </div>
-      {corporationID && refTypes !== "" ? (
-        <CorporationWalletTable {...{ corporationID, refTypes }} />
+      <div className="d-flex flex-column align-items-center my-1">
+        <h5>{t("Division Balances")}</h5>
+        <CorpDivisions corporationID={corporationID} />
+      </div>
+      {corporationID ? (
+        refTypes == "" ? (
+          <CorpLoader title={t("Select Ref Types")} />
+        ) : (
+          <CorporationWalletTable {...{ corporationID, refTypes }} />
+        )
       ) : (
         <CorpLoader />
       )}

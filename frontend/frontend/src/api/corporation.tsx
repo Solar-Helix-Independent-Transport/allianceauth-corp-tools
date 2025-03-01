@@ -113,6 +113,12 @@ export async function loadWallet(corporation_id: number, refType = "", page = 1)
   return api.data;
 }
 
+export async function loadDivisions(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/divisions`);
+  console.log(`get divisions in api ${corporation_id}`);
+  return api.data;
+}
+
 export async function loadRefTypes() {
   const api = await axios.get(`/audit/api/corporation/wallettypes`);
   console.log(`get wallet types in api`);
