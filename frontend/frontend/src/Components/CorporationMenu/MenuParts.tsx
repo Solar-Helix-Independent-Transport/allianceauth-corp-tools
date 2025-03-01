@@ -13,7 +13,13 @@ export const MenuDropdown = ({ cat }: any) => {
       {cat.links?.map((link: any) => {
         return (
           <Nav.Item as="li">
-            <DropdownMenuItem link={link} />
+            {link.link.startsWith("/") ? (
+              <NavDropdown.Item id={link.name} key={link.name} href={link.link}>
+                <>{link.name}</>
+              </NavDropdown.Item>
+            ) : (
+              <DropdownMenuItem link={link} />
+            )}
           </Nav.Item>
         );
       })}
