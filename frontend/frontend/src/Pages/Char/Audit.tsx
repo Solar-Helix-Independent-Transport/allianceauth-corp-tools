@@ -3,6 +3,7 @@ import { CharMenuAsync } from "../../Components/CharacterMenu/CharacterMenuAsync
 import { CharMenuRight } from "../../Components/CharacterMenu/CharacterMenuRight";
 import { Col } from "react-bootstrap";
 import { Outlet } from "react-router-dom";
+import ErrorBoundary from "../../Components/Helpers/ErrorBoundary";
 
 const CharacterAudit = () => {
   return (
@@ -12,7 +13,9 @@ const CharacterAudit = () => {
       <CharHeader />
       <Col>
         <div className="mt-4">
-          <Outlet /> {/* Render the Children here */}
+          <ErrorBoundary>
+            <Outlet /> {/* Render the Children here */}
+          </ErrorBoundary>
         </div>
       </Col>
     </>

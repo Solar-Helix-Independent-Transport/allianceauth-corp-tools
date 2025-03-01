@@ -4,7 +4,6 @@ import CorpSelect from "../../Components/Corporation/CorporationSelect";
 import RefTypeSelect from "../../Components/Corporation/RefTypeSelect";
 import CorporationWalletTable from "../../Components/Corporation/WalletTable";
 import { CorpLoader } from "../../Components/Loaders/loaders";
-import { Card } from "react-bootstrap";
 import CorpDivisions from "../../Components/Corporation/Divisions";
 
 const CorporationWallets = () => {

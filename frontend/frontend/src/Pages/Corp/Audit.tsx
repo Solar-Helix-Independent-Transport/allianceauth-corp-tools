@@ -1,7 +1,8 @@
 import { CorpMenuPortal } from "../../Components/CorporationMenu/CorpMenuPortal";
 import { CorpMenuRight } from "../../Components/CorporationMenu/CorpMenuRight";
-import { Card, Col } from "react-bootstrap";
+import { Col } from "react-bootstrap";
 import { Outlet } from "react-router-dom";
+import ErrorBoundary from "../../Components/Helpers/ErrorBoundary";
 
 const CharacterAudit = () => {
   return (
@@ -9,7 +10,9 @@ const CharacterAudit = () => {
       <CorpMenuPortal />
       <CorpMenuRight />
       <Col>
-        <Outlet /> {/* Render the Children here */}
+        <ErrorBoundary>
+          <Outlet /> {/* Render the Children here */}
+        </ErrorBoundary>
       </Col>
     </>
   );
