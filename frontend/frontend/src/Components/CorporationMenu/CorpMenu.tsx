@@ -75,6 +75,10 @@ const CorpMenu = (props: CorpMenuProps) => {
           name: t("Metenox"),
           link: `/audit/corp/dashboard/metenox`,
         },
+        {
+          name: t("Bridges"),
+          link: `bridges`,
+        },
       ],
     },
   ];
