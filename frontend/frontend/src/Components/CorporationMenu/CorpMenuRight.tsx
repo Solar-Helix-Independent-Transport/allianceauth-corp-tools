@@ -5,7 +5,6 @@ import { Nav } from "react-bootstrap";
 import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useIsFetching } from "react-query";
-import { Link } from "react-router-dom";
 import { MenuItem } from "./MenuParts";
 
 const menuRoot = document.getElementById("nav-right");

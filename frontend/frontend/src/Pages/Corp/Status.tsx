@@ -4,7 +4,6 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "react-query";
 import { loadStatus } from "../../api/corporation";
 import { CorporationLogo } from "../../Components/EveImages/EveImages";
-import React from "react";
 import ReactTimeAgo from "react-time-ago";
 
 const CorporationStatus = () => {
