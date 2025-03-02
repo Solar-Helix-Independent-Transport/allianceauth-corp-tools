@@ -8,5 +8,5 @@
     "strict": true,
     "plugins": [{ "name": "typescript-plugin-css-modules" }]
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts", "vite.config.settings.ts"]
 }
