@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from ninja import NinjaAPI
 
 from django.db.models import F, Q, Sum
+from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from allianceauth.services.hooks import get_extension_logger
@@ -15,6 +18,14 @@ from corptools.api.helpers import (
 )
 
 logger = get_extension_logger(__name__)
+
+
+def check_permisions(corp_id, user):
+    corps_vis = models.CorporationAudit.objects.visible_to(user)
+    if user.has_perm("corptools.holding_corp_structures"):
+        corps_holding = models.CorptoolsConfiguration.get_solo().holding_corp_qs()
+        corps_vis = corps_vis | corps_holding
+    return corps_vis.filter(corporation__corporation_id=corp_id).exists()
 
 
 class CorpGlanceApiEndpoints:
@@ -33,7 +44,7 @@ class CorpGlanceApiEndpoints:
 
             characters = get_corporation_characters(request, corporation_id)
 
-            if not characters.count():
+            if not characters.count() or not check_permisions(corporation_id, request.user):
                 return 403, _("Permission Denied")
 
             ship_cat = [6]
@@ -150,7 +161,7 @@ class CorpGlanceApiEndpoints:
 
             characters = get_corporation_characters(request, corporation_id)
 
-            if not characters.count():
+            if not characters.count() or not check_permisions(corporation_id, request.user):
                 return 403, _("Permission Denied")
 
             output = {}
@@ -184,7 +195,7 @@ class CorpGlanceApiEndpoints:
 
             characters = get_corporation_characters(request, corporation_id)
 
-            if not characters.count():
+            if not characters.count() or not check_permisions(corporation_id, request.user):
                 return 403, _("Permission Denied")
 
             output = {
