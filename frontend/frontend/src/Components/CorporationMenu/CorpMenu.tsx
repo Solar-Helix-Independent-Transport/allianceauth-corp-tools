@@ -81,7 +81,7 @@ const CorpMenu = () => {
           <MenuDropdown {...{ cat }} />
         ) : (
           <>
-            {cat.link.startsWith("/") ? (
+            {cat?.link?.startsWith("/") ? (
               <Nav.Item as="li">
                 <Nav.Link id={cat.name} key={cat.name} href={cat.link}>
                   <>{cat.name}</>

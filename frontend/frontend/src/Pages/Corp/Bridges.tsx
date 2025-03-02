@@ -1,7 +1,7 @@
 import { loadBridges } from "../../api/corporation";
 import { useQuery } from "react-query";
 import { PanelLoader } from "../../Components/Loaders/loaders";
-import { Badge, Card } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import { BridgeLink } from "../../Components/Corporation/BridgeLink";
 import { BridgeHeader } from "../../Components/Corporation/BridgeHeader";
 
