@@ -10,6 +10,7 @@ help:
 	@echo "  deploy     Configure the PyPi config file in CI"
 	@echo "  package    Build the Project"
 	@echo "  transkate  Build/update the translation files"
+	@echo "  devjs      Dev server for the JS project"
 
 clean:
 	rm -rf dist/*
@@ -43,3 +44,6 @@ package:
 translate:
 	django-admin makemessages -l en
 	cd frontend/frontend/;yarn buildTranslations
+
+devjs:
+	cd frontend/frontend/;yarn install;yarn dev
