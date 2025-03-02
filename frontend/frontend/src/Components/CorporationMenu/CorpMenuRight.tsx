@@ -6,6 +6,7 @@ import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useIsFetching } from "react-query";
 import { Link } from "react-router-dom";
+import { MenuItem } from "./MenuParts";
 
 const menuRoot = document.getElementById("nav-right");
 
@@ -40,12 +41,15 @@ const CorpMenuRight = () => {
         <></>
       )}
       <CorpAddToken />
-      <Nav.Link as={Link} to={`corporations`} key="corporation_list">
-        {t("Corporations")}
-      </Nav.Link>
-      <Nav.Link as={Link} to={`audit/r/0`} key="corporation_list">
+      <MenuItem
+        link={{
+          link: `corporations`,
+          name: t("Corporations"),
+        }}
+      />
+      {/* <Nav.Link as={Link} to={`audit/r/0`} key="corporation_list">
         <i className="fa-solid fa-users"></i>
-      </Nav.Link>
+      </Nav.Link> */}
     </>,
     menuRoot,
   );

@@ -15,7 +15,10 @@ const colourStyles = {
 };
 
 const CorpSelect = ({ setCorporation }: { setCorporation: any }) => {
-  const { isLoading, data } = useQuery(["corp-status"], () => loadStatus());
+  const { isLoading, data } = useQuery({
+    queryKey: ["corp-status"],
+    queryFn: () => loadStatus(),
+  });
   let options = [];
   if (!isLoading) {
     options = data?.corps.map((corp: any) => {

@@ -1,16 +1,16 @@
-import { postCorporationRefresh } from "../../api/corporation";
+// import { postCorporationRefresh } from "../../api/corporation";
 import Button from "react-bootstrap/Button";
 // import { Checkbox, FormControl, Glyphicon, NavDropdown, NavItem } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
-import Nav from "react-bootstrap/Nav";
+// import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { useTranslation } from "react-i18next";
-import { useMutation } from "react-query";
+// import { useMutation } from "react-query";
 
 function CorpAddToken() {
   const { t } = useTranslation();
 
-  const { mutate } = useMutation(postCorporationRefresh);
+  // const { mutate } = useMutation(postCorporationRefresh);
 
   return (
     <>
@@ -92,9 +92,9 @@ function CorpAddToken() {
         </form>
         {/* </NavDropdown.Item> */}
       </NavDropdown>
-      <Nav.Link onClick={() => mutate()}>
+      {/* <Nav.Link onClick={() => mutate()}>
         <i className="fa fa-refresh" aria-hidden="true"></i>
-      </Nav.Link>
+      </Nav.Link> */}
     </>
   );
 }

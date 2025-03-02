@@ -39,6 +39,7 @@ import CorporationAssetGroups from "./Pages/Corp/AssetsGroups";
 import CorporationAssets from "./Pages/Corp/AssetsList";
 import CorporationWallets from "./Pages/Corp/Wallet";
 import CorporationPocos from "./Pages/Corp/Pocos";
+import CorporationStatus from "./Pages/Corp/Status";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -112,14 +113,7 @@ function App() {
             </Route>
             <Route path="audit/r_beta/corp/" element={<CorporationAudit />}>
               <Route index element={<Navigate to="glance" replace />} />
-              <Route
-                path="corporations"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is Corp List.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="corporations" element={<CorporationStatus />} />
               <Route path="glance" element={<CorporationAtAGlance />} />
               <Route path="structures" element={<Structures />} />
               <Route path="wallets" element={<CorporationWallets />} />
