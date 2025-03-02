@@ -18,7 +18,7 @@ import Card from "react-bootstrap/Card";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
-const Activities = ({ data }: any) => {
+const Activities = ({ data, isLoading }: any) => {
   const { t } = useTranslation();
 
   return (
@@ -33,6 +33,7 @@ const Activities = ({ data }: any) => {
             <IconStatusCard
               iconSrc={Sansha}
               cardVariant={data?.incursion ? "success" : undefined}
+              isLoading={isLoading}
               text={
                 data?.incursion &&
                 `+Ƶ${data?.incursion?.toLocaleString("en-US", {
@@ -46,6 +47,7 @@ const Activities = ({ data }: any) => {
             <IconStatusCard
               iconSrc={Triglavian}
               cardVariant={data?.pochven ? "success" : undefined}
+              isLoading={isLoading}
               text={
                 data?.pochven &&
                 `+Ƶ${data?.pochven?.toLocaleString("en-US", {
@@ -59,6 +61,7 @@ const Activities = ({ data }: any) => {
             <IconStatusCard
               iconSrc={NPC}
               cardVariant={data?.ratting ? "success" : undefined}
+              isLoading={isLoading}
               text={
                 data?.ratting &&
                 `+Ƶ${data?.ratting?.toLocaleString("en-US", {
@@ -72,6 +75,7 @@ const Activities = ({ data }: any) => {
             <IconStatusCard
               iconSrc={Missions}
               cardVariant={data?.mission ? "success" : undefined}
+              isLoading={isLoading}
               text={
                 data?.mission &&
                 `+Ƶ${data?.mission?.toLocaleString("en-US", {
@@ -89,9 +93,14 @@ const Activities = ({ data }: any) => {
             <Card.Title>{t("Economic")}</Card.Title>
           </Card.Header>
           <div className="d-flex flex-wrap justify-content-center">
-            <IconStatusCard iconSrc={Market} cardVariant={data?.market ? "success" : undefined} />
+            <IconStatusCard
+              isLoading={isLoading}
+              iconSrc={Market}
+              cardVariant={data?.market ? "success" : undefined}
+            />
             <IconStatusCard
               iconSrc={Industry}
+              isLoading={isLoading}
               cardVariant={data?.industry ? "success" : undefined}
               toolTipText={t("Industry activities such as manufacturing or reactions")}
             />
@@ -105,6 +114,7 @@ const Activities = ({ data }: any) => {
             <IconStatusCard
               iconSrc={Ice}
               cardVariant={data?.mining_ice ? "success" : undefined}
+              isLoading={isLoading}
               text={
                 data?.mining_ice &&
                 `${data?.mining_ice?.toLocaleString("en-US", {
@@ -118,6 +128,7 @@ const Activities = ({ data }: any) => {
             <IconStatusCard
               iconSrc={Asteroid}
               cardVariant={data?.mining_ore ? "success" : undefined}
+              isLoading={isLoading}
               text={
                 data?.mining_ore &&
                 `${data?.mining_ore?.toLocaleString("en-US", {
@@ -131,6 +142,7 @@ const Activities = ({ data }: any) => {
             <IconStatusCard
               iconSrc={Moons}
               cardVariant={data?.mining_moon ? "success" : undefined}
+              isLoading={isLoading}
               text={
                 data?.mining_moon &&
                 `${data?.mining_moon?.toLocaleString("en-US", {
@@ -144,6 +156,7 @@ const Activities = ({ data }: any) => {
             <IconStatusCard
               iconSrc={Gas}
               cardVariant={data?.mining_gas ? "success" : undefined}
+              isLoading={isLoading}
               text={
                 data?.mining_gas &&
                 `${data?.mining_gas?.toLocaleString("en-US", {
@@ -156,6 +169,7 @@ const Activities = ({ data }: any) => {
             />
             <IconStatusCard
               iconSrc={Planet}
+              isLoading={isLoading}
               cardVariant={data?.pi ? "success" : undefined}
               toolTipText={t("Planetary import/export seen in the last 30 Days")}
             />
@@ -169,21 +183,21 @@ const Activities = ({ data }: any) => {
 export const CharacterGlancesActivities = () => {
   const { characterID } = useParams();
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["glances", "activities", characterID],
     queryFn: () => loadGlanceActivityData(characterID ? Number(characterID) : 0),
     refetchOnWindowFocus: false,
   });
 
-  return <Activities data={data} />;
+  return <Activities {...{ data, isLoading }} />;
 };
 
 export const CorporationGlancesActivities = ({ corporationID = 0 }) => {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["glances", "corp", "activities", corporationID],
     queryFn: () => loadCorpGlanceActivityData(corporationID),
     refetchOnWindowFocus: false,
   });
 
-  return <Activities data={data} />;
+  return <Activities {...{ data, isLoading }} />;
 };
