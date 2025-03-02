@@ -1354,6 +1354,95 @@ class StructureService(models.Model):
     state = models.CharField(max_length=8, choices=_state_enum)
 
 
+# class Starbase(models.Model):
+#     corporation = models.ForeignKey(
+#         CorporationAudit,
+#         on_delete=models.CASCADE
+#     )
+#     starbase_id = models.BigIntegerField()
+
+#     onlined_since = models.DateTimeField(null=True, default=None)
+#     reinforced_until = models.DateTimeField(null=True, default=None)
+#     unanchor_at = models.DateTimeField(null=True, default=None)
+
+#     moon = models.ForeignKey(
+#         MapSystemMoon,
+#         on_delete=models.CASCADE,
+#         null=True,
+#         default=None
+#     )
+#     system = models.ForeignKey(
+#         MapSystem,
+#         on_delete=models.CASCADE,
+#         null=True,
+#         default=None
+#     )
+#     type_name = models.ForeignKey(
+#         EveItemType,
+#         on_delete=models.CASCADE,
+#         null=True,
+#         default=None
+#     )
+
+#     allow_alliance_members = models.BooleanField(default=False)
+#     allow_corporation_members = models.BooleanField(default=False)
+#     attack_if_at_war = models.BooleanField(default=False)
+#     attack_if_other_security_status_dropping = models.BooleanField(default=False)
+#     use_alliance_standings = models.BooleanField(default=False)
+
+#     attack_security_status_threshold = models.FloatField(null=True, default=None)
+#     attack_standing_threshold = models.FloatField(null=True, default=None)
+
+#     _state_enum = Choices('online', 'offline', 'onlining', 'reinforced', 'unanchoring')
+#     state = models.CharField(max_length=12, choices=_state_enum)
+
+#     _perm_enum = Choices(
+#         'alliance_member',
+#         'config_starbase_equipment_role',
+#         'corporation_member',
+#         'starbase_fuel_technician_role'
+#     )
+
+#     anchor = models.CharField(
+#         max_length=31,
+#         choices=_perm_enum,
+#         null=True,
+#         default=None
+#     )
+#     online = models.CharField(
+#         max_length=31,
+#         choices=_perm_enum,
+#         null=True,
+#         default=None
+#     )
+#     offline = models.CharField(
+#         max_length=31,
+#         choices=_perm_enum,
+#         null=True,
+#         default=None
+#     )
+#     unanchor = models.CharField(
+#         max_length=31,
+#         choices=_perm_enum,
+#         null=True,
+#         default=None
+#     )
+#     fuel_bay_take = models.CharField(
+#         max_length=31,
+#         choices=_perm_enum,
+#         null=True,
+#         default=None
+#     )
+#     fuel_bay_view = models.CharField(
+#         max_length=31,
+#         choices=_perm_enum,
+#         null=True,
+#         default=None
+#     )
+
+#     fuels = models.TextField(null=True, default="", blank=True)
+
+
 # Market History ( GMetrics )
 
 
