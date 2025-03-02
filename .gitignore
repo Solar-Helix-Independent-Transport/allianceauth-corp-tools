@@ -150,3 +150,5 @@ corptools/static/corptools/static/*
 # Building of translation packages are ignored
 
 corptools/static/i18n*
+
+frontend/frontend/vite.config.settings.ts
