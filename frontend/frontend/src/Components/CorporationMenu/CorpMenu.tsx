@@ -4,24 +4,19 @@ import { MenuDropdown, MenuItem } from "./MenuParts";
 
 export interface MenuItemProps {
   name: string;
-  link: string;
+  link?: string;
 }
 
 export interface CategoryProps {
   name: string;
-  links: Array<MenuItemProps>;
+  links?: Array<MenuItemProps>;
+  link?: string;
 }
 
-export interface CorpMenuProps extends Partial<HTMLElement> {
-  isLoading?: boolean;
-  data?: Array<CategoryProps> | null;
-  error?: boolean;
-}
-
-const CorpMenu = (props: CorpMenuProps) => {
+const CorpMenu = () => {
   const { t } = useTranslation();
 
-  const menuLinks = [
+  const menuLinks: Array<CategoryProps> = [
     {
       name: t("Overview"),
       link: `glance`,
@@ -32,10 +27,6 @@ const CorpMenu = (props: CorpMenuProps) => {
         {
           name: t("Structures"),
           link: `structures`,
-        },
-        {
-          name: t("Bridges"),
-          link: `bridges`,
         },
         {
           name: t("Pocos"),
@@ -83,7 +74,6 @@ const CorpMenu = (props: CorpMenuProps) => {
     },
   ];
 
-  console.log(props);
   return (
     <>
       {menuLinks.map((cat) => {

@@ -3,6 +3,7 @@ import { useQuery } from "react-query";
 import { PanelLoader } from "../../Components/Loaders/loaders";
 import { Badge, Card } from "react-bootstrap";
 import { BridgeLink } from "../../Components/Corporation/BridgeLink";
+import { BridgeHeader } from "../../Components/Corporation/BridgeHeader";
 
 const Bridges = () => {
   const { data, isFetching } = useQuery({
@@ -14,53 +15,8 @@ const Bridges = () => {
 
   return data.length > 0 ? (
     <>
-      <Card.Header>Jump Bridge Network</Card.Header>
       <Card.Body className="flex-container">
-        <div className="flex-container">
-          <p
-            className="gate-active"
-            style={{
-              margin: "15px",
-              borderBottom: "3px dotted",
-            }}
-          >
-            Gate Online
-          </p>
-          <p
-            className="gate-inactive"
-            style={{
-              margin: "15px",
-              borderBottom: "3px dotted",
-            }}
-          >
-            Gate Offline
-          </p>{" "}
-          <p
-            className="gate-unknown"
-            style={{
-              margin: "15px",
-              borderBottom: "3px dotted",
-            }}
-          >
-            Gate Unknown
-          </p>
-          <Badge
-            bg="info"
-            style={{
-              margin: "15px",
-            }}
-          >
-            Lo/Fuel Level Ok
-          </Badge>
-          <Badge
-            bg="danger"
-            style={{
-              margin: "15px",
-            }}
-          >
-            Lo/Fuel Level Low
-          </Badge>
-        </div>
+        <BridgeHeader />
 
         <hr className="col-xs-12" />
 

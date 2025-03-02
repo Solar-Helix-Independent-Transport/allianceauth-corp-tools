@@ -6,7 +6,7 @@
   text-align: right;
 }
 
-@media only screen and (max-width: 1250px) {
+@media only screen and (max-width: 900px) {
   .start {
     width: 100%;
     border-left: 3px dotted;
@@ -23,7 +23,7 @@
   text-align: left;
 }
 
-@media only screen and (max-width: 1250px) {
+@media only screen and (max-width: 900px) {
   .end {
     width: 100%;
     border-right: 3px dotted;
@@ -32,23 +32,23 @@
   }
 }
 
-.gate-active {
+.gateActive {
   border-color: aqua !important;
 }
 
-.gate-inactive {
+.gateInactive {
   border-color: red !important;
 }
 
-.gate-unknown {
+.gateUnknown {
   border-color: orange !important;
 }
 
-.link-line {
+.linkLine {
   border-top: 2px dashed grey;
   margin: 0px 20px 0px 20px;
 }
 
-.bridge-div {
+.bridgeDiv {
   margin: 15px;
 }
