@@ -1,51 +1,51 @@
 {
-  "_@app-libs-CplkXEOv.js": {
-    "file": "assets/@app-libs-CplkXEOv.js",
+  "_@app-libs-Cb_auZyT.js": {
+    "file": "assets/@app-libs-Cb_auZyT.js",
     "name": "@app-libs"
   },
-  "_@bootstrap-libs-SqYrk-r-.js": {
-    "file": "assets/@bootstrap-libs-SqYrk-r-.js",
+  "_@bootstrap-libs-DZc4rDL4.js": {
+    "file": "assets/@bootstrap-libs-DZc4rDL4.js",
     "name": "@bootstrap-libs",
     "imports": [
-      "_@app-libs-CplkXEOv.js"
+      "_@app-libs-Cb_auZyT.js"
     ]
   },
-  "_@lang-libs-BujMiMKP.js": {
-    "file": "assets/@lang-libs-BujMiMKP.js",
+  "_@lang-libs-Bb81l5PV.js": {
+    "file": "assets/@lang-libs-Bb81l5PV.js",
     "name": "@lang-libs",
     "imports": [
-      "_@app-libs-CplkXEOv.js"
+      "_@app-libs-Cb_auZyT.js"
     ],
     "dynamicImports": [
-      "_browser-ponyfill-CwUmXqjf.js"
+      "_browser-ponyfill-B9iOa5IF.js"
     ]
   },
-  "_@react-libs-DDnGEoIu.js": {
-    "file": "assets/@react-libs-DDnGEoIu.js",
+  "_@react-libs-CeaqA_Hv.js": {
+    "file": "assets/@react-libs-CeaqA_Hv.js",
     "name": "@react-libs",
     "imports": [
-      "_@app-libs-CplkXEOv.js",
-      "_@bootstrap-libs-SqYrk-r-.js"
+      "_@app-libs-Cb_auZyT.js",
+      "_@bootstrap-libs-DZc4rDL4.js"
     ]
   },
-  "_browser-ponyfill-CwUmXqjf.js": {
-    "file": "assets/browser-ponyfill-CwUmXqjf.js",
+  "_browser-ponyfill-B9iOa5IF.js": {
+    "file": "assets/browser-ponyfill-B9iOa5IF.js",
     "name": "browser-ponyfill",
     "isDynamicEntry": true,
     "imports": [
-      "_@app-libs-CplkXEOv.js"
+      "_@app-libs-Cb_auZyT.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-CSH3V4Zt.js",
+    "file": "assets/index-B6xw6vr4.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@app-libs-CplkXEOv.js",
-      "_@bootstrap-libs-SqYrk-r-.js",
-      "_@react-libs-DDnGEoIu.js",
-      "_@lang-libs-BujMiMKP.js"
+      "_@app-libs-Cb_auZyT.js",
+      "_@bootstrap-libs-DZc4rDL4.js",
+      "_@react-libs-CeaqA_Hv.js",
+      "_@lang-libs-Bb81l5PV.js"
     ],
     "css": [
       "static/corptools/bs5/static/css/index-DeoTJ7V7.css"
