@@ -1,8 +1,6 @@
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig } from "vite";
 
-import { urlProxy, urlProxySecure } from "./vite.config.settings";
-
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -10,14 +8,14 @@ export default defineConfig({
     port: 3002,
     proxy: {
       "/audit/api/": {
-        target: urlProxy,
+        target: "http://localhost:8000",
         changeOrigin: true,
-        secure: urlProxySecure,
+        secure: false,
       },
       "/static": {
-        target: urlProxy,
+        target: "http://localhost:8000",
         changeOrigin: true,
-        secure: urlProxySecure,
+        secure: false,
       },
     },
   },
