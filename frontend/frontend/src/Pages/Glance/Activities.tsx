@@ -105,12 +105,26 @@ const Activities = ({ data, isLoading }: any) => {
               isLoading={isLoading}
               iconSrc={Market}
               cardVariant={data?.market ? "success" : undefined}
+              toolTipText={t("Market activity (Net ISK) in the last 30 Days")}
+              text={
+                data?.mining_ice
+                  ? `${data?.market?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })} ISK`
+                  : "-"
+              }
             />
             <IconStatusCard
               iconSrc={Industry}
               isLoading={isLoading}
               cardVariant={data?.industry ? "success" : undefined}
-              toolTipText={t("Industry activities such as manufacturing or reactions")}
+              textVariant={data?.industry ? "success" : "muted"}
+              text={data?.industry ? data?.industry : "-"}
+              toolTipText={t(
+                "Count of Industry activities such as manufacturing or reactions in the last 30 Days",
+              )}
             />
           </div>
         </Card>
@@ -187,6 +201,15 @@ const Activities = ({ data, isLoading }: any) => {
               iconSrc={Planet}
               isLoading={isLoading}
               cardVariant={data?.pi ? "success" : undefined}
+              text={
+                data?.mining_gas
+                  ? `${data?.pi?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })} Isk`
+                  : "-"
+              }
               toolTipText={t("Planetary import/export seen in the last 30 Days")}
             />
           </div>

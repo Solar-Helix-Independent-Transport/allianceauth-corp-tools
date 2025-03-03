@@ -27,26 +27,45 @@ export const Factions = ({ data }: any) => {
             <IconStatusCard
               iconSrc={Amarr}
               cardVariant={data?.factions?.amarr ? "success" : undefined}
+              textVariant={data?.factions?.amarr ? "success" : "muted"}
+              text={data?.factions?.amarr ? data?.factions?.amarr : "-"}
+              toolTipText={t("Number of detected alts in Amarr Militia")}
             />
             <IconStatusCard
               iconSrc={Gal}
               cardVariant={data?.factions?.gallente ? "success" : undefined}
+              textVariant={data?.factions?.gallente ? "success" : "muted"}
+              text={data?.factions?.gallente ? data?.factions?.gallente : "-"}
+              toolTipText={t("Number of detected alts in Gallente Militia")}
             />
             <IconStatusCard
               iconSrc={Min}
               cardVariant={data?.factions?.minmatar ? "success" : undefined}
+              textVariant={data?.factions?.minmatar ? "success" : "muted"}
+              text={data?.factions?.minmatar ? data?.factions?.minmatar : "-"}
+              toolTipText={t("Number of detected alts in Minmatar Militia")}
             />
+
             <IconStatusCard
               iconSrc={Cal}
               cardVariant={data?.factions?.caldari ? "success" : undefined}
+              textVariant={data?.factions?.caldari ? "success" : "muted"}
+              text={data?.factions?.caldari ? data?.factions?.caldari : "-"}
+              toolTipText={t("Number of detected alts in Caldari Militia")}
             />
             <IconStatusCard
               cardVariant={data?.factions?.angel ? "success" : undefined}
+              textVariant={data?.factions?.angel ? "success" : "muted"}
               iconSrc={"https://images.evetech.net/corporations/500011/logo?size=128"}
+              text={data?.factions?.angel ? data?.factions?.angel : "-"}
+              toolTipText={t("Number of detected alts in Angel Cartel Militia")}
             />
             <IconStatusCard
               cardVariant={data?.factions?.guristas ? "success" : undefined}
+              textVariant={data?.factions?.guristas ? "success" : "muted"}
               iconSrc={"https://images.evetech.net/corporations/500010/logo?size=128"}
+              text={data?.factions?.guristas ? data?.factions?.guristas : "-"}
+              toolTipText={t("Number of detected alts in Guristas Militia")}
             />
           </div>
         </Card>
@@ -69,6 +88,7 @@ export const Factions = ({ data }: any) => {
               }
               textVariant={data?.lp?.total ? "success" : undefined}
               cardVariant={data?.lp?.total ? "success" : undefined}
+              toolTipText={t("Total LP")}
             />
             {data?.lp?.top_five?.map((lp_data: any) => {
               return (
@@ -84,6 +104,7 @@ export const Factions = ({ data }: any) => {
                       : "?"
                   }
                   textVariant="muted"
+                  toolTipText={lp_data.corp_name}
                 />
               );
             })}

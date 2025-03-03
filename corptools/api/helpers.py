@@ -153,18 +153,18 @@ def glances_pochven_check(characters):
 
 def glances_market_check(characters):
     types = ["brokers_fee", "market_provider_tax"]
-    return wallet_check(characters, types).exists()
+    return wallet_check(characters, types).aggregate(total=Sum("amount"))["total"]
 
 
 def glances_industry_check(characters):
     types = ["industry_job_tax"]
-    return wallet_check(characters, types).exists()
+    return wallet_check(characters, types).count()
 
 
 def glances_pi_check(characters):
     types = ["planetary_import_tax",
-             "planetary_export_tax", "planetary_construction"]
-    return wallet_check(characters, types).exists()
+             "planetary_export_tax"]
+    return wallet_check(characters, types).aggregate(total=Sum("amount"))["total"]
 
 
 def glances_ore_check(characters):
