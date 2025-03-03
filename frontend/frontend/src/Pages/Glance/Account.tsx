@@ -50,11 +50,11 @@ export const CharacterGlancesAccount = () => {
           cardVariant={isk < 1000000 ? "warning" : "success"}
           iconSrc={Isk}
           textVariant={isk < 1000000 ? "warning" : "success"}
-          text={`Ƶ${isk?.toLocaleString("en-US", {
+          text={`${isk?.toLocaleString("en-US", {
             maximumFractionDigits: 2,
             notation: "compact",
             compactDisplay: "short",
-          })}`}
+          })} ISK`}
           isLoading={isLoading}
           toolTipText={t("Total Liquid Isk across all characters")}
         />
