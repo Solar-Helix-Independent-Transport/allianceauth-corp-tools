@@ -68,7 +68,7 @@ class GlanceApiEndpoints:
             cruiser_groups = [26, 358, 832, 833, 894, 906, 963, 1972]
             bc_groups = [419, 540, 1201]
             bs_groups = [27, 381, 898, 900]
-            indy_groups = [28, 380, 1202, 941]
+            indy_groups = [28, 380, 1202]
             indy_command_groups = [941]
             dread_groups = [485, 4594]
             cap_indy_groups = [902, 513, 883]

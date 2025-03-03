@@ -43,7 +43,7 @@ const AccountList = () => {
       header: t("Characters"),
       cell: (props) =>
         props.getValue() ? (
-          <div className="d-flex flex-wrap text-center justify-content-evenly">
+          <div className="d-flex flex-wrap text-center ">
             {props?.getValue()?.map((char) => {
               return (
                 <span
