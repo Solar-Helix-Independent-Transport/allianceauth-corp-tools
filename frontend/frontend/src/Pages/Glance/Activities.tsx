@@ -108,7 +108,7 @@ const Activities = ({ data, isLoading }: any) => {
               toolTipText={t("Market activity (Net ISK) in the last 30 Days")}
               text={
                 data?.market
-                  ? `${data?.market?.toLocaleString("en-US", {
+                  ? `${Number(data?.market).toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       notation: "compact",
                       compactDisplay: "short",
@@ -203,7 +203,7 @@ const Activities = ({ data, isLoading }: any) => {
               cardVariant={data?.pi ? "success" : undefined}
               text={
                 data?.mining_gas
-                  ? `${data?.pi?.toLocaleString("en-US", {
+                  ? `${Number(data?.pi).toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       notation: "compact",
                       compactDisplay: "short",
