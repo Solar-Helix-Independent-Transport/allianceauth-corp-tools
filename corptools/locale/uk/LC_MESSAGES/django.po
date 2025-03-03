@@ -88,7 +88,7 @@ msgstr "Залишок"
 #: corptools/api/core/menu.py:24
 #: corptools/templates/corptools/character/char_menu.html:89
 msgid "Interactions"
-msgstr "Взаємодії"
+msgstr "Взаємодія"
 
 #: corptools/api/core/menu.py:28
 msgid "Finances"
@@ -209,17 +209,22 @@ msgid ""
 "Please enter a valid skill name for `{skill}`. Hint: a known character must "
 "have trained the skill for auth to know about it."
 msgstr ""
+"Будь ласка, введіть дійсну назву навику для {skill}. Підказка: відомий "
+"персонаж має вивчити цей навик, щоб авторизація могла її розпізнати."
 
 #: corptools/models.py:1026
 #, python-brace-format
 msgid "Please enter a valid skill level for `{skill}`. Hint: between 0 and 5."
 msgstr ""
+"Будь ласка, введіть дійсний рівень навику для {skill}. Підказка: від 0 до 5."
 
 #: corptools/models.py:1030
 msgid ""
 "Please check format for valid JSON. Hint: [\"skill name\": 4, \"skill name "
 "2\": 1]"
 msgstr ""
+"Будь ласка, перевірте формат на валідний JSON. Підказка: [\"назва навички\":"
+" 4, \"назва навички 2\": 1]"
 
 #: corptools/models.py:1627
 #: corptools/templates/corptools/character/char_menu.html:17
@@ -838,31 +843,32 @@ msgstr "Структури не доступні"
 
 #: corptools/templates/corptools/fittings/characters.html:3
 msgid "Character Skill Checks"
-msgstr ""
+msgstr "Перевірка навиків персонажа"
 
 #: corptools/templates/corptools/fittings/characters.html:21
 msgid "Skills Required"
-msgstr ""
+msgstr "Необхідні навик"
 
 #: corptools/templates/corptools/fittings/characters.html:29
 msgid "Basic skills required to"
-msgstr ""
+msgstr "Базові навики потрібні для"
 
 #: corptools/templates/corptools/fittings/characters.html:29
 msgid "sit in the hull"
-msgstr ""
+msgstr "сидить у кораблі"
 
 #: corptools/templates/corptools/fittings/characters.html:29
 msgid "and"
-msgstr ""
+msgstr "і"
 
 #: corptools/templates/corptools/fittings/characters.html:29
 msgid "fit the modules"
-msgstr ""
+msgstr "встановлення модулів"
 
 #: corptools/templates/corptools/fittings/characters.html:31
 msgid "Extra skills may be required to use this fitting in fleets"
 msgstr ""
+"Додаткові навики можуть знадобитися для використання цього фітингу в флотах"
 
 #: corptools/templates/corptools/menu.html:56
 msgid "Main Character"
