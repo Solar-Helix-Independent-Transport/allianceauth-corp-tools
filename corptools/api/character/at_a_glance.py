@@ -69,6 +69,7 @@ class GlanceApiEndpoints:
             bc_groups = [419, 540, 1201]
             bs_groups = [27, 381, 898, 900]
             indy_groups = [28, 380, 1202, 941]
+            indy_command_groups = [941]
             dread_groups = [485, 4594]
             cap_indy_groups = [902, 513, 883]
 
@@ -107,6 +108,8 @@ class GlanceApiEndpoints:
                     out_groups["battleship"] += group["grp_total"]
                 elif grp in indy_groups:
                     out_groups["hauler"] += group["grp_total"]
+                elif grp in indy_command_groups:
+                    out_groups["indy_command"] += group["grp_total"]
                 elif grp in mining_groups:
                     out_groups["mining"] += group["grp_total"]
                 elif grp in dread_groups:

@@ -195,6 +195,9 @@ def glances_ore_check(characters):
         4516,
         4568,
         4756,
+        4757,
+        4758,
+        4759,
 
     ]
     return mining_check(

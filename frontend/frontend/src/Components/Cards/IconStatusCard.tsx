@@ -94,6 +94,7 @@ export const IconStatusCard = ({
         text={text}
         textVariant={textVariant}
         cardVariant={cardVariant}
+        borderVariant={borderVariant}
         isLoading={isLoading}
         toolTipText={toolTipText}
       />
