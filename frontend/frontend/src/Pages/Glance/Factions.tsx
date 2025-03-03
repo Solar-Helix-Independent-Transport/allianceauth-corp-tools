@@ -67,7 +67,8 @@ export const Factions = ({ data }: any) => {
                     })
                   : "0"
               }
-              textVariant="info"
+              textVariant={data?.lp?.total ? "success" : undefined}
+              cardVariant={data?.lp?.total ? "success" : undefined}
             />
             {data?.lp?.top_five?.map((lp_data: any) => {
               return (

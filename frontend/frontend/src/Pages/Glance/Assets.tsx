@@ -37,35 +37,40 @@ export const Assets = ({ data, isLoading }: any) => {
           <div className="d-flex align-items-center flex-wrap justify-content-center">
             <IconStatusDiv
               iconSrc={Frigate}
-              textVariant={data?.frigate ? "info" : "warning"}
+              textVariant={data?.frigate ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.frigate ? "success" : isLoading ? undefined : "warning"}
               text={data?.frigate ? data?.frigate : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of Frigate hulls owned")}
             />
             <IconStatusDiv
               iconSrc={Destroyer}
-              textVariant={data?.destroyer ? "info" : "warning"}
+              textVariant={data?.destroyer ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.destroyer ? "success" : isLoading ? undefined : "warning"}
               text={data?.destroyer ? data?.destroyer : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of Destroyer hulls owned")}
             />
             <IconStatusDiv
               iconSrc={Cruiser}
-              textVariant={data?.cruiser ? "info" : "warning"}
+              textVariant={data?.cruiser ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.cruiser ? "success" : isLoading ? undefined : "warning"}
               text={data?.cruiser ? data?.cruiser : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of Cruiser hulls owned")}
             />
             <IconStatusDiv
               iconSrc={Battlecruiser}
-              textVariant={data?.battlecruiser ? "info" : "warning"}
+              textVariant={data?.battlecruiser ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.battlecruiser ? "success" : isLoading ? undefined : "warning"}
               text={data?.battlecruiser ? data?.battlecruiser : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of battlecruisers hulls owned")}
             />
             <IconStatusDiv
               iconSrc={Battleship}
-              textVariant={data?.battleship ? "info" : "warning"}
+              textVariant={data?.battleship ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.battleship ? "success" : isLoading ? undefined : "warning"}
               text={data?.battleship ? data?.battleship : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of battleship hulls owned")}
@@ -79,35 +84,42 @@ export const Assets = ({ data, isLoading }: any) => {
           <div className="d-flex align-items-center flex-wrap justify-content-center">
             <IconStatusDiv
               iconSrc={Carrier}
-              textVariant={data?.carrier ? "info" : "warning"}
+              textVariant={data?.carrier ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.carrier ? "success" : isLoading ? undefined : "warning"}
               text={data?.carrier ? data?.carrier : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of Carrier hulls owned")}
             />
             <IconStatusDiv
               iconSrc={Fax}
-              textVariant={data?.fax ? "info" : "warning"}
+              textVariant={data?.fax ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.fax ? "success" : isLoading ? undefined : "warning"}
               text={data?.fax ? data?.fax : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of Fax hulls owned")}
             />
             <IconStatusDiv
               iconSrc={Dreadnought}
-              textVariant={data?.dread ? "info" : "warning"}
+              textVariant={data?.dread ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.dread ? "success" : isLoading ? undefined : "warning"}
               text={data?.dread ? data?.dread : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of Dread hulls owned")}
             />
             <IconStatusDiv
               iconSrc={Supercarrier}
-              textVariant={data?.supercarrier ? "info" : "warning"}
+              textVariant={data?.supercarrier ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.supercarrier ? "success" : isLoading ? undefined : "warning"}
               text={data?.supercarrier ? data?.supercarrier : "-"}
+              isLoading={isLoading}
               toolTipText={t("Count of Super Carrier hulls owned")}
             />
             <IconStatusDiv
               iconSrc={Titan}
-              textVariant={data?.titan ? "info" : "warning"}
+              textVariant={data?.titan ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.titan ? "success" : isLoading ? undefined : "warning"}
               text={data?.titan ? data?.titan : "-"}
+              isLoading={isLoading}
               toolTipText={t("Count of Titan hulls owned")}
             />
           </div>
@@ -119,28 +131,32 @@ export const Assets = ({ data, isLoading }: any) => {
           <div className="d-flex align-items-center flex-wrap justify-content-center">
             <IconStatusDiv
               iconSrc={MiningBarge}
-              textVariant={data?.mining ? "info" : "warning"}
+              textVariant={data?.mining ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.mining ? "success" : isLoading ? undefined : "warning"}
               text={data?.mining ? data?.mining : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of Subcap Industry hulls owned")}
             />
             <IconStatusDiv
               iconSrc={Industrial}
-              textVariant={data?.hauler ? "info" : "warning"}
+              textVariant={data?.hauler ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.hauler ? "success" : isLoading ? undefined : "warning"}
               text={data?.hauler ? data?.hauler : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of Subcap Hauler hulls owned")}
             />
             <IconStatusDiv
               iconSrc={IndustrialCommand}
-              textVariant={data?.indy_command ? "info" : "warning"}
+              textVariant={data?.indy_command ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.indy_command ? "success" : isLoading ? undefined : "warning"}
               text={data?.indy_command ? data?.indy_command : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of Subcap Industrial Command hulls owned")}
             />
             <IconStatusDiv
               iconSrc={Frieghter}
-              textVariant={data?.capital_indy ? "info" : "warning"}
+              textVariant={data?.capital_indy ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.capital_indy ? "success" : isLoading ? undefined : "warning"}
               text={data?.capital_indy ? data?.capital_indy : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of Capital Industrial hulls owned")}
@@ -155,14 +171,16 @@ export const Assets = ({ data, isLoading }: any) => {
           <div className="d-flex align-items-center">
             <IconStatusDiv
               iconSrc={Injector}
-              textVariant={data?.injector ? "info" : "warning"}
+              textVariant={data?.injector ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.injector ? "success" : isLoading ? undefined : "warning"}
               text={data?.injector ? data?.injector : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of Skill Injectors owned")}
             />
             <IconStatusDiv
               iconSrc={Extractor}
-              textVariant={data?.extractor ? "info" : "warning"}
+              textVariant={data?.extractor ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.extractor ? "success" : isLoading ? undefined : "warning"}
               text={data?.extractor ? data?.extractor : "-"}
               isLoading={isLoading}
               toolTipText={t("Count of Skill Extractors owned")}

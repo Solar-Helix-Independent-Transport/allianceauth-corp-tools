@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en" data-bs-theme="dark">
-  <head>
+  <!-- <html lang="en" > -->
+    <head>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -88,6 +89,8 @@
         </a>
 
         <div class="navbar-brand">Corp Tools - Dev Auth</div>
+
+        <div class="navbar-brand" id="theme-swap"><i class="fa-solid fa-circle-half-stroke"></i></div>
 
         <div class="collapse navbar-collapse ms-2 px-2" id="navbarexpand">
           <ul id="nav-left" class="nav navbar-nav me-auto"></ul>
@@ -365,7 +368,17 @@
         } else {
           sidebar.classList.add("show");
         }
+
+        const themeSwap = document.getElementById("theme-swap");
+        themeSwap.addEventListener("click", () => {
+          const theme = document.documentElement.getAttribute("data-bs-theme");
+          const newTheme = theme === "dark" ? "light" : "dark";
+          document.documentElement.setAttribute("data-bs-theme", newTheme)
+        });
+
+
       })();
+
     </script>
 
     <!-- Start jQuery js from cdnjs -->

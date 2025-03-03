@@ -2,6 +2,7 @@ import Card from "react-bootstrap/Card";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Spinner from "react-bootstrap/Spinner";
 import Tooltip from "react-bootstrap/Tooltip";
+import styles from "./IconsStatusCard.module.css";
 
 type IconStatusCardProps = {
   iconSrc: string;
@@ -44,6 +45,8 @@ export const IconStatusDiv = ({
   iconSrc,
   text,
   textVariant,
+  cardVariant,
+  borderVariant,
   isLoading,
   toolTipText,
 }: IconStatusCardProps) => {
@@ -51,13 +54,20 @@ export const IconStatusDiv = ({
     <OverlayTrigger trigger={["hover", "focus"]} overlay={showOverlay(toolTipText)}>
       <div
         className={`d-flex m-1 ${text ? "pt-2" : ""} flex-column align-items-center`}
-        style={{ minWidth: "64px", height: "64px" }}
+        style={{ minWidth: "64px" }}
       >
-        <img
-          src={iconSrc}
-          height={text || isLoading ? 32 : 64}
-          width={text || isLoading ? 32 : 64}
-        />
+        <div
+          // style={{ borderColor: `var(--bs-${cardVariant})` }}
+          className={`${styles.imgBg} border border-${cardVariant} ${borderVariant == "thick" ? "border-5" : "border-3"}`}
+        >
+          <img
+            className="m-1"
+            style={{ borderRadius: "30%" }}
+            src={iconSrc}
+            height={text || isLoading ? 32 : 64}
+            width={text || isLoading ? 32 : 64}
+          />
+        </div>
         {!isLoading ? (
           text && <h6 className={`text-${textVariant} text-nowrap mx-1`}>{text}</h6>
         ) : (
@@ -78,16 +88,12 @@ export const IconStatusCard = ({
   toolTipText,
 }: IconStatusCardProps) => {
   return (
-    <Card
-      border={cardVariant}
-      className={`m-2 ${borderVariant == "thick" ? "border-4" : "border-2"} ${
-        text || (isLoading && "pt-2")
-      }`}
-    >
+    <Card className={`m-2 border-0 ${text || (isLoading && "pt-2")}`}>
       <IconStatusDiv
         iconSrc={iconSrc}
         text={text}
         textVariant={textVariant}
+        cardVariant={cardVariant}
         isLoading={isLoading}
         toolTipText={toolTipText}
       />

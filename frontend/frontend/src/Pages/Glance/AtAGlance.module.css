@@ -1,17 +1,26 @@
 .strikeOut {
   display: flex;
   flex-direction: row;
+  justify-content: center;
   margin: 0;
 }
-.strikeOut:before,
+
+.strikeOut:before {
+  content: "";
+  width: 150px !important;
+  border-bottom: 1px solid var(--bs-border-color);
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-right: 10px !important;
+  margin-left: 10px !important;
+}
+
 .strikeOut:after {
   content: "";
-  flex: 1 1;
+  width: 150px !important;
   border-bottom: 1px solid var(--bs-border-color);
-  margin: auto;
-}
-.strikeOut:before,
-.strikeOut:after {
-  margin-right: 10px;
-  margin-left: 10px;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-right: 10px !important;
+  margin-left: 10px !important;
 }

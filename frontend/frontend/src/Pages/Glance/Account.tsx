@@ -45,11 +45,11 @@ export const CharacterGlancesAccount = () => {
     <>
       <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Account at a Glance")}</h3>
 
-      <div className="d-flex flex-wrap justify-content-center">
+      <div className="d-flex flex-wrap justify-content-center ">
         <IconStatusCard
-          cardVariant={isk < 1000000 ? "warning" : undefined}
+          cardVariant={isk < 1000000 ? "warning" : "success"}
           iconSrc={Isk}
-          textVariant={isk < 1000000 ? "warning" : undefined}
+          textVariant={isk < 1000000 ? "warning" : "success"}
           text={`Ƶ${isk?.toLocaleString("en-US", {
             maximumFractionDigits: 2,
             notation: "compact",
@@ -60,9 +60,9 @@ export const CharacterGlancesAccount = () => {
         />
 
         <IconStatusCard
-          cardVariant={sp < 1000000 ? "warning" : undefined}
+          cardVariant={sp < 1000000 ? "warning" : "success"}
           iconSrc={Skills}
-          textVariant={sp < 1000000 ? "warning" : undefined}
+          textVariant={sp < 1000000 ? "warning" : "success"}
           text={`${sp?.toLocaleString("en-US", {
             maximumFractionDigits: 2,
             notation: "compact",

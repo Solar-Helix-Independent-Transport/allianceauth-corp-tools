@@ -32,57 +32,65 @@ const Activities = ({ data, isLoading }: any) => {
           <div className="d-flex flex-wrap justify-content-center">
             <IconStatusCard
               iconSrc={Sansha}
+              textVariant={data?.incursion ? "success" : undefined}
               cardVariant={data?.incursion ? "success" : undefined}
               isLoading={isLoading}
               text={
-                data?.incursion &&
-                `+Ƶ${data?.incursion?.toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                  notation: "compact",
-                  compactDisplay: "short",
-                })}`
+                data?.incursion
+                  ? `+Ƶ${data?.incursion?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })}`
+                  : "-"
               }
               toolTipText={t("Total Isk earned in Incursions in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={Triglavian}
+              textVariant={data?.pochven ? "success" : undefined}
               cardVariant={data?.pochven ? "success" : undefined}
               isLoading={isLoading}
               text={
-                data?.pochven &&
-                `+Ƶ${data?.pochven?.toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                  notation: "compact",
-                  compactDisplay: "short",
-                })}`
+                data?.pochven
+                  ? `+Ƶ${data?.pochven?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })}`
+                  : "-"
               }
               toolTipText={t("Total Isk earned in Pochven in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={NPC}
+              textVariant={data?.ratting ? "success" : undefined}
               cardVariant={data?.ratting ? "success" : undefined}
               isLoading={isLoading}
               text={
-                data?.ratting &&
-                `+Ƶ${data?.ratting?.toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                  notation: "compact",
-                  compactDisplay: "short",
-                })}`
+                data?.ratting
+                  ? `+Ƶ${data?.ratting?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })}`
+                  : "-"
               }
               toolTipText={t("Total Isk earned Ratting in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={Missions}
+              textVariant={data?.mission ? "success" : undefined}
               cardVariant={data?.mission ? "success" : undefined}
               isLoading={isLoading}
               text={
-                data?.mission &&
-                `+Ƶ${data?.mission?.toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                  notation: "compact",
-                  compactDisplay: "short",
-                })}`
+                data?.mission
+                  ? `+Ƶ${data?.mission?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })}`
+                  : "-"
               }
               toolTipText={t("Total Isk earned running missions in the last 30 Days")}
             />
@@ -114,56 +122,64 @@ const Activities = ({ data, isLoading }: any) => {
             <IconStatusCard
               iconSrc={Ice}
               cardVariant={data?.mining_ice ? "success" : undefined}
+              textVariant={data?.mining_ice ? "success" : undefined}
               isLoading={isLoading}
               text={
-                data?.mining_ice &&
-                `${data?.mining_ice?.toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                  notation: "compact",
-                  compactDisplay: "short",
-                })} m3`
+                data?.mining_ice
+                  ? `${data?.mining_ice?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })} m3`
+                  : "-"
               }
               toolTipText={t("Total m3 of Ice mined in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={Asteroid}
+              textVariant={data?.mining_ore ? "success" : undefined}
               cardVariant={data?.mining_ore ? "success" : undefined}
               isLoading={isLoading}
               text={
-                data?.mining_ore &&
-                `${data?.mining_ore?.toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                  notation: "compact",
-                  compactDisplay: "short",
-                })} m3`
+                data?.mining_ore
+                  ? `${data?.mining_ore?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })} m3`
+                  : "-"
               }
               toolTipText={t("Total m3 of standard ore mined in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={Moons}
+              textVariant={data?.mining_moon ? "success" : undefined}
               cardVariant={data?.mining_moon ? "success" : undefined}
               isLoading={isLoading}
               text={
-                data?.mining_moon &&
-                `${data?.mining_moon?.toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                  notation: "compact",
-                  compactDisplay: "short",
-                })} m3`
+                data?.mining_moon
+                  ? `${data?.mining_moon?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })} m3`
+                  : "-"
               }
               toolTipText={t("Total m3 of moon ore mined in the last 30 Days")}
             />
             <IconStatusCard
               iconSrc={Gas}
+              textVariant={data?.mining_gas ? "success" : undefined}
               cardVariant={data?.mining_gas ? "success" : undefined}
               isLoading={isLoading}
               text={
-                data?.mining_gas &&
-                `${data?.mining_gas?.toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                  notation: "compact",
-                  compactDisplay: "short",
-                })} m3`
+                data?.mining_gas
+                  ? `${data?.mining_gas?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })} m3`
+                  : "-"
               }
               toolTipText={t("Total m3 of gas anomalies mined in the last 30 Days")}
             />
