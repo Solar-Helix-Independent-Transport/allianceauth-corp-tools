@@ -3,9 +3,9 @@
 {% block page_title %}{{page_title}}{% endblock %}
 
 {% block header_nav_user_character_control %}{% endblock %}
-
+{% get_current_language as LANGUAGE_CODE %}
 {% block content %}
-  <div id="root">
+  <div id="root" lang="{{LANGUAGE_CODE}}">
     <div id="app">
         <div id="loading-div" class="flex-container-main ">
             <div class="text-center">
