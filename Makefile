@@ -45,5 +45,8 @@ translate:
 	django-admin makemessages -l en
 	cd frontend/frontend/;yarn buildTranslations
 
+buildlang:
+	django-admin compilemessages
+
 devjs:
 	cd frontend/frontend/;yarn install;yarn dev
