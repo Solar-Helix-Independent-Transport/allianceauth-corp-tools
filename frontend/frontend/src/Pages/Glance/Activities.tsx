@@ -105,6 +105,7 @@ const Activities = ({ data, isLoading }: any) => {
               isLoading={isLoading}
               iconSrc={Market}
               cardVariant={data?.market ? "success" : undefined}
+              textVariant={data?.market > 0 ? "success" : "muted"}
               toolTipText={t("Market activity (Net ISK) in the last 30 Days")}
               text={
                 data?.market
@@ -201,6 +202,7 @@ const Activities = ({ data, isLoading }: any) => {
               iconSrc={Planet}
               isLoading={isLoading}
               cardVariant={data?.pi ? "success" : undefined}
+              textVariant={data?.pi > 0 ? "success" : "muted"}
               text={
                 data?.mining_gas
                   ? `${Number(data?.pi).toLocaleString("en-US", {
