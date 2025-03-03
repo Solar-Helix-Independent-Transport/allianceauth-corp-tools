@@ -46,44 +46,50 @@ const CharacterClones = () => {
                 <tr>
                   <th>{t("Location")}</th>
                   <th className="text-end pe-2">{t("Implants")}</th>
-                  <th style={{ width: "45px" }}></th>
                 </tr>
               </thead>
               <tbody>
                 {data?.map((d: components["schemas"]["CharacterClone"]) => {
                   return (
-                    <tr className="align-items-center">
-                      <td style={{ verticalAlign: "middle" }}>
-                        {d.name} {d.location?.name}
-                      </td>
-                      <td style={{ verticalAlign: "middle" }}>
-                        <div className="d-flex justify-content-end align-items-center">
-                          {d.implants?.length ? (
-                            d.implants.map((imp) => {
-                              return <TypeIcon textContent={imp.name} type_id={imp.id} size={32} />;
-                            })
-                          ) : (
-                            <i className="fa-regular fa-circle-xmark pe-2"></i>
-                          )}
-                        </div>
-                      </td>
-                      <td style={{ verticalAlign: "middle" }}>
-                        {d.implants?.length ? (
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={() => {
-                              setModalData(d);
-                              setOpenModal(true);
-                            }}
-                          >
-                            <i className="fa-solid fa-info"></i>
-                          </Button>
-                        ) : (
-                          <></>
-                        )}
-                      </td>
-                    </tr>
+                    <>
+                      <tr className="align-items-center">
+                        <td colSpan={2} style={{ verticalAlign: "middle" }} className="border-0">
+                          {d.name} {d.location?.name}
+                        </td>
+                      </tr>
+                      <tr className="align-items-center">
+                        <td colSpan={2} style={{ verticalAlign: "middle" }}>
+                          <div className="d-flex justify-content-end align-items-center">
+                            {d.implants?.length ? (
+                              d.implants.map((imp) => {
+                                return (
+                                  <TypeIcon textContent={imp.name} type_id={imp.id} size={32} />
+                                );
+                              })
+                            ) : (
+                              <>
+                                {t("No Implants")}
+                                <i className="ms-2 fa-regular fa-circle-xmark pe-2"></i>
+                              </>
+                            )}
+                            {d.implants?.length ? (
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => {
+                                  setModalData(d);
+                                  setOpenModal(true);
+                                }}
+                              >
+                                <i className="fa-solid fa-info"></i>
+                              </Button>
+                            ) : (
+                              <></>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    </>
                   );
                 })}
               </tbody>
