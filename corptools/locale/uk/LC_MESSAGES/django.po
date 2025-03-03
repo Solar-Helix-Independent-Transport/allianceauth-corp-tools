@@ -311,7 +311,7 @@ msgstr "Регіони"
 
 #: corptools/templates/corptools/admin.html:446
 msgid "Constellations"
-msgstr "Сузір\\'я"
+msgstr "Сузір'я"
 
 #: corptools/templates/corptools/admin.html:452
 msgid "Systems"
@@ -319,11 +319,11 @@ msgstr "Cистеми"
 
 #: corptools/templates/corptools/admin.html:458
 msgid "Gate Links"
-msgstr "Зв\\'язки воріт"
+msgstr "Зв'язки воріт"
 
 #: corptools/templates/corptools/admin.html:464
 msgid "Jump Bridge Links"
-msgstr "Зв\\'язки мостів гіперстрибка"
+msgstr "Зв'язки JB"
 
 #: corptools/templates/corptools/admin.html:482
 msgid "Corporation Audits"
@@ -491,7 +491,7 @@ msgstr "Немає клонів"
 
 #: corptools/templates/corptools/character/contacts.html:13
 msgid "Name"
-msgstr "Ім\\'я"
+msgstr "Ім'я"
 
 #: corptools/templates/corptools/character/contacts.html:14
 msgid "Standing"
@@ -628,7 +628,7 @@ msgstr "ISK"
 
 #: corptools/templates/corptools/character/public.html:27
 msgid "Joined"
-msgstr "Приєднався"
+msgstr "Приєднання"
 
 #: corptools/templates/corptools/character/public.html:47
 msgid "No Data"
