@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en" data-bs-theme="dark">
-  <head>
+  <!-- <html lang="en" > -->
+    <head>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -77,12 +78,12 @@
         padding-top: 3.5em !important;
       }
     </style>
-    <script type="module" crossorigin src="/assets/index-B6xw6vr4.js"></script>
+    <script type="module" crossorigin src="/assets/index-CCT9QYHZ.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/@app-libs-Cb_auZyT.js">
     <link rel="modulepreload" crossorigin href="/assets/@bootstrap-libs-DZc4rDL4.js">
     <link rel="modulepreload" crossorigin href="/assets/@react-libs-CeaqA_Hv.js">
     <link rel="modulepreload" crossorigin href="/assets/@lang-libs-Bb81l5PV.js">
-    <link rel="stylesheet" crossorigin href="/static/corptools/bs5/static/css/index-DeoTJ7V7.css">
+    <link rel="stylesheet" crossorigin href="/static/corptools/bs5/static/css/index-Bo54A6Zv.css">
   </head>
 
   <body>
@@ -94,6 +95,8 @@
         </a>
 
         <div class="navbar-brand">Corp Tools - Dev Auth</div>
+
+        <div class="navbar-brand" id="theme-swap"><i class="fa-solid fa-circle-half-stroke"></i></div>
 
         <div class="collapse navbar-collapse ms-2 px-2" id="navbarexpand">
           <ul id="nav-left" class="nav navbar-nav me-auto"></ul>
@@ -370,7 +373,17 @@
         } else {
           sidebar.classList.add("show");
         }
+
+        const themeSwap = document.getElementById("theme-swap");
+        themeSwap.addEventListener("click", () => {
+          const theme = document.documentElement.getAttribute("data-bs-theme");
+          const newTheme = theme === "dark" ? "light" : "dark";
+          document.documentElement.setAttribute("data-bs-theme", newTheme)
+        });
+
+
       })();
+
     </script>
 
     <!-- Start jQuery js from cdnjs -->
