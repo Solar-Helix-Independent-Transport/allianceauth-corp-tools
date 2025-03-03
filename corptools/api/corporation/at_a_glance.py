@@ -74,7 +74,8 @@ class CorpGlanceApiEndpoints:
             cruiser_groups = [26, 358, 832, 833, 894, 906, 963, 1972]
             bc_groups = [419, 540, 1201]
             bs_groups = [27, 381, 898, 900]
-            indy_groups = [28, 380, 1202, 941]
+            indy_groups = [28, 380, 1202]
+            indy_command_groups = [941]
             dread_groups = [485, 4594]
             cap_indy_groups = [902, 513, 883]
 
@@ -113,6 +114,8 @@ class CorpGlanceApiEndpoints:
                     out_groups["battleship"] += group["grp_total"]
                 elif grp in indy_groups:
                     out_groups["hauler"] += group["grp_total"]
+                elif grp in indy_command_groups:
+                    out_groups["indy_command"] += group["grp_total"]
                 elif grp in mining_groups:
                     out_groups["mining"] += group["grp_total"]
                 elif grp in dread_groups:
@@ -200,12 +203,12 @@ class CorpGlanceApiEndpoints:
 
             output = {
                 "factions": {
-                    "amarr": False,
-                    "caldari": False,
-                    "gallente": False,
-                    "minmatar": False,
-                    "angel": False,
-                    "guristas": False,
+                    "amarr": 0,
+                    "caldari": 0,
+                    "gallente": 0,
+                    "minmatar": 0,
+                    "angel": 0,
+                    "guristas": 0,
                 },
                 "lp": {
                     "total": 0,
@@ -218,17 +221,17 @@ class CorpGlanceApiEndpoints:
                 if character.faction_id is not None:
                     # check_faction
                     if character.faction_id == 500003:
-                        output["factions"]["amarr"] = True
+                        output["factions"]["amarr"] += 1
                     elif character.faction_id == 500010:
-                        output["factions"]["guristas"] = True
+                        output["factions"]["guristas"] += 1
                     elif character.faction_id == 500004:
-                        output["factions"]["gallente"] = True
+                        output["factions"]["gallente"] += 1
                     elif character.faction_id == 500011:
-                        output["factions"]["angel"] = True
+                        output["factions"]["angel"] += 1
                     elif character.faction_id == 500001:
-                        output["factions"]["caldari"] = True
+                        output["factions"]["caldari"] += 1
                     elif character.faction_id == 500002:
-                        output["factions"]["minmatar"] = True
+                        output["factions"]["minmatar"] += 1
 
             account_lp = models.LoyaltyPoint.objects.filter(
                 character__character__in=characters,
