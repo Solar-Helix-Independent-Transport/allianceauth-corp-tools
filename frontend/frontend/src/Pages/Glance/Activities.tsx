@@ -107,7 +107,7 @@ const Activities = ({ data, isLoading }: any) => {
               cardVariant={data?.market ? "success" : undefined}
               toolTipText={t("Market activity (Net ISK) in the last 30 Days")}
               text={
-                data?.mining_ice
+                data?.market
                   ? `${data?.market?.toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       notation: "compact",
