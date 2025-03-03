@@ -60,6 +60,11 @@ export async function loadAllStructures() {
   console.log(`get structures in api`);
   return api.data;
 }
+export async function loadStructureFit(structureId: number) {
+  const api = await axios.get(`/audit/api/corp/structures/${structureId}`);
+  console.log(`get structures in api`);
+  return api.data;
+}
 
 export async function loadAllPocos() {
   const api = await axios.get(`/audit/api/corp/pocos`);

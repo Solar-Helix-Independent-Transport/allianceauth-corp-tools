@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { IconStatusCard, IconStatusDiv } from "../../Components/Cards/IconStatusCard";
+import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
 import { loadGlanceFactionData } from "../../api/character";
 import { loadCorpGlanceFactionData } from "../../api/corporation";
 import Amarr from "../../assets/amarr_128.png";
@@ -24,21 +24,21 @@ export const Factions = ({ data }: any) => {
             <Card.Title>{t("Detected Militia")}</Card.Title>
           </Card.Header>
           <div className="d-flex flex-wrap justify-content-center">
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Amarr}
               cardVariant={data?.factions?.amarr ? "success" : undefined}
               textVariant={data?.factions?.amarr ? "success" : "muted"}
               text={data?.factions?.amarr ? data?.factions?.amarr : "-"}
               toolTipText={t("Number of detected alts in Amarr Militia")}
             />
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Gal}
               cardVariant={data?.factions?.gallente ? "success" : undefined}
               textVariant={data?.factions?.gallente ? "success" : "muted"}
               text={data?.factions?.gallente ? data?.factions?.gallente : "-"}
               toolTipText={t("Number of detected alts in Gallente Militia")}
             />
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Min}
               cardVariant={data?.factions?.minmatar ? "success" : undefined}
               textVariant={data?.factions?.minmatar ? "success" : "muted"}
@@ -46,21 +46,21 @@ export const Factions = ({ data }: any) => {
               toolTipText={t("Number of detected alts in Minmatar Militia")}
             />
 
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Cal}
               cardVariant={data?.factions?.caldari ? "success" : undefined}
               textVariant={data?.factions?.caldari ? "success" : "muted"}
               text={data?.factions?.caldari ? data?.factions?.caldari : "-"}
               toolTipText={t("Number of detected alts in Caldari Militia")}
             />
-            <IconStatusCard
+            <IconStatusDiv
               cardVariant={data?.factions?.angel ? "success" : undefined}
               textVariant={data?.factions?.angel ? "success" : "muted"}
               iconSrc={"https://images.evetech.net/corporations/500011/logo?size=128"}
               text={data?.factions?.angel ? data?.factions?.angel : "-"}
               toolTipText={t("Number of detected alts in Angel Cartel Militia")}
             />
-            <IconStatusCard
+            <IconStatusDiv
               cardVariant={data?.factions?.guristas ? "success" : undefined}
               textVariant={data?.factions?.guristas ? "success" : "muted"}
               iconSrc={"https://images.evetech.net/corporations/500010/logo?size=128"}

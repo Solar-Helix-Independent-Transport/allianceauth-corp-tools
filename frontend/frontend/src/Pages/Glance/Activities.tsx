@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { IconStatusCard } from "../../Components/Cards/IconStatusCard";
+import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
 import { loadGlanceActivityData } from "../../api/character";
 import { loadCorpGlanceActivityData } from "../../api/corporation";
 import Asteroid from "../../assets/asteroid_64.png";
@@ -30,7 +30,7 @@ const Activities = ({ data, isLoading }: any) => {
             <Card.Title>{t("PvE")}</Card.Title>
           </Card.Header>
           <div className="d-flex flex-wrap justify-content-center">
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Sansha}
               textVariant={data?.incursion ? "success" : undefined}
               cardVariant={data?.incursion ? "success" : undefined}
@@ -46,7 +46,7 @@ const Activities = ({ data, isLoading }: any) => {
               }
               toolTipText={t("Total Isk earned in Incursions in the last 30 Days")}
             />
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Triglavian}
               textVariant={data?.pochven ? "success" : undefined}
               cardVariant={data?.pochven ? "success" : undefined}
@@ -62,7 +62,7 @@ const Activities = ({ data, isLoading }: any) => {
               }
               toolTipText={t("Total Isk earned in Pochven in the last 30 Days")}
             />
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={NPC}
               textVariant={data?.ratting ? "success" : undefined}
               cardVariant={data?.ratting ? "success" : undefined}
@@ -78,7 +78,7 @@ const Activities = ({ data, isLoading }: any) => {
               }
               toolTipText={t("Total Isk earned Ratting in the last 30 Days")}
             />
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Missions}
               textVariant={data?.mission ? "success" : undefined}
               cardVariant={data?.mission ? "success" : undefined}
@@ -101,7 +101,7 @@ const Activities = ({ data, isLoading }: any) => {
             <Card.Title>{t("Economic")}</Card.Title>
           </Card.Header>
           <div className="d-flex flex-wrap justify-content-center">
-            <IconStatusCard
+            <IconStatusDiv
               isLoading={isLoading}
               iconSrc={Market}
               cardVariant={data?.market ? "success" : undefined}
@@ -117,7 +117,7 @@ const Activities = ({ data, isLoading }: any) => {
                   : "-"
               }
             />
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Industry}
               isLoading={isLoading}
               cardVariant={data?.industry ? "success" : undefined}
@@ -134,7 +134,7 @@ const Activities = ({ data, isLoading }: any) => {
             <Card.Title>{t("Mining")}</Card.Title>
           </Card.Header>
           <div className="d-flex flex-wrap justify-content-center">
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Ice}
               cardVariant={data?.mining_ice ? "success" : undefined}
               textVariant={data?.mining_ice ? "success" : undefined}
@@ -150,7 +150,7 @@ const Activities = ({ data, isLoading }: any) => {
               }
               toolTipText={t("Total m3 of Ice mined in the last 30 Days")}
             />
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Asteroid}
               textVariant={data?.mining_ore ? "success" : undefined}
               cardVariant={data?.mining_ore ? "success" : undefined}
@@ -166,7 +166,7 @@ const Activities = ({ data, isLoading }: any) => {
               }
               toolTipText={t("Total m3 of standard ore mined in the last 30 Days")}
             />
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Moons}
               textVariant={data?.mining_moon ? "success" : undefined}
               cardVariant={data?.mining_moon ? "success" : undefined}
@@ -182,7 +182,7 @@ const Activities = ({ data, isLoading }: any) => {
               }
               toolTipText={t("Total m3 of moon ore mined in the last 30 Days")}
             />
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Gas}
               textVariant={data?.mining_gas ? "success" : undefined}
               cardVariant={data?.mining_gas ? "success" : undefined}
@@ -198,7 +198,7 @@ const Activities = ({ data, isLoading }: any) => {
               }
               toolTipText={t("Total m3 of gas anomalies mined in the last 30 Days")}
             />
-            <IconStatusCard
+            <IconStatusDiv
               iconSrc={Planet}
               isLoading={isLoading}
               cardVariant={data?.pi ? "success" : undefined}

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { IconStatusCard } from "../../Components/Cards/IconStatusCard";
+import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
 import { loadCorpGlanceStatusData } from "../../api/corporation";
 import Isk from "../../assets/isk_128.png";
 import Omega from "../../assets/omega_128.png";
@@ -20,7 +20,7 @@ export const CorporationGlancesInfo = ({ corporationID = 0 }) => {
     <>
       <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Corporation Members")}</h3>
       <div className="d-flex flex-wrap justify-content-center">
-        <IconStatusCard
+        <IconStatusDiv
           cardVariant={data?.characters?.liquid < 1000000 ? "warning" : undefined}
           iconSrc={Isk}
           textVariant={data?.characters?.liquid < 1000000 ? "warning" : undefined}
@@ -33,14 +33,14 @@ export const CorporationGlancesInfo = ({ corporationID = 0 }) => {
           toolTipText={t("Total Liquid Isk across all characters and alts in corporation")}
         />
 
-        <IconStatusCard
+        <IconStatusDiv
           iconSrc={Omega}
           text={data?.characters?.known_and_alts?.toLocaleString()}
           isLoading={isLoading}
           toolTipText={t("Count of all known Characters and Alts")}
         />
 
-        <IconStatusCard
+        <IconStatusDiv
           cardVariant={
             data?.characters?.known_in_corp < data?.characters?.in_corp ? "warning" : "success"
           }
@@ -53,7 +53,7 @@ export const CorporationGlancesInfo = ({ corporationID = 0 }) => {
           toolTipText={t("Count of all known Characters in Corp")}
         />
 
-        <IconStatusCard
+        <IconStatusDiv
           cardVariant={data?.characters?.bad > 0 ? "danger" : "success"}
           iconSrc={Unknowns}
           textVariant={data?.characters?.bad > 0 ? "danger" : "success"}

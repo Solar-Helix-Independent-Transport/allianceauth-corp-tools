@@ -5,6 +5,8 @@ import BaseTable from "../Tables/BaseTable/BaseTable";
 import { NameObjectArrayFilterFn } from "../Tables/BaseTable/BaseTableFilter";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Badge } from "react-bootstrap";
+import { FittingModal } from "../Modals/FittingModal";
+import { useState } from "react";
 
 type Corporation = {
   corporation_id: number;
@@ -19,6 +21,7 @@ type BaseItemType = {
 };
 
 type StructureType = {
+  id: number;
   owner: Corporation;
   type: BaseItemType;
   location: BaseItemType;
@@ -32,6 +35,7 @@ type StructureType = {
 
 const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
   const { t } = useTranslation();
+  const [structure, setStructure] = useState({ id: 0, name: "" });
 
   const columnHelper = createColumnHelper<StructureType>();
 
@@ -48,7 +52,10 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
       header: t("Constellation"),
       cell: (cell) => (
         <a
-          href={`https://evemaps.dotlan.net/map/${cell.row.original.region.name.replace(" ", "_")}/${cell.getValue().replace(" ", "_")}`}
+          href={`https://evemaps.dotlan.net/map/${cell.row.original.region.name.replace(
+            " ",
+            "_",
+          )}/${cell.getValue().replace(" ", "_")}`}
         >
           {cell.getValue()}
         </a>
@@ -66,6 +73,9 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
     }),
     columnHelper.accessor("name", {
       header: t("Structure"),
+      // cell: (cell) => {
+      //   return <p onClick={() => setStructure(cell.row.original)}>{cell.getValue()}</p>
+      // }
     }),
     columnHelper.accessor("type.name", {
       header: t("Type"),
@@ -124,8 +134,13 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
         ),
     }),
   ];
-
-  return <BaseTable {...{ isFetching, columns, data }} />;
+  console.log(structure);
+  return (
+    <>
+      <BaseTable {...{ isFetching, columns, data }} />
+      {structure?.id !== 0 && <FittingModal ship={structure} />}
+    </>
+  );
 };
 
 export default StructuresTable;

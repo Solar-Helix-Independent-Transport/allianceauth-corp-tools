@@ -213,12 +213,47 @@ class StructureApiEndpoints:
 
         @api.get(
             "corp/structures/{structure_id}",
-            response={200: List[schema.FittingItem], 404: str, 403: str},
+            response={200: dict, 404: str, 403: str},
             tags=self.tags
         )
-        def get_corporation_structure_fitting(request, corporation_id, structure_id):
-            output = []
-            return 200, output
+        def get_corporation_structure_fitting(request, structure_id):
+            perms = (
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_structures')
+            )
+            vis = models.Structure.get_visible(request.user).filter(
+                structure_id=structure_id).exists()
+
+            if not perms or not perms:
+                logging.error(
+                    f"Permission Denied for {request.user} to view structures!")
+                return 403, "Permission Denied!"
+
+            output = {}
+            assets = models.CorpAsset.objects.filter(location_id=structure_id)
+            accepted_flags = [
+                "Cargo",
+                "StructureFuel",
+                "QuantumCoreRoom"
+            ]
+            for a in assets:
+                if "Slot" in a.location_flag:
+                    output[a.location_flag] = {
+                        "id": a.type_name.type_id,
+                        "name": a.type_name.name
+                    }
+                else:
+                    if a.location_flag in accepted_flags:
+                        if a.location_flag not in output:
+                            output[a.location_flag] = []
+                        output[a.location_flag].append({
+                            "id": a.type_name.type_id,
+                            "name": a.type_name.name
+                        })
+            return output
 
         @api.get(
             "corp/pocos",

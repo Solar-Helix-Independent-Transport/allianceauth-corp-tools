@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { IconStatusCard } from "../../Components/Cards/IconStatusCard";
+import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
 import { loadCharacterStatus } from "../../api/character";
 // import Asteroid from "../../../assets/asteroid_64.png";
 // import NPC from "../../../assets/npcbattleship_32.png";
@@ -46,7 +46,7 @@ export const CharacterGlancesAccount = () => {
       <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Account at a Glance")}</h3>
 
       <div className="d-flex flex-wrap justify-content-center ">
-        <IconStatusCard
+        <IconStatusDiv
           cardVariant={isk < 1000000 ? "warning" : "success"}
           iconSrc={Isk}
           textVariant={isk < 1000000 ? "warning" : "success"}
@@ -59,7 +59,7 @@ export const CharacterGlancesAccount = () => {
           toolTipText={t("Total Liquid Isk across all characters")}
         />
 
-        <IconStatusCard
+        <IconStatusDiv
           cardVariant={sp < 1000000 ? "warning" : "success"}
           iconSrc={Skills}
           textVariant={sp < 1000000 ? "warning" : "success"}
@@ -72,14 +72,14 @@ export const CharacterGlancesAccount = () => {
           toolTipText={t("Total SP across all characters")}
         />
 
-        <IconStatusCard
+        <IconStatusDiv
           iconSrc={Omega}
           text={total_chars?.toLocaleString()}
           isLoading={isLoading}
           toolTipText={t("Count of all known alts")}
         />
 
-        <IconStatusCard
+        <IconStatusDiv
           cardVariant={bad_chars > 0 ? "danger" : "success"}
           iconSrc={Unknowns}
           textVariant={bad_chars > 0 ? "danger" : "success"}
