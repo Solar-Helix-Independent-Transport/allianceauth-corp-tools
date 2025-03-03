@@ -23,7 +23,7 @@ const Activities = ({ data, isLoading }: any) => {
 
   return (
     <>
-      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Activity</h3>
+      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Activity")}</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <Card className="m-2">
           <Card.Header className="text-center">

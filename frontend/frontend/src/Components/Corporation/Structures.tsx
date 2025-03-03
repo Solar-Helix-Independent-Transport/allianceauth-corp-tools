@@ -5,8 +5,8 @@ import BaseTable from "../Tables/BaseTable/BaseTable";
 import { NameObjectArrayFilterFn } from "../Tables/BaseTable/BaseTableFilter";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Badge } from "react-bootstrap";
-import { FittingModal } from "../Modals/FittingModal";
-import { useState } from "react";
+// import { FittingModal } from "../Modals/FittingModal";
+// import { useState } from "react";
 
 type Corporation = {
   corporation_id: number;
@@ -35,7 +35,7 @@ type StructureType = {
 
 const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
   const { t } = useTranslation();
-  const [structure, setStructure] = useState({ id: 0, name: "" });
+  // const [structure, setStructure] = useState({ id: 0, name: "" });
 
   const columnHelper = createColumnHelper<StructureType>();
 
@@ -134,11 +134,11 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
         ),
     }),
   ];
-  console.log(structure);
+  // console.log(structure);
   return (
     <>
       <BaseTable {...{ isFetching, columns, data }} />
-      {structure?.id !== 0 && <FittingModal ship={structure} />}
+      {/* {structure?.id !== 0 && <FittingModal ship={structure} />} */}
     </>
   );
 };

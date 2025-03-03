@@ -17,7 +17,7 @@ export const Factions = ({ data }: any) => {
 
   return (
     <>
-      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>Affiliations</h3>
+      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Affiliations")}</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <Card className="m-2">
           <Card.Header className="text-center">

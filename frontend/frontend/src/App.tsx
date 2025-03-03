@@ -51,7 +51,17 @@ i18n
   .use(LanguageDetector)
   .init({
     detection: {
-      htmlTag: window.document ? window.document.head : undefined,
+      order: [
+        "htmlTag",
+        "querystring",
+        "cookie",
+        "localStorage",
+        "sessionStorage",
+        "navigator",
+        "path",
+        "subdomain",
+      ],
+      htmlTag: document.getElementById("root"),
     },
     fallbackLng: "en",
     interpolation: {
