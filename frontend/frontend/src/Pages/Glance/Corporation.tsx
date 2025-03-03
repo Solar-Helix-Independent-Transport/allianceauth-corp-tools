@@ -24,11 +24,11 @@ export const CorporationGlancesInfo = ({ corporationID = 0 }) => {
           cardVariant={data?.characters?.liquid < 1000000 ? "warning" : undefined}
           iconSrc={Isk}
           textVariant={data?.characters?.liquid < 1000000 ? "warning" : undefined}
-          text={`Ƶ${data?.characters?.liquid?.toLocaleString("en-US", {
+          text={`${data?.characters?.liquid?.toLocaleString("en-US", {
             maximumFractionDigits: 2,
             notation: "compact",
             compactDisplay: "short",
-          })}`}
+          })} ISK`}
           isLoading={isLoading}
           toolTipText={t("Total Liquid Isk across all characters and alts in corporation")}
         />

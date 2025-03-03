@@ -37,11 +37,11 @@ const Activities = ({ data, isLoading }: any) => {
               isLoading={isLoading}
               text={
                 data?.incursion
-                  ? `+Ƶ${data?.incursion?.toLocaleString("en-US", {
+                  ? `+${data?.incursion?.toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       notation: "compact",
                       compactDisplay: "short",
-                    })}`
+                    })} ISK`
                   : "-"
               }
               toolTipText={t("Total Isk earned in Incursions in the last 30 Days")}
@@ -53,11 +53,11 @@ const Activities = ({ data, isLoading }: any) => {
               isLoading={isLoading}
               text={
                 data?.pochven
-                  ? `+Ƶ${data?.pochven?.toLocaleString("en-US", {
+                  ? `+${data?.pochven?.toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       notation: "compact",
                       compactDisplay: "short",
-                    })}`
+                    })} ISK`
                   : "-"
               }
               toolTipText={t("Total Isk earned in Pochven in the last 30 Days")}
@@ -69,11 +69,11 @@ const Activities = ({ data, isLoading }: any) => {
               isLoading={isLoading}
               text={
                 data?.ratting
-                  ? `+Ƶ${data?.ratting?.toLocaleString("en-US", {
+                  ? `+${data?.ratting?.toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       notation: "compact",
                       compactDisplay: "short",
-                    })}`
+                    })} ISK`
                   : "-"
               }
               toolTipText={t("Total Isk earned Ratting in the last 30 Days")}
@@ -85,11 +85,11 @@ const Activities = ({ data, isLoading }: any) => {
               isLoading={isLoading}
               text={
                 data?.mission
-                  ? `+Ƶ${data?.mission?.toLocaleString("en-US", {
+                  ? `+${data?.mission?.toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       notation: "compact",
                       compactDisplay: "short",
-                    })}`
+                    })} ISK`
                   : "-"
               }
               toolTipText={t("Total Isk earned running missions in the last 30 Days")}
@@ -209,7 +209,7 @@ const Activities = ({ data, isLoading }: any) => {
                       maximumFractionDigits: 2,
                       notation: "compact",
                       compactDisplay: "short",
-                    })} Isk`
+                    })} IsSK`
                   : "-"
               }
               toolTipText={t("Planetary import/export seen in the last 30 Days")}
