@@ -233,6 +233,7 @@ class GlanceApiEndpoints:
 
             account_lp = models.LoyaltyPoint.objects.filter(
                 character__character__in=characters,
+                amount__gte=0
             ).values(
                 corp_id=F("corporation__eve_id")
             ).annotate(
