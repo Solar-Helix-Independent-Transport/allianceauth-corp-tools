@@ -23,7 +23,7 @@ export function TimeTill({ date }: TimeTillProps) {
 
   if (isValidDate(dateObj)) {
     return (
-      <>
+      <div className="text-nowrap">
         <ReactTimeAgo date={dateObj} />
         <br />
         <Figure.Caption>
@@ -37,7 +37,7 @@ export function TimeTill({ date }: TimeTillProps) {
             minute: "2-digit",
           })}
         </Figure.Caption>
-      </>
+      </div>
     );
   } else {
     return <></>;

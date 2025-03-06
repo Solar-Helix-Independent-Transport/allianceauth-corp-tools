@@ -8,9 +8,12 @@ import { Modal } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { loadStructureFit } from "../../api/corporation";
 import { PanelLoader } from "../Loaders/loaders";
+import { t } from "i18next";
 
 const type_url = (typeID: number, size = 32) => {
-  return `https://images.evetech.net/types/${typeID}/icon?size=${size}`;
+  return `https://images.evetech.net/types/${typeID}/${
+    size >= 256 ? "render" : `icon?size=${size}`
+  }`;
 };
 
 const TypeIcon = ({
@@ -179,6 +182,7 @@ const FittingModalContent = ({ ship, fitting }: any) => {
       >
         <img className="rounded" src={s} alt="Subsystem Slots" style={{ border: 0 }} />
       </div>
+      {/* This is a ship */}
       {fitting.SubSystemSlot0 && (
         <TypeIcon item={fitting.SubSystemSlot0} left={117} top={131} id="sub1" />
       )}
@@ -190,6 +194,19 @@ const FittingModalContent = ({ ship, fitting }: any) => {
       )}
       {fitting.SubSystemSlot3 && (
         <TypeIcon item={fitting.SubSystemSlot3} left={221} top={107} id="sub4" />
+      )}
+      {/* This is a structure */}
+      {fitting.ServiceSlot0 && (
+        <TypeIcon item={fitting.ServiceSlot0} left={117} top={131} id="sub1" />
+      )}
+      {fitting.ServiceSlot1 && (
+        <TypeIcon item={fitting.ServiceSlot1} left={147} top={108} id="sub2" />
+      )}
+      {fitting.ServiceSlot2 && (
+        <TypeIcon item={fitting.ServiceSlot2} left={184} top={98} id="sub3" />
+      )}
+      {fitting.ServiceSlot3 && (
+        <TypeIcon item={fitting.ServiceSlot3} left={221} top={107} id="sub4" />
       )}
 
       <div
@@ -216,22 +233,31 @@ const FittingModalContent = ({ ship, fitting }: any) => {
   );
 };
 
-export const FittingModal = ({ ship }: any) => {
+export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
   console.log(ship);
-  const { data, isLoading } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ["glances", "account", ship.id],
     queryFn: () => loadStructureFit(ship.id ? Number(ship.id) : 0),
     refetchOnWindowFocus: false,
   });
 
-  if (isLoading) {
-    return <PanelLoader title="Laoding Fit" message="Please Wait" />;
-  }
-
   return (
     <>
-      <Modal size="xl" show={true}>
-        <FittingModalContent ship={ship} fitting={data} />
+      <Modal
+        size="xl"
+        show={showModal}
+        onHide={() => {
+          setShowModal(false);
+        }}
+      >
+        <Modal.Header>
+          <Modal.Title>{ship?.name}</Modal.Title>
+        </Modal.Header>
+        {isFetching ? (
+          <PanelLoader title={t("Laoding Fit")} message={t("Please Wait")} />
+        ) : (
+          <FittingModalContent ship={ship} fitting={data} />
+        )}
       </Modal>
     </>
   );

@@ -4,9 +4,9 @@ import { TimeTill } from "../Helpers/TimeTill";
 import BaseTable from "../Tables/BaseTable/BaseTable";
 import { NameObjectArrayFilterFn } from "../Tables/BaseTable/BaseTableFilter";
 import { createColumnHelper } from "@tanstack/react-table";
-import { Badge } from "react-bootstrap";
-// import { FittingModal } from "../Modals/FittingModal";
-// import { useState } from "react";
+import { Badge, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { FittingModal } from "../Modals/FittingModal";
+import { useState } from "react";
 
 type Corporation = {
   corporation_id: number;
@@ -33,9 +33,20 @@ type StructureType = {
   services: BaseItemType[];
 };
 
+const showTooltip = (toolTipText: string | undefined) => {
+  return toolTipText ? (
+    <Tooltip placement={"top"} id={toolTipText} style={{ position: "fixed" }}>
+      {toolTipText}
+    </Tooltip>
+  ) : (
+    <></>
+  );
+};
+
 const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
   const { t } = useTranslation();
-  // const [structure, setStructure] = useState({ id: 0, name: "" });
+  const [structure, setStructure] = useState({ id: 0, name: "" });
+  const [showModal, setShowModal] = useState(false);
 
   const columnHelper = createColumnHelper<StructureType>();
 
@@ -73,29 +84,47 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
     }),
     columnHelper.accessor("name", {
       header: t("Structure"),
-      // cell: (cell) => {
-      //   return <p onClick={() => setStructure(cell.row.original)}>{cell.getValue()}</p>
-      // }
+      cell: (cell) => {
+        return (
+          <div className="d-flex text-nowrap">
+            <span className="me-auto align-self-center">{cell.getValue()}</span>
+            <OverlayTrigger
+              trigger={["hover"]}
+              overlay={showTooltip(t("Open Structure Fitting. It Assets Token is loaded."))}
+            >
+              <Button
+                size="sm"
+                onClick={() => {
+                  setStructure(cell.row.original);
+                  setShowModal(true);
+                }}
+              >
+                <i className="fa-solid fa-wrench"></i>
+              </Button>
+            </OverlayTrigger>
+          </div>
+        );
+      },
     }),
     columnHelper.accessor("type.name", {
       header: t("Type"),
       cell: (cell) => (
-        <>
-          <TypeIcon type_id={cell.row.original.type.id} size={32}></TypeIcon>,
-          <span className="ms-2">{cell.row.original.type.name}</span>
-        </>
+        <div className="d-flex text-nowrap">
+          <TypeIcon type_id={cell.row.original.type.id} size={32}></TypeIcon>
+          <span className="mx-2 ">{cell.row.original.type.name}</span>
+        </div>
       ),
     }),
     columnHelper.accessor("owner.corporation_name", {
       header: t("Owner"),
       cell: (cell) => (
-        <>
+        <div className="text-nowrap">
           <CorporationLogo
             corporation_id={cell.row.original.owner.corporation_id}
             size={32}
           ></CorporationLogo>
           <span className="ms-2">{cell.row.original.owner.corporation_name}</span>
-        </>
+        </div>
       ),
     }),
     columnHelper.accessor("fuel_expiry", {
@@ -138,7 +167,7 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
   return (
     <>
       <BaseTable {...{ isFetching, columns, data }} />
-      {/* {structure?.id !== 0 && <FittingModal ship={structure} />} */}
+      {structure?.id !== 0 && <FittingModal ship={structure} {...{ showModal, setShowModal }} />}
     </>
   );
 };
