@@ -37,6 +37,16 @@ class ErrorBoundary extends Component<Props, State> {
       return (
         <>
           <ErrorLoader title={this.state.title} message={this.state.message} />
+          <p className="text-center">
+            You should not be seeing this message
+            <br />
+            Please report this in the Corp Tools Channel on the{" "}
+            <a href="https://discord.gg/fjnHAmk">Alliance Auth Discord</a> or create an issue on the{" "}
+            <a href="https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools">
+              Git
+            </a>
+            .
+          </p>
           <div style={{ justifyContent: "center" }} className="d-flex">
             <pre style={{ maxWidth: "1000px" }} className="border">
               {this.state.trace}
