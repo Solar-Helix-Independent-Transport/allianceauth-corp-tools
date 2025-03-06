@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { AssetGroups } from "../../Components/AssetGroups";
 import CorporationAssetLocationSelect from "../../Components/Corporation/CorpAssetLocationSelect";
-import { PanelLoader } from "../../Components/Loaders/loaders";
+import { CorpLoader, PanelLoader } from "../../Components/Loaders/loaders";
 import CorpSelect from "../../Components/Corporation/CorporationSelect";
 import { loadAssetGroups } from "../../api/corporation";
 
@@ -40,8 +40,10 @@ const CorporationAssetGroups = () => {
       </div>
       {isFetching ? (
         <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />
-      ) : (
+      ) : corporationID > 0 ? (
         <AssetGroups {...{ data }} />
+      ) : (
+        <CorpLoader title={t("Select Corporation")} />
       )}
     </>
   );

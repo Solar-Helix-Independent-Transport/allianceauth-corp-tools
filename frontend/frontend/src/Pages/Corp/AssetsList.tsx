@@ -6,6 +6,7 @@ import { useQuery } from "react-query";
 import CorporationAssetLocationSelect from "../../Components/Corporation/CorpAssetLocationSelect";
 import CorpSelect from "../../Components/Corporation/CorporationSelect";
 import { loadAssetList } from "../../api/corporation";
+import { CorpLoader, PanelLoader } from "../../Components/Loaders/loaders";
 
 const CorporationAssets = () => {
   const { t } = useTranslation();
@@ -55,7 +56,13 @@ const CorporationAssets = () => {
           />
         </div>
       </div>
-      <TableWrapper {...{ isFetching, data, columns }} />
+      {isFetching ? (
+        <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />
+      ) : corporationID > 0 ? (
+        <TableWrapper {...{ isFetching, data, columns }} />
+      ) : (
+        <CorpLoader title={t("Select Corporation")} />
+      )}
     </>
   );
 };
