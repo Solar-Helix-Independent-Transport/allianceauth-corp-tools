@@ -4,6 +4,8 @@ from typing import List
 
 from ninja import NinjaAPI
 
+from django.db.models import F
+from django.db.models.functions import Power, Sqrt
 from django.http import HttpResponse
 from django.utils import timezone
 
@@ -417,3 +419,68 @@ class StructureApiEndpoints:
                 }
                 output.append(_s)
             return list(output)
+
+        @api.get(
+            "corp/starbase/{starbase_id}",
+            response={200: List, 403: str},
+            tags=self.tags
+        )
+        def get_visible_starbase_fit(request, starbase_id: int):
+            perms = (
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_structures')
+            )
+
+            if not perms:
+                logging.error(
+                    f"Permission Denied for {request.user} to view starbases!")
+                return 403, "Permission Denied!"
+
+            if models.Starbase.get_visible(
+                request.user
+            ).filter(starbase_id=starbase_id).exists():
+                parent = models.CorpAsset.objects.filter(
+                    item_id=starbase_id,
+                    coordinate__isnull=False
+                ).first()
+
+                if parent:
+                    logger.warning(f"Tower - {parent.type_name.name}")
+                    distances = models.CorpAsset.objects.filter(
+                        coordinate__isnull=False
+                    ).annotate(
+                        distance=Sqrt(
+                            Power(
+                                parent.coordinate.x - F("coordinate__x"),
+                                2
+                            ) + Power(
+                                parent.coordinate.y - F("coordinate__y"),
+                                2
+                            ) + Power(
+                                parent.coordinate.z - F("coordinate__z"),
+                                2
+                            )
+                        )
+                    ).filter(
+                        distance__lte=100000
+                    )
+
+                    assets_in_space = []
+                    for d in distances:
+                        assets_in_space.append({
+                            "type": {
+                                "id": d.type_name.type_id,
+                                "name": d.type_name.name
+                            },
+                            "distance": d.distance
+                        })
+                    return 200, assets_in_space
+            else:
+                logging.error(
+                    f"Permission Denied for {request.user} to view starbase {starbase_id}!")
+                logger.warning(f"Tower - not found in assets")
+
+                return 403, "Permission Denied!"

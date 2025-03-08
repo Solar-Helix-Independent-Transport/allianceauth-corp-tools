@@ -73,7 +73,7 @@ export async function LoadAllStarbases() {
   return api.data;
 }
 
-export async function LoadStarbaseFit(starbaseID: number) {
+export async function loadStarbaseFit(starbaseID: number) {
   const api = await axios.get(`/audit/api/corp/starbase/${starbaseID}`);
   console.log(`get starbase ${starbaseID} fit in api`);
   return api.data;

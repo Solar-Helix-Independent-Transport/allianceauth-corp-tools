@@ -688,6 +688,7 @@ def update_corp_assets(corp_id):
 
         CorpAsset.objects.bulk_create(items)
         que = []
+        que.append(fetch_coordiantes.si(corp_id))
         que.append(run_ozone_levels.si(corp_id))
         que.append(build_managed_asset_locations.si(corp_id))
         chain(que).apply_async(priority=7)
@@ -1231,8 +1232,8 @@ def fetch_starbases(self, corp_id, force_refresh=False):
                 }
             )
 
-        for id in ids:
-            get_local_assets(id)
+        # for id in ids:
+        #     get_local_assets(id)
 
         Starbase.objects.filter(
             corporation=_corporation,
@@ -1246,42 +1247,3 @@ def fetch_starbases(self, corp_id, force_refresh=False):
         pass
 
     return f"CT: Completed Starbases for {_corporation.corporation.corporation_name}"
-
-
-def get_local_assets(item_id):
-    from django.db.models import F
-    from django.db.models.functions import Power, Sqrt
-
-    from corptools.models import CorpAsset
-
-    parent = CorpAsset.objects.filter(
-        item_id=item_id,
-        coordinate__isnull=False
-    ).first()
-
-    if parent:
-        logger.warning(f"Tower - {parent.type_name.name}")
-        distances = CorpAsset.objects.filter(
-            coordinate__isnull=False
-        ).annotate(
-            distance=Sqrt(
-                Power(
-                    parent.coordinate.x - F("coordinate__x"),
-                    2
-                ) + Power(
-                    parent.coordinate.y - F("coordinate__y"),
-                    2
-                ) + Power(
-                    parent.coordinate.z - F("coordinate__z"),
-                    2
-                )
-            )
-        ).filter(
-            distance__lte=100000
-        )
-
-        for d in distances:
-            logger.info(
-                f"      - {d.type_name.name} @ {d.distance/1000:,.2f}Km")
-    else:
-        logger.warning(f"Tower - not found in assets")
