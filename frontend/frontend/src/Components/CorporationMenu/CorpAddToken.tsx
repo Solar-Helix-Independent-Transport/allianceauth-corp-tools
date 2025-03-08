@@ -20,7 +20,7 @@ function CorpAddToken() {
           action="/audit/corp/add_options"
           method="get"
           className="m-4"
-          style={{ width: "350px" }}
+          style={{ width: "400px" }}
         >
           <Form>
             <Form.Check
