@@ -1,4 +1,4 @@
-import { DateToFields, StrIntToFields, StrToFields } from "./ModalFields";
+import { DateToFields, StrToFields } from "./ModalFields";
 import { Button, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import StarbaseModalTable from "./StarbaseModalTable";
