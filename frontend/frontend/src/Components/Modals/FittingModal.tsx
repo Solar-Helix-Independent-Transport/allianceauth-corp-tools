@@ -35,7 +35,6 @@ import { Card, Modal } from "react-bootstrap";
 import { useQuery } from "react-query";
 import { loadStructureFit } from "../../api/corporation";
 import { PanelLoader } from "../Loaders/loaders";
-import { t } from "i18next";
 import { useTranslation } from "react-i18next";
 
 const type_url = (typeID: number, size = 32) => {
