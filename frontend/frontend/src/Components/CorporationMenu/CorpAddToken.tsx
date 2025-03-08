@@ -51,7 +51,7 @@ function CorpAddToken() {
             />
             <p>
               {t(
-                "Assets also Enables: LO levels in Bridges, fittings on Structures, in space fittings to Starbases's",
+                "Assets also Enables: LO levels in Bridges, fittings on Structures, in space fittings adjacent to Starbases",
               )}
             </p>
 
