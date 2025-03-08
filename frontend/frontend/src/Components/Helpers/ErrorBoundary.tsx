@@ -41,9 +41,9 @@ class ErrorBoundary extends Component<Props, State> {
             You should not be seeing this message
             <br />
             Please report this in the Corp Tools Channel on the{" "}
-            <a href="https://discord.gg/fjnHAmk">Alliance Auth Discord</a> or create an issue on the{" "}
+            <a href="https://discord.gg/fjnHAmk">Alliance Auth Discord</a> or create an issue on{" "}
             <a href="https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools">
-              Git
+              GitHub
             </a>
             .
           </p>
