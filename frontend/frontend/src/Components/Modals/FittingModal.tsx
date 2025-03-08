@@ -36,6 +36,7 @@ import { useQuery } from "react-query";
 import { loadStructureFit } from "../../api/corporation";
 import { PanelLoader } from "../Loaders/loaders";
 import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const type_url = (typeID: number, size = 32) => {
   return `https://images.evetech.net/types/${typeID}/${
@@ -258,7 +259,7 @@ const EmptyTypeDiv = ({ message }: { message: string }) => {
   );
 };
 
-const FittingModalContent = ({
+const FittingModalCircle = ({
   ship,
   fitting,
   low = 8,
@@ -457,7 +458,7 @@ const FittingModalContent = ({
 };
 
 export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
-  console.log(ship);
+  const { t } = useTranslation();
   const { data, isFetching } = useQuery({
     queryKey: ["glances", "account", ship.id],
     queryFn: () => loadStructureFit(ship.id ? Number(ship.id) : 0),
@@ -481,7 +482,7 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
         ) : (
           <div className="d-flex">
             <div className="m-3">
-              <FittingModalContent
+              <FittingModalCircle
                 ship={ship}
                 fitting={data.fit}
                 high={data.high}
@@ -495,48 +496,48 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
               {data.high > 0 && (
                 <div className="my-2">
                   <div className="aa-callout aa-callout-warning">
-                    <Card.Title>High Slots</Card.Title>
+                    <Card.Title>{t("Hi Slots")}</Card.Title>
                   </div>
                   <div className="px-3">
                     {data?.fit?.HiSlot0 ? (
                       <FitTypeDiv item={data?.fit?.HiSlot0} />
                     ) : (
-                      data.high > 0 && <EmptyTypeDiv message={"Empty High Slot"} />
+                      data.high > 0 && <EmptyTypeDiv message={t("Empty Hi Slot")} />
                     )}
                     {data?.fit?.HiSlot1 ? (
                       <FitTypeDiv item={data?.fit?.HiSlot1} />
                     ) : (
-                      data.high > 1 && <EmptyTypeDiv message={"Empty High Slot"} />
+                      data.high > 1 && <EmptyTypeDiv message={t("Empty Hi Slot")} />
                     )}
                     {data?.fit?.HiSlot2 ? (
                       <FitTypeDiv item={data?.fit?.HiSlot2} />
                     ) : (
-                      data.high > 2 && <EmptyTypeDiv message={"Empty High Slot"} />
+                      data.high > 2 && <EmptyTypeDiv message={t("Empty Hi Slot")} />
                     )}
                     {data?.fit?.HiSlot3 ? (
                       <FitTypeDiv item={data?.fit?.HiSlot3} />
                     ) : (
-                      data.high > 3 && <EmptyTypeDiv message={"Empty High Slot"} />
+                      data.high > 3 && <EmptyTypeDiv message={t("Empty Hi Slot")} />
                     )}
                     {data?.fit?.HiSlot4 ? (
                       <FitTypeDiv item={data?.fit?.HiSlot4} />
                     ) : (
-                      data.high > 4 && <EmptyTypeDiv message={"Empty High Slot"} />
+                      data.high > 4 && <EmptyTypeDiv message={t("Empty Hi Slot")} />
                     )}
                     {data?.fit?.HiSlot5 ? (
                       <FitTypeDiv item={data?.fit?.HiSlot5} />
                     ) : (
-                      data.high > 5 && <EmptyTypeDiv message={"Empty High Slot"} />
+                      data.high > 5 && <EmptyTypeDiv message={t("Empty Hi Slot")} />
                     )}
                     {data?.fit?.HiSlot6 ? (
                       <FitTypeDiv item={data?.fit?.HiSlot6} />
                     ) : (
-                      data.high > 6 && <EmptyTypeDiv message={"Empty High Slot"} />
+                      data.high > 6 && <EmptyTypeDiv message={t("Empty Hi Slot")} />
                     )}
                     {data?.fit?.HiSlot7 ? (
                       <FitTypeDiv item={data?.fit?.HiSlot7} />
                     ) : (
-                      data.high > 7 && <EmptyTypeDiv message={"Empty High Slot"} />
+                      data.high > 7 && <EmptyTypeDiv message={t("Empty Hi Slot")} />
                     )}
                   </div>
                 </div>
@@ -544,48 +545,48 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
               {data.med > 0 && (
                 <div className="my-2">
                   <div className="aa-callout aa-callout-warning">
-                    <Card.Title>Med Slots</Card.Title>
+                    <Card.Title>{t("Med Slots")}</Card.Title>
                   </div>
                   <div className="px-3">
                     {data?.fit?.MedSlot0 ? (
                       <FitTypeDiv item={data?.fit?.MedSlot0} />
                     ) : (
-                      data.med > 0 && <EmptyTypeDiv message={"Empty Med Slot"} />
+                      data.med > 0 && <EmptyTypeDiv message={t("Empty Med Slot")} />
                     )}
                     {data?.fit?.MedSlot1 ? (
                       <FitTypeDiv item={data?.fit?.MedSlot1} />
                     ) : (
-                      data.med > 1 && <EmptyTypeDiv message={"Empty Med Slot"} />
+                      data.med > 1 && <EmptyTypeDiv message={t("Empty Med Slot")} />
                     )}
                     {data?.fit?.MedSlot2 ? (
                       <FitTypeDiv item={data?.fit?.MedSlot2} />
                     ) : (
-                      data.med > 2 && <EmptyTypeDiv message={"Empty Med Slot"} />
+                      data.med > 2 && <EmptyTypeDiv message={t("Empty Med Slot")} />
                     )}
                     {data?.fit?.MedSlot3 ? (
                       <FitTypeDiv item={data?.fit?.MedSlot3} />
                     ) : (
-                      data.med > 3 && <EmptyTypeDiv message={"Empty Med Slot"} />
+                      data.med > 3 && <EmptyTypeDiv message={t("Empty Med Slot")} />
                     )}
                     {data?.fit?.MedSlot4 ? (
                       <FitTypeDiv item={data?.fit?.MedSlot4} />
                     ) : (
-                      data.med > 4 && <EmptyTypeDiv message={"Empty Med Slot"} />
+                      data.med > 4 && <EmptyTypeDiv message={t("Empty Med Slot")} />
                     )}
                     {data?.fit?.MedSlot5 ? (
                       <FitTypeDiv item={data?.fit?.MedSlot5} />
                     ) : (
-                      data.med > 5 && <EmptyTypeDiv message={"Empty Med Slot"} />
+                      data.med > 5 && <EmptyTypeDiv message={t("Empty Med Slot")} />
                     )}
                     {data?.fit?.MedSlot6 ? (
                       <FitTypeDiv item={data?.fit?.MedSlot6} />
                     ) : (
-                      data.med > 6 && <EmptyTypeDiv message={"Empty Med Slot"} />
+                      data.med > 6 && <EmptyTypeDiv message={t("Empty Med Slot")} />
                     )}
                     {data?.fit?.MedSlot7 ? (
                       <FitTypeDiv item={data?.fit?.MedSlot7} />
                     ) : (
-                      data.med > 7 && <EmptyTypeDiv message={"Empty Med Slot"} />
+                      data.med > 7 && <EmptyTypeDiv message={t("Empty Med Slot")} />
                     )}
                   </div>
                 </div>
@@ -593,48 +594,48 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
               {data.low > 0 && (
                 <div className="my-2">
                   <div className="aa-callout aa-callout-warning">
-                    <Card.Title>Low Slots</Card.Title>
+                    <Card.Title>{t("Lo Slots")}</Card.Title>
                   </div>
                   <div className="px-3">
                     {data?.fit?.LoSlot0 ? (
                       <FitTypeDiv item={data?.fit?.LoSlot0} />
                     ) : (
-                      data.low > 0 && <EmptyTypeDiv message={"Empty Low Slot"} />
+                      data.low > 0 && <EmptyTypeDiv message={t("Empty Lo Slot")} />
                     )}
                     {data?.fit?.LoSlot1 ? (
                       <FitTypeDiv item={data?.fit?.LoSlot1} />
                     ) : (
-                      data.low > 1 && <EmptyTypeDiv message={"Empty Low Slot"} />
+                      data.low > 1 && <EmptyTypeDiv message={t("Empty Lo Slot")} />
                     )}
                     {data?.fit?.LoSlot2 ? (
                       <FitTypeDiv item={data?.fit?.LoSlot2} />
                     ) : (
-                      data.low > 2 && <EmptyTypeDiv message={"Empty Low Slot"} />
+                      data.low > 2 && <EmptyTypeDiv message={t("Empty Lo Slot")} />
                     )}
                     {data?.fit?.LoSlot3 ? (
                       <FitTypeDiv item={data?.fit?.LoSlot3} />
                     ) : (
-                      data.low > 3 && <EmptyTypeDiv message={"Empty Low Slot"} />
+                      data.low > 3 && <EmptyTypeDiv message={t("Empty Lo Slot")} />
                     )}
                     {data?.fit?.LoSlot4 ? (
                       <FitTypeDiv item={data?.fit?.LoSlot4} />
                     ) : (
-                      data.low > 4 && <EmptyTypeDiv message={"Empty Low Slot"} />
+                      data.low > 4 && <EmptyTypeDiv message={t("Empty Lo Slot")} />
                     )}
                     {data?.fit?.LoSlot5 ? (
                       <FitTypeDiv item={data?.fit?.LoSlot5} />
                     ) : (
-                      data.low > 5 && <EmptyTypeDiv message={"Empty Low Slot"} />
+                      data.low > 5 && <EmptyTypeDiv message={t("Empty Lo Slot")} />
                     )}
                     {data?.fit?.LoSlot6 ? (
                       <FitTypeDiv item={data?.fit?.LoSlot6} />
                     ) : (
-                      data.low > 6 && <EmptyTypeDiv message={"Empty Low Slot"} />
+                      data.low > 6 && <EmptyTypeDiv message={t("Empty Lo Slot")} />
                     )}
                     {data?.fit?.LoSlot7 ? (
                       <FitTypeDiv item={data?.fit?.LoSlot7} />
                     ) : (
-                      data.low > 7 && <EmptyTypeDiv message={"Empty Low Slot"} />
+                      data.low > 7 && <EmptyTypeDiv message={t("Empty Lo Slot")} />
                     )}
                   </div>
                 </div>
@@ -642,23 +643,23 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
               {data.rig > 0 && (
                 <div className="my-2">
                   <div className="aa-callout aa-callout-warning">
-                    <Card.Title>Rigs</Card.Title>
+                    <Card.Title>{t("Rigs")}</Card.Title>
                   </div>
                   <div className="px-3">
                     {data?.fit?.RigSlot0 ? (
                       <FitTypeDiv item={data?.fit?.RigSlot0} />
                     ) : (
-                      data.rig > 0 && <EmptyTypeDiv message={"Empty Rig Slot"} />
+                      data.rig > 0 && <EmptyTypeDiv message={t("Empty Rig Slot")} />
                     )}
                     {data?.fit?.RigSlot1 ? (
                       <FitTypeDiv item={data?.fit?.RigSlot1} />
                     ) : (
-                      data.rig > 1 && <EmptyTypeDiv message={"Empty Rig Slot"} />
+                      data.rig > 1 && <EmptyTypeDiv message={t("Empty Rig Slot")} />
                     )}
                     {data?.fit?.RigSlot2 ? (
                       <FitTypeDiv item={data?.fit?.RigSlot2} />
                     ) : (
-                      data.rig > 2 && <EmptyTypeDiv message={"Empty Rig Slot"} />
+                      data.rig > 2 && <EmptyTypeDiv message={t("Empty Rig Slot")} />
                     )}
                   </div>
                 </div>
@@ -666,38 +667,38 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
               {data.service > 0 && (
                 <div className="my-2">
                   <div className="aa-callout aa-callout-warning">
-                    <Card.Title>Service Slots</Card.Title>
+                    <Card.Title>{t("Service Slots")}</Card.Title>
                   </div>
                   <div className="px-3">
                     {data?.fit?.ServiceSlot0 ? (
                       <FitTypeDiv item={data?.fit?.ServiceSlot0} />
                     ) : (
-                      data.service > 0 && <EmptyTypeDiv message={"Empty Service Slot"} />
+                      data.service > 0 && <EmptyTypeDiv message={t("Empty Service Slot")} />
                     )}
                     {data?.fit?.ServiceSlot1 ? (
                       <FitTypeDiv item={data?.fit?.ServiceSlot1} />
                     ) : (
-                      data.service > 1 && <EmptyTypeDiv message={"Empty Service Slot"} />
+                      data.service > 1 && <EmptyTypeDiv message={t("Empty Service Slot")} />
                     )}
                     {data?.fit?.ServiceSlot2 ? (
                       <FitTypeDiv item={data?.fit?.ServiceSlot2} />
                     ) : (
-                      data.service > 2 && <EmptyTypeDiv message={"Empty Service Slot"} />
+                      data.service > 2 && <EmptyTypeDiv message={t("Empty Service Slot")} />
                     )}
                     {data?.fit?.ServiceSlot3 ? (
                       <FitTypeDiv item={data?.fit?.ServiceSlot3} />
                     ) : (
-                      data.service > 3 && <EmptyTypeDiv message={"Empty Service Slot"} />
+                      data.service > 3 && <EmptyTypeDiv message={t("Empty Service Slot")} />
                     )}
                     {data?.fit?.ServiceSlot4 ? (
                       <FitTypeDiv item={data?.fit?.ServiceSlot4} />
                     ) : (
-                      data.service > 4 && <EmptyTypeDiv message={"Empty Service Slot"} />
+                      data.service > 4 && <EmptyTypeDiv message={t("Empty Service Slot")} />
                     )}
                     {data?.fit?.ServiceSlot5 ? (
                       <FitTypeDiv item={data?.fit?.ServiceSlot5} />
                     ) : (
-                      data.service > 5 && <EmptyTypeDiv message={"Empty Service Slot"} />
+                      data.service > 5 && <EmptyTypeDiv message={t("Empty Service Slot")} />
                     )}
                   </div>
                 </div>
@@ -705,38 +706,38 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
               {data.subsystem > 0 && (
                 <div className="my-2">
                   <div className="aa-callout aa-callout-warning">
-                    <Card.Title>Service Slots</Card.Title>
+                    <Card.Title>{t("Service Slots")}</Card.Title>
                   </div>
                   <div className="px-3">
                     {data?.fit?.SubSystemSlot0 ? (
                       <FitTypeDiv item={data?.fit?.SubSystemSlot0} />
                     ) : (
-                      data.subsystem > 0 && <EmptyTypeDiv message={"Empty SubSystem Slot"} />
+                      data.subsystem > 0 && <EmptyTypeDiv message={t("Empty Sub System Slot")} />
                     )}
                     {data?.fit?.SubSystemSlot1 ? (
                       <FitTypeDiv item={data?.fit?.SubSystemSlot1} />
                     ) : (
-                      data.subsystem > 1 && <EmptyTypeDiv message={"Empty SubSystem Slot"} />
+                      data.subsystem > 1 && <EmptyTypeDiv message={t("Empty Sub System Slot")} />
                     )}
                     {data?.fit?.SubSystemSlot2 ? (
                       <FitTypeDiv item={data?.fit?.SubSystemSlot2} />
                     ) : (
-                      data.subsystem > 2 && <EmptyTypeDiv message={"Empty SubSystem Slot"} />
+                      data.subsystem > 2 && <EmptyTypeDiv message={t("Empty Sub System Slot")} />
                     )}
                     {data?.fit?.SubSystemSlot3 ? (
                       <FitTypeDiv item={data?.fit?.SubSystemSlot3} />
                     ) : (
-                      data.subsystem > 3 && <EmptyTypeDiv message={"Empty SubSystem Slot"} />
+                      data.subsystem > 3 && <EmptyTypeDiv message={t("Empty Sub System Slot")} />
                     )}
                     {data?.fit?.SubSystemSlot4 ? (
                       <FitTypeDiv item={data?.fit?.SubSystemSlot4} />
                     ) : (
-                      data.subsystem > 4 && <EmptyTypeDiv message={"Empty SubSystem Slot"} />
+                      data.subsystem > 4 && <EmptyTypeDiv message={t("Empty Sub System Slot")} />
                     )}
                     {data?.fit?.SubSystemSlot5 ? (
                       <FitTypeDiv item={data?.fit?.SubSystemSlot5} />
                     ) : (
-                      data.subsystem > 5 && <EmptyTypeDiv message={"Empty SubSystem Slot"} />
+                      data.subsystem > 5 && <EmptyTypeDiv message={t("Empty Sub System Slot")} />
                     )}
                   </div>
                 </div>
@@ -745,7 +746,7 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
               {data.fit.StructureFuel && (
                 <div className="my-2">
                   <div className="aa-callout aa-callout-warning">
-                    <Card.Title>Structure Fuel</Card.Title>
+                    <Card.Title>{t("Structure Fuel")}</Card.Title>
                   </div>
                   <div className="px-3">
                     {data?.fit?.StructureFuel.map((item: any) => (
@@ -758,7 +759,7 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
               {data.fit.Cargo && (
                 <div className="my-2">
                   <div className="aa-callout aa-callout-warning">
-                    <Card.Title>Cargo</Card.Title>
+                    <Card.Title>{t("Cargo")}</Card.Title>
                   </div>
                   <div className="px-3">
                     {data?.fit?.Cargo.map((item: any) => <FitTypeDiv item={item} qty={item.qty} />)}
@@ -769,7 +770,7 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
               {data.fit.MoonMaterialBay && (
                 <div className="my-2">
                   <div className="aa-callout aa-callout-warning">
-                    <Card.Title>Moon Material Bay</Card.Title>
+                    <Card.Title>{t("Moon Material Bay")}</Card.Title>
                   </div>
                   <div className="px-3">
                     {data?.fit?.MoonMaterialBay.map((item: any) => (
@@ -782,7 +783,7 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
               {data.fighter > 0 && (
                 <div className="my-2">
                   <div className="aa-callout aa-callout-warning">
-                    <Card.Title>Fighter Tubes</Card.Title>
+                    <Card.Title>{"Fighter Tubes"}</Card.Title>
                   </div>
                   <div className="px-3">
                     {data?.fit?.FighterTube0 ? (
@@ -817,7 +818,7 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
               {data?.fit?.FighterBay && (
                 <div className="my-2">
                   <div className="aa-callout aa-callout-warning">
-                    <Card.Title>Fighter Bay</Card.Title>
+                    <Card.Title>{t("Fighter Bay")}</Card.Title>
                   </div>
                   <div className="px-3">
                     {data?.fit?.FighterBay.map((item: any) => (
