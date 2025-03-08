@@ -40,6 +40,7 @@ import CorporationAssets from "./Pages/Corp/AssetsList";
 import CorporationWallets from "./Pages/Corp/Wallet";
 import CorporationPocos from "./Pages/Corp/Pocos";
 import CorporationStatus from "./Pages/Corp/Status";
+import CorporationStarbases from "./Pages/Corp/Starbases";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -130,14 +131,7 @@ function App() {
               <Route path="assetgroup" element={<CorporationAssetGroups />} />
               <Route path="assetlist" element={<CorporationAssets />} />
               <Route path="pocos" element={<CorporationPocos />} />
-              <Route
-                path="pos"
-                element={
-                  <Card>
-                    <Card.Body className="text-center">This is POSs.</Card.Body>
-                  </Card>
-                }
-              />
+              <Route path="starbases" element={<CorporationStarbases />} />
               <Route path="bridges" element={<Bridges />} />
               {/* <Route path="fuel" element={<Bridges />} /> */}
               {/* <Route

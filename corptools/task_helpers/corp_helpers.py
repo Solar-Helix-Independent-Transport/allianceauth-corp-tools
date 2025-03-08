@@ -24,8 +24,8 @@ from ..models import (
     CorporateContract, CorporateContractItem, CorporationAudit,
     CorporationWalletDivision, CorporationWalletJournalEntry,
     CorptoolsConfiguration, EveItemType, EveLocation, EveName, MapJumpBridge,
-    MapSystem, MapSystemPlanet, Poco, Structure, StructureCelestial,
-    StructureService,
+    MapSystem, MapSystemMoon, MapSystemPlanet, Poco, Starbase, Structure,
+    StructureCelestial, StructureService,
 )
 from . import sanitize_location_flag
 
@@ -1138,7 +1138,7 @@ def fetch_coordiantes(self, corp_id):
 
 
 @shared_task(bind=True, base=QueueOnce)
-def fetch_starbases(self, corp_id):
+def fetch_starbases(self, corp_id, force_refresh=False):
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
 
@@ -1153,19 +1153,99 @@ def fetch_starbases(self, corp_id):
         _req_roles
     )
 
-    starbases = providers.esi.client.Corporation.get_corporations_corporation_id_starbases(
+    starbases_ob = providers.esi.client.Corporation.get_corporations_corporation_id_starbases(
         corporation_id=_corporation.corporation.corporation_id,
-        token=_token.valid_access_token()
-    ).result()
+    )
+    try:
+        starbases = etag_results(starbases_ob, _token,
+                                 force_refresh=force_refresh)
 
-    logger.info(f"CT: STARBASES {starbases}")
+        logger.info(f"CT: STARBASES {starbases}")
 
-    ids = []
-    for sb in starbases:
-        ids.append(sb['starbase_id'])
+        ids = []
+        for sb in starbases:
+            ids.append(sb['starbase_id'])
 
-    for id in ids:
-        get_local_assets(id)
+        starbase_names = {}
+
+        _req_scopes_assets = ['esi-assets.read_corporation_assets.v1']
+        _req_roles_assets = ['Director']
+        _token_assets = get_corp_token(
+            _corporation.corporation.corporation_id,
+            _req_scopes_assets,
+            _req_roles_assets
+        )
+
+        if _token_assets:
+            names = providers.esi.client.Assets.post_corporations_corporation_id_assets_names(
+                corporation_id=_corporation.corporation.corporation_id,
+                item_ids=ids,
+                token=_token.valid_access_token()
+            ).result()
+            for nm in names:
+                starbase_names[nm.get("item_id")] = nm.get("name")
+
+        for sb in starbases:
+            starbase = providers.esi.client.Corporation.get_corporations_corporation_id_starbases_starbase_id(
+                corporation_id=_corporation.corporation.corporation_id,
+                starbase_id=sb.get("starbase_id"),
+                system_id=sb.get("system_id"),
+                token=_token.valid_access_token()
+            ).result()
+
+            update_fields = {}
+
+            if sb.get("moon_id"):
+                moon, _created = MapSystemMoon.objects.get_or_create_from_esi(
+                    sb.get("moon_id"))
+                update_fields["moon"] = moon
+
+            eve_type, _created = EveItemType.objects.get_or_create_from_esi(
+                sb.get("type_id"))
+            Starbase.objects.update_or_create(
+                starbase_id=sb.get("starbase_id"),
+                corporation=_corporation,
+                defaults={
+                    "name": starbase_names.get(sb.get("starbase_id")),
+                    "onlined_since": sb.get("onlined_since"),
+                    "reinforced_until": sb.get("reinforced_until"),
+                    "unanchor_at": sb.get("unanchor_at"),
+                    "state": sb.get("state"),
+                    "system_id": sb.get("system_id"),
+                    "type_name": eve_type,
+                    "allow_alliance_members": starbase.get("allow_alliance_members"),
+                    "allow_corporation_members": starbase.get("allow_corporation_members"),
+                    "anchor": starbase.get("anchor"),
+                    "attack_if_at_war": starbase.get("attack_if_at_war"),
+                    "attack_if_other_security_status_dropping": starbase.get("attack_if_other_security_status_dropping"),
+                    "attack_security_status_threshold": starbase.get("attack_security_status_threshold"),
+                    "attack_standing_threshold": starbase.get("attack_standing_threshold"),
+                    "fuel_bay_take": starbase.get("fuel_bay_take"),
+                    "fuel_bay_view": starbase.get("fuel_bay_view"),
+                    "offline": starbase.get("offline"),
+                    "online": starbase.get("online"),
+                    "unanchor": starbase.get("unanchor"),
+                    "use_alliance_standings": starbase.get("use_alliance_standings"),
+                    "fuels": starbase.get("fuels", {}),
+                    **update_fields
+                }
+            )
+
+        for id in ids:
+            get_local_assets(id)
+
+        Starbase.objects.filter(
+            corporation=_corporation,
+        ).exclude(
+            starbase_id__in=ids
+        ).delete()
+
+    except NotModifiedError:
+        logger.info(
+            f"CT: No New Starbases for {_corporation.corporation.corporation_name}")
+        pass
+
+    return f"CT: Completed Starbases for {_corporation.corporation.corporation_name}"
 
 
 def get_local_assets(item_id):
@@ -1175,28 +1255,33 @@ def get_local_assets(item_id):
     from corptools.models import CorpAsset
 
     parent = CorpAsset.objects.filter(
-        item_id=item_id
+        item_id=item_id,
+        coordinate__isnull=False
     ).first()
 
-    logger.warning(f"Tower - {parent.type_name.name}")
-    distances = CorpAsset.objects.filter(
-        coordinate__isnull=False
-    ).annotate(
-        distance=Sqrt(
-            Power(
-                parent.coordinate.x - F("coordinate__x"),
-                2
-            ) + Power(
-                parent.coordinate.y - F("coordinate__y"),
-                2
-            ) + Power(
-                parent.coordinate.z - F("coordinate__z"),
-                2
+    if parent:
+        logger.warning(f"Tower - {parent.type_name.name}")
+        distances = CorpAsset.objects.filter(
+            coordinate__isnull=False
+        ).annotate(
+            distance=Sqrt(
+                Power(
+                    parent.coordinate.x - F("coordinate__x"),
+                    2
+                ) + Power(
+                    parent.coordinate.y - F("coordinate__y"),
+                    2
+                ) + Power(
+                    parent.coordinate.z - F("coordinate__z"),
+                    2
+                )
             )
+        ).filter(
+            distance__lte=100000
         )
-    ).filter(
-        distance__lte=100000
-    )
 
-    for d in distances:
-        logger.info(f"      - {d.type_name.name} @ {d.distance/1000:,.2f}Km")
+        for d in distances:
+            logger.info(
+                f"      - {d.type_name.name} @ {d.distance/1000:,.2f}Km")
+    else:
+        logger.warning(f"Tower - not found in assets")

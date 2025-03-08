@@ -33,6 +33,15 @@ function CorpAddToken() {
             />
             <br />
             <Form.Check
+              label={t("Starbases")}
+              type="checkbox"
+              defaultChecked={true}
+              inline={true}
+              id="sb"
+              name="sb"
+            />
+            <br />
+            <Form.Check
               type="checkbox"
               defaultChecked={false}
               //   inline={true}
@@ -40,7 +49,11 @@ function CorpAddToken() {
               name="a"
               label={t("Assets")}
             />
-            <h6>{t("Assets Enables LO Levels in Bridges")}</h6>
+            <p>
+              {t(
+                "Assets also Enables: LO levels in Bridges, fittings on Structures, in space fittings to Starbases's",
+              )}
+            </p>
 
             <Form.Check
               type="checkbox"
@@ -50,7 +63,7 @@ function CorpAddToken() {
               name="m"
               label={t("Moons")}
             />
-            <h6>{t("Moons enable Active Observation Tracking")}</h6>
+            <p>{t("Moons enable Active Observation Tracking")}</p>
 
             <Form.Check
               type="checkbox"
@@ -60,7 +73,7 @@ function CorpAddToken() {
               name="w"
               label={t("Wallets")}
             />
-            <h6>{t("Required for invoice module on holding corps")}</h6>
+            <p>{t("Required for invoice module on holding corps")}</p>
 
             <Form.Check
               type="checkbox"
@@ -70,9 +83,9 @@ function CorpAddToken() {
               name="t"
               label={t("Member Tracking")}
             />
-            <h6>
+            <p>
               {t("Member Tracking enables the Last Login Tracking of characters for smart filters")}
-            </h6>
+            </p>
 
             <Form.Check
               type="checkbox"

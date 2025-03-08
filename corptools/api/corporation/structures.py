@@ -224,10 +224,10 @@ class StructureApiEndpoints:
                 | request.user.has_perm('corptools.global_corp_manager')
                 | request.user.has_perm('corptools.holding_corp_structures')
             )
-            vis = models.Structure.get_visible(request.user).filter(
-                structure_id=structure_id).exists()
+            structure = models.Structure.get_visible(request.user).filter(
+                structure_id=structure_id)
 
-            if not perms or not perms:
+            if not perms or not structure.exists():
                 logging.error(
                     f"Permission Denied for {request.user} to view structures!")
                 return 403, "Permission Denied!"
@@ -237,10 +237,18 @@ class StructureApiEndpoints:
             accepted_flags = [
                 "Cargo",
                 "StructureFuel",
-                "QuantumCoreRoom"
+                "QuantumCoreRoom",
+                "FighterBay",
+                "MoonMaterialBay"
             ]
             for a in assets:
+
                 if "Slot" in a.location_flag:
+                    output[a.location_flag] = {
+                        "id": a.type_name.type_id,
+                        "name": a.type_name.name
+                    }
+                elif "Tube" in a.location_flag:
                     output[a.location_flag] = {
                         "id": a.type_name.type_id,
                         "name": a.type_name.name
@@ -251,9 +259,34 @@ class StructureApiEndpoints:
                             output[a.location_flag] = []
                         output[a.location_flag].append({
                             "id": a.type_name.type_id,
-                            "name": a.type_name.name
+                            "name": a.type_name.name,
+                            "qty": a.quantity
                         })
-            return output
+
+            _dogma = models.EveItemDogmaAttribute.objects.filter(
+                eve_type_id=structure.first().type_id,
+                attribute_id__in=[12, 13, 14, 1137, 2216, 2056]
+            )
+            slots = {"low": 8, "med": 8, "high": 8, "rig": 3,
+                     "service": 0, "fighter": 0, "subsystem": 0}
+            for d in _dogma:
+                if d.attribute_id == 12:
+                    slots["low"] = d.value
+                if d.attribute_id == 13:
+                    slots["med"] = d.value
+                if d.attribute_id == 14:
+                    slots["high"] = d.value
+                if d.attribute_id == 1137:
+                    slots["rig"] = d.value
+                if d.attribute_id == 2216:
+                    slots["fighter"] = d.value
+                if d.attribute_id == 2056:
+                    slots["service"] = d.value
+
+            return {
+                "fit": output,
+                **slots
+            }
 
         @api.get(
             "corp/pocos",
@@ -323,3 +356,64 @@ class StructureApiEndpoints:
 
                 output.append(f"{id} {from_sys} --> {to_sys}")
             return HttpResponse("\n".join(output), content_type="text/plain")
+
+        @api.get(
+            "corp/starbases",
+            response={200: List, 403: str},
+            tags=self.tags
+        )
+        def get_visible_starbases(request):
+            perms = (
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.holding_corp_structures')
+            )
+
+            if not perms:
+                logging.error(
+                    f"Permission Denied for {request.user} to view starbases!")
+                return 403, "Permission Denied!"
+
+            output = []
+            for s in models.Starbase.get_visible(request.user).select_related(
+                'type_name', "corporation__corporation", "system", "moon"
+            ):
+                _s = {
+                    "starbase_id": s.starbase_id,
+                    "owner": {
+                        "corporation_id": s.corporation.corporation.corporation_id,
+                        "corporation_name": s.corporation.corporation.corporation_name,
+                    },
+                    "name": s.name,
+                    "type": {"id": s.type_name.type_id,
+                             "name": s.type_name.name},
+                    "system": {"id": s.system.system_id,
+                               "name": s.system.name},
+                    "constellation": {"id": s.system.constellation.constellation_id,
+                                      "name": s.system.constellation.name},
+                    "region": {"id": s.system.constellation.region.region_id,
+                               "name": s.system.constellation.region.name},
+                    "moon": {"id": s.moon.moon_id,
+                             "name": s.moon.name},
+                    "state": s.state,
+                    "onlined_since": s.onlined_since,
+                    "reinforced_until": s.reinforced_until,
+                    "unanchor_at": s.unanchor_at,
+                    "allow_alliance_members": s.allow_alliance_members,
+                    "allow_corporation_members": s.allow_corporation_members,
+                    "attack_if_other_security_status_dropping": s.attack_if_other_security_status_dropping,
+                    "use_alliance_standings": s.use_alliance_standings,
+                    "attack_security_status_threshold": s.attack_security_status_threshold,
+                    "attack_standing_threshold": s.attack_standing_threshold,
+                    "anchor": s.anchor,
+                    "online": s.online,
+                    "offline": s.offline,
+                    "unanchor": s.unanchor,
+                    "fuel_bay_take": s.fuel_bay_take,
+                    "fuel_bay_view": s.fuel_bay_view,
+                    "fuels": s.fuels
+                }
+                output.append(_s)
+            return list(output)

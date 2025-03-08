@@ -32,10 +32,10 @@ const CorpMenu = () => {
           name: t("Pocos"),
           link: `pocos`,
         },
-        // {
-        //   name: t("POSs"),
-        //   link: `pos`,
-        // },
+        {
+          name: t("Starbases"),
+          link: `starbases`,
+        },
       ],
     },
     {

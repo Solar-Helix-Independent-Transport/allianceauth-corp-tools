@@ -60,15 +60,28 @@ export async function loadAllStructures() {
   console.log(`get structures in api`);
   return api.data;
 }
+
 export async function loadStructureFit(structureId: number) {
   const api = await axios.get(`/audit/api/corp/structures/${structureId}`);
   console.log(`get structures in api`);
   return api.data;
 }
 
+export async function LoadAllStarbases() {
+  const api = await axios.get(`/audit/api/corp/starbases`);
+  console.log(`get starbases in api`);
+  return api.data;
+}
+
+export async function LoadStarbaseFit(starbaseID: number) {
+  const api = await axios.get(`/audit/api/corp/starbase/${starbaseID}`);
+  console.log(`get starbase ${starbaseID} fit in api`);
+  return api.data;
+}
+
 export async function loadAllPocos() {
   const api = await axios.get(`/audit/api/corp/pocos`);
-  console.log(`get pocos in api 1`);
+  console.log(`get pocos in api`);
   return api.data;
 }
 
