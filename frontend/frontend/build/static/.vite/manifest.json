@@ -37,7 +37,7 @@
     ]
   },
   "index.html": {
-    "file": "assets/index-CNwLR-5y.js",
+    "file": "assets/index-B5WL_zia.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
@@ -68,7 +68,30 @@
       "static/corptools/bs5/static/img/amarr_128-B9KvGWt4.png",
       "static/corptools/bs5/static/img/caldari_128-BSQ2VRRx.png",
       "static/corptools/bs5/static/img/gallente_128-oOYpsEmX.png",
-      "static/corptools/bs5/static/img/minmatar128-BCerHXFk.png"
+      "static/corptools/bs5/static/img/minmatar128-BCerHXFk.png",
+      "static/corptools/bs5/static/img/tyrannis-DSq5_x0q.png",
+      "static/corptools/bs5/static/img/3h-X6O4aMtx.png",
+      "static/corptools/bs5/static/img/4h-DM7Dhiqa.png",
+      "static/corptools/bs5/static/img/5h-BicZ_kS5.png",
+      "static/corptools/bs5/static/img/6h-ndoyFy77.png",
+      "static/corptools/bs5/static/img/7h-B5R4GWMb.png",
+      "static/corptools/bs5/static/img/8h-C17Yjhwj.png",
+      "static/corptools/bs5/static/img/4m-DvP_HOND.png",
+      "static/corptools/bs5/static/img/5m-fFpAJ2rM.png",
+      "static/corptools/bs5/static/img/6m-DKVPLsUc.png",
+      "static/corptools/bs5/static/img/7m-BLe6olY4.png",
+      "static/corptools/bs5/static/img/8m-hxd_N3hx.png",
+      "static/corptools/bs5/static/img/8l-UbnNMK0o.png",
+      "static/corptools/bs5/static/img/7l-Dql_h1Xo.png",
+      "static/corptools/bs5/static/img/6l-Ciemt68W.png",
+      "static/corptools/bs5/static/img/5l-DtBLoe7X.png",
+      "static/corptools/bs5/static/img/4l-BsWsNOjS.png",
+      "static/corptools/bs5/static/img/3r-BEm9rD6Q.png",
+      "static/corptools/bs5/static/img/1s-3LB3dveW.png",
+      "static/corptools/bs5/static/img/2s-DLD5F1oU.png",
+      "static/corptools/bs5/static/img/3s-bnWOfmy9.png",
+      "static/corptools/bs5/static/img/4s-wQRUJNgw.png",
+      "static/corptools/bs5/static/img/5s-C_pFgY_F.png"
     ]
   },
   "src/assets/amarr_128.png": {
@@ -86,6 +109,98 @@
   "src/assets/extractor_64.png": {
     "file": "static/corptools/bs5/static/img/extractor_64-BQGwjQ_v.png",
     "src": "src/assets/extractor_64.png"
+  },
+  "src/assets/fittings/1s.png": {
+    "file": "static/corptools/bs5/static/img/1s-3LB3dveW.png",
+    "src": "src/assets/fittings/1s.png"
+  },
+  "src/assets/fittings/2s.png": {
+    "file": "static/corptools/bs5/static/img/2s-DLD5F1oU.png",
+    "src": "src/assets/fittings/2s.png"
+  },
+  "src/assets/fittings/3h.png": {
+    "file": "static/corptools/bs5/static/img/3h-X6O4aMtx.png",
+    "src": "src/assets/fittings/3h.png"
+  },
+  "src/assets/fittings/3r.png": {
+    "file": "static/corptools/bs5/static/img/3r-BEm9rD6Q.png",
+    "src": "src/assets/fittings/3r.png"
+  },
+  "src/assets/fittings/3s.png": {
+    "file": "static/corptools/bs5/static/img/3s-bnWOfmy9.png",
+    "src": "src/assets/fittings/3s.png"
+  },
+  "src/assets/fittings/4h.png": {
+    "file": "static/corptools/bs5/static/img/4h-DM7Dhiqa.png",
+    "src": "src/assets/fittings/4h.png"
+  },
+  "src/assets/fittings/4l.png": {
+    "file": "static/corptools/bs5/static/img/4l-BsWsNOjS.png",
+    "src": "src/assets/fittings/4l.png"
+  },
+  "src/assets/fittings/4m.png": {
+    "file": "static/corptools/bs5/static/img/4m-DvP_HOND.png",
+    "src": "src/assets/fittings/4m.png"
+  },
+  "src/assets/fittings/4s.png": {
+    "file": "static/corptools/bs5/static/img/4s-wQRUJNgw.png",
+    "src": "src/assets/fittings/4s.png"
+  },
+  "src/assets/fittings/5h.png": {
+    "file": "static/corptools/bs5/static/img/5h-BicZ_kS5.png",
+    "src": "src/assets/fittings/5h.png"
+  },
+  "src/assets/fittings/5l.png": {
+    "file": "static/corptools/bs5/static/img/5l-DtBLoe7X.png",
+    "src": "src/assets/fittings/5l.png"
+  },
+  "src/assets/fittings/5m.png": {
+    "file": "static/corptools/bs5/static/img/5m-fFpAJ2rM.png",
+    "src": "src/assets/fittings/5m.png"
+  },
+  "src/assets/fittings/5s.png": {
+    "file": "static/corptools/bs5/static/img/5s-C_pFgY_F.png",
+    "src": "src/assets/fittings/5s.png"
+  },
+  "src/assets/fittings/6h.png": {
+    "file": "static/corptools/bs5/static/img/6h-ndoyFy77.png",
+    "src": "src/assets/fittings/6h.png"
+  },
+  "src/assets/fittings/6l.png": {
+    "file": "static/corptools/bs5/static/img/6l-Ciemt68W.png",
+    "src": "src/assets/fittings/6l.png"
+  },
+  "src/assets/fittings/6m.png": {
+    "file": "static/corptools/bs5/static/img/6m-DKVPLsUc.png",
+    "src": "src/assets/fittings/6m.png"
+  },
+  "src/assets/fittings/7h.png": {
+    "file": "static/corptools/bs5/static/img/7h-B5R4GWMb.png",
+    "src": "src/assets/fittings/7h.png"
+  },
+  "src/assets/fittings/7l.png": {
+    "file": "static/corptools/bs5/static/img/7l-Dql_h1Xo.png",
+    "src": "src/assets/fittings/7l.png"
+  },
+  "src/assets/fittings/7m.png": {
+    "file": "static/corptools/bs5/static/img/7m-BLe6olY4.png",
+    "src": "src/assets/fittings/7m.png"
+  },
+  "src/assets/fittings/8h.png": {
+    "file": "static/corptools/bs5/static/img/8h-C17Yjhwj.png",
+    "src": "src/assets/fittings/8h.png"
+  },
+  "src/assets/fittings/8l.png": {
+    "file": "static/corptools/bs5/static/img/8l-UbnNMK0o.png",
+    "src": "src/assets/fittings/8l.png"
+  },
+  "src/assets/fittings/8m.png": {
+    "file": "static/corptools/bs5/static/img/8m-hxd_N3hx.png",
+    "src": "src/assets/fittings/8m.png"
+  },
+  "src/assets/fittings/tyrannis.png": {
+    "file": "static/corptools/bs5/static/img/tyrannis-DSq5_x0q.png",
+    "src": "src/assets/fittings/tyrannis.png"
   },
   "src/assets/gallente_128.png": {
     "file": "static/corptools/bs5/static/img/gallente_128-oOYpsEmX.png",
