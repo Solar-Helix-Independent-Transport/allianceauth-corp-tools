@@ -249,7 +249,8 @@ def admin_run_tasks(request):
             update_all_eve_names.apply_async(priority=6)
         if request.POST.get('run_corp_updates'):
             messages.info(request, "Queued update_all_corps")
-            update_all_corps.apply_async(priority=6)
+            update_all_corps.apply_async(
+                priority=6, kwargs={"force_refresh": True})
         if request.POST.get('run_locations'):
             messages.info(request, "Queued update_all_locations")
             update_all_locations.apply_async(priority=6)

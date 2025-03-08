@@ -1,7 +1,7 @@
 import { Nav, NavDropdown } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
 
-const BASEURL = "/audit/r_beta/corp/";
+const BASEURL = "/audit/r/corp/";
 
 export const MenuDropdown = ({ cat }: any) => {
   const path = useLocation();

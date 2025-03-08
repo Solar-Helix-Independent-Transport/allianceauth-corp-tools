@@ -1138,8 +1138,7 @@ def fetch_coordiantes(self, corp_id):
     AssetCoordiante.objects.bulk_create(new_models, ignore_conflicts=True)
 
 
-@shared_task(bind=True, base=QueueOnce)
-def fetch_starbases(self, corp_id, force_refresh=False):
+def fetch_starbases(corp_id, force_refresh=False):
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
 

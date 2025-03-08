@@ -122,7 +122,7 @@ function App() {
                 }
               />
             </Route>
-            <Route path="audit/r_beta/corp/" element={<CorporationAudit />}>
+            <Route path="audit/r/corp/" element={<CorporationAudit />}>
               <Route index element={<Navigate to="glance" replace />} />
               <Route path="corporations" element={<CorporationStatus />} />
               <Route path="glance" element={<CorporationAtAGlance />} />

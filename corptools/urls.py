@@ -68,9 +68,9 @@ urlpatterns = [
         name='reactmain'
     ),
     re_path(
-        'r_beta/corp',
+        'r/corp',
         views.react_corp_beta,
-        name='corp_beta_react'
+        name='corp_react'
     ),
     path(
         'r_legacy/',
@@ -94,7 +94,7 @@ urlpatterns = [
     re_path(r'^char/(?P<character_id>(\d)*)/', include(_character_ulrs)),
     path('corp/', include([
         re_path(r'^menu/', corp_list, name='corp_menu'),
-        path('r/', views.react_corp, name='corp_react'),
+        path('r_legacy/', views.react_corp, name='corp_legacy_react'),
         path('add/', views.add_corp, name='add_corp'),
         path('add_options/', views.add_corp_section,
              name='add_corp_options'),

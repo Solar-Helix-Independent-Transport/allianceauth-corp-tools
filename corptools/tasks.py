@@ -990,38 +990,50 @@ def update_all_locations(self, character_filter=None, force_citadels=False, upda
 
 
 @shared_task(bind=True, base=QueueOnce)
+@no_fail_chain
 @esi_error_retry
-def update_corp_wallet(self, corp_id, full_update=False):
+def update_corp_wallet(self, corp_id, full_update=False, chain=[]):
     return corp_helpers.update_corp_wallet_division(corp_id, full_update=full_update)
 
 
 @shared_task(bind=True, base=QueueOnce)
+@no_fail_chain
 @esi_error_retry
-def update_corp_structures(self, corp_id, force_refresh=False):
+def update_corp_structures(self, corp_id, force_refresh=False, chain=[]):
     return corp_helpers.update_corp_structures(corp_id, force_refresh=force_refresh)
 
 
 @shared_task(bind=True, base=QueueOnce)
 @esi_error_retry
-def update_corp_assets(self, corp_id):
+def update_corp_assets(self, corp_id, chain=[]):
     return corp_helpers.update_corp_assets(corp_id)
 
 
 @shared_task(bind=True, base=QueueOnce)
+@no_fail_chain
 @esi_error_retry
-def update_corp_pocos(self, corp_id):
+def update_corp_pocos(self, corp_id, chain=[]):
     return corp_helpers.update_corporation_pocos(corp_id)
 
 
 @shared_task(bind=True, base=QueueOnce)
+@no_fail_chain
 @esi_error_retry
-def update_corp_logins(self, corp_id):
+def update_corp_logins(self, corp_id, chain=[]):
     return corp_helpers.update_character_logins_from_corp(corp_id)
 
 
 @shared_task(bind=True, base=QueueOnce)
+@no_fail_chain
 @esi_error_retry
-def update_corp_contracts(self, corp_id, force_refresh=False):
+def update_corp_starbases(self, corp_id, force_refresh=False, chain=[]):
+    return corp_helpers.fetch_starbases(corp_id, force_refresh=force_refresh)
+
+
+@shared_task(bind=True, base=QueueOnce, queue=[])
+@no_fail_chain
+@esi_error_retry
+def update_corp_contracts(self, corp_id, force_refresh=False, chain=[]):
     _, ids = corp_helpers.update_corporate_contracts(
         corp_id, force_refresh=force_refresh)
 
@@ -1043,6 +1055,7 @@ def update_corp(corp_id, force_refresh=False):
     que = []
     que.append(update_corp_wallet.si(corp_id))
     que.append(update_corp_structures.si(corp_id, force_refresh=force_refresh))
+    que.append(update_corp_starbases.si(corp_id, force_refresh=force_refresh))
     que.append(update_corp_assets.si(corp_id))
     que.append(update_corp_pocos.si(corp_id))
     que.append(update_corp_contracts.si(corp_id))
@@ -1054,17 +1067,17 @@ def update_corp(corp_id, force_refresh=False):
 def update_all_corps(force_refresh=False):
     corps = CorporationAudit.objects.all().select_related('corporation')
     for corp in corps:
+        countdown = 1 if force_refresh else random()*app_settings.CT_TASK_SPREAD_DELAY*2
         update_corp.apply_async(
             args=[corp.corporation.corporation_id],
             kwargs={"force_refresh": force_refresh},
-            countdown=random()*app_settings.CT_TASK_SPREAD_DELAY*2
+            countdown=countdown
         )
 
 
 @shared_task
 def run_housekeeping():
     notifs = remove_old_notifications()
-
     return notifs
 
 

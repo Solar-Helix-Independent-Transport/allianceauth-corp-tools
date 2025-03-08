@@ -94,7 +94,7 @@ const CharacterDoctrine = () => {
       {data ? (
         data.map((char: components["schemas"]["CharacterDoctrines"]) => {
           const doctrineCount = Object.entries(char.doctrines).length;
-          const filtered_doctrines = Object.entries(char.doctrines).reduce((output, [k, v]) => {
+          const filtered_doctrines = Object.entries(char.doctrines)?.reduce((output, [k, v]) => {
             return (
               output ||
               ((!hideFailures || Object.entries(v).length === 0) &&
