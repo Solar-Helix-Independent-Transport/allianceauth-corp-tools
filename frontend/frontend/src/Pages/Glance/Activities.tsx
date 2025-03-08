@@ -204,7 +204,7 @@ const Activities = ({ data, isLoading }: any) => {
               cardVariant={data?.pi ? "success" : undefined}
               textVariant={data?.pi > 0 ? "success" : "muted"}
               text={
-                data?.mining_gas
+                data?.pi
                   ? `${Number(data?.pi).toLocaleString("en-US", {
                       maximumFractionDigits: 2,
                       notation: "compact",
