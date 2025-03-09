@@ -1,11 +1,14 @@
 import tableStyles from "./BaseTable.module.css";
 import Filter from "./BaseTableFilter";
 import {
+  Cell,
+  Column,
   ColumnDef,
   Header,
   HeaderGroup,
   PaginationInitialTableState,
   Table as ReactTable,
+  Row,
   SortingTableState,
   VisibilityTableState,
   flexRender,
@@ -38,6 +41,11 @@ function MyTooltip(message: string) {
     </Tooltip>
   );
 }
+
+const isNumber = (cell: Cell<any, unknown>) => {
+  const value: any = cell.getValue();
+  return typeof value === "number";
+};
 
 const exportToCSV = (table: ReactTable<any>, exportFileName: string) => {
   const { rows } = table.getCoreRowModel();
@@ -227,7 +235,13 @@ function _baseTable({
               <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => {
                   return (
-                    <td key={cell.id} style={{ verticalAlign: "middle" }}>
+                    <td
+                      key={cell.id}
+                      style={{
+                        verticalAlign: "middle",
+                        textAlign: isNumber(cell) ? "right" : "left",
+                      }}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   );
