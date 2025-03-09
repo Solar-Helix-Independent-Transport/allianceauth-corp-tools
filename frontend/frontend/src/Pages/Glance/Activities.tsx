@@ -209,7 +209,7 @@ const Activities = ({ data, isLoading }: any) => {
                       maximumFractionDigits: 2,
                       notation: "compact",
                       compactDisplay: "short",
-                    })} IsSK`
+                    })} ISK`
                   : "-"
               }
               toolTipText={t("Planetary import/export seen in the last 30 Days")}
