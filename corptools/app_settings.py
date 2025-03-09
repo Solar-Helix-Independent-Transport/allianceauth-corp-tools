@@ -326,7 +326,7 @@ _corp_scopes_structures = [
 ]
 
 # structures
-_corp_scopes_structures = [
+_corp_scopes_starbases = [
     'esi-corporations.read_starbases.v1',
 ]
 

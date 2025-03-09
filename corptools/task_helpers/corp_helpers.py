@@ -1108,6 +1108,11 @@ def fetch_coordiantes(self, corp_id):
         _req_roles
     )
 
+    if not _token or not assets.count():
+        logger.info(
+            f"CT: COORDS No Tokens or Assets for {_corporation.corporation.corporation_name}")
+        return f"CT: COORDS No Tokens or Assets for {_corporation.corporation.corporation_name}"
+
     locations = providers.esi.client.Assets.post_corporations_corporation_id_assets_locations(
         corporation_id=_corporation.corporation.corporation_id,
         item_ids=list(
@@ -1135,7 +1140,10 @@ def fetch_coordiantes(self, corp_id):
             )
             logger.info(
                 f"CT: COORD - {a.type_name.name} {new_coords[a.item_id]}")
+
     AssetCoordiante.objects.bulk_create(new_models, ignore_conflicts=True)
+
+    return f"CT: Finished Coords for {_corporation.corporation.corporation_name}"
 
 
 def fetch_starbases(corp_id, force_refresh=False):
@@ -1152,6 +1160,10 @@ def fetch_starbases(corp_id, force_refresh=False):
         _req_scopes,
         _req_roles
     )
+    if not _token:
+        logger.info(
+            f"CT: No Tokens for Starbases for {_corporation.corporation.corporation_name}")
+        return f"CT: No Tokens for Starbases for {_corporation.corporation.corporation_name}"
 
     starbases_ob = providers.esi.client.Corporation.get_corporations_corporation_id_starbases(
         corporation_id=_corporation.corporation.corporation_id,
@@ -1202,6 +1214,7 @@ def fetch_starbases(corp_id, force_refresh=False):
 
             eve_type, _created = EveItemType.objects.get_or_create_from_esi(
                 sb.get("type_id"))
+
             Starbase.objects.update_or_create(
                 starbase_id=sb.get("starbase_id"),
                 corporation=_corporation,
