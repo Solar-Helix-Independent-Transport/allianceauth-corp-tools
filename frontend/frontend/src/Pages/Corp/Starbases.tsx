@@ -70,7 +70,7 @@ const CorporationStarbases = () => {
             <span className="me-auto align-self-center">{cell.getValue()}</span>
             <OverlayTrigger
               trigger={["hover", "focus"]}
-              overlay={showTooltip(t("Open Starbase Fitting. It Assets Token is loaded."))}
+              overlay={showTooltip(t("Open Starbase Fitting. If Assets Token is loaded."))}
             >
               <Button
                 size="sm"

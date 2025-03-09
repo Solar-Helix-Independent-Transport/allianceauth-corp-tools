@@ -90,7 +90,7 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
             <span className="me-auto align-self-center">{cell.getValue()}</span>
             <OverlayTrigger
               trigger={["hover"]}
-              overlay={showTooltip(t("Open Structure Fitting. It Assets Token is loaded."))}
+              overlay={showTooltip(t("Open Structure Fitting. If Assets Token is loaded."))}
             >
               <Button
                 size="sm"
