@@ -130,7 +130,7 @@ def add_corp_section(request, *args, **kwargs):
     if structures:
         scopes += app_settings._corp_scopes_structures
 
-    if structures:
+    if starbases:
         scopes += app_settings._corp_scopes_starbases
 
     if moons:
