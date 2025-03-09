@@ -97,6 +97,7 @@ def add_corp_section(request, *args, **kwargs):
     tracking = request.GET.get('t', False)
     assets = request.GET.get('a', False)
     structures = request.GET.get('s', False)
+    starbases = request.GET.get('sb', False)
     wallets = request.GET.get('w', False)
     moons = request.GET.get('m', False)
     pocos = request.GET.get('p', False)
@@ -128,6 +129,9 @@ def add_corp_section(request, *args, **kwargs):
 
     if structures:
         scopes += app_settings._corp_scopes_structures
+
+    if structures:
+        scopes += app_settings._corp_scopes_starbases
 
     if moons:
         scopes += app_settings._corp_scopes_moons
