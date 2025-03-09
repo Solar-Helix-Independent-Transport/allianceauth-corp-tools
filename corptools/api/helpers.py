@@ -152,7 +152,8 @@ def glances_pochven_check(characters):
 
 
 def glances_market_check(characters):
-    types = ["brokers_fee", "market_provider_tax"]
+    types = ["brokers_fee", "market_provider_tax",
+             "market_transaction", "transaction_tax"]
     return wallet_check(characters, types).aggregate(total=Sum("amount"))["total"]
 
 
