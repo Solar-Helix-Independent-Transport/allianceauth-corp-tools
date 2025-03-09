@@ -13,7 +13,7 @@ const CharacterSkillQueues = () => {
   const { t } = useTranslation();
   const { characterID } = useParams();
   const { isLoading, isFetching, error, data } = useQuery(
-    ["skills", characterID],
+    ["skills", "queue", characterID],
     () => getCharacterSkillQueues(characterID ? Number(characterID) : 0),
     { refetchOnWindowFocus: false },
   );
