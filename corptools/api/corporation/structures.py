@@ -382,6 +382,27 @@ class StructureApiEndpoints:
             for s in models.Starbase.get_visible(request.user).select_related(
                 'type_name', "corporation__corporation", "system", "moon"
             ):
+                extras = {}
+                if s.moon:
+                    extras["moon"] = {
+                        "id": s.moon.moon_id,
+                        "name": s.moon.name
+                    }
+
+                if s.system:
+                    extras["system"] = {
+                        "id": s.system.system_id,
+                        "name": s.system.name
+                    }
+                    extras["constellation"] = {
+                        "id": s.system.constellation.constellation_id,
+                        "name": s.system.constellation.name
+                    }
+                    extras["region"] = {
+                        "id": s.system.constellation.region.region_id,
+                        "name": s.system.constellation.region.name
+                    }
+
                 _s = {
                     "starbase_id": s.starbase_id,
                     "owner": {
@@ -391,14 +412,6 @@ class StructureApiEndpoints:
                     "name": s.name,
                     "type": {"id": s.type_name.type_id,
                              "name": s.type_name.name},
-                    "system": {"id": s.system.system_id,
-                               "name": s.system.name},
-                    "constellation": {"id": s.system.constellation.constellation_id,
-                                      "name": s.system.constellation.name},
-                    "region": {"id": s.system.constellation.region.region_id,
-                               "name": s.system.constellation.region.name},
-                    "moon": {"id": s.moon.moon_id,
-                             "name": s.moon.name},
                     "state": s.state,
                     "onlined_since": s.onlined_since,
                     "reinforced_until": s.reinforced_until,
@@ -415,7 +428,8 @@ class StructureApiEndpoints:
                     "unanchor": s.unanchor,
                     "fuel_bay_take": s.fuel_bay_take,
                     "fuel_bay_view": s.fuel_bay_view,
-                    "fuels": s.fuels
+                    "fuels": s.fuels,
+                    **extras
                 }
                 output.append(_s)
             return list(output)
