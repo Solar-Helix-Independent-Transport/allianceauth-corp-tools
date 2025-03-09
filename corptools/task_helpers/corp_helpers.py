@@ -1178,6 +1178,9 @@ def fetch_starbases(corp_id, force_refresh=False):
         for sb in starbases:
             ids.append(sb['starbase_id'])
 
+        if not len(ids):
+            return f"CT: Completed Starbases for {_corporation.corporation.corporation_name}. No Starbases found"
+
         starbase_names = {}
 
         _req_scopes_assets = ['esi-assets.read_corporation_assets.v1']
