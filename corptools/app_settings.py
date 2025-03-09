@@ -322,8 +322,11 @@ _corp_scopes_tracking = [
 # structures
 _corp_scopes_structures = [
     'esi-planets.read_customs_offices.v1',
-    'esi-corporations.read_starbases.v1',
     'esi-corporations.read_structures.v1',
+]
+
+# structures
+_corp_scopes_structures = [
     'esi-corporations.read_starbases.v1',
 ]
 
