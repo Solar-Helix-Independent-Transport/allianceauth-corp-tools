@@ -16,13 +16,8 @@ function CorpAddToken() {
     <>
       <NavDropdown title="Add Token" id="add-token">
         {/* <NavDropdown.Item> */}
-        <form
-          action="/audit/corp/add_options"
-          method="get"
-          className="m-4"
-          style={{ width: "400px" }}
-        >
-          <Form>
+        <div className="m-4" style={{ width: "400px" }}>
+          <Form action="/audit/corp/add_options" method="get">
             <Form.Check
               label={t("Structures")}
               type="checkbox"
@@ -102,7 +97,7 @@ function CorpAddToken() {
               {t("Add Token")}
             </Button>
           </Form>
-        </form>
+        </div>
         {/* </NavDropdown.Item> */}
       </NavDropdown>
       {/* <Nav.Link onClick={() => mutate()}>
