@@ -245,5 +245,15 @@
   "Moon Material Bay": "Moon Material Bay",
   "Fighter Bay": "Fighter Bay",
   "Moon": "Moon",
-  "Name": "Name"
+  "Name": "Name",
+  "Open Structure Fitting. If Assets Token is loaded.": "Open Structure Fitting. If Assets Token is loaded.",
+  "Assets also Enables: LO levels in Bridges, fittings on Structures, in space fittings adjacent to Starbases": "Assets also Enables: LO levels in Bridges, fittings on Structures, in space fittings adjacent to Starbases",
+  "Starbase Detail": "Starbase Detail",
+  "Detail": "Detail",
+  "Online Since": "Online Since",
+  "Reinforced Till": "Reinforced Till",
+  "Unanchoring AT": "Unanchoring AT",
+  "Fitting": "Fitting",
+  "Distance": "Distance",
+  "Open Starbase Fitting. If Assets Token is loaded.": "Open Starbase Fitting. If Assets Token is loaded."
 }
