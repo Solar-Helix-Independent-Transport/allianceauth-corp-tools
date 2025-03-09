@@ -2,13 +2,11 @@ import tableStyles from "./BaseTable.module.css";
 import Filter from "./BaseTableFilter";
 import {
   Cell,
-  Column,
   ColumnDef,
   Header,
   HeaderGroup,
   PaginationInitialTableState,
   Table as ReactTable,
-  Row,
   SortingTableState,
   VisibilityTableState,
   flexRender,
