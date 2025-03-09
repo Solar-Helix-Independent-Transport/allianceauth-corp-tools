@@ -50,9 +50,11 @@ const CharacterWalletActivity = () => {
     }),
     columnHelper.accessor("value", {
       header: t("Amount"),
+      cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
     columnHelper.accessor("interactions", {
       header: t("Interaction Count"),
+      cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
   ];
 
