@@ -13,11 +13,11 @@ const CorpDivisions = ({ corporationID }: { corporationID: number }) => {
   });
 
   return (
-    <div className="d-flex">
+    <div className="d-flex flex-wrap">
       {data.length > 0 ? (
         data.map((division: any) => {
           return (
-            <div className="d-flex">
+            <div>
               <h5>
                 <Badge className="text-center m-2">
                   {division.division} {division.name == "Unknown" ? "" : division.name}:{" "}
