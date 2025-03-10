@@ -373,7 +373,7 @@ def assets_glances(ship_assets, sp_assets):
     }
 
     for group in ship_assets:
-        # this is ugly...
+        # this is ugly... but functional...
         grp = group["type_name__group__group_id"]
 
         if grp in frig_groups:
