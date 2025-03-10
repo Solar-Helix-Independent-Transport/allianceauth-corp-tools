@@ -18,6 +18,7 @@ import MiningBarge from "../../assets/miningBarge_32.png";
 import Injector from "../../assets/skillInjector_64.png";
 import Supercarrier from "../../assets/superCarrier_32.png";
 import Titan from "../../assets/titan_32.png";
+import Citadel from "../../assets/citadelExtraLarge.png";
 import styles from "./AtAGlance.module.css";
 import Card from "react-bootstrap/Card";
 import { useQuery } from "react-query";
@@ -28,7 +29,6 @@ export const Assets = ({ data, isLoading }: any) => {
 
   return (
     <>
-      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Assets")}</h3>
       <div className="d-flex flex-wrap justify-content-center">
         <Card className="m-2">
           <Card.Header className="text-center">
@@ -187,12 +187,53 @@ export const Assets = ({ data, isLoading }: any) => {
             />
           </div>
         </Card>
+        <Card className="m-2">
+          <Card.Header className="text-center">
+            <Card.Title>{t("Structures")}</Card.Title>
+          </Card.Header>
+
+          <div className="d-flex align-items-center">
+            <IconStatusDiv
+              iconSrc={"https://images.evetech.net/types/35834/icon?size=32"}
+              textVariant={data?.citadel ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.citadel ? "success" : isLoading ? undefined : "warning"}
+              text={data?.citadel ? data?.citadel : "-"}
+              isLoading={isLoading}
+              toolTipText={t("Count of Citadel Hulls owned")}
+            />
+            <IconStatusDiv
+              iconSrc={"https://images.evetech.net/types/35827/icon?size=32"}
+              textVariant={data?.eng_comp ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.eng_comp ? "success" : isLoading ? undefined : "warning"}
+              text={data?.eng_comp ? data?.eng_comp : "-"}
+              isLoading={isLoading}
+              toolTipText={t("Count of Engineering Complex Hulls owned")}
+            />
+            <IconStatusDiv
+              iconSrc={"https://images.evetech.net/types/81826/icon?size=32"}
+              textVariant={data?.refinary ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.refinary ? "success" : isLoading ? undefined : "warning"}
+              text={data?.refinary ? data?.refinary : "-"}
+              isLoading={isLoading}
+              toolTipText={t("Count of Refinary Hulls owned")}
+            />
+            <IconStatusDiv
+              iconSrc={"https://images.evetech.net/types/35841/icon?size=32"}
+              textVariant={data?.flex ? "success" : isLoading ? undefined : "warning"}
+              cardVariant={data?.flex ? "success" : isLoading ? undefined : "warning"}
+              text={data?.flex ? data?.flex : "-"}
+              isLoading={isLoading}
+              toolTipText={t("Count of Flex Structure Hulls owned")}
+            />
+          </div>
+        </Card>
       </div>
     </>
   );
 };
 
 export const CharacterGlancesAssets = () => {
+  const { t } = useTranslation();
   const { characterID } = useParams();
 
   const { data, isLoading } = useQuery({
@@ -201,15 +242,28 @@ export const CharacterGlancesAssets = () => {
     refetchOnWindowFocus: false,
   });
   console.log(data, isLoading);
-  return <Assets {...{ data, isLoading }} />;
+  return (
+    <>
+      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Character Assets")}</h3>
+      <Assets {...{ data, isLoading }} />
+    </>
+  );
 };
 
 export const CorporationGlancesAssets = ({ corporationID = 0 }) => {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "corp", "assets", corporationID],
     queryFn: () => loadCorpGlanceAssetData(corporationID),
     refetchOnWindowFocus: false,
   });
 
-  return <Assets {...{ data, isLoading }} />;
+  return (
+    <>
+      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Character Assets")}</h3>
+      <Assets data={data?.character} {...{ isLoading }} />
+      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Corporate Assets")}</h3>
+      <Assets data={data?.corporate} {...{ isLoading }} />
+    </>
+  );
 };
