@@ -30,12 +30,10 @@ deploy:
 	twine upload dist/*
 
 buildjs:
-	cd frontend/corp;yarn install;yarn build
 	cd frontend/frontend/;yarn install;yarn build
 
 package:
 	pip install -U hatch
-	cd frontend/corp;yarn install;yarn build
 	cd frontend/frontend/;yarn install;yarn build
 	rm -rf corptools/static/i18n
 	cp -r frontend/frontend/i18n corptools/static/i18n
