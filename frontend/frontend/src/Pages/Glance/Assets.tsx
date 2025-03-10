@@ -18,7 +18,6 @@ import MiningBarge from "../../assets/miningBarge_32.png";
 import Injector from "../../assets/skillInjector_64.png";
 import Supercarrier from "../../assets/superCarrier_32.png";
 import Titan from "../../assets/titan_32.png";
-import Citadel from "../../assets/citadelExtraLarge.png";
 import styles from "./AtAGlance.module.css";
 import Card from "react-bootstrap/Card";
 import { useQuery } from "react-query";
