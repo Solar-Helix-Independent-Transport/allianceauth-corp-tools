@@ -24,9 +24,17 @@ const AccountList = () => {
     columnHelper.accessor("main.character_name", {
       header: t("Character"),
       cell: (cell) => (
-        <div className="text-nowrap">
+        <div className="d-flex align-items-center text-nowrap">
           <CharacterPortrait size={32} character_id={cell.row.original.main.character_id} />{" "}
-          {cell.getValue()}
+          <span className="ms-2 me-auto">{cell.getValue()}</span>
+          <Link
+            className="btn btn-primary"
+            to={{
+              pathname: `/audit/r/${cell.row.original.main.character_id}/`,
+            }}
+          >
+            <i className="fas fa-external-link" aria-hidden="true"></i>
+          </Link>
         </div>
       ),
     }),
@@ -69,24 +77,6 @@ const AccountList = () => {
           return rowValue ? rowValue.toLowerCase().includes(filterValue.toLowerCase()) : false;
         }
       },
-    }),
-    columnHelper.accessor("main", {
-      header: "",
-      enableColumnFilter: false,
-      enableSorting: false,
-      cell: (cell) =>
-        cell.getValue() ? (
-          <Link
-            className="btn btn-primary"
-            to={{
-              pathname: `/audit/r/${cell.getValue().character_id}/`,
-            }}
-          >
-            <i className="fas fa-external-link" aria-hidden="true"></i>
-          </Link>
-        ) : (
-          <></>
-        ),
     }),
   ];
 
