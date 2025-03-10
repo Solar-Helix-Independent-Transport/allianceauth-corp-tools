@@ -6,6 +6,7 @@ import { useQuery } from "react-query";
 import { loadStarbaseFit } from "../../api/corporation";
 import { TypeIcon } from "../EveImages/EveImages";
 import styles from "../../Pages/Glance/AtAGlance.module.css";
+import StarbaseModalFuelTable from "./StarbaseModalFuelTable";
 
 function StarbaseModal({ starbase, showModal, setShowModal }: any) {
   const { t } = useTranslation();
@@ -47,7 +48,8 @@ function StarbaseModal({ starbase, showModal, setShowModal }: any) {
           <StrToFields strValue={starbase?.fuel_bay_view} text={"Fuel View Permissions:"} />
         </table>
 
-        <StarbaseModalTable data={data} isFetching={isFetching} header={t("Fitting")} />
+        <StarbaseModalFuelTable data={data?.fuel} isFetching={isFetching} header={t("Fuel Bay")} />
+        <StarbaseModalTable data={data?.space} isFetching={isFetching} header={t("Fitting")} />
       </Modal.Body>
       <Modal.Footer>
         <Button className="w-100" onClick={() => setShowModal(false)}>

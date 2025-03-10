@@ -1,3 +1,4 @@
+import json
 import logging
 from datetime import timedelta
 from typing import List
@@ -436,7 +437,7 @@ class StructureApiEndpoints:
 
         @api.get(
             "corp/starbase/{starbase_id}",
-            response={200: List, 403: str},
+            response={200: dict, 403: str},
             tags=self.tags
         )
         def get_visible_starbase_fit(request, starbase_id: int):
@@ -452,10 +453,10 @@ class StructureApiEndpoints:
                 logging.error(
                     f"Permission Denied for {request.user} to view starbases!")
                 return 403, "Permission Denied!"
-
-            if models.Starbase.get_visible(
+            starbase = models.Starbase.get_visible(
                 request.user
-            ).filter(starbase_id=starbase_id).exists():
+            ).filter(starbase_id=starbase_id)
+            if starbase.exists():
                 parent = models.CorpAsset.objects.filter(
                     item_id=starbase_id,
                     coordinate__isnull=False
@@ -491,7 +492,28 @@ class StructureApiEndpoints:
                             },
                             "distance": d.distance
                         })
-                    return 200, assets_in_space
+
+                    assets_in_bay = []
+                    starbase = starbase.first()
+                    try:
+                        for f in json.loads(starbase.fuels.replace("'", '"')):
+                            # This is bad and i should feel bad....
+                            # TODO save this correctly...
+                            # TODO investigate if i can do this via assets betterer
+                            type_name = models.EveItemType.objects.get(
+                                type_id=f['type_id'])
+                            assets_in_bay.append({
+                                "id": type_name.type_id,
+                                "name": type_name.name,
+                                "qty": f['quantity']
+                            })
+                    except json.JSONDecodeError as e:
+                        pass
+
+                    return 200, {
+                        "fuel": assets_in_bay,
+                        "space": assets_in_space
+                    }
             else:
                 logging.error(
                     f"Permission Denied for {request.user} to view starbase {starbase_id}!")

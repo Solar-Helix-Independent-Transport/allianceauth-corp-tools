@@ -23,9 +23,9 @@ from ..models import (
     AssetCoordiante, BridgeOzoneLevel, CharacterAudit, CorpAsset,
     CorporateContract, CorporateContractItem, CorporationAudit,
     CorporationWalletDivision, CorporationWalletJournalEntry,
-    CorptoolsConfiguration, EveItemType, EveLocation, EveName, MapJumpBridge,
-    MapSystem, MapSystemMoon, MapSystemPlanet, Poco, Starbase, Structure,
-    StructureCelestial, StructureService,
+    CorptoolsConfiguration, EveItemDogmaAttribute, EveItemType, EveLocation,
+    EveName, MapJumpBridge, MapSystem, MapSystemMoon, MapSystemPlanet, Poco,
+    Starbase, Structure, StructureCelestial, StructureService,
 )
 from . import sanitize_location_flag
 
@@ -1145,6 +1145,18 @@ def fetch_coordiantes(self, corp_id):
 
     return f"CT: Finished Coords for {_corporation.corporation.corporation_name}"
 
+# TODO Fuel
+# Small: 10 blocks / hour, 7200 / 30 days
+# Medium: 20 blocks / hour, 14400 / 30 days
+# Large: 40 blocks / hour, 28800 / 30 days
+# 25% for sov
+# Faction towers use less (10% less for tier 1, 20% less for tier 2).
+# how is tier calculated?
+# TODO Stront
+# Small: 100/hr, 4166 max units for 41.7 hours
+# Medium: 200/hr, 8333 max units for 41.7 hours
+# Large: 400/hr, 16666 max units for 41.7 hours
+
 
 def fetch_starbases(corp_id, force_refresh=False):
     _corporation = CorporationAudit.objects.get(
@@ -1179,7 +1191,7 @@ def fetch_starbases(corp_id, force_refresh=False):
             ids.append(sb['starbase_id'])
 
         if not len(ids):
-            return f"CT: Completed Starbases for {_corporation.corporation.corporation_name}. No Starbases found"
+            return f"CT: Completed Starbases for {_corporation.corporation.corporation_name}. No Starbases found."
 
         starbase_names = {}
 
