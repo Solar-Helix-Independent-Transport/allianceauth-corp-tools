@@ -11,7 +11,7 @@ const CharacterPubData = () => {
     () => loadPubData(characterID ? Number(characterID) : 0),
     {
       refetchOnWindowFocus: false,
-    }
+    },
   );
 
   console.log(data);

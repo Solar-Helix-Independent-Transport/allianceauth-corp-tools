@@ -10,7 +10,7 @@ const CharSkillGroups = ({ data }: any) => {
         ...hash,
         [obj[key]]: (hash[obj[key]] || []).concat(obj),
       }),
-      {}
+      {},
     );
 
   const skills_data = groupByKey(data, "group");

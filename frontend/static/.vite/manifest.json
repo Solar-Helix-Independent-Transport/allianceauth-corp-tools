@@ -6,35 +6,24 @@
   "_@bootstrap-libs-DZc4rDL4.js": {
     "file": "assets/@bootstrap-libs-DZc4rDL4.js",
     "name": "@bootstrap-libs",
-    "imports": [
-      "_@app-libs-Cb_auZyT.js"
-    ]
+    "imports": ["_@app-libs-Cb_auZyT.js"]
   },
   "_@lang-libs-Bb81l5PV.js": {
     "file": "assets/@lang-libs-Bb81l5PV.js",
     "name": "@lang-libs",
-    "imports": [
-      "_@app-libs-Cb_auZyT.js"
-    ],
-    "dynamicImports": [
-      "_browser-ponyfill-B9iOa5IF.js"
-    ]
+    "imports": ["_@app-libs-Cb_auZyT.js"],
+    "dynamicImports": ["_browser-ponyfill-B9iOa5IF.js"]
   },
   "_@react-libs-CeaqA_Hv.js": {
     "file": "assets/@react-libs-CeaqA_Hv.js",
     "name": "@react-libs",
-    "imports": [
-      "_@app-libs-Cb_auZyT.js",
-      "_@bootstrap-libs-DZc4rDL4.js"
-    ]
+    "imports": ["_@app-libs-Cb_auZyT.js", "_@bootstrap-libs-DZc4rDL4.js"]
   },
   "_browser-ponyfill-B9iOa5IF.js": {
     "file": "assets/browser-ponyfill-B9iOa5IF.js",
     "name": "browser-ponyfill",
     "isDynamicEntry": true,
-    "imports": [
-      "_@app-libs-Cb_auZyT.js"
-    ]
+    "imports": ["_@app-libs-Cb_auZyT.js"]
   },
   "index.html": {
     "file": "assets/index-BeGYDsWF.js",
@@ -47,9 +36,7 @@
       "_@react-libs-CeaqA_Hv.js",
       "_@lang-libs-Bb81l5PV.js"
     ],
-    "css": [
-      "static/corptools/bs5/static/css/index-Bo54A6Zv.css"
-    ],
+    "css": ["static/corptools/bs5/static/css/index-Bo54A6Zv.css"],
     "assets": [
       "static/corptools/bs5/static/img/omega_128-B8POqXI6.png",
       "static/corptools/bs5/static/img/skillInjector_64-CiNLYJYo.png",

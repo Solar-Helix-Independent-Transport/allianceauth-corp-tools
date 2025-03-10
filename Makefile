@@ -30,21 +30,21 @@ deploy:
 	twine upload dist/*
 
 buildjs:
-	cd frontend/frontend/;yarn install;yarn build
+	cd frontend/;yarn install;yarn build
 
 package:
 	pip install -U hatch
-	cd frontend/frontend/;yarn install;yarn build
+	cd frontend/;yarn install;yarn build
 	rm -rf corptools/static/i18n
-	cp -r frontend/frontend/i18n corptools/static/i18n
+	cp -r frontend/i18n corptools/static/i18n
 	hatch build
 
 translate:
 	django-admin makemessages -l en
-	cd frontend/frontend/;yarn buildTranslations
+	cd frontend/;yarn buildTranslations
 
 buildlang:
 	django-admin compilemessages
 
 devjs:
-	cd frontend/frontend/;yarn install;yarn dev
+	cd frontend/;yarn install;yarn dev

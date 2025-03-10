@@ -15,7 +15,7 @@ export const RefreshCharButton = () => {
     {
       refetchOnWindowFocus: false,
       enabled: false, // disable this query from automatically running
-    }
+    },
   );
   async function refreshChar() {
     return await refetch();
