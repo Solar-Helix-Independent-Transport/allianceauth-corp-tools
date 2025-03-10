@@ -48,7 +48,7 @@ function StarbaseModal({ starbase, showModal, setShowModal }: any) {
           <StrToFields strValue={starbase?.fuel_bay_view} text={"Fuel View Permissions:"} />
         </table>
 
-        <StarbaseModalFuelTable data={data?.fuel} isFetching={isFetching} header={t("Fuel Bay")} />
+        <StarbaseModalFuelTable data={data?.fuel} isFetching={isFetching} header={t("Fuel Bays")} />
         <StarbaseModalTable data={data?.space} isFetching={isFetching} header={t("Fitting")} />
       </Modal.Body>
       <Modal.Footer>
