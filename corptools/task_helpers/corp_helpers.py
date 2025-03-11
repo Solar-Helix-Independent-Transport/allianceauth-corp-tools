@@ -1207,7 +1207,7 @@ def fetch_starbases(corp_id, force_refresh=False):
             names = providers.esi.client.Assets.post_corporations_corporation_id_assets_names(
                 corporation_id=_corporation.corporation.corporation_id,
                 item_ids=ids,
-                token=_token.valid_access_token()
+                token=_token_assets.valid_access_token()
             ).result()
             for nm in names:
                 starbase_names[nm.get("item_id")] = nm.get("name")
