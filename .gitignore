@@ -151,4 +151,4 @@ corptools/static/corptools/static/*
 
 corptools/static/i18n*
 
-frontend/frontend/vite.config.settings.ts
+frontend/build
