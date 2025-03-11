@@ -732,6 +732,7 @@ class SkillTotalHistory(models.Model):
 
 
 class Skill(models.Model):
+    id = models.BigAutoField(primary_key=True)
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
     skill_id = models.IntegerField()
     skill_name = models.ForeignKey(
