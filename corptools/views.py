@@ -2,6 +2,7 @@ import json
 import xml.etree.ElementTree as ET
 from datetime import timedelta
 
+from celery.schedules import crontab
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 from django.contrib import messages
@@ -12,6 +13,7 @@ from django.template import TemplateDoesNotExist
 from django.urls import reverse
 from django.utils import timezone
 
+from allianceauth.crontab.utils import offset_cron
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 from allianceauth.services.hooks import get_extension_logger
 from esi.decorators import _check_callback, token_required
@@ -268,21 +270,28 @@ def admin_run_tasks(request):
 @login_required
 @permission_required('corptools.admin')
 def admin_create_tasks(request):
-    schedule_char, _ = CrontabSchedule.objects.get_or_create(minute='15,45',
-                                                             hour='*',
-                                                             day_of_week='*',
-                                                             day_of_month='*',
-                                                             month_of_year='*',
-                                                             timezone='UTC'
-                                                             )
 
-    schedule_corp, _ = CrontabSchedule.objects.get_or_create(minute='30',
-                                                             hour='*',
-                                                             day_of_week='*',
-                                                             day_of_month='*',
-                                                             month_of_year='*',
-                                                             timezone='UTC'
-                                                             )
+    schedule_a = CrontabSchedule.from_schedule(
+        offset_cron(crontab(minute='15,45')))
+    schedule_char, created = CrontabSchedule.objects.get_or_create(
+        minute=schedule_a.minute,
+        hour=schedule_a.hour,
+        day_of_month=schedule_a.day_of_month,
+        month_of_year=schedule_a.month_of_year,
+        day_of_week=schedule_a.day_of_week,
+        timezone=schedule_a.timezone,
+    )
+
+    schedule_b = CrontabSchedule.from_schedule(
+        offset_cron(crontab(minute='30')))
+    schedule_corp, schedule_corp_created = CrontabSchedule.objects.get_or_create(
+        minute=schedule_b.minute,
+        hour=schedule_b.hour,
+        day_of_month=schedule_b.day_of_month,
+        month_of_year=schedule_b.month_of_year,
+        day_of_week=schedule_b.day_of_week,
+        timezone=schedule_b.timezone,
+    )
 
     PeriodicTask.objects.update_or_create(
         task='corptools.tasks.update_subset_of_characters',
@@ -292,10 +301,6 @@ def admin_create_tasks(request):
             'enabled': True
         }
     )
-    # if created:
-    #    messages.info(request, "Created Character Task")
-    # else:
-    #    messages.info(request, "Reset Character Task to defaults")
 
     PeriodicTask.objects.update_or_create(
         task='corptools.tasks.update_all_corps',
@@ -305,10 +310,6 @@ def admin_create_tasks(request):
             'enabled': True
         }
     )
-    # if created:
-    #    messages.info(request, "Created Corporation Task")
-    # else:
-    #    messages.info(request, "Reset Corporation Task to defaults")
 
     # https://github.com/celery/django-celery-beat/issues/106
     messages.info(
