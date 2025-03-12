@@ -250,9 +250,9 @@ class DashboardApiEndpoints:
                     "value": 0
                 }
 
-            output[_lid]["contents"][_tid]["quantity"] += a.quantity
-            output[_lid]["contents"][_tid]["value"] += a.value
-            output[_lid]["total"] += a.value
+            output[_lid]["contents"][_tid]["quantity"] += a.quantity or 0
+            output[_lid]["contents"][_tid]["value"] += a.value or 0
+            output[_lid]["total"] += a.value or 0
 
         for k, i in output.items():
             i["contents"] = list(i["contents"].values())
