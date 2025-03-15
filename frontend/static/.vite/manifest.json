@@ -1,0 +1,248 @@
+{
+  "_@app-libs-Cb_auZyT.js": {
+    "file": "assets/@app-libs-Cb_auZyT.js",
+    "name": "@app-libs"
+  },
+  "_@bootstrap-libs-DZc4rDL4.js": {
+    "file": "assets/@bootstrap-libs-DZc4rDL4.js",
+    "name": "@bootstrap-libs",
+    "imports": ["_@app-libs-Cb_auZyT.js"]
+  },
+  "_@lang-libs-Bb81l5PV.js": {
+    "file": "assets/@lang-libs-Bb81l5PV.js",
+    "name": "@lang-libs",
+    "imports": ["_@app-libs-Cb_auZyT.js"],
+    "dynamicImports": ["_browser-ponyfill-B9iOa5IF.js"]
+  },
+  "_@react-libs-CeaqA_Hv.js": {
+    "file": "assets/@react-libs-CeaqA_Hv.js",
+    "name": "@react-libs",
+    "imports": ["_@app-libs-Cb_auZyT.js", "_@bootstrap-libs-DZc4rDL4.js"]
+  },
+  "_browser-ponyfill-B9iOa5IF.js": {
+    "file": "assets/browser-ponyfill-B9iOa5IF.js",
+    "name": "browser-ponyfill",
+    "isDynamicEntry": true,
+    "imports": ["_@app-libs-Cb_auZyT.js"]
+  },
+  "index.html": {
+    "file": "assets/index-BeGYDsWF.js",
+    "name": "index",
+    "src": "index.html",
+    "isEntry": true,
+    "imports": [
+      "_@app-libs-Cb_auZyT.js",
+      "_@bootstrap-libs-DZc4rDL4.js",
+      "_@react-libs-CeaqA_Hv.js",
+      "_@lang-libs-Bb81l5PV.js"
+    ],
+    "css": ["static/corptools/bs5/static/css/index-Bo54A6Zv.css"],
+    "assets": [
+      "static/corptools/bs5/static/img/omega_128-B8POqXI6.png",
+      "static/corptools/bs5/static/img/skillInjector_64-CiNLYJYo.png",
+      "static/corptools/bs5/static/img/asteroid_64-_mwThky8.png",
+      "static/corptools/bs5/static/img/gas_64-lUUIHkb8.png",
+      "static/corptools/bs5/static/img/ice_64-C-X-JxCQ.png",
+      "static/corptools/bs5/static/img/incursion_2_64-CezWswVX.png",
+      "static/corptools/bs5/static/img/industry_128-DM0mBaQY.png",
+      "static/corptools/bs5/static/img/market_128-oRcbZRsd.png",
+      "static/corptools/bs5/static/img/missions_2_128-Dg_KBb12.png",
+      "static/corptools/bs5/static/img/moonAsteroid_JackpotR32-CbqQRgx1.png",
+      "static/corptools/bs5/static/img/npcbattleship_32-BFJ3Lc7-.png",
+      "static/corptools/bs5/static/img/planet_128-BhhMKsyX.png",
+      "static/corptools/bs5/static/img/triglavian_128-RGqDm8eK.png",
+      "static/corptools/bs5/static/img/extractor_64-BQGwjQ_v.png",
+      "static/corptools/bs5/static/img/amarr_128-B9KvGWt4.png",
+      "static/corptools/bs5/static/img/caldari_128-BSQ2VRRx.png",
+      "static/corptools/bs5/static/img/gallente_128-oOYpsEmX.png",
+      "static/corptools/bs5/static/img/minmatar128-BCerHXFk.png",
+      "static/corptools/bs5/static/img/tyrannis-DSq5_x0q.png",
+      "static/corptools/bs5/static/img/3h-X6O4aMtx.png",
+      "static/corptools/bs5/static/img/4h-DM7Dhiqa.png",
+      "static/corptools/bs5/static/img/5h-BicZ_kS5.png",
+      "static/corptools/bs5/static/img/6h-ndoyFy77.png",
+      "static/corptools/bs5/static/img/7h-B5R4GWMb.png",
+      "static/corptools/bs5/static/img/8h-C17Yjhwj.png",
+      "static/corptools/bs5/static/img/4m-DvP_HOND.png",
+      "static/corptools/bs5/static/img/5m-fFpAJ2rM.png",
+      "static/corptools/bs5/static/img/6m-DKVPLsUc.png",
+      "static/corptools/bs5/static/img/7m-BLe6olY4.png",
+      "static/corptools/bs5/static/img/8m-hxd_N3hx.png",
+      "static/corptools/bs5/static/img/8l-UbnNMK0o.png",
+      "static/corptools/bs5/static/img/7l-Dql_h1Xo.png",
+      "static/corptools/bs5/static/img/6l-Ciemt68W.png",
+      "static/corptools/bs5/static/img/5l-DtBLoe7X.png",
+      "static/corptools/bs5/static/img/4l-BsWsNOjS.png",
+      "static/corptools/bs5/static/img/3r-BEm9rD6Q.png",
+      "static/corptools/bs5/static/img/1s-3LB3dveW.png",
+      "static/corptools/bs5/static/img/2s-DLD5F1oU.png",
+      "static/corptools/bs5/static/img/3s-bnWOfmy9.png",
+      "static/corptools/bs5/static/img/4s-wQRUJNgw.png",
+      "static/corptools/bs5/static/img/5s-C_pFgY_F.png"
+    ]
+  },
+  "src/assets/amarr_128.png": {
+    "file": "static/corptools/bs5/static/img/amarr_128-B9KvGWt4.png",
+    "src": "src/assets/amarr_128.png"
+  },
+  "src/assets/asteroid_64.png": {
+    "file": "static/corptools/bs5/static/img/asteroid_64-_mwThky8.png",
+    "src": "src/assets/asteroid_64.png"
+  },
+  "src/assets/caldari_128.png": {
+    "file": "static/corptools/bs5/static/img/caldari_128-BSQ2VRRx.png",
+    "src": "src/assets/caldari_128.png"
+  },
+  "src/assets/extractor_64.png": {
+    "file": "static/corptools/bs5/static/img/extractor_64-BQGwjQ_v.png",
+    "src": "src/assets/extractor_64.png"
+  },
+  "src/assets/fittings/1s.png": {
+    "file": "static/corptools/bs5/static/img/1s-3LB3dveW.png",
+    "src": "src/assets/fittings/1s.png"
+  },
+  "src/assets/fittings/2s.png": {
+    "file": "static/corptools/bs5/static/img/2s-DLD5F1oU.png",
+    "src": "src/assets/fittings/2s.png"
+  },
+  "src/assets/fittings/3h.png": {
+    "file": "static/corptools/bs5/static/img/3h-X6O4aMtx.png",
+    "src": "src/assets/fittings/3h.png"
+  },
+  "src/assets/fittings/3r.png": {
+    "file": "static/corptools/bs5/static/img/3r-BEm9rD6Q.png",
+    "src": "src/assets/fittings/3r.png"
+  },
+  "src/assets/fittings/3s.png": {
+    "file": "static/corptools/bs5/static/img/3s-bnWOfmy9.png",
+    "src": "src/assets/fittings/3s.png"
+  },
+  "src/assets/fittings/4h.png": {
+    "file": "static/corptools/bs5/static/img/4h-DM7Dhiqa.png",
+    "src": "src/assets/fittings/4h.png"
+  },
+  "src/assets/fittings/4l.png": {
+    "file": "static/corptools/bs5/static/img/4l-BsWsNOjS.png",
+    "src": "src/assets/fittings/4l.png"
+  },
+  "src/assets/fittings/4m.png": {
+    "file": "static/corptools/bs5/static/img/4m-DvP_HOND.png",
+    "src": "src/assets/fittings/4m.png"
+  },
+  "src/assets/fittings/4s.png": {
+    "file": "static/corptools/bs5/static/img/4s-wQRUJNgw.png",
+    "src": "src/assets/fittings/4s.png"
+  },
+  "src/assets/fittings/5h.png": {
+    "file": "static/corptools/bs5/static/img/5h-BicZ_kS5.png",
+    "src": "src/assets/fittings/5h.png"
+  },
+  "src/assets/fittings/5l.png": {
+    "file": "static/corptools/bs5/static/img/5l-DtBLoe7X.png",
+    "src": "src/assets/fittings/5l.png"
+  },
+  "src/assets/fittings/5m.png": {
+    "file": "static/corptools/bs5/static/img/5m-fFpAJ2rM.png",
+    "src": "src/assets/fittings/5m.png"
+  },
+  "src/assets/fittings/5s.png": {
+    "file": "static/corptools/bs5/static/img/5s-C_pFgY_F.png",
+    "src": "src/assets/fittings/5s.png"
+  },
+  "src/assets/fittings/6h.png": {
+    "file": "static/corptools/bs5/static/img/6h-ndoyFy77.png",
+    "src": "src/assets/fittings/6h.png"
+  },
+  "src/assets/fittings/6l.png": {
+    "file": "static/corptools/bs5/static/img/6l-Ciemt68W.png",
+    "src": "src/assets/fittings/6l.png"
+  },
+  "src/assets/fittings/6m.png": {
+    "file": "static/corptools/bs5/static/img/6m-DKVPLsUc.png",
+    "src": "src/assets/fittings/6m.png"
+  },
+  "src/assets/fittings/7h.png": {
+    "file": "static/corptools/bs5/static/img/7h-B5R4GWMb.png",
+    "src": "src/assets/fittings/7h.png"
+  },
+  "src/assets/fittings/7l.png": {
+    "file": "static/corptools/bs5/static/img/7l-Dql_h1Xo.png",
+    "src": "src/assets/fittings/7l.png"
+  },
+  "src/assets/fittings/7m.png": {
+    "file": "static/corptools/bs5/static/img/7m-BLe6olY4.png",
+    "src": "src/assets/fittings/7m.png"
+  },
+  "src/assets/fittings/8h.png": {
+    "file": "static/corptools/bs5/static/img/8h-C17Yjhwj.png",
+    "src": "src/assets/fittings/8h.png"
+  },
+  "src/assets/fittings/8l.png": {
+    "file": "static/corptools/bs5/static/img/8l-UbnNMK0o.png",
+    "src": "src/assets/fittings/8l.png"
+  },
+  "src/assets/fittings/8m.png": {
+    "file": "static/corptools/bs5/static/img/8m-hxd_N3hx.png",
+    "src": "src/assets/fittings/8m.png"
+  },
+  "src/assets/fittings/tyrannis.png": {
+    "file": "static/corptools/bs5/static/img/tyrannis-DSq5_x0q.png",
+    "src": "src/assets/fittings/tyrannis.png"
+  },
+  "src/assets/gallente_128.png": {
+    "file": "static/corptools/bs5/static/img/gallente_128-oOYpsEmX.png",
+    "src": "src/assets/gallente_128.png"
+  },
+  "src/assets/gas_64.png": {
+    "file": "static/corptools/bs5/static/img/gas_64-lUUIHkb8.png",
+    "src": "src/assets/gas_64.png"
+  },
+  "src/assets/ice_64.png": {
+    "file": "static/corptools/bs5/static/img/ice_64-C-X-JxCQ.png",
+    "src": "src/assets/ice_64.png"
+  },
+  "src/assets/incursion_2_64.png": {
+    "file": "static/corptools/bs5/static/img/incursion_2_64-CezWswVX.png",
+    "src": "src/assets/incursion_2_64.png"
+  },
+  "src/assets/industry_128.png": {
+    "file": "static/corptools/bs5/static/img/industry_128-DM0mBaQY.png",
+    "src": "src/assets/industry_128.png"
+  },
+  "src/assets/market_128.png": {
+    "file": "static/corptools/bs5/static/img/market_128-oRcbZRsd.png",
+    "src": "src/assets/market_128.png"
+  },
+  "src/assets/minmatar128.png": {
+    "file": "static/corptools/bs5/static/img/minmatar128-BCerHXFk.png",
+    "src": "src/assets/minmatar128.png"
+  },
+  "src/assets/missions_2_128.png": {
+    "file": "static/corptools/bs5/static/img/missions_2_128-Dg_KBb12.png",
+    "src": "src/assets/missions_2_128.png"
+  },
+  "src/assets/moonAsteroid_JackpotR32.png": {
+    "file": "static/corptools/bs5/static/img/moonAsteroid_JackpotR32-CbqQRgx1.png",
+    "src": "src/assets/moonAsteroid_JackpotR32.png"
+  },
+  "src/assets/npcbattleship_32.png": {
+    "file": "static/corptools/bs5/static/img/npcbattleship_32-BFJ3Lc7-.png",
+    "src": "src/assets/npcbattleship_32.png"
+  },
+  "src/assets/omega_128.png": {
+    "file": "static/corptools/bs5/static/img/omega_128-B8POqXI6.png",
+    "src": "src/assets/omega_128.png"
+  },
+  "src/assets/planet_128.png": {
+    "file": "static/corptools/bs5/static/img/planet_128-BhhMKsyX.png",
+    "src": "src/assets/planet_128.png"
+  },
+  "src/assets/skillInjector_64.png": {
+    "file": "static/corptools/bs5/static/img/skillInjector_64-CiNLYJYo.png",
+    "src": "src/assets/skillInjector_64.png"
+  },
+  "src/assets/triglavian_128.png": {
+    "file": "static/corptools/bs5/static/img/triglavian_128-RGqDm8eK.png",
+    "src": "src/assets/triglavian_128.png"
+  }
+}

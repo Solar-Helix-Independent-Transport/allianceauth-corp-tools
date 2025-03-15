@@ -23,9 +23,9 @@ from ..models import (
     AssetCoordiante, BridgeOzoneLevel, CharacterAudit, CorpAsset,
     CorporateContract, CorporateContractItem, CorporationAudit,
     CorporationWalletDivision, CorporationWalletJournalEntry,
-    CorptoolsConfiguration, EveItemType, EveLocation, EveName, MapJumpBridge,
-    MapSystem, MapSystemPlanet, Poco, Structure, StructureCelestial,
-    StructureService,
+    CorptoolsConfiguration, EveItemDogmaAttribute, EveItemType, EveLocation,
+    EveName, MapJumpBridge, MapSystem, MapSystemMoon, MapSystemPlanet, Poco,
+    Starbase, Structure, StructureCelestial, StructureService,
 )
 from . import sanitize_location_flag
 
@@ -688,6 +688,7 @@ def update_corp_assets(corp_id):
 
         CorpAsset.objects.bulk_create(items)
         que = []
+        que.append(fetch_coordiantes.si(corp_id))
         que.append(run_ozone_levels.si(corp_id))
         que.append(build_managed_asset_locations.si(corp_id))
         chain(que).apply_async(priority=7)
@@ -1107,6 +1108,11 @@ def fetch_coordiantes(self, corp_id):
         _req_roles
     )
 
+    if not _token or not assets.count():
+        logger.info(
+            f"CT: COORDS No Tokens or Assets for {_corporation.corporation.corporation_name}")
+        return f"CT: COORDS No Tokens or Assets for {_corporation.corporation.corporation_name}"
+
     locations = providers.esi.client.Assets.post_corporations_corporation_id_assets_locations(
         corporation_id=_corporation.corporation.corporation_id,
         item_ids=list(
@@ -1134,11 +1140,25 @@ def fetch_coordiantes(self, corp_id):
             )
             logger.info(
                 f"CT: COORD - {a.type_name.name} {new_coords[a.item_id]}")
+
     AssetCoordiante.objects.bulk_create(new_models, ignore_conflicts=True)
 
+    return f"CT: Finished Coords for {_corporation.corporation.corporation_name}"
 
-@shared_task(bind=True, base=QueueOnce)
-def fetch_starbases(self, corp_id):
+# TODO Fuel
+# Small: 10 blocks / hour, 7200 / 30 days
+# Medium: 20 blocks / hour, 14400 / 30 days
+# Large: 40 blocks / hour, 28800 / 30 days
+# 25% for sov
+# Faction towers use less (10% less for tier 1, 20% less for tier 2).
+# how is tier calculated?
+# TODO Stront
+# Small: 100/hr, 4166 max units for 41.7 hours
+# Medium: 200/hr, 8333 max units for 41.7 hours
+# Large: 400/hr, 16666 max units for 41.7 hours
+
+
+def fetch_starbases(corp_id, force_refresh=False):
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
 
@@ -1152,51 +1172,105 @@ def fetch_starbases(self, corp_id):
         _req_scopes,
         _req_roles
     )
+    if not _token:
+        logger.info(
+            f"CT: No Tokens for Starbases for {_corporation.corporation.corporation_name}")
+        return f"CT: No Tokens for Starbases for {_corporation.corporation.corporation_name}"
 
-    starbases = providers.esi.client.Corporation.get_corporations_corporation_id_starbases(
+    starbases_ob = providers.esi.client.Corporation.get_corporations_corporation_id_starbases(
         corporation_id=_corporation.corporation.corporation_id,
-        token=_token.valid_access_token()
-    ).result()
-
-    logger.info(f"CT: STARBASES {starbases}")
-
-    ids = []
-    for sb in starbases:
-        ids.append(sb['starbase_id'])
-
-    for id in ids:
-        get_local_assets(id)
-
-
-def get_local_assets(item_id):
-    from django.db.models import F
-    from django.db.models.functions import Power, Sqrt
-
-    from corptools.models import CorpAsset
-
-    parent = CorpAsset.objects.filter(
-        item_id=item_id
-    ).first()
-
-    logger.warning(f"Tower - {parent.type_name.name}")
-    distances = CorpAsset.objects.filter(
-        coordinate__isnull=False
-    ).annotate(
-        distance=Sqrt(
-            Power(
-                parent.coordinate.x - F("coordinate__x"),
-                2
-            ) + Power(
-                parent.coordinate.y - F("coordinate__y"),
-                2
-            ) + Power(
-                parent.coordinate.z - F("coordinate__z"),
-                2
-            )
-        )
-    ).filter(
-        distance__lte=100000
     )
+    try:
+        starbases = etag_results(starbases_ob, _token,
+                                 force_refresh=force_refresh)
 
-    for d in distances:
-        logger.info(f"      - {d.type_name.name} @ {d.distance/1000:,.2f}Km")
+        logger.info(f"CT: STARBASES {starbases}")
+
+        ids = []
+        for sb in starbases:
+            ids.append(sb['starbase_id'])
+
+        if not len(ids):
+            return f"CT: Completed Starbases for {_corporation.corporation.corporation_name}. No Starbases found."
+
+        starbase_names = {}
+
+        _req_scopes_assets = ['esi-assets.read_corporation_assets.v1']
+        _req_roles_assets = ['Director']
+        _token_assets = get_corp_token(
+            _corporation.corporation.corporation_id,
+            _req_scopes_assets,
+            _req_roles_assets
+        )
+
+        if _token_assets:
+            names = providers.esi.client.Assets.post_corporations_corporation_id_assets_names(
+                corporation_id=_corporation.corporation.corporation_id,
+                item_ids=ids,
+                token=_token_assets.valid_access_token()
+            ).result()
+            for nm in names:
+                starbase_names[nm.get("item_id")] = nm.get("name")
+
+        for sb in starbases:
+            starbase = providers.esi.client.Corporation.get_corporations_corporation_id_starbases_starbase_id(
+                corporation_id=_corporation.corporation.corporation_id,
+                starbase_id=sb.get("starbase_id"),
+                system_id=sb.get("system_id"),
+                token=_token.valid_access_token()
+            ).result()
+
+            update_fields = {}
+
+            if sb.get("moon_id"):
+                moon, _created = MapSystemMoon.objects.get_or_create_from_esi(
+                    sb.get("moon_id"))
+                update_fields["moon"] = moon
+
+            eve_type, _created = EveItemType.objects.get_or_create_from_esi(
+                sb.get("type_id"))
+
+            Starbase.objects.update_or_create(
+                starbase_id=sb.get("starbase_id"),
+                corporation=_corporation,
+                defaults={
+                    "name": starbase_names.get(sb.get("starbase_id")),
+                    "onlined_since": sb.get("onlined_since"),
+                    "reinforced_until": sb.get("reinforced_until"),
+                    "unanchor_at": sb.get("unanchor_at"),
+                    "state": sb.get("state"),
+                    "system_id": sb.get("system_id"),
+                    "type_name": eve_type,
+                    "allow_alliance_members": starbase.get("allow_alliance_members"),
+                    "allow_corporation_members": starbase.get("allow_corporation_members"),
+                    "anchor": starbase.get("anchor"),
+                    "attack_if_at_war": starbase.get("attack_if_at_war"),
+                    "attack_if_other_security_status_dropping": starbase.get("attack_if_other_security_status_dropping"),
+                    "attack_security_status_threshold": starbase.get("attack_security_status_threshold"),
+                    "attack_standing_threshold": starbase.get("attack_standing_threshold"),
+                    "fuel_bay_take": starbase.get("fuel_bay_take"),
+                    "fuel_bay_view": starbase.get("fuel_bay_view"),
+                    "offline": starbase.get("offline"),
+                    "online": starbase.get("online"),
+                    "unanchor": starbase.get("unanchor"),
+                    "use_alliance_standings": starbase.get("use_alliance_standings"),
+                    "fuels": starbase.get("fuels", {}),
+                    **update_fields
+                }
+            )
+
+        # for id in ids:
+        #     get_local_assets(id)
+
+        Starbase.objects.filter(
+            corporation=_corporation,
+        ).exclude(
+            starbase_id__in=ids
+        ).delete()
+
+    except NotModifiedError:
+        logger.info(
+            f"CT: No New Starbases for {_corporation.corporation.corporation_name}")
+        pass
+
+    return f"CT: Completed Starbases for {_corporation.corporation.corporation_name}"

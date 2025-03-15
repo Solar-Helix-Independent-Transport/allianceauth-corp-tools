@@ -97,6 +97,7 @@ def add_corp_section(request, *args, **kwargs):
     tracking = request.GET.get('t', False)
     assets = request.GET.get('a', False)
     structures = request.GET.get('s', False)
+    starbases = request.GET.get('sb', False)
     wallets = request.GET.get('w', False)
     moons = request.GET.get('m', False)
     pocos = request.GET.get('p', False)
@@ -128,6 +129,9 @@ def add_corp_section(request, *args, **kwargs):
 
     if structures:
         scopes += app_settings._corp_scopes_structures
+
+    if starbases:
+        scopes += app_settings._corp_scopes_starbases
 
     if moons:
         scopes += app_settings._corp_scopes_moons
@@ -249,7 +253,8 @@ def admin_run_tasks(request):
             update_all_eve_names.apply_async(priority=6)
         if request.POST.get('run_corp_updates'):
             messages.info(request, "Queued update_all_corps")
-            update_all_corps.apply_async(priority=6)
+            update_all_corps.apply_async(
+                priority=6, kwargs={"force_refresh": True})
         if request.POST.get('run_locations'):
             messages.info(request, "Queued update_all_locations")
             update_all_locations.apply_async(priority=6)

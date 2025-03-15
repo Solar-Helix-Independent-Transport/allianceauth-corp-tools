@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <!-- <html lang="en" > -->
+    <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- End Required meta tags -->
+
+    <!-- Meta tags -->
+    <!-- TODO Bundle all the site specific stuff up into its own template for easy override -->
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/static/allianceauth/icons/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/static/allianceauth/icons/favicon-16x16.png"
+      sizes="16x16"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/static/allianceauth/icons/favicon-32x32.png"
+      sizes="32x32"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/static/allianceauth/icons/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link rel="manifest" href="/static/allianceauth/icons/site.webmanifest" />
+    <link rel="mask-icon" href="/static/allianceauth/icons/safari-pinned-tab.svg" color="#5bbad5" />
+    <link rel="shortcut icon" type="image/png" href="/static/allianceauth/icons/favicon.ico" />
+
+    <meta name="msapplication-TileColor" content="#2d89ef" />
+    <meta name="msapplication-config" content="/static/allianceauth/icons/browserconfig.xml" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- Meta tags -->
+    <title>CorpTools - DevSite BS5</title>
+
+    <!-- allianceauth.theme.Bootstrap Dark CSS -->
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <!-- allianceauth.theme.Bootstrap Dark CSS Ends -->
+
+    <!-- Start FontAwesome CSS from cdnjs -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!-- End FontAwesome CSS from cdnjs -->
+
+    <link href="/static/allianceauth/framework/css/auth-framework.css" rel="stylesheet" />
+
+    <style>
+      .navbar-toggler.collapsed {
+        transform: rotate(180deg);
+      }
+
+      .nav-padding {
+        padding-top: 3.5em !important;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-BeGYDsWF.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/@app-libs-Cb_auZyT.js">
+    <link rel="modulepreload" crossorigin href="/assets/@bootstrap-libs-DZc4rDL4.js">
+    <link rel="modulepreload" crossorigin href="/assets/@react-libs-CeaqA_Hv.js">
+    <link rel="modulepreload" crossorigin href="/assets/@lang-libs-Bb81l5PV.js">
+    <link rel="stylesheet" crossorigin href="/static/corptools/bs5/static/css/index-Bo54A6Zv.css">
+  </head>
+
+  <body>
+    <!-- Top Menu, Blocks don't work in "include" tagged views -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-primary">
+      <div class="container-fluid justify-content-start">
+        <a class="navbar-brand" data-bs-toggle="collapse" data-bs-target="#sidebar" role="button">
+          <i class="fa-solid fa-bars ms-2 me-2"></i>
+        </a>
+
+        <div class="navbar-brand">Corp Tools - Dev Auth</div>
+
+        <div class="navbar-brand" id="theme-swap"><i class="fa-solid fa-circle-half-stroke"></i></div>
+
+        <div class="collapse navbar-collapse ms-2 px-2" id="navbarexpand">
+          <ul id="nav-left" class="nav navbar-nav me-auto"></ul>
+
+          <ul id="nav-right" class="nav navbar-nav"></ul>
+
+          <ul id="nav-right-character-control" class="nav navbar-nav">
+            <!-- Default to add char and swap main -->
+
+            <li class="nav-item active">
+              <a href="/account/characters/add/" class="nav-link" title="Add Character">
+                <i class="fa-solid fa-plus"></i>
+                <span class="d-lg-none d-md-inline m-2">Add Character</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/account/characters/main/" class="nav-link" title="Change Main">
+                <i class="fa-solid fa-shuffle"></i>
+                <span class="d-lg-none d-md-inline m-2">Change Main</span>
+              </a>
+            </li>
+
+            <li class="nav-item" id="menu_item_notifications">
+              <a class="nav-link" href="/notifications/">
+                <i class="fa-solid fa-bell text-danger"></i>
+
+                <span class="d-lg-none d-md-inline m-2"> Notifications </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <a
+          class="navbar-toggler navbar-brand border-0 collapsed"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarexpand"
+          aria-controls="navbarColor01"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+          style="margin-left: auto"
+        >
+          <i class="fa-solid fa-chevron-up"></i>
+        </a>
+      </div>
+    </nav>
+
+    <!-- End Top Menu -->
+
+    <!-- Body -->
+    <main class="row flex-nowrap m-0">
+      <div class="col-auto px-0">
+        <div class="collapse collapse-horizontal" tabindex="-1" id="sidebar">
+          <div style="width: 350px">
+            <div
+              class="nav-padding navbar-dark bg-dark text-light px-0 d-flex flex-column overflow-hidden vh-100"
+            >
+              <ul
+                style="z-index: 5"
+                id="sidebar-menu"
+                class="navbar-nav flex-column mb-auto overflow-auto pt-2"
+              >
+                <li class="d-flex flex-wrap m-2 p-2 pt-0 pb-0 mt-0 mb-0 me-0 pe-0">
+                  <i class="nav-link fas fa-tachometer-alt fa-fw align-self-center me-3 active"></i>
+                  <a class="nav-link flex-fill align-self-center" href="/dashboard/"> Dashboard </a>
+                </li>
+              </ul>
+
+              <div class="align-items-center text-center">
+                <img src="/static/allianceauth/images/auth-logo.svg" widht="128px" height="128px" />
+              </div>
+
+              <div
+                style="z-index: 5"
+                class="w100 d-flex flex-column justify-content-center align-items-center text-center pb-2 border-top border-secondary"
+              >
+                <div class="d-flex mb-0 w-100 bg-dark text-light">
+                  <div class="p-2 position-relative m-2">
+                    <img
+                      class="rounded-circle"
+                      src="https://images.evetech.net/characters/0/portrait?size=64"
+                      alt="A-A Ron"
+                    />
+                    <img
+                      class="rounded-circle position-absolute bottom-0 start-0"
+                      src="https://images.evetech.net/corporations/0/logo?size=32"
+                      alt="Tactically Challenged"
+                    />
+
+                    <img
+                      class="rounded-circle position-absolute bottom-0 end-0"
+                      src="https://images.evetech.net/alliances/0/logo?size=32"
+                      alt="The Initiative."
+                    />
+                  </div>
+                  <div class="align-self-center text-start">
+                    <h5 class="m-0">Dummy Character</h5>
+                    <p class="m-0 small">Corp</p>
+
+                    <p class="m-0 small">Alli/Faction</p>
+                  </div>
+                  <div class="ms-auto dropup">
+                    <button
+                      type="button"
+                      class="h-100 btn"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      <i class="fa-solid fa-gear fa-fw text-light"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><h6 class="dropdown-header">Language</h6></li>
+                      <li>
+                        <a class="dropdown-item">
+                          <div class="dropdown">
+                            <form method="post">
+                              <select
+                                class="form-select"
+                                onchange="this.form.submit()"
+                                class="form-control"
+                                id="lang-select"
+                                name="language"
+                              >
+                                <option lang="en" value="en" selected="selected">
+                                  English (en)
+                                </option>
+
+                                <option lang="de" value="de">Deutsch (de)</option>
+
+                                <option lang="es" value="es">Español (es)</option>
+
+                                <option lang="zh-hans" value="zh-hans">简体中文 (zh-hans)</option>
+
+                                <option lang="ru" value="ru">Русский (ru)</option>
+
+                                <option lang="ko" value="ko">한국어 (ko)</option>
+
+                                <option lang="fr" value="fr">Français (fr)</option>
+
+                                <option lang="ja" value="ja">日本語 (ja)</option>
+
+                                <option lang="it" value="it">Italiano (it)</option>
+
+                                <option lang="uk" value="uk">Українська (uk)</option>
+                              </select>
+                            </form>
+                          </div>
+                        </a>
+                      </li>
+                      <li><h6 class="dropdown-header">Theme</h6></li>
+
+                      <li>
+                        <a class="dropdown-item">
+                          <form method="post">
+                            <select
+                              name="theme"
+                              value="theme"
+                              class="form-select"
+                              aria-label=""
+                              onchange="this.form.submit()"
+                            >
+                              <option selected>Select Theme</option>
+
+                              <option value="allianceauth.theme.darkly.auth_hooks.DarklyThemeHook">
+                                Darkly
+                              </option>
+
+                              <option value="allianceauth.theme.flatly.auth_hooks.FlatlyThemeHook">
+                                Flatly
+                              </option>
+
+                              <option
+                                value="allianceauth.theme.materia.auth_hooks.MateriaThemeHook"
+                              >
+                                Materia
+                              </option>
+
+                              <option
+                                value="allianceauth.theme.bootstrap.auth_hooks.BootstrapThemeHook"
+                              >
+                                Bootstrap
+                              </option>
+
+                              <option
+                                value="allianceauth.theme.bootstrap_dark.auth_hooks.BootstrapDarkThemeHook"
+                              >
+                                Bootstrap Dark
+                              </option>
+                            </select>
+                          </form>
+                        </a>
+                      </li>
+
+                      <li><hr class="dropdown-divider" /></li>
+                      <li><h6 class="dropdown-header">Super User</h6></li>
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          href="https://allianceauth.readthedocs.io/"
+                          title="Alliance Auth Documentation"
+                          ><i class="fa-solid fa-book fa-fw"></i> Alliance Auth Documentation</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          href="https://discord.gg/fjnHAmk"
+                          title="Alliance Auth Discord"
+                          ><i class="fa-brands fa-discord fa-fw"></i> Alliance Auth Discord</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          href="https://gitlab.com/allianceauth/allianceauth"
+                          title="Alliance Auth Git"
+                          ><i class="fa-brands fa-gitlab fa-fw"></i> Alliance Auth Git</a
+                        >
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="/admin/">
+                          <i class="fa-solid fa-gear fa-fw"></i> Admin
+                        </a>
+                      </li>
+
+                      <li><hr class="dropdown-divider" /></li>
+
+                      <li>
+                        <a class="dropdown-item" href="/account/tokens/manage/">
+                          <i class="fa-solid fa-user-lock fa-fw"></i> Token Management
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          class="dropdown-item text-danger"
+                          href="/account/logout/"
+                          title="Sign Out"
+                          ><i class="fa-solid fa-right-from-bracket fa-fw"></i> Sign Out</a
+                        >
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-padding col flex-nowrap vh-100 overflow-auto">
+        <div class="my-3">
+          <div id="root" lang="eu" className="w-100"></div>
+        </div>
+        <!-- END -->
+      </div>
+    </main>
+    <!-- End Body -->
+
+    <script>
+      (() => {
+        // TODO Extend this to the groups in the sidebar too.
+        // TODO Move to own JS file
+        const sidebar = document.getElementById("sidebar");
+
+        sidebar.addEventListener("shown.bs.collapse", () => {
+          localStorage.removeItem("sidebar_" + sidebar.id);
+        });
+
+        sidebar.addEventListener("hidden.bs.collapse", () => {
+          localStorage.setItem("sidebar_" + sidebar.id, true);
+        });
+
+        if (localStorage.getItem("sidebar_" + sidebar.id) === "true") {
+          sidebar.classList.remove("show");
+        } else {
+          sidebar.classList.add("show");
+        }
+
+        const themeSwap = document.getElementById("theme-swap");
+        themeSwap.addEventListener("click", () => {
+          const theme = document.documentElement.getAttribute("data-bs-theme");
+          const newTheme = theme === "dark" ? "light" : "dark";
+          document.documentElement.setAttribute("data-bs-theme", newTheme)
+        });
+
+
+      })();
+
+    </script>
+
+    <!-- Start jQuery js from cdnjs -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+      integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <!-- End jQuery js from cdnjs -->
+
+    <!-- allianceauth.theme.Bootstrap Dark JS -->
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"
+      integrity="sha512-TPh2Oxlg1zp+kz3nFA0C5vVC6leG/6mm1z9+mA81MI5eaUVqasPLO8Cuk4gMF4gUfP5etR73rgU/8PNMsSesoQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"
+      integrity="sha512-WW8/jxkELe2CAiE4LvQfwm1rajOS8PHasCCx+knHG0gBHt8EXxS6T6tJRTGuDQVnluuAvMxWF4j8SNFDKceLFg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <!-- allianceauth.theme.Bootstrap Dark JS Ends-->
+
+    <script src="/static/allianceauth/js/refresh-notification-icon.js"></script>
+
+    <script></script>
+  </body>
+</html>

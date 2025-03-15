@@ -74,3 +74,23 @@ class FittingsApiEndpoints:
                 "Fitting": _fit.name,
                 "skill_list": out
             }
+
+        @api.get(
+            "/extras/dogma/{type_id}",
+            response={200: dict, 403: str, 404: str, 500: str},
+            tags=["Fittings"]
+        )
+        def get_dogma(request, type_id: str):
+            """
+                Load dogma for a type_id.
+            """
+            if not request.user.is_superuser:
+                return 403, {"message": "Hard no pall!"}
+
+            _types = models.EveItemDogmaAttribute.objects.filter(
+                eve_type_id=type_id)
+
+            dogma = {}
+            for t in _types:
+                dogma[t.attribute_id] = t.value
+            return dogma

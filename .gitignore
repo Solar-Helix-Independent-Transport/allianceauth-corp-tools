@@ -47,8 +47,8 @@ coverage.xml
 .pytest_cache/
 
 # Translations
-*.mo
-*.pot
+# *.mo
+# *.pot
 
 # Django stuff:
 *.log
@@ -151,4 +151,4 @@ corptools/static/corptools/static/*
 
 corptools/static/i18n*
 
-frontend/frontend/vite.config.settings.ts
+frontend/build

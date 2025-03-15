@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-03 17:14+0800\n"
+"POT-Creation-Date: 2025-03-09 11:21+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -218,22 +218,22 @@ msgid ""
 "2\": 1]"
 msgstr ""
 
-#: corptools/models.py:1627
+#: corptools/models.py:1638
 #: corptools/templates/corptools/character/char_menu.html:17
 #: corptools/templates/corptools/character/notifications.html:15
 #: corptools/templates/corptools/character/roles.html:17
 msgid "Character"
 msgstr ""
 
-#: corptools/models.py:1629
+#: corptools/models.py:1640
 msgid "NPC Corporation"
 msgstr ""
 
-#: corptools/models.py:1630
+#: corptools/models.py:1641
 msgid "LP"
 msgstr ""
 
-#: corptools/models.py:1633
+#: corptools/models.py:1644
 msgid "Loyalty Point"
 msgstr ""
 
