@@ -26,14 +26,13 @@ const AccountList = () => {
       cell: (cell) => (
         <div className="d-flex align-items-center text-nowrap">
           <CharacterPortrait size={32} character_id={cell.row.original.main.character_id} />{" "}
-          <span className="ms-2 me-auto">{cell.getValue()}</span>
           <Link
-            className="btn btn-primary"
+            className="ms-2"
             to={{
               pathname: `/audit/r/${cell.row.original.main.character_id}/`,
             }}
           >
-            <i className="fas fa-external-link" aria-hidden="true"></i>
+            {cell.getValue()}
           </Link>
         </div>
       ),
