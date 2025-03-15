@@ -27,22 +27,28 @@ class ListApiEndpoints:
         )
         # @decorate_view(cache_page(300))
         def get_account_list(request, orphans=False):
-            characters = models.CharacterAudit.objects.visible_to(
-                request.user).filter(character=F("character__character_ownership__user__profile__main_character"))\
-                .select_related('character__character_ownership',
-                                'character__character_ownership__user__profile',
-                                'character__character_ownership__user__profile__main_character',
-                                'character__characteraudit')\
-                .prefetch_related('character__character_ownership__user__character_ownerships')\
-                .prefetch_related('character__character_ownership__user__character_ownerships__character')\
-                .prefetch_related('character__character_ownership__user__character_ownerships__character__characteraudit')\
+            characters = models.CharacterAudit.objects.visible_eve_characters(
+                request.user
+            ).filter(
+                character_id=F(
+                    "character_ownership__user__profile__main_character__character_id")
+            ).select_related(
+                'character_ownership',
+                'character_ownership__user__profile',
+                'character_ownership__user__profile__main_character',
+                'characteraudit'
+            ).prefetch_related(
+                'character_ownership__user__character_ownerships',
+                'character_ownership__user__character_ownerships__character',
+                'character_ownership__user__character_ownerships__character__characteraudit'
+            )
 
             character_ids = []
             output = {}
             for char in characters:
-                main = char.character.character_ownership.user.profile.main_character
-                for c in char.character.character_ownership.user.character_ownerships.all():
-                    if char.character.character_id not in output:
+                main = char.character_ownership.user.profile.main_character
+                for c in char.character_ownership.user.character_ownerships.all():
+                    if char.character_id not in output:
                         output[main.character_id] = {
                             "main": main,
                             "characters": []
