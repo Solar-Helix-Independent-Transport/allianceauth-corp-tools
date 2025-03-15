@@ -255,5 +255,13 @@
   "Unanchoring AT": "Unanchoring AT",
   "Fitting": "Fitting",
   "Distance": "Distance",
-  "Open Starbase Fitting. If Assets Token is loaded.": "Open Starbase Fitting. If Assets Token is loaded."
+  "Open Starbase Fitting. If Assets Token is loaded.": "Open Starbase Fitting. If Assets Token is loaded.",
+  "Fuel Bays": "Fuel Bays",
+  "Character Activity": "Character Activity",
+  "Count of Citadel hulls owned": "Count of Citadel hulls owned",
+  "Count of Engineering Complex hulls owned": "Count of Engineering Complex hulls owned",
+  "Count of Refinery hulls owned": "Count of Refinery hulls owned",
+  "Count of Flex Structure hulls owned": "Count of Flex Structure hulls owned",
+  "Character Assets": "Character Assets",
+  "Corporate Assets": "Corporate Assets"
 }

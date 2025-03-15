@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-09 11:21+0800\n"
+"POT-Creation-Date: 2025-03-15 18:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,8 +21,8 @@ msgstr ""
 #: corptools/api/character/assets.py:30 corptools/api/character/assets.py:62
 #: corptools/api/character/assets.py:121 corptools/api/character/assets.py:170
 #: corptools/api/character/at_a_glance.py:40
-#: corptools/api/character/at_a_glance.py:162
-#: corptools/api/character/at_a_glance.py:198
+#: corptools/api/character/at_a_glance.py:58
+#: corptools/api/character/at_a_glance.py:94
 #: corptools/api/character/clones.py:29 corptools/api/character/finances.py:34
 #: corptools/api/character/finances.py:85
 #: corptools/api/character/finances.py:130
@@ -39,9 +39,9 @@ msgstr ""
 #: corptools/api/character/skills.py:114 corptools/api/character/skills.py:171
 #: corptools/api/character/status.py:30 corptools/api/character/status.py:94
 #: corptools/api/character/status.py:120
-#: corptools/api/corporation/at_a_glance.py:48
-#: corptools/api/corporation/at_a_glance.py:168
-#: corptools/api/corporation/at_a_glance.py:202
+#: corptools/api/corporation/at_a_glance.py:49
+#: corptools/api/corporation/at_a_glance.py:65
+#: corptools/api/corporation/at_a_glance.py:99
 #: corptools/api/corporation/status.py:66
 msgid "Permission Denied"
 msgstr ""
@@ -200,40 +200,40 @@ msgstr ""
 msgid "Hard no pall!"
 msgstr ""
 
-#: corptools/models.py:1017
+#: corptools/models.py:1018
 #, python-brace-format
 msgid ""
 "Please enter a valid skill name for `{skill}`. Hint: a known character must "
 "have trained the skill for auth to know about it."
 msgstr ""
 
-#: corptools/models.py:1026
+#: corptools/models.py:1027
 #, python-brace-format
 msgid "Please enter a valid skill level for `{skill}`. Hint: between 0 and 5."
 msgstr ""
 
-#: corptools/models.py:1030
+#: corptools/models.py:1031
 msgid ""
 "Please check format for valid JSON. Hint: [\"skill name\": 4, \"skill name "
 "2\": 1]"
 msgstr ""
 
-#: corptools/models.py:1638
+#: corptools/models.py:1639
 #: corptools/templates/corptools/character/char_menu.html:17
 #: corptools/templates/corptools/character/notifications.html:15
 #: corptools/templates/corptools/character/roles.html:17
 msgid "Character"
 msgstr ""
 
-#: corptools/models.py:1640
+#: corptools/models.py:1641
 msgid "NPC Corporation"
 msgstr ""
 
-#: corptools/models.py:1641
+#: corptools/models.py:1642
 msgid "LP"
 msgstr ""
 
-#: corptools/models.py:1644
+#: corptools/models.py:1645
 msgid "Loyalty Point"
 msgstr ""
 
