@@ -69,6 +69,33 @@ export const Factions = ({ data }: any) => {
             />
           </div>
         </Card>
+        {data?.lp?.evermark?.length > 0 && (
+          <Card className="m-2">
+            <Card.Header className="text-center">
+              <Card.Title>{t("Evermarks")}</Card.Title>
+            </Card.Header>
+            <div className="d-flex h-100 align-items-center flex-wrap justify-content-center">
+              {data?.lp?.evermark?.map((lp_data: any) => {
+                return (
+                  <IconStatusDiv
+                    iconSrc={`https://images.evetech.net/corporations/${lp_data.corp_id}/logo?size=128`}
+                    text={
+                      lp_data?.lp
+                        ? lp_data?.lp?.toLocaleString("en-US", {
+                            maximumFractionDigits: 2,
+                            notation: "compact",
+                            compactDisplay: "short",
+                          })
+                        : "?"
+                    }
+                    textVariant="muted"
+                    toolTipText={lp_data.corp_name}
+                  />
+                );
+              })}
+            </div>
+          </Card>
+        )}
         <Card className="m-2">
           <Card.Header className="text-center">
             <Card.Title>{t("Loyalty Points")}</Card.Title>

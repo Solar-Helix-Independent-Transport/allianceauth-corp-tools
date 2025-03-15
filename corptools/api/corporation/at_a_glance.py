@@ -109,6 +109,7 @@ class CorpGlanceApiEndpoints:
                 },
                 "lp": {
                     "total": 0,
+                    "evermark": [],
                     "top_five": []
                 }
             }
@@ -142,11 +143,19 @@ class CorpGlanceApiEndpoints:
             ).order_by("-total_lp")[:5]
 
             for lp in account_lp:
-                output["lp"]["top_five"].append({
-                    "corp_id": lp.get("corp_id"),
-                    "lp": lp.get("total_lp"),
-                    "corp_name": lp.get("corp_name"),
-                })
+                # Evermarks and anything future
+                if lp.get('corp_id') in [1000419,]:
+                    output["lp"]["evermark"].append({
+                        "corp_id": lp.get("corp_id"),
+                        "lp": lp.get("total_lp"),
+                        "corp_name": lp.get("corp_name"),
+                    })
+                else:
+                    output["lp"]["top_five"].append({
+                        "corp_id": lp.get("corp_id"),
+                        "lp": lp.get("total_lp"),
+                        "corp_name": lp.get("corp_name"),
+                    })
 
             output["lp"]["total"] = models.LoyaltyPoint.objects.filter(
                 character__character__in=characters,

@@ -110,7 +110,7 @@ export async function loadCharacterStatus(character_id: number) {
   console.log(`got character status from api for '${character_id}'`);
   const headers = Array.from(
     new Set(
-      api.data.characters.reduce((p: any, c: any) => {
+      api.data.characters?.reduce((p: any, c: any) => {
         try {
           return p.concat(Object.keys(c.last_updates));
         } catch (err) {

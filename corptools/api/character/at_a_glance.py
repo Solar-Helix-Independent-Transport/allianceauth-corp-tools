@@ -106,6 +106,7 @@ class GlanceApiEndpoints:
                 },
                 "lp": {
                     "total": 0,
+                    "evermark": [],
                     "top_five": []
                 }
             }
@@ -129,7 +130,7 @@ class GlanceApiEndpoints:
 
             account_lp = models.LoyaltyPoint.objects.filter(
                 character__character__in=characters,
-                amount__gte=0
+                amount__gte=1
             ).values(
                 corp_id=F("corporation__eve_id")
             ).annotate(
@@ -139,14 +140,24 @@ class GlanceApiEndpoints:
             ).order_by("-total_lp")[:5]
 
             for lp in account_lp:
-                output["lp"]["top_five"].append({
-                    "corp_id": lp.get("corp_id"),
-                    "lp": lp.get("total_lp"),
-                    "corp_name": lp.get("corp_name"),
-                })
+                # Evermarks and anything future
+                if lp.get('corp_id') in [1000419,]:
+                    output["lp"]["evermark"].append({
+                        "corp_id": lp.get("corp_id"),
+                        "lp": lp.get("total_lp"),
+                        "corp_name": lp.get("corp_name"),
+                    })
+                else:
+                    output["lp"]["top_five"].append({
+                        "corp_id": lp.get("corp_id"),
+                        "lp": lp.get("total_lp"),
+                        "corp_name": lp.get("corp_name"),
+                    })
 
             output["lp"]["total"] = models.LoyaltyPoint.objects.filter(
                 character__character__in=characters,
+            ).exclude(
+                corporation__eve_id__in=[1000419,]
             ).aggregate(total_lp=Sum("amount"))["total_lp"]
 
             return output
