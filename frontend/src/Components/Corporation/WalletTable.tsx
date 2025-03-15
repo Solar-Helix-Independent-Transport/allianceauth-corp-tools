@@ -30,6 +30,9 @@ const CorporationWalletTable = ({
     }),
     columnHelper.accessor("ref_type", {
       header: t("Type"),
+      cell: (cell) => (
+        <span style={{ textTransform: "capitalize" }}>{cell.getValue().replaceAll("_", " ")}</span>
+      ),
     }),
     columnHelper.accessor("division", {
       header: t("Division"),

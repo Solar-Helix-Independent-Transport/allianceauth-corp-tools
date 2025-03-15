@@ -37,6 +37,14 @@ const CharacterNotifications = () => {
     }),
     columnHelper.accessor("notification_type", {
       header: t("Type"),
+      cell: (cell) => (
+        <span style={{ textTransform: "capitalize" }}>
+          {cell
+            ?.getValue()
+            ?.match(/[A-Z][a-z]+/g)
+            ?.join(" ")}
+        </span>
+      ),
     }),
     columnHelper.accessor("notification_text", {
       header: t("Text"),

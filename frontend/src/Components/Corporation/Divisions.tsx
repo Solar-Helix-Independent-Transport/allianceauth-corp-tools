@@ -17,14 +17,12 @@ const CorpDivisions = ({ corporationID }: { corporationID: number }) => {
       {data.length > 0 ? (
         data.map((division: any) => {
           return (
-            <div>
-              <h5>
-                <Badge className="text-center m-2">
-                  {division.division} {division.name == "Unknown" ? "" : division.name}:{" "}
-                  {Number(division.balance).toLocaleString()} Isk
-                </Badge>
-              </h5>
-            </div>
+            <h5>
+              <Badge className="text-center m-2">
+                {division.division} {division.name == "Unknown" ? "" : division.name}:{" "}
+                {Number(division.balance).toLocaleString()} Isk
+              </Badge>
+            </h5>
           );
         })
       ) : isLoading ? (

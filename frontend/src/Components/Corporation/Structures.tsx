@@ -109,7 +109,7 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
     columnHelper.accessor("type.name", {
       header: t("Type"),
       cell: (cell) => (
-        <div className="d-flex text-nowrap">
+        <div className="text-nowrap">
           <TypeIcon type_id={cell.row.original.type.id} size={32}></TypeIcon>
           <span className="mx-2 ">{cell.row.original.type.name}</span>
         </div>
@@ -134,6 +134,9 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
     }),
     columnHelper.accessor("state", {
       header: t("State"),
+      cell: (cell) => (
+        <span style={{ textTransform: "capitalize" }}>{cell.getValue().replaceAll("_", " ")}</span>
+      ),
     }),
     columnHelper.accessor("services", {
       header: t("Services"),

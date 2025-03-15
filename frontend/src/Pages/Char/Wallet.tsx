@@ -29,6 +29,9 @@ const CharacterWallet = () => {
     }),
     columnHelper.accessor("ref_type", {
       header: t("Type"),
+      cell: (cell) => (
+        <span style={{ textTransform: "capitalize" }}>{cell.getValue().replaceAll("_", " ")}</span>
+      ),
     }),
     columnHelper.accessor("first_party.name", {
       header: t("First Party"),

@@ -14,6 +14,13 @@ const colourStyles = {
   menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
 };
 
+const convertToTitleCase = (str: string) => {
+  if (!str) {
+    return "";
+  }
+  return str.toLowerCase().replace(/\b\w/g, (s) => s.toUpperCase());
+};
+
 const RefTypeSelect = ({ setFilter }: any) => {
   const { data, isLoading } = useQuery({
     queryKey: ["ref_types", 0],
@@ -27,7 +34,7 @@ const RefTypeSelect = ({ setFilter }: any) => {
     options = data?.map((ref: any) => {
       return {
         value: ref,
-        label: ref,
+        label: convertToTitleCase(ref.replaceAll("_", " ")),
       };
     });
   }

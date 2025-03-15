@@ -246,8 +246,8 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
   const isObjectorHTML =
     isHTML(sortedUniqueValues?.[0]) || typeof sortedUniqueValues?.[0] === "object";
 
-  const selectOptions = sortedUniqueValues
-    .reduce((previousValue: Array<any>, currentValue: any) => {
+  const selectOptions = sortedUniqueValues.reduce(
+    (previousValue: Array<any>, currentValue: any) => {
       if (typeof currentValue != "undefined") {
         if (!isObjectorHTML) {
           if (
@@ -259,8 +259,9 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
         }
       }
       return previousValue;
-    }, [])
-    .slice(0, 10);
+    },
+    [],
+  );
 
   return (
     <OverlayTrigger
@@ -269,19 +270,21 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
       rootClose={true}
       overlay={
         <Dropdown show drop={"down-centered"}>
-          <Dropdown.Menu>
+          <Dropdown.Menu className={Styles.dropDown}>
             <>
               {selectOptions.length > 0 ? (
                 selectOptions.map((item: any) => {
+                  const cammelCase = item.value.match(/[A-Z][a-z]+/g)?.join(" ");
                   return (
                     <Dropdown.Item
+                      className={Styles.capitaliseWords}
                       eventKey={item.value}
                       onClick={() => {
                         column.setFilterValue(item.value ? item.value : "");
                         document.body.click();
                       }}
                     >
-                      {item.label}
+                      {cammelCase ? cammelCase : item.value.replaceAll("_", " ")}
                     </Dropdown.Item>
                   );
                 })

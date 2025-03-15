@@ -126,3 +126,12 @@
 .searchInput[type="search"]::-webkit-search-results-decoration {
   appearance: none;
 }
+
+.capitaliseWords {
+  text-transform: capitalize;
+}
+
+.dropDown {
+  max-height: 250px !important;
+  overflow-y: auto;
+}
