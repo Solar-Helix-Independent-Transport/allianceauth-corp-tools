@@ -198,7 +198,7 @@ export const Assets = ({ data, isLoading }: any) => {
               cardVariant={data?.citadel ? "success" : isLoading ? undefined : "warning"}
               text={data?.citadel ? data?.citadel : "-"}
               isLoading={isLoading}
-              toolTipText={t("Count of Citadel Hulls owned")}
+              toolTipText={t("Count of Citadel hulls owned")}
             />
             <IconStatusDiv
               iconSrc={"https://images.evetech.net/types/35827/icon?size=32"}
@@ -206,7 +206,7 @@ export const Assets = ({ data, isLoading }: any) => {
               cardVariant={data?.eng_comp ? "success" : isLoading ? undefined : "warning"}
               text={data?.eng_comp ? data?.eng_comp : "-"}
               isLoading={isLoading}
-              toolTipText={t("Count of Engineering Complex Hulls owned")}
+              toolTipText={t("Count of Engineering Complex hulls owned")}
             />
             <IconStatusDiv
               iconSrc={"https://images.evetech.net/types/81826/icon?size=32"}
@@ -214,7 +214,7 @@ export const Assets = ({ data, isLoading }: any) => {
               cardVariant={data?.refinary ? "success" : isLoading ? undefined : "warning"}
               text={data?.refinary ? data?.refinary : "-"}
               isLoading={isLoading}
-              toolTipText={t("Count of Refinary Hulls owned")}
+              toolTipText={t("Count of Refinery hulls owned")}
             />
             <IconStatusDiv
               iconSrc={"https://images.evetech.net/types/35841/icon?size=32"}
@@ -222,7 +222,7 @@ export const Assets = ({ data, isLoading }: any) => {
               cardVariant={data?.flex ? "success" : isLoading ? undefined : "warning"}
               text={data?.flex ? data?.flex : "-"}
               isLoading={isLoading}
-              toolTipText={t("Count of Flex Structure Hulls owned")}
+              toolTipText={t("Count of Flex Structure hulls owned")}
             />
           </div>
         </Card>
