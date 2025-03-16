@@ -38,9 +38,9 @@ class ErrorBoundary extends Component<Props, State> {
         <>
           <ErrorLoader title={this.state.title} message={this.state.message} />
           <p className="text-center">
-            You should not be seeing this message
+            You should not be seeing this message, please report this error to your Admininstrators.
             <br />
-            Please report this in the Corp Tools Channel on the{" "}
+            Should they need help they can find help in the Corp Tools Channel on the{" "}
             <a href="https://discord.gg/fjnHAmk">Alliance Auth Discord</a> or create an issue on{" "}
             <a href="https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools">
               GitHub
