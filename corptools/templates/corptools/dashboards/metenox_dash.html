@@ -2,6 +2,9 @@
 {% load i18n %}
 {% load static %}
 {% load humanize %}
+{% block header_nav_collapse_left %}
+    {% include 'corptools/top_menu.html' %}
+{% endblock %}
 {% block content %}
 {% if structures %}
 <h2 class="text-center">Metenox Stats</h2>
