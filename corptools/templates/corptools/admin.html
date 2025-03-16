@@ -1,6 +1,11 @@
 {% extends 'allianceauth/base-bs5.html' %}
 {% load i18n %}
 {% block page_title %}{{page_title}}{% endblock %}
+
+{% block header_nav_collapse_left %}
+    {% include 'corptools/top_menu.html' %}
+{% endblock %}
+
 {% block content %}
 <h2 class="text-center">{% translate "Corptools Configuration Info" %}</h2>
 <div class="d-flex flex-wrap" >
@@ -26,25 +31,25 @@
                 <br/>
                 <div class="form-check">
                     <input type="checkbox" name="run_locations" class="form-check-input" id="run_locations" />
-                    <label for="run_universe">{% translate "Force update all Citadel Locations" %}</label>
+                    <label class="form-check-label" for="run_locations">{% translate "Force update all Citadel Locations" %}</label>
                 </div>
                 <figcaption class="figure-caption">Attempt to update all Citadel names from ESI</figcaption>
                 <br/>
                 <div class="form-check">
                     <input type="checkbox" name="run_update_all" class="form-check-input" id="run_update_all" />
-                    <label for="run_update_all">{% translate "Force all character updates" %}</label>
+                    <label class="form-check-label" for="run_update_all">{% translate "Force all character updates" %}</label>
                 </div>
                 <figcaption class="figure-caption">Force updates to ALL Character Audits</figcaption>
                 <br/>
                 <div class="form-check">
                     <input type="checkbox" name="run_corp_updates" class="form-check-input" id="run_corp_updates" />
-                    <label for="run_corp_updates">{% translate "Force all corp updates" %}</label>
+                    <label class="form-check-label" for="run_corp_updates">{% translate "Force all corp updates" %}</label>
                 </div>
                 <figcaption class="figure-caption">Force updates to ALL Corporation Audits</figcaption>
                 <br/>
                 <div class="form-check">
                     <input type="checkbox" name="run_update_eve_models" class="form-check-input" id="run_update_eve_models" />
-                    <label for="run_update_eve_models">{% translate "Update Eve Entirty Models" %}</label>
+                    <label class="form-check-label" for="run_update_eve_models">{% translate "Update Eve Entirty Models" %}</label>
                 </div>
                 <figcaption class="figure-caption">Force updates to ALL Eve Entity Names</figcaption>
             </div>
