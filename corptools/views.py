@@ -439,6 +439,7 @@ def fuel_levels(request):
         'Jump Access': [0, 0, 0, 15],  # large to show errors
         'Cynosural Jammer': [0, 0, 0, 40],
         'Jump Gate Access': [0, 0, 0, 30],
+        'Jump Bridge Access': [0, 0, 0, 30],
         'Automatic Moon Drilling': [0, 0, 0, 5]
     }
 
