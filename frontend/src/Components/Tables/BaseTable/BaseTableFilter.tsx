@@ -279,7 +279,9 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
               {selectOptions.length > 0 ? (
                 selectOptions.map((item: any) => {
                   if (item?.value) {
-                    const cammelCase = item?.value?.match(/[A-Z][a-z]+/g)?.join(" ");
+                    // const gaps = item?.value.split(" ").length;
+                    // const cammelCase =
+                    //   gaps === 0 ? item?.value?.match(/[A-Z][a-z]+/g)?.join(" ") : false;
                     return (
                       <Dropdown.Item
                         className={Styles.capitaliseWords}
@@ -289,7 +291,8 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
                           document.body.click();
                         }}
                       >
-                        {cammelCase ? cammelCase : item.value.replaceAll("_", " ")}
+                        {/* {cammelCase ? cammelCase : item.value.replaceAll("_", " ")} */}
+                        {item.value.replaceAll("_", " ")}
                       </Dropdown.Item>
                     );
                   }
@@ -352,7 +355,6 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
 
 export const Filter = ({ column, table }: { column: Column<any, any>; table: ReactTable<any> }) => {
   const firstValue: any = table.getPreFilteredRowModel().flatRows[0]?.getValue(column.id);
-
   if (typeof firstValue === "number") {
     return <NumberFilter {...{ column }} />;
   } else if (typeof firstValue === "boolean") {
