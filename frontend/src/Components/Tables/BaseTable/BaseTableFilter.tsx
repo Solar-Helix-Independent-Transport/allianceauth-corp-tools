@@ -274,7 +274,7 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
             <>
               {selectOptions.length > 0 ? (
                 selectOptions.map((item: any) => {
-                  const cammelCase = item.value.match(/[A-Z][a-z]+/g)?.join(" ");
+                  const cammelCase = item?.value?.match(/[A-Z][a-z]+/g)?.join(" ");
                   return (
                     <Dropdown.Item
                       className={Styles.capitaliseWords}
