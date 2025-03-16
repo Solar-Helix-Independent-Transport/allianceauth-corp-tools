@@ -4,6 +4,10 @@ import { Button, Dropdown, Form, OverlayTrigger, Popover } from "react-bootstrap
 
 const isHTML = RegExp.prototype.test.bind(/(<([^>]+)>)/i);
 
+const isDate = (str: string) => {
+  const dateCheck = Date.parse(str);
+  return !isNaN(dateCheck);
+};
 export const NameObjectArrayFilterFn = (row: Row<any>, columnId: string, filterValue: any) => {
   const data: any = row.getValue(columnId);
   const _svrs = data.reduce((o: string, r: any) => (o += `|${r.name}`), "");
@@ -356,7 +360,12 @@ export const Filter = ({ column, table }: { column: Column<any, any>; table: Rea
   } else if (typeof firstValue === "object") {
     return <TextFilter {...{ column }} />;
   } else {
-    return <SelectFilter {...{ column }} />;
+    if (isDate(firstValue)) {
+      // TODO maybe add a date range selecterer for now nothing.
+      return <></>;
+    } else {
+      return <SelectFilter {...{ column }} />;
+    }
   }
 };
 
