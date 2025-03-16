@@ -284,7 +284,7 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
                         document.body.click();
                       }}
                     >
-                      {cammelCase ? cammelCase : item.value.replaceAll("_", " ")}
+                      {cammelCase ? cammelCase : item?.value?.replaceAll("_", " ")}
                     </Dropdown.Item>
                   );
                 })
