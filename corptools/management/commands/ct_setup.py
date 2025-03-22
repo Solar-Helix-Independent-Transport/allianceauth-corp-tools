@@ -1,6 +1,9 @@
+from celery.schedules import crontab
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 from django.core.management.base import BaseCommand
+
+from allianceauth.crontab.utils import offset_cron
 
 from corptools.tasks import update_or_create_map
 
@@ -14,21 +17,28 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write("Configuring Tasks!")
-        schedule_char, _ = CrontabSchedule.objects.get_or_create(minute='15,45',
-                                                                 hour='*',
-                                                                 day_of_week='*',
-                                                                 day_of_month='*',
-                                                                 month_of_year='*',
-                                                                 timezone='UTC'
-                                                                 )
 
-        schedule_corp, _ = CrontabSchedule.objects.get_or_create(minute='30',
-                                                                 hour='*',
-                                                                 day_of_week='*',
-                                                                 day_of_month='*',
-                                                                 month_of_year='*',
-                                                                 timezone='UTC'
-                                                                 )
+        schedule_a = CrontabSchedule.from_schedule(
+            offset_cron(crontab(minute='15,45')))
+        schedule_char, created = CrontabSchedule.objects.get_or_create(
+            minute=schedule_a.minute,
+            hour=schedule_a.hour,
+            day_of_month=schedule_a.day_of_month,
+            month_of_year=schedule_a.month_of_year,
+            day_of_week=schedule_a.day_of_week,
+            timezone=schedule_a.timezone,
+        )
+
+        schedule_b = CrontabSchedule.from_schedule(
+            offset_cron(crontab(minute='30', hour='*')))
+        schedule_corp, schedule_corp_created = CrontabSchedule.objects.get_or_create(
+            minute=schedule_b.minute,
+            hour=schedule_b.hour,
+            day_of_month=schedule_b.day_of_month,
+            month_of_year=schedule_b.month_of_year,
+            day_of_week=schedule_b.day_of_week,
+            timezone=schedule_b.timezone,
+        )
 
         PeriodicTask.objects.update_or_create(
             task='corptools.tasks.update_subset_of_characters',
