@@ -184,6 +184,18 @@ export const Assets = ({ data, isLoading }: any) => {
               isLoading={isLoading}
               toolTipText={t("Count of Skill Extractors owned")}
             />
+            {data?.merc_den ? (
+              <IconStatusDiv
+                iconSrc={"https://images.evetech.net/types/85230/icon?size=32"}
+                textVariant={data?.merc_den ? "success" : isLoading ? undefined : "warning"}
+                cardVariant={data?.merc_den ? "success" : isLoading ? undefined : "warning"}
+                text={data?.merc_den ? data?.merc_den : "-"}
+                isLoading={isLoading}
+                toolTipText={t("Count of Mercenary Dens currently deployed in space")}
+              />
+            ) : (
+              <></>
+            )}
           </div>
         </Card>
         <Card className="m-2">
@@ -224,6 +236,18 @@ export const Assets = ({ data, isLoading }: any) => {
               isLoading={isLoading}
               toolTipText={t("Count of Flex Structure hulls owned")}
             />
+            {data?.merc_den_grp ? (
+              <IconStatusDiv
+                iconSrc={"https://images.evetech.net/types/85230/icon?size=32"}
+                textVariant={data?.merc_den ? "success" : isLoading ? undefined : "warning"}
+                cardVariant={data?.merc_den ? "success" : isLoading ? undefined : "warning"}
+                text={data?.merc_den ? data?.merc_den : "-"}
+                isLoading={isLoading}
+                toolTipText={t("Count of Mercenary Den hulls owned")}
+              />
+            ) : (
+              <></>
+            )}
           </div>
         </Card>
       </div>

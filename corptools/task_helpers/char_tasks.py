@@ -386,8 +386,8 @@ def update_character_assets(character_id, force_refresh=False):
         delete_query = CharacterAsset.objects.filter(
             character=audit_char)  # Flush Assets
         if delete_query.exists():
-            # speed and we are not caring about f-keys or signals on these models
-            delete_query._raw_delete(delete_query.db)
+            # We now have some FKeys so slow it down...
+            delete_query.delete()
 
         CharacterAsset.objects.bulk_create(items)
         logger.debug(
@@ -402,7 +402,21 @@ def update_character_assets(character_id, force_refresh=False):
     audit_char.save()
     audit_char.is_active()
 
+    # Locaite assets in space!
+    update_asset_locations(character_id, force_refresh=force_refresh)
+
     return f"CT: Finished assets for: {audit_char.character.character_name}"
+
+
+def update_asset_locations(character_id, force_refresh=False):
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+    logger.debug("Updating Asset locations for: {}".format(
+        audit_char.character.character_name))
+
+    type_ids = []
+
+    return f"CT: Finished asset locations for: {audit_char.character.character_name}"
 
 
 def update_character_mining(character_id, force_refresh=False):

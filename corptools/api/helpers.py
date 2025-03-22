@@ -256,7 +256,7 @@ def roundFloat(input):
 
 
 def glances_assets_character(characters):
-    cats = [6, 65]
+    cats = [6, 65, 22]
     injector_grp = 1739
     sp_types = [
         40519,  # extractor
@@ -288,6 +288,18 @@ def glances_assets_character(characters):
     ).annotate(
         type_total=Sum('quantity')
     )
+
+    den_assets = models.CharacterAsset.objects.filter(
+        character__character__in=characters,
+        type_name__type_id=85230,
+        location_type="solar_system"
+    ).values(
+        'type_name__type_id'
+    ).annotate(
+        type_total=Sum('quantity')
+    )
+
+    sp_assets = sp_assets | den_assets
 
     return assets_glances(ship_assets, sp_assets)
 
@@ -348,6 +360,7 @@ def assets_glances(ship_assets, sp_assets):
     eng_comp_groups = [1404, ]
     refinary_groups = [1406, 4744]
     flex_groups = [1408, 2016, 2017]
+    merc_den_groups = [4810, ]
 
     out_groups = {
         "frigate": 0,
@@ -370,6 +383,8 @@ def assets_glances(ship_assets, sp_assets):
         "eng_comp": 0,
         "refinary": 0,
         "flex": 0,
+        "merc_den_grp": 0,
+        "merc_den": 0,
     }
 
     for group in ship_assets:
@@ -414,6 +429,8 @@ def assets_glances(ship_assets, sp_assets):
             out_groups["refinary"] += group["grp_total"]
         elif grp in flex_groups:
             out_groups["flex"] += group["grp_total"]
+        elif grp in merc_den_groups:
+            out_groups["merc_den_grp"] += group["grp_total"]
         # else:
         #     print(group)
 
@@ -421,5 +438,7 @@ def assets_glances(ship_assets, sp_assets):
         _type = sp_type["type_name__type_id"]
         if _type == 40519:
             out_groups["extractor"] += sp_type["type_total"]
+        elif _type == 85230:
+            out_groups["merc_den"] += sp_type["type_total"]
 
     return out_groups
