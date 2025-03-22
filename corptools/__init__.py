@@ -1,4 +1,4 @@
 """
 This module is the core of the CorpTools Ecosystem
 """
-__version__ = "2.9.2"
+__version__ = "2.9.3"
