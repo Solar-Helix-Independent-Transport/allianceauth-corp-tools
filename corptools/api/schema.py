@@ -224,7 +224,7 @@ class CharacterContract(Schema):
     character: Union[str, Character]
     id: Optional[int] = None
     contract: Optional[int] = None
-    items: Optional[list[ContractItems]] = []
+    items: Optional[List[ContractItems]] = []
     contract_type: str
     availbility: Optional[str] = None
     tittle: Optional[str] = None
