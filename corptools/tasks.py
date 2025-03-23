@@ -294,6 +294,7 @@ def esi_error_retry(func):
 def no_fail_chain(func):
     """
         Decorator to chain tasks provided in the chain kwargs regardless of task failures.
+        Be sure to add chain=[] to your kwargs. TODO make this not needed.
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
