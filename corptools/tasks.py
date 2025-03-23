@@ -808,14 +808,18 @@ def update_missing_locations(location_id):
 @shared_task(bind=True, base=QueueOnce, max_retries=None)
 @esi_error_retry
 def update_location(self, location_id, character_ids=None, force_citadel=False):
-    if get_error_count_flag():
-        self.retry(countdown=300)
 
     if get_location_cooloff(location_id):
         if force_citadel and location_id > 64000000:
             pass
         else:
             return f"CT LOCATIONS: Cooloff on ID: {location_id}"
+
+    if get_error_count_flag():
+        logger.warning(
+            f"CT_LOC: Unable to check {location_id} ESI in cooloff...")
+        return "ESI Error Limit reached... We will need to try this again later... Somehow..."
+        # self.retry(countdown=300)
 
     if location_id < 64000000:
         location = fetch_location_name(location_id, None, 0, update=True)
