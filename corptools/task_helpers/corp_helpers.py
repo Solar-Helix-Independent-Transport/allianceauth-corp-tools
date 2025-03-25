@@ -1191,6 +1191,10 @@ def fetch_starbases(corp_id, force_refresh=False):
             ids.append(sb['starbase_id'])
 
         if not len(ids):
+            # Remove them all!
+            Starbase.objects.filter(
+                corporation=_corporation,
+            ).delete()
             return f"CT: Completed Starbases for {_corporation.corporation.corporation_name}. No Starbases found."
 
         starbase_names = {}
