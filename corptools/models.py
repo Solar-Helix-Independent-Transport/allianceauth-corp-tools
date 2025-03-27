@@ -10,7 +10,9 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.db.models import ExpressionWrapper, F, Func, Max
 from django.utils import timezone
+from django.utils.formats import localize
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
 from allianceauth.authentication.models import CharacterOwnership
 from allianceauth.eveonline.evelinks import eveimageserver
@@ -1818,6 +1820,7 @@ class TimeInCorpFilter(FilterBase):
             max_timestamp=Max(
                 'profile__main_character__characteraudit__corporationhistory__start_date')
         ).values("id", "max_timestamp")
+
         chars = defaultdict(lambda: {})
         for c in co:
             if c['max_timestamp']:
@@ -1825,19 +1828,45 @@ class TimeInCorpFilter(FilterBase):
                 days = days.days
             else:
                 days = -1
-            chars[c['id']] = days
+            chars[c['id']] = {
+                "start_date": c["max_timestamp"],
+                "days_in_corp": days
+            }
 
         output = defaultdict(lambda: {"message": "", "check": False})
-        for c, char_list in chars.items():
-            if char_list >= self.days_in_corp:
+
+        for c, char_corp_data in chars.items():
+            start_date_localized = localize(char_corp_data["start_date"].date()) if char_corp_data["start_date"] is not None else None
+            end_date_localized = None
+
+            if char_corp_data["days_in_corp"] >= self.days_in_corp:
                 check = not logic
             else:
+                if start_date_localized:
+                    end_date_localized = localize(
+                        (
+                            char_corp_data["start_date"] + datetime.timedelta(days=self.days_in_corp)
+                        ).date()
+                    )
+
                 check = logic
-            if char_list < 0:
+            if char_corp_data["days_in_corp"] < 0:
                 msg = "No Audit"
                 check = False
             else:
-                msg = str(char_list) + " Days"
+                msg = (
+                    ngettext_lazy(
+                        singular=f'{char_corp_data["days_in_corp"]:d} day (Since: {start_date_localized})',
+                        plural=f'{char_corp_data["days_in_corp"]:d} days (Since: {start_date_localized})',
+                        number=char_corp_data["days_in_corp"],
+                    )
+                    if not end_date_localized
+                    else ngettext_lazy(
+                        singular=f'{char_corp_data["days_in_corp"]:d} day (Until: {end_date_localized})',
+                        plural=f'{char_corp_data["days_in_corp"]:d} days (Until: {end_date_localized})',
+                        number=char_corp_data["days_in_corp"],
+                    )
+                )
             output[c] = {"message": msg, "check": check}
         return output
 
