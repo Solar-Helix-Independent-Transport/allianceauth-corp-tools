@@ -1158,7 +1158,7 @@ def fetch_coordiantes(self, corp_id):
 # Large: 400/hr, 16666 max units for 41.7 hours
 
 
-def fetch_starbases(corp_id, force_refresh=False):
+def fetch_starbases(corp_id, force_refresh=True):  # Set true as we have bad data
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
 
@@ -1184,18 +1184,18 @@ def fetch_starbases(corp_id, force_refresh=False):
         starbases = etag_results(starbases_ob, _token,
                                  force_refresh=force_refresh)
 
-        logger.info(f"CT: STARBASES {starbases}")
+        # logger.info(f"CT: STARBASES {starbases}")
 
-        ids = []
-        for sb in starbases:
-            ids.append(sb['starbase_id'])
-
-        if not len(ids):
+        if not len(starbases):
             # Remove them all!
             Starbase.objects.filter(
                 corporation=_corporation,
             ).delete()
             return f"CT: Completed Starbases for {_corporation.corporation.corporation_name}. No Starbases found."
+
+        ids = []
+        for sb in starbases:
+            ids.append(sb['starbase_id'])
 
         starbase_names = {}
 
