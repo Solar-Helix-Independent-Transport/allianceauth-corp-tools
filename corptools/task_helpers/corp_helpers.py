@@ -1184,8 +1184,6 @@ def fetch_starbases(corp_id, force_refresh=True):  # Set true as we have bad dat
         starbases = etag_results(starbases_ob, _token,
                                  force_refresh=force_refresh)
 
-        # logger.info(f"CT: STARBASES {starbases}")
-
         if not len(starbases):
             # Remove them all!
             Starbase.objects.filter(
