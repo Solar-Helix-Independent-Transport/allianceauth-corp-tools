@@ -41,7 +41,7 @@ dynamic = [
     "version",
 ]
 dependencies = [
-    "allianceauth<5,>=4.6.1",
+    "allianceauth<6,>=4.6.1",
     "django-model-utils",
     "django-ninja<2,>=1.0.1",
     "networkx",

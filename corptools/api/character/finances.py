@@ -283,6 +283,9 @@ class FinancesApiEndpoints:
 
             characters = get_alts_queryset(main)
 
+            character_list = list(
+                characters.values_list("character_id", flat=True))
+
             contracts = models.Contract.objects\
                 .filter(character__character__in=characters)\
                 .select_related('character__character', 'acceptor_name', 'assignee_name', 'issuer_corporation_name', 'issuer_name') \
@@ -291,6 +294,10 @@ class FinancesApiEndpoints:
             output = []
 
             for c in contracts:
+                own_account = False
+                if (c.acceptor_id in character_list and c.assignee_id in character_list):
+                    own_account = True
+
                 _i = []
                 for i in c.contractitem_set.all():
                     _i.append({
@@ -325,7 +332,8 @@ class FinancesApiEndpoints:
                     "contract_type": c.contract_type,
                     "availability": c.availability,
                     "title": c.title,
-                    "items": _i
+                    "items": _i,
+                    "own_account": own_account
                 }
                 if c.start_location_name:
                     _c.update(
