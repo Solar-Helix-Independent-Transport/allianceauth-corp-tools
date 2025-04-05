@@ -159,7 +159,6 @@ def update_missing_locations(location_id):
 
     count += Clone.objects.filter(
         location_id=location_id,
-        location_name__isnull=True
     ).update(location_name_id=location_id)
 
     count += JumpClone.objects.filter(
