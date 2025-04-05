@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: "22"
 
-      - run: npm install -g yarn
+      - run: npm install -g @yarnpkg/cli
 
       - name: install dependencies
         run: make dev
