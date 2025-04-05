@@ -20,39 +20,40 @@
                 <div class="form-check">
                     <input type="checkbox" name="run_clear_etag" class="form-check-input" id="run_clear_etag">
                     <label class="form-check-label" for="run_clear_etag">{% translate "Clear all cached Etags" %}</label>
+                    <p class="figure-caption">Wipe all the etags from cache to force new data pulls</p>
                 </div>
-                <figcaption class="figure-caption">Wipe all the etags from cache to force new data pulls</figcaption>
-                <br>
+
                 <div class="form-check">
                     <input type="checkbox" name="run_universe" class="form-check-input" id="run_universe">
                     <label class="form-check-label" for="run_universe">{% translate "Update EvE Map Data" %}</label>
+                    <p class="figure-caption">Force a full map update from ESI</p>
                 </div>
-                <figcaption class="figure-caption">Force a full map update from ESI</figcaption>
-                <br>
+
                 <div class="form-check">
                     <input type="checkbox" name="run_locations" class="form-check-input" id="run_locations">
                     <label class="form-check-label" for="run_locations">{% translate "Force update all Citadel Locations" %}</label>
+                    <p class="figure-caption">Attempt to update all Citadel names from ESI</p>
                 </div>
-                <figcaption class="figure-caption">Attempt to update all Citadel names from ESI</figcaption>
-                <br>
+
                 <div class="form-check">
                     <input type="checkbox" name="run_update_all" class="form-check-input" id="run_update_all">
                     <label class="form-check-label" for="run_update_all">{% translate "Force all character updates" %}</label>
+                    <p class="figure-caption">Force updates to ALL Character Audits</p>
                 </div>
-                <figcaption class="figure-caption">Force updates to ALL Character Audits</figcaption>
-                <br>
+
                 <div class="form-check">
                     <input type="checkbox" name="run_corp_updates" class="form-check-input" id="run_corp_updates">
                     <label class="form-check-label" for="run_corp_updates">{% translate "Force all corp updates" %}</label>
+                    <p class="figure-caption">Force updates to ALL Corporation Audits</p>
                 </div>
-                <figcaption class="figure-caption">Force updates to ALL Corporation Audits</figcaption>
-                <br>
+
                 <div class="form-check">
                     <input type="checkbox" name="run_update_eve_models" class="form-check-input" id="run_update_eve_models">
                     <label class="form-check-label" for="run_update_eve_models">{% translate "Update Eve Entirty Models" %}</label>
+                    <p class="figure-caption">Force updates to ALL Eve Entity Names</p>
                 </div>
-                <figcaption class="figure-caption">Force updates to ALL Eve Entity Names</figcaption>
             </div>
+
             <div class="card-footer">
                 <input type="submit" value="{% translate "Submit" %}" class="btn btn-primary w-100 mt-auto">
             </div>
