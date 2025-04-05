@@ -87,7 +87,12 @@ def location_set(location_id, character_id):
     return False
 
 
-@shared_task(bind=True, base=QueueOnce, max_retries=None)
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    max_retries=None,
+    name="corptools.tasks.update_citadel_names"
+)
 @esi_error_retry
 def update_citadel_names(self):
     citadels = EveLocation.objects.filter(location_id__gte=64000000)
@@ -191,7 +196,12 @@ def update_missing_locations(location_id):
     return count
 
 
-@shared_task(bind=True, base=QueueOnce, max_retries=None)
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    max_retries=None,
+    name="corptools.tasks.update_location"
+)
 @esi_error_retry
 def update_location(self, location_id, character_ids=None, force_citadel=False):
 
@@ -236,7 +246,11 @@ def update_location(self, location_id, character_ids=None, force_citadel=False):
     return f"CT LOCATIONS: No more Characters for Location_id: {location_id} cooling off for a while"
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.update_all_locations"
+)
 @no_fail_chain
 def update_all_locations(self, character_filter=None, force_citadels=False, update_all=False, chain=[]):
     location_flags = [

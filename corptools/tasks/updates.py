@@ -36,32 +36,37 @@ logger = get_extension_logger(__name__)
 # Bulk Updates
 
 
-@shared_task
+@shared_task(
+    name="corptools.tasks.update_or_create_map"
+)
 def update_or_create_map():
     return process_map_from_esi()
 
 
-@shared_task
-def update_or_create_map():
-    return process_map_from_esi()
-
-
-@shared_task
+@shared_task(
+    name="corptools.tasks.update_ore_comp_table"
+)
 def update_ore_comp_table():
     return update_ore_comp_table_from_fuzzworks()
 
 
-@shared_task
+@shared_task(
+    name="corptools.tasks.update_category"
+)
 def update_category(category_id):
     return process_category_from_esi(category_id)
 
 
-@shared_task
+@shared_task(
+    name="corptools.tasks.process_ores_from_esi"
+)
 def process_ores_from_esi():
     return process_category_from_esi(25)
 
 
-@shared_task
+@shared_task(
+    name="corptools.tasks.update_all_eve_names"
+)
 def update_all_eve_names(chunk=False):
     needs_update = timezone.now() - datetime.timedelta(days=30)
     en = EveName.objects.filter(last_update__lte=needs_update)
@@ -79,7 +84,12 @@ def get_error_count_flag():
     return cache.get("esi_errors_timeout", False)
 
 
-@shared_task(bind=True, base=QueueOnce, max_retries=None)
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    max_retries=None,
+    name="corptools.tasks.update_eve_name"
+)
 def update_eve_name(self, id):
     if get_error_count_flag():
         self.retry(countdown=60)
@@ -139,7 +149,7 @@ def update_eve_name(self, id):
             name.save()
 
 
-@shared_task
+@shared_task(name="corptools.tasks.process_all_categories")
 def process_all_categories():
     categories = providers.esi.client.Universe.get_universe_categories().result()
     que = []
@@ -152,19 +162,19 @@ def process_all_categories():
     return f"Queued {len(que)} Tasks"
 
 
-@shared_task
+@shared_task(name="corptools.tasks.run_housekeeping")
 def run_housekeeping():
     notifs = remove_old_notifications()
     return notifs
 
 
-@shared_task
+@shared_task(name="corptools.tasks.update_all_raw_minerals")
 def update_all_raw_minerals():
     _types = EveItemType.objects.filter(group__category_id=4)
     return update_prices_for_types(list(_types.values_list("type_id", flat=True)))
 
 
-@shared_task
+@shared_task(name="corptools.tasks.update_prices_for_types")
 def update_prices_for_types(type_ids: list):
     logger.info(
         "Pulling values from Jita @`buy`-`weightedAverage`"
@@ -191,7 +201,7 @@ def update_prices_for_types(type_ids: list):
 # Bulk Updates
 
 
-@shared_task
+@shared_task(name="corptools.tasks.clear_all_etags")
 def clear_all_etags():
     try:
         from django_redis import get_redis_connection
