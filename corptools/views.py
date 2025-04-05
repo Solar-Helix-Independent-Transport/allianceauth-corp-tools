@@ -209,9 +209,9 @@ def admin(request):
     corpations = CorporationAudit.objects.all().count()
 
     char_tasks = PeriodicTask.objects.filter(
-        task='corptools.tasks.update_subset_of_characters', enabled=True).count()
+        task='corptools.tasks.character.update_subset_of_characters', enabled=True).count()
     corp_tasks = PeriodicTask.objects.filter(
-        task='corptools.tasks.update_all_corps', enabled=True).count()
+        task='corptools.tasks.corporation.update_all_corps', enabled=True).count()
 
     context = {
         "names": names,
@@ -293,8 +293,13 @@ def admin_create_tasks(request):
         timezone=schedule_b.timezone,
     )
 
+    try:
+        PeriodicTask.objects.get(task='corptools.tasks.update_subset_of_characters').delete()
+    except PeriodicTask.DoesNotExist:
+        pass
+
     PeriodicTask.objects.update_or_create(
-        task='corptools.tasks.update_subset_of_characters',
+        task='corptools.tasks.character.update_subset_of_characters',
         defaults={
             'crontab': schedule_char,
             'name': 'Character Audit Rolling Update',
@@ -302,8 +307,13 @@ def admin_create_tasks(request):
         }
     )
 
+    try:
+        PeriodicTask.objects.get(task='corptools.tasks.update_all_corps').delete()
+    except PeriodicTask.DoesNotExist:
+        pass
+
     PeriodicTask.objects.update_or_create(
-        task='corptools.tasks.update_all_corps',
+        task='corptools.tasks.corporation.update_all_corps',
         defaults={
             'crontab': schedule_corp,
             'name': 'Corporation Audit Update',

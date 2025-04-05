@@ -40,8 +40,13 @@ class Command(BaseCommand):
             timezone=schedule_b.timezone,
         )
 
+        try:
+            PeriodicTask.objects.get(task='corptools.tasks.update_subset_of_characters').delete()
+        except PeriodicTask.DoesNotExist:
+            pass
+
         PeriodicTask.objects.update_or_create(
-            task='corptools.tasks.update_subset_of_characters',
+            task='corptools.tasks.character.update_subset_of_characters',
             defaults={
                 'crontab': schedule_char,
                 'name': 'Character Audit Rolling Update',
@@ -49,8 +54,13 @@ class Command(BaseCommand):
             }
         )
 
+        try:
+            PeriodicTask.objects.get(task='corptools.tasks.update_all_corps').delete()
+        except PeriodicTask.DoesNotExist:
+            pass
+
         PeriodicTask.objects.update_or_create(
-            task='corptools.tasks.update_all_corps',
+            task='corptools.tasks.corporation.update_all_corps',
             defaults={
                 'crontab': schedule_corp,
                 'name': 'Corporation Audit Update',
