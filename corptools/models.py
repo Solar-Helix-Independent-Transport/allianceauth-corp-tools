@@ -8,11 +8,10 @@ from solo.models import SingletonModel
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
-from django.db.models import ExpressionWrapper, F, Func, Max
+from django.db.models import ExpressionWrapper, F, Func, Max, Min
 from django.utils import timezone
 from django.utils.formats import localize
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import ngettext_lazy
+from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 from allianceauth.authentication.models import CharacterOwnership
 from allianceauth.eveonline.evelinks import eveimageserver
@@ -1836,7 +1835,8 @@ class TimeInCorpFilter(FilterBase):
         output = defaultdict(lambda: {"message": "", "check": False})
 
         for c, char_corp_data in chars.items():
-            start_date_localized = localize(char_corp_data["start_date"].date()) if char_corp_data["start_date"] is not None else None
+            start_date_localized = localize(char_corp_data["start_date"].date(
+            )) if char_corp_data["start_date"] is not None else None
             end_date_localized = None
 
             if char_corp_data["days_in_corp"] >= self.days_in_corp:
@@ -1845,7 +1845,8 @@ class TimeInCorpFilter(FilterBase):
                 if start_date_localized:
                     end_date_localized = localize(
                         (
-                            char_corp_data["start_date"] + datetime.timedelta(days=self.days_in_corp)
+                            char_corp_data["start_date"] +
+                            datetime.timedelta(days=self.days_in_corp)
                         ).date()
                     )
 
@@ -2603,4 +2604,91 @@ class JumpCloneFilter(FilterBase):
                         out_message), "check": True}
             else:
                 output[u.id] = {"message": "", "check": False}
+        return output
+
+
+class CharacterAgeFilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Character Age Filter"
+        verbose_name_plural = verbose_name
+
+    min_age = models.IntegerField(default=30)
+
+    reversed_logic = models.BooleanField(
+        default=False,
+        help_text="If set all user with age less than the min_max_age will pass the test."
+    )
+
+    def process_filter(self, user: User):
+        logic = self.reversed_logic
+        try:
+            main_character = user.profile.main_character.characteraudit
+            histories = CorporationHistory.objects.filter(
+                character=main_character).order_by('start_date').first()
+
+            days = timezone.now() - histories.start_date
+            if days.days >= self.min_age:
+                return not logic
+            else:
+                return logic
+        except Exception as e:
+            # logger.error(e, exc_info=1)
+            return False
+
+    def audit_filter(self, users):
+        logic = self.reversed_logic
+        co = users.annotate(
+            min_timestamp=Min(
+                'profile__main_character__characteraudit__corporationhistory__start_date')
+        ).values("id", "min_timestamp")
+
+        chars = defaultdict(lambda: {})
+        for c in co:
+            if c['min_timestamp']:
+                days = timezone.now() - c['min_timestamp']
+                days = days.days
+            else:
+                days = -1
+            chars[c['id']] = {
+                "start_date": c["min_timestamp"],
+                "age": days
+            }
+
+        output = defaultdict(lambda: {"message": "", "check": False})
+
+        for c, char_corp_data in chars.items():
+            start_date_localized = localize(char_corp_data["start_date"].date(
+            )) if char_corp_data["start_date"] is not None else None
+            end_date_localized = None
+
+            if char_corp_data["age"] >= self.min_age:
+                check = not logic
+            else:
+                if start_date_localized:
+                    end_date_localized = localize(
+                        (
+                            char_corp_data["start_date"] +
+                            datetime.timedelta(days=self.min_age)
+                        ).date()
+                    )
+
+                check = logic
+            if char_corp_data["age"] < 0:
+                msg = "No Audit"
+                check = False
+            else:
+                msg = (
+                    ngettext_lazy(
+                        singular=f'{char_corp_data["age"]:d} day old (Since: {start_date_localized})',
+                        plural=f'{char_corp_data["age"]:d} days old (Since: {start_date_localized})',
+                        number=char_corp_data["age"],
+                    )
+                    if not end_date_localized
+                    else ngettext_lazy(
+                        singular=f'{char_corp_data["age"]:d} day old (Until: {end_date_localized})',
+                        plural=f'{char_corp_data["age"]:d} days old (Until: {end_date_localized})',
+                        number=char_corp_data["age"],
+                    )
+                )
+            output[c] = {"message": msg, "check": check}
         return output
