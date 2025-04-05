@@ -21,3 +21,10 @@ declare module "react-copy-to-clipboard" {
   class CopyToClipboard extends React.Component<PropsWithChildren<Props>, {}> {}
   export default CopyToClipboard;
 }
+
+declare module "react-slider" {
+  import React from "react";
+
+  class ReactSlider extends React.Component<PropsWithChildren<any>, {}> {}
+  export default ReactSlider;
+}
