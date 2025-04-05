@@ -2,7 +2,7 @@ import { DoctrineModal } from "./DoctrineModal";
 // import "./doctrine.css";
 import { useState } from "react";
 import { Button, ButtonGroup } from "react-bootstrap";
-import { CopyToClipboard } from "react-copy-to-clipboard";
+import CopyToClipboard from "react-copy-to-clipboard";
 
 export const DoctrineCheck = ({ name, skill_reqs, skill_list }: any) => {
   const [show, setShow] = useState(false);
