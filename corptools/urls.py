@@ -1,6 +1,6 @@
 from django.urls import include, path, re_path
 
-from . import app_settings, views
+from . import views
 from .api import api
 
 app_name = 'corptools'

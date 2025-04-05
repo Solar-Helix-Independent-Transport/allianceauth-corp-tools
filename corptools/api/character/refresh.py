@@ -6,9 +6,10 @@ from allianceauth.eveonline.tasks import (
     update_character as eve_character_update,
 )
 
-from corptools import app_settings, models, tasks
+from corptools import app_settings, models
 from corptools.api import schema
 from corptools.api.helpers import get_alts_queryset, get_main_character
+from corptools.tasks import character
 
 
 class RefreshApiEndpoints:
@@ -28,7 +29,7 @@ class RefreshApiEndpoints:
             audits_visible = models.CharacterAudit.objects.visible_to(
                 request.user).values_list('character_id', flat=True)
             if character_id in audits_visible:
-                tasks.update_character.apply_async(args=[character_id], kwargs={
+                character.update_character.apply_async(args=[character_id], kwargs={
                     "force_refresh": True}, priority=4)
             return 200, {"message": "Requested Update!"}
 
@@ -50,7 +51,7 @@ class RefreshApiEndpoints:
             force = app_settings.CT_USERS_CAN_FORCE_REFRESH or request.user.is_superuser
 
             for cid in characters.values_list('character_id', flat=True):
-                tasks.update_character.apply_async(
+                character.update_character.apply_async(
                     args=[cid], kwargs={"force_refresh": force}, priority=4)
                 eve_character_update.apply_async(
                     args=[cid], priority=4)
