@@ -13,44 +13,44 @@
         <!-- <div class="card m-2 flex-grow-1" style="min-width: 350px;"> -->
             <div class="card-body">
                 <h5 class="card-title text-center">
-                    Manual Task Run
+                    {% translate "Manual Task Run" %}
                 </h5>
                 <hr>
                 {% csrf_token %}
                 <div class="form-check">
                     <input type="checkbox" name="run_clear_etag" class="form-check-input" id="run_clear_etag">
                     <label class="form-check-label" for="run_clear_etag">{% translate "Clear all cached Etags" %}</label>
-                    <p class="figure-caption">Wipe all the etags from cache to force new data pulls</p>
+                    <p class="figure-caption">{% translate "Wipe all the etags from cache to force new data pulls" %}</p>
                 </div>
 
                 <div class="form-check">
                     <input type="checkbox" name="run_universe" class="form-check-input" id="run_universe">
                     <label class="form-check-label" for="run_universe">{% translate "Update EvE Map Data" %}</label>
-                    <p class="figure-caption">Force a full map update from ESI</p>
+                    <p class="figure-caption">{% translate "Force a full map update from ESI" %}</p>
                 </div>
 
                 <div class="form-check">
                     <input type="checkbox" name="run_locations" class="form-check-input" id="run_locations">
                     <label class="form-check-label" for="run_locations">{% translate "Force update all Citadel Locations" %}</label>
-                    <p class="figure-caption">Attempt to update all Citadel names from ESI</p>
+                    <p class="figure-caption">{% translate "Attempt to update all Citadel names from ESI" %}</p>
                 </div>
 
                 <div class="form-check">
                     <input type="checkbox" name="run_update_all" class="form-check-input" id="run_update_all">
                     <label class="form-check-label" for="run_update_all">{% translate "Force all character updates" %}</label>
-                    <p class="figure-caption">Force updates to ALL Character Audits</p>
+                    <p class="figure-caption">{% translate "Force updates to ALL Character Audits" %}</p>
                 </div>
 
                 <div class="form-check">
                     <input type="checkbox" name="run_corp_updates" class="form-check-input" id="run_corp_updates">
                     <label class="form-check-label" for="run_corp_updates">{% translate "Force all corp updates" %}</label>
-                    <p class="figure-caption">Force updates to ALL Corporation Audits</p>
+                    <p class="figure-caption">{% translate "Force updates to ALL Corporation Audits" %}</p>
                 </div>
 
                 <div class="form-check">
                     <input type="checkbox" name="run_update_eve_models" class="form-check-input" id="run_update_eve_models">
                     <label class="form-check-label" for="run_update_eve_models">{% translate "Update Eve Entirty Models" %}</label>
-                    <p class="figure-caption">Force updates to ALL Eve Entity Names</p>
+                    <p class="figure-caption">{% translate "Force updates to ALL Eve Entity Names" %}</p>
                 </div>
             </div>
 
@@ -62,25 +62,25 @@
     <div class="card m-2 flex-grow-1">
         <div class="card-body">
             <h5 class="card-title text-center">
-                Corptools Module Configuration
+                {% translate "Corptools Module Configuration" %}
             </h5>
             <div>
                 <table class="table">
                     <thead>
                       <tr>
-                        <th>Module</th>
-                        <th>Enabled</th>
-                        <th>Include in Active</th>
-                        <th>Temp Disabled</th>
+                        <th>{% translate "Module" %}</th>
+                        <th>{% translate "Enabled" %}</th>
+                        <th>{% translate "Include in Active" %}</th>
+                        <th>{% translate "Temp Disabled" %}</th>
                       </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Assets
+                            <td>{% translate "Assets" %}
                                 {% if ct_config.disable_verification_assets %}
-                                    <span class="text-danger">( Validation Disabled )</span>
+                                    <span class="text-danger">{% translate "(Validation Disabled)" %}</span>
                                 {% else %}
-                                    <span class="text-success">( Validation Enabled )</span>
+                                    <span class="text-success">{% translate "(Validation Enabled)" %}</span>
                                 {% endif %}
                             </td>
                             <td class="text-center">
@@ -106,7 +106,7 @@
                             </td>
                         </tr>
                         <!-- <tr>
-                            <td>Standings</td>
+                            <td>{% translate "Standings" %}</td>
                             <td class="text-center">
                                 {% if app_settings.CT_CHAR_STANDINGS_MODULE %}
                                     <i class="fas fa-check-circle text-success"></i>
@@ -130,7 +130,7 @@
                             </td>
                         </tr> -->
                         <tr>
-                            <td>Contacts</td>
+                            <td>{% translate "Contacts" %}</td>
                             <td class="text-center">
                                 {% if app_settings.CT_CHAR_CONTACTS_MODULE %}
                                     <i class="fas fa-check-circle text-success"></i>
@@ -154,11 +154,11 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Notifications
+                            <td>{% translate "Notifications" %}
                                 {% if ct_config.disable_verification_notifications %}
-                                    <span class="text-danger">( Validation Disabled )</span>
+                                    <span class="text-danger">{% translate "(Validation Disabled)" %}</span>
                                 {% else %}
-                                    <span class="text-success">( Validation Enabled )</span>
+                                    <span class="text-success">{% translate "(Validation Enabled)" %}</span>
                                 {% endif %}
                             </td>
                             <td class="text-center">
@@ -184,7 +184,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Roles</td>
+                            <td>{% translate "Roles" %}</td>
                             <td class="text-center">
                                 {% if app_settings.CT_CHAR_ROLES_MODULE %}
                                     <i class="fas fa-check-circle text-success"></i>
@@ -208,7 +208,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Industry</td>
+                            <td>{% translate "Industry" %}</td>
                             <td class="text-center">
                                 {% if app_settings.CT_CHAR_INDUSTRY_MODULE %}
                                     <i class="fas fa-check-circle text-success"></i>
@@ -232,7 +232,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Mining</td>
+                            <td>{% translate "Mining" %}</td>
                             <td class="text-center">
                                 {% if app_settings.CT_CHAR_MINING_MODULE %}
                                     <i class="fas fa-check-circle text-success"></i>
@@ -256,7 +256,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Wallets/Markets/Contracts</td>
+                            <td>{% translate "Wallets/Markets/Contracts" %}</td>
                             <td class="text-center">
                                 {% if app_settings.CT_CHAR_WALLET_MODULE %}
                                     <i class="fas fa-check-circle text-success"></i>
@@ -280,7 +280,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Skills</td>
+                            <td>{% translate "Skills" %}</td>
                             <td class="text-center">
                                 {% if app_settings.CT_CHAR_SKILLS_MODULE %}
                                     <i class="fas fa-check-circle text-success"></i>
@@ -304,7 +304,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Clones</td>
+                            <td>{% translate "Clones" %}</td>
                             <td class="text-center">
                                 {% if app_settings.CT_CHAR_CLONES_MODULE %}
                                     <i class="fas fa-check-circle text-success"></i>
@@ -328,7 +328,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Mail</td>
+                            <td>{% translate "Mail" %}</td>
                             <td class="text-center">
                                 {% if app_settings.CT_CHAR_MAIL_MODULE %}
                                     <i class="fas fa-check-circle text-success"></i>
@@ -352,7 +352,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Loyalty Points</td>
+                            <td>{% translate "Loyalty Points" %}</td>
                             <td class="text-center">
                                 {% if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE %}
                                     <i class="fas fa-check-circle text-success"></i>
@@ -383,7 +383,7 @@
     <div class="card m-2 flex-grow-1" style="min-width: 350px;">
         <div class="card-body">
             <h5 class="card-title text-center">
-                Eve Models
+                {% translate "Eve Models" %}
             </h5>
             <hr>
             <div>
@@ -437,7 +437,7 @@
     <div class="card m-2 flex-grow-1" style="min-width: 350px;">
         <div class="card-body">
             <h5 class="card-title text-center">
-                Eve Universe Models
+                {% translate "Eve Universe Models" %}
             </h5>
             <hr>
             <div>
@@ -479,7 +479,7 @@
     <div class="card m-2 flex-grow-1" style="min-width: 350px;">
         <div class="card-body">
             <h5 class="card-title text-center">
-                Audit Models
+                {% translate "Audit Models" %}
             </h5>
             <hr>
             <div>
@@ -505,7 +505,7 @@
                 </table>
             </div>
             <h5 class="card-title text-center">
-                Audit Tasks
+                {% translate "Audit Tasks" %}
             </h5>
             <hr>
             <table class="table">
