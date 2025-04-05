@@ -16,48 +16,76 @@ TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
 logger = get_extension_logger(__name__)
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.update_corp_wallet"
+)
 @no_fail_chain
 @esi_error_retry
 def update_corp_wallet(self, corp_id, full_update=False, chain=[]):
     return corp_helpers.update_corp_wallet_division(corp_id, full_update=full_update)
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.update_corp_structures"
+)
 @no_fail_chain
 @esi_error_retry
 def update_corp_structures(self, corp_id, force_refresh=False, chain=[]):
     return corp_helpers.update_corp_structures(corp_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.update_corp_assets"
+)
 @esi_error_retry
 def update_corp_assets(self, corp_id, chain=[]):
     return corp_helpers.update_corp_assets(corp_id)
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.update_corp_pocos"
+)
 @no_fail_chain
 @esi_error_retry
 def update_corp_pocos(self, corp_id, chain=[]):
     return corp_helpers.update_corporation_pocos(corp_id)
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.update_corp_logins"
+)
 @no_fail_chain
 @esi_error_retry
 def update_corp_logins(self, corp_id, chain=[]):
     return corp_helpers.update_character_logins_from_corp(corp_id)
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.update_corp_starbases"
+)
 @no_fail_chain
 @esi_error_retry
 def update_corp_starbases(self, corp_id, force_refresh=False, chain=[]):
     return corp_helpers.fetch_starbases(corp_id, force_refresh=force_refresh)
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.update_corp_contracts"
+)
 @no_fail_chain
 @esi_error_retry
 def update_corp_contracts(self, corp_id, force_refresh=False, chain=[]):
@@ -74,7 +102,9 @@ def update_corp_contracts(self, corp_id, force_refresh=False, chain=[]):
     return "Completed Que of contract items for: %s" % str(corp_id)
 
 
-@shared_task
+@shared_task(
+    name="corptools.tasks.update_corp"
+)
 def update_corp(corp_id, force_refresh=False):
     corp = CorporationAudit.objects.get(corporation__corporation_id=corp_id)
     logger.info("Starting Updates for {}".format(
@@ -90,7 +120,9 @@ def update_corp(corp_id, force_refresh=False):
     Chain(que).apply_async(priority=6)
 
 
-@shared_task
+@shared_task(
+    name="corptools.tasks.update_all_corps"
+)
 def update_all_corps(force_refresh=False):
     corps = CorporationAudit.objects.all().select_related('corporation')
     for corp in corps:

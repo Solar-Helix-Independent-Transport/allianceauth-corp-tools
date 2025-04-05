@@ -36,7 +36,7 @@ TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
 logger = get_extension_logger(__name__)
 
 
-@shared_task
+@shared_task(name="corptools.tasks.clear_all_etags")
 def clear_all_etags():
     try:
         from django_redis import get_redis_connection
@@ -52,14 +52,14 @@ def clear_all_etags():
     return f"Deleted {deleted} etag keys"
 
 
-@shared_task
+@shared_task(name="corptools.tasks.update_all_characters")
 def update_all_characters():
     characters = CharacterAudit.objects.all().select_related('character')
     for char in characters:
         update_character.apply_async(args=[char.character.character_id])
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(bind=True, base=QueueOnce, name="corptools.tasks.update_subset_of_characters")
 def update_subset_of_characters(self, subset=48, min_runs=15, force=False):
     amount_of_updates = max(
         CharacterAudit.objects.all().count() / subset, min_runs)
@@ -77,12 +77,12 @@ def update_subset_of_characters(self, subset=48, min_runs=15, force=False):
     return f"Queued {len(characters)} Character Updates"
 
 
-@shared_task()
+@shared_task(name="corptools.tasks.re_que_corp_histories")
 def re_que_corp_histories():
     process_corp_histories.apply_async(priority=6)
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(bind=True, base=QueueOnce, name="corptools.tasks.process_corp_histories")
 def process_corp_histories(self):
     cid = CharacterAudit.objects.all().order_by(
         'last_update_pub_data'
@@ -92,7 +92,7 @@ def process_corp_histories(self):
     return f"{(cid)} Character historys Updated"
 
 
-@shared_task
+@shared_task(name="corptools.tasks.check_account")
 def check_account(character_id):
     char = EveCharacter.objects\
         .select_related('character_ownership',
@@ -107,7 +107,7 @@ def check_account(character_id):
         update_character.apply_async(args=[cid], priority=6)
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(bind=True, base=QueueOnce, name="corptools.tasks.update_character")
 def update_character(self, char_id, force_refresh=False):
     character = CharacterAudit.objects.filter(
         character__character_id=char_id).first()
