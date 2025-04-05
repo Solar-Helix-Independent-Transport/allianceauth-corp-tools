@@ -6,13 +6,11 @@
   "scripts": {
     "dev": "vite",
     "tsc": "tsc",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && ./copy-assets.sh",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "postbuild": "./copy-assets.sh",
     "buildApiTypes": "npx openapi-typescript ./openapi.json -o ./src/api/CtApi.d.ts",
-    "buildTranslations": "npx i18next-scanner --config i18next-scanner.config.cjs",
-    "postbuildTranslations": "./copy-langs.sh"
+    "buildTranslations": "npx i18next-scanner --config i18next-scanner.config.cjs && ./copy-langs.sh"
   },
   "dependencies": {
     "@nivo/bar": "^0.88.0",
