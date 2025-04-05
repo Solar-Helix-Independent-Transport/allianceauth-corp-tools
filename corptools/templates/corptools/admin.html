@@ -17,40 +17,40 @@
                 </h5>
                 <hr>
                 {% csrf_token %}
-                <div class="form-check">
+                <div class="form-check mb-3">
                     <input type="checkbox" name="run_clear_etag" class="form-check-input" id="run_clear_etag">
                     <label class="form-check-label" for="run_clear_etag">{% translate "Clear all cached Etags" %}</label>
-                    <p class="figure-caption">{% translate "Wipe all the etags from cache to force new data pulls" %}</p>
+                    <div class="form-text">{% translate "Wipe all the etags from cache to force new data pulls" %}</div>
                 </div>
 
-                <div class="form-check">
+                <div class="form-check mb-3">
                     <input type="checkbox" name="run_universe" class="form-check-input" id="run_universe">
                     <label class="form-check-label" for="run_universe">{% translate "Update EvE Map Data" %}</label>
-                    <p class="figure-caption">{% translate "Force a full map update from ESI" %}</p>
+                    <div class="form-text">{% translate "Force a full map update from ESI" %}</div>
                 </div>
 
-                <div class="form-check">
+                <div class="form-check mb-3">
                     <input type="checkbox" name="run_locations" class="form-check-input" id="run_locations">
                     <label class="form-check-label" for="run_locations">{% translate "Force update all Citadel Locations" %}</label>
-                    <p class="figure-caption">{% translate "Attempt to update all Citadel names from ESI" %}</p>
+                    <div class="form-text">{% translate "Attempt to update all Citadel names from ESI" %}</div>
                 </div>
 
-                <div class="form-check">
+                <div class="form-check mb-3">
                     <input type="checkbox" name="run_update_all" class="form-check-input" id="run_update_all">
                     <label class="form-check-label" for="run_update_all">{% translate "Force all character updates" %}</label>
-                    <p class="figure-caption">{% translate "Force updates to ALL Character Audits" %}</p>
+                    <div class="form-text">{% translate "Force updates to ALL Character Audits" %}</div>
                 </div>
 
-                <div class="form-check">
+                <div class="form-check mb-3">
                     <input type="checkbox" name="run_corp_updates" class="form-check-input" id="run_corp_updates">
                     <label class="form-check-label" for="run_corp_updates">{% translate "Force all corp updates" %}</label>
-                    <p class="figure-caption">{% translate "Force updates to ALL Corporation Audits" %}</p>
+                    <div class="form-text">{% translate "Force updates to ALL Corporation Audits" %}</div>
                 </div>
 
-                <div class="form-check">
+                <div class="form-check mb-3">
                     <input type="checkbox" name="run_update_eve_models" class="form-check-input" id="run_update_eve_models">
                     <label class="form-check-label" for="run_update_eve_models">{% translate "Update Eve Entirty Models" %}</label>
-                    <p class="figure-caption">{% translate "Force updates to ALL Eve Entity Names" %}</p>
+                    <div class="form-text">{% translate "Force updates to ALL Eve Entity Names" %}</div>
                 </div>
             </div>
 
@@ -535,12 +535,13 @@
             <hr>
             <div>
                 {% csrf_token %}
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label for="name">{% translate "Skill List Description" %}</label>
                     <input type="text" class="form-control" name="name" placeholder="Enter Description">
-                    <small id="nameHelp" class="form-text text-muted">{% translate "This will show as the name of the Skill List" %}.</small>
+                    <div id="nameHelp" class="form-text">{% translate "This will show as the name of the Skill List" %}.</div>
                 </div>
-                <div class="form-group">
+
+                <div class="form-group mb-3">
                     <div class="input-group">
                         <span class='form-control' id="upload-file-info"></span>
                         <span class="input-group-btn">
@@ -550,7 +551,7 @@
                             </label>
                         </span>
                     </div>
-                    <p id="descriptionHelp" class="form-text text-muted">{% translate "PYFA XML Skills required list" %}.</p>
+                    <div id="descriptionHelp" class="form-text">{% translate "PYFA XML Skills required list" %}.</div>
                 </div>
             </div>
         </div>
