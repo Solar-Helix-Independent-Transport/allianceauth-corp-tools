@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import CharacterAssetModal from "../../Components/Modals/CharacterAssetContents";
 
 const CharacterAssets = () => {
   const { t } = useTranslation();
@@ -33,14 +34,7 @@ const CharacterAssets = () => {
     }),
     columnHelper.accessor("expand", {
       header: t("Show Contents"),
-      cell: (cell) =>
-        cell.getValue() && (
-          <div className="text-center">
-            <Button variant="secondary" size="sm">
-              Show Contents
-            </Button>
-          </div>
-        ),
+      cell: (cell) => cell.getValue() && <CharacterAssetModal item={cell.row.original} />,
     }),
     columnHelper.accessor("item.cat", {
       header: t("Category"),

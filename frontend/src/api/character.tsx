@@ -42,7 +42,6 @@ export async function getCharacterRoles(characterID: number) {
 export async function loadGlanceAssetData(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/glance/assets", characterID);
 }
-
 export async function loadGlanceActivityData(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/glance/activities", characterID);
 }
@@ -192,6 +191,12 @@ export async function postAccountRefresh(character_id: number) {
 export async function loadAssetList(character_id: number, location_id: number) {
   const api = await axios.get(`/audit/api/account/${character_id}/asset/${location_id}/list`);
   console.log(`get asset list in api ${character_id} ${location_id}`);
+  return api.data;
+}
+
+export async function loadAssetContents(character_id: number, item_id: number) {
+  const api = await axios.get(`/audit/api/account/${character_id}/asset/${item_id}/contents`);
+  console.log(`get asset list in api ${character_id} ${item_id}`);
   return api.data;
 }
 
