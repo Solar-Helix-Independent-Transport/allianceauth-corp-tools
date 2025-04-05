@@ -7,7 +7,9 @@
 {% endblock %}
 
 {% block content %}
-<h2 class="text-center">{% translate "Corptools Configuration Info" %}</h2>
+{% translate "Corptools Configuration Info" as page_title %}
+{% include "framework/header/page-header.html" with title=page_title %}
+
 <div class="d-flex flex-wrap" >
     <form action="{% url 'corptools:run_tasks' %}" method="post" class="card m-2 flex-grow-1">
         <!-- <div class="card m-2 flex-grow-1" style="min-width: 350px;"> -->
