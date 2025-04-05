@@ -18,43 +18,43 @@
                 <hr>
                 {% csrf_token %}
                 <div class="form-check">
-                    <input type="checkbox" name="run_clear_etag" class="form-check-input" id="run_clear_etag" />
+                    <input type="checkbox" name="run_clear_etag" class="form-check-input" id="run_clear_etag">
                     <label class="form-check-label" for="run_clear_etag">{% translate "Clear all cached Etags" %}</label>
                 </div>
                 <figcaption class="figure-caption">Wipe all the etags from cache to force new data pulls</figcaption>
-                <br/>
+                <br>
                 <div class="form-check">
-                    <input type="checkbox" name="run_universe" class="form-check-input" id="run_universe" />
+                    <input type="checkbox" name="run_universe" class="form-check-input" id="run_universe">
                     <label class="form-check-label" for="run_universe">{% translate "Update EvE Map Data" %}</label>
                 </div>
                 <figcaption class="figure-caption">Force a full map update from ESI</figcaption>
-                <br/>
+                <br>
                 <div class="form-check">
-                    <input type="checkbox" name="run_locations" class="form-check-input" id="run_locations" />
+                    <input type="checkbox" name="run_locations" class="form-check-input" id="run_locations">
                     <label class="form-check-label" for="run_locations">{% translate "Force update all Citadel Locations" %}</label>
                 </div>
                 <figcaption class="figure-caption">Attempt to update all Citadel names from ESI</figcaption>
-                <br/>
+                <br>
                 <div class="form-check">
-                    <input type="checkbox" name="run_update_all" class="form-check-input" id="run_update_all" />
+                    <input type="checkbox" name="run_update_all" class="form-check-input" id="run_update_all">
                     <label class="form-check-label" for="run_update_all">{% translate "Force all character updates" %}</label>
                 </div>
                 <figcaption class="figure-caption">Force updates to ALL Character Audits</figcaption>
-                <br/>
+                <br>
                 <div class="form-check">
-                    <input type="checkbox" name="run_corp_updates" class="form-check-input" id="run_corp_updates" />
+                    <input type="checkbox" name="run_corp_updates" class="form-check-input" id="run_corp_updates">
                     <label class="form-check-label" for="run_corp_updates">{% translate "Force all corp updates" %}</label>
                 </div>
                 <figcaption class="figure-caption">Force updates to ALL Corporation Audits</figcaption>
-                <br/>
+                <br>
                 <div class="form-check">
-                    <input type="checkbox" name="run_update_eve_models" class="form-check-input" id="run_update_eve_models" />
+                    <input type="checkbox" name="run_update_eve_models" class="form-check-input" id="run_update_eve_models">
                     <label class="form-check-label" for="run_update_eve_models">{% translate "Update Eve Entirty Models" %}</label>
                 </div>
                 <figcaption class="figure-caption">Force updates to ALL Eve Entity Names</figcaption>
             </div>
             <div class="card-footer">
-                <input type="submit" value="{% translate "Submit" %}" class="btn btn-primary w-100 mt-auto" />
+                <input type="submit" value="{% translate "Submit" %}" class="btn btn-primary w-100 mt-auto">
             </div>
         <!-- </div> -->
     </form>
@@ -536,7 +536,7 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="name">{% translate "Skill List Description" %}</label>
-                    <input type="text" class="form-control" name="name" placeholder="Enter Description" />
+                    <input type="text" class="form-control" name="name" placeholder="Enter Description">
                     <small id="nameHelp" class="form-text text-muted">{% translate "This will show as the name of the Skill List" %}.</small>
                 </div>
                 <div class="form-group">
@@ -544,7 +544,7 @@
                         <span class='form-control' id="upload-file-info"></span>
                         <span class="input-group-btn">
                             <label class="btn btn-default" for="file">
-                                <input id="file" name="file" type="file" style="display:none" onchange="$('#upload-file-info').html(this.files[0].name)" />
+                                <input id="file" name="file" type="file" style="display:none" onchange="$('#upload-file-info').html(this.files[0].name)">
                                 {% translate "Browse" %}
                             </label>
                         </div>
@@ -554,7 +554,7 @@
             </div>
         </div>
         <div class="card-footer">
-            <input type="submit" class="btn w-100 btn-primary" />
+            <input type="submit" class="btn w-100 btn-primary">
         </div>
     </form>
 </div>
