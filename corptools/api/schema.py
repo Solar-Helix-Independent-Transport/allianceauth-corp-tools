@@ -250,6 +250,7 @@ class CharacterContract(Schema):
     end_location: Optional[EveName] = None
 
     for_corporation: bool
+    own_account: Optional[bool] = False
 
     date_accepted: Optional[datetime] = None
     date_completed: Optional[datetime] = None

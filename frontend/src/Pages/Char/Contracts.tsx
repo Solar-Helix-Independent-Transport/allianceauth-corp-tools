@@ -4,7 +4,7 @@ import { components } from "../../api/CtApi";
 import { getCharacterContracts } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
@@ -14,6 +14,7 @@ const CharacterContracts = () => {
   const { characterID } = useParams();
   const [showModal, setModal] = useState(false);
   const [modalData, setData] = useState(null as components["schemas"]["CharacterContract"] | null);
+  const [showAll, setShowAll] = useState(true);
 
   const { data, isFetching } = useQuery({
     queryKey: ["contracts", characterID],
@@ -63,9 +64,28 @@ const CharacterContracts = () => {
     }),
   ];
 
+  const data_out = data?.filter((row: any) => {
+    if (showAll) {
+      return true;
+    } else {
+      return !row.own_account;
+    }
+  });
+
   return (
     <>
-      <TableWrapper data={data} {...{ isFetching, columns }} />
+      <Form.Check
+        type="switch"
+        id="custom-switch"
+        label={t("Show Own Account Activity")}
+        className="float-end"
+        onChange={(event: any) => {
+          setShowAll(event.target.checked);
+        }}
+        defaultChecked={showAll}
+      />
+
+      <TableWrapper data={data_out} {...{ isFetching, columns }} />
       <CharacterContractModal data={modalData} shown={showModal} setShown={setModal} />
     </>
   );
