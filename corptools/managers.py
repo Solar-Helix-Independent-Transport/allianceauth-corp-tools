@@ -180,6 +180,27 @@ class EveItemTypeManager(models.Manager):
             entity, created = self.update_or_create_from_esi(eve_id)
         return entity, created
 
+    def get_or_create_from_esi_name(self, name: str):
+        """gets or creates with ESI when only name is known"""
+        try:
+            entity = self.get(name=name)
+            created = False
+        except ObjectDoesNotExist:
+            ids = providers.esi.client.Universe.post_universe_ids(
+                names=[
+                    name
+                ],
+
+            )
+            id = None
+            for nm in ids.get("inventory_types", []):
+                if nm.get("id"):
+                    if nm.get("name") == name:
+                        id = nm.get("id")
+                        break
+            entity, created = self.update_or_create_from_esi(id)
+        return entity, created
+
     def create_bulk_from_esi(self, eve_ids):
         """gets or creates with ESI"""
         from corptools.task_helpers.update_tasks import (
