@@ -295,7 +295,7 @@ class FinancesApiEndpoints:
 
             for c in contracts:
                 own_account = False
-                if (c.acceptor_id in character_list and c.assignee_id in character_list):
+                if (c.assignee_id in character_list):
                     own_account = True
 
                 _i = []
