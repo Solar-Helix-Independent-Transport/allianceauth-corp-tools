@@ -68,6 +68,7 @@ export interface TypeIconProps extends Partial<Element> {
   height?: number;
   width?: number;
   style?: Partial<React.CSSProperties>;
+  forceType?: String;
 }
 
 export const TypeIcon = (props: TypeIconProps) => {
@@ -77,7 +78,7 @@ export const TypeIcon = (props: TypeIconProps) => {
       width={props.width && props.width}
       style={props.style && props.style}
       src={`https://images.evetech.net/types/${props.type_id}/${
-        props.size > 64 ? "render" : "icon"
+        props.forceType ? props.forceType : props.size > 64 ? "render" : "icon"
       }?size=${props.size}`}
     />
   );

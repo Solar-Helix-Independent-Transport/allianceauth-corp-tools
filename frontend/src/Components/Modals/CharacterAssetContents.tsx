@@ -38,7 +38,7 @@ function CharacterAssetModal({ item }: any) {
         </Modal.Header>
         <Modal.Body>
           <div className="text-center m-2">
-            <TypeIcon type_id={item.item.id} size={256} />
+            <TypeIcon type_id={item.item.id} size={128} forceType="icon" />
           </div>
           {item?.item?.name && <h3 className="text-center m-2">{item?.item?.name}</h3>}
           <AssetContentsTable data={data} header={t("Contents")} isFetching={isFetching} />
