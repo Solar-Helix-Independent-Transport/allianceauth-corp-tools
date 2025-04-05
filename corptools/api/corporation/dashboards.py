@@ -70,7 +70,7 @@ class DashboardApiEndpoints:
                     days = (s.fuel_expires - now).days
                 active = False
                 for ss in s.structureservice_set.all():
-                    if ss.name == "Jump Gate Access" and ss.state == "online":
+                    if ss.name == "Jump Bridge Access" and ss.state == "online":
                         active = True
                 if reverse_connection in second_systems:
                     output[to_sys]["end"] = {
