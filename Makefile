@@ -30,7 +30,7 @@ deploy:
 	twine upload dist/*
 
 buildjs:
-	cd frontend/;yarn install;yarn build
+	cd frontend/;yarn install; yarn info;yarn build
 
 package:
 	pip install -U hatch
