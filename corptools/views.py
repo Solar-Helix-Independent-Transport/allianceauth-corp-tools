@@ -498,7 +498,7 @@ def fuel_levels(request):
                 out["name"] = itm.type_name.name
                 out["qty"] += itm.quantity
 
-            out["expires"] = timezone.now() + timedelta(hours=out["qty"] / 88)
+            out["expires"] = timezone.now() + timedelta(hours=out["qty"] / 150)
             if out['qty'] > 0:
                 extras = out
 
