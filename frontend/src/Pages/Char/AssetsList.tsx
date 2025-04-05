@@ -7,7 +7,6 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
-import { Button } from "react-bootstrap";
 import CharacterAssetModal from "../../Components/Modals/CharacterAssetContents";
 
 const CharacterAssets = () => {

@@ -5,7 +5,6 @@ import { TypeIcon } from "../EveImages/EveImages";
 import React from "react";
 import { loadAssetContents } from "../../api/character";
 import { useParams } from "react-router-dom";
-import styles from "../../Pages/Glance/AtAGlance.module.css";
 import AssetContentsTable from "./AssetContentsTable";
 
 function CharacterAssetModal({ item }: any) {
