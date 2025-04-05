@@ -457,12 +457,50 @@ const FittingModalCircle = ({
 };
 
 export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
-  const { t } = useTranslation();
   const { data, isFetching } = useQuery({
     queryKey: ["glances", "account", ship.id],
     queryFn: () => loadStructureFit(ship.id ? Number(ship.id) : 0),
     refetchOnWindowFocus: false,
   });
+
+  return <FittingModalBase {...{ ship, data, showModal, setShowModal, isFetching }} />;
+};
+
+export const AssetFittingModal = ({ asset, assetContents, showModal, setShowModal }: any) => {
+  console.log(asset, assetContents, showModal, setShowModal);
+  const data = assetContents?.reduce(
+    (o: any, n: any) => {
+      if (o.fit.hasOwnProperty(n.location.name)) {
+        console.log(o, n);
+        o.fit[n.location.name].push(n.item);
+      } else {
+        o.fit[n.location.name] = n.item;
+      }
+      console.log(o);
+      return o;
+    },
+    {
+      fit: {
+        StructureFuel: [],
+        Cargo: [],
+        MoonMaterialBay: [],
+        DroneBay: [],
+        FighterBay: [],
+      },
+    },
+  );
+  const ship = {
+    name: asset.item.name,
+    type: {
+      id: asset.item.id,
+    },
+  };
+  // console.log(data, ship)
+  return <FittingModalBase {...{ ship, data, showModal, setShowModal }} isFetching={false} />;
+};
+
+export const FittingModalBase = ({ ship, data, showModal, setShowModal, isFetching }: any) => {
+  const { t } = useTranslation();
 
   return (
     <>
@@ -476,7 +514,7 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
         <Modal.Header>
           <Modal.Title>{ship?.name}</Modal.Title>
         </Modal.Header>
-        {isFetching ? (
+        {isFetching || !data ? (
           <PanelLoader title={t("Laoding Fit")} message={t("Please Wait")} />
         ) : (
           <div className="d-flex">

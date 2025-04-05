@@ -6,6 +6,7 @@ import React from "react";
 import { loadAssetContents } from "../../api/character";
 import { useParams } from "react-router-dom";
 import AssetContentsTable from "./AssetContentsTable";
+// import { AssetFittingModal } from "./FittingModal";
 
 function CharacterAssetModal({ item }: any) {
   // type is asset from api
@@ -24,7 +25,14 @@ function CharacterAssetModal({ item }: any) {
       <Button variant="secondary" size="sm" onClick={() => setShow(true)}>
         Show Contents
       </Button>
-
+      {/* {show && item?.item?.cat_id === 6 ? (
+        <AssetFittingModal
+          asset={item}
+          assetContents={data}
+          showModal={show}
+          setShowModal={setShow}
+        />
+      ) : ( */}
       <Modal
         show={show}
         size="lg"
@@ -48,6 +56,7 @@ function CharacterAssetModal({ item }: any) {
           </Button>
         </Modal.Footer>
       </Modal>
+      {/* )} */}
     </div>
   );
 }
