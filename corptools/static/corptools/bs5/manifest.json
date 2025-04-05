@@ -20,8 +20,8 @@
       "_browser-ponyfill-D3RGdBlu.js"
     ]
   },
-  "_@react-libs-Dc4i1TgS.js": {
-    "file": "assets/@react-libs-Dc4i1TgS.js",
+  "_@react-libs-D5qnd626.js": {
+    "file": "assets/@react-libs-D5qnd626.js",
     "name": "@react-libs",
     "imports": [
       "_@app-libs-Bb0EQArq.js",
@@ -37,14 +37,14 @@
     ]
   },
   "index.html": {
-    "file": "assets/index-ySlvrfHd.js",
+    "file": "assets/index-qYl3qfMJ.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
     "imports": [
       "_@app-libs-Bb0EQArq.js",
       "_@bootstrap-libs-2jJo3XFp.js",
-      "_@react-libs-Dc4i1TgS.js",
+      "_@react-libs-D5qnd626.js",
       "_@lang-libs-dZIgFA8-.js"
     ],
     "css": [
