@@ -2701,7 +2701,7 @@ __metadata:
     react-select: "npm:^5.8.0"
     react-slider: "npm:^2.0.6"
     react-time-ago: "npm:^7.3.3"
-    react-timeago: "npm:^7.2.0"
+    react-timeago: "npm:^8.0.0"
     typescript: "npm:^5.2.2"
     vite: "npm:^5.4.15"
   languageName: unknown
@@ -4145,12 +4145,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-timeago@npm:^7.2.0":
-  version: 7.2.0
-  resolution: "react-timeago@npm:7.2.0"
+"react-timeago@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "react-timeago@npm:8.0.0"
   peerDependencies:
-    react: ^16.0.0 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/89051a12296934e3400319ca7887a0f3ae5a779fd9456769b526ac4771c47a431fb4c68f56ac9726e23d65aad55538f7e2f1c6adfa83224bc8f6278775c26fa3
+    react: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/c6c249760b6d79646b6a1c4121480c9f2de84fa2a8955057ac94b6d01db80e45196b99190ebf6b0019c9b8ef25ec7962463064052c7923b6839fa7cf45913853
   languageName: node
   linkType: hard
 
