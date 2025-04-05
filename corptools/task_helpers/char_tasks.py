@@ -792,12 +792,20 @@ def update_character_clones(character_id, force_refresh=False):
     clones = {}
     clones[0] = active_clone
 
+    home_loc = None  # Setting this to  none will force a lookup later on.
+    try:
+        home_loc = EveLocation.objects.get(
+            location_id=jump_clones.get('home_location').get('location_id'))
+    except EveLocation.DoesNotExist:
+        pass
+
     char_clone, created = Clone.objects.update_or_create(character=audit_char,
                                                          defaults={
                                                              'last_clone_jump_date': jump_clones.get('last_clone_jump_date'),
                                                              'last_station_change_date': jump_clones.get('last_station_change_date'),
                                                              'location_id': jump_clones.get('home_location').get('location_id'),
                                                              'location_type': jump_clones.get('home_location').get('location_type'),
+                                                             'location_name': home_loc
                                                          })
 
     JumpClone.objects.filter(character=audit_char).delete()  # remove all
