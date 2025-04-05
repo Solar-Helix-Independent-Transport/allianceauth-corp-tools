@@ -2699,7 +2699,7 @@ __metadata:
     react-router-bootstrap: "npm:^0.26.2"
     react-router-dom: "npm:^7.2.0"
     react-select: "npm:^5.8.0"
-    react-slider: "npm:^2.0.6"
+    react-slider: "npm:^1.3.3"
     react-time-ago: "npm:^7.3.3"
     react-timeago: "npm:^8.0.0"
     typescript: "npm:^5.2.2"
@@ -4119,14 +4119,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-slider@npm:^2.0.6":
-  version: 2.0.6
-  resolution: "react-slider@npm:2.0.6"
-  dependencies:
-    prop-types: "npm:^15.8.1"
+"react-slider@npm:^1.3.3":
+  version: 1.3.3
+  resolution: "react-slider@npm:1.3.3"
   peerDependencies:
+    prop-types: ^15.6
     react: ^16 || ^17 || ^18
-  checksum: 10c0/15396f103d5c840822395e6fe666850c71bb0a66647204c5646c21f58fa838fe28f652810bacdd386ffa8df26895812f926f174f6f6ae67f456dbd9c5a3e5bfa
+  checksum: 10c0/710440744b49a08a069d15e97feb3ee8152c801cafbaa81fd7d3b2291a124fbc1914c60532ebba96f920e6ca73af9842a1c153839dbde9e1e223be9e79fe15f3
   languageName: node
   linkType: hard
 
