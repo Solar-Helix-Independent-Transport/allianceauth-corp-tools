@@ -84,7 +84,7 @@
                                         <br/>
                                         <span class="badge bg-secondary">Blocks: {{ structure.structure.fuel_expires|timeuntil }}</span>
                                         <br/>
-                                        <span class="badge bg-secondary">{{ structure.extra_fuel_info.name }}: {{ ft.extra_fuel_info.expires|timeuntil }}</span>
+                                        <span class="badge bg-secondary">{{ structure.extra_fuel_info.name }}: {{ structure.extra_fuel_info.expires|timeuntil }}</span>
                                     {% else %}
                                         {{ structure.extra_fuel_info.expires|date:"Y-m-d" }}
                                         <br/>
