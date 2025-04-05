@@ -81,6 +81,9 @@ class AssetsApiEndpoints:
             output = []
 
             for a in assets:
+                type_nm = a.type_name.name
+                if a.name:
+                    type_nm = f"{a.type_name.name} ({a.name})"
                 if a.location_name:
                     output.append({
                         "character": {
@@ -93,7 +96,7 @@ class AssetsApiEndpoints:
                         },
                         "item": {
                             "id": a.type_name.type_id,
-                            "name": a.type_name.name,
+                            "name": type_nm,
                             "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}"
                         },
                         "quantity": a.quantity,

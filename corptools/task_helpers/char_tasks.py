@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from celery import shared_task
 
+from django.core.paginator import Paginator
 from django.utils import timezone
 from django.utils.html import strip_tags
 
@@ -404,8 +405,68 @@ def update_character_assets(character_id, force_refresh=False):
 
     # Locaite assets in space!
     update_asset_locations(character_id, force_refresh=force_refresh)
+    try:
+        # Get Asset Names!
+        update_character_assets_names(character_id)
+    except Exception as e:
+        logger.error(e)
 
     return f"CT: Finished assets for: {audit_char.character.character_name}"
+
+
+def chunks(qst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, qst.count(), n):
+        yield qst[i:i + n]
+
+
+def update_character_assets_names(character_id):
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+    logger.debug("Updating Asset names for: {}".format(
+        audit_char.character.character_name))
+
+    req_scopes = ['esi-assets.read_assets.v1']
+
+    token = get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+
+    expandable_cats = [2, 6]
+
+    asset_list = CharacterAsset.objects.filter(
+        character=audit_char,
+        type_name__group__category_id__in=expandable_cats,
+        singleton=True
+    ).order_by("pk")
+
+    print(asset_list.count())
+
+    for subset in chunks(asset_list, 100):
+
+        assets_names = providers.esi.client.Assets.post_characters_character_id_assets_names(
+            character_id=character_id,
+            item_ids=[i.item_id for i in subset],
+            token=token.valid_access_token()
+        ).results()
+
+        id_list = {i.get("item_id"): i.get("name") for i in assets_names}
+        print(id_list)
+
+        for asset in subset:
+            if asset.item_id in id_list:
+                asset.name = id_list.get(asset.item_id)
+                asset.save()
+
+    asset_list = CharacterAsset.objects.filter(
+        character=audit_char,
+        name__isnull=False
+    ).order_by("pk")
+
+    print(asset_list.values_list("name"))
+
+    return f"CT: Finished asset names for: {audit_char.character.character_name}"
 
 
 def update_asset_locations(character_id, force_refresh=False):

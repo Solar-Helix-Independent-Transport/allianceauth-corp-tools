@@ -7,6 +7,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
+import { Button } from "react-bootstrap";
 
 const CharacterAssets = () => {
   const { t } = useTranslation();
@@ -29,6 +30,17 @@ const CharacterAssets = () => {
     }),
     columnHelper.accessor("item.name", {
       header: t("Item Type"),
+    }),
+    columnHelper.accessor("expand", {
+      header: t("Show Contents"),
+      cell: (cell) =>
+        cell.getValue() && (
+          <div className="text-center">
+            <Button variant="secondary" size="sm">
+              Show Contents
+            </Button>
+          </div>
+        ),
     }),
     columnHelper.accessor("item.cat", {
       header: t("Category"),
