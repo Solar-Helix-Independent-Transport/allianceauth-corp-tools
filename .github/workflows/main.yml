@@ -42,7 +42,7 @@ jobs:
 
       - run: npm install -g @yarnpkg/cli
 
-      - run: yarn --version
+      - run: yarn info
 
       - name: install dependencies
         run: make dev
