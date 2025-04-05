@@ -17,7 +17,13 @@ function AssetContentsTable({ data, header = "", isFetching }: any) {
         return (
           <div className="d-flex align-items-center">
             <div style={{ widows: "32px" }}>
-              <TypeIcon height={32} width={32} type_id={cell.row.original.item?.id} size={32} />
+              <TypeIcon
+                height={32}
+                width={32}
+                type_id={cell.row.original.item?.id}
+                forceType={cell.row.original.item?.cat_id == 9 ? "bp" : undefined}
+                size={32}
+              />
             </div>
             <p className="m-0 ms-2">{cell.getValue()}</p>
           </div>

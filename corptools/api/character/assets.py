@@ -97,7 +97,8 @@ class AssetsApiEndpoints:
                         "item": {
                             "id": a.type_name.type_id,
                             "name": type_nm,
-                            "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}"
+                            "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}",
+                            "cat_id": a.type_name.group.category_id
                         },
                         "quantity": a.quantity,
                         "id": a.item_id,
@@ -146,7 +147,9 @@ class AssetsApiEndpoints:
                     "item": {
                         "id": a.type_name.type_id,
                         "name": a.type_name.name,
-                        "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}"
+                        "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}",
+                        "cat_id": a.type_name.group.category_id
+
                     },
                     "quantity": a.quantity,
                     "id": a.item_id,
