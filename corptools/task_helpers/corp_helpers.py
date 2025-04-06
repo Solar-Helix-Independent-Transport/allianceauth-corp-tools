@@ -687,6 +687,11 @@ def update_corp_assets(corp_id):
             delete_query.delete()  # with coords we need to care about the fkeys/signals
 
         CorpAsset.objects.bulk_create(items)
+        try:
+            update_corp_asset_names(corp_id)
+        except Exception as e:
+            logger.error(e)
+
         que = []
         que.append(fetch_coordiantes.si(corp_id))
         que.append(run_ozone_levels.si(corp_id))
@@ -701,6 +706,53 @@ def update_corp_assets(corp_id):
     audit_corp.save()
 
     return f"Finished assets for: {audit_corp.corporation}"
+
+
+def chunks(qst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, qst.count(), n):
+        yield qst[i:i + n]
+
+
+def update_corp_asset_names(corp_id):
+    audit_corp = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+    logger.debug("Updating Assets for: {}".format(
+        audit_corp.corporation))
+
+    req_scopes = ['esi-assets.read_corporation_assets.v1',
+                  'esi-characters.read_corporation_roles.v1']
+    req_roles = ['Director']
+
+    token = get_corp_token(corp_id, req_scopes, req_roles)
+
+    if not token:
+        return "No Tokens"
+
+    expandable_cats = [2, 6, 65]
+
+    asset_list = CorpAsset.objects.filter(
+        corporation=audit_corp,
+        type_name__group__category_id__in=expandable_cats,
+        singleton=True
+    ).order_by("pk")
+
+    for subset in chunks(asset_list, 100):
+
+        assets_names = providers.esi.client.Assets.post_corporations_corporation_id_assets_names(
+            corporation_id=corp_id,
+            item_ids=[i.item_id for i in subset],
+            token=token.valid_access_token()
+        ).results()
+
+        id_list = {i.get("item_id"): i.get("name") for i in assets_names}
+
+        for asset in subset:
+            if asset.item_id in id_list:
+                asset.name = id_list.get(asset.item_id)
+                asset.save()
+
+    return f"CT: Finished corp asset names for: {audit_corp.corporation}"
 
 
 @shared_task(bind=True, base=QueueOnce)

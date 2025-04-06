@@ -441,8 +441,6 @@ def update_character_assets_names(character_id):
         singleton=True
     ).order_by("pk")
 
-    print(asset_list.count())
-
     for subset in chunks(asset_list, 100):
 
         assets_names = providers.esi.client.Assets.post_characters_character_id_assets_names(
@@ -452,19 +450,11 @@ def update_character_assets_names(character_id):
         ).results()
 
         id_list = {i.get("item_id"): i.get("name") for i in assets_names}
-        print(id_list)
 
         for asset in subset:
             if asset.item_id in id_list:
                 asset.name = id_list.get(asset.item_id)
                 asset.save()
-
-    asset_list = CharacterAsset.objects.filter(
-        character=audit_char,
-        name__isnull=False
-    ).order_by("pk")
-
-    print(asset_list.values_list("name"))
 
     return f"CT: Finished asset names for: {audit_char.character.character_name}"
 

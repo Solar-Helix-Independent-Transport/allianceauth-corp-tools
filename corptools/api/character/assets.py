@@ -84,30 +84,32 @@ class AssetsApiEndpoints:
                 type_nm = a.type_name.name
                 if a.name:
                     type_nm = f"{a.type_name.name} ({a.name})"
+                loc = f"{a.location_id} ({a.location_flag})"
                 if a.location_name:
-                    output.append({
-                        "character": {
-                            "character_id": a.character.character.character_id,
-                            "character_name": a.character.character.character_name,
-                            "corporation_id": a.character.character.corporation_id,
-                            "corporation_name": a.character.character.corporation_name,
-                            "alliance_id": a.character.character.alliance_id,
-                            "alliance_name": a.character.character.alliance_name
-                        },
-                        "item": {
-                            "id": a.type_name.type_id,
-                            "name": type_nm,
-                            "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}",
-                            "cat_id": a.type_name.group.category_id
-                        },
-                        "quantity": a.quantity,
-                        "id": a.item_id,
-                        "expand": True if a.type_name.group.category.category_id in expandable_cats else True if a.type_name_id == 60 else False,  # ships or asset wraps
-                        "location": {
-                            "id": a.location_name.location_id,
-                            "name": a.location_name.location_name
-                        }
-                    })
+                    loc = a.location_name.location_name
+                output.append({
+                    "character": {
+                        "character_id": a.character.character.character_id,
+                        "character_name": a.character.character.character_name,
+                        "corporation_id": a.character.character.corporation_id,
+                        "corporation_name": a.character.character.corporation_name,
+                        "alliance_id": a.character.character.alliance_id,
+                        "alliance_name": a.character.character.alliance_name
+                    },
+                    "item": {
+                        "id": a.type_name.type_id,
+                        "name": type_nm,
+                        "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}",
+                        "cat_id": a.type_name.group.category_id
+                    },
+                    "quantity": a.quantity,
+                    "id": a.item_id,
+                    "expand": True if a.type_name.group.category.category_id in expandable_cats else True if a.type_name_id == 60 else False,  # ships or asset wraps
+                    "location": {
+                        "id": a.location_id,
+                        "name": loc
+                    }
+                })
 
             return output
 

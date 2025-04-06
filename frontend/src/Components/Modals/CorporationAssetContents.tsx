@@ -3,25 +3,21 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { TypeIcon } from "../EveImages/EveImages";
 import React from "react";
-import { loadAssetContents } from "../../api/character";
-import { useParams } from "react-router-dom";
+import { loadAssetContents } from "../../api/corporation";
 import AssetContentsTable from "./AssetContentsTable";
 // import { AssetFittingModal } from "./FittingModal";
 
-function CharacterAssetModal({ item }: any) {
+function CorporationAssetModal({ item }: any) {
   // type is asset from api
   const { t } = useTranslation();
-  const { characterID } = useParams();
   const [show, setShow] = React.useState(false);
 
   const { data, isFetching } = useQuery({
-    queryKey: ["assets", characterID, item.id],
-    queryFn: () =>
-      loadAssetContents(characterID ? Number(characterID) : 0, item.id ? Number(item.id) : 0),
+    queryKey: ["assets-corp", item.id],
+    queryFn: () => loadAssetContents(item.id ? Number(item.id) : 0),
     refetchOnWindowFocus: false,
     enabled: show,
   });
-
   return (
     <div className="text-center">
       <Button variant="secondary" size="sm" onClick={() => setShow(true)}>
@@ -55,4 +51,4 @@ function CharacterAssetModal({ item }: any) {
   );
 }
 
-export default CharacterAssetModal;
+export default CorporationAssetModal;

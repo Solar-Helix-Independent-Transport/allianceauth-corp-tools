@@ -215,7 +215,8 @@ def process_category_from_esi(category_id):
             _groups_model_creates.append(__group)
 
     EveItemGroup.objects.bulk_update(
-        _groups_model_updates, ['name', 'category_id'], batch_size=1000)  # bulk update
+        # bulk update
+        _groups_model_updates, ['name', 'category_id'], batch_size=1000)
     EveItemGroup.objects.bulk_create(
         _groups_model_creates, batch_size=1000)  # bulk create
 
@@ -346,7 +347,8 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
             _groups_model_creates, batch_size=1000, ignore_conflicts=True)  # bulk create
     if len(_groups_model_updates) > 0:
         EveItemGroup.objects.bulk_update(
-            _groups_model_updates, ['name', 'category_id'], batch_size=1000)  # bulk update
+            # bulk update
+            _groups_model_updates, ['name', 'category_id'], batch_size=1000)
 
     if len(_items_models_creates) > 0:
         EveItemType.objects.bulk_create(
@@ -394,7 +396,8 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
                                'Hangar',
                                'HangarAll',
                                'solar_system',
-                               'OfficeFolder']
+                               'OfficeFolder',
+                               'AutoFit']
 
     if location_flag not in accepted_location_flags:
         if location_flag is not None:

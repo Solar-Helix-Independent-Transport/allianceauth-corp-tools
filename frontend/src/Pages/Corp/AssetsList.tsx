@@ -7,6 +7,7 @@ import CorporationAssetLocationSelect from "../../Components/Corporation/CorpAss
 import CorpSelect from "../../Components/Corporation/CorporationSelect";
 import { loadAssetList } from "../../api/corporation";
 import { CorpLoader, PanelLoader } from "../../Components/Loaders/loaders";
+import CorporationAssetModal from "../../Components/Modals/CorporationAssetContents";
 
 const CorporationAssets = () => {
   const { t } = useTranslation();
@@ -29,6 +30,10 @@ const CorporationAssets = () => {
     }),
     columnHelper.accessor("item.cat", {
       header: t("Category"),
+    }),
+    columnHelper.accessor("expand", {
+      header: t("Show Contents"),
+      cell: (cell) => cell.getValue() && <CorporationAssetModal item={cell.row.original} />,
     }),
     columnHelper.accessor("quantity", {
       header: t("Quantity"),

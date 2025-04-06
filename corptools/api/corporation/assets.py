@@ -76,9 +76,9 @@ class AssetsApiEndpoints:
                     f"Permission Denied for {request.user} to view wallets!")
                 return 403, "Permission Denied!"
 
-            if new_asset_tree:
-                expandable_cats = []
+            expandable_cats = [2, 6, 29, 65]
 
+            if new_asset_tree:
                 if corporation_id == 0:
                     corporation_id = request.user.profile.main_character.corporation_id
 
@@ -106,18 +106,22 @@ class AssetsApiEndpoints:
                 location_names = {}
 
                 for a in assets:
+                    type_nm = a.type_name.name
+                    if a.name:
+                        type_nm = f"{a.type_name.name} ({a.name})"
                     loc = f"{a.location_id} ({a.location_flag})"
                     if a.location_name:
                         loc = a.location_name.location_name
                     output.append({
                         "item": {
                             "id": a.type_name.type_id,
-                            "name": a.type_name.name,
-                            "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}"
+                            "name": type_nm,
+                            "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}",
+                            "cat_id": a.type_name.group.category.category_id
                         },
                         "quantity": a.quantity,
                         "id": a.item_id,
-                        "expand": False,
+                        "expand": True if a.type_name.group.category.category_id in expandable_cats else False,
                         "location": {
                             "id": a.location_id,
                             "name": loc
@@ -127,7 +131,6 @@ class AssetsApiEndpoints:
 
                 return output
 
-            expandable_cats = [2, 6, 29]
             everywhere_flags = ["CorpSAG1", "CorpSAG2", "CorpSAG3", "CorpSAG4",
                                 "CorpSAG5", "CorpSAG6", "CorpSAG7", "CorpDeliveries", "AssetSafety"]
 
@@ -200,13 +203,17 @@ class AssetsApiEndpoints:
 
             if not perms:
                 logging.error(
-                    f"Permission Denied for {request.user} to view wallets!")
+                    f"Permission Denied for {request.user} to view Assets!")
                 return 403, "Permission Denied!"
 
-            assets = models.CorpAsset.get_visible(request.user)\
-                .select_related(
-                    "type_name", "location_name", "type_name__group__category"
+            assets = models.CorpAsset.get_visible(
+                request.user
+            ).select_related(
+                "type_name",
+                "location_name",
+                "type_name__group__category"
             )
+
             assets = assets.filter(location_id=item_id)
 
             output = []
