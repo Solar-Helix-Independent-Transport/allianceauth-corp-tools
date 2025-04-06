@@ -56,6 +56,13 @@ class MiningApiEndpoints:
 
             start_date = timezone.now() - timedelta(days=look_back)
 
+            values = {}
+            try:
+                from moons.helpers import OreHelper
+                values = OreHelper.get_ore_array_with_value()
+            except Exception as e:
+                pass
+
             mining_ledger_data = models.CharacterMiningLedger.objects.filter(
                 character__character__in=characters,
                 date__gte=start_date
@@ -77,6 +84,8 @@ class MiningApiEndpoints:
                     "ores": {},
                     "characters": {},
                     "systems": {},
+                    "value": 0,
+                    "volume": 0
                 }
 
             for w in mining_ledger_data:
@@ -89,6 +98,12 @@ class MiningApiEndpoints:
                 all_systems.add(w.system.name)
                 vol = w.quantity * w.type_name.volume
                 t_vol += vol
+                value = 0
+
+                if w.type_name.type_id in values:
+                    value = w.quantity * values[w.type_name.type_id]["value"]
+
+                t_val += value
 
                 if w.type_name.type_id not in output[_d]["ores"]:
                     output[_d]["ores"][w.type_name.type_id] = {
@@ -96,9 +111,12 @@ class MiningApiEndpoints:
                         "group": w.type_name.group.name,
                         "id": w.type_name.type_id,
                         "volume": 0,
-                        "value": 0
+                        "value": value
                     }
                 output[_d]["ores"][w.type_name.type_id]["volume"] += vol
+                output[_d]["ores"][w.type_name.type_id]["value"] += value
+                output[_d]["volume"] += vol
+                output[_d]["value"] += value
 
                 if w.character.character.character_id not in output[_d]["characters"]:
                     output[_d]["characters"][w.character.character.character_id] = {
