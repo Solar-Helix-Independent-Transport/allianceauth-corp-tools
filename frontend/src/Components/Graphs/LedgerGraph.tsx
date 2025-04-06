@@ -84,6 +84,18 @@ const LedgerGraph = ({ data }: any) => {
     columnHelper.accessor("date", {
       header: t("Date"),
     }),
+    columnHelper.accessor("value", {
+      header: () => <span className="ms-auto">{t("Total Value")}</span>,
+      enableColumnFilter: false,
+      cell: (cell) => (
+        <p className=" m-0 w-100 text-end">{`${(~~cell.getValue()).toLocaleString()} Isk`}</p>
+      ),
+    }),
+    columnHelper.accessor("volume", {
+      header: () => <span className="ms-auto">{t("Total Volume")}</span>,
+      enableColumnFilter: false,
+      cell: (cell) => `${(~~cell.getValue()).toLocaleString()} m3`,
+    }),
     columnHelper.accessor("characters", {
       header: t("Characters"),
       enableSorting: false,
@@ -114,15 +126,15 @@ const LedgerGraph = ({ data }: any) => {
         }),
     }),
     columnHelper.accessor("ores", {
-      header: t("Detail"),
+      header: () => <span className="ms-auto">{t("Detail")}</span>,
       enableSorting: false,
       enableColumnFilter: false,
       cell: (cell) => (
         <table className="w-100">
           <tr>
             <th>{t("Type")}</th>
-            <th>{t("Volume")}</th>
-            <th>{t("Value")}</th>
+            <th className="text-end">{t("Volume")}</th>
+            <th className="text-end">{t("Value")}</th>
           </tr>
           {cell.getValue()?.map((d: any) => {
             return (
@@ -132,8 +144,22 @@ const LedgerGraph = ({ data }: any) => {
                     <TypeIcon type_id={d.id} size={32} />
                     {d.name}
                   </td>
-                  <td style={{ width: "20%" }}>{(~~d.volume).toLocaleString()} m3</td>
-                  <td style={{ width: "20%" }}>{`${(~~d.value).toLocaleString()} Isk`}</td>
+                  <td className="text-end" style={{ width: "20%" }}>
+                    {(~~d.volume).toLocaleString("en-US", {
+                      maximumFractionDigits: 1,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })}{" "}
+                    m3
+                  </td>
+                  <td className="text-end" style={{ width: "20%" }}>
+                    {(~~d.value).toLocaleString("en-US", {
+                      maximumFractionDigits: 1,
+                      notation: "compact",
+                      compactDisplay: "short",
+                    })}{" "}
+                    Isk
+                  </td>
                 </tr>
               </>
             );

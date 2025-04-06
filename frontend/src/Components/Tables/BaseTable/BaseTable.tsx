@@ -202,9 +202,8 @@ function _baseTable({
                               )}
                             </div>
                           ) : null}
-                          <div>
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                          </div>
+
+                          {flexRender(header.column.columnDef.header, header.getContext())}
                         </div>
                       )}
                     </th>
