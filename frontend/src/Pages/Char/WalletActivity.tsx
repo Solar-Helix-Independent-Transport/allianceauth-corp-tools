@@ -49,11 +49,11 @@ const CharacterWalletActivity = () => {
       ),
     }),
     columnHelper.accessor("value", {
-      header: t("Amount"),
+      header: () => <span className="ms-auto">{t("Amount")}</span>,
       cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
     columnHelper.accessor("interactions", {
-      header: t("Interaction Count"),
+      header: () => <span className="ms-auto">{t("Interaction Count")}</span>,
       cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
   ];

@@ -44,11 +44,11 @@ const CharacterMarket = () => {
       header: t("Location"),
     }),
     columnHelper.accessor("price", {
-      header: t("Price"),
+      header: () => <span className="ms-auto">{t("Price")}</span>,
       cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
     columnHelper.accessor("volume_remain", {
-      header: t("Volume"),
+      header: () => <span className="ms-auto">{t("Volume")}</span>,
       cell: (cell) => {
         return `${cell.getValue().toLocaleString()}/${cell.row.original.volume_total.toLocaleString()}`;
       },
