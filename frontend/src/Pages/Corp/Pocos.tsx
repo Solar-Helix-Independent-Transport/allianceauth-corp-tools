@@ -57,31 +57,31 @@ const CorporationPocos = () => {
       header: t("Alliance Access"),
     }),
     columnHelper.accessor("alliance_tax_rate", {
-      header: t("Alliance"),
+      header: () => <span className="ms-auto">{t("Alliance")}</span>,
     }),
     columnHelper.accessor("corporation_tax_rate", {
-      header: t("Corporations"),
+      header: () => <span className="ms-auto">{t("Corporations")}</span>,
     }),
     columnHelper.accessor("terrible_standing_tax_rate", {
-      header: t("Terrible"),
+      header: () => <span className="ms-auto">{t("Terrible")}</span>,
     }),
     columnHelper.accessor("bad_standing_tax_rate", {
-      header: t("Bad"),
+      header: () => <span className="ms-auto">{t("Bad")}</span>,
     }),
     columnHelper.accessor("neutral_standing_tax_rate", {
-      header: t("Nuetral"),
+      header: () => <span className="ms-auto">{t("Nuetral")}</span>,
     }),
     columnHelper.accessor("good_standing_tax_rate", {
-      header: t("Good"),
+      header: () => <span className="ms-auto">{t("Good")}</span>,
     }),
     columnHelper.accessor("excellent_standing_tax_rate", {
-      header: t("Excelent"),
+      header: () => <span className="ms-auto">{t("Excelent")}</span>,
     }),
     columnHelper.accessor("reinforce_exit_start", {
-      header: t("Ref Exit Start"),
+      header: () => <span className="ms-auto">{t("Ref Exit Start")}</span>,
     }),
     columnHelper.accessor("reinforce_exit_end", {
-      header: t("Ref Exit End"),
+      header: () => <span className="ms-auto">{t("Ref Exit End")}</span>,
     }),
   ];
 
