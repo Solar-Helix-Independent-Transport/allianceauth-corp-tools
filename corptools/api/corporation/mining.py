@@ -54,6 +54,10 @@ class MiningApiEndpoints:
                 date__gte=start_date
             ).select_related(
                 'character__character',
+                'character__character__character_ownership',
+                'character__character__character_ownership__user',
+                'character__character__character_ownership__user__profile',
+                'character__character__character_ownership__user__profile__main_character',
                 'type_name',
                 'type_name__group'
             )
@@ -74,7 +78,8 @@ class MiningApiEndpoints:
 
             for w in mining_ledger_data:
                 _d = str(w.date)
-
+                if _d not in output:
+                    continue
                 all_ores.add(w.type_name.name)
                 all_groups.add(w.type_name.group.name)
                 all_systems.add(w.system.name)

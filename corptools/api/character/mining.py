@@ -81,6 +81,8 @@ class MiningApiEndpoints:
 
             for w in mining_ledger_data:
                 _d = str(w.date)
+                if _d not in output:
+                    continue
 
                 all_ores.add(w.type_name.name)
                 all_groups.add(w.type_name.group.name)
