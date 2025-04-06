@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from esi.clients import EsiClientProvider
 
-from . import __version__
+from . import __url__, __version__
 from .task_helpers.skill_helpers import SkillListCache
 
 
@@ -261,6 +261,6 @@ class EveRouter():
         return result
 
 
-esi = CorpToolsESIClient(app_info_text=f"corptools v{__version__}")
+esi = CorpToolsESIClient(app_info_text=f"corptools/{__version__} ({__url__})")
 routes = EveRouter()
 skills = SkillListCache()
