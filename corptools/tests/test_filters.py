@@ -1532,7 +1532,7 @@ class TestSecGroupBotFilters(TestCase):
 
     def test_user_age_p(self):
         _filter = ct_models.CharacterAgeFilter.objects.create(
-            name="age > 20d",
+            name="age > 31d",
             description="Something to tell user",
             min_age=31
         )
@@ -1557,7 +1557,7 @@ class TestSecGroupBotFilters(TestCase):
 
     def test_user_age_rev_p(self):
         _filter = ct_models.CharacterAgeFilter.objects.create(
-            name="age > 20d",
+            name="age > 31d",
             description="Something to tell user",
             min_age=31,
             reversed_logic=True
@@ -1711,7 +1711,7 @@ class TestSecGroupBotFilters(TestCase):
 
         tests = _filter.audit_filter(User.objects.filter(id__in=[11]))
 
-        self.assertFalse(tests[1]["check"])
+        self.assertFalse(tests[11]["check"])
 
     def test_user_time_in_corp_no_audit(self):
         _filter = ct_models.TimeInCorpFilter.objects.create(
@@ -1722,4 +1722,27 @@ class TestSecGroupBotFilters(TestCase):
 
         tests = _filter.audit_filter(User.objects.filter(id__in=[11]))
 
-        self.assertFalse(tests[1]["check"])
+        self.assertFalse(tests[11]["check"])
+
+    def test_user_age_no_audit_rev(self):
+        _filter = ct_models.CharacterAgeFilter.objects.create(
+            name="Age > 20d",
+            description="Something to tell user",
+            min_age=20,
+            reversed_logic=True
+        )
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=[11]))
+
+        self.assertFalse(tests[11]["check"])
+
+    def test_user_age_no_audit(self):
+        _filter = ct_models.CharacterAgeFilter.objects.create(
+            name="Age > 20d",
+            description="Something to tell user",
+            min_age=20
+        )
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=[11]))
+
+        self.assertFalse(tests[11]["check"])
