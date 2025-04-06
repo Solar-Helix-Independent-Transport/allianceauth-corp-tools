@@ -22,7 +22,7 @@ function tickGen(a: any, n: any) {
   });
 }
 
-export const MiningGraph = ({ data, keys }: any) => {
+export const MiningGraph = ({ data, keys, dataType = "Volume" }: any) => {
   const ticks = tickGen(data, 10).map((e: any) => {
     return e.id;
   });
@@ -66,7 +66,7 @@ export const MiningGraph = ({ data, keys }: any) => {
         tickPadding: 5,
         tickRotation: 0,
         format: (tick) => `${abbreviateNumber(tick)}`,
-        legend: "Daily Volume",
+        legend: `Daily ${dataType}`,
         legendPosition: "middle",
         legendOffset: -70,
       }}

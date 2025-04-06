@@ -8,6 +8,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import TableWrapper from "../Tables/BaseTable/TableWrapper";
 import { useTranslation } from "react-i18next";
 import { TypeIcon, CharacterPortrait } from "../EveImages/EveImages";
+import { Card, Form } from "react-bootstrap";
 
 // function dateSort(a: any, b: any) {
 //   if (a.date > b.date) {
@@ -39,7 +40,7 @@ function apiDataToTotals(group_list: any, ore_list: any, input: any, dataKey = "
   console.log("PRE", out);
   input.map((d: any) => {
     for (let i = 0; i < d.ores.length; ++i)
-      out[d.ores[i]["group"]][d.ores[i]["name"]] += d.ores[i][dataKey];
+      out[d.ores[i]["group"]][d.ores[i]["name"]] += ~~d.ores[i][dataKey];
     return 0;
   });
   console.log("POST", out);
@@ -53,7 +54,7 @@ function apiDataToTotals(group_list: any, ore_list: any, input: any, dataKey = "
 
 const LedgerGraph = ({ data }: any) => {
   const { t } = useTranslation();
-
+  const [mode, setMode] = useState(false);
   const [slice, setSlice] = useState([0, data.data.length]);
 
   const graphData = apiDataToObject(
@@ -61,6 +62,7 @@ const LedgerGraph = ({ data }: any) => {
       let pass = slice[0] < index && index < slice[1];
       return pass;
     }),
+    mode ? "value" : "volume",
   );
 
   const tableData = data.data.filter((e: any, index: any) => {
@@ -76,6 +78,7 @@ const LedgerGraph = ({ data }: any) => {
       let pass = slice[0] < index && index < slice[1];
       return pass;
     }),
+    mode ? "value" : "volume",
   );
 
   const columnHelper = createColumnHelper<any>();
@@ -171,6 +174,18 @@ const LedgerGraph = ({ data }: any) => {
 
   return (
     <>
+      <div className="d-flex me-2">
+        <Form.Check
+          type="switch"
+          id="custom-switch"
+          label={t("Show As Value")}
+          className="ms-auto"
+          onChange={(event: any) => {
+            setMode(event.target.checked);
+          }}
+          defaultChecked={mode}
+        />
+      </div>
       <div
         style={{
           background: "#646464",
@@ -182,10 +197,15 @@ const LedgerGraph = ({ data }: any) => {
         }}
       >
         <div style={{ height: "250px", margin: "5px", background: "#646464" }}>
-          <MiningTotalsGraph data={totalData} groups={data.all_groups} ores={data.all_ores} />
+          <MiningTotalsGraph
+            data={totalData}
+            groups={data.all_groups}
+            ores={data.all_ores}
+            dataType={mode ? "Value" : "Volume"}
+          />
         </div>
         <div style={{ height: "300px", margin: "5px", background: "#646464" }}>
-          <MiningGraph data={graphData} keys={data.all_ores} />
+          <MiningGraph data={graphData} keys={data.all_ores} dataType={mode ? "Value" : "Volume"} />
         </div>
         <div style={{ display: "flex", margin: "7px" }}>
           <p style={{ margin: "5px", marginTop: "auto", marginBottom: "auto" }}>Zoom:</p>
@@ -208,7 +228,10 @@ const LedgerGraph = ({ data }: any) => {
           </div>
         </div>
       </div>
-      <TableWrapper data={tableData} columns={columns} isFetching={false} />
+
+      <Card className="m-1 mt-3">
+        <TableWrapper data={tableData} columns={columns} isFetching={false} />
+      </Card>
     </>
   );
 };

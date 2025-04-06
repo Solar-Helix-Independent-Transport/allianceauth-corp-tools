@@ -9,7 +9,7 @@ import { ResponsiveBarCanvas } from "@nivo/bar";
 // website examples showcase many properties,
 // you'll often use just a few of them.
 
-export const MiningTotalsGraph = ({ data, ores }: any) => {
+export const MiningTotalsGraph = ({ data, ores, dataType }: any) => {
   console.log(ores, data);
   return (
     <ResponsiveBarCanvas
@@ -49,7 +49,7 @@ export const MiningTotalsGraph = ({ data, ores }: any) => {
         tickPadding: 5,
         tickRotation: 0,
         format: (tick) => `${abbreviateNumber(tick)}`,
-        legend: "Total Volume",
+        legend: `Total ${dataType}`,
         legendPosition: "middle",
         legendOffset: -70,
       }}
