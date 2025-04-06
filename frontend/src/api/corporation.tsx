@@ -148,3 +148,9 @@ export async function loadRefTypes() {
   console.log(`get wallet types in api`);
   return api.data;
 }
+
+export async function LoadAgregatedMining(corporationId: Number) {
+  const api = await axios.get(`/audit/api/corporation/${corporationId}/mining?look_back=150`);
+  console.log(`get mining in api`);
+  return api.data;
+}

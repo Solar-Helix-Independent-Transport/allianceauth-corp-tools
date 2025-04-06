@@ -41,6 +41,7 @@ import CorporationWallets from "./Pages/Corp/Wallet";
 import CorporationPocos from "./Pages/Corp/Pocos";
 import CorporationStatus from "./Pages/Corp/Status";
 import CorporationStarbases from "./Pages/Corp/Starbases";
+import CorporationMiningLedger from "./Pages/Corp/MiningLedger";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -127,6 +128,7 @@ function App() {
               <Route path="corporations" element={<CorporationStatus />} />
               <Route path="glance" element={<CorporationAtAGlance />} />
               <Route path="structures" element={<Structures />} />
+              <Route path="mining" element={<CorporationMiningLedger />} />
               <Route path="wallets" element={<CorporationWallets />} />
               <Route path="assetgroup" element={<CorporationAssetGroups />} />
               <Route path="assetlist" element={<CorporationAssets />} />

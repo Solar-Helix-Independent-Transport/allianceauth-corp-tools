@@ -6,53 +6,46 @@ from ninja import NinjaAPI
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+from allianceauth.services.hooks import get_extension_logger
+
 from corptools import models
-from corptools.api.helpers import get_alts_queryset, get_main_character
+from corptools.api.helpers import (
+    get_alts_queryset, get_corporation_characters, get_main_character,
+)
+
+from ..schema import Character
+
+logger = get_extension_logger(__name__)
 
 
 class MiningApiEndpoints:
 
-    tags = ["Account"]
+    tags = ["Corporation"]
 
     def __init__(self, api: NinjaAPI):
         @api.get(
-            "account/{character_id}/mining/chars",
+            "corporation/{corporation_id}/mining",
             response={200: dict, 403: str},
-            tags=["Account"]
+            tags=self.tags
         )
-        def get_all_characters_character_mining(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
+        def get_corporation_agregated_mining(
+            request,
+            corporation_id: int,
+            look_back: Optional[int] = 90
+        ):
+            perms = (
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+            )
 
-            if not response:
-                return 403, _("Permission Denied")
+            if not perms:
+                logger.error(
+                    f"Permission Denied for {request.user} to view mining!")
+                return 403, "Permission Denied!"
 
-            characters = get_alts_queryset(main)
-
-            return characters
-
-        @api.get(
-            "account/{character_id}/mining",
-            response={200: dict, 403: str},
-            tags=["Account"]
-        )
-        def get_character_mining(request,
-                                 character_id: int,
-                                 filter_characters: Optional[List[int]] = [],
-                                 look_back: Optional[int] = 90):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
-
-            if len(filter_characters):
-                characters = characters.exclude(
-                    character_id__in=filter_characters)
+            characters = get_corporation_characters(request, corporation_id)
 
             start_date = timezone.now() - timedelta(days=look_back)
 
@@ -98,10 +91,15 @@ class MiningApiEndpoints:
                     }
                 output[_d]["ores"][w.type_name.type_id]["volume"] += vol
 
-                if w.character.character.character_id not in output[_d]["characters"]:
-                    output[_d]["characters"][w.character.character.character_id] = {
-                        "id": w.character.character.character_id,
-                        "name": w.character.character.character_name
+                try:
+                    mc = w.character.character.character_ownership.user.profile.main_character
+                except Exception as e:
+                    mc = w.character.character
+
+                if mc.character_id not in output[_d]["characters"]:
+                    output[_d]["characters"][mc.character_id] = {
+                        "id": mc.character_id,
+                        "name": mc.character_name
                     }
 
                 if w.system.system_id not in output[_d]["systems"]:

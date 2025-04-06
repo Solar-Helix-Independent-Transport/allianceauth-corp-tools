@@ -7,6 +7,7 @@ import { MiningGraphBrush } from "../../Components/Graphs/MiningGraphBrush";
 import { createColumnHelper } from "@tanstack/react-table";
 import TableWrapper from "../Tables/BaseTable/TableWrapper";
 import { useTranslation } from "react-i18next";
+import { TypeIcon, CharacterPortrait } from "../EveImages/EveImages";
 
 // function dateSort(a: any, b: any) {
 //   if (a.date > b.date) {
@@ -85,11 +86,14 @@ const LedgerGraph = ({ data }: any) => {
     }),
     columnHelper.accessor("characters", {
       header: t("Characters"),
+      enableSorting: false,
+      enableColumnFilter: false,
       cell: (cell) =>
         cell.getValue()?.map((d: any) => {
           return (
             <>
-              {`${d}`}
+              <CharacterPortrait className="me-2" character_id={d.id} size={32} />
+              {`${d.name}`}
               <br />
             </>
           );
@@ -97,31 +101,42 @@ const LedgerGraph = ({ data }: any) => {
     }),
     columnHelper.accessor("systems", {
       header: t("Systems"),
+      enableSorting: false,
+      enableColumnFilter: false,
       cell: (cell) =>
         cell.getValue()?.map((d: any) => {
           return (
             <>
-              {`${d}`}
+              {`${d.name}`}
               <br />
             </>
           );
         }),
     }),
     columnHelper.accessor("ores", {
-      header: t("Quantity"),
-      cell: (cell) =>
-        cell.getValue()?.map((d: any) => {
-          return (
-            <>
-              {`${d.name}: ${(~~d.volume).toLocaleString()}`}
-              <br />
-            </>
-          );
-        }),
+      header: t("Volume"),
+      enableSorting: false,
+      enableColumnFilter: false,
+      cell: (cell) => (
+        <table className="w-100">
+          {cell.getValue()?.map((d: any) => {
+            return (
+              <>
+                <tr>
+                  <td style={{ width: "40px" }}>
+                    <TypeIcon type_id={d.id} size={32} />
+                  </td>
+                  <td className="w-50">{d.name}</td>
+                  <td>{(~~d.volume).toLocaleString()} m3</td>
+                </tr>
+              </>
+            );
+          })}
+        </table>
+      ),
     }),
   ];
 
-  console.log("I'm HERE", tableData, graphData, totalData);
   return (
     <>
       <div

@@ -70,6 +70,10 @@ const CorpMenu = () => {
           name: t("Bridges"),
           link: `bridges`,
         },
+        {
+          name: t("Mining"),
+          link: `mining`,
+        },
       ],
     },
   ];
