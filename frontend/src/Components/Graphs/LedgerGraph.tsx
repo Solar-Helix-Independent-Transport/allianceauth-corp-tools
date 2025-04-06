@@ -114,20 +114,26 @@ const LedgerGraph = ({ data }: any) => {
         }),
     }),
     columnHelper.accessor("ores", {
-      header: t("Volume"),
+      header: t("Detail"),
       enableSorting: false,
       enableColumnFilter: false,
       cell: (cell) => (
         <table className="w-100">
+          <tr>
+            <th>{t("Type")}</th>
+            <th>{t("Volume")}</th>
+            <th>{t("Value")}</th>
+          </tr>
           {cell.getValue()?.map((d: any) => {
             return (
               <>
                 <tr>
-                  <td style={{ width: "40px" }}>
+                  <td style={{ width: "60%" }}>
                     <TypeIcon type_id={d.id} size={32} />
+                    {d.name}
                   </td>
-                  <td className="w-50">{d.name}</td>
-                  <td>{(~~d.volume).toLocaleString()} m3</td>
+                  <td style={{ width: "20%" }}>{(~~d.volume).toLocaleString()} m3</td>
+                  <td style={{ width: "20%" }}>{`${(~~d.value).toLocaleString()} Isk`}</td>
                 </tr>
               </>
             );
