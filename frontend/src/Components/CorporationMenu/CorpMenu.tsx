@@ -71,7 +71,7 @@ const CorpMenu = () => {
           link: `bridges`,
         },
         {
-          name: t("Mining"),
+          name: t("Character Mining Ledger"),
           link: `mining`,
         },
       ],
