@@ -40,11 +40,11 @@ const CharacterWallet = () => {
       header: t("Second Party"),
     }),
     columnHelper.accessor("amount", {
-      header: t("Amount"),
+      header: () => <span className="ms-auto">{t("Amount")}</span>,
       cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
     columnHelper.accessor("balance", {
-      header: t("Balance"),
+      header: () => <span className="ms-auto">{t("Balance")}</span>,
       cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
     columnHelper.accessor("reason", {
