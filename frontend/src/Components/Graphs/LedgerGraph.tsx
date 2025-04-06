@@ -30,7 +30,7 @@ function apiDataToTotals(group_list: any, ore_list: any, input: any, dataKey = "
   console.log("PRE", out);
   input.map((d: any) => {
     for (let i = 0; i < d.ores.length; ++i)
-      out[d.ores[i]["group"]][d.ores[i]["name"]] += ~~d.ores[i][dataKey];
+      out[d.ores[i]["group"]][d.ores[i]["name"]] += Math.floor(Number(d.ores[i][dataKey]));
     return 0;
   });
   console.log("POST", out);
@@ -81,13 +81,13 @@ const LedgerGraph = ({ data }: any) => {
       header: () => <span className="ms-auto">{t("Total Value")}</span>,
       enableColumnFilter: false,
       cell: (cell) => (
-        <p className=" m-0 w-100 text-end">{`${(~~cell.getValue()).toLocaleString()} Isk`}</p>
+        <p className=" m-0 w-100 text-end">{`${Math.floor(Number(cell.getValue())).toLocaleString()} Isk`}</p>
       ),
     }),
     columnHelper.accessor("volume", {
       header: () => <span className="ms-auto">{t("Total Volume")}</span>,
       enableColumnFilter: false,
-      cell: (cell) => `${(~~cell.getValue()).toLocaleString()} m3`,
+      cell: (cell) => `${Math.floor(Number(cell.getValue())).toLocaleString()} m3`,
     }),
     columnHelper.accessor("characters", {
       header: t("Characters"),
@@ -138,7 +138,7 @@ const LedgerGraph = ({ data }: any) => {
                     {d.name}
                   </td>
                   <td className="text-end" style={{ width: "20%" }}>
-                    {(~~d.volume).toLocaleString("en-US", {
+                    {Math.floor(Number(d.volume)).toLocaleString("en-US", {
                       maximumFractionDigits: 1,
                       notation: "compact",
                       compactDisplay: "short",
@@ -146,7 +146,7 @@ const LedgerGraph = ({ data }: any) => {
                     m3
                   </td>
                   <td className="text-end" style={{ width: "20%" }}>
-                    {(~~d.value).toLocaleString("en-US", {
+                    {Math.floor(Number(d.value)).toLocaleString("en-US", {
                       maximumFractionDigits: 1,
                       notation: "compact",
                       compactDisplay: "short",
