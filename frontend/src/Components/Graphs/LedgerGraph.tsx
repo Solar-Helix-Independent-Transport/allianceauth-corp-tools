@@ -10,16 +10,6 @@ import { useTranslation } from "react-i18next";
 import { TypeIcon, CharacterPortrait } from "../EveImages/EveImages";
 import { Card, Form } from "react-bootstrap";
 
-// function dateSort(a: any, b: any) {
-//   if (a.date > b.date) {
-//     return 1;
-//   }
-//   if (a.date < b.date) {
-//     return -1;
-//   }
-//   return 0;
-// }
-
 // Function to create js objects from python api data. types later...
 function apiDataToObject(input: any, dataKey = "volume") {
   let out = input.map((d: any) => {
@@ -228,7 +218,6 @@ const LedgerGraph = ({ data }: any) => {
           </div>
         </div>
       </div>
-
       <Card className="m-1 mt-3">
         <TableWrapper data={tableData} columns={columns} isFetching={false} />
       </Card>
