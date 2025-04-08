@@ -1,6 +1,7 @@
 import datetime
 import json
 from collections import defaultdict
+from typing import ClassVar
 
 from model_utils import Choices
 from solo.models import SingletonModel
@@ -173,7 +174,7 @@ def check_date(last_update, time_ref):
 
 class CharacterAudit(models.Model):
 
-    objects = AuditCharacterManager()
+    objects: ClassVar[AuditCharacterManager] = AuditCharacterManager()
 
     active = models.BooleanField(default=False)
 
@@ -387,7 +388,7 @@ class CharacterAudit(models.Model):
 
 class CorporationAudit(models.Model):
 
-    objects = AuditCorporationManager()
+    objects: ClassVar[AuditCorporationManager] = AuditCorporationManager()
 
     corporation = models.OneToOneField(
         EveCorporationInfo, on_delete=models.CASCADE)
@@ -449,7 +450,7 @@ class CorporationAudit(models.Model):
 
 
 class EveItemCategory(models.Model):
-    objects = EveCategoryManager()
+    objects: ClassVar[EveCategoryManager] = EveCategoryManager()
     category_id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255)  # unknown max
 
@@ -458,7 +459,7 @@ class EveItemCategory(models.Model):
 
 
 class EveItemGroup(models.Model):
-    objects = EveGroupManager()
+    objects: ClassVar[EveGroupManager] = EveGroupManager()
     group_id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255)  # unknown max
     category = models.ForeignKey(
@@ -469,7 +470,7 @@ class EveItemGroup(models.Model):
 
 
 class EveItemType(models.Model):
-    objects = EveItemTypeManager()
+    objects: ClassVar[EveItemTypeManager] = EveItemTypeManager()
     type_id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255)  # unknown max
     group = models.ForeignKey(
@@ -505,7 +506,7 @@ class InvTypeMaterials(models.Model):
 
 # Name Class
 class EveName(models.Model):
-    objects = EveNameManager()
+    objects: ClassVar[EveNameManager] = EveNameManager()
 
     eve_id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -585,7 +586,7 @@ class MapSystemGate(models.Model):
 
 
 class MapSystemPlanet(models.Model):
-    objects = EvePlanetManager()
+    objects: ClassVar[EvePlanetManager] = EvePlanetManager()
 
     planet_id = models.IntegerField(primary_key=True)
     system = models.ForeignKey(
@@ -605,7 +606,7 @@ class MapSystemPlanet(models.Model):
 
 class MapSystemMoon(models.Model):
 
-    objects = EveMoonManager()
+    objects: ClassVar[EveMoonManager] = EveMoonManager()
 
     moon_id = models.IntegerField(primary_key=True)
     system = models.ForeignKey(
