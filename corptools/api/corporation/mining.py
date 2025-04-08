@@ -31,7 +31,7 @@ class MiningApiEndpoints:
         def get_corporation_agregated_mining(
             request,
             corporation_id: int,
-            look_back: Optional[int] = 90
+            look_back: Optional[int] = 0
         ):
             perms = (
                 request.user.has_perm('corptools.own_corp_manager')
@@ -46,6 +46,9 @@ class MiningApiEndpoints:
                 return 403, "Permission Denied!"
 
             characters = get_corporation_characters(request, corporation_id)
+
+            if look_back <= 1:
+                look_back = models.CorptoolsConfiguration.get_solo().mining_aggregate_lookback
 
             start_date = timezone.now() - timedelta(days=look_back)
 

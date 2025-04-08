@@ -150,7 +150,7 @@ export async function loadRefTypes() {
 }
 
 export async function LoadAgregatedMining(corporationId: Number) {
-  const api = await axios.get(`/audit/api/corporation/${corporationId}/mining?look_back=150`);
+  const api = await axios.get(`/audit/api/corporation/${corporationId}/mining`);
   console.log(`get mining in api`);
   return api.data;
 }

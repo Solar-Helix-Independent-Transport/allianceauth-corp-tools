@@ -155,7 +155,7 @@ export async function getMailBody(character_id: Number, mail_id: Number) {
 }
 
 export async function loadMining(character_id: Number) {
-  const api = await axios.get(`/audit/api/account/${character_id}/mining?look_back=150`);
+  const api = await axios.get(`/audit/api/account/${character_id}/mining`);
   console.log(`get mining in api ${character_id}`);
   return api.data;
 }

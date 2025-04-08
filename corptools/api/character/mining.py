@@ -40,10 +40,13 @@ class MiningApiEndpoints:
         def get_character_mining(request,
                                  character_id: int,
                                  filter_characters: Optional[List[int]] = [],
-                                 look_back: Optional[int] = 90):
+                                 look_back: Optional[int] = 0):
             if character_id == 0:
                 character_id = request.user.profile.main_character.character_id
             response, main = get_main_character(request, character_id)
+
+            if look_back <= 1:
+                look_back = models.CorptoolsConfiguration.get_solo().mining_aggregate_lookback
 
             if not response:
                 return 403, _("Permission Denied")
