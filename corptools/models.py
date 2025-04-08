@@ -33,9 +33,9 @@ logger = get_extension_logger(__name__)
 class CorptoolsConfiguration(SingletonModel):
     holding_corps = models.ManyToManyField(EveCorporationInfo, blank=True)
 
-    mining_aggregate_lookback = models.IntegerField(
+    aggregate_lookback = models.IntegerField(
         default=90,
-        help_text="Days to look back in the aggregated Views like mining ledger graphs."
+        help_text="Days to look back in aggregated views, like the mining ledger graphs."
     )
 
     disable_verification_assets = models.BooleanField(

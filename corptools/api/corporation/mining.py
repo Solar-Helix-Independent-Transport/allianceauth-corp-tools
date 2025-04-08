@@ -48,7 +48,7 @@ class MiningApiEndpoints:
             characters = get_corporation_characters(request, corporation_id)
 
             if look_back <= 1:
-                look_back = models.CorptoolsConfiguration.get_solo().mining_aggregate_lookback
+                look_back = models.CorptoolsConfiguration.get_solo().aggregate_lookback
 
             start_date = timezone.now() - timedelta(days=look_back)
 
