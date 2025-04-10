@@ -304,12 +304,18 @@ def glances_assets_character(characters):
     return assets_glances(ship_assets, sp_assets)
 
 
-def glances_assets_corporation(characters, corp_id):
+def glances_assets_corporation(characters, corp_id, user=None):
     cats = [6, 65]
     injector_grp = 1739
     sp_types = [
         40519,  # extractor
     ]
+
+    ship_assets = models.CorpAsset.objects.get_queryset()
+    if user:
+        ship_assets = models.CorpAsset.get_visible(
+            user
+        )
 
     ship_assets = models.CorpAsset.objects.filter(
         Q(type_name__group__category_id__in=cats)
@@ -328,6 +334,13 @@ def glances_assets_corporation(characters, corp_id):
     ).order_by(
         '-grp_total'
     )
+
+    sp_assets = models.CorpAsset.objects.get_queryset()
+
+    if user:
+        sp_assets = models.CorpAsset.get_visible(
+            user
+        )
 
     sp_assets = models.CorpAsset.objects.filter(
         corporation__corporation__corporation_id=corp_id,

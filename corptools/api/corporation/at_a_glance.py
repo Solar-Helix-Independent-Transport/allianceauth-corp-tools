@@ -48,7 +48,7 @@ class CorpGlanceApiEndpoints:
             if not check_permisions(corporation_id, request.user):
                 return 403, _("Permission Denied")
 
-            return glances_assets_corporation(characters, corporation_id)
+            return glances_assets_corporation(characters, corporation_id, user=request.user)
 
         @api.get(
             "corporation/{corporation_id}/glance/activities",

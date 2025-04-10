@@ -30,7 +30,7 @@
     "openapi-fetch": "^0.10.4",
     "rc-slider": "^11.1.8",
     "react": "^18.2.0",
-    "react-bootstrap": "^2.10.1",
+    "react-bootstrap": "^2.10.9",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^15.4.0",
