@@ -190,16 +190,19 @@ class EveItemTypeManager(models.Manager):
                 names=[
                     name
                 ],
-
-            )
+            ).results()
             id = None
-            for nm in ids.get("inventory_types", []):
-                if nm.get("id"):
-                    if nm.get("name") == name:
-                        id = nm.get("id")
-                        break
-            entity, created = self.update_or_create_from_esi(id)
-        return entity, created
+            if ids.get("inventory_types"):
+                for nm in ids.get("inventory_types"):
+                    if nm.get("id"):
+                        if nm.get("name") == name:
+                            id = nm.get("id")
+                            break
+            if id:
+                entity, created = self.update_or_create_from_esi(id)
+                return entity, created
+            else:
+                raise ValueError(f"Unable to find item {name} on ESI")
 
     def create_bulk_from_esi(self, eve_ids):
         """gets or creates with ESI"""
