@@ -1,6 +1,6 @@
 // install (please try to align the version of installed @nivo packages)
 // yarn add @nivo/bar
-import { abbreviateNumber } from "./GraphHelpers";
+import { abbreviateNumber, getCSSVariable } from "./GraphHelpers";
 import { ResponsiveBarCanvas } from "@nivo/bar";
 
 // make sure parent container have a defined height when using
@@ -26,6 +26,10 @@ export const MiningGraph = ({ data, keys, dataType = "Volume" }: any) => {
   const ticks = tickGen(data, 10).map((e: any) => {
     return e.id;
   });
+  const bg = getCSSVariable("--bs-body-bg");
+  const txt = getCSSVariable("--bs-body-color");
+  const bdr = getCSSVariable("--bs-light-border-subtle");
+
   return (
     <ResponsiveBarCanvas
       data={data}
@@ -75,40 +79,40 @@ export const MiningGraph = ({ data, keys, dataType = "Volume" }: any) => {
       enableLabel={false}
       labelSkipWidth={24}
       labelSkipHeight={24}
-      labelTextColor={"#fff"}
+      labelTextColor={txt}
       isInteractive={true}
       legends={[]}
       theme={{
-        background: "#646464",
+        background: bg,
         text: {
           fontSize: 11,
-          fill: "#fff",
+          fill: txt,
           outlineWidth: 0,
           outlineColor: "transparent",
         },
         axis: {
           domain: {
             line: {
-              stroke: "#ddd",
+              stroke: bdr,
               strokeWidth: 1,
             },
           },
           legend: {
             text: {
               fontSize: 14,
-              fill: "#fff",
+              fill: txt,
               outlineWidth: 0,
               outlineColor: "transparent",
             },
           },
           ticks: {
             line: {
-              stroke: "#ddd",
+              stroke: bdr,
               strokeWidth: 1,
             },
             text: {
               fontSize: 14,
-              fill: "#fff",
+              fill: txt,
               outlineWidth: 0,
               outlineColor: "transparent",
             },
@@ -116,7 +120,7 @@ export const MiningGraph = ({ data, keys, dataType = "Volume" }: any) => {
         },
         grid: {
           line: {
-            stroke: "#999",
+            stroke: bdr,
             strokeWidth: 1,
           },
         },
@@ -124,14 +128,14 @@ export const MiningGraph = ({ data, keys, dataType = "Volume" }: any) => {
           title: {
             text: {
               fontSize: 14,
-              fill: "#fff",
+              fill: txt,
               outlineWidth: 0,
               outlineColor: "transparent",
             },
           },
           text: {
             fontSize: 14,
-            fill: "#fff",
+            fill: txt,
             outlineWidth: 0,
             outlineColor: "transparent",
           },
@@ -139,7 +143,7 @@ export const MiningGraph = ({ data, keys, dataType = "Volume" }: any) => {
             line: {},
             text: {
               fontSize: 12,
-              fill: "#000",
+              fill: bdr,
               outlineWidth: 0,
               outlineColor: "transparent",
             },
@@ -148,35 +152,35 @@ export const MiningGraph = ({ data, keys, dataType = "Volume" }: any) => {
         annotations: {
           text: {
             fontSize: 12,
-            fill: "#ddd",
+            fill: bg,
             outlineWidth: 2,
-            outlineColor: "#ffffff",
+            outlineColor: txt,
             outlineOpacity: 1,
           },
           link: {
-            stroke: "#ddd",
+            stroke: bg,
             strokeWidth: 1,
             outlineWidth: 2,
-            outlineColor: "#ffffff",
+            outlineColor: txt,
             outlineOpacity: 1,
           },
           outline: {
-            stroke: "#ddd",
+            stroke: bg,
             strokeWidth: 2,
             outlineWidth: 2,
-            outlineColor: "#ffffff",
+            outlineColor: txt,
             outlineOpacity: 1,
           },
           symbol: {
-            fill: "#ddd",
+            fill: bg,
             outlineWidth: 2,
-            outlineColor: "#ffffff",
+            outlineColor: txt,
             outlineOpacity: 1,
           },
         },
         tooltip: {
           container: {
-            background: "#000",
+            background: bg,
             fontSize: 14,
           },
           basic: {},

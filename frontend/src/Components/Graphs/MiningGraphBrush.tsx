@@ -1,6 +1,7 @@
 // install (please try to align the version of installed @nivo packages)
 // yarn add @nivo/bar
 import { ResponsiveBarCanvas } from "@nivo/bar";
+import { getCSSVariable } from "./GraphHelpers";
 
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 and
@@ -9,6 +10,10 @@ import { ResponsiveBarCanvas } from "@nivo/bar";
 // you'll often use just a few of them.
 
 export const MiningGraphBrush = ({ data, keys }: any) => {
+  const bg = getCSSVariable("--bs-body-bg");
+  const txt = getCSSVariable("--bs-body-color");
+  const bdr = getCSSVariable("--bs-light-border-subtle");
+
   return (
     <ResponsiveBarCanvas
       data={data}
@@ -40,36 +45,36 @@ export const MiningGraphBrush = ({ data, keys }: any) => {
       isInteractive={false}
       legends={[]}
       theme={{
-        background: "#646464",
+        background: bg,
         text: {
           fontSize: 11,
-          fill: "#fff",
+          fill: txt,
           outlineWidth: 0,
           outlineColor: "transparent",
         },
         axis: {
           domain: {
             line: {
-              stroke: "#ddd",
+              stroke: bdr,
               strokeWidth: 1,
             },
           },
           legend: {
             text: {
-              fontSize: 12,
-              fill: "#fff",
+              fontSize: 14,
+              fill: txt,
               outlineWidth: 0,
               outlineColor: "transparent",
             },
           },
           ticks: {
             line: {
-              stroke: "#ddd",
+              stroke: bdr,
               strokeWidth: 1,
             },
             text: {
-              fontSize: 11,
-              fill: "#fff",
+              fontSize: 14,
+              fill: txt,
               outlineWidth: 0,
               outlineColor: "transparent",
             },
@@ -77,30 +82,30 @@ export const MiningGraphBrush = ({ data, keys }: any) => {
         },
         grid: {
           line: {
-            stroke: "#999",
+            stroke: bdr,
             strokeWidth: 1,
           },
         },
         legends: {
           title: {
             text: {
-              fontSize: 11,
-              fill: "#fff",
+              fontSize: 14,
+              fill: txt,
               outlineWidth: 0,
               outlineColor: "transparent",
             },
           },
           text: {
-            fontSize: 11,
-            fill: "#fff",
+            fontSize: 14,
+            fill: txt,
             outlineWidth: 0,
             outlineColor: "transparent",
           },
           ticks: {
             line: {},
             text: {
-              fontSize: 10,
-              fill: "#000",
+              fontSize: 12,
+              fill: bdr,
               outlineWidth: 0,
               outlineColor: "transparent",
             },
@@ -108,37 +113,37 @@ export const MiningGraphBrush = ({ data, keys }: any) => {
         },
         annotations: {
           text: {
-            fontSize: 13,
-            fill: "#ddd",
+            fontSize: 12,
+            fill: bg,
             outlineWidth: 2,
-            outlineColor: "#ffffff",
+            outlineColor: txt,
             outlineOpacity: 1,
           },
           link: {
-            stroke: "#ddd",
+            stroke: bg,
             strokeWidth: 1,
             outlineWidth: 2,
-            outlineColor: "#ffffff",
+            outlineColor: txt,
             outlineOpacity: 1,
           },
           outline: {
-            stroke: "#ddd",
+            stroke: bg,
             strokeWidth: 2,
             outlineWidth: 2,
-            outlineColor: "#ffffff",
+            outlineColor: txt,
             outlineOpacity: 1,
           },
           symbol: {
-            fill: "#ddd",
+            fill: bg,
             outlineWidth: 2,
-            outlineColor: "#ffffff",
+            outlineColor: txt,
             outlineOpacity: 1,
           },
         },
         tooltip: {
           container: {
-            background: "#000",
-            fontSize: 12,
+            background: bg,
+            fontSize: 14,
           },
           basic: {},
           chip: {},

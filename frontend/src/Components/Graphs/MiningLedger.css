@@ -1,7 +1,7 @@
 :root {
-  --main-color: #eeeeee33;
+  --main-color: var(--bs-primary-border-subtle);
   --main-color-hover: rgb(104, 117, 217, 0.2);
-  --track-color: #ffffff33;
+  --track-color: var(--bs-gradient);
 }
 .horizontal-slider {
   max-width: 100%;

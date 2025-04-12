@@ -20,3 +20,7 @@ export function abbreviateNumber(value: number) {
   }
   return newValue;
 }
+
+export function getCSSVariable(codeName: string) {
+  return window.getComputedStyle(document.body).getPropertyValue(codeName);
+}

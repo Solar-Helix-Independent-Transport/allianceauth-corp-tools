@@ -81,7 +81,9 @@ const LedgerGraph = ({ data }: any) => {
       header: () => <span className="ms-auto">{t("Total Value")}</span>,
       enableColumnFilter: false,
       cell: (cell) => (
-        <p className=" m-0 w-100 text-end">{`${Math.floor(Number(cell.getValue())).toLocaleString()} Isk`}</p>
+        <p className=" m-0 w-100 text-end">{`${Math.floor(
+          Number(cell.getValue()),
+        ).toLocaleString()} Isk`}</p>
       ),
     }),
     columnHelper.accessor("volume", {
@@ -176,15 +178,16 @@ const LedgerGraph = ({ data }: any) => {
           defaultChecked={mode}
         />
       </div>
-      <div
-        style={{
-          background: "#646464",
-          color: "#ffffff",
-          paddingTop: "2px",
-          paddingBottom: "2px",
-          borderRadius: "10px",
-          margin: "5px",
-        }}
+      <Card
+        className="m-1"
+        // style={{
+        //   // background: "#646464",
+        //   // color: "#ffffff",
+        //   paddingTop: "2px",
+        //   paddingBottom: "2px",
+        //   borderRadius: "10px",
+        //   margin: "5px",
+        // }}
       >
         <div style={{ height: "250px", margin: "5px", background: "#646464" }}>
           <MiningTotalsGraph
@@ -217,7 +220,7 @@ const LedgerGraph = ({ data }: any) => {
             </div>
           </div>
         </div>
-      </div>
+      </Card>
       <Card className="m-1 mt-3">
         <TableWrapper data={tableData} columns={columns} isFetching={false} />
       </Card>
