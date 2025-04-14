@@ -10,7 +10,7 @@
 
     {% if structures %}
         <h2 class="text-center">Structure and Fuel Stats</h2>
-        <hr />
+        <hr>
         <div id="chart_info" class="mx-auto">
             <div class="text-center">
                 <h4 class="text-center">Filtered Stats</h4>
@@ -34,15 +34,15 @@
                 </p>
             </div>
             <!-- <div class="text-center col-lg-6 hide">
-                <h4 class="text-center">Filtered Fuel Stats</h4><hr />
+                <h4 class="text-center">Filtered Fuel Stats</h4><hr>
                 <p>Total Current Block Count <span class="label label-primary">0</span></p>
                 <p>Approx Time of Current Stocks <span class="label label-primary">0</span></p>
             </div> -->
         </div>
-        <hr />
+        <hr>
         <div class="">
             <label for="fuelDuration" class="form-label">Refuel Duration in days</label>
-            <input type="number" class="form-control" id="fuelDuration" placeholder="90" />
+            <input type="number" class="form-control" id="fuelDuration" placeholder="90">
         </div>
         <div class="table-responsive">
             <table id="table-structs" class="table table-responsive ">
@@ -67,13 +67,13 @@
                     {% for structure in structures %}
                         <tr>
                             <td>
-                                <img class="ra-avatar img-circle" src="https://image.eveonline.com/Type/{{ structure.structure.type_id }}_64.png" />
+                                <img class="ra-avatar img-circle" src="https://image.eveonline.com/Type/{{ structure.structure.type_id }}_64.png">
                             </td>
                             <td>
                                 {{ structure.structure.name }}
-                                </br />
+                                <br>
                                 <span class="badge bg-secondary">{{ structure.structure.type_name.name }}</span>
-                                </br />
+                                <br>
                                 <span class="badge bg-primary">{{ structure.structure.corporation.corporation.corporation_name }}</span>
                             </td>
                             <td class="text-center">{% widthratio structure.fuel_req 1 720 %}</td>
@@ -81,20 +81,20 @@
                                 {% if structure.extra_fuel_info %}
                                     {% if structure.structure.fuel_expires < structure.extra_fuel_info.expires %}
                                         {{ structure.structure.fuel_expires|date:"Y-m-d" }}
-                                        <br/>
+                                        <br>
                                         <span class="badge bg-secondary">Blocks: {{ structure.structure.fuel_expires|timeuntil }}</span>
-                                        <br/>
+                                        <br>
                                         <span class="badge bg-secondary">{{ structure.extra_fuel_info.name }}: {{ structure.extra_fuel_info.expires|timeuntil }}</span>
                                     {% else %}
                                         {{ structure.extra_fuel_info.expires|date:"Y-m-d" }}
-                                        <br/>
+                                        <br>
                                         <span class="badge bg-secondary">{{ structure.extra_fuel_info.name }}: {{ structure.extra_fuel_info.expires|timeuntil }}</span>
-                                        <br/>
+                                        <br>
                                         <span class="badge bg-secondary">Blocks: {{ structure.structure.fuel_expires|timeuntil }}</span>
                                     {% endif %}
                                 {% else %}
                                     {{ structure.structure.fuel_expires|date:"Y-m-d" }}
-                                    <br/>
+                                    <br>
                                     <span class="badge bg-secondary">Blocks: {{ structure.structure.fuel_expires|timeuntil }}</span>
                                 {% endif %}
 
