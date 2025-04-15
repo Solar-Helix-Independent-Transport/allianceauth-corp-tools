@@ -192,7 +192,8 @@ class DashboardApiEndpoints:
                 type_id=1,
                 singleton=True,
                 location_id__lte=32000000,
-                character__in=characters
+                character__in=characters,
+                type__name__group_id=4810
             ).select_related(
                 "character",
                 "character__character",
