@@ -202,7 +202,7 @@ class DashboardApiEndpoints:
                 "type_name__group__category"
             )
 
-            output = {}
+            output = []
 
             for a in assets:
                 type_nm = a.type_name.name
