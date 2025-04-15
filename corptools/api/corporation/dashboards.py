@@ -190,7 +190,6 @@ class DashboardApiEndpoints:
                 request.user
             )
             assets = models.CharacterAsset.objects.filter(
-                type_id=1,
                 singleton=True,
                 location_id__lte=32000000,
                 character__in=characters,
