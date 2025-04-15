@@ -17,7 +17,7 @@ const Dens = () => {
   const columnHelper = createColumnHelper<any>();
 
   const columns = [
-    columnHelper.accessor("region.name", {
+    columnHelper.accessor("location.region.name", {
       header: t("Region"),
       cell: (cell) => (
         <a href={`https://evemaps.dotlan.net/map/${cell.getValue().replace(" ", "_")}`}>
@@ -25,7 +25,7 @@ const Dens = () => {
         </a>
       ),
     }),
-    columnHelper.accessor("constellation.name", {
+    columnHelper.accessor("location.constellation.name", {
       header: t("Constellation"),
       cell: (cell) => (
         <a
