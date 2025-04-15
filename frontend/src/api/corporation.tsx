@@ -91,6 +91,12 @@ export async function loadBridges() {
   return api.data;
 }
 
+export async function loadDens() {
+  const api = await axios.get(`/audit/api/dashboard/dens`);
+  console.log(`get dens in api`);
+  return api.data;
+}
+
 export async function loadSov() {
   const api = await axios.get(`/audit/api/dashboard/sov`);
   console.log(`get sov in api`);

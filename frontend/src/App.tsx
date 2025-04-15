@@ -42,6 +42,7 @@ import CorporationPocos from "./Pages/Corp/Pocos";
 import CorporationStatus from "./Pages/Corp/Status";
 import CorporationStarbases from "./Pages/Corp/Starbases";
 import CorporationMiningLedger from "./Pages/Corp/MiningLedger";
+import Dens from "./Pages/Corp/Dens";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -135,6 +136,7 @@ function App() {
               <Route path="pocos" element={<CorporationPocos />} />
               <Route path="starbases" element={<CorporationStarbases />} />
               <Route path="bridges" element={<Bridges />} />
+              <Route path="dens" element={<Dens />} />
               {/* <Route path="fuel" element={<Bridges />} /> */}
               {/* <Route
                 path="bridges"

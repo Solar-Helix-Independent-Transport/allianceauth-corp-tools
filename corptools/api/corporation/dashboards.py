@@ -209,9 +209,27 @@ class DashboardApiEndpoints:
                 if a.name:
                     type_nm = f"{a.type_name.name} ({a.name})"
                 loc = f"{a.location_id} ({a.location_flag})"
+                const = {"id": 0, "name": ""}
+                region = {"id": 0, "name": ""}
                 if a.location_name:
                     loc = a.location_name.location_name
-
+                    try:
+                        const = {
+                            "id": a.location_name.system.constellation_id,
+                            "name": a.location_name.system.constellation.name
+                        }
+                        region = {
+                            "id": a.location_name.system.constellation.region_id,
+                            "name": a.location_name.system.constellation.region.name
+                        }
+                    except Exception:
+                        pass
+                character_name = a.character.character.character_name
+                try:
+                    mc = a.character.character.character_ownership.user.profile.main_character
+                    character_name = f"{mc.character_name} ({character_name})"
+                except Exception:
+                    pass
                 output.append({
                     "character": {
                         "character_id": a.character.character.character_id,
@@ -232,7 +250,9 @@ class DashboardApiEndpoints:
                     "expand": False,
                     "location": {
                         "id": a.location_id,
-                        "name": loc
+                        "name": loc,
+                        "constellation": const,
+                        "region": region
                     }
                 })
 
