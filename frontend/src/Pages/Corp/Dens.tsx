@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "react-query";
 import { loadDens } from "../../api/corporation";
-import { CorporationLogo } from "../../Components/EveImages/EveImages";
+import { CharacterPortrait, CorporationLogo } from "../../Components/EveImages/EveImages";
 import BaseTable from "../../Components/Tables/BaseTable/BaseTable";
 
 const Dens = () => {
@@ -53,10 +53,7 @@ const Dens = () => {
       header: t("Owner Corp"),
       cell: (cell) => (
         <>
-          <CorporationLogo
-            corporation_id={cell.row.original.character.corporation_id}
-            size={32}
-          ></CorporationLogo>
+          <CorporationLogo corporation_id={cell.row.original.character.corporation_id} size={32} />
           <span className="ms-2">{cell.row.original.character.corporation_name}</span>
         </>
       ),
@@ -65,11 +62,8 @@ const Dens = () => {
       header: t("Owner"),
       cell: (cell) => (
         <>
-          <CorporationLogo
-            corporation_id={cell.row.original.character.corporation_id}
-            size={32}
-          ></CorporationLogo>
-          <span className="ms-2">{cell.row.original.character.corporation_name}</span>
+          <CharacterPortrait character_id={cell.row.original.character.character_id} size={32} />
+          <span className="ms-2">{cell.row.original.character.character_name}</span>
         </>
       ),
     }),

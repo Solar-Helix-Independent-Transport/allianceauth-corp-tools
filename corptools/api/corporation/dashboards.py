@@ -233,7 +233,7 @@ class DashboardApiEndpoints:
                 output.append({
                     "character": {
                         "character_id": a.character.character.character_id,
-                        "character_name": a.character.character.character_name,
+                        "character_name": character_name,
                         "corporation_id": a.character.character.corporation_id,
                         "corporation_name": a.character.character.corporation_name,
                         "alliance_id": a.character.character.alliance_id,
