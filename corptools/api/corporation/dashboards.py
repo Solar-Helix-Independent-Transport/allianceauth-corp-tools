@@ -168,7 +168,7 @@ class DashboardApiEndpoints:
 
         @api.get(
             "dashboard/dens",
-            response={200: schema.CharacterAssetItem, 403: str},
+            response={200: list, 403: str},
             tags=self.tags
         )
         def get_visible_dens(
