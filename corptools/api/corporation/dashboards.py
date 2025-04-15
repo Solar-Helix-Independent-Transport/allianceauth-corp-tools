@@ -186,8 +186,9 @@ class DashboardApiEndpoints:
                     f"Permission Denied for {request.user} to view mining!")
                 return 403, "Permission Denied!"
 
-            characters = models.CharacterAudit.objects.get_visible(
-                request.user)
+            characters = models.CharacterAudit.objects.visible_to(
+                request.user
+            )
             assets = models.CharacterAsset.objects.filter(
                 type_id=1,
                 singleton=True,
