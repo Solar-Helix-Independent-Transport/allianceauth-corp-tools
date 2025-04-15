@@ -54,10 +54,10 @@ const Dens = () => {
       cell: (cell) => (
         <>
           <CorporationLogo
-            corporation_id={cell.row.original.owner.corporation_id}
+            corporation_id={cell.row.original.character.corporation_id}
             size={32}
           ></CorporationLogo>
-          <span className="ms-2">{cell.row.original.owner.corporation_name}</span>
+          <span className="ms-2">{cell.row.original.character.corporation_name}</span>
         </>
       ),
     }),
@@ -66,10 +66,10 @@ const Dens = () => {
       cell: (cell) => (
         <>
           <CorporationLogo
-            corporation_id={cell.row.original.owner.corporation_id}
+            corporation_id={cell.row.original.character.corporation_id}
             size={32}
           ></CorporationLogo>
-          <span className="ms-2">{cell.row.original.owner.corporation_name}</span>
+          <span className="ms-2">{cell.row.original.character.corporation_name}</span>
         </>
       ),
     }),
