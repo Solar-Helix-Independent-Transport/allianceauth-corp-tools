@@ -192,8 +192,8 @@ class DashboardApiEndpoints:
             assets = models.CharacterAsset.objects.filter(
                 singleton=True,
                 location_id__lte=32000000,
+                type_name__group_id=4810,
                 character__in=characters,
-                type__name__group_id=4810
             ).select_related(
                 "character",
                 "character__character",
