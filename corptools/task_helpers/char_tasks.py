@@ -433,7 +433,7 @@ def update_character_assets_names(character_id):
     if not token:
         return "No Tokens"
 
-    expandable_cats = [2, 6]
+    expandable_cats = [2, 6, 22]
 
     asset_list = CharacterAsset.objects.filter(
         character=audit_char,
