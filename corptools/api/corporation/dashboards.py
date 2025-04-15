@@ -166,6 +166,77 @@ class DashboardApiEndpoints:
         def get_dashboard_drills(request):
             return self.get_dashboard_drills_levels(request)
 
+        @api.get(
+            "dashboard/dens",
+            response={200: schema.CharacterAssetItem, 403: str},
+            tags=self.tags
+        )
+        def get_visible_dens(
+            request,
+        ):
+            perms = (
+                request.user.has_perm('corptools.own_corp_manager')
+                | request.user.has_perm('corptools.alliance_corp_manager')
+                | request.user.has_perm('corptools.state_corp_manager')
+                | request.user.has_perm('corptools.global_corp_manager')
+            )
+
+            if not perms:
+                logger.error(
+                    f"Permission Denied for {request.user} to view mining!")
+                return 403, "Permission Denied!"
+
+            characters = models.CharacterAudit.objects.get_visible(
+                request.user)
+            assets = models.CharacterAsset.objects.filter(
+                type_id=1,
+                singleton=True,
+                location_id__lte=32000000,
+                character__in=characters
+            ).select_related(
+                "character",
+                "character__character",
+                "type_name",
+                "location_name",
+                "type_name__group__category"
+            )
+
+            output = {}
+
+            for a in assets:
+                type_nm = a.type_name.name
+                if a.name:
+                    type_nm = f"{a.type_name.name} ({a.name})"
+                loc = f"{a.location_id} ({a.location_flag})"
+                if a.location_name:
+                    loc = a.location_name.location_name
+
+                output.append({
+                    "character": {
+                        "character_id": a.character.character.character_id,
+                        "character_name": a.character.character.character_name,
+                        "corporation_id": a.character.character.corporation_id,
+                        "corporation_name": a.character.character.corporation_name,
+                        "alliance_id": a.character.character.alliance_id,
+                        "alliance_name": a.character.character.alliance_name
+                    },
+                    "item": {
+                        "id": a.type_name.type_id,
+                        "name": type_nm,
+                        "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}",
+                        "cat_id": a.type_name.group.category_id
+                    },
+                    "quantity": a.quantity,
+                    "id": a.item_id,
+                    "expand": False,
+                    "location": {
+                        "id": a.location_id,
+                        "name": loc
+                    }
+                })
+
+            return output
+
     def get_dashboard_drills_levels(request):
         perms = (
             request.user.has_perm('corptools.own_corp_manager')
