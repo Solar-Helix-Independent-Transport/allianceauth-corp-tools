@@ -13,7 +13,7 @@ from corptools import providers
 from corptools.models import (
     EveItemCategory, EveItemDogmaAttribute, EveItemGroup, EveItemType,
     EveLocation, InvTypeMaterials, MapConstellation, MapRegion, MapSystem,
-    MapSystemGate,
+    MapSystemGate, MapSystemMoon, MapSystemPlanet,
 )
 
 logger = get_extension_logger(__name__)
@@ -468,3 +468,15 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
             return EveLocation(location_id=location_id,
                                location_name=structure.get('name'),
                                system_id=structure.get('solar_system_id'))
+
+
+def load_system(system_id, moons_update=False):
+    _sys = providers.esi.client.Universe.get_universe_systems_system_id(
+        system_id=system_id
+    ).result()
+    for p in _sys["planets"]:
+        MapSystemPlanet.objects.update_or_create_from_esi(p["planet_id"])
+        if "moons" in p and moons_update:
+            if p["moons"]:
+                for m in p["moons"]:
+                    MapSystemMoon.objects.update_or_create_from_esi(m)

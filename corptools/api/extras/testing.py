@@ -2,6 +2,8 @@ import pprint
 
 from ninja import NinjaAPI
 
+from corptools.models import CharacterAsset, MapSystem
+
 
 class TestingApiEndpoints:
     tags = ["Extras"]
@@ -63,3 +65,22 @@ class TestingApiEndpoints:
                 "item_name": item.name,
                 "item_id": item.type_id
             }
+
+        @api.get(
+            "/extras/test/newapi4",
+            tags=["Testing"]
+        )
+        def get_test_api_openapi_4(request, character_id=0):
+            """
+                Not for real use!
+                this has type hinting
+            """
+            if not request.user.is_superuser:
+                return 403, {"message": "Hard no pall!"}
+
+            from corptools.task_helpers.char_tasks import (
+                update_character_assets,
+            )
+
+            update_character_assets(character_id, force_refresh=True)
+            return "done"

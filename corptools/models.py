@@ -715,6 +715,18 @@ class AssetCoordiante(models.Model):
     y = models.FloatField()
     z = models.FloatField()
 
+
+class CharAssetCoordiante(models.Model):
+    item = models.OneToOneField(
+        CharacterAsset,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        related_name="coordinate"
+    )
+    x = models.FloatField()
+    y = models.FloatField()
+    z = models.FloatField()
+
 # ************************ Character Models
 # Character Skill
 

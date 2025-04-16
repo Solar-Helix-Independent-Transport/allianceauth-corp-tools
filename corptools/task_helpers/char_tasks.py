@@ -4,24 +4,28 @@ from datetime import timedelta
 from celery import shared_task
 
 from django.core.paginator import Paginator
+from django.db.models import F
+from django.db.models.functions import Power, Sqrt
 from django.utils import timezone
 from django.utils.html import strip_tags
 
 from allianceauth.services.hooks import get_extension_logger
 from esi.models import Token
 
-from corptools.task_helpers.update_tasks import fetch_location_name
+from corptools.task_helpers.update_tasks import (
+    fetch_location_name, load_system,
+)
 
 from .. import providers
 from ..models import (
-    CharacterAsset, CharacterAudit, CharacterContact, CharacterContactLabel,
-    CharacterIndustryJob, CharacterLocation, CharacterMarketOrder,
-    CharacterMiningLedger, CharacterRoles, CharacterTitle,
-    CharacterWalletJournalEntry, Clone, Contract, ContractItem,
-    CorporationHistory, CorptoolsConfiguration, EveItemType, EveLocation,
-    EveName, Implant, JumpClone, LoyaltyPoint, MailLabel, MailMessage,
-    MailRecipient, Notification, NotificationText, Skill, SkillQueue,
-    SkillTotalHistory, SkillTotals,
+    AssetCoordiante, CharacterAsset, CharacterAudit, CharacterContact,
+    CharacterContactLabel, CharacterIndustryJob, CharacterLocation,
+    CharacterMarketOrder, CharacterMiningLedger, CharacterRoles,
+    CharacterTitle, CharacterWalletJournalEntry, CharAssetCoordiante, Clone,
+    Contract, ContractItem, CorporationHistory, CorptoolsConfiguration,
+    EveItemType, EveLocation, EveName, Implant, JumpClone, LoyaltyPoint,
+    MailLabel, MailMessage, MailRecipient, MapSystemPlanet, Notification,
+    NotificationText, Skill, SkillQueue, SkillTotalHistory, SkillTotals,
 )
 from . import sanitize_location_flag, sanitize_notification_type
 from .etag_helpers import NotModifiedError, etag_results
@@ -410,6 +414,11 @@ def update_character_assets(character_id, force_refresh=False):
         update_character_assets_names(character_id)
     except Exception as e:
         logger.error(e)
+    try:
+        # Get den plannets!
+        update_den_locations(character_id)
+    except Exception as e:
+        logger.error(e)
 
     return f"CT: Finished assets for: {audit_char.character.character_name}"
 
@@ -433,7 +442,7 @@ def update_character_assets_names(character_id):
     if not token:
         return "No Tokens"
 
-    expandable_cats = [2, 6, 22]
+    expandable_cats = [2, 6]
 
     asset_list = CharacterAsset.objects.filter(
         character=audit_char,
@@ -442,7 +451,6 @@ def update_character_assets_names(character_id):
     ).order_by("pk")
 
     for subset in chunks(asset_list, 100):
-
         assets_names = providers.esi.client.Assets.post_characters_character_id_assets_names(
             character_id=character_id,
             item_ids=[i.item_id for i in subset],
@@ -456,7 +464,38 @@ def update_character_assets_names(character_id):
                 asset.name = id_list.get(asset.item_id)
                 asset.save()
 
-    return f"CT: Finished asset names for: {audit_char.character.character_name}"
+
+def update_den_locations(character_id, force_refresh=False):
+    max_location_id = 35000000
+    min_location_id = 30000000
+
+    parents = CharacterAsset.objects.filter(
+        character__character__character_id=character_id,
+        singleton=True,
+        type_name__group_id=4810,
+        location_id__gte=min_location_id,
+        location_id__lte=max_location_id
+    )
+    for parent in parents:
+        load_system(parent.location_name.system.system_id)
+        distance = MapSystemPlanet.objects.filter(
+            system=parent.location_name.system
+        ).annotate(
+            distance=Sqrt(
+                Power(
+                    parent.coordinate.x - F("x"),
+                    2
+                ) + Power(
+                    parent.coordinate.y - F("y"),
+                    2
+                ) + Power(
+                    parent.coordinate.z - F("z"),
+                    2
+                )
+            )
+        ).order_by("distance").first()
+        parent.name = distance.name
+        parent.save()
 
 
 def update_asset_locations(character_id, force_refresh=False):
@@ -464,8 +503,61 @@ def update_asset_locations(character_id, force_refresh=False):
         character__character_id=character_id)
     logger.debug("Updating Asset locations for: {}".format(
         audit_char.character.character_name))
+    catagories = [
+        23,  # Starbases
+        65,  # Structures
+        40,  # Sov
+        22,  # Deployables
+    ]
+# These must be in space
+    max_location_id = 35000000
+    min_location_id = 30000000
 
-    type_ids = []
+    assets = CharacterAsset.objects.filter(
+        character=audit_char,
+        type_name__group__category_id__in=catagories,
+        location_id__gte=min_location_id,
+        location_id__lte=max_location_id
+    )
+
+    req_scopes = ['esi-assets.read_assets.v1']
+
+    _token = get_token(character_id, req_scopes)
+
+    if not _token or not assets.count():
+        logger.info(
+            f"CT: COORDS No Tokens or Assets for {audit_char.character}")
+        return f"CT: COORDS No Tokens or Assets for {audit_char.character}"
+
+    locations = providers.esi.client.Assets.post_characters_character_id_assets_locations(
+        character_id=audit_char.character.character_id,
+        item_ids=list(
+            assets.values_list("item_id", flat=True)
+        ),
+        token=_token.valid_access_token()
+    ).result()
+
+    logger.info(locations)
+
+    new_coords = {}
+    for loc in locations:
+        new_coords[loc['item_id']] = loc["position"]
+
+    new_models = []
+    for a in assets:
+        if a.item_id in new_coords:
+            new_models.append(
+                CharAssetCoordiante(
+                    item=a,
+                    x=new_coords[a.item_id]['x'],
+                    y=new_coords[a.item_id]['y'],
+                    z=new_coords[a.item_id]['z']
+                )
+            )
+            logger.info(
+                f"CT: COORD - {a.type_name.name} {new_coords[a.item_id]}")
+
+    CharAssetCoordiante.objects.bulk_create(new_models, ignore_conflicts=True)
 
     return f"CT: Finished asset locations for: {audit_char.character.character_name}"
 

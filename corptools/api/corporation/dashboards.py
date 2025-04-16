@@ -248,6 +248,7 @@ class DashboardApiEndpoints:
                     "quantity": a.quantity,
                     "id": a.item_id,
                     "expand": False,
+                    "name": a.name,
                     "location": {
                         "id": a.location_id,
                         "name": loc,

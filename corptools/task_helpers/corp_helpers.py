@@ -1137,6 +1137,7 @@ def fetch_coordiantes(self, corp_id):
         23,  # Starbases
         65,  # Structures
         40,  # Sov
+        22,  # Deployables
     ]
 
     # These must be in space

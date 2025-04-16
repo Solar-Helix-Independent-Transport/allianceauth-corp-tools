@@ -6,7 +6,6 @@ import requests
 from celery import chain as Chain, shared_task
 
 from django.core.cache import cache
-from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
 from allianceauth.eveonline.providers import provider as eve_names
@@ -16,17 +15,11 @@ from allianceauth.services.tasks import QueueOnce
 from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
 
 from .. import app_settings, providers
-from ..models import (
-    CharacterAsset, CharacterAudit, CharacterMarketOrder, Clone, Contract,
-    CorpAsset, CorporateContract, CorporationAudit, EveItemType, EveLocation,
-    EveName, JumpClone, TypePrice,
-)
-from ..task_helpers import corp_helpers
+from ..models import EveItemType, EveName, MapSystem, TypePrice
 from ..task_helpers.update_tasks import (
-    fetch_location_name, process_category_from_esi, process_map_from_esi,
+    load_system, process_category_from_esi, process_map_from_esi,
     set_error_count_flag, update_ore_comp_table_from_fuzzworks,
 )
-from .utils import esi_error_retry, no_fail_chain
 
 TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -216,3 +209,14 @@ def clear_all_etags():
         deleted = _client.delete(*keys)
 
     return f"Deleted {deleted} etag keys"
+
+
+@shared_task
+def load_planets_moons_from_esi():
+    for ss in MapSystem.objects.filter(constellation__region_id=10000058):
+        load_system_from_esi.delay(ss.system_id)
+
+
+@shared_task
+def load_system_from_esi(system_id):
+    load_system(system_id, moons_update=True)
