@@ -8,17 +8,37 @@
     </div>
 
     <div class="card-body">
+        <div
+        class="alert alert-info"
+        style="-webkit-animation: progress-bar-stripes 2s linear infinite;
+                animation: progress-bar-stripes 2s linear infinite;
+                animation-direction: alternate;
+                background-image: linear-gradient(
+                    45deg,
+                    rgba(255, 255, 255, 0.15) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, 0.15) 50%,
+                    rgba(255, 255, 255, 0.15) 75%,
+                    transparent 75%,
+                    transparent 50%
+                );
+                background-size: 40px 40px"
+    >
+        <p class="text-center m-0">
+            {% translate "Basic skills required to <b>sit in the hull</b> and <b>fit the modules</b>." %}
+            <br>
+            {% translate "Extra skills <b>will</b> be required to use this fitting properly in fleets" %}.
+        </p>
+    </div>
+
         {% for c, d in skills.chars.items %}
             <p>
                 {{ c }}
-
                 <span class="float-end">
                     <span class="badge {% if d.doctrines.fit|length > 0 %}bg-danger{% else %}bg-success{% endif %}">
                         <span class="fa-solid {% if d.doctrines.fit|length > 0 %}fa-times{% else %}fa-check{% endif %} fa-fw"></span>
                     </span>
-{#                    <span class="label {% if d.omega%}label-warning{%else%}label-success{% endif %}">#}
-{#                        <i class="fa-solid fa-money-bill-wave fa-fw"></i>#}
-{#                    </span>#}
                 </span>
             </p>
         {% endfor %}
@@ -37,6 +57,7 @@
             class="alert alert-info"
             style="-webkit-animation: progress-bar-stripes 2s linear infinite;
                     animation: progress-bar-stripes 2s linear infinite;
+                    animation-direction: alternate;
                     background-image: linear-gradient(
                         45deg,
                         rgba(255, 255, 255, 0.15) 25%,
@@ -49,10 +70,10 @@
                     );
                     background-size: 40px 40px"
         >
-            <p class="text-center">
+            <p class="text-center m-0">
                 {% translate "Basic skills required to <b>sit in the hull</b> and <b>fit the modules</b>." %}
                 <br>
-                {% translate "Extra skills may be required to use this fitting in fleets" %}.
+                {% translate "Extra skills <b>will</b> be required to use this fitting properly in fleets" %}.
             </p>
         </div>
 
