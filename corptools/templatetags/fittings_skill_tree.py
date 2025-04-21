@@ -64,11 +64,20 @@ def character_skill_overview(context) -> dict:
         sk_check[t.name] = skills[t.type_id]["l"]
 
     import json
-
-    checks = SkillListCache().check_skill_lists(
-        [SkillList(name="fit", skill_list=json.dumps(sk_check))],
+    char_ids = list(
         context.request.user.character_ownerships.all(
-        ).values_list('character__character_id', flat=True)
+        ).order_by(
+            "-character__characteraudit__skilltotals__total_sp"
+        ).values_list('character__character_id', flat=True)[:15]
+    )
+    checks = SkillListCache().check_skill_lists(
+        [
+            SkillList(
+                name="fit",
+                skill_list=json.dumps(sk_check)
+            )
+        ],
+        char_ids
     )
     for c, d in checks.items():
         del (d["skills"])
