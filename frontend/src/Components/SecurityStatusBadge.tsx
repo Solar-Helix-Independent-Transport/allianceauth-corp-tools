@@ -12,7 +12,11 @@ const showOverlay = (toolTipText: string | undefined) => {
   );
 };
 
-export const SecurityStatusBadge = ({ securityStatus }: { securityStatus: number | null }) => {
+export const SecurityStatusBadge = ({
+  securityStatus,
+}: {
+  securityStatus: number | null | undefined;
+}) => {
   const { t } = useTranslation();
 
   let text = t("Unknown System Security");

@@ -48,7 +48,11 @@ const CharacterAssets = () => {
       cell: (cell) => (
         <div className="d-flex flex-row align-items-center">
           <SecurityStatusBadge
-            securityStatus={cell.row?.original?.location?.solar_system?.security_status}
+            securityStatus={
+              cell.row?.original?.location?.solar_system?.security_status
+                ? cell.row?.original?.location?.solar_system?.security_status
+                : 0
+            }
           />
           {cell.getValue()}{" "}
         </div>

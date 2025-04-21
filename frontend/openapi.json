@@ -959,7 +959,18 @@
       "get": {
         "operationId": "corptools_api_character_list_get_account_list",
         "summary": "Get Account List",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orphans",
+            "schema": {
+              "default": false,
+              "title": "Orphans",
+              "type": "boolean"
+            },
+            "required": false
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1068,7 +1079,7 @@
                   "type": "null"
                 }
               ],
-              "default": 90,
+              "default": 0,
               "title": "Look Back"
             },
             "required": false
@@ -1758,6 +1769,16 @@
               "type": "integer"
             },
             "required": true
+          },
+          {
+            "in": "query",
+            "name": "top_level_only",
+            "schema": {
+              "default": true,
+              "title": "Top Level Only",
+              "type": "boolean"
+            },
+            "required": false
           }
         ],
         "responses": {
@@ -1835,7 +1856,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/CorporationAssetItem"
+                    "$ref": "#/components/schemas/AssetItem"
                   },
                   "title": "Response",
                   "type": "array"
@@ -1884,7 +1905,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/CorporationAssetItem"
+                    "$ref": "#/components/schemas/AssetItem"
                   },
                   "title": "Response",
                   "type": "array"
@@ -2031,6 +2052,74 @@
                   "items": {
                     "$ref": "#/components/schemas/CorporationWalletEvent"
                   },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Finances"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/audit/api/corporation/{corporation_id}/divisions": {
+      "get": {
+        "operationId": "corptools_api_corporation_finances_get_corporation_divisions",
+        "summary": "Get Corporation Divisions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": {
+              "title": "Corporation Id",
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "type_refs",
+            "schema": {
+              "default": "",
+              "title": "Type Refs",
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {},
                   "title": "Response",
                   "type": "array"
                 }
@@ -2305,6 +2394,44 @@
         ]
       }
     },
+    "/audit/api/dashboard/dens": {
+      "get": {
+        "operationId": "corptools_api_corporation_dashboards_get_visible_dens",
+        "summary": "Get Visible Dens",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {},
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Dashboards"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
     "/audit/api/corp/structures": {
       "get": {
         "operationId": "corptools_api_corporation_structures_get_visible_structures",
@@ -2345,20 +2472,48 @@
         ]
       }
     },
+    "/audit/api/corp/structures/fuel": {
+      "get": {
+        "operationId": "corptools_api_corporation_structures_get_fuel_data",
+        "summary": "Get Fuel Data",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Structures"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
     "/audit/api/corp/structures/{structure_id}": {
       "get": {
         "operationId": "corptools_api_corporation_structures_get_corporation_structure_fitting",
         "summary": "Get Corporation Structure Fitting",
         "parameters": [
-          {
-            "in": "query",
-            "name": "corporation_id",
-            "schema": {
-              "title": "Corporation Id",
-              "type": "string"
-            },
-            "required": true
-          },
           {
             "in": "path",
             "name": "structure_id",
@@ -2375,11 +2530,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/FittingItem"
-                  },
                   "title": "Response",
-                  "type": "array"
+                  "type": "object"
                 }
               }
             }
@@ -2483,6 +2635,91 @@
           }
         },
         "tags": ["Extras"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/audit/api/corp/starbases": {
+      "get": {
+        "operationId": "corptools_api_corporation_structures_get_visible_starbases",
+        "summary": "Get Visible Starbases",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {},
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Structures"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/audit/api/corp/starbase/{starbase_id}": {
+      "get": {
+        "operationId": "corptools_api_corporation_structures_get_visible_starbase_fit",
+        "summary": "Get Visible Starbase Fit",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "starbase_id",
+            "schema": {
+              "title": "Starbase Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Structures"],
         "security": [
           {
             "SessionAuth": []
@@ -2631,6 +2868,70 @@
         ]
       }
     },
+    "/audit/api/corporation/{corporation_id}/mining": {
+      "get": {
+        "operationId": "corptools_api_corporation_mining_get_corporation_agregated_mining",
+        "summary": "Get Corporation Agregated Mining",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": {
+              "title": "Corporation Id",
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "look_back",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": 0,
+              "title": "Look Back"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Corporation"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
     "/audit/api/extras/fit2skills/{fit_id}": {
       "get": {
         "operationId": "corptools_api_extras_fittings_get_fit_skills",
@@ -2693,6 +2994,76 @@
           }
         },
         "description": "Turn a Fitting into a skill list json.",
+        "tags": ["Fittings"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/audit/api/extras/dogma/{type_id}": {
+      "get": {
+        "operationId": "corptools_api_extras_fittings_get_dogma",
+        "summary": "Get Dogma",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "type_id",
+            "schema": {
+              "title": "Type Id",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "description": "Load dogma for a type_id.",
         "tags": ["Fittings"],
         "security": [
           {
@@ -2982,6 +3353,104 @@
           }
         ]
       }
+    },
+    "/audit/api/extras/test/newapi1": {
+      "get": {
+        "operationId": "corptools_api_extras_testing_get_test_api_bravadosih",
+        "summary": "Get Test Api Bravadosih",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Not for real use!\nthis is kinda like bravado in use... no type hinting",
+        "tags": ["Testing"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/audit/api/extras/test/newapi2": {
+      "get": {
+        "operationId": "corptools_api_extras_testing_get_test_api_openapi",
+        "summary": "Get Test Api Openapi",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Not for real use!\nthis has type hinting",
+        "tags": ["Testing"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/audit/api/extras/test/newapi3": {
+      "get": {
+        "operationId": "corptools_api_extras_testing_get_test_api_openapi_3",
+        "summary": "Get Test Api Openapi 3",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "schema": {
+              "default": "",
+              "title": "Name",
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Not for real use!\nthis has type hinting",
+        "tags": ["Testing"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/audit/api/extras/test/newapi4": {
+      "get": {
+        "operationId": "corptools_api_extras_testing_get_test_api_openapi_4",
+        "summary": "Get Test Api Openapi 4",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "character_id",
+            "schema": {
+              "default": 0,
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Not for real use!\nthis has type hinting",
+        "tags": ["Testing"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -3043,6 +3512,17 @@
               }
             ],
             "title": "Cat"
+          },
+          "cat_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cat Id"
           }
         },
         "required": ["id", "name"],
@@ -3128,9 +3608,6 @@
             "title": "Id",
             "type": "integer"
           },
-          "character": {
-            "$ref": "#/components/schemas/Character"
-          },
           "item": {
             "$ref": "#/components/schemas/EveName"
           },
@@ -3140,19 +3617,106 @@
             "type": "integer"
           },
           "location": {
-            "allOf": [
+            "anyOf": [
               {
-                "$ref": "#/components/schemas/EveName"
+                "$ref": "#/components/schemas/EveLocation"
+              },
+              {
+                "type": "null"
               }
             ]
           },
           "expand": {
-            "title": "Expand",
-            "type": "boolean"
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expand"
+          },
+          "character": {
+            "$ref": "#/components/schemas/Character"
           }
         },
-        "required": ["id", "character", "item"],
+        "required": ["id", "item", "character"],
         "title": "CharacterAssetItem",
+        "type": "object"
+      },
+      "EveLocation": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "cat": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cat"
+          },
+          "cat_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cat Id"
+          },
+          "solar_system": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SolarSystem"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["id", "name"],
+        "title": "EveLocation",
+        "type": "object"
+      },
+      "SolarSystem": {
+        "properties": {
+          "system": {
+            "$ref": "#/components/schemas/EveName"
+          },
+          "constellation": {
+            "$ref": "#/components/schemas/EveName"
+          },
+          "region": {
+            "$ref": "#/components/schemas/EveName"
+          },
+          "security_status": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Security Status"
+          }
+        },
+        "required": ["system", "constellation", "region"],
+        "title": "SolarSystem",
         "type": "object"
       },
       "CharacterAssetGroups": {
@@ -3220,9 +3784,12 @@
             "type": "array"
           },
           "home": {
-            "allOf": [
+            "anyOf": [
               {
                 "$ref": "#/components/schemas/EveName"
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -3304,6 +3871,18 @@
           "amount": {
             "title": "Amount",
             "type": "number"
+          },
+          "own_account": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": true,
+            "title": "Own Account"
           },
           "reason": {
             "anyOf": [
@@ -3451,11 +4030,11 @@
           },
           "total_active": {
             "title": "Total Active",
-            "type": "integer"
+            "type": "number"
           },
           "total_expired": {
             "title": "Total Expired",
-            "type": "integer"
+            "type": "number"
           }
         },
         "required": ["total_active", "total_expired"],
@@ -3632,29 +4211,89 @@
             ],
             "title": "End Location Id"
           },
+          "start_location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EveName"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "end_location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EveName"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "for_corporation": {
             "title": "For Corporation",
             "type": "boolean"
           },
+          "own_account": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": false,
+            "title": "Own Account"
+          },
           "date_accepted": {
-            "format": "date-time",
-            "title": "Date Accepted",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Accepted"
           },
           "date_completed": {
-            "format": "date-time",
-            "title": "Date Completed",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Completed"
           },
           "date_expired": {
-            "format": "date-time",
-            "title": "Date Expired",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Expired"
           },
           "date_issued": {
-            "format": "date-time",
-            "title": "Date Issued",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Issued"
           }
         },
         "required": [
@@ -3667,11 +4306,7 @@
           "reward",
           "volume",
           "status",
-          "for_corporation",
-          "date_accepted",
-          "date_completed",
-          "date_expired",
-          "date_issued"
+          "for_corporation"
         ],
         "title": "CharacterContract",
         "type": "object"
@@ -3874,6 +4509,17 @@
               }
             ],
             "title": "Ship"
+          },
+          "ship_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ship Name"
           },
           "active": {
             "title": "Active",
@@ -4243,7 +4889,7 @@
         "title": "Message",
         "type": "object"
       },
-      "CorporationAssetItem": {
+      "AssetItem": {
         "properties": {
           "id": {
             "title": "Id",
@@ -4258,19 +4904,29 @@
             "type": "integer"
           },
           "location": {
-            "allOf": [
+            "anyOf": [
               {
-                "$ref": "#/components/schemas/EveName"
+                "$ref": "#/components/schemas/EveLocation"
+              },
+              {
+                "type": "null"
               }
             ]
           },
           "expand": {
-            "title": "Expand",
-            "type": "boolean"
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expand"
           }
         },
         "required": ["id", "item"],
-        "title": "CorporationAssetItem",
+        "title": "AssetItem",
         "type": "object"
       },
       "CorporationWalletEvent": {
@@ -4509,20 +5165,6 @@
         },
         "required": ["name", "state"],
         "title": "StructureService",
-        "type": "object"
-      },
-      "FittingItem": {
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/EveName"
-          },
-          "location": {
-            "title": "Location",
-            "type": "string"
-          }
-        },
-        "required": ["type", "location"],
-        "title": "FittingItem",
         "type": "object"
       },
       "PingStats": {

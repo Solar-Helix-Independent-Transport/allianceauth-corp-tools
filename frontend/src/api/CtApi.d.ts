@@ -701,6 +701,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/corporation/{corporation_id}/divisions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Divisions */
+    get: operations["corptools_api_corporation_finances_get_corporation_divisions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/corp/list": {
     parameters: {
       query?: never;
@@ -803,6 +820,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/dashboard/dens": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Visible Dens */
+    get: operations["corptools_api_corporation_dashboards_get_visible_dens"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/corp/structures": {
     parameters: {
       query?: never;
@@ -812,6 +846,23 @@ export interface paths {
     };
     /** Get Visible Structures */
     get: operations["corptools_api_corporation_structures_get_visible_structures"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corp/structures/fuel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Fuel Data */
+    get: operations["corptools_api_corporation_structures_get_fuel_data"];
     put?: never;
     post?: never;
     delete?: never;
@@ -871,6 +922,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/corp/starbases": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Visible Starbases */
+    get: operations["corptools_api_corporation_structures_get_visible_starbases"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corp/starbase/{starbase_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Visible Starbase Fit */
+    get: operations["corptools_api_corporation_structures_get_visible_starbase_fit"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/corporation/{corporation_id}/glance/assets": {
     parameters: {
       query?: never;
@@ -922,6 +1007,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/corporation/{corporation_id}/mining": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Agregated Mining */
+    get: operations["corptools_api_corporation_mining_get_corporation_agregated_mining"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/extras/fit2skills/{fit_id}": {
     parameters: {
       query?: never;
@@ -934,6 +1036,26 @@ export interface paths {
      * @description Turn a Fitting into a skill list json.
      */
     get: operations["corptools_api_extras_fittings_get_fit_skills"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/extras/dogma/{type_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Dogma
+     * @description Load dogma for a type_id.
+     */
+    get: operations["corptools_api_extras_fittings_get_dogma"];
     put?: never;
     post?: never;
     delete?: never;
@@ -996,6 +1118,90 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/extras/test/newapi1": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Test Api Bravadosih
+     * @description Not for real use!
+     *     this is kinda like bravado in use... no type hinting
+     */
+    get: operations["corptools_api_extras_testing_get_test_api_bravadosih"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/extras/test/newapi2": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Test Api Openapi
+     * @description Not for real use!
+     *     this has type hinting
+     */
+    get: operations["corptools_api_extras_testing_get_test_api_openapi"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/extras/test/newapi3": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Test Api Openapi 3
+     * @description Not for real use!
+     *     this has type hinting
+     */
+    get: operations["corptools_api_extras_testing_get_test_api_openapi_3"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/extras/test/newapi4": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Test Api Openapi 4
+     * @description Not for real use!
+     *     this has type hinting
+     */
+    get: operations["corptools_api_extras_testing_get_test_api_openapi_4"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1024,6 +1230,8 @@ export interface components {
       name: string;
       /** Cat */
       cat?: string | null;
+      /** Cat Id */
+      cat_id?: number | null;
     };
     /** ValueLabel */
     ValueLabel: {
@@ -1051,16 +1259,36 @@ export interface components {
     CharacterAssetItem: {
       /** Id */
       id: number;
-      character: components["schemas"]["Character"];
       item: components["schemas"]["EveName"];
       /**
        * Quantity
        * @default 0
        */
       quantity: number;
-      location?: components["schemas"]["EveName"];
+      location?: components["schemas"]["EveLocation"] | null;
       /** Expand */
-      expand?: boolean;
+      expand?: boolean | null;
+      character: components["schemas"]["Character"];
+    };
+    /** EveLocation */
+    EveLocation: {
+      /** Id */
+      id: number;
+      /** Name */
+      name: string;
+      /** Cat */
+      cat?: string | null;
+      /** Cat Id */
+      cat_id?: number | null;
+      solar_system?: components["schemas"]["SolarSystem"] | null;
+    };
+    /** SolarSystem */
+    SolarSystem: {
+      system: components["schemas"]["EveName"];
+      constellation: components["schemas"]["EveName"];
+      region: components["schemas"]["EveName"];
+      /** Security Status */
+      security_status?: number | null;
     };
     /** CharacterAssetGroups */
     CharacterAssetGroups: {
@@ -1082,7 +1310,7 @@ export interface components {
       character: components["schemas"]["Character"];
       /** Clones */
       clones?: components["schemas"]["CharacterClone"][];
-      home?: components["schemas"]["EveName"];
+      home?: components["schemas"]["EveName"] | null;
       /** Last Station Change */
       last_station_change?: string | null;
       /** Last Clone Jump */
@@ -1119,6 +1347,11 @@ export interface components {
       balance: number;
       /** Amount */
       amount: number;
+      /**
+       * Own Account
+       * @default true
+       */
+      own_account: boolean | null;
       /** Reason */
       reason?: string | null;
     };
@@ -1210,28 +1443,23 @@ export interface components {
       start_location_id?: number | null;
       /** End Location Id */
       end_location_id?: number | null;
+      start_location?: components["schemas"]["EveName"] | null;
+      end_location?: components["schemas"]["EveName"] | null;
       /** For Corporation */
       for_corporation: boolean;
       /**
-       * Date Accepted
-       * Format: date-time
+       * Own Account
+       * @default false
        */
-      date_accepted: string;
-      /**
-       * Date Completed
-       * Format: date-time
-       */
-      date_completed: string;
-      /**
-       * Date Expired
-       * Format: date-time
-       */
-      date_expired: string;
-      /**
-       * Date Issued
-       * Format: date-time
-       */
-      date_issued: string;
+      own_account: boolean | null;
+      /** Date Accepted */
+      date_accepted?: string | null;
+      /** Date Completed */
+      date_completed?: string | null;
+      /** Date Expired */
+      date_expired?: string | null;
+      /** Date Issued */
+      date_issued?: string | null;
     };
     /** ContractItems */
     ContractItems: {
@@ -1305,6 +1533,8 @@ export interface components {
       location?: string | null;
       /** Ship */
       ship?: string | null;
+      /** Ship Name */
+      ship_name?: string | null;
       /** Active */
       active: boolean;
       /** Last Updates */
@@ -1441,8 +1671,8 @@ export interface components {
       /** Message */
       message: string;
     };
-    /** CorporationAssetItem */
-    CorporationAssetItem: {
+    /** AssetItem */
+    AssetItem: {
       /** Id */
       id: number;
       item: components["schemas"]["EveName"];
@@ -1451,9 +1681,9 @@ export interface components {
        * @default 0
        */
       quantity: number;
-      location?: components["schemas"]["EveName"];
+      location?: components["schemas"]["EveLocation"] | null;
       /** Expand */
-      expand?: boolean;
+      expand?: boolean | null;
     };
     /** CorporationWalletEvent */
     CorporationWalletEvent: {
@@ -1531,12 +1761,6 @@ export interface components {
       name: string;
       /** State */
       state: string;
-    };
-    /** FittingItem */
-    FittingItem: {
-      type: components["schemas"]["EveName"];
-      /** Location */
-      location: string;
     };
     /** PingStats */
     PingStats: {
@@ -2109,7 +2333,9 @@ export interface operations {
   };
   corptools_api_character_list_get_account_list: {
     parameters: {
-      query?: never;
+      query?: {
+        orphans?: boolean;
+      };
       header?: never;
       path?: never;
       cookie?: never;
@@ -2600,7 +2826,9 @@ export interface operations {
   };
   corptools_api_corporation_assets_get_corporation_asset_locations: {
     parameters: {
-      query?: never;
+      query?: {
+        top_level_only?: boolean;
+      };
       header?: never;
       path: {
         corporation_id: number;
@@ -2649,7 +2877,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CorporationAssetItem"][];
+          "application/json": components["schemas"]["AssetItem"][];
         };
       };
       /** @description Forbidden */
@@ -2680,7 +2908,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CorporationAssetItem"][];
+          "application/json": components["schemas"]["AssetItem"][];
         };
       };
       /** @description Forbidden */
@@ -2765,6 +2993,40 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["CorporationWalletEvent"][];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_finances_get_corporation_divisions: {
+    parameters: {
+      query?: {
+        type_refs?: string;
+        page?: number;
+      };
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown[];
         };
       };
       /** @description Forbidden */
@@ -2956,6 +3218,35 @@ export interface operations {
       };
     };
   };
+  corptools_api_corporation_dashboards_get_visible_dens: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown[];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
   corptools_api_corporation_structures_get_visible_structures: {
     parameters: {
       query?: never;
@@ -2985,11 +3276,38 @@ export interface operations {
       };
     };
   };
+  corptools_api_corporation_structures_get_fuel_data: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
   corptools_api_corporation_structures_get_corporation_structure_fitting: {
     parameters: {
-      query: {
-        corporation_id: string;
-      };
+      query?: never;
       header?: never;
       path: {
         structure_id: string;
@@ -3004,7 +3322,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["FittingItem"][];
+          "application/json": Record<string, never>;
         };
       };
       /** @description Forbidden */
@@ -3072,6 +3390,66 @@ export interface operations {
         };
         content: {
           "application/json": string;
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_structures_get_visible_starbases: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown[];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_structures_get_visible_starbase_fit: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        starbase_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
         };
       };
       /** @description Forbidden */
@@ -3178,12 +3556,94 @@ export interface operations {
       };
     };
   };
+  corptools_api_corporation_mining_get_corporation_agregated_mining: {
+    parameters: {
+      query?: {
+        look_back?: number | null;
+      };
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
   corptools_api_extras_fittings_get_fit_skills: {
     parameters: {
       query?: never;
       header?: never;
       path: {
         fit_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_extras_fittings_get_dogma: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        type_id: string;
       };
       cookie?: never;
     };
@@ -3347,6 +3807,82 @@ export interface operations {
         content: {
           "application/json": string;
         };
+      };
+    };
+  };
+  corptools_api_extras_testing_get_test_api_bravadosih: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  corptools_api_extras_testing_get_test_api_openapi: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  corptools_api_extras_testing_get_test_api_openapi_3: {
+    parameters: {
+      query?: {
+        name?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  corptools_api_extras_testing_get_test_api_openapi_4: {
+    parameters: {
+      query?: {
+        character_id?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
