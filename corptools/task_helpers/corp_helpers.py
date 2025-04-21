@@ -837,8 +837,10 @@ def build_managed_asset_locations(self, corp_id):
     corp_hangars = {}
     hangar_ids = []
     for i in folders:
+        system = None
         if i.location_name:
             names[i.item_id] = i.location_name.location_name
+            system = i.location_name.system
         else:
             names[i.item_id] = i.location_id
         corp_hangars[i.item_id] = {}
@@ -859,7 +861,8 @@ def build_managed_asset_locations(self, corp_id):
                 defaults={
                     "location_name": name,
                     "managed": True,
-                    "managed_corp": _corporation
+                    "managed_corp": _corporation,
+                    "system": system
                 }
             )
 

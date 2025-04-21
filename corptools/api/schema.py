@@ -55,6 +55,17 @@ class EveName(Schema):
     cat_id: Optional[int] = None
 
 
+class SolarSystem(Schema):
+    system: EveName
+    constellation: EveName
+    region: EveName
+    security_status: Optional[float] = None
+
+
+class EveLocation(EveName):
+    solar_system: Optional[SolarSystem] = None
+
+
 class CharacterStatus(Schema):
     character: Character
     isk: Optional[float] = None
@@ -82,21 +93,16 @@ class CharacterAssetGroups(Schema):
     items: List[ValueLabel] = None
 
 
-class CharacterAssetItem(Schema):
+class AssetItem(Schema):
     id: int
+    item: EveName
+    quantity: int = 0
+    location: Optional[EveLocation] = None
+    expand: Optional[bool] = None
+
+
+class CharacterAssetItem(AssetItem):
     character: Character
-    item: EveName
-    quantity: int = 0
-    location: EveName = None
-    expand: bool = None
-
-
-class CorporationAssetItem(Schema):
-    id: int
-    item: EveName
-    quantity: int = 0
-    location: EveName = None
-    expand: bool = None
 
 
 class CharacterClone(Schema):

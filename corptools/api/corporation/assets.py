@@ -58,7 +58,7 @@ class AssetsApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/asset/{location_id}/list",
-            response={200: List[schema.CorporationAssetItem],
+            response={200: List[schema.AssetItem],
                       403: schema.Message},
             tags=self.tags
         )
@@ -84,7 +84,12 @@ class AssetsApiEndpoints:
 
                 assets = models.CorpAsset.get_visible(request.user).filter(
                     corporation__corporation__corporation_id=corporation_id).select_related(
-                    "type_name", "location_name", "type_name__group__category"
+                    "type_name",
+                    "location_name",
+                    "location_name__system",
+                    "location_name__system__constellation",
+                    "location_name__system__constellation__region",
+                    "type_name__group__category"
                 )
 
                 asset_locations = []
@@ -109,9 +114,28 @@ class AssetsApiEndpoints:
                     type_nm = a.type_name.name
                     if a.name:
                         type_nm = f"{a.type_name.name} ({a.name})"
-                    loc = f"{a.location_id} ({a.location_flag})"
+                    loc = {
+                        "id": a.location_id,
+                        "name": f"{a.location_id} ({a.location_flag})"
+                    }
                     if a.location_name:
-                        loc = a.location_name.location_name
+                        loc["name"] = a.location_name.location_name
+                        if a.location_name.system:
+                            loc["solar_system"] = {
+                                "system": {
+                                    "id": a.location_name.system.system_id,
+                                    "name": a.location_name.system.name
+                                },
+                                "constellation": {
+                                    "id": a.location_name.system.constellation.constellation_id,
+                                    "name": a.location_name.system.constellation.name
+                                },
+                                "region": {
+                                    "id": a.location_name.system.constellation.region.region_id,
+                                    "name": a.location_name.system.constellation.region.name
+                                },
+                                "security_status": a.location_name.system.security_status
+                            }
                     output.append({
                         "item": {
                             "id": a.type_name.type_id,
@@ -122,11 +146,7 @@ class AssetsApiEndpoints:
                         "quantity": a.quantity,
                         "id": a.item_id,
                         "expand": True if a.type_name.group.category.category_id in expandable_cats else False,
-                        "location": {
-                            "id": a.location_id,
-                            "name": loc
-                        },
-
+                        "location": loc
                     })
 
                 return output
@@ -188,7 +208,7 @@ class AssetsApiEndpoints:
 
         @api.get(
             "corporation/asset/{item_id}/contents",
-            response={200: List[schema.CorporationAssetItem],
+            response={200: List[schema.AssetItem],
                       403: schema.Message},
             tags=self.tags
         )

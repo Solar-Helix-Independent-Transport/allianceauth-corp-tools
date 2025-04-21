@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import CharacterAssetModal from "../../Components/Modals/CharacterAssetContents";
+import { SecurityStatusBadge } from "../../Components/SecurityStatusBadge";
 
 const CharacterAssets = () => {
   const { t } = useTranslation();
@@ -44,9 +45,17 @@ const CharacterAssets = () => {
     }),
     columnHelper.accessor("location.name", {
       header: t("Location"),
+      cell: (cell) => (
+        <div className="d-flex flex-row align-items-center">
+          <SecurityStatusBadge
+            securityStatus={cell.row?.original?.location?.solar_system?.security_status}
+          />
+          {cell.getValue()}{" "}
+        </div>
+      ),
     }),
   ];
-
+  console.log("we are here");
   return (
     <>
       <div className="m-3 d-flex align-items-center">

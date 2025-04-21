@@ -38,9 +38,13 @@ class AssetsApiEndpoints:
 
             asset_locations = [{"label": _("Everywhere"), "value": 0},
                                {"label": _("AssetSafety"), "value": 2004}, ]
+
             for loc in asset_locs:
+                name = loc.location_name
+                if loc.system:
+                    name = f"{loc.location_name} ({loc.system.security_status:0.2f})"
                 asset_locations.append({
-                    "label": loc.location_name,
+                    "label": name,
                     "value": loc.location_id
                 })
 
@@ -66,8 +70,14 @@ class AssetsApiEndpoints:
             assets = models.CharacterAsset.objects\
                 .filter((Q(blueprint_copy=None) | Q(blueprint_copy=False)),
                         character__character__in=characters).select_related(
-                            "character", "character__character",
-                            "type_name", "location_name", "type_name__group__category"
+                            "character",
+                            "character__character",
+                            "type_name",
+                            "location_name",
+                            "location_name__system",
+                            "location_name__system__constellation",
+                            "location_name__system__constellation__region",
+                            "type_name__group__category"
                 )
 
             if location_id == 2004:
@@ -84,9 +94,29 @@ class AssetsApiEndpoints:
                 type_nm = a.type_name.name
                 if a.name:
                     type_nm = f"{a.type_name.name} ({a.name})"
-                loc = f"{a.location_id} ({a.location_flag})"
+                loc = {
+                    "id": a.location_id,
+                    "name": f"{a.location_id} ({a.location_flag})"
+                }
                 if a.location_name:
-                    loc = a.location_name.location_name
+                    loc["name"] = a.location_name.location_name
+                    if a.location_name.system:
+                        loc["solar_system"] = {
+                            "system": {
+                                "id": a.location_name.system.system_id,
+                                "name": a.location_name.system.name
+                            },
+                            "constellation": {
+                                "id": a.location_name.system.constellation.constellation_id,
+                                "name": a.location_name.system.constellation.name
+                            },
+                            "region": {
+                                "id": a.location_name.system.constellation.region.region_id,
+                                "name": a.location_name.system.constellation.region.name
+                            },
+                            "security_status": a.location_name.system.security_status
+                        }
+
                 output.append({
                     "character": {
                         "character_id": a.character.character.character_id,
@@ -105,10 +135,7 @@ class AssetsApiEndpoints:
                     "quantity": a.quantity,
                     "id": a.item_id,
                     "expand": True if a.type_name.group.category.category_id in expandable_cats else True if a.type_name_id == 60 else False,  # ships or asset wraps
-                    "location": {
-                        "id": a.location_id,
-                        "name": loc
-                    }
+                    "location": loc
                 })
 
             return output

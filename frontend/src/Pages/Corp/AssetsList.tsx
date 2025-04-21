@@ -8,6 +8,7 @@ import CorpSelect from "../../Components/Corporation/CorporationSelect";
 import { loadAssetList } from "../../api/corporation";
 import { CorpLoader, PanelLoader } from "../../Components/Loaders/loaders";
 import CorporationAssetModal from "../../Components/Modals/CorporationAssetContents";
+import { SecurityStatusBadge } from "../../Components/SecurityStatusBadge";
 
 const CorporationAssets = () => {
   const { t } = useTranslation();
@@ -41,6 +42,14 @@ const CorporationAssets = () => {
     }),
     columnHelper.accessor("location.name", {
       header: t("Location"),
+      cell: (cell) => (
+        <div className="d-flex flex-row align-items-center">
+          <SecurityStatusBadge
+            securityStatus={cell.row?.original?.location?.solar_system?.security_status}
+          />
+          {cell.getValue()}{" "}
+        </div>
+      ),
     }),
   ];
 
@@ -52,7 +61,7 @@ const CorporationAssets = () => {
           <CorpSelect {...{ setCorporation }} />
         </div>
       </div>
-      <div className="m-3 d-flex align-items-center my-1">
+      <div className="m-3 d-flex align-items-center">
         <h6 className="me-1">{t("Location Filter")}</h6>
         <div className="flex-grow-1">
           <CorporationAssetLocationSelect
