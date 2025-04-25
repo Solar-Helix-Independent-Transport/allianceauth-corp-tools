@@ -6,6 +6,7 @@ requires = [
 
 [project]
 name = "allianceauth-corptools"
+description = "Corp Level Toolbox for directors and CEO's"
 readme = "README.md"
 keywords = [
     "allianceauth",
@@ -37,7 +38,6 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
 ]
 dynamic = [
-    "description",
     "version",
 ]
 dependencies = [
