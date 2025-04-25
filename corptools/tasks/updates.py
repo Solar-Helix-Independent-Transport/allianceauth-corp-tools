@@ -213,7 +213,7 @@ def clear_all_etags():
 
 @shared_task
 def load_planets_moons_from_esi():
-    for ss in MapSystem.objects.filter(constellation__region_id=10000058):
+    for ss in MapSystem.objects.all():
         load_system_from_esi.delay(ss.system_id)
 
 

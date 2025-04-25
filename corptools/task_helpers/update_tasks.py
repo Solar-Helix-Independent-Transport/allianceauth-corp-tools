@@ -475,8 +475,8 @@ def load_system(system_id, moons_update=False):
         system_id=system_id
     ).result()
     for p in _sys["planets"]:
-        MapSystemPlanet.objects.update_or_create_from_esi(p["planet_id"])
+        MapSystemPlanet.objects.get_or_create_from_esi(p["planet_id"])
         if "moons" in p and moons_update:
             if p["moons"]:
                 for m in p["moons"]:
-                    MapSystemMoon.objects.update_or_create_from_esi(m)
+                    MapSystemMoon.objects.get_or_create_from_esi(m)
