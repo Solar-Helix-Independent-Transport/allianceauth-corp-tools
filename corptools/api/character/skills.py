@@ -2,6 +2,7 @@ from typing import List
 
 from ninja import NinjaAPI
 
+from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from corptools import models, providers
@@ -115,11 +116,23 @@ class SkillApiEndpoints:
 
             characters = get_alts_queryset(main)
 
-            skills = models.SkillQueue.objects.filter(character__character__in=characters)\
-                .select_related('character__character', 'skill_name', "skill_name__group")
+            now = timezone.now()
 
-            skill_totals = models.Skill.objects.filter(character__character__in=characters)\
-                .select_related('character__character', 'skill_name', "skill_name__group")
+            skills = models.SkillQueue.objects.filter(
+                character__character__in=characters,
+            ).select_related(
+                "character__character",
+                "skill_name",
+                "skill_name__group"
+            )
+
+            skill_totals = models.Skill.objects.filter(
+                character__character__in=characters
+            ).select_related(
+                "character__character",
+                "skill_name",
+                "skill_name__group"
+            )
 
             skl_ttl = {}
 
@@ -141,6 +154,11 @@ class SkillApiEndpoints:
                         "character": s.character.character,
                         "queue": [],
                     }
+
+                if s.finish_date:
+                    if s.finish_date < now:
+                        continue
+
                 output[s.character.character.character_id]["queue"].append(
                     {
                         "position": s.queue_position,
@@ -151,7 +169,13 @@ class SkillApiEndpoints:
                         "end_sp": s.level_end_sp,
                         "start": s.start_date,
                         "end": s.finish_date,
-                        "current_level": skl_ttl.get(s.character.character_id, {}).get(s.skill_name.name, 0)
+                        "current_level": skl_ttl.get(
+                            s.character.character_id,
+                            {}
+                        ).get(
+                            s.skill_name.name,
+                            0
+                        )
                     }
                 )
 

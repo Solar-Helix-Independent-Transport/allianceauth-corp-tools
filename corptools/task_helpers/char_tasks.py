@@ -273,7 +273,9 @@ def update_character_skill_queue(character_id, force_refresh=False):
 
         _st = time.perf_counter()
         # Delete current SkillList
-        SkillQueue.objects.filter(character=audit_char).delete()
+        SkillQueue.objects.filter(
+            character=audit_char
+        ).delete()
 
         items = []
         _check_skills = []
@@ -299,8 +301,11 @@ def update_character_skill_queue(character_id, force_refresh=False):
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_queue {character_id}")
 
     except NotModifiedError:
-        logger.info("CT: No New skill queue for: {}".format(
-            audit_char.character.character_name))
+        logger.info(
+            "CT: No New skill queue for: {}".format(
+                audit_char.character.character_name
+            )
+        )
         pass
 
     audit_char.last_update_skill_que = timezone.now()
