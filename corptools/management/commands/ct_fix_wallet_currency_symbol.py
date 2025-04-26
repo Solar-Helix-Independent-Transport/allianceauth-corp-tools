@@ -26,7 +26,7 @@ class Command(BaseCommand):
         if user_input == "yes":
             _count = 0
             count = 0
-            step = 10000
+            step = 1000
             for m in messages.values_list("pk", flat=True):
                 # update the reason
                 update_wallet_currency.apply_async(args=[m], priority=9)
