@@ -22,7 +22,7 @@ class Command(BaseCommand):
             self.stdout.write(f"Nothing to do... Have a good day!")
             return
 
-        user_input = input(text="Are you sure you want to proceed? (yes/no) ")
+        user_input = input("Are you sure you want to proceed? (yes/no) ")
         if user_input == "yes":
             _count = 0
             count = 0
