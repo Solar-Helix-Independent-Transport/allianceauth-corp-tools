@@ -11,7 +11,7 @@ export const SkillGroup = ({ group, skills }: { group: string; skills: Array<any
         <span className="flex-grow-1">{group}</span>
         <span className="badge bg-secondary me-2">
           {skills
-            .reduce((p, c) => {
+            ?.reduce((p, c) => {
               p += c.sp;
               return p;
             }, 0)

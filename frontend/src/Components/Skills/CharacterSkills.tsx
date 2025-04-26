@@ -5,7 +5,7 @@ import Accordion from "react-bootstrap/Accordion";
 
 const CharSkillGroups = ({ data }: any) => {
   const groupByKey = (list: any, key: any) =>
-    list.reduce(
+    list?.reduce(
       (hash: any, obj: any) => ({
         ...hash,
         [obj[key]]: (hash[obj[key]] || []).concat(obj),
