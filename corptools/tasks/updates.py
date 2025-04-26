@@ -15,7 +15,9 @@ from allianceauth.services.tasks import QueueOnce
 from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
 
 from .. import app_settings, providers
-from ..models import EveItemType, EveName, MapSystem, TypePrice
+from ..models import (
+    CharacterWalletJournalEntry, EveItemType, EveName, MapSystem, TypePrice,
+)
 from ..task_helpers.update_tasks import (
     load_system, process_category_from_esi, process_map_from_esi,
     set_error_count_flag, update_ore_comp_table_from_fuzzworks,
@@ -220,3 +222,14 @@ def load_planets_moons_from_esi():
 @shared_task
 def load_system_from_esi(system_id):
     load_system(system_id, moons_update=True)
+
+
+@shared_task
+def update_wallet_currency(pk):
+    m = CharacterWalletJournalEntry.objects.get(pk=pk)
+    reason = m.reason
+    if not reason.endswith("ISK"):
+        reason = reason.replace(" @ $", " @ ")
+        reason = reason + " ISK"
+        m.reason = reason
+        m.save()
