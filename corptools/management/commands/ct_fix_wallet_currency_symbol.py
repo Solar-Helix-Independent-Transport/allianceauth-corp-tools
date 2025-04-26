@@ -29,7 +29,7 @@ class Command(BaseCommand):
             step = 1000
             for m in messages.values_list("pk", flat=True):
                 # update the reason
-                update_wallet_currency.apply_async(args=[m], priority=9)
+                update_wallet_currency.apply_async(args=[m], priority=8)
                 # lets not spam the shit out of the console
                 _count += 1
                 if _count >= step:
