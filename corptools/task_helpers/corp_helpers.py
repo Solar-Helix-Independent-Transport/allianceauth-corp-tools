@@ -844,7 +844,7 @@ def build_managed_asset_locations(self, corp_id):
         else:
             names[i.item_id] = i.location_id
         corp_hangars[i.item_id] = {}
-        for j in range(1, 7):
+        for j in range(1, 8):
 
             # Build the Managed Location for hangars
             id = -int(f"{i.item_id}{j}")
