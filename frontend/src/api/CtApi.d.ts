@@ -1415,8 +1415,8 @@ export interface components {
       contract_type: string;
       /** Availbility */
       availbility?: string | null;
-      /** Tittle */
-      tittle?: string | null;
+      /** Title */
+      title?: string | null;
       /** Acceptor */
       acceptor?: string | null;
       /** Assignee */

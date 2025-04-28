@@ -43,8 +43,8 @@ const CharacterContracts = () => {
       header: t("Price"),
       cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
-    columnHelper.accessor("tittle", {
-      header: t("Tittle"),
+    columnHelper.accessor("title", {
+      header: t("Title"),
     }),
     columnHelper.accessor("items", {
       header: t("Details"),
