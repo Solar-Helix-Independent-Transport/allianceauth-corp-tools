@@ -4,7 +4,7 @@ import { components } from "../../api/CtApi";
 import { getCharacterContacts } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
-import { Badge, Card, Form } from "react-bootstrap";
+import { Badge, Button, ButtonGroup, Card, Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
@@ -29,9 +29,9 @@ const CharacterContacts = () => {
       header: t("Contact"),
       cell: (cell) => {
         return (
-          <>
+          <div className="text-nowrap">
             {cell.getValue()} {cell.row.original.contact.id <= 4000000 && <Badge>NPC</Badge>}
-          </>
+          </div>
         );
       },
     }),
@@ -52,6 +52,67 @@ const CharacterContacts = () => {
     }),
     columnHelper.accessor("contact.cat", {
       header: "Type",
+    }),
+    columnHelper.accessor("contact", {
+      header: "Links",
+      enableSorting: false,
+      enableColumnFilter: false,
+      cell: (cell) => {
+        return (
+          cell.getValue().id > 4000000 && (
+            <div className="d-flex flex-column text-nowrap justify-content-end">
+              <ButtonGroup className="w-100">
+                <Button
+                  variant="link"
+                  size="sm"
+                  href={`https://zkillboard.com/${cell.getValue().cat}/${cell.getValue().id}`}
+                  target="_blank"
+                >
+                  zKill
+                </Button>
+                <Button
+                  variant="link"
+                  size="sm"
+                  href={`https://evewho.com/${cell.getValue().cat}/${cell.getValue().id}`}
+                  target="_blank"
+                >
+                  EVE Who
+                </Button>
+                {cell.getValue().cat == "character" && (
+                  <>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      href={`https://www.eve411.com/${cell.getValue().cat}/${cell.getValue().id}`}
+                      target="_blank"
+                    >
+                      EVE411
+                    </Button>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      href={`https://forums.eveonline.com/u/${cell
+                        .getValue()
+                        .name.replace(" ", "_")}/summary`}
+                      target="_blank"
+                    >
+                      EVE Forums
+                    </Button>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      href={`https://eve-search.com/search/author/${cell.getValue().name}`}
+                      target="_blank"
+                    >
+                      EVE Search
+                    </Button>
+                  </>
+                )}
+              </ButtonGroup>
+            </div>
+          )
+        );
+      },
     }),
   ];
 
