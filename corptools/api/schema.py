@@ -234,7 +234,7 @@ class CharacterContract(Schema):
     items: Optional[List[ContractItems]] = []
     contract_type: str
     availbility: Optional[str] = None
-    tittle: Optional[str] = None
+    title: Optional[str] = None
 
     acceptor: Optional[str] = None
     assignee: Optional[str] = None

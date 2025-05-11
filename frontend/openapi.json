@@ -4106,7 +4106,7 @@
             ],
             "title": "Availbility"
           },
-          "tittle": {
+          "title": {
             "anyOf": [
               {
                 "type": "string"
@@ -4115,7 +4115,7 @@
                 "type": "null"
               }
             ],
-            "title": "Tittle"
+            "title": "Title"
           },
           "acceptor": {
             "anyOf": [
