@@ -37,7 +37,7 @@ class FinancesApiEndpoints:
             ref_types = models.CorporationWalletJournalEntry.objects.values_list(
                 "ref_type", flat=True).distinct()
 
-            return 200, list(ref_types)
+            return 200, ["all"] + list(ref_types)
 
         @api.get(
             "corporation/{corporation_id}/wallet",
@@ -66,11 +66,17 @@ class FinancesApiEndpoints:
             start_count = (page - 1) * 10000
             end_count = page * 10000
 
+            filter_refs = True
             if type_refs:
                 refs = type_refs.split(",")
+                if "all" in refs:
+                    filter_refs = False
+
                 if len(refs) == 0:
                     return 200, []
-                wallet_journal = wallet_journal.filter(ref_type__in=refs)
+
+                if filter_refs:
+                    wallet_journal = wallet_journal.filter(ref_type__in=refs)
 
             wallet_journal = wallet_journal[start_count:end_count]
 

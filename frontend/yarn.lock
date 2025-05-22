@@ -2731,6 +2731,7 @@ __metadata:
     i18next-scanner-typescript: "npm:^1.2.1"
     javascript-time-ago: "npm:^2.5.10"
     js-cookie: "npm:^3.0.5"
+    nuqs: "npm:^2.4.3"
     openapi-fetch: "npm:^0.10.4"
     rc-slider: "npm:^11.1.8"
     react: "npm:^18.2.0"
@@ -3674,6 +3675,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mitt@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "mitt@npm:3.0.1"
+  checksum: 10c0/3ab4fdecf3be8c5255536faa07064d05caa3dd332bd318ff02e04621f7b3069ca1de9106cfe8e7ced675abfc2bec2ce4c4ef321c4a1bb1fb29df8ae090741913
+  languageName: node
+  linkType: hard
+
 "mkdirp@npm:^3.0.1":
   version: 3.0.1
   resolution: "mkdirp@npm:3.0.1"
@@ -3780,6 +3788,30 @@ __metadata:
   dependencies:
     once: "npm:^1.4.0"
   checksum: 10c0/9ed96bae9f4bf66c01704a59aa5b6a8aa26bd65445133a08a2b867470c1705ae746f7261e4676b2ae6fc9dce0dc778055b816218bdeb1efbf610e0c95a83711b
+  languageName: node
+  linkType: hard
+
+"nuqs@npm:^2.4.3":
+  version: 2.4.3
+  resolution: "nuqs@npm:2.4.3"
+  dependencies:
+    mitt: "npm:^3.0.1"
+  peerDependencies:
+    "@remix-run/react": ">=2"
+    next: ">=14.2.0"
+    react: ">=18.2.0 || ^19.0.0-0"
+    react-router: ^6 || ^7
+    react-router-dom: ^6 || ^7
+  peerDependenciesMeta:
+    "@remix-run/react":
+      optional: true
+    next:
+      optional: true
+    react-router:
+      optional: true
+    react-router-dom:
+      optional: true
+  checksum: 10c0/29a911749a74a1b2933942f7de7952ddf6158ec2f19c2a0a849111f894b9d0745848b84095e5e0549ad9f2690303a122392b76296e6018c3bb540b4ea68a58c8
   languageName: node
   linkType: hard
 

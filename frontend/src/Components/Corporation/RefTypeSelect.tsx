@@ -1,6 +1,8 @@
 import { useQuery } from "react-query";
 import Select from "react-select";
 import { loadRefTypes } from "../../api/corporation";
+import { useQueryState } from "nuqs";
+import { useEffect } from "react";
 
 const colourStyles = {
   option: (styles: any) => {
@@ -28,8 +30,18 @@ const RefTypeSelect = ({ setFilter }: any) => {
     initialData: [],
     refetchOnWindowFocus: false,
   });
-  console.log(data);
+  const [baseQry, setRefQry] = useQueryState("refs");
+
+  const updateFilter = (entry: any) => {
+    let values = entry.map((o: any) => {
+      return o.value;
+    });
+    setFilter(values.sort().join(","));
+    setRefQry(values.sort().join(","));
+  };
+
   let options = [];
+
   if (!isLoading) {
     options = data?.map((ref: any) => {
       return {
@@ -38,14 +50,29 @@ const RefTypeSelect = ({ setFilter }: any) => {
       };
     });
   }
+
+  const defaultValue = baseQry?.split(",").map((ref: any) => {
+    return {
+      value: ref,
+      label: convertToTitleCase(ref.replaceAll("_", " ")),
+    };
+  });
+
+  useEffect(() => {
+    baseQry && setFilter(baseQry);
+  }, []);
+
   return (
-    <Select
-      isLoading={isLoading}
-      styles={colourStyles}
-      options={options}
-      isMulti={true}
-      onChange={setFilter}
-    />
+    !isLoading && (
+      <Select
+        isLoading={isLoading}
+        styles={colourStyles}
+        options={options}
+        isMulti={true}
+        onChange={updateFilter}
+        defaultValue={defaultValue}
+      />
+    )
   );
 };
 

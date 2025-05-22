@@ -51,7 +51,61 @@ class CorpGlanceApiEndpoints:
             return glances_assets_corporation(characters, corporation_id, user=request.user)
 
         @api.get(
-            "corporation/{corporation_id}/glance/activities",
+            "corporation/{corporation_id}/glance/activities/pve",
+            response={200: dict, 403: str},
+            tags=self.tags
+        )
+        def get_glance_activities_pve(request, corporation_id: int):
+            if corporation_id == 0:
+                corporation_id = request.user.profile.main_character.corporation_id
+
+            characters = get_corporation_characters(request, corporation_id)
+
+            if not check_permisions(corporation_id, request.user):
+                return 403, _("Permission Denied")
+
+            output = {}
+
+            output["ratting"] = roundFloat(
+                glances_ratting_check(characters)
+            )
+            output["incursion"] = roundFloat(
+                glance_incursion_check(characters)
+            )
+            output["pochven"] = roundFloat(
+                glances_pochven_check(characters)
+            )
+            output["mission"] = roundFloat(
+                glances_missions_check(characters)
+            )
+
+            output["market"] = glances_market_check(characters)
+            output["industry"] = glances_industry_check(characters)
+
+        @api.get(
+            "corporation/{corporation_id}/glance/activities/indy",
+            response={200: dict, 403: str},
+            tags=self.tags
+        )
+        def get_glance_activities_indy(request, corporation_id: int):
+            if corporation_id == 0:
+                corporation_id = request.user.profile.main_character.corporation_id
+
+            characters = get_corporation_characters(request, corporation_id)
+
+            if not check_permisions(corporation_id, request.user):
+                return 403, _("Permission Denied")
+
+            output = {}
+
+            output["market"] = glances_market_check(characters)
+            output["industry"] = glances_industry_check(characters)
+            output["pi"] = glances_pi_check(characters)
+
+            return output
+
+        @api.get(
+            "corporation/{corporation_id}/glance/activities/mining",
             response={200: dict, 403: str},
             tags=self.tags
         )
@@ -65,17 +119,6 @@ class CorpGlanceApiEndpoints:
                 return 403, _("Permission Denied")
 
             output = {}
-
-            output["ratting"] = roundFloat(glances_ratting_check(characters))
-            output["incursion"] = roundFloat(
-                glance_incursion_check(characters))
-            output["pochven"] = roundFloat(glances_pochven_check(characters))
-            output["mission"] = roundFloat(glances_missions_check(characters))
-
-            output["market"] = glances_market_check(characters)
-            output["industry"] = glances_industry_check(characters)
-
-            output["pi"] = glances_pi_check(characters)
 
             output["mining_ore"] = roundFloat(glances_ore_check(characters))
             output["mining_moon"] = roundFloat(glances_moon_check(characters))

@@ -1,6 +1,8 @@
 import { useQuery } from "react-query";
 import Select from "react-select";
 import { loadStatus } from "../../api/corporation";
+import { useQueryState } from "nuqs";
+import { useEffect } from "react";
 
 const colourStyles = {
   option: (styles: any) => {
@@ -19,9 +21,23 @@ const CorpSelect = ({ setCorporation }: { setCorporation: any }) => {
     queryKey: ["corp-status"],
     queryFn: () => loadStatus(),
   });
+  const [baseQry, setRefQry] = useQueryState("cid");
+
+  const updateFilter = (entry: any) => {
+    setCorporation(entry.value);
+    setRefQry(entry.value);
+  };
+
   let options = [];
+  let defaultValue: any = undefined;
   if (!isLoading) {
     options = data?.corps.map((corp: any) => {
+      if (Number(baseQry) === corp.corporation.corporation_id) {
+        defaultValue = {
+          value: corp.corporation.corporation_id,
+          label: corp.corporation.corporation_name,
+        };
+      }
       return {
         value: corp.corporation.corporation_id,
         label: corp.corporation.corporation_name,
@@ -31,12 +47,19 @@ const CorpSelect = ({ setCorporation }: { setCorporation: any }) => {
       setCorporation(options[0].value);
     }
   }
+
+  useEffect(() => {
+    defaultValue && setCorporation(defaultValue?.value);
+    console.log(defaultValue?.value);
+  }, [data]);
+
   return (
     <Select
       isLoading={isLoading}
+      value={defaultValue}
       styles={colourStyles}
       options={options}
-      onChange={(e: any) => setCorporation(e.value)}
+      onChange={updateFilter}
     />
   );
 };
