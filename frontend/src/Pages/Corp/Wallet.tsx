@@ -5,7 +5,6 @@ import RefTypeSelect from "../../Components/Corporation/RefTypeSelect";
 import CorporationWalletTable from "../../Components/Corporation/WalletTable";
 import { CorpLoader } from "../../Components/Loaders/loaders";
 import CorpDivisions from "../../Components/Corporation/Divisions";
-import { useQueryState } from "nuqs";
 
 const CorporationWallets = () => {
   const { t } = useTranslation();
