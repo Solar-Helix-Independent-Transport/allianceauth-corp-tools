@@ -264,7 +264,6 @@ export const CharacterGlancesAssets = () => {
     queryFn: () => loadGlanceAssetData(characterID ? Number(characterID) : 0),
     refetchOnWindowFocus: false,
   });
-  console.log(data, isLoading);
   return (
     <>
       <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Character Assets")}</h3>

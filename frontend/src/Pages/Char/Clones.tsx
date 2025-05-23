@@ -99,7 +99,6 @@ const CharacterClones = () => {
       },
     }),
   ];
-  console.log(modalData);
 
   return (
     <>

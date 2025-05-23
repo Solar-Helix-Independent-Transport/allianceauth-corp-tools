@@ -467,16 +467,13 @@ export const FittingModal = ({ ship, showModal, setShowModal }: any) => {
 };
 
 export const AssetFittingModal = ({ asset, assetContents, showModal, setShowModal }: any) => {
-  console.log(asset, assetContents, showModal, setShowModal);
   const data = assetContents?.reduce(
     (o: any, n: any) => {
       if (o.fit.hasOwnProperty(n.location.name)) {
-        console.log(o, n);
         o.fit[n.location.name].push(n.item);
       } else {
         o.fit[n.location.name] = n.item;
       }
-      console.log(o);
       return o;
     },
     {
@@ -495,7 +492,6 @@ export const AssetFittingModal = ({ asset, assetContents, showModal, setShowModa
       id: asset.item.id,
     },
   };
-  // console.log(data, ship)
   return <FittingModalBase {...{ ship, data, showModal, setShowModal }} isFetching={false} />;
 };
 

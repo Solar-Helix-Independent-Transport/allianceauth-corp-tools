@@ -50,7 +50,6 @@ const CorpSelect = ({ setCorporation }: { setCorporation: any }) => {
 
   useEffect(() => {
     defaultValue && setCorporation(defaultValue?.value);
-    console.log(defaultValue?.value);
   }, [data]);
 
   return (

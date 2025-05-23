@@ -6,7 +6,6 @@ export const MenuDropdown = ({ cat }: { cat: any }) => {
   const hit = cat.links?.reduce((o: boolean, n: any) => {
     return (o = o || path.pathname.includes(n.link));
   }, false);
-  console.log(path, hit, cat);
   return (
     <NavDropdown as={"li"} active={hit} id={cat.name} title={cat.name} key={cat.name}>
       {cat.links?.map((link: any) => {
@@ -24,7 +23,6 @@ export const DropdownMenuItem = ({ link }: any) => {
   const path = useLocation();
   const { characterID } = useParams();
   const hit = path.pathname.endsWith(link.link);
-  // console.log(path, hit, link)
   return (
     <Nav.Item as="li">
       <NavDropdown.Item

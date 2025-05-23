@@ -50,10 +50,8 @@ const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boo
       },
     }),
   ];
-  console.log(data?.last_updates);
   if (data?.characters[0]?.last_updates) {
     Object.keys(data?.characters[0]?.last_updates)?.map((h: string) => {
-      console.log(h);
       columns.push(
         columnHelper.accessor(`last_updates.${h}`, {
           header: h,

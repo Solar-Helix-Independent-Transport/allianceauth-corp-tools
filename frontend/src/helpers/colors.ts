@@ -1,6 +1,5 @@
 // System Security Level
 export const GetSecurityColors = (secLevel: number) => {
-  console.log(secLevel);
   if (secLevel >= 0.9) {
     return "#2c74e0";
   } else if (secLevel >= 0.8) {

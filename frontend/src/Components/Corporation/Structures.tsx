@@ -166,7 +166,6 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
         ),
     }),
   ];
-  // console.log(structure);
   return (
     <>
       <BaseTable {...{ isFetching, columns, data }} />

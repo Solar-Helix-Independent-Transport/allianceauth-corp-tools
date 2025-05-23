@@ -15,7 +15,6 @@ function tickGen(a: any, n: any) {
     return a;
   }
   var p = Math.round(a.length / n);
-  console.log(a.length, n, p);
 
   return a.slice(Math.round(p / 2), p * n + Math.round(p / 2)).filter(function (_: any, i: any) {
     return 0 === i % p;

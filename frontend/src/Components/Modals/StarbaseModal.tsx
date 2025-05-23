@@ -15,8 +15,6 @@ function StarbaseModal({ starbase, showModal, setShowModal }: any) {
     queryFn: () => loadStarbaseFit(starbase.starbase_id ? Number(starbase.starbase_id) : 0),
     refetchOnWindowFocus: false,
   });
-  console.log(data);
-  console.log(starbase);
   return (
     <Modal
       show={showModal}

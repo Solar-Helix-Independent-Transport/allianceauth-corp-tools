@@ -18,7 +18,6 @@ const CharSkillGroups = ({ data }: any) => {
   if (Object.entries(skills_data).length === 0) {
     return <PanelLoader title="Nothing Found" />;
   }
-  console.log(skills_data);
   return (
     <ErrorBoundary>
       <Accordion defaultActiveKey={[]} alwaysOpen>

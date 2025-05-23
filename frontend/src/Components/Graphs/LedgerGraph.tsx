@@ -27,13 +27,11 @@ function apiDataToTotals(group_list: any, ore_list: any, input: any, dataKey = "
   let out = Object.fromEntries(
     group_list.map((x: any) => [x, Object.fromEntries(ore_list.map((x: any) => [x, 0]))]),
   );
-  console.log("PRE", out);
   input.map((d: any) => {
     for (let i = 0; i < d.ores.length; ++i)
       out[d.ores[i]["group"]][d.ores[i]["name"]] += Math.floor(Number(d.ores[i][dataKey]));
     return 0;
   });
-  console.log("POST", out);
 
   return Object.entries(out).map((elem) => {
     let out: any = { name: elem[0] };

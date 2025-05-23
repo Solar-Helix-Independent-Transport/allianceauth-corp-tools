@@ -75,7 +75,6 @@ const CorporationStarbases = () => {
               <Button
                 size="sm"
                 onClick={() => {
-                  console.log(cell.row.original);
                   setSarbase(cell.row.original);
                   setShowModal(true);
                 }}
@@ -118,7 +117,6 @@ const CorporationStarbases = () => {
       },
     }),
   ];
-  console.log(starbase);
   return (
     <>
       <BaseTable {...{ isFetching, data, columns }} />

@@ -59,7 +59,6 @@ const CharacterAssets = () => {
       ),
     }),
   ];
-  console.log("we are here");
   return (
     <>
       <div className="m-3 d-flex align-items-center">

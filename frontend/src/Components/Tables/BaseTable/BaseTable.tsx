@@ -59,7 +59,6 @@ const exportToCSV = (table: ReactTable<any>, exportFileName: string) => {
       return cell.getValue();
     });
   });
-  console.log(headerRows, csvData);
   const csv = stringify([...headerRows, ...csvData]);
   const fileType = "csv";
   const blob = new Blob([csv], {
@@ -330,7 +329,6 @@ function _baseTable({
                   key={_pageSize}
                   eventKey={_pageSize}
                   onClick={(eventKey: any) => {
-                    console.log(eventKey.target.id);
                     table.setPageSize(Number(eventKey.target.id));
                   }}
                 >

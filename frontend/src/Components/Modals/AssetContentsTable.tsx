@@ -9,7 +9,6 @@ function AssetContentsTable({ data, header = "", isFetching }: any) {
   const { t } = useTranslation();
   const columnHelper = createColumnHelper<any>();
 
-  console.log(data);
   const columns = [
     columnHelper.accessor("item.name", {
       header: t("Type Name"),

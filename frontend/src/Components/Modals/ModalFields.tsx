@@ -1,5 +1,4 @@
 export function StrToFields({ strValue, text, valuePre = "", valuePost = "", children }: any) {
-  //console.log("StrToFields", strValue, text);
   return strValue || children ? (
     <tr className="m-0">
       <td className="m-0">
@@ -20,7 +19,6 @@ export function StrToFields({ strValue, text, valuePre = "", valuePost = "", chi
 }
 
 export function DateToFields({ dateStrValue, text, valuePre = "", valuePost = "" }: any) {
-  //console.log("IntToFields", intValue, text);
   return dateStrValue ? (
     <StrToFields
       strValue={new Date(dateStrValue).toLocaleString()}
@@ -34,7 +32,6 @@ export function DateToFields({ dateStrValue, text, valuePre = "", valuePost = ""
 }
 
 export function IntToFields({ intValue, text, valuePre = "", valuePost = "" }: any) {
-  //console.log("IntToFields", intValue, text);
   return intValue !== 0 ? (
     <StrToFields
       strValue={intValue.toLocaleString()}
@@ -48,7 +45,6 @@ export function IntToFields({ intValue, text, valuePre = "", valuePost = "" }: a
 }
 
 export function StrIntToFields({ strValue, text, valuePre = "", valuePost = "" }: any) {
-  //console.log("StrIntToFields", strValue, text);
   let intValue = parseInt(strValue);
   return strValue ? (
     <IntToFields intValue={intValue} text={text} valuePre={valuePre} valuePost={valuePost} />

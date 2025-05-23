@@ -14,8 +14,6 @@ const CharacterPubData = () => {
     },
   );
 
-  console.log(data);
-
   return (
     <>
       {/* <CharacterStatusPanels {...{ isFetching }} data={data} /> */}
