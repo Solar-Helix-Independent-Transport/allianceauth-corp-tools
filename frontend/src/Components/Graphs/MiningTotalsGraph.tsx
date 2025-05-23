@@ -10,7 +10,6 @@ import { ResponsiveBarCanvas } from "@nivo/bar";
 // you'll often use just a few of them.
 
 export const MiningTotalsGraph = ({ data, ores, dataType }: any) => {
-  console.log(ores, data);
   const bg = getCSSVariable("--bs-body-bg");
   const txt = getCSSVariable("--bs-body-color");
   const bdr = getCSSVariable("--bs-light-border-subtle");

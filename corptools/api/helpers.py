@@ -444,8 +444,6 @@ def assets_glances(ship_assets, sp_assets):
             out_groups["flex"] += group["grp_total"]
         elif grp in merc_den_groups:
             out_groups["merc_den_grp"] += group["grp_total"]
-        # else:
-        #     print(group)
 
     for sp_type in sp_assets:
         _type = sp_type["type_name__type_id"]

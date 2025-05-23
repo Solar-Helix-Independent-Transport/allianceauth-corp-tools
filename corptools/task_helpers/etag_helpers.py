@@ -62,14 +62,15 @@ def etag_results(operation, token, force_refresh=False, disable_verification=Fal
     _start_tm = time.perf_counter()
     results = list()
     # override to always get the raw response for expiry header
-    # print("******************", operation.operation.swagger_spec.config["validate_responses"])
 
     operation.request_config.also_return_response = True
 
     try:
-        logger.debug(f"ETAG Validate Pre: {operation.operation.swagger_spec.config['validate_responses']}")
+        logger.debug(
+            f"ETAG Validate Pre: {operation.operation.swagger_spec.config['validate_responses']}")
     except Exception:
-        logger.warning("Pre operation.operation.swagger_spec.config['validate_responses'] not checkable")
+        logger.warning(
+            "Pre operation.operation.swagger_spec.config['validate_responses'] not checkable")
 
     if disable_verification:
         operation.operation.swagger_spec.config["validate_responses"] = False
@@ -77,9 +78,11 @@ def etag_results(operation, token, force_refresh=False, disable_verification=Fal
         operation.operation.swagger_spec.config["validate_responses"] = True
 
     try:
-        logger.debug(f"ETAG Validate Override: {operation.operation.swagger_spec.config['validate_responses']}")
+        logger.debug(
+            f"ETAG Validate Override: {operation.operation.swagger_spec.config['validate_responses']}")
     except Exception:
-        logger.warning("Override operation.operation.swagger_spec.config['validate_responses'] not checkable")
+        logger.warning(
+            "Override operation.operation.swagger_spec.config['validate_responses'] not checkable")
 
     if token:
         operation.future.request.headers["Authorization"] = "Bearer " + \
@@ -200,9 +203,11 @@ def etag_results(operation, token, force_refresh=False, disable_verification=Fal
         if not disable_verification:
             operation.operation.swagger_spec.config["validate_responses"] = True
         try:
-            logger.debug(f"ETAG Validate Post: {operation.operation.swagger_spec.config['validate_responses']}")
+            logger.debug(
+                f"ETAG Validate Post: {operation.operation.swagger_spec.config['validate_responses']}")
         except Exception:
-            logger.warning("Post operation.operation.swagger_spec.config['validate_responses'] not checkable")
+            logger.warning(
+                "Post operation.operation.swagger_spec.config['validate_responses'] not checkable")
 
     logger.debug(
         f"ESI_TIME: OVERALL {time.perf_counter() - _start_tm} {operation.operation.operation_id} {stringify_params(operation)}")

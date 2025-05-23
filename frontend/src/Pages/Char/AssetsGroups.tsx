@@ -20,8 +20,6 @@ const CharacterAssetGroups = () => {
     refetchOnWindowFocus: false,
   });
 
-  console.log(isFetching);
-
   return (
     <>
       <div className="m-3 d-flex align-items-center">

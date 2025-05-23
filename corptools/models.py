@@ -1967,7 +1967,6 @@ class AssetsFilter(FilterBase):
     def process_filter(self, user: User):
         try:
             co = self.filter_query([user])
-            # print(character_count.query)
             if co.count() > 0:
                 return True
             else:
@@ -2100,7 +2099,6 @@ class CurrentShipFilter(FilterBase):
     def process_filter(self, user: User):
         try:
             co = self.filter_query([user])
-            # print(character_count.query)
             if co.count() > 0:
                 return True
             else:
@@ -2159,7 +2157,6 @@ class Skillfilter(FilterBase):
     def process_filter(self, user: User):
         try:  # avatar 11567
             skills_list = providers.skills.get_and_cache_user(user.id)
-            # print(skills_list)
             skill_lists = self.required_skill_lists.all()
             req_one = self.single_req_skill_lists.all()
             if skill_lists.count() == 0 and req_one.count() == 0:
@@ -2199,7 +2196,6 @@ class Skillfilter(FilterBase):
                 return result
 
         except Exception as e:
-            print(e)
             logger.error(e, exc_info=1)
             return False
 
@@ -2208,7 +2204,6 @@ class Skillfilter(FilterBase):
         accounts = providers.skills.get_and_cache_users(users)
         for uid, u in accounts.items():
             message = []
-            # print(skills_list)
             skill_lists = self.required_skill_lists.all()
             req_one = self.single_req_skill_lists.all()
             if skill_lists.count() == 0 and req_one.count() == 0:
@@ -2515,7 +2510,6 @@ class HomeStationFilter(FilterBase):
     def process_filter(self, user: User):
         try:
             co = self.filter_query([user])
-            # print(character_count.query)
             if co.count() > 0:
                 return True
             else:
@@ -2586,7 +2580,6 @@ class JumpCloneFilter(FilterBase):
     def process_filter(self, user: User):
         try:
             co = self.filter_query([user])
-            # print(character_count.query)
             if co.count() > 0:
                 return True
             else:

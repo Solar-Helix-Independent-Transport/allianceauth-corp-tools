@@ -1339,8 +1339,6 @@ class TestSecGroupBotFilters(TestCase):
         c2.update(last_known_login=timezone.now() -
                   timedelta(days=15), last_update_login=timezone.now())
 
-        print(c1)
-        print(c2)
         users = []
         for user in ct_models.CharacterAudit.objects.all():
             users.append(user.character.character_ownership.user.id)

@@ -121,7 +121,6 @@ def process_map_from_esi():
             gate_models.append(MapSystemGate(
                 from_solar_system_id=_to_sys, to_solar_system_id=_from_sys))
 
-    # print(_unique_gate_links)
     MapSystemGate.objects.all().delete()
     MapSystemGate.objects.bulk_create(gate_models)
     # sample_mem()

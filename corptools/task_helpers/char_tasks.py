@@ -904,7 +904,6 @@ def update_character_transactions(character_id, force_refresh=False):
                 ).update(
                     reason=message
                 )
-                # print(f"{audit_char.character.character_name} {message}")
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_transactions {character_id}")
 
