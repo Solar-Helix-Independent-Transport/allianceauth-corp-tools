@@ -10,7 +10,6 @@ const CorporationWallets = () => {
   const { t } = useTranslation();
   const [corporationID, setCorporation] = useState<number>(0);
   const [refTypes, setRefs] = useState("");
-  console.log(refTypes);
   return (
     <>
       <div className="m-3 d-flex align-items-center my-1">
