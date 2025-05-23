@@ -13,6 +13,7 @@ import Tooltip from "react-bootstrap/Tooltip";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
+import { useEffect } from "react";
 
 function MyTooltip({ message }: { message: String }) {
   return (
@@ -38,23 +39,13 @@ const CharHeader = () => {
     },
   );
 
-  // const isk = data?.characters.reduce((p: number, c: any) => {
-  //   try {
-  //     return p + c.isk;
-  //   } catch (err) {
-  //     return p;
-  //   }
-  // }, 0);
-  // const sp = data?.characters.reduce((p: number, c: any) => {
-  //   try {
-  //     return p + c.sp;
-  //   } catch (err) {
-  //     return p;
-  //   }
-  // }, 0);
   const bad_chars = data?.characters
     .filter((char: any) => !char.active)
     .map((char: any) => char.character.character_name);
+
+  if (data?.main) {
+    document.title = `${data.main.character_name} - Audit`;
+  }
 
   return (
     <Card>
@@ -84,22 +75,6 @@ const CharHeader = () => {
             <h5 className="m-1 mx-3">{data?.main.alliance_name}</h5>
           </>
         )}
-        {/* <p className="m-1 ms-4">
-          {sp ? (
-            <>
-              <Badge>Total SP: {sp.toLocaleString()}</Badge> <br />
-            </>
-          ) : (
-            <></>
-          )}
-          {isk ? (
-            <>
-              <Badge>Total Isk: {isk.toLocaleString()}</Badge>
-            </>
-          ) : (
-            <></>
-          )}
-        </p> */}
         <ButtonGroup className="me-3 ms-auto">
           <RefreshCharButton />
           {data ? (
