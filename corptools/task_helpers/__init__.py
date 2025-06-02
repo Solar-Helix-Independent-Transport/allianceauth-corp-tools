@@ -16,6 +16,12 @@ NOTIFICATION_TYPE_REPLACEMENTS = {
     "unknown notification type (285)": "SkyhookDeployed",
     "unknown notification type (286)": "MercenaryDenReinforced",
     "unknown notification type (287)": "MercenaryDenAttacked",
+    "unknown notification type (290)": "FreelanceProjectClosed",
+    "unknown notification type (292)": "FreelanceProjectCompleted",
+    "unknown notification type (293)": "FreelanceProjectLimitReached",
+    "unknown notification type (294)": "FreelanceProjectParticipantKicked",
+    "unknown notification type (295)": "FreelanceProjectCreated",
+    "unknown notification type (296)": "FreelanceProjectExpired",
     "unknown notification type (6013)": "DailyItemRewardAutoClaimed",
     "unknown notification type (6040)": "StructureLowReagentsAlert",
     "unknown notification type (6041)": "StructureNoReagentsAlert"
