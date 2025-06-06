@@ -43,8 +43,18 @@ export async function loadCorpGlanceStatusData(corporation_id: number) {
   return api.data;
 }
 
-export async function loadCorpGlanceActivityData(corporation_id: number) {
-  const api = await axios.get(`/audit/api/corporation/${corporation_id}/glance/activities`);
+export async function loadCorpGlanceActivityDataPVE(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/glance/activities/pve`);
+  console.log(`get glance/activities in api ${corporation_id}`);
+  return api.data;
+}
+export async function loadCorpGlanceActivityDataEco(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/glance/activities/indy`);
+  console.log(`get glance/activities in api ${corporation_id}`);
+  return api.data;
+}
+export async function loadCorpGlanceActivityDataMining(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/glance/activities/mining`);
   console.log(`get glance/activities in api ${corporation_id}`);
   return api.data;
 }

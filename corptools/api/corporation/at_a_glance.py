@@ -82,6 +82,8 @@ class CorpGlanceApiEndpoints:
             output["market"] = glances_market_check(characters)
             output["industry"] = glances_industry_check(characters)
 
+            return output
+
         @api.get(
             "corporation/{corporation_id}/glance/activities/indy",
             response={200: dict, 403: str},
