@@ -3,15 +3,15 @@
     "file": "assets/@app-libs-DnZqKox2.js",
     "name": "@app-libs"
   },
-  "_@bootstrap-libs-CcNb2AFO.js": {
-    "file": "assets/@bootstrap-libs-CcNb2AFO.js",
+  "_@bootstrap-libs-C5UspN1R.js": {
+    "file": "assets/@bootstrap-libs-C5UspN1R.js",
     "name": "@bootstrap-libs",
     "imports": [
       "_@app-libs-DnZqKox2.js"
     ]
   },
-  "_@lang-libs-BEwi9QKL.js": {
-    "file": "assets/@lang-libs-BEwi9QKL.js",
+  "_@lang-libs-BAJ5NGZN.js": {
+    "file": "assets/@lang-libs-BAJ5NGZN.js",
     "name": "@lang-libs",
     "imports": [
       "_@app-libs-DnZqKox2.js"
@@ -20,12 +20,12 @@
       "_browser-ponyfill-AGsofrp4.js"
     ]
   },
-  "_@react-libs-DhgT9Wlh.js": {
-    "file": "assets/@react-libs-DhgT9Wlh.js",
+  "_@react-libs-CNJz1fMZ.js": {
+    "file": "assets/@react-libs-CNJz1fMZ.js",
     "name": "@react-libs",
     "imports": [
       "_@app-libs-DnZqKox2.js",
-      "_@bootstrap-libs-CcNb2AFO.js"
+      "_@bootstrap-libs-C5UspN1R.js"
     ]
   },
   "_browser-ponyfill-AGsofrp4.js": {
@@ -37,15 +37,15 @@
     ]
   },
   "index.html": {
-    "file": "assets/index-C4P2uwUS.js",
+    "file": "assets/index-BQF1QDL7.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
     "imports": [
       "_@app-libs-DnZqKox2.js",
-      "_@bootstrap-libs-CcNb2AFO.js",
-      "_@react-libs-DhgT9Wlh.js",
-      "_@lang-libs-BEwi9QKL.js"
+      "_@bootstrap-libs-C5UspN1R.js",
+      "_@react-libs-CNJz1fMZ.js",
+      "_@lang-libs-BAJ5NGZN.js"
     ],
     "css": [
       "static/corptools/bs5/static/css/index-B7hQrVZ6.css"
