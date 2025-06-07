@@ -22,11 +22,17 @@ const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boo
     }),
     columnHelper.accessor("last_login", {
       header: t("Last Login"),
-      cell: (cell) => (cell.getValue() ? <TimeAgo date={cell.getValue()} /> : t("Never")),
+      cell: (cell) => {
+        let date = cell.getValue();
+        return date ? <TimeAgo date={date} /> : t("Never");
+      },
     }),
     columnHelper.accessor("last_logoff", {
       header: t("Last Logoff"),
-      cell: (cell) => (cell.getValue() ? <TimeAgo date={cell.getValue()} /> : t("Never")),
+      cell: (cell) => {
+        let date = cell.getValue();
+        return date ? <TimeAgo date={date} /> : t("Never");
+      },
     }),
     columnHelper.accessor("total_logins", {
       header: t("Total Logins"),
