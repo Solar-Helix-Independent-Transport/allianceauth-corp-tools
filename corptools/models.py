@@ -1823,33 +1823,68 @@ class TimeInCorpFilter(FilterBase):
         try:
             main_character = user.profile.main_character.characteraudit
             histories = CorporationHistory.objects.filter(
-                character=main_character).order_by('-start_date').first()
+                character=main_character
+            ).order_by('-start_date').first()
 
             days = timezone.now() - histories.start_date
+
+            if main_character.character.corporation_id != histories.corporation_id:
+                print(f"{main_character} bad corp - {histories} ")
+                return False  # FAIL if history is no god from CCP.
+
             if days.days >= self.days_in_corp:
+                print(f"{main_character} if - {days.days} ")
                 return not logic
             else:
+                print(f"{main_character} else - {days.days} ")
                 return logic
         except Exception as e:
-            # logger.error(e, exc_info=1)
+            logger.error(e, exc_info=1)
             return False
 
     def audit_filter(self, users):
         logic = self.reversed_logic
-        co = users.annotate(
-            max_timestamp=Max(
-                'profile__main_character__characteraudit__corporationhistory__start_date')
-        ).values("id", "max_timestamp")
+        histories = CorporationHistory.objects.filter(
+            character__character_id__in=users.values_list(
+                "profile__main_character", flat=True)
+        ).values(uid=F("character__character__character_ownership__user_id")).annotate(
+            max_id=Max("record_id"),
+        )
+        # from django.core.serializers.json import DjangoJSONEncoder
+        # print(json.dumps(
+        #     list(histories),
+        #     indent=2,
+        #     cls=DjangoJSONEncoder
+        # ))
+
+        # pull the specific histories
+        histories = CorporationHistory.objects.filter(
+            record_id__in=histories.values_list("max_id", flat=True)
+        ).values(
+            ccid=F("character__character__corporation_id"),
+            rcid=F("corporation_id"),
+            uid=F("character__character__character_ownership__user_id"),
+            std=F("start_date")
+        )
+        # from django.core.serializers.json import DjangoJSONEncoder
+        # print(json.dumps(
+        #     list(histories),
+        #     indent=2,
+        #     cls=DjangoJSONEncoder
+        # ))
 
         chars = defaultdict(lambda: {})
-        for c in co:
-            if c['max_timestamp']:
-                days = timezone.now() - c['max_timestamp']
+        for c in histories:
+            if c["ccid"] != c["rcid"]:
+                continue  # Skip if not main corp.
+
+            if c['std']:
+                days = timezone.now() - c['std']
                 days = days.days
             else:
                 days = -1
-            chars[c['id']] = {
-                "start_date": c["max_timestamp"],
+            chars[c['uid']] = {
+                "start_date": c["std"],
                 "days_in_corp": days
             }
 
