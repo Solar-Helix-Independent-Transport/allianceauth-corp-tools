@@ -1829,14 +1829,11 @@ class TimeInCorpFilter(FilterBase):
             days = timezone.now() - histories.start_date
 
             if main_character.character.corporation_id != histories.corporation_id:
-                print(f"{main_character} bad corp - {histories} ")
                 return False  # FAIL if history is no god from CCP.
 
             if days.days >= self.days_in_corp:
-                print(f"{main_character} if - {days.days} ")
                 return not logic
             else:
-                print(f"{main_character} else - {days.days} ")
                 return logic
         except Exception as e:
             logger.error(e, exc_info=1)
@@ -1850,13 +1847,6 @@ class TimeInCorpFilter(FilterBase):
         ).values(uid=F("character__character__character_ownership__user_id")).annotate(
             max_id=Max("record_id"),
         )
-        # from django.core.serializers.json import DjangoJSONEncoder
-        # print(json.dumps(
-        #     list(histories),
-        #     indent=2,
-        #     cls=DjangoJSONEncoder
-        # ))
-
         # pull the specific histories
         histories = CorporationHistory.objects.filter(
             record_id__in=histories.values_list("max_id", flat=True)
@@ -1866,12 +1856,6 @@ class TimeInCorpFilter(FilterBase):
             uid=F("character__character__character_ownership__user_id"),
             std=F("start_date")
         )
-        # from django.core.serializers.json import DjangoJSONEncoder
-        # print(json.dumps(
-        #     list(histories),
-        #     indent=2,
-        #     cls=DjangoJSONEncoder
-        # ))
 
         chars = defaultdict(lambda: {})
         for c in histories:
