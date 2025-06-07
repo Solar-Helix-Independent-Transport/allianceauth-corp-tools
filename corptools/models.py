@@ -243,6 +243,9 @@ class CharacterAudit(models.Model):
     last_known_logoff = models.DateTimeField(
         null=True, default=None, blank=True)
 
+    total_logins = models.IntegerField(
+        null=True, default=None, blank=True)
+
     def __str__(self):
         return f"{self.character.character_name}'s Character Data"
 

@@ -48,6 +48,14 @@ class StatusApiEndpoints:
                       "main": main
                       }
             for character in characters:
+                last_login = None
+                last_logout = None
+                total_logins = 0
+                if hasattr(character, "characteraudit"):
+                    last_login = character.characteraudit.last_known_login
+                    last_logout = character.characteraudit.last_known_logoff
+                    total_logins = character.characteraudit.total_logins
+
                 _o = {
                     "character": character,
                     "isk": 0,
@@ -56,7 +64,10 @@ class StatusApiEndpoints:
                     "ship_name": "Unknown",
                     "sp": skills.get(character.character_id, 0),
                     "active": False,
-                    "last_updates": None
+                    "last_updates": None,
+                    "last_login": last_login,
+                    "last_logout": last_logout,
+                    "total_logins": total_logins
                 }
                 try:
                     _updates = {}

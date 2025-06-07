@@ -20,6 +20,17 @@ const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boo
     columnHelper.accessor("character.alliance_name", {
       header: t("Alliance"),
     }),
+    columnHelper.accessor("last_login", {
+      header: t("Last Login"),
+      cell: (cell) => (cell.getValue() ? <TimeAgo date={cell.getValue()} /> : t("Never")),
+    }),
+    columnHelper.accessor("last_logoff", {
+      header: t("Last Logoff"),
+      cell: (cell) => (cell.getValue() ? <TimeAgo date={cell.getValue()} /> : t("Never")),
+    }),
+    columnHelper.accessor("total_logins", {
+      header: t("Total Logins"),
+    }),
     columnHelper.accessor("isk", {
       header: t("Isk"),
       cell: (cell) => {

@@ -973,7 +973,41 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/audit/api/corporation/{corporation_id}/glance/activities": {
+  "/audit/api/corporation/{corporation_id}/glance/activities/pve": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Glance Activities Pve */
+    get: operations["corptools_api_corporation_at_a_glance_get_glance_activities_pve"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/glance/activities/indy": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Glance Activities Indy */
+    get: operations["corptools_api_corporation_at_a_glance_get_glance_activities_indy"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/glance/activities/mining": {
     parameters: {
       query?: never;
       header?: never;
@@ -1537,6 +1571,12 @@ export interface components {
       ship_name?: string | null;
       /** Active */
       active: boolean;
+      /** Last Logoff */
+      last_logoff?: string | null;
+      /** Last Login */
+      last_login?: string | null;
+      /** Total Logins */
+      total_logins?: number | null;
       /** Last Updates */
       last_updates?: Record<string, never> | null;
     };
@@ -3464,6 +3504,68 @@ export interface operations {
     };
   };
   corptools_api_corporation_at_a_glance_get_glance_assets_corp: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_at_a_glance_get_glance_activities_pve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_at_a_glance_get_glance_activities_indy: {
     parameters: {
       query?: never;
       header?: never;

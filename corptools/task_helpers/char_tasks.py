@@ -134,11 +134,41 @@ def update_character_location(character_id, force_refresh=False):
             audit_char.character.character_name))
         pass
 
+    try:
+        req_scopes = ['esi-location.read_online.v1']
+
+        token = get_token(character_id, req_scopes)
+
+        if token:
+            online_op = providers.esi.client.Location.get_characters_character_id_online(
+                character_id=character_id)
+
+            ship_data = etag_results(
+                online_op, token, force_refresh=force_refresh)
+            _st = time.perf_counter()
+
+            if ship_data.get("last_login"):
+                audit_char.last_known_login = ship_data.get("last_login")
+
+            if ship_data.get("last_logout"):
+                audit_char.last_known_logoff = ship_data.get("last_logout")
+
+            if ship_data.get("logins"):
+                audit_char.total_logins = ship_data.get("logins")
+
+            logger.debug(
+                f"CT_TIME: {time.perf_counter() - _st} update_character_location_last_online {character_id}")
+
+    except NotModifiedError:
+        logger.info("CT: No New online data for: {}".format(
+            audit_char.character.character_name))
+        pass
+
     audit_char.last_update_location = timezone.now()
     audit_char.save()
     audit_char.is_active()
 
-    return f"CT: Finished location for: {audit_char.character.character_name}"
+    return f"CT: Finished location/ship/online for: {audit_char.character.character_name}"
 
 
 def update_corp_history(character_id, force_refresh=False):

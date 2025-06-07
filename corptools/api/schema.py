@@ -74,6 +74,9 @@ class CharacterStatus(Schema):
     ship: Optional[str] = None
     ship_name: Optional[str] = None
     active: bool
+    last_logoff: Optional[datetime] = None
+    last_login: Optional[datetime] = None
+    total_logins: Optional[int] = None
     last_updates: Optional[Dict] = None
 
 

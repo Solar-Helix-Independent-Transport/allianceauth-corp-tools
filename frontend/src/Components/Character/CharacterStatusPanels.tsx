@@ -36,6 +36,31 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                 <br />
                 {t("Isk")}:{" "}
                 <Badge className={"text-center"}>${char.isk && char.isk.toLocaleString()}</Badge>
+                {char.last_login && (
+                  <>
+                    <br />
+                    {t("Last Login")}:{" "}
+                    <Badge className={"text-center"}>
+                      <TimeAgo date={char.last_login} />
+                    </Badge>
+                  </>
+                )}
+                {char.last_logoff && (
+                  <>
+                    <br />
+                    {t("Last Logoff")}:{" "}
+                    <Badge className={"text-center"}>
+                      <TimeAgo date={char.last_logoff} />
+                    </Badge>
+                  </>
+                )}
+                {char.total_logins && (
+                  <>
+                    <br />
+                    {t("Total Logins")}:{" "}
+                    <Badge className={"text-center"}>{char.total_logins.toLocaleString()}</Badge>
+                  </>
+                )}
               </Card.Text>
               <Card.Title className={"text-center"}>{t("Location")}</Card.Title>
               <Card.Text className={"text-center"}>

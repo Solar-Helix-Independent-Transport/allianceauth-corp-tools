@@ -2774,7 +2774,101 @@
         ]
       }
     },
-    "/audit/api/corporation/{corporation_id}/glance/activities": {
+    "/audit/api/corporation/{corporation_id}/glance/activities/pve": {
+      "get": {
+        "operationId": "corptools_api_corporation_at_a_glance_get_glance_activities_pve",
+        "summary": "Get Glance Activities Pve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": {
+              "title": "Corporation Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Corporation At a Glance"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/audit/api/corporation/{corporation_id}/glance/activities/indy": {
+      "get": {
+        "operationId": "corptools_api_corporation_at_a_glance_get_glance_activities_indy",
+        "summary": "Get Glance Activities Indy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "corporation_id",
+            "schema": {
+              "title": "Corporation Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Corporation At a Glance"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/audit/api/corporation/{corporation_id}/glance/activities/mining": {
       "get": {
         "operationId": "corptools_api_corporation_at_a_glance_get_glance_activities",
         "summary": "Get Glance Activities",
@@ -4524,6 +4618,41 @@
           "active": {
             "title": "Active",
             "type": "boolean"
+          },
+          "last_logoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Logoff"
+          },
+          "last_login": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Login"
+          },
+          "total_logins": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Logins"
           },
           "last_updates": {
             "anyOf": [
