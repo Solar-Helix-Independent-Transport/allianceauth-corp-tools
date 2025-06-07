@@ -222,8 +222,10 @@ class assetFilterAdmin(admin.ModelAdmin):
 
 class CurrentShipFilterAdmin(admin.ModelAdmin):
 
-    list_display = ['__str__', '_types', '_groups', '_systems', '_constellations', '_regions']
-    filter_horizontal = ["types", "groups", "systems", "constellations", "regions"]
+    list_display = ['__str__', '_types', '_groups',
+                    '_systems', '_constellations', '_regions']
+    filter_horizontal = ["types", "groups",
+                         "systems", "constellations", "regions"]
 
     def _list_2_html_w_tooltips(self, my_items: list, max_items: int) -> str:
         """converts list of strings into HTML with cutoff and tooltip"""
@@ -262,7 +264,8 @@ class CurrentShipFilterAdmin(admin.ModelAdmin):
 
     @admin.display(description='constellations')
     def _constellations(self, obj):
-        my_constellations = [x.name for x in obj.constellations.order_by('name')]
+        my_constellations = [
+            x.name for x in obj.constellations.order_by('name')]
 
         return self._list_2_html_w_tooltips(my_constellations, 10)
 
@@ -324,14 +327,20 @@ class skillsFilterAdmin(admin.ModelAdmin):
 
 class TimeInCorpFilterAdmin(admin.ModelAdmin):
 
-    list_display = ['__str__', 'days_in_corp']
+    list_display = ['__str__', 'days_in_corp', "reversed_logic"]
+
+
+class CharacterAgeFilterAdmin(admin.ModelAdmin):
+
+    list_display = ['__str__', 'min_age', "reversed_logic"]
 
 
 class rolesFilterAdmin(admin.ModelAdmin):
     filter_horizontal = ["corps_filter",
                          "alliances_filter"]
 
-    list_display = ['__str__', 'has_director', 'has_accountant', 'has_station_manager', 'has_personnel_manager']
+    list_display = ['__str__', 'has_director', 'has_accountant',
+                    'has_station_manager', 'has_personnel_manager']
 
 
 class titleFilterAdmin(admin.ModelAdmin):
@@ -340,7 +349,8 @@ class titleFilterAdmin(admin.ModelAdmin):
 
 
 class LoginAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'days_since_login', 'no_data_pass', 'main_corp_only']
+    list_display = ['__str__', 'days_since_login',
+                    'no_data_pass', 'main_corp_only']
 
 
 class HomeStationFilterAdmin(admin.ModelAdmin):
@@ -356,6 +366,7 @@ class JumpCloneFilterAdmin(admin.ModelAdmin):
 if apps.is_installed('securegroups'):
     admin.site.register(models.FullyLoadedFilter)
     admin.site.register(models.TimeInCorpFilter, TimeInCorpFilterAdmin)
+    admin.site.register(models.CharacterAgeFilter, CharacterAgeFilterAdmin)
     if app_settings.CT_CHAR_ASSETS_MODULE:
         admin.site.register(models.AssetsFilter, assetFilterAdmin)
     if app_settings.CT_CHAR_LOCATIONS_MODULE:

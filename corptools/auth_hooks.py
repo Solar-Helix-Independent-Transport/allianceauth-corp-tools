@@ -83,6 +83,7 @@ def filters():
         models.FullyLoadedFilter,
         models.Skillfilter,
         models.TimeInCorpFilter,
+        models.CharacterAgeFilter,
         models.Rolefilter,
         models.Titlefilter,
         models.HighestSPFilter,
