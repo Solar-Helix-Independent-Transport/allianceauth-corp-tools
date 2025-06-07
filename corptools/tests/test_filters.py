@@ -476,11 +476,19 @@ class TestSecGroupBotFilters(TestCase):
                 record_id=2,
                 start_date=timezone.now()-timedelta(days=30)
             )
-        for i in range(5, 9):
+        for i in range(5, 7):
             ct_models.CorporationHistory.objects.create(
                 character=audits[i],
                 corporation_id=1,
                 corporation_name=en,
+                record_id=2,
+                start_date=timezone.now()-timedelta(days=14)
+            )
+        for i in range(7, 9):
+            ct_models.CorporationHistory.objects.create(
+                character=audits[i],
+                corporation_id=2,
+                corporation_name=en2,
                 record_id=2,
                 start_date=timezone.now()-timedelta(days=14)
             )
@@ -1603,8 +1611,8 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[5])
         self.assertTrue(tests[6])
         self.assertTrue(tests[7])
-        self.assertTrue(tests[8])
-        self.assertTrue(tests[9])
+        self.assertFalse(tests[8])
+        self.assertFalse(tests[9])
 
     def test_user_time_in_corp_a(self):
         _filter = ct_models.TimeInCorpFilter.objects.create(
@@ -1697,8 +1705,8 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[5]["check"])
         self.assertTrue(tests[6]["check"])
         self.assertTrue(tests[7]["check"])
-        self.assertTrue(tests[8]["check"])
-        self.assertTrue(tests[9]["check"])
+        self.assertFalse(tests[8]["check"])
+        self.assertFalse(tests[9]["check"])
 
     def test_user_time_in_corp_no_audit_rev(self):
         _filter = ct_models.TimeInCorpFilter.objects.create(

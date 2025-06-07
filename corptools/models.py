@@ -1836,7 +1836,7 @@ class TimeInCorpFilter(FilterBase):
             else:
                 return logic
         except Exception as e:
-            logger.error(e, exc_info=1)
+            # logger.error(e, exc_info=1)
             return False
 
     def audit_filter(self, users):
@@ -2537,7 +2537,7 @@ class HomeStationFilter(FilterBase):
             else:
                 return False
         except Exception as e:
-            logger.exception(e)
+            # logger.exception(e)
             return False
 
     def audit_filter(self, users):
