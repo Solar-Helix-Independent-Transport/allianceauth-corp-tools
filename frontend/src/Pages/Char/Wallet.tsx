@@ -47,6 +47,9 @@ const CharacterWallet = () => {
       header: () => <span className="ms-auto">{t("Balance")}</span>,
       cell: (cell) => `${cell.getValue().toLocaleString()}`,
     }),
+    columnHelper.accessor("description", {
+      header: t("Description"),
+    }),
     columnHelper.accessor("reason", {
       header: t("Reason"),
     }),

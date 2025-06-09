@@ -66,6 +66,7 @@ class FinancesApiEndpoints:
                         "amount": w.amount,
                         "balance": w.balance,
                         "reason": w.reason,
+                        "description": w.description,
                         "own_account": own_account
                     })
 

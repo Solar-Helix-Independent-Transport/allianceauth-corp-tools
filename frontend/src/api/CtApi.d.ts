@@ -1388,6 +1388,8 @@ export interface components {
       own_account: boolean | null;
       /** Reason */
       reason?: string | null;
+      /** Description */
+      description?: string | null;
     };
     /** PagedCharacterWalletEvent */
     PagedCharacterWalletEvent: {

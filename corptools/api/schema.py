@@ -201,6 +201,7 @@ class CharacterWalletEvent(Schema):
     amount: float
     own_account: Optional[bool] = True
     reason: Optional[str] = None
+    description: Optional[str] = None
 
 
 class LoyaltyPoints(Schema):
