@@ -39,13 +39,21 @@ class FinancesApiEndpoints:
 
             wallet_journal = models.CharacterWalletJournalEntry.objects\
                 .filter(character__character__in=characters)\
-                .select_related('first_party_name', 'second_party_name', 'character__character').order_by('-date')[:35000]
+                .select_related(
+                    'first_party_name',
+                    'second_party_name',
+                    'character__character',
+                    "msg"
+                ).order_by('-date')[:35000]
 
             output = []
             for w in wallet_journal:
                 own_account = False
                 if (w.second_party_id in character_list and w.first_party_id in character_list):
                     own_account = True
+                msg = w.reason
+                if hasattr(w, "msg"):
+                    msg = w.msg.message
 
                 output.append(
                     {
@@ -65,7 +73,7 @@ class FinancesApiEndpoints:
                         "ref_type": w.ref_type,
                         "amount": w.amount,
                         "balance": w.balance,
-                        "reason": w.reason,
+                        "reason": msg,
                         "description": w.description,
                         "own_account": own_account
                     })

@@ -49,9 +49,15 @@ const CharacterWallet = () => {
     }),
     columnHelper.accessor("description", {
       header: t("Description"),
+      cell: (cell) => {
+        return <span style={{ whiteSpace: "pre-line" }}>{cell.getValue()}</span>;
+      },
     }),
     columnHelper.accessor("reason", {
       header: t("Reason"),
+      cell: (cell) => {
+        return <span style={{ whiteSpace: "pre-line" }}>{cell.getValue()}</span>;
+      },
     }),
   ];
 

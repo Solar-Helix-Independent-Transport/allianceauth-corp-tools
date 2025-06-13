@@ -1,6 +1,9 @@
+import ast
 import datetime
+import json
 from random import random
 
+import yaml
 from celery import chain as Chain, shared_task
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -13,7 +16,11 @@ from esi.errors import TokenExpiredError
 from esi.models import Token
 
 from .. import app_settings, providers
-from ..models import CharacterAudit, CorptoolsConfiguration
+from ..models import (
+    CharacterAudit, CharacterBountyEvent, CharacterBountyStat,
+    CharacterWalletJournalEntry, CorptoolsConfiguration, EveItemDogmaAttribute,
+    EveItemType,
+)
 from ..task_helpers.char_tasks import (
     update_character_assets, update_character_clones,
     update_character_contacts, update_character_contract_items,
@@ -419,7 +426,22 @@ def update_char_assets(self, character_id, force_refresh=False, chain=[]):
 @no_fail_chain
 @esi_error_retry
 def update_char_wallet(self, character_id, force_refresh=False, chain=[]):
-    return update_character_wallet(character_id, force_refresh=force_refresh)
+    msg = update_character_wallet(character_id, force_refresh=force_refresh)
+
+    for entry in CharacterWalletJournalEntry.objects.filter(
+        character__character__character_id=character_id,
+        ref_type="bounty_prizes",
+        processed=False
+    ):
+        update_char_wallet_bounty_text.apply_async(
+            args=[
+                character_id,
+                entry.entry_id
+            ],
+            priority=9
+        )
+
+    return msg
 
 
 @shared_task(
@@ -582,3 +604,61 @@ def update_char_clones(self, character_id, force_refresh=False, chain=[]):
 def update_char_loyaltypoints(self, character_id, force_refresh=False, chain=[]):
     return update_character_loyaltypoints(
         character_id, force_refresh=force_refresh)
+
+
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    once={
+        "keys": ["character_id", "entry_id"]
+    },
+    name="corptools.tasks.translate_char_wallet_bounty_text"
+)
+def update_char_wallet_bounty_text(self, character_id, entry_id, force_refresh=False):
+    logger.info(f"Translating {character_id} - {entry_id}")
+    try:
+        entry = CharacterWalletJournalEntry.objects.get(
+            character__character__character_id=character_id,
+            entry_id=entry_id,
+            processed=False
+        )
+    except CharacterWalletJournalEntry.DoesNotExist:
+        return "Unable to find {character_id} - {entry_id}"
+    # Load Yaml
+    bounties = []
+
+    logger.debug(f"Found {entry.reason}")
+
+    for bty in entry.reason.split(","):
+        b = bty.split(":")
+        ship_type, _ = EveItemType.objects.get_or_create_from_esi(
+            b[0].strip()
+        )
+        ship_dogma = EveItemDogmaAttribute.objects.filter(
+            eve_type_id=ship_type.type_id,
+            attribute_id=481
+        ).first()
+        bounties.append(
+            {
+                "msg": f"{b[1].strip()}x {ship_type.name} @ {ship_dogma.value:,.0f} ISK",
+                "type_id": ship_type.type_id,
+                "qty": b[1].strip()
+            }
+        )
+
+    msg = "\n".join([b["msg"] for b in bounties])
+
+    event = CharacterBountyEvent.objects.create(
+        entry=entry,
+        message=msg
+    )
+    for b in bounties:
+        CharacterBountyStat.objects.create(
+            event=event,
+            type_name_id=b["type_id"],
+            qty=b["qty"]
+        )
+    entry.processed = True
+    entry.save()
+
+    logger.info(f"Completed {character_id} - {entry_id}\n{event.message}")

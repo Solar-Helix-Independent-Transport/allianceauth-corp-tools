@@ -23,7 +23,7 @@ def enqueue_next_task(chain, delay=1):
         _t = signature(_t)
         _t.kwargs.update({"chain": chain})
         try:
-            _t.apply_async(priority=9, countdown=delay)
+            _t.apply_async(priority=6, countdown=delay)
         except AlreadyQueued:
             # skip this task as it is already in the queue
             logger.warning(f"Skipping task as its already queued {_t}")

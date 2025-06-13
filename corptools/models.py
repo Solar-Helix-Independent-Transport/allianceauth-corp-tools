@@ -869,6 +869,8 @@ class WalletJournalEntry(models.Model):
         max_digits=20, decimal_places=2, null=True, default=None)
     tax_receiver_id = models.IntegerField(null=True, default=None)
 
+    processed = models.BooleanField(default=False)
+
     class Meta:
         abstract = True
         indexes = (
@@ -929,7 +931,29 @@ class CharacterWalletJournalEntry(WalletJournalEntry):
         EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_second_party')
 
 
+class CharacterBountyEvent(models.Model):
+    entry = models.OneToOneField(
+        CharacterWalletJournalEntry,
+        on_delete=models.CASCADE,
+        related_name="msg"
+    )
+    message = models.TextField()
+
+
+class CharacterBountyStat(models.Model):
+    event = models.ForeignKey(
+        CharacterBountyEvent,
+        on_delete=models.CASCADE,
+        related_name="stats"
+    )
+    type_name = models.ForeignKey(
+        EveItemType,
+        on_delete=models.CASCADE
+    )
+    qty = models.IntegerField()
+
 # Mining Models
+
 
 class CharacterMiningLedger(models.Model):
     id = models.CharField(max_length=50, primary_key=True)
