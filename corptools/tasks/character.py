@@ -620,7 +620,8 @@ def update_char_wallet_bounty_text(self, character_id, entry_id, force_refresh=F
         entry = CharacterWalletJournalEntry.objects.get(
             character__character__character_id=character_id,
             entry_id=entry_id,
-            processed=False
+            processed=False,
+            ref_type="bounty_prizes"
         )
     except CharacterWalletJournalEntry.DoesNotExist:
         return "Unable to find {character_id} - {entry_id}"
