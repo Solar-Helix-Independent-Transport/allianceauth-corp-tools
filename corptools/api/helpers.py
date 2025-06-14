@@ -11,6 +11,13 @@ from django.utils import timezone
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 
+from corptools.constants.types import (
+    MINING_GAS_GROUPS, MINING_ICE_GROUPS, MINING_MOON_GROUPS,
+    MINING_ORE_GROUPS, RAT_CAPITAL_GROUPS, RAT_OFFICER_CRUISER_GROUPS,
+    RAT_OFFICER_FRIGATE_GROUPS, RAT_OFFICER_GROUPS, RAT_SUPER_GROUPS,
+    RAT_TITAN_GROUPS,
+)
+
 from .. import app_settings, models
 
 logger = get_extension_logger(__name__)
@@ -127,6 +134,79 @@ def mining_check(characters, groups, look_back=30):
     )
 
 
+def bounty_check(characters, groups, look_back=30):
+    start_date = timezone.now() - timedelta(days=look_back)
+    return models.CharacterBountyStat.objects.filter(
+        event__entry__character__character__in=characters,
+        type_name__group_id__in=groups,
+        event__entry__date__gte=start_date
+    )
+
+
+def rats_killed_check(characters, groups):
+    return models.CharacterBountyStat.objects.filter(
+        event__entry__character__character__in=characters,
+        type_name__group_id__in=groups
+    )
+
+
+def glance_rest_count(characters):
+    excluded_groups = RAT_CAPITAL_GROUPS
+    excluded_groups += RAT_SUPER_GROUPS
+    excluded_groups += RAT_TITAN_GROUPS
+    excluded_groups += RAT_OFFICER_GROUPS
+    excluded_groups += RAT_OFFICER_CRUISER_GROUPS
+    excluded_groups += RAT_OFFICER_FRIGATE_GROUPS
+
+    return models.CharacterBountyStat.objects.filter(
+        event__entry__character__character__in=characters
+    ).exclude(
+        type_name__group_id__in=excluded_groups
+    ).aggregate(total=Sum("qty"))["total"]
+
+
+def glance_capital_count(characters):
+    return rats_killed_check(
+        characters,
+        RAT_CAPITAL_GROUPS
+    ).aggregate(total=Sum("qty"))["total"]
+
+
+def glance_supers_count(characters):
+    return rats_killed_check(
+        characters,
+        RAT_SUPER_GROUPS
+    ).aggregate(total=Sum("qty"))["total"]
+
+
+def glance_titans_count(characters):
+    return rats_killed_check(
+        characters,
+        RAT_TITAN_GROUPS
+    ).aggregate(total=Sum("qty"))["total"]
+
+
+def glance_officers_count(characters):
+    return rats_killed_check(
+        characters,
+        RAT_OFFICER_GROUPS
+    ).aggregate(total=Sum("qty"))["total"]
+
+
+def glance_officers_cruiser_count(characters):
+    return rats_killed_check(
+        characters,
+        RAT_OFFICER_CRUISER_GROUPS
+    ).aggregate(total=Sum("qty"))["total"]
+
+
+def glance_officers_frigate_count(characters):
+    return rats_killed_check(
+        characters,
+        RAT_OFFICER_FRIGATE_GROUPS
+    ).aggregate(total=Sum("qty"))["total"]
+
+
 def glance_incursion_check(characters):
     from_ids = [1000125]
     types = ["corporate_reward_payout"]
@@ -169,80 +249,36 @@ def glances_pi_check(characters):
 
 
 def glances_ore_check(characters):
-    group_ids = [
-        450,
-        451,
-        452,
-        453,
-        454,
-        455,
-        456,
-        457,
-        458,
-        459,
-        460,
-        461,
-        462,
-        467,
-        468,
-        469,
-        2024,
-        4029,
-        4030,
-        4031,
-        4513,
-        4514,
-        4515,
-        4516,
-        4568,
-        4756,
-        4757,
-        4758,
-        4759,
-
-    ]
     return mining_check(
         characters,
-        group_ids
+        MINING_ORE_GROUPS
     ).aggregate(
         total=Sum(F("quantity") * F("type_name__volume"))
     )["total"]
 
 
 def glances_moon_check(characters):
-    group_ids = [
-        1884,
-        1920,
-        1921,
-        1922,
-        1920
-    ]
     return mining_check(
         characters,
-        group_ids
+        MINING_MOON_GROUPS
     ).aggregate(
         total=Sum(F("quantity") * F("type_name__volume"))
     )["total"]
 
 
 def glances_ice_check(characters):
-    group_ids = [
-        465,
-        903
-    ]
     return mining_check(
         characters,
-        group_ids
+        MINING_ICE_GROUPS
     ).aggregate(
         total=Sum(F("quantity") * F("type_name__volume"))
     )["total"]
 
 
 def glances_gas_check(characters):
-    group_ids = [711]
     return mining_check(
         characters,
-        group_ids
+        MINING_GAS_GROUPS
     ).aggregate(
         total=Sum(F("quantity") * F("type_name__volume"))
     )["total"]

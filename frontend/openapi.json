@@ -1709,6 +1709,53 @@
         ]
       }
     },
+    "/audit/api/account/{character_id}/glance/ratting": {
+      "get": {
+        "operationId": "corptools_api_character_at_a_glance_get_glance_ratting_counts",
+        "summary": "Get Glance Ratting Counts",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Character At a Glance"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
     "/audit/api/account/{character_id}/glance/faction": {
       "get": {
         "operationId": "corptools_api_character_at_a_glance_get_glance_factions",

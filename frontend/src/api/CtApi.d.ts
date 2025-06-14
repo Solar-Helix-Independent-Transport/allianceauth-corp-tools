@@ -582,6 +582,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/account/{character_id}/glance/ratting": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Glance Ratting Counts */
+    get: operations["corptools_api_character_at_a_glance_get_glance_ratting_counts"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/account/{character_id}/glance/faction": {
     parameters: {
       query?: never;
@@ -2805,6 +2822,37 @@ export interface operations {
     };
   };
   corptools_api_character_at_a_glance_get_glance_activities: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_at_a_glance_get_glance_ratting_counts: {
     parameters: {
       query?: never;
       header?: never;

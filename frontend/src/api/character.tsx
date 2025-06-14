@@ -38,7 +38,9 @@ export async function getCharacterClones(characterID: number) {
 export async function getCharacterRoles(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/roles", characterID);
 }
-
+export async function loadGlanceRattingData(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/glance/ratting", characterID);
+}
 export async function loadGlanceAssetData(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/glance/assets", characterID);
 }
