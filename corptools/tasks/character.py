@@ -539,7 +539,7 @@ def update_char_contract_items(self, character_id, contract_id, force_refresh=Fa
     bind=True,
     base=QueueOnce,
     once={
-        "graceful": False,
+        "graceful": True,
         "keys": ["character_id"]
     },
     name="corptools.tasks.update_char_contracts"
