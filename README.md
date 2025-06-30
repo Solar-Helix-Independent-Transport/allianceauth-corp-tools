@@ -2,14 +2,14 @@
 
 [![CI](https://github.com/pvyParts/allianceauth-corp-tools/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/pvyParts/allianceauth-corp-tools/actions/workflows/main.yml) [![PyPI version](https://badge.fury.io/py/allianceauth-corptools.svg)](https://badge.fury.io/py/allianceauth-corptools) ![Discord](https://img.shields.io/discord/399006117012832262?label=Support%20Server)
 
-### Lightweight Toolbox of Bits and bobs for todays Eve Group on the go!
+### Lightweight Toolbox of Bits and bobs for today's Eve Group on the go!
 
 This module is the core of the CorpTools Ecosystem, this includes;
 
 - [Invoices](https://github.com/Solar-Helix-Independent-Transport/allianceauth-invoice-manager): Automatic tracking of payments made to a holding wallet.
 - [Moons](https://github.com/pvyParts/allianceauth-corp-tools-moons): Moon Mining tracking and Tax system.
 - [Indy Dash](https://github.com/pvyParts/allianceauth-corp-tools-indy-dash): What Industrial structures have what rigs and where are they.
-- [Pinger](https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools-pinger): High performance pings from the notification endpoint, using the data avaialbe from character audit.
+- [Pinger](https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools-pinger): High performance pings from the notification endpoint, using the data available from character audit.
 
 Included `Bits and Bobs`:
 
@@ -178,7 +178,7 @@ To assist with auth related tasks we request `publicData` on top of the configur
 
 ### Extra Scopes
 
-If `Assets`, `Clones`, `Wallets` or `Minning` are enabled these extra spoces are requested:
+If `Assets`, `Clones`, `Wallets` or `Minning` are enabled these extra scopes are requested:
 
 - 'esi-universe.read_structures.v1'
 - 'esi-search.search_structures.v1'
@@ -187,12 +187,13 @@ this is to be able to lookup location names.
 
 ### Other Settings
 
-| Setting                      | Default                                              | Description                                                                                                                                                   |
-| ---------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CT_CHAR_MAX_INACTIVE_DAYS`  | 3                                                    | Days till data is considered Stale                                                                                                                            |
-| `CORPTOOLS_DISCORD_BOT_COGS` | `["corptools.cogs.routes", "corptools.cogs.locate"]` | Discord bot cogs to enable/disable                                                                                                                            |
-| `CT_PAGINATION_SIZE`         | 30000                                                | Max items per page of data in the UI                                                                                                                          |
-| `CT_USERS_CAN_FORCE_REFRESH` | False                                                | Set to `True` to force cache invalidation on a regular user requresting updates from the UI. Superusers will always cache invalidate on requesting an update. |
+| Setting                      | Default                                              | Description                                                                                                                                                  |
+| ---------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `CT_CHAR_MAX_INACTIVE_DAYS`  | 3                                                    | Days till data is considered Stale                                                                                                                           |
+| `CORPTOOLS_DISCORD_BOT_COGS` | `["corptools.cogs.routes", "corptools.cogs.locate"]` | Discord bot cogs to enable/disable                                                                                                                           |
+| `CORPTOOLS_GUEST_HR_STATES`  | `["Guest"]`                                          | Configurable list of states considered valid for `guest_hr` permission to see.                                                                               |
+| `CT_PAGINATION_SIZE`         | 30000                                                | Max items per page of data in the UI                                                                                                                         |
+| `CT_USERS_CAN_FORCE_REFRESH` | False                                                | Set to `True` to force cache invalidation on a regular user requesting updates from the UI. Superusers will always cache invalidate on requesting an update. |
 
 ## Contributing
 

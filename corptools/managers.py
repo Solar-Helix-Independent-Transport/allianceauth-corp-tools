@@ -4,7 +4,7 @@ from django.db import models
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 
-from . import providers
+from . import app_settings, providers
 
 logger = get_extension_logger(__name__)
 
@@ -339,7 +339,11 @@ class AuditCharacterQuerySet(models.QuerySet):
                         models.Q(character__corporation_id=char.corporation_id))
             if user.has_perm('corptools.guest_hr'):
                 queries.append(
-                    models.Q(character__character_ownership__user__profile__state__name="Guest", character__character_ownership__user__profile__main_character__isnull=False))
+                    models.Q(
+                        character__character_ownership__user__profile__state__name__in=app_settings.CORPTOOLS_GUEST_HR_STATES,
+                        character__character_ownership__user__profile__main_character__isnull=False
+                    )
+                )
             if user.has_perm('corptools.state_hr'):
                 queries.append(
                     models.Q(character__character_ownership__user__profile__state=user.profile.state))
@@ -392,7 +396,11 @@ class AuditCharacterManager(models.Manager):
                         models.Q(corporation_id=char.corporation_id))
             if user.has_perm('corptools.guest_hr'):
                 queries.append(
-                    models.Q(character_ownership__user__profile__state__name="Guest", character_ownership__user__profile__main_character__isnull=False))
+                    models.Q(
+                        character_ownership__user__profile__state__name__in=app_settings.CORPTOOLS_GUEST_HR_STATES,
+                        character_ownership__user__profile__main_character__isnull=False
+                    )
+                )
             if user.has_perm('corptools.state_hr'):
                 queries.append(
                     models.Q(character_ownership__user__profile__state=user.profile.state))
