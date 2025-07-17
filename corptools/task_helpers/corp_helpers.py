@@ -7,6 +7,7 @@ from celery import chain, shared_task
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db.models import F, Q
 from django.db.models.aggregates import Sum
+from django.db.models.functions import Power, Sqrt
 from django.utils import timezone
 
 from allianceauth.eveonline.models import EveCharacter
@@ -266,27 +267,6 @@ def update_corporation_pocos(corp_id, full_update=False):
         # Get all Poco Names ( planet name here )
         _all_ids = [p.get("office_id") for p in poco_data]
 
-        token_assets = get_corp_token(
-            corp_id, ['esi-assets.read_corporation_assets.v1'], req_roles)
-
-        _all_names = []
-
-        for id_chunk in providers.esi.chunk_ids(_all_ids):
-            _all_names += providers.esi.client.Assets.post_corporations_corporation_id_assets_names(
-                corporation_id=corp_id,
-                item_ids=id_chunk,
-                token=token_assets.valid_access_token()
-            ).result()
-
-        _planets = []
-        _office_to_names = {}
-        _planet_to_office = {}
-        for n in _all_names:
-            pn = n['name'][16: -1]
-            _office_to_names[n['item_id']] = {"n": n['name'], "p": None}
-            _planet_to_office[pn] = n['item_id']
-            _planets += pn
-
         # Ensure all planets are in DB
         _all_system_ids = [p.get("system_id") for p in poco_data]
 
@@ -297,9 +277,41 @@ def update_corporation_pocos(corp_id, full_update=False):
             _pids += [_p['planet_id'] for _p in _s.get('planets', [])]
 
         for _p in _pids:
-            p, _ = MapSystemPlanet.objects.get_or_create_from_esi(_p)
-            if p.name in _planet_to_office:
-                _office_to_names[_planet_to_office[p.name]]["p"] = p.planet_id
+            _, _ = MapSystemPlanet.objects.get_or_create_from_esi(_p)
+
+        token_assets = get_corp_token(
+            corp_id, ['esi-assets.read_corporation_assets.v1'], req_roles)
+
+        _all_locations = []
+
+        for id_chunk in providers.esi.chunk_ids(_all_ids):
+            _all_locations += providers.esi.client.Assets.post_corporations_corporation_id_assets_locations(
+                corporation_id=corp_id,
+                item_ids=id_chunk,
+                token=token_assets.valid_access_token()
+            ).result()
+
+        _office_to_names = {}
+
+        for n in _all_locations:
+            nearest = MapSystemPlanet.objects.all(
+            ).annotate(
+                distance=Sqrt(
+                    Power(
+                        n["x"] - F("x"),
+                        2
+                    ) + Power(
+                        n["y"] - F("y"),
+                        2
+                    ) + Power(
+                        n["z"] - F("z"),
+                        2
+                    )
+                )
+            ).order_by(
+                "distance"
+            ).first()
+            _office_to_names[n['item_id']] = nearest.name
 
         for poco in poco_data:
             Poco.objects.update_or_create(
@@ -320,8 +332,8 @@ def update_corporation_pocos(corp_id, full_update=False):
                     "standing_level": poco.get('standing_level'),
                     "system_id": poco.get('system_id'),
                     "system_name_id": poco.get('system_id'),
-                    "name": _office_to_names.get(poco.get('office_id'))['n'],
-                    "planet_id": _office_to_names.get(poco.get('office_id'))['p'],
+                    "name": _office_to_names.get(poco.get('office_id')).name,
+                    "planet_id": _office_to_names.get(poco.get('office_id')).planet_id,
                     "terrible_standing_tax_rate": poco.get('terrible_standing_tax_rate')
                 }
             )
