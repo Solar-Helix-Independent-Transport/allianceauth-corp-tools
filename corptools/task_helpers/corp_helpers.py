@@ -16,11 +16,7 @@ from allianceauth.services.tasks import QueueOnce
 from esi.errors import TokenError
 from esi.models import Token
 
-from corptools.task_helpers.etag_helpers import NotModifiedError, etag_results
-from corptools.task_helpers.update_tasks import fetch_location_name
-
-from .. import providers
-from ..models import (
+from corptools.models import (
     AssetCoordiante, BridgeOzoneLevel, CharacterAudit, CorpAsset,
     CorporateContract, CorporateContractItem, CorporationAudit,
     CorporationWalletDivision, CorporationWalletJournalEntry,
@@ -28,6 +24,10 @@ from ..models import (
     EveName, MapJumpBridge, MapSystem, MapSystemMoon, MapSystemPlanet, Poco,
     Starbase, Structure, StructureCelestial, StructureService,
 )
+from corptools.task_helpers.etag_helpers import NotModifiedError, etag_results
+from corptools.task_helpers.update_tasks import fetch_location_name
+
+from .. import providers
 from . import sanitize_location_flag
 
 logger = get_extension_logger(__name__)
@@ -337,10 +337,14 @@ def update_corporation_pocos(corp_id, full_update=False):
                     "terrible_standing_tax_rate": poco.get('terrible_standing_tax_rate')
                 }
             )
+        logger.info(
+            f"{audit_corp.corporation.corporation_name}: Created {len(poco_data)} Pocos")
 
-        Poco.objects.filter(corporation=audit_corp).exclude(
+        d = Poco.objects.filter(corporation=audit_corp).exclude(
             office_id__in=_all_ids).delete()
 
+        logger.info(
+            f"{audit_corp.corporation.corporation_name}: Deleted {d} Pocos")
     except NotModifiedError:
         logger.info("CT: No New Poco data for: {}".format(
             audit_corp.corporation.corporation_name))
