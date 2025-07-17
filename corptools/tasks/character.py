@@ -444,6 +444,13 @@ def update_char_wallet(self, character_id, force_refresh=False, chain=[]):
     return msg
 
 
+def clear_dupes(character_id):
+    dupe_ids = CharacterWalletJournalEntry.objects.filter(
+        character__character__character_id=character_id,
+        ref_type="bounty_prizes"
+    )
+
+
 @shared_task(
     bind=True,
     base=QueueOnce,

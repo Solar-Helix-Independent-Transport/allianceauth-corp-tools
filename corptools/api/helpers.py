@@ -220,9 +220,10 @@ def glances_missions_check(characters):
 
 def glances_ratting_check(characters):
     types = ["bounty_prizes"]
-    min_amount = 5000000
+    min_amount = 1000000
     # 5 mill ticks should cover gate rats etc. but still show passive ratting
     return wallet_check(characters, types, minimum_amount=min_amount).aggregate(total=Sum("amount"))["total"]
+    # return wallet_check(characters, types).aggregate(total=Sum("amount"))["total"]
 
 
 def glances_pochven_check(characters):

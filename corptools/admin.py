@@ -80,6 +80,28 @@ class MapSystemMoonAdmin(admin.ModelAdmin):
         return {}
 
 
+@admin.register(models.MapSystemPlanet)
+class PlanetSystemMoonAdmin(admin.ModelAdmin):
+    list_display = ['name', 'get_region', 'get_constellation', 'get_system']
+    search_fields = ['name', 'system__constellation__region__name',
+                     'system__constellation__name', 'system__name']
+
+    def get_region(self, obj):
+        return obj.system.constellation.region.name
+
+    def get_constellation(self, obj):
+        return obj.system.constellation.name
+
+    def get_system(self, obj):
+        return obj.system.name
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('system__constellation__region', 'system__constellation', 'system')
+
+    def get_model_perms(self, request):
+        return {}
+
+
 @admin.register(models.EveName)
 class EveNameAdmin(admin.ModelAdmin):
     search_fields = ['name']
