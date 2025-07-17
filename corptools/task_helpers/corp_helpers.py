@@ -298,13 +298,13 @@ def update_corporation_pocos(corp_id, full_update=False):
             ).annotate(
                 distance=Sqrt(
                     Power(
-                        n["x"] - F("x"),
+                        n["position"]["x"] - F("x"),
                         2
                     ) + Power(
-                        n["y"] - F("y"),
+                        n["position"]["y"] - F("y"),
                         2
                     ) + Power(
-                        n["z"] - F("z"),
+                        n["position"]["z"] - F("z"),
                         2
                     )
                 )
