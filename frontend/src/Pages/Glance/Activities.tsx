@@ -261,7 +261,7 @@ export const CharacterGlancesActivities = () => {
 
 export const CorporationGlancesActivitiesPVE = ({ corporationID = 0 }) => {
   const { data, isLoading } = useQuery({
-    queryKey: ["glances", "corp", "activities", corporationID],
+    queryKey: ["glances", "corp", "pve", corporationID],
     queryFn: () => loadCorpGlanceActivityDataPVE(corporationID),
     refetchOnWindowFocus: false,
   });
@@ -271,7 +271,7 @@ export const CorporationGlancesActivitiesPVE = ({ corporationID = 0 }) => {
 
 export const CorporationGlancesActivitiesEco = ({ corporationID = 0 }) => {
   const { data, isLoading } = useQuery({
-    queryKey: ["glances", "corp", "activities", corporationID],
+    queryKey: ["glances", "corp", "eco", corporationID],
     queryFn: () => loadCorpGlanceActivityDataEco(corporationID),
     refetchOnWindowFocus: false,
   });
@@ -281,7 +281,7 @@ export const CorporationGlancesActivitiesEco = ({ corporationID = 0 }) => {
 
 export const CorporationGlancesActivitiesMining = ({ corporationID = 0 }) => {
   const { data, isLoading } = useQuery({
-    queryKey: ["glances", "corp", "activities", corporationID],
+    queryKey: ["glances", "corp", "ore", corporationID],
     queryFn: () => loadCorpGlanceActivityDataMining(corporationID),
     refetchOnWindowFocus: false,
   });
