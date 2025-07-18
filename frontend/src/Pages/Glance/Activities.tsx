@@ -140,7 +140,7 @@ const ActivitiesEco = ({ data, isLoading }: any) => {
             iconSrc={Planet}
             isLoading={isLoading}
             cardVariant={data?.pi ? "success" : undefined}
-            textVariant={data?.pi > 0 ? "success" : "muted"}
+            textVariant={data?.pi != 0 ? "success" : "muted"}
             text={
               data?.pi
                 ? `${Number(data?.pi).toLocaleString("en-US", {
