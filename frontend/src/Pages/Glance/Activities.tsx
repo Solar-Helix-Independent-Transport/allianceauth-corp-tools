@@ -136,6 +136,22 @@ const ActivitiesEco = ({ data, isLoading }: any) => {
               "Count of Industry activities such as manufacturing or reactions in the last 30 Days",
             )}
           />
+          <IconStatusDiv
+            iconSrc={Planet}
+            isLoading={isLoading}
+            cardVariant={data?.pi ? "success" : undefined}
+            textVariant={data?.pi > 0 ? "success" : "muted"}
+            text={
+              data?.pi
+                ? `${Number(data?.pi).toLocaleString("en-US", {
+                    maximumFractionDigits: 2,
+                    notation: "compact",
+                    compactDisplay: "short",
+                  })} ISK`
+                : "-"
+            }
+            toolTipText={t("Planetary import/export seen in the last 30 Days")}
+          />
         </div>
       </Card>
     </>
@@ -214,22 +230,6 @@ const ActivitiesMining = ({ data, isLoading }: any) => {
                 : "-"
             }
             toolTipText={t("Total m3 of gas anomalies mined in the last 30 Days")}
-          />
-          <IconStatusDiv
-            iconSrc={Planet}
-            isLoading={isLoading}
-            cardVariant={data?.pi ? "success" : undefined}
-            textVariant={data?.pi > 0 ? "success" : "muted"}
-            text={
-              data?.pi
-                ? `${Number(data?.pi).toLocaleString("en-US", {
-                    maximumFractionDigits: 2,
-                    notation: "compact",
-                    compactDisplay: "short",
-                  })} ISK`
-                : "-"
-            }
-            toolTipText={t("Planetary import/export seen in the last 30 Days")}
           />
         </div>
       </Card>
