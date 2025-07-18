@@ -14,7 +14,7 @@ const AccountList = () => {
   const { characterID } = useParams();
 
   const { data, isFetching } = useQuery({
-    queryKey: ["contacts", characterID],
+    queryKey: ["list", characterID],
     queryFn: () => getCharacterList(),
     refetchOnWindowFocus: false,
   });
