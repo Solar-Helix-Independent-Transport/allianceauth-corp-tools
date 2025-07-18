@@ -7,6 +7,7 @@ import yaml
 from celery import chain as Chain, shared_task
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count
 from django.utils import timezone
 
 from allianceauth.eveonline.models import EveCharacter
@@ -444,13 +445,6 @@ def update_char_wallet(self, character_id, force_refresh=False, chain=[]):
     return msg
 
 
-def clear_dupes(character_id):
-    dupe_ids = CharacterWalletJournalEntry.objects.filter(
-        character__character__character_id=character_id,
-        ref_type="bounty_prizes"
-    )
-
-
 @shared_task(
     bind=True,
     base=QueueOnce,
@@ -632,7 +626,10 @@ def update_char_wallet_bounty_text(self, character_id, entry_id, force_refresh=F
         )
     except CharacterWalletJournalEntry.DoesNotExist:
         return "Unable to find {character_id} - {entry_id}"
-    # Load Yaml
+    except CharacterWalletJournalEntry.MultipleObjectsReturned:
+        clear_dupes(character_id, entry_id)
+        self.retry()
+
     bounties = []
 
     logger.debug(f"Found {entry.reason}")
@@ -670,3 +667,29 @@ def update_char_wallet_bounty_text(self, character_id, entry_id, force_refresh=F
     entry.save()
 
     logger.info(f"Completed {character_id} - {entry_id}\n{event.message}")
+
+
+def clear_dupes(character_id, entry_id):
+    # dupe_ids = CharacterWalletJournalEntry.objects.filter(
+    #     ref_type="bounty_prizes",
+    #     character__character__character_id=character_id,
+    #     entry_id=entry_id
+    # ).values(
+    #     'entry_id'
+    # ).annotate(
+    #     count=Count('entry_id')
+    # ).filter(count__gt=1)
+
+    logger.warning(f"Cleaning up `{entry_id}` duplicates in wallet.")
+
+    ls = list(
+        CharacterWalletJournalEntry.objects.filter(
+            ref_type="bounty_prizes",
+            character__character__character_id=character_id,
+            entry_id=entry_id
+        )
+    )
+    ls.pop()
+    logger.warning(f"Found `{len(ls)}` duplicates.")
+    for l in ls:
+        l.delete()
