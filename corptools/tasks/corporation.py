@@ -103,6 +103,16 @@ def update_corp_contracts(self, corp_id, force_refresh=False, chain=[]):
 
 
 @shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.update_corp_industry_jobs"
+)
+@no_fail_chain
+@esi_error_retry
+def update_corp_industry_jobs(self, corp_id: int, force_refresh: bool = False, chain=[]) -> str:
+    return corp_helpers.update_corporation_industry_jobs(corp_id, force_refresh=force_refresh)
+
+@shared_task(
     name="corptools.tasks.update_corp"
 )
 def update_corp(corp_id, force_refresh=False):
@@ -117,6 +127,7 @@ def update_corp(corp_id, force_refresh=False):
     que.append(update_corp_pocos.si(corp_id))
     que.append(update_corp_contracts.si(corp_id))
     que.append(update_corp_logins.si(corp_id))
+    que.append(update_corp_industry_jobs.si(corp_id, force_refresh=force_refresh))
     Chain(que).apply_async(priority=6)
 
 

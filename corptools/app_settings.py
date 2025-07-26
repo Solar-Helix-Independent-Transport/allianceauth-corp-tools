@@ -358,6 +358,10 @@ _corp_scopes_pocos = [
     'esi-planets.read_customs_offices.v1',
 ]
 
+_corp_scopes_industry_jobs = [
+    'esi-industry.read_corporation_jobs.v1'
+]
+
 
 CORP_REQUIRED_SCOPES = _corp_scopes_base + _corp_scopes_tracking + \
     _corp_scopes_structures + _corp_scopes_moons + \
