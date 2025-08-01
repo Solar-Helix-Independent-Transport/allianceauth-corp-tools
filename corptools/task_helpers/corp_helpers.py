@@ -18,7 +18,7 @@ from esi.models import Token
 
 from corptools.models import (
     AssetCoordiante, BridgeOzoneLevel, CharacterAudit, CorpAsset,
-    CorporateContract, CorporateContractItem, CorporationAudit,
+    CorporateContract, CorporateContractItem, CorporationAudit, CorporationIndustryJob,
     CorporationWalletDivision, CorporationWalletJournalEntry,
     CorptoolsConfiguration, EveItemDogmaAttribute, EveItemType, EveLocation,
     EveName, MapJumpBridge, MapSystem, MapSystemMoon, MapSystemPlanet, Poco,
@@ -582,6 +582,100 @@ def update_corp_structures(corp_id, force_refresh=False):  # pagnated results
     _corporation.save()
 
     return f"Updated structures for: {_corporation}"
+
+
+def update_corporation_industry_jobs(corp_id: int, force_refresh: bool = False) -> str:
+    """
+    https://developers.eveonline.com/api-explorer#/operations/GetCorporationsCorporationIdIndustryJobs
+    """
+    req_scopes = ['esi-industry.read_corporation_jobs.v1']
+
+    req_roles = ['Factory_Manager']
+
+    token = get_corp_token(corp_id, req_scopes, req_roles)
+    
+    if not token:
+        return "No Tokens"
+
+    _corporation: CorporationAudit = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+    
+    operation = providers.esi.client.Industry.list_corporation_industry_jobs(
+        corporation_id=_corporation.corporation.corporation_id)
+    operation = providers.esi.client.Industry.get_corporatioons_corporation_id_industry_jobs(
+        character_id=_corporation.corporation.corporation_id, include_completed=True)
+
+    try:
+        industry_jobs = etag_results(
+            operation, token, force_refresh=force_refresh)
+    except NotModifiedError:
+        _corporation.last_update_industry_jobs = timezone.now()
+        _corporation.save()
+        return f"No New industry job data for: {_corporation}"
+    
+    existing_pks: set[int] = set(CorporationIndustryJob.objects.filter(
+        corporation=_corporation
+    ).values_list("job_id", flat=True))
+    type_ids: set[int] = set()
+    new_events = [] 
+    for event in industry_jobs:
+        type_ids.add(event.get('blueprint_type_id'))
+        if event.get('product_type_id'):
+            type_ids.add(event.get('product_type_id'))
+
+        if event.get('job_id') in existing_pks:
+            _m: CorporationIndustryJob = CorporationIndustryJob.objects.get(
+                corporation=_corporation, job_id=event.get("job_id"))
+            _m.completed_character_id = event.get("completed_character_id")
+            _m.completed_date = event.get("completed_date")
+            _m.end_date = event.get("end_date")
+            _m.pause_date = event.get("pause_date")
+            _m.status = event.get("status")
+            _m.successful_runs = event.get("successful_runs")
+            _m.save()
+            continue
+        
+        _e = CorporationIndustryJob(
+                character=_corporation,
+                activity_id=event.get("activity_id"),
+                blueprint_id=event.get("blueprint_id"),
+                blueprint_location_id=event.get("blueprint_location_id"),
+                blueprint_type_id=event.get("blueprint_type_id"),
+                blueprint_type_name_id=event.get("blueprint_type_id"),
+                completed_character_id=event.get("completed_character_id"),
+                completed_date=event.get("completed_date"),
+                cost=event.get("cost"),
+                duration=event.get("duration"),
+                end_date=event.get("end_date"),
+                facility_id=event.get("facility_id"),
+                installer_id=event.get("installer_id"),
+                job_id=event.get("job_id"),
+                licensed_runs=event.get("licensed_runs"),
+                location_id=event.get("location_id"),
+                output_location_id=event.get("output_location_id"),
+                pause_date=event.get("pause_date"),
+                probability=event.get("probability"),
+                product_type_id=event.get("product_type_id"),
+                product_type_name_id=event.get("product_type_id"),
+                runs=event.get("runs"),
+                start_date=event.get("start_date"),
+                status=event.get("status"),
+                successful_runs=event.get("successful_runs")
+             )
+        
+        new_events.append(_e)
+    
+    EveItemType.objects.create_bulk_from_esi(list(type_ids))
+    
+    if len(new_events):
+        CorporationIndustryJob.objects.bulk_create(
+            new_events, ignore_conflicts=True)
+
+    _corporation.last_change_structures = timezone.now()
+    _corporation.last_update_structures = timezone.now()
+    _corporation.save()
+    
+    return f"Updated industry jobs for {_corporation}"
 
 
 def update_character_logins_from_corp(corp_id):
