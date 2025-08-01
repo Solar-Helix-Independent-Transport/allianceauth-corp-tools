@@ -430,12 +430,11 @@ class CorporationAudit(models.Model):
         null=True, default=None, blank=True)
     last_change_contracts = models.DateTimeField(
         null=True, default=None, blank=True)
-    
+
     last_update_industry_jobs = models.DateTimeField(
         null=True, default=None, blank=True)
     last_change_industry_jobs = models.DateTimeField(
         null=True, default=None, blank=True)
-
 
     last_update_known_login = models.DateTimeField(
         null=True, default=None, blank=True)
@@ -1058,6 +1057,7 @@ class CharacterIndustryJob(models.Model):
     status = models.CharField(max_length=15)
     successful_runs = models.IntegerField(default=None, null=True, blank=True)
 
+
 class CorporationIndustryJob(models.Model):
     """
     https://developers.eveonline.com/api-explorer#/schemas/CorporationsCorporationIdIndustryJobsGet
@@ -1069,7 +1069,7 @@ class CorporationIndustryJob(models.Model):
     blueprint_location_id = models.BigIntegerField()
     blueprint_type_id = models.BigIntegerField()
     blueprint_type_name = models.ForeignKey(
-        EveItemType, on_delete=models.SET_NULL, null=True, default=None, related_name="blueprint_type")
+        EveItemType, on_delete=models.SET_NULL, null=True, default=None, related_name="corp_blueprint_type")
     completed_character_id = models.BigIntegerField(
         default=None, null=True, blank=True)
     completed_date = models.DateTimeField(default=None, null=True, blank=True)
@@ -1087,7 +1087,7 @@ class CorporationIndustryJob(models.Model):
     probability = models.FloatField(default=None, null=True, blank=True)
     product_type_id = models.IntegerField()
     product_type_name = models.ForeignKey(
-        EveItemType, on_delete=models.SET_NULL, null=True, default=None, related_name="product_type")
+        EveItemType, on_delete=models.SET_NULL, null=True, default=None, related_name="corp_product_type")
 
     runs = models.IntegerField()
     start_date = models.DateTimeField()
