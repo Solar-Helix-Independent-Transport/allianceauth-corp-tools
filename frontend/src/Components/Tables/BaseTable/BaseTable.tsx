@@ -50,6 +50,9 @@ const exportToCSV = (table: ReactTable<any>, exportFileName: string) => {
 
   const headerRows = table.getHeaderGroups().map((headerGroup: HeaderGroup<any>) => {
     return headerGroup.headers.map((header: Header<any, any>) => {
+      if (typeof header.column.columnDef.header === "function") {
+        return header.column.columnDef.accessorKey;
+      }
       return header.column.columnDef.header;
     });
   });
@@ -59,6 +62,8 @@ const exportToCSV = (table: ReactTable<any>, exportFileName: string) => {
       return cell.getValue();
     });
   });
+  console.log(headerRows);
+  console.log(csvData);
   const csv = stringify([...headerRows, ...csvData]);
   const fileType = "csv";
   const blob = new Blob([csv], {
