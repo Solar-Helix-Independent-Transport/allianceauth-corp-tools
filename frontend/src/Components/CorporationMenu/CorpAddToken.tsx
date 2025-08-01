@@ -91,6 +91,15 @@ function CorpAddToken() {
               label={t("Contracts")}
             />
 
+            <Form.Check
+              type="checkbox"
+              defaultChecked={false}
+              //   inline={true}
+              id="i"
+              name="i"
+              label={t("Industry Jobs")}
+            />
+
             <br />
             <br />
             <Button variant="primary" type="submit">
