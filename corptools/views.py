@@ -104,7 +104,7 @@ def add_corp_section(request, *args, **kwargs):
     moons = request.GET.get('m', False)
     pocos = request.GET.get('p', False)
     contracts = request.GET.get('c', False)
-    industry_jobs = request.get('i', False)
+    industry_jobs = request.GET.get('i', False)
 
     # if we're coming back from SSO with a new token, return it
     token = _check_callback(request)
@@ -151,10 +151,10 @@ def add_corp_section(request, *args, **kwargs):
 
     if contracts:
         scopes += app_settings._corp_scopes_contracts
-        
+
     if industry_jobs:
         scopes += app_settings._corp_scopes_industry_jobs
-    
+
     # user has selected to add a new token
     return sso_redirect(request, scopes=scopes)
 
