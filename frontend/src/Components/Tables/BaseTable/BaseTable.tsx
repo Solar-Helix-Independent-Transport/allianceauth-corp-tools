@@ -49,7 +49,7 @@ const exportToCSV = (table: ReactTable<any>, exportFileName: string) => {
   const { rows } = table.getCoreRowModel();
 
   const headerRows = table.getHeaderGroups().map((headerGroup: HeaderGroup<any>) => {
-    return headerGroup.headers.map((header: Header<any, any>) => {
+    return headerGroup.headers.map((header: Header<any, any> | any) => {
       if (typeof header.column.columnDef.header === "function") {
         return header.column.columnDef.accessorKey;
       }
