@@ -19,7 +19,7 @@ urlpatterns = [
         name='reactmain'
     ),
     re_path(
-        'r/corp',
+        'r/corp/',
         views.react_corp_beta,
         name='corp_react'
     ),
@@ -47,8 +47,8 @@ urlpatterns = [
         path('add/', views.add_corp, name='add_corp'),
         path('add_options/', views.add_corp_section,
              name='add_corp_options'),
-        re_path(r'^dashboard/fuel', views.fuel_levels, name='fuel_dashboard'),
-        re_path(r'^dashboard/metenox', views.metenox_levels,
+        re_path(r'^dashboard/fuel/', views.fuel_levels, name='fuel_dashboard'),
+        re_path(r'^dashboard/metenox/', views.metenox_levels,
                 name='drill_dashboard'),
     ])),
 ]
