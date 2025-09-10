@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from allianceauth.services.hooks import get_extension_logger
 
-from corptools import models
+from corptools import app_settings, models
 from corptools.api import schema
 from corptools.api.helpers import round_or_null
 
@@ -167,8 +167,10 @@ class StructureApiEndpoints:
                         out["name"] = itm.type_name.name
                         out["qty"] += itm.quantity
 
-                    out["expires"] = timezone.now(
-                    ) + timedelta(hours=out["qty"] / 88)
+                    out["expires"] = timezone.now() + timedelta(
+                        hours=out["qty"] /
+                        app_settings.CT_CHAR_METENOX_GAS_USE_HOURLY
+                    )
                     if out['qty'] > 0:
                         extras = out
 
