@@ -601,8 +601,6 @@ def update_corporation_industry_jobs(corp_id: int, force_refresh: bool = False) 
     _corporation: CorporationAudit = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
 
-    operation = providers.esi.client.Industry.list_corporation_industry_jobs(
-        corporation_id=_corporation.corporation.corporation_id)
     operation = providers.esi.client.Industry.get_corporatioons_corporation_id_industry_jobs(
         character_id=_corporation.corporation.corporation_id, include_completed=True)
 

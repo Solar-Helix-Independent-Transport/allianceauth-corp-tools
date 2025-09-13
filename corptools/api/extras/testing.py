@@ -98,6 +98,13 @@ class TestingApiEndpoints:
                 return 403, {"message": "Hard no pall!"}
             from aiopenapi3 import OpenAPI
 
+            from esi.clients import EsiClientProvider
+            esi2 = EsiClientProvider()
+            res = esi2.client.Sovereignty.get_sovereignty_campaigns()
+            res.request_config.also_return_response = True
+            result, headers = res.result()
+            etag1 = headers.headers["etag"]
+            print("here")
             # res = esi.client.Alliance.GetAlliances(
             # )
             # result, headers = res.result(return_response=True)
@@ -115,14 +122,13 @@ class TestingApiEndpoints:
             # )
             # result, headers = res.result(return_response=True)
             # # print([result, headers])
-            from esi import fauxbravado
-            from esi.decorators import esi_rolling_rate_limit
+            from esi import openapi_clients
             from esi.models import Token
             from esi.rate_limiting import ESIRateLimitBucket
 
             from corptools.models import CharacterAsset, MapSystem
-            esi = fauxbravado.ESIClientProvider(
-                compatibility_date="2025-07-23",
+            esi = openapi_clients.ESIClientProvider(
+                compatibility_date="2025-08-26",
                 ua_appname="ack-testing-django-esi",
                 ua_version="0.0.1a1"
             )
@@ -134,9 +140,11 @@ class TestingApiEndpoints:
             # for i in range(0,50):
             #     print(f"Hit {i}")
             #     hit_api()
-            req_scopes = ['esi-assets.read_assets.v1']
-
-            token = get_token(755166922, req_scopes)
+            # req_scopes = ['esi-assets.read_assets.v1']
+            req_scopes = ['esi-fleets.write_fleet.v1']
+            cid = 2119950231
+            # cid = 755166922
+            # token = get_token(cid, req_scopes)
 
             # try:
             #     esi.client.Alliance.GetAlliances(
@@ -145,17 +153,31 @@ class TestingApiEndpoints:
             # except ValueError:
             #     print("This is good")
 
-            res = esi.client.Assets.GetCharactersCharacterIdAssets(
-                character_id=755166922,
-                token=token
-            )
+            # res = esi.client.Assets.GetCharactersCharacterIdAssets(
+            #     character_id=755166922,
+            #     token=token
+            # )
 
-            result, headers = res.results(return_response=True)
+            # result, headers = res.results(return_response=True)
 
-            print(result[0])
-            for a in result:
-                print(a.type_id)
+            # print(result[0])
+            # for a in result:
+            #     print(a.type_id)
+            # flt = esi.client.Fleets.GetCharactersCharacterIdFleet(
+            #     body={"is_free_move": True, "motd": "Testing 1, 2, 3"},
+            #     character_id=cid,
+            #     token=token
+            # ).result()
 
+            # flt_up = esi.client.Fleets.PutFleetsFleetId(
+            #     body={"is_free_move": True, "motd": "Testing 1, 2, 3"},
+            #     fleet_id=1234,
+            #     token=token
+            # )
+            # flt_up.result()
+
+            # print(flt)
+            # print(flt_up)
             # res = esi.client.Assets.GetCharactersCharacterIdAssets(
             #     character_id=755166922,
             #     token=Token.objects.all().require_scopes_exact("publicData").first()
@@ -174,8 +196,30 @@ class TestingApiEndpoints:
             #     character_id=755166922,
             #     token=token.valid_access_token()
             # )
+            print(etag1)
 
+            from esi import openapi_clients
+            esi = openapi_clients.ESIClientProvider(
+                compatibility_date="2025-08-26",
+                ua_appname="ack-testing-django-esi",
+                ua_version="0.0.1a1"
+            )
+
+            req = esi.client.Sovereignty.GetSovereigntyCampaigns()
+
+            resp2, result2 = req.result(
+                return_response=True
+            )
             # result2 = res.results()
-            # print([len(result2)])
+            etag2 = result2.headers["etag"]
+            print(etag2)
 
-            return [len(result)]
+            resp3, result3 = esi.client.Sovereignty.GetSovereigntyCampaigns().result(
+                return_response=True,
+                etag=etag1,
+                use_cache=False
+            )
+            etag3 = result3.headers["etag"]
+            print(etag3)
+
+            return [etag2, str(resp2), etag3, str(resp3)]
