@@ -28,7 +28,7 @@ from ..models import (
     NotificationText, Skill, SkillQueue, SkillTotalHistory, SkillTotals,
 )
 from . import sanitize_location_flag, sanitize_notification_type
-from .etag_helpers import NotModifiedError, etag_results
+from .etag_helpers import NotModifiedError, etag_results, openapi_etag_result
 
 logger = get_extension_logger(__name__)
 
@@ -1277,7 +1277,8 @@ def update_character_order_history(character_id, force_refresh=False):
 @shared_task
 def update_character_notifications(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
-        character__character_id=character_id)
+        character__character_id=character_id
+    )
     logger.debug("Updating Notifications for: {}".format(
         audit_char.character.character_name))
 
@@ -1289,56 +1290,72 @@ def update_character_notifications(character_id, force_refresh=False):
         return "No Tokens"
 
     try:
-        notifications_op = providers.esi.client.Character.get_characters_character_id_notifications(
-            character_id=character_id)
+        notes_op = providers.esi_openapi.client.Character.GetCharactersCharacterIdNotifications(
+            character_id=character_id,
+            token=token,
+        )
 
-        notifications = etag_results(
-            notifications_op,
-            token,
-            force_refresh=force_refresh,
-            disable_verification=CorptoolsConfiguration.skip_verify_notifications()
+        notifications = openapi_etag_result(
+            notes_op,
+            force_refresh=force_refresh
         )
 
         _st = time.perf_counter()
 
         last_five_hundred = list(
-            Notification.objects.filter(character=audit_char)
-            .order_by('-timestamp')[:500]
-            .values_list('notification_id', flat=True))
+            Notification.objects.filter(
+                character=audit_char
+            ).order_by(
+                '-timestamp'
+            )[:500].values_list(
+                'notification_id',
+                flat=True
+            )
+        )
 
         _creates = []
         _create_notifs = []
         for note in notifications:
-            if not note.get('notification_id') in last_five_hundred:
+            if not note.notification_id in last_five_hundred:
                 _creates.append(
                     Notification(
                         character=audit_char,
-                        notification_id=note.get('notification_id'),
-                        sender_id=note.get('sender_id'),
-                        sender_type=note.get('sender_type'),
-                        notification_text_id=note.get('notification_id'),
-                        timestamp=note.get('timestamp'),
+                        notification_id=note.notification_id,
+                        sender_id=note.sender_id,
+                        sender_type=note.sender_type,
+                        notification_text_id=note.notification_id,
+                        timestamp=note.timestamp,
                         notification_type=sanitize_notification_type(
-                            note.get('type')
+                            note.type
                         ),
-                        is_read=note.get('is_read')
+                        is_read=note.is_read
                     )
+                )
+                _create_notifs.append(
+                    NotificationText(
+                        notification_id=note.notification_id,
+                        notification_text=note.text
+                    )
+                )
 
-                )
-                _create_notifs.append(NotificationText(
-                    notification_id=note.get('notification_id'),
-                    notification_text=note.get('text')
-                )
-                )
         NotificationText.objects.bulk_create(
-            _create_notifs, ignore_conflicts=True, batch_size=500)
-        Notification.objects.bulk_create(_creates, batch_size=500)
+            _create_notifs,
+            ignore_conflicts=True,
+            batch_size=500
+        )
+        Notification.objects.bulk_create(
+            _creates,
+            batch_size=500
+        )
+
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_notifications {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_character_notifications {character_id}"
+        )
 
     except NotModifiedError:
-        logger.info("CT: No New notifications for: {}".format(
-            audit_char.character.character_name))
+        logger.info(
+            f"CT: No New notifications for: {audit_char.character.character_name}"
+        )
         pass
 
     audit_char.last_update_notif = timezone.now()

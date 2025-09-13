@@ -5,6 +5,9 @@ from bravado.exception import HTTPNotModified
 from django.core.cache import cache
 
 from allianceauth.services.hooks import get_extension_logger
+from esi.exceptions import HTTPNotModified as NotModified
+from esi.models import Token
+from esi.openapi_clients import EsiOperation
 
 MAX_ETAG_LIFE = 60 * 60 * 24 * 7  # 7 Days
 
@@ -49,6 +52,18 @@ def set_etag_header(operation, headers):
         result = cache.set(etag_key, etag, MAX_ETAG_LIFE)
         logger.debug(
             f"ETag: set_etag {operation.operation.operation_id} - {stringify_params(operation)} - etag:{etag} - stored:{result}")
+
+
+def set_etag_header_openapi(
+        operation,
+        req
+):
+    etag_key = get_etag_key(operation)
+    etag = req.headers.get('ETag', None)
+    if etag is not None:
+        result = cache.set(etag_key, etag, MAX_ETAG_LIFE)
+        logger.debug(
+            f"ETag: set_etag {operation} - etag:{etag} - stored:{result}")
 
 
 def stringify_params(operation):
@@ -212,3 +227,36 @@ def etag_results(operation, token, force_refresh=False, disable_verification=Fal
     logger.debug(
         f"ESI_TIME: OVERALL {time.perf_counter() - _start_tm} {operation.operation.operation_id} {stringify_params(operation)}")
     return results
+
+
+def openapi_etag_result(
+    operation: EsiOperation,
+    force_refresh=False,
+):
+    if force_refresh:
+        del_etag_header(operation)
+    etag_key = get_etag_key(operation)
+    etag = get_etag_header(operation)
+    try:
+        data, req = operation.result(
+            etag=False if force_refresh else etag,
+            return_response=True
+        )
+    except NotModified as e:
+        logger.debug(
+            f"ETag: result Hit ETag - resetting ttl - {operation} - {etag}"
+        )
+        set_etag_header_openapi(operation, e)
+        raise NotModifiedError()
+
+    if etag == req.headers.get('ETag'):
+        logger.debug(
+            f"ETag: result Hit ETag from hard cache - resetting ttl - {operation} - {etag}"
+        )
+        set_etag_header_openapi(operation, req)
+        raise NotModifiedError()
+
+    # save etag for later
+    set_etag_header_openapi(operation, req)
+
+    return data
