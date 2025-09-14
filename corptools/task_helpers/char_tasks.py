@@ -358,14 +358,14 @@ def update_character_assets(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
     try:
-        assets_op = providers.esi.client.Assets.get_characters_character_id_assets(
-            character_id=character_id)
+        assets_op = providers.esi_openapi.client.Assets.GetCharactersCharacterIdAssets(
+            character_id=character_id,
+            token=token
+        )
 
-        assets = etag_results(
+        assets = openapi_etag_result(
             assets_op,
-            token,
             force_refresh=force_refresh,
-            disable_verification=CorptoolsConfiguration.skip_verify_assets()
         )
 
         _st = time.perf_counter()
@@ -375,26 +375,24 @@ def update_character_assets(character_id, force_refresh=False):
         item_ids = []
         items = []
         for item in assets:
-            if item.get('type_id') not in _current_type_ids:
-                _current_type_ids.append(item.get('type_id'))
-            item_ids.append(item.get('item_id'))
+            if item.type_id not in _current_type_ids:
+                _current_type_ids.append(item.type_id)
+            item_ids.append(item.item_id)
             asset_item = CharacterAsset(character=audit_char,
-                                        blueprint_copy=item.get(
-                                            'is_blueprint_copy'),
-                                        singleton=item.get('is_singleton'),
-                                        item_id=item.get('item_id'),
+                                        blueprint_copy=item.is_blueprint_copy,
+                                        singleton=item.is_singleton,
+                                        item_id=item.item_id,
                                         location_flag=sanitize_location_flag(
-                                            item.get('location_flag')
+                                            item.location_flag
                                         ),
-                                        location_id=item.get('location_id'),
-                                        location_type=item.get(
-                                            'location_type'),
-                                        quantity=item.get('quantity'),
-                                        type_id=item.get('type_id'),
-                                        type_name_id=item.get('type_id')
+                                        location_id=item.location_id,
+                                        location_type=item.location_type,
+                                        quantity=item.quantity,
+                                        type_id=item.type_id,
+                                        type_name_id=item.type_id
                                         )
-            if item.get('location_id') in location_names:
-                asset_item.location_name_id = item.get('location_id')
+            if item.location_id in location_names:
+                asset_item.location_name_id = item.location_id
             items.append(asset_item)
 
         # current ship doesn't show if in space sometimes
@@ -433,6 +431,19 @@ def update_character_assets(character_id, force_refresh=False):
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_assets {character_id}")
 
+        # Locate assets in space!
+        update_asset_locations(character_id, force_refresh=force_refresh)
+        try:
+            # Get Asset Names!
+            update_character_assets_names(character_id)
+        except Exception as e:
+            logger.error(e)
+        try:
+            # Get den plannets!
+            update_den_locations(character_id)
+        except Exception as e:
+            logger.error(e)
+
     except NotModifiedError:
         logger.info("CT: No New assets for: {}".format(
             audit_char.character.character_name))
@@ -441,19 +452,6 @@ def update_character_assets(character_id, force_refresh=False):
     audit_char.last_update_assets = timezone.now()
     audit_char.save()
     audit_char.is_active()
-
-    # Locaite assets in space!
-    update_asset_locations(character_id, force_refresh=force_refresh)
-    try:
-        # Get Asset Names!
-        update_character_assets_names(character_id)
-    except Exception as e:
-        logger.error(e)
-    try:
-        # Get den plannets!
-        update_den_locations(character_id)
-    except Exception as e:
-        logger.error(e)
 
     return f"CT: Finished assets for: {audit_char.character.character_name}"
 
@@ -486,13 +484,13 @@ def update_character_assets_names(character_id):
     ).order_by("pk")
 
     for subset in chunks(asset_list, 100):
-        assets_names = providers.esi.client.Assets.post_characters_character_id_assets_names(
+        assets_names = providers.esi_openapi.client.Assets.PostCharactersCharacterIdAssetsNames(
             character_id=character_id,
-            item_ids=[i.item_id for i in subset],
-            token=token.valid_access_token()
+            body=[i.item_id for i in subset],
+            token=token
         ).results()
 
-        id_list = {i.get("item_id"): i.get("name") for i in assets_names}
+        id_list = {i.item_id: i.name for i in assets_names}
 
         for asset in subset:
             if asset.item_id in id_list:
@@ -564,19 +562,17 @@ def update_asset_locations(character_id, force_refresh=False):
             f"CT: COORDS No Tokens or Assets for {audit_char.character}")
         return f"CT: COORDS No Tokens or Assets for {audit_char.character}"
 
-    locations = providers.esi.client.Assets.post_characters_character_id_assets_locations(
+    locations = providers.esi_openapi.client.Assets.PostCharactersCharacterIdAssetsLocations(
         character_id=audit_char.character.character_id,
-        item_ids=list(
+        body=list(
             assets.values_list("item_id", flat=True)
         ),
-        token=_token.valid_access_token()
+        token=_token
     ).result()
-
-    logger.info(locations)
 
     new_coords = {}
     for loc in locations:
-        new_coords[loc['item_id']] = loc["position"]
+        new_coords[loc.item_id] = loc.position
 
     new_models = []
     for a in assets:
@@ -589,8 +585,6 @@ def update_asset_locations(character_id, force_refresh=False):
                     z=new_coords[a.item_id]['z']
                 )
             )
-            logger.info(
-                f"CT: COORD - {a.type_name.name} {new_coords[a.item_id]}")
 
     CharAssetCoordiante.objects.bulk_create(new_models, ignore_conflicts=True)
 
@@ -767,26 +761,31 @@ def get_current_ship_location(character_id, force_refresh=False):
     if not token:
         return False
 
-    ship = providers.esi.client.Location.get_characters_character_id_ship(character_id=character_id,
-                                                                          token=token.valid_access_token()).result()
-    location = providers.esi.client.Location.get_characters_character_id_location(character_id=character_id,
-                                                                                  token=token.valid_access_token()).result()
-    location_id = location.get('solar_system_id')
+    ship = providers.esi_openapi.client.Location.GetCharactersCharacterIdShip(
+        character_id=character_id,
+        token=token
+    ).result()
+    location = providers.esi_openapi.client.Location.GetCharactersCharacterIdLocation(
+        character_id=character_id,
+        token=token
+    ).result()
+
+    location_id = location.solar_system_id
     location_flag = "solar_system"
     location_type = "unlocked"
-    if location.get('structure_id') is not None:
-        location_id = location.get('structure_id')
+    if location.structure_id is not None:
+        location_id = location.structure_id
         location_flag = "item"
         location_type = "hangar"
-    elif location.get('station_id') is not None:
-        location_id = location.get('station_id')
+    elif location.station_id is not None:
+        location_id = location.station_id
         location_flag = "station"
         location_type = "hangar"
     current_ship = {
-        "item_id": ship.get('ship_item_id'),
-        "type_id": ship.get('ship_type_id'),
-        "name": ship.get('ship_name'),
-        "system_id": location.get('solar_system_id'),
+        "item_id": ship.ship_item_id,
+        "type_id": ship.ship_type_id,
+        "name": ship.ship_name,
+        "system_id": location.solar_system_id,
         "location_id": location_id,
         "location_flag": location_flag,
         "location_type": location_type,
