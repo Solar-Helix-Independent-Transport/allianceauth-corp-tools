@@ -474,7 +474,7 @@ class TestSecGroupBotFilters(TestCase):
                 corporation_id=1,
                 corporation_name=en,
                 record_id=2,
-                start_date=timezone.now()-timedelta(days=30)
+                start_date=timezone.now() - timedelta(days=30)
             )
         for i in range(5, 7):
             ct_models.CorporationHistory.objects.create(
@@ -482,7 +482,7 @@ class TestSecGroupBotFilters(TestCase):
                 corporation_id=1,
                 corporation_name=en,
                 record_id=2,
-                start_date=timezone.now()-timedelta(days=14)
+                start_date=timezone.now() - timedelta(days=14)
             )
         for i in range(7, 9):
             ct_models.CorporationHistory.objects.create(
@@ -490,7 +490,7 @@ class TestSecGroupBotFilters(TestCase):
                 corporation_id=2,
                 corporation_name=en2,
                 record_id=2,
-                start_date=timezone.now()-timedelta(days=14)
+                start_date=timezone.now() - timedelta(days=14)
             )
         for i in range(0, 4):
             ct_models.CorporationHistory.objects.create(
@@ -498,7 +498,7 @@ class TestSecGroupBotFilters(TestCase):
                 corporation_id=2,
                 corporation_name=en2,
                 record_id=1,
-                start_date=timezone.now()-timedelta(days=60)
+                start_date=timezone.now() - timedelta(days=60)
             )
         for i in range(5, 9):
             ct_models.CorporationHistory.objects.create(
@@ -506,7 +506,7 @@ class TestSecGroupBotFilters(TestCase):
                 corporation_id=2,
                 corporation_name=en2,
                 record_id=1,
-                start_date=timezone.now()-timedelta(days=30)
+                start_date=timezone.now() - timedelta(days=30)
             )
 
     def test_user_loaded_fully(self):
@@ -608,6 +608,33 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[9])
         self.assertFalse(tests[10])
 
+    def test_user_assets_no_loc_reverse(self):
+        _filter = ct_models.AssetsFilter.objects.create(
+            name="Assets Test",
+            description="Something to tell user",
+            reversed_logic=True
+        )
+        _filter.types.add(ct_models.EveItemType.objects.get(type_id=10))
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k, u in users.items():
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        self.assertFalse(tests[1])
+        self.assertTrue(tests[2])
+        self.assertFalse(tests[3])
+        self.assertTrue(tests[4])
+        self.assertTrue(tests[5])
+        self.assertFalse(tests[6])
+        self.assertTrue(tests[7])
+        self.assertFalse(tests[8])
+        self.assertTrue(tests[9])
+        self.assertTrue(tests[10])
+
     def test_user_assets_no_loc_cat(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")
@@ -633,6 +660,34 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[9])
         self.assertFalse(tests[10])
 
+    def test_user_assets_no_loc_cat_reverse(self):
+        _filter = ct_models.AssetsFilter.objects.create(
+            name="Assets Test",
+            description="Something to tell user",
+            reversed_logic=True
+        )
+        _filter.categories.add(
+            ct_models.EveItemCategory.objects.get(category_id=1))
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k, u in users.items():
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        self.assertFalse(tests[1])
+        self.assertTrue(tests[2])
+        self.assertFalse(tests[3])
+        self.assertTrue(tests[4])
+        self.assertTrue(tests[5])
+        self.assertFalse(tests[6])
+        self.assertTrue(tests[7])
+        self.assertFalse(tests[8])
+        self.assertTrue(tests[9])
+        self.assertTrue(tests[10])
+
     def test_user_assets_no_loc_grp(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")
@@ -656,6 +711,33 @@ class TestSecGroupBotFilters(TestCase):
         self.assertTrue(tests[8])
         self.assertFalse(tests[9])
         self.assertFalse(tests[10])
+
+    def test_user_assets_no_loc_grp_reverse(self):
+        _filter = ct_models.AssetsFilter.objects.create(
+            name="Assets Test",
+            description="Something to tell user",
+            reversed_logic=True
+        )
+        _filter.groups.add(ct_models.EveItemGroup.objects.get(group_id=2))
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k, u in users.items():
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        self.assertFalse(tests[1])
+        self.assertTrue(tests[2])
+        self.assertFalse(tests[3])
+        self.assertTrue(tests[4])
+        self.assertTrue(tests[5])
+        self.assertFalse(tests[6])
+        self.assertTrue(tests[7])
+        self.assertFalse(tests[8])
+        self.assertTrue(tests[9])
+        self.assertTrue(tests[10])
 
     def test_user_assets_loc(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
@@ -683,6 +765,35 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[9])
         self.assertFalse(tests[10])
 
+    def test_user_assets_loc_reverse(self):
+        _filter = ct_models.AssetsFilter.objects.create(
+            name="Assets Test",
+            description="Something to tell user",
+            reversed_logic=True
+        )
+        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.systems.add(
+            ct_models.MapSystem.objects.get(name="Test System 1"))
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k, u in users.items():
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        self.assertTrue(tests[1])
+        self.assertTrue(tests[2])
+        self.assertTrue(tests[3])
+        self.assertTrue(tests[4])
+        self.assertFalse(tests[5])
+        self.assertFalse(tests[6])
+        self.assertFalse(tests[7])
+        self.assertFalse(tests[8])
+        self.assertTrue(tests[9])
+        self.assertTrue(tests[10])
+
     def test_user_assets_loc_con(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")
@@ -708,6 +819,35 @@ class TestSecGroupBotFilters(TestCase):
         self.assertTrue(tests[8])
         self.assertFalse(tests[9])
         self.assertFalse(tests[10])
+
+    def test_user_assets_loc_con_reverse(self):
+        _filter = ct_models.AssetsFilter.objects.create(
+            name="Assets Test",
+            description="Something to tell user",
+            reversed_logic=True
+        )
+        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.constellations.add(
+            ct_models.MapConstellation.objects.get(name="Test Constellation 1"))
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k, u in users.items():
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        self.assertTrue(tests[1])
+        self.assertTrue(tests[2])
+        self.assertTrue(tests[3])
+        self.assertTrue(tests[4])
+        self.assertFalse(tests[5])
+        self.assertFalse(tests[6])
+        self.assertFalse(tests[7])
+        self.assertFalse(tests[8])
+        self.assertTrue(tests[9])
+        self.assertTrue(tests[10])
 
     def test_user_assets_loc_reg(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
@@ -735,6 +875,35 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[9])
         self.assertFalse(tests[10])
 
+    def test_user_assets_loc_reg_reverse(self):
+        _filter = ct_models.AssetsFilter.objects.create(
+            name="Assets Test",
+            description="Something to tell user",
+            reversed_logic=True
+        )
+        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.regions.add(
+            ct_models.MapRegion.objects.get(name="Test region 1"))
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k, u in users.items():
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        self.assertTrue(tests[1])
+        self.assertTrue(tests[2])
+        self.assertTrue(tests[3])
+        self.assertTrue(tests[4])
+        self.assertFalse(tests[5])
+        self.assertFalse(tests[6])
+        self.assertFalse(tests[7])
+        self.assertFalse(tests[8])
+        self.assertTrue(tests[9])
+        self.assertTrue(tests[10])
+
     def test_user_assets_loc_2(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")
@@ -759,6 +928,34 @@ class TestSecGroupBotFilters(TestCase):
         self.assertTrue(tests[7])
         self.assertFalse(tests[8])
         self.assertFalse(tests[9])
+
+    def test_user_assets_loc_2_reverse(self):
+        _filter = ct_models.AssetsFilter.objects.create(
+            name="Assets Test",
+            description="Something to tell user",
+            reversed_logic=True
+        )
+        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.systems.add(
+            ct_models.MapSystem.objects.get(name="Test System 2"))
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k, u in users.items():
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        self.assertTrue(tests[1])
+        self.assertFalse(tests[2])
+        self.assertTrue(tests[3])
+        self.assertFalse(tests[4])
+        self.assertFalse(tests[5])
+        self.assertTrue(tests[6])
+        self.assertFalse(tests[7])
+        self.assertTrue(tests[8])
+        self.assertTrue(tests[9])
 
     def test_user_skill_lists_alpha(self):
         _filter = ct_models.Skillfilter.objects.create(name="Skills Test",
