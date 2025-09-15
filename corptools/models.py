@@ -1998,7 +1998,7 @@ class AssetsFilter(FilterBase):
     regions = models.ManyToManyField(MapRegion, blank=True,
                                      help_text="Limit filter to specific regions")
 
-    negate = models.BooleanField(default=False, help_text="Negate the value of the filter, i.e. check for absence of assets")
+    reversed_logic = models.BooleanField(default=False, help_text="Negate the value of the filter, i.e. check for absence of assets")
 
     def filter_query(self, users):
         character_list = CharacterOwnership.objects.filter(user__in=users) \
@@ -2057,10 +2057,10 @@ class AssetsFilter(FilterBase):
     def process_filter(self, user: User):
         try:
             co = self.filter_query([user])
-            return (co.count() > 0) != self.negate  # XOR with self.negate
+            return (co.count() > 0) != self.reversed_logic  # XOR with self.reversed_logic
         except Exception as e:
             logger.error(e, exc_info=1)
-            return False != self.negate
+            return False != self.reversed_logic
 
     def audit_filter(self, users):
         co = self.filter_query(users).values("character__character__character_ownership__user",
@@ -2074,7 +2074,7 @@ class AssetsFilter(FilterBase):
                 chars[uid][char_name] = []
             chars[uid][char_name].append(asset_type)
 
-        output = defaultdict(lambda: {"message": "", "check": False != self.negate})
+        output = defaultdict(lambda: {"message": "", "check": False != self.reversed_logic})
         for u in users:
             if len(chars[u.id]) > 0:
                 dread_count = 0
@@ -2084,12 +2084,12 @@ class AssetsFilter(FilterBase):
                     out_message.append(
                         f"{char}: {', '.join(list(set(char_items)))}")
                 if self.count_message_only:
-                    output[u.id] = {"message": dread_count, "check": True != self.negate}
+                    output[u.id] = {"message": dread_count, "check": True != self.reversed_logic}
                 else:
                     output[u.id] = {"message": "<br>".join(
-                        out_message), "check": True != self.negate}
+                        out_message), "check": True != self.reversed_logic}
             else:
-                output[u.id] = {"message": "", "check": False != self.negate}
+                output[u.id] = {"message": "", "check": False != self.reversed_logic}
         return output
 
 
