@@ -280,6 +280,8 @@ def openapi_etag_result(
     operation: EsiOperation,
     force_refresh=False,
 ):
+    if force_refresh:
+        del_etag_header(operation)
     if operation._has_page_param():
         page = 1
         update_page_num(operation, page)
@@ -289,8 +291,6 @@ def openapi_etag_result(
         while page < total_pages:
             page += 1
             update_page_num(operation, page)
-            if force_refresh:
-                del_etag_header(operation)
             _data, res = single_page(operation, force_refresh=force_refresh)
             if _data:
                 data += _data
