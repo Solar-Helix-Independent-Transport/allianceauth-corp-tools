@@ -59,10 +59,11 @@ def set_etag_header_openapi(
         operation,
         req
 ):
-    etag_key = get_etag_key(operation)
-    etag = req.headers.get('ETag', None)
-    if etag is not None:
-        result = cache.set(etag_key, etag, MAX_ETAG_LIFE)
+    etag = req.headers.get("ETag") if req else None
+    if etag:
+        result = cache.set(
+            key=get_etag_key(operation=operation), value=etag, timeout=MAX_ETAG_LIFE
+        )
         logger.debug(
             f"ETag: set_etag {operation} - etag:{etag} - stored:{result}")
 
