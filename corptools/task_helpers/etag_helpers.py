@@ -253,10 +253,13 @@ def single_page(
 
     etag = get_etag_header(operation)
     try:
-        data, res = operation.result(
-            etag=etag,
-            return_response=True
-        )
+        result = operation.result(etag=etag, return_response=True)
+
+        if isinstance(result, tuple) and len(result) == 2:
+            data, res = result
+        else:
+            # Handle case where result is not a tuple of (data, res)
+            data, res = result, None
     except NotModified as e:
         logger.debug(
             f"ETag: result Hit ETag - resetting ttl - {operation} - {etag}"
@@ -264,7 +267,7 @@ def single_page(
         set_etag_header_openapi(operation, e)
         raise NotModifiedError()
 
-    if etag == res.headers.get('ETag'):
+    if etag == (res.headers.get("ETag") if res else None):
         logger.debug(
             f"ETag: result Hit ETag from hard cache - resetting ttl - {operation} - {etag}"
         )
