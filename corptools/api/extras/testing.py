@@ -205,21 +205,19 @@ class TestingApiEndpoints:
                 ua_version="0.0.1a1"
             )
 
-            req = esi.client.Sovereignty.GetSovereigntyCampaigns()
+            req = esi.client.Sovereignty.GetSovereigntyCampaigns().result(force_refresh=True)
+            req = esi.client.Sovereignty.GetSovereigntyCampaigns().result()
 
-            resp2, result2 = req.result(
-                return_response=True
-            )
-            # result2 = res.results()
-            etag2 = result2.headers["etag"]
-            print(etag2)
+            # # result2 = res.results()
+            # etag2 = result2.headers["etag"]
+            # print(etag2)
 
-            resp3, result3 = esi.client.Sovereignty.GetSovereigntyCampaigns().result(
-                return_response=True,
-                etag=etag1,
-                use_cache=False
-            )
-            etag3 = result3.headers["etag"]
-            print(etag3)
+            # resp3, result3 = esi.client.Sovereignty.GetSovereigntyCampaigns().result(
+            #     return_response=True,
+            #     etag=etag1,
+            #     use_cache=False
+            # )
+            # etag3 = result3.headers["etag"]
+            # print(etag3)
 
-            return [etag2, str(resp2), etag3, str(resp3)]
+            return [req]

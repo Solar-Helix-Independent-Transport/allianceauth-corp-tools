@@ -3,13 +3,13 @@ from datetime import timedelta
 
 from celery import shared_task
 
-from django.core.paginator import Paginator
 from django.db.models import F
 from django.db.models.functions import Power, Sqrt
 from django.utils import timezone
 from django.utils.html import strip_tags
 
 from allianceauth.services.hooks import get_extension_logger
+from esi.exceptions import HTTPNotModified
 from esi.models import Token
 
 from corptools.task_helpers.update_tasks import (
@@ -358,14 +358,11 @@ def update_character_assets(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
     try:
-        assets_op = providers.esi_openapi.client.Assets.GetCharactersCharacterIdAssets(
+        assets = providers.esi_openapi.client.Assets.GetCharactersCharacterIdAssets(
             character_id=character_id,
             token=token
-        )
-
-        assets = openapi_etag_result(
-            assets_op,
-            force_refresh=force_refresh,
+        ).results(
+            force_refresh=force_refresh
         )
 
         _st = time.perf_counter()
@@ -396,7 +393,8 @@ def update_character_assets(character_id, force_refresh=False):
             items.append(asset_item)
 
         # current ship doesn't show if in space sometimes
-        ship = get_current_ship_location(character_id)
+        ship = get_current_ship_location(
+            character_id, force_refresh=force_refresh)
         if ship:
             if ship.get('item_id') not in item_ids:
                 if ship.get('type_id') not in _current_type_ids:
@@ -444,7 +442,7 @@ def update_character_assets(character_id, force_refresh=False):
         except Exception as e:
             logger.error(e)
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info("CT: No New assets for: {}".format(
             audit_char.character.character_name))
         pass
@@ -760,37 +758,41 @@ def get_current_ship_location(character_id, force_refresh=False):
 
     if not token:
         return False
+    try:
+        # Todo decouple this
+        ship = providers.esi_openapi.client.Location.GetCharactersCharacterIdShip(
+            character_id=character_id,
+            token=token
+        ).result(force_refresh=force_refresh)
 
-    ship = providers.esi_openapi.client.Location.GetCharactersCharacterIdShip(
-        character_id=character_id,
-        token=token
-    ).result()
-    location = providers.esi_openapi.client.Location.GetCharactersCharacterIdLocation(
-        character_id=character_id,
-        token=token
-    ).result()
+        location = providers.esi_openapi.client.Location.GetCharactersCharacterIdLocation(
+            character_id=character_id,
+            token=token
+        ).result(force_refresh=force_refresh)
 
-    location_id = location.solar_system_id
-    location_flag = "solar_system"
-    location_type = "unlocked"
-    if location.structure_id is not None:
-        location_id = location.structure_id
-        location_flag = "item"
-        location_type = "hangar"
-    elif location.station_id is not None:
-        location_id = location.station_id
-        location_flag = "station"
-        location_type = "hangar"
-    current_ship = {
-        "item_id": ship.ship_item_id,
-        "type_id": ship.ship_type_id,
-        "name": ship.ship_name,
-        "system_id": location.solar_system_id,
-        "location_id": location_id,
-        "location_flag": location_flag,
-        "location_type": location_type,
-    }
-    return current_ship
+        location_id = location.solar_system_id
+        location_flag = "solar_system"
+        location_type = "unlocked"
+        if location.structure_id is not None:
+            location_id = location.structure_id
+            location_flag = "item"
+            location_type = "hangar"
+        elif location.station_id is not None:
+            location_id = location.station_id
+            location_flag = "station"
+            location_type = "hangar"
+        current_ship = {
+            "item_id": ship.ship_item_id,
+            "type_id": ship.ship_type_id,
+            "name": ship.ship_name,
+            "system_id": location.solar_system_id,
+            "location_id": location_id,
+            "location_flag": location_flag,
+            "location_type": location_type,
+        }
+        return current_ship
+    except HTTPNotModified:
+        return False
 
 
 def update_character_wallet(character_id, force_refresh=False):
@@ -1289,15 +1291,10 @@ def update_character_notifications(character_id, force_refresh=False):
         return "No Tokens"
 
     try:
-        notes_op = providers.esi_openapi.client.Character.GetCharactersCharacterIdNotifications(
+        notifications = providers.esi_openapi.client.Character.GetCharactersCharacterIdNotifications(
             character_id=character_id,
             token=token,
-        )
-
-        notifications = openapi_etag_result(
-            notes_op,
-            force_refresh=force_refresh
-        )
+        ).result(force_refresh=force_refresh)
 
         _st = time.perf_counter()
 
@@ -1351,7 +1348,7 @@ def update_character_notifications(character_id, force_refresh=False):
             f"CT_TIME: {time.perf_counter() - _st} update_character_notifications {character_id}"
         )
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             f"CT: No New notifications for: {audit_char.character.character_name}"
         )
