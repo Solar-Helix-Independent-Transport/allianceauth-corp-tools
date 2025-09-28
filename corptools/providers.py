@@ -272,3 +272,5 @@ esi_openapi = ESIOpenApiProvider(
     ua_url=__url__,
     ua_version=__version__
 )
+
+# esi_openapi.client
