@@ -45,6 +45,7 @@ dependencies = [
     "django-model-utils",
     "django-ninja<2,>=1.0.1",
     "networkx",
+    "pydantic==2.11.10",      # model defaults issue
 ]
 optional-dependencies.test = [
     "allianceauth-securegroups",
