@@ -33,6 +33,12 @@ from .etag_helpers import NotModifiedError, etag_results
 logger = get_extension_logger(__name__)
 
 
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
+
 def get_token(character_id: int, scopes: list) -> "Token":
     """Helper method to get a valid token for a specific character with specific scopes.
 
@@ -564,15 +570,16 @@ def update_asset_locations(character_id, force_refresh=False):
             f"CT: COORDS No Tokens or Assets for {audit_char.character}")
         return f"CT: COORDS No Tokens or Assets for {audit_char.character}"
 
-    locations = providers.esi.client.Assets.post_characters_character_id_assets_locations(
-        character_id=audit_char.character.character_id,
-        item_ids=list(
-            assets.values_list("item_id", flat=True)
-        ),
-        token=_token.valid_access_token()
-    ).result()
+    locations = []
 
-    logger.info(locations)
+    for ids in chunks(list(assets.values_list("item_id", flat=True)), 900):
+        locations += providers.esi.client.Assets.post_characters_character_id_assets_locations(
+            character_id=audit_char.character.character_id,
+            item_ids=ids,
+            token=_token.valid_access_token()
+        ).result()
+
+    # logger.info(locations)
 
     new_coords = {}
     for loc in locations:
