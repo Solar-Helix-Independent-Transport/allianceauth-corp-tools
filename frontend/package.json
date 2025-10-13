@@ -19,7 +19,7 @@
     "@types/js-cookie": "^3.0.6",
     "@types/react-router-bootstrap": "^0.26.6",
     "@types/react-timeago": "^4.1.7",
-    "axios": "^1.6.7",
+    "axios": "^1.12.0",
     "bootstrap": "^5.3.3",
     "csv-stringify": "^6.5.0",
     "i18next": "^24.2.2",
