@@ -39,6 +39,9 @@ const CharacterContracts = () => {
     columnHelper.accessor("assignee", {
       header: t("Assignee"),
     }),
+    columnHelper.accessor("acceptor", {
+      header: t("Acceptor"),
+    }),
     columnHelper.accessor("price", {
       header: t("Price"),
       cell: (cell) => `${cell.getValue().toLocaleString()}`,
