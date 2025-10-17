@@ -602,7 +602,7 @@ def update_corporation_industry_jobs(corp_id: int, force_refresh: bool = False) 
         corporation__corporation_id=corp_id)
 
     operation = providers.esi.client.Industry.get_corporations_corporation_id_industry_jobs(
-        character_id=_corporation.corporation.corporation_id, include_completed=True
+        corporation_id=_corporation.corporation.corporation_id, include_completed=True
     )
 
     try:
@@ -644,7 +644,7 @@ def update_corporation_industry_jobs(corp_id: int, force_refresh: bool = False) 
             continue
 
         _e = CorporationIndustryJob(
-            character=_corporation,
+            corporation=_corporation,
             activity_id=event.get("activity_id"),
             blueprint_id=event.get("blueprint_id"),
             blueprint_location_id=event.get("blueprint_location_id"),
