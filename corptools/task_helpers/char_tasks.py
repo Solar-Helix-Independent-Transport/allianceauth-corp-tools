@@ -374,59 +374,43 @@ def update_character_assets(character_id, force_refresh=False):
         _st = time.perf_counter()
         location_names = list(
             EveLocation.objects.all().values_list('location_id', flat=True))
+
         _current_type_ids = []
         item_ids = []
         items = []
+
         for item in assets:
             if item.type_id not in _current_type_ids:
                 _current_type_ids.append(item.type_id)
             item_ids.append(item.item_id)
-            asset_item = CharacterAsset(character=audit_char,
-                                        blueprint_copy=item.is_blueprint_copy,
-                                        singleton=item.is_singleton,
-                                        item_id=item.item_id,
-                                        location_flag=sanitize_location_flag(
-                                            item.location_flag
-                                        ),
-                                        location_id=item.location_id,
-                                        location_type=item.location_type,
-                                        quantity=item.quantity,
-                                        type_id=item.type_id,
-                                        type_name_id=item.type_id
-                                        )
+
+            asset_item = CharacterAsset.from_esi_model(audit_char, item)
+
+            # attach location name
             if item.location_id in location_names:
                 asset_item.location_name_id = item.location_id
+
             items.append(asset_item)
 
         # current ship doesn't show if in space sometimes
         ship = get_current_ship_location(
-            character_id, force_refresh=force_refresh)
+            character_id,
+            force_refresh=force_refresh
+        )
         if ship:
-            if ship.get('item_id') not in item_ids:
-                if ship.get('type_id') not in _current_type_ids:
-                    _current_type_ids.append(ship.get('type_id'))
+            if ship.item_id not in item_ids:
+                if ship.type_id not in _current_type_ids:
+                    _current_type_ids.append(ship.type_id)
 
-                asset_item = CharacterAsset(character=audit_char,
-                                            singleton=True,
-                                            item_id=ship.get('item_id'),
-                                            location_flag=ship.get(
-                                                'location_flag'),
-                                            location_id=ship.get(
-                                                'location_id'),
-                                            location_type=ship.get(
-                                                'location_type'),
-                                            quantity=1,
-                                            type_id=ship.get('type_id'),
-                                            type_name_id=ship.get('type_id')
-                                            )
-                if ship.get('location_id') in location_names:
-                    asset_item.location_name_id = ship.get('location_id')
-                items.append(asset_item)
+                if ship.location_id in location_names:
+                    ship.location_name_id = ship.location_id
+                items.append(ship)
 
         EveItemType.objects.create_bulk_from_esi(_current_type_ids)
 
         delete_query = CharacterAsset.objects.filter(
-            character=audit_char)  # Flush Assets
+            character=audit_char
+        )  # Flush Assets
         if delete_query.exists():
             # We now have some FKeys so slow it down...
             delete_query.delete()
@@ -467,6 +451,9 @@ def chunks(qst, n):
 
 
 def update_character_assets_names(character_id):
+    """
+        Uses PostCharactersCharacterIdAssetsNames
+    """
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating Asset names for: {}".format(
@@ -536,6 +523,9 @@ def update_den_locations(character_id, force_refresh=False):
 
 
 def update_asset_locations(character_id, force_refresh=False):
+    """
+        Uses PostCharactersCharacterIdAssetsLocations
+    """
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating Asset locations for: {}".format(
@@ -546,7 +536,7 @@ def update_asset_locations(character_id, force_refresh=False):
         40,  # Sov
         22,  # Deployables
     ]
-# These must be in space
+    # These must be in space
     max_location_id = 35000000
     min_location_id = 30000000
 
@@ -758,10 +748,17 @@ def update_character_industry_jobs(character_id, force_refresh=False):
 
 
 def get_current_ship_location(character_id, force_refresh=False):
-    CharacterAudit.objects.get(
-        character__character_id=character_id)
-    req_scopes = ['esi-location.read_location.v1',
-                  'esi-location.read_ship_type.v1']
+    """
+        Uses GetCharactersCharacterIdShip, GetCharactersCharacterIdLocation
+    """
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id
+    )
+
+    req_scopes = [
+        'esi-location.read_location.v1',
+        'esi-location.read_ship_type.v1'
+    ]
 
     token = get_token(character_id, req_scopes)
 
@@ -779,27 +776,7 @@ def get_current_ship_location(character_id, force_refresh=False):
             token=token
         ).result(force_refresh=force_refresh)
 
-        location_id = location.solar_system_id
-        location_flag = "solar_system"
-        location_type = "unlocked"
-        if location.structure_id is not None:
-            location_id = location.structure_id
-            location_flag = "item"
-            location_type = "hangar"
-        elif location.station_id is not None:
-            location_id = location.station_id
-            location_flag = "station"
-            location_type = "hangar"
-        current_ship = {
-            "item_id": ship.ship_item_id,
-            "type_id": ship.ship_type_id,
-            "name": ship.ship_name,
-            "system_id": location.solar_system_id,
-            "location_id": location_id,
-            "location_flag": location_flag,
-            "location_type": location_type,
-        }
-        return current_ship
+        return CharacterAsset.from_esi_location(audit_char, ship, location)
     except HTTPNotModified:
         return False
 
@@ -1286,6 +1263,9 @@ def update_character_order_history(character_id, force_refresh=False):
 
 @shared_task
 def update_character_notifications(character_id, force_refresh=False):
+    """
+        Uses GetCharactersCharacterIdNotifications
+    """
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id
     )
@@ -1322,26 +1302,9 @@ def update_character_notifications(character_id, force_refresh=False):
         _create_notifs = []
         for note in notifications:
             if not note.notification_id in last_five_hundred:
-                _creates.append(
-                    Notification(
-                        character=audit_char,
-                        notification_id=note.notification_id,
-                        sender_id=note.sender_id,
-                        sender_type=note.sender_type,
-                        notification_text_id=note.notification_id,
-                        timestamp=note.timestamp,
-                        notification_type=sanitize_notification_type(
-                            note.type
-                        ),
-                        is_read=note.is_read
-                    )
-                )
-                _create_notifs.append(
-                    NotificationText(
-                        notification_id=note.notification_id,
-                        notification_text=note.text
-                    )
-                )
+                _note, _text = Notification.from_esi_model(audit_char, note)
+                _creates.append(_note)
+                _create_notifs.append(_text)
 
         NotificationText.objects.bulk_create(
             _create_notifs,

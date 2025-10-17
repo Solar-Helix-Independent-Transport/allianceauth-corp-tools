@@ -1,6 +1,8 @@
 
 from django.db import models
 
+from corptools.task_helpers import sanitize_location_flag
+
 from .audits import (
     CharacterAudit, CorporationAudit, CorptoolsConfiguration, EveLocation,
 )
@@ -60,6 +62,51 @@ class CharacterAsset(Asset):
             self.character,
             self.location_id,
             self.location_type
+        )
+
+    @classmethod
+    def from_esi_model(cls, character, model):
+        return cls(
+            character=character,
+            blueprint_copy=model.is_blueprint_copy,
+            singleton=model.is_singleton,
+            item_id=model.item_id,
+            location_flag=sanitize_location_flag(
+                model.location_flag
+            ),
+            location_id=model.location_id,
+            location_type=model.location_type,
+            quantity=model.quantity,
+            type_id=model.type_id,
+            type_name_id=model.type_id
+        )
+
+    @classmethod
+    def from_esi_location(cls, character, ship, location):
+        location_id = location.solar_system_id
+        location_flag = "solar_system"
+        location_type = "unlocked"
+        if location.structure_id is not None:
+            location_id = location.structure_id
+            location_flag = "item"
+            location_type = "hangar"
+        elif location.station_id is not None:
+            location_id = location.station_id
+            location_flag = "station"
+            location_type = "hangar"
+
+        return cls(
+            character=character,
+            singleton=True,
+            item_id=ship.ship_item_id,
+            location_flag=sanitize_location_flag(
+                location_flag
+            ),
+            location_id=location_id,
+            location_type=location_type,
+            quantity=1,
+            type_id=ship.ship_item_id,
+            type_name_id=ship.ship_item_id
         )
 
 
