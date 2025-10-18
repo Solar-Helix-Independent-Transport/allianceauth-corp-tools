@@ -602,7 +602,7 @@ def update_corporation_industry_jobs(corp_id: int, force_refresh: bool = False) 
         corporation__corporation_id=corp_id)
 
     operation = providers.esi.client.Industry.get_corporations_corporation_id_industry_jobs(
-        character_id=_corporation.corporation.corporation_id, include_completed=True
+        corporation_id=_corporation.corporation.corporation_id, include_completed=True
     )
 
     try:
@@ -644,7 +644,7 @@ def update_corporation_industry_jobs(corp_id: int, force_refresh: bool = False) 
             continue
 
         _e = CorporationIndustryJob(
-            character=_corporation,
+            corporation=_corporation,
             activity_id=event.get("activity_id"),
             blueprint_id=event.get("blueprint_id"),
             blueprint_location_id=event.get("blueprint_location_id"),
@@ -1287,13 +1287,14 @@ def fetch_coordiantes(self, corp_id):
             f"CT: COORDS No Tokens or Assets for {_corporation.corporation.corporation_name}")
         return f"CT: COORDS No Tokens or Assets for {_corporation.corporation.corporation_name}"
 
-    locations = providers.esi.client.Assets.post_corporations_corporation_id_assets_locations(
-        corporation_id=_corporation.corporation.corporation_id,
-        item_ids=list(
-            assets.values_list("item_id", flat=True)
-        ),
-        token=_token.valid_access_token()
-    ).result()
+    _all_ids = assets.values_list("item_id", flat=True)
+
+    for id_chunk in providers.esi.chunk_ids(_all_ids):
+        locations += providers.esi.client.Assets.post_corporations_corporation_id_assets_locations(
+            corporation_id=_corporation.corporation.corporation_id,
+            item_ids=id_chunk,
+            token=_token.valid_access_token()
+        ).result()
 
     logger.info(locations)
 
