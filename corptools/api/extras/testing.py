@@ -96,15 +96,15 @@ class TestingApiEndpoints:
             """
             if not request.user.is_superuser:
                 return 403, {"message": "Hard no pall!"}
-            from aiopenapi3 import OpenAPI
+            # from aiopenapi3 import OpenAPI
 
-            from esi.clients import EsiClientProvider
-            esi2 = EsiClientProvider()
-            res = esi2.client.Sovereignty.get_sovereignty_campaigns()
-            res.request_config.also_return_response = True
-            result, headers = res.result()
-            etag1 = headers.headers["etag"]
-            print("here")
+            # from esi.clients import EsiClientProvider
+            # esi2 = EsiClientProvider()
+            # res = esi2.client.Sovereignty.get_sovereignty_campaigns()
+            # res.request_config.also_return_response = True
+            # result, headers = res.result()
+            # etag1 = headers.headers["etag"]
+            # print("here")
             # res = esi.client.Alliance.GetAlliances(
             # )
             # result, headers = res.result(return_response=True)
@@ -189,27 +189,24 @@ class TestingApiEndpoints:
             esi = openapi_clients.ESIClientProvider(
                 compatibility_date="2025-08-26",
                 ua_appname="ack-testing-django-esi",
-                ua_version="0.0.1a1"
+                ua_version="0.0.1a1",
+                tags=["Character", "Assets"]
             )
+            # try:
+            #     req, res = esi.client.Universe.GetUniverseCategoriesCategoryId(category_id=999999).result(use_etag=False, return_response=True)
+            # except Exception as e:
+            #     print(e)
 
-            req = esi.client.Sovereignty.GetSovereigntyCampaigns().result(force_refresh=True)
-            req = esi.client.Sovereignty.GetSovereigntyCampaigns().result()
-            req = esi.client.Sovereignty.GetSovereigntyCampaigns().result()
-            req = esi.client.Sovereignty.GetSovereigntyCampaigns().result()
-            req = esi.client.Sovereignty.GetSovereigntyCampaigns().result()
+            # req, res = esi.client.Universe.GetUniverseCategoriesCategoryId(category_id=5).result(return_response=True)
+            # print(res.headers)
 
-            resp2, result2 = req.result(
-                return_response=True
-            )
-            # result2 = res.results()
-            etag2 = result2.headers["etag"]
-            # print(etag2)
+            req_scopes = ['esi-fleets.write_fleet.v1']
+            cid = 755166922
+            # token = get_token(cid, req_scopes)
+            # req = esi.client.Character.GetCharactersCharacterIdNotifications(character_id=cid, token=token).result()
 
-            resp3, result3 = esi.client.Sovereignty.GetSovereigntyCampaigns().result(
-                return_response=True,
-                use_cache=False
-            )
-            etag3 = result3.headers["etag"]
-            # print(etag3)
-
-            return [req]
+            req_scopes = ['esi-assets.read_assets.v1']
+            token = get_token(cid, req_scopes)
+            req, res = esi.client.Assets.GetCharactersCharacterIdAssets(
+                character_id=cid, token=token).results(return_response=True, use_etag=False)
+            return [req[:10]]

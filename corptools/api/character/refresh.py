@@ -29,8 +29,12 @@ class RefreshApiEndpoints:
             audits_visible = models.CharacterAudit.objects.visible_to(
                 request.user).values_list('character_id', flat=True)
             if character_id in audits_visible:
-                character.update_character.apply_async(args=[character_id], kwargs={
-                    "force_refresh": True}, priority=4)
+                character.update_character.apply_async(
+                    args=[character_id],
+                    kwargs={
+                        "force_refresh": True
+                    },
+                    priority=4)
             return 200, {"message": "Requested Update!"}
 
         @api.post(
@@ -52,7 +56,11 @@ class RefreshApiEndpoints:
 
             for cid in characters.values_list('character_id', flat=True):
                 character.update_character.apply_async(
-                    args=[cid], kwargs={"force_refresh": force}, priority=4)
+                    args=[cid],
+                    kwargs={
+                        "force_refresh": force
+                    },
+                    priority=4)
                 eve_character_update.apply_async(
                     args=[cid], priority=4)
             return 200, {"message": "Requested Updates!"}
