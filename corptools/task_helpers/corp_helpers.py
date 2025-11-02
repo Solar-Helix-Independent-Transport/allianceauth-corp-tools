@@ -1289,6 +1289,8 @@ def fetch_coordiantes(self, corp_id):
 
     _all_ids = assets.values_list("item_id", flat=True)
 
+    locations = []
+
     for id_chunk in providers.esi.chunk_ids(_all_ids):
         locations += providers.esi.client.Assets.post_corporations_corporation_id_assets_locations(
             corporation_id=_corporation.corporation.corporation_id,
