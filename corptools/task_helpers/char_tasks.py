@@ -577,9 +577,9 @@ def update_asset_locations(character_id, force_refresh=False):
             new_models.append(
                 CharAssetCoordiante(
                     item=a,
-                    x=new_coords[a.item_id]['x'],
-                    y=new_coords[a.item_id]['y'],
-                    z=new_coords[a.item_id]['z']
+                    x=new_coords[a.item_id].x,
+                    y=new_coords[a.item_id].y,
+                    z=new_coords[a.item_id].z
                 )
             )
 
