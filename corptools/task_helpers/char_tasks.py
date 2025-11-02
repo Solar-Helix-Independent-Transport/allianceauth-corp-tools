@@ -558,10 +558,10 @@ def update_asset_locations(character_id, force_refresh=False):
 
     locations = []
 
-    for ids in chunks(list(assets.values_list("item_id", flat=True)), 900):
+    for ids in chunks(assets, 900):
         locations = providers.esi_openapi.client.Assets.PostCharactersCharacterIdAssetsLocations(
             character_id=audit_char.character.character_id,
-            body=ids,
+            body=list(ids.values_list("item_id", flat=True)),
             token=_token
         ).result()
 
