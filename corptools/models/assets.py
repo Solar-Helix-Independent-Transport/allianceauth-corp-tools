@@ -105,8 +105,8 @@ class CharacterAsset(Asset):
             location_id=location_id,
             location_type=location_type,
             quantity=1,
-            type_id=ship.ship_item_id,
-            type_name_id=ship.ship_item_id
+            type_id=ship.ship_type_id,
+            type_name_id=ship.ship_type_id
         )
 
 

@@ -20,22 +20,27 @@ class RefreshApiEndpoints:
 
         @api.post(
             "characters/refresh",
-            response={200: schema.Message, 403: str},
+            response={200: schema.Message, 403: str, 404: str},
             tags=self.tags
         )
         def post_characters_refresh(request, character_id: int):
             if character_id == 0:
                 character_id = request.user.profile.main_character.character_id
-            audits_visible = models.CharacterAudit.objects.visible_to(
-                request.user).values_list('character_id', flat=True)
-            if character_id in audits_visible:
+            response, main = get_main_character(request, character_id)
+
+            if not response:
+                return 403, _("Permission Denied")
+
+            characters = get_alts_queryset(main)
+            if character_id in characters.values_list('character_id', flat=True):
                 character.update_character.apply_async(
                     args=[character_id],
                     kwargs={
                         "force_refresh": True
                     },
                     priority=4)
-            return 200, {"message": "Requested Update!"}
+                return 200, {"message": "Requested Update!"}
+            return 404, "Not Found!"
 
         @api.post(
             "account/refresh",
