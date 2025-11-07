@@ -281,5 +281,11 @@ esi_openapi = ESIOpenApiProvider(
         "GetCharactersCharacterIdLocation",
         # Character Notification
         "GetCharactersCharacterIdNotifications",
+        # Corporate Assets
+        "GetCorporationsCorporationIdAssets",
+        "PostCorporationsCorporationIdAssetsNames",
+        "PostCorporationsCorporationIdAssetsLocations",
+        # Corp Data
+        "GetCorporationsCorporationIdDivisions",
     ]
 )

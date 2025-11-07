@@ -14,6 +14,7 @@ from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
 from esi.errors import TokenError
+from esi.exceptions import HTTPNotModified
 from esi.models import Token
 
 from corptools.models import (
@@ -727,7 +728,7 @@ def update_character_logins_from_corp(corp_id):
     return f"Finished Logins for: {audit_corp.corporation}"
 
 
-def update_corp_assets(corp_id):
+def update_corp_assets(corp_id, force_refresh: bool = False):
     audit_corp = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
     logger.debug("Updating Assets for: {}".format(
@@ -744,54 +745,48 @@ def update_corp_assets(corp_id):
     try:
         failed_locations = []
 
-        assets_op = providers.esi.client.Assets.get_corporations_corporation_id_assets(
-            corporation_id=corp_id
+        assets = providers.esi_openapi.client.Assets.GetCorporationsCorporationIdAssets(
+            corporation_id=corp_id,
+            token=token
+        ).results(
+            force_refresh=force_refresh
         )
-
-        assets = etag_results(
-            assets_op, token, disable_verification=CorptoolsConfiguration.skip_verify_assets())
 
         location_names = list(
             EveLocation.objects.all().values_list('location_id', flat=True)
         )
+
         _current_type_ids = []
         item_ids = []
         items = []
+
         for item in assets:
-            if item.get('type_id') not in _current_type_ids:
-                _current_type_ids.append(item.get('type_id'))
-            item_ids.append(item.get('item_id'))
-            asset_item = CorpAsset(corporation=audit_corp,
-                                   blueprint_copy=item.get(
-                                       'is_blueprint_copy'),
-                                   singleton=item.get('is_singleton'),
-                                   item_id=item.get('item_id'),
-                                   location_flag=sanitize_location_flag(
-                                       item.get('location_flag')
-                                   ),
-                                   location_id=item.get('location_id'),
-                                   location_type=item.get(
-                                       'location_type'),
-                                   quantity=item.get('quantity'),
-                                   type_id=item.get('type_id'),
-                                   type_name_id=item.get('type_id')
-                                   )
-            if item.get('location_id') not in location_names:
+            if item.type_id not in _current_type_ids:
+                _current_type_ids.append(item.type_id)
+            item_ids.append(item.item_id)
+
+            asset_item = CorpAsset.from_esi_model(audit_corp, item)
+
+            if item.location_id not in location_names:
                 try:
-                    if item.get('location_id') not in failed_locations:
+                    if item.location_id not in failed_locations:
                         new_name = fetch_location_name(
-                            item.get('location_id'), item.get('location_flag'), token.character_id)
+                            item.location_id,
+                            item.location_flag,
+                            token.character_id
+                        )
                         if new_name:
                             new_name.save()
-                            location_names.append(item.get('location_id'))
-                            asset_item.location_name_id = item.get(
-                                'location_id')
+                            location_names.append(
+                                item.location_id
+                            )
+                            asset_item.location_name_id = item.location_id
                         else:
-                            failed_locations.append(item.get('location_id'))
+                            failed_locations.append(item.location_id)
                 except Exception:
                     pass  # TODO
             else:
-                asset_item.location_name_id = item.get('location_id')
+                asset_item.location_name_id = item.location_id
 
             items.append(asset_item)
 
@@ -800,9 +795,8 @@ def update_corp_assets(corp_id):
         delete_query = CorpAsset.objects.filter(
             corporation=audit_corp)  # Flush Assets
         if delete_query.exists():
-            # speed and we are not caring about f-keys or signals on these models
-            # delete_query._raw_delete(delete_query.db)
-            delete_query.delete()  # with coords we need to care about the fkeys/signals
+            # with coords we need to care about the fkeys/signals
+            delete_query.delete()
 
         CorpAsset.objects.bulk_create(items)
         try:
@@ -811,11 +805,12 @@ def update_corp_assets(corp_id):
             logger.error(e)
 
         que = []
-        que.append(fetch_coordiantes.si(corp_id))
+        que.append(fetch_coordiantes.si(corp_id, force_refresh=force_refresh))
         que.append(run_ozone_levels.si(corp_id))
-        que.append(build_managed_asset_locations.si(corp_id))
+        que.append(build_managed_asset_locations.si(
+            corp_id, force_refresh=force_refresh))
         chain(que).apply_async(priority=7)
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info("CT: No New assets for: {}".format(
             audit_corp.corporation))
         pass
@@ -832,7 +827,11 @@ def chunks(qst, n):
         yield qst[i:i + n]
 
 
-def update_corp_asset_names(corp_id):
+def update_corp_asset_names(corp_id, force_refresh: bool = False):
+    """
+        Uses PostCorporationCorporationIdAssetsNames
+    """
+
     audit_corp = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
     logger.debug("Updating Assets for: {}".format(
@@ -855,15 +854,16 @@ def update_corp_asset_names(corp_id):
         singleton=True
     ).order_by("pk")
 
-    for subset in chunks(asset_list, 100):
-
-        assets_names = providers.esi.client.Assets.post_corporations_corporation_id_assets_names(
+    for subset in chunks(asset_list, 900):
+        assets_names = providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsNames(
             corporation_id=corp_id,
-            item_ids=[i.item_id for i in subset],
+            body=list(set([i.item_id for i in subset])),
             token=token.valid_access_token()
-        ).results()
+        ).results(
+            force_refresh=force_refresh
+        )
 
-        id_list = {i.get("item_id"): i.get("name") for i in assets_names}
+        id_list = {i.item_id: i.name for i in assets_names}
 
         for asset in subset:
             if asset.item_id in id_list:
@@ -909,7 +909,7 @@ def chunks(lst, n):
 
 
 @shared_task(bind=True)
-def build_managed_asset_locations(self, corp_id):
+def build_managed_asset_locations(self, corp_id, force_refresh: bool = True):
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
     logger.debug("Updating Corporate Hangar Locations for: %s" %
@@ -923,12 +923,14 @@ def build_managed_asset_locations(self, corp_id):
 
     divisions = {}
     if token:
-        divs = providers.esi.client.Corporation.get_corporations_corporation_id_divisions(
+        divs = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdDivisions(
             corporation_id=_corporation.corporation.corporation_id,
             token=token.valid_access_token()
-        ).result()
-        for d in divs['hangar']:
-            divisions[f"CorpSAG{d['division']}"] = d['name']
+        ).result(
+            force_refresh=force_refresh
+        )
+        for d in divs.hangar:
+            divisions[f"CorpSAG{d.division}"] = d.name
 
     existing_locations = set(list(EveLocation.objects.filter(
         managed=True, managed_corp=_corporation).values_list("location_id", flat=True)))
@@ -936,9 +938,11 @@ def build_managed_asset_locations(self, corp_id):
     new = []
     updates = []
     # get office folders and name them
-    folders = CorpAsset.objects.filter(corporation=_corporation,
-                                       location_flag="OfficeFolder"
-                                       ).select_related("location_name")
+    folders = CorpAsset.objects.filter(
+        corporation=_corporation,
+        location_flag="OfficeFolder"
+    ).select_related("location_name")
+
     names = {}
 
     grp_ids = [
@@ -1010,14 +1014,16 @@ def build_managed_asset_locations(self, corp_id):
     token = get_corp_token(corp_id, req_scopes, req_roles)
     if token:
         ids = list(set(list(containers.values_list("item_id", flat=True))))
-        for c in chunks(ids, 250):
-            items = providers.esi.client.Assets.post_corporations_corporation_id_assets_names(
-                item_ids=c,
+        for c in chunks(ids, 900):
+            items = providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsNames(
+                body=c,
                 corporation_id=_corporation.corporation.corporation_id,
                 token=token.valid_access_token()
-            ).result()
+            ).result(
+                force_refresh=force_refresh
+            )
             for n in items:
-                names[n['item_id']] = n['name']
+                names[n.item_id] = n.name
 
     # each container gets a location name Station > Hangar > Type
     for c in containers:
@@ -1247,7 +1253,7 @@ def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=Fa
 
 
 @shared_task(bind=True, base=QueueOnce)
-def fetch_coordiantes(self, corp_id):
+def fetch_coordiantes(self, corp_id, force_refresh: bool = False):
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
 
@@ -1292,17 +1298,19 @@ def fetch_coordiantes(self, corp_id):
     locations = []
 
     for id_chunk in providers.esi.chunk_ids(_all_ids):
-        locations += providers.esi.client.Assets.post_corporations_corporation_id_assets_locations(
+        locations += providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsLocations(
             corporation_id=_corporation.corporation.corporation_id,
-            item_ids=id_chunk,
+            body=id_chunk,
             token=_token.valid_access_token()
-        ).result()
+        ).result(
+            force_refresh=force_refresh
+        )
 
     logger.info(locations)
 
     new_coords = {}
     for loc in locations:
-        new_coords[loc['item_id']] = loc["position"]
+        new_coords[loc.item_id] = loc.position
 
     new_models = []
     for a in assets:
@@ -1310,9 +1318,9 @@ def fetch_coordiantes(self, corp_id):
             new_models.append(
                 AssetCoordiante(
                     item=a,
-                    x=new_coords[a.item_id]['x'],
-                    y=new_coords[a.item_id]['y'],
-                    z=new_coords[a.item_id]['z']
+                    x=new_coords[a.item_id].x,
+                    y=new_coords[a.item_id].y,
+                    z=new_coords[a.item_id].z
                 )
             )
             logger.info(

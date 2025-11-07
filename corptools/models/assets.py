@@ -51,6 +51,23 @@ class CorpAsset(Asset):
 
         return cls.objects.filter(corporation__in=corps_vis)
 
+    @classmethod
+    def from_esi_model(cls, corporation: CorporationAudit, model):
+        return cls(
+            corporation=corporation,
+            blueprint_copy=model.is_blueprint_copy,
+            singleton=model.is_singleton,
+            item_id=model.item_id,
+            location_flag=sanitize_location_flag(
+                model.location_flag
+            ),
+            location_id=model.location_id,
+            location_type=model.location_type,
+            quantity=model.quantity,
+            type_id=model.type_id,
+            type_name_id=model.type_id
+        )
+
 
 class CharacterAsset(Asset):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
@@ -65,7 +82,7 @@ class CharacterAsset(Asset):
         )
 
     @classmethod
-    def from_esi_model(cls, character, model):
+    def from_esi_model(cls, character: CharacterAudit, model):
         return cls(
             character=character,
             blueprint_copy=model.is_blueprint_copy,
@@ -82,7 +99,7 @@ class CharacterAsset(Asset):
         )
 
     @classmethod
-    def from_esi_location(cls, character, ship, location):
+    def from_esi_location(cls, character: CharacterAudit, ship, location):
         location_id = location.solar_system_id
         location_flag = "solar_system"
         location_type = "unlocked"
