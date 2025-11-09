@@ -155,3 +155,18 @@ class TestCorptoolsCorpAccessPerms(CorptoolsTestCase):
         self.assertNotIn(self.cp2, cs)
         self.assertIn(self.cp3, cs)
         self.assertNotIn(self.cp4, cs)
+
+    def test_only_director_perms_u3(self):
+        # own corp 3
+        # alt corp 4
+        self.user3.user_permissions.add(self.director_manager)
+        CharacterRoles.objects.create(
+            character=self.ca7,
+            director=True
+        )
+        self.user3.refresh_from_db()
+        cs = CorporationAudit.objects.visible_to(self.user3)
+        self.assertNotIn(self.cp1, cs)
+        self.assertNotIn(self.cp2, cs)
+        self.assertNotIn(self.cp3, cs)
+        self.assertIn(self.cp4, cs)
