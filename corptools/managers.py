@@ -437,22 +437,31 @@ class AuditCorporationQuerySet(models.QuerySet):
             assert char
             # build all accepted queries
             queries = []
+
             if user.has_perm('corptools.own_corp_manager'):
                 queries.append(
                     models.Q(corporation__corporation_id=char.corporation_id))
+
             if user.has_perm('corptools.alliance_corp_manager'):
                 if char.alliance_id is not None:
                     queries.append(
                         models.Q(corporation__alliance__alliance_id=char.alliance_id))
                 else:
                     queries.append(
-                        models.Q(corporation__corporation_id=char.corporation_id))
-            """if user.has_perm('corptools.state_corp_manager'):
-                if user.has_perm('corptools.alliance_corp_manager'):
-                    pass
-                else:
-                    queries.append(
-                        models.Q(corporation__corporation_id=char.corporation_id))"""
+                        models.Q(
+                            corporation__corporation_id=char.corporation_id)
+                    )
+
+            if user.has_perm('corptools.show_if_director'):
+                queries.append(
+                    models.Q(
+                        corporation__corporation_id__in=EveCharacter.objects.filter(
+                            characteraudit__characterroles__director=True,
+                            character_ownership__user=user
+                        ).values_list("corporation_id", flat=True)
+                    )
+                )
+
             logger.debug('%s queries for user %s visible chracters.' %
                          (len(queries), user))
             # filter based on queries

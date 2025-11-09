@@ -453,6 +453,8 @@ class CorporationAudit(models.Model):
             ('state_corp_manager',
              'Can access other corporations\'s data for own state.'),
             ('global_corp_manager', 'Can access all corporations\'s data.'),
+            ('show_if_director',
+             'Can access all corporations\'s where character is a director.'),
         )
 
 
