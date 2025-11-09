@@ -131,6 +131,8 @@ class CorptoolsTestCase(TestCase):
             'alliance_corp_manager', 'corptools', 'corporationaudit')
         cls.global_corp_manager = Permission.objects.get_by_natural_key(
             'global_corp_manager', 'corptools', 'corporationaudit')
+        cls.director_manager = Permission.objects.get_by_natural_key(
+            'show_if_director', 'corptools', 'corporationaudit')
 
         cls.view_corp_permission = Permission.objects.get_by_natural_key(
             'corp_hr', 'corptools', 'characteraudit')

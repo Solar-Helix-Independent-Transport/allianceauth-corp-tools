@@ -8,3 +8,7 @@ class CorpToolsConfig(AppConfig):
     label = 'corptools'
 
     verbose_name = f"Corp Tools v{__version__}"
+
+    def ready(self):
+        from . import \
+            signals  # NOQA - Loading Signals after models are loaded.

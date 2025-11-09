@@ -1,4 +1,5 @@
 from ..models import CorporationAudit
+from ..models.interactions import CharacterRoles
 from . import CorptoolsTestCase
 
 
@@ -18,7 +19,7 @@ class TestCorptoolsCorpAccessPerms(CorptoolsTestCase):
         self.assertNotIn(self.cp4, cs)
 
     def test_no_perms_get_self_u3(self):
-        cs = CorporationAudit.objects.visible_to(self.user2)
+        cs = CorporationAudit.objects.visible_to(self.user3)
         self.assertNotIn(self.cp1, cs)
         self.assertNotIn(self.cp2, cs)
         self.assertNotIn(self.cp3, cs)
@@ -104,3 +105,53 @@ class TestCorptoolsCorpAccessPerms(CorptoolsTestCase):
         self.assertIn(self.cp2, cs)
         self.assertIn(self.cp3, cs)
         self.assertIn(self.cp4, cs)
+
+    def test_director_perms_u3(self):
+        # own corp 3
+        # alt corp 4
+        self.user3.user_permissions.add(self.own_corp_manager)
+        self.user3.user_permissions.add(self.director_manager)
+        CharacterRoles.objects.create(
+            character=self.ca7,
+            director=True
+        )
+        self.user3.refresh_from_db()
+        cs = CorporationAudit.objects.visible_to(self.user3)
+        self.assertNotIn(self.cp1, cs)
+        self.assertNotIn(self.cp2, cs)
+        self.assertIn(self.cp3, cs)
+        self.assertIn(self.cp4, cs)
+
+    def test_director_perms_after_corp_change_u3(self):
+        # own corp 3
+        # alt corp 4
+        self.user3.user_permissions.add(self.own_corp_manager)
+        self.user3.user_permissions.add(self.director_manager)
+        CharacterRoles.objects.create(
+            character=self.ca7,
+            director=True
+        )
+        self.user3.refresh_from_db()
+        # this bit is technically a dupe of test_director_perms_u3
+        # leave in anyway to prove the full cycle
+        cs = CorporationAudit.objects.visible_to(self.user3)
+        self.assertNotIn(self.cp1, cs)
+        self.assertNotIn(self.cp2, cs)
+        self.assertIn(self.cp3, cs)
+        self.assertIn(self.cp4, cs)
+
+        # swap corps on char7 to corp 1
+        self.char7.corporation_id = 123
+        self.char7.corporation_name = "corporation.name1"
+        self.char7.corporation_ticker = "ABC"
+        self.char7.save()
+
+        # refresh the char
+        self.user3.refresh_from_db()
+
+        # prove no leaks in perms
+        cs = CorporationAudit.objects.visible_to(self.user3)
+        self.assertNotIn(self.cp1, cs)
+        self.assertNotIn(self.cp2, cs)
+        self.assertIn(self.cp3, cs)
+        self.assertNotIn(self.cp4, cs)
