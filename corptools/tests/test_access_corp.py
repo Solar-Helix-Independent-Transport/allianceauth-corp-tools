@@ -132,8 +132,14 @@ class TestCorptoolsCorpAccessPerms(CorptoolsTestCase):
             director=True
         )
         self.user3.refresh_from_db()
-        # this bit is technically a dupe of test_director_perms_u3
-        # leave in anyway to prove the full cycle
+
+        # swap alliance on char7 to corp 1
+        self.char7.alliance_id = 109
+        self.char7.alliance_name = "alliance.name1"
+        self.char7.alliance_ticker = "ABC-d"
+        self.char7.save()
+
+        # No Changes
         cs = CorporationAudit.objects.visible_to(self.user3)
         self.assertNotIn(self.cp1, cs)
         self.assertNotIn(self.cp2, cs)
