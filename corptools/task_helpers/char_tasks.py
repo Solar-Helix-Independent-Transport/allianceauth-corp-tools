@@ -3,13 +3,13 @@ from datetime import timedelta
 
 from celery import shared_task
 
-from django.core.paginator import Paginator
 from django.db.models import F
 from django.db.models.functions import Power, Sqrt
 from django.utils import timezone
 from django.utils.html import strip_tags
 
 from allianceauth.services.hooks import get_extension_logger
+from esi.exceptions import HTTPNotModified
 from esi.models import Token
 
 from corptools.task_helpers.update_tasks import (
@@ -28,15 +28,15 @@ from ..models import (
     NotificationText, Skill, SkillQueue, SkillTotalHistory, SkillTotals,
 )
 from . import sanitize_location_flag, sanitize_notification_type
-from .etag_helpers import NotModifiedError, etag_results
+from .etag_helpers import NotModifiedError, etag_results, openapi_etag_result
 
 logger = get_extension_logger(__name__)
 
 
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
+# def chunks(lst, n):
+#     """Yield successive n-sized chunks from lst."""
+#     for i in range(0, len(lst), n):
+#         yield lst[i:i + n]
 
 
 def get_token(character_id: int, scopes: list) -> "Token":
@@ -364,73 +364,53 @@ def update_character_assets(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
     try:
-        assets_op = providers.esi.client.Assets.get_characters_character_id_assets(
-            character_id=character_id)
-
-        assets = etag_results(
-            assets_op,
-            token,
-            force_refresh=force_refresh,
-            disable_verification=CorptoolsConfiguration.skip_verify_assets()
+        assets = providers.esi_openapi.client.Assets.GetCharactersCharacterIdAssets(
+            character_id=character_id,
+            token=token
+        ).results(
+            force_refresh=force_refresh
         )
 
         _st = time.perf_counter()
         location_names = list(
             EveLocation.objects.all().values_list('location_id', flat=True))
+
         _current_type_ids = []
         item_ids = []
         items = []
+
         for item in assets:
-            if item.get('type_id') not in _current_type_ids:
-                _current_type_ids.append(item.get('type_id'))
-            item_ids.append(item.get('item_id'))
-            asset_item = CharacterAsset(character=audit_char,
-                                        blueprint_copy=item.get(
-                                            'is_blueprint_copy'),
-                                        singleton=item.get('is_singleton'),
-                                        item_id=item.get('item_id'),
-                                        location_flag=sanitize_location_flag(
-                                            item.get('location_flag')
-                                        ),
-                                        location_id=item.get('location_id'),
-                                        location_type=item.get(
-                                            'location_type'),
-                                        quantity=item.get('quantity'),
-                                        type_id=item.get('type_id'),
-                                        type_name_id=item.get('type_id')
-                                        )
-            if item.get('location_id') in location_names:
-                asset_item.location_name_id = item.get('location_id')
+            if item.type_id not in _current_type_ids:
+                _current_type_ids.append(item.type_id)
+            item_ids.append(item.item_id)
+
+            asset_item = CharacterAsset.from_esi_model(audit_char, item)
+
+            # attach location name
+            if item.location_id in location_names:
+                asset_item.location_name_id = item.location_id
+
             items.append(asset_item)
 
         # current ship doesn't show if in space sometimes
-        ship = get_current_ship_location(character_id)
+        ship = get_current_ship_location(
+            character_id,
+            force_refresh=force_refresh
+        )
         if ship:
-            if ship.get('item_id') not in item_ids:
-                if ship.get('type_id') not in _current_type_ids:
-                    _current_type_ids.append(ship.get('type_id'))
+            if ship.item_id not in item_ids:
+                if ship.type_id not in _current_type_ids:
+                    _current_type_ids.append(ship.type_id)
 
-                asset_item = CharacterAsset(character=audit_char,
-                                            singleton=True,
-                                            item_id=ship.get('item_id'),
-                                            location_flag=ship.get(
-                                                'location_flag'),
-                                            location_id=ship.get(
-                                                'location_id'),
-                                            location_type=ship.get(
-                                                'location_type'),
-                                            quantity=1,
-                                            type_id=ship.get('type_id'),
-                                            type_name_id=ship.get('type_id')
-                                            )
-                if ship.get('location_id') in location_names:
-                    asset_item.location_name_id = ship.get('location_id')
-                items.append(asset_item)
+                if ship.location_id in location_names:
+                    ship.location_name_id = ship.location_id
+                items.append(ship)
 
         EveItemType.objects.create_bulk_from_esi(_current_type_ids)
 
         delete_query = CharacterAsset.objects.filter(
-            character=audit_char)  # Flush Assets
+            character=audit_char
+        )  # Flush Assets
         if delete_query.exists():
             # We now have some FKeys so slow it down...
             delete_query.delete()
@@ -439,7 +419,20 @@ def update_character_assets(character_id, force_refresh=False):
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_assets {character_id}")
 
-    except NotModifiedError:
+        # Locate assets in space!
+        update_asset_locations(character_id, force_refresh=force_refresh)
+        try:
+            # Get Asset Names!
+            update_character_assets_names(character_id)
+        except Exception as e:
+            logger.error(e)
+        try:
+            # Get den plannets!
+            update_den_locations(character_id)
+        except Exception as e:
+            logger.error(e)
+
+    except HTTPNotModified:
         logger.info("CT: No New assets for: {}".format(
             audit_char.character.character_name))
         pass
@@ -447,19 +440,6 @@ def update_character_assets(character_id, force_refresh=False):
     audit_char.last_update_assets = timezone.now()
     audit_char.save()
     audit_char.is_active()
-
-    # Locaite assets in space!
-    update_asset_locations(character_id, force_refresh=force_refresh)
-    try:
-        # Get Asset Names!
-        update_character_assets_names(character_id)
-    except Exception as e:
-        logger.error(e)
-    try:
-        # Get den plannets!
-        update_den_locations(character_id)
-    except Exception as e:
-        logger.error(e)
 
     return f"CT: Finished assets for: {audit_char.character.character_name}"
 
@@ -471,6 +451,9 @@ def chunks(qst, n):
 
 
 def update_character_assets_names(character_id):
+    """
+        Uses PostCharactersCharacterIdAssetsNames
+    """
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating Asset names for: {}".format(
@@ -492,13 +475,13 @@ def update_character_assets_names(character_id):
     ).order_by("pk")
 
     for subset in chunks(asset_list, 100):
-        assets_names = providers.esi.client.Assets.post_characters_character_id_assets_names(
+        assets_names = providers.esi_openapi.client.Assets.PostCharactersCharacterIdAssetsNames(
             character_id=character_id,
-            item_ids=[i.item_id for i in subset],
-            token=token.valid_access_token()
+            body=[i.item_id for i in subset],
+            token=token
         ).results()
 
-        id_list = {i.get("item_id"): i.get("name") for i in assets_names}
+        id_list = {i.item_id: i.name for i in assets_names}
 
         for asset in subset:
             if asset.item_id in id_list:
@@ -540,6 +523,9 @@ def update_den_locations(character_id, force_refresh=False):
 
 
 def update_asset_locations(character_id, force_refresh=False):
+    """
+        Uses PostCharactersCharacterIdAssetsLocations
+    """
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
     logger.debug("Updating Asset locations for: {}".format(
@@ -550,7 +536,7 @@ def update_asset_locations(character_id, force_refresh=False):
         40,  # Sov
         22,  # Deployables
     ]
-# These must be in space
+    # These must be in space
     max_location_id = 35000000
     min_location_id = 30000000
 
@@ -572,18 +558,18 @@ def update_asset_locations(character_id, force_refresh=False):
 
     locations = []
 
-    for ids in chunks(list(assets.values_list("item_id", flat=True)), 900):
-        locations += providers.esi.client.Assets.post_characters_character_id_assets_locations(
+    for ids in chunks(assets, 900):
+        locations = providers.esi_openapi.client.Assets.PostCharactersCharacterIdAssetsLocations(
             character_id=audit_char.character.character_id,
-            item_ids=ids,
-            token=_token.valid_access_token()
+            body=list(ids.values_list("item_id", flat=True)),
+            token=_token
         ).result()
 
     # logger.info(locations)
 
     new_coords = {}
     for loc in locations:
-        new_coords[loc['item_id']] = loc["position"]
+        new_coords[loc.item_id] = loc.position
 
     new_models = []
     for a in assets:
@@ -591,13 +577,11 @@ def update_asset_locations(character_id, force_refresh=False):
             new_models.append(
                 CharAssetCoordiante(
                     item=a,
-                    x=new_coords[a.item_id]['x'],
-                    y=new_coords[a.item_id]['y'],
-                    z=new_coords[a.item_id]['z']
+                    x=new_coords[a.item_id].x,
+                    y=new_coords[a.item_id].y,
+                    z=new_coords[a.item_id].z
                 )
             )
-            logger.info(
-                f"CT: COORD - {a.type_name.name} {new_coords[a.item_id]}")
 
     CharAssetCoordiante.objects.bulk_create(new_models, ignore_conflicts=True)
 
@@ -764,41 +748,37 @@ def update_character_industry_jobs(character_id, force_refresh=False):
 
 
 def get_current_ship_location(character_id, force_refresh=False):
-    CharacterAudit.objects.get(
-        character__character_id=character_id)
-    req_scopes = ['esi-location.read_location.v1',
-                  'esi-location.read_ship_type.v1']
+    """
+        Uses GetCharactersCharacterIdShip, GetCharactersCharacterIdLocation
+    """
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id
+    )
+
+    req_scopes = [
+        'esi-location.read_location.v1',
+        'esi-location.read_ship_type.v1'
+    ]
 
     token = get_token(character_id, req_scopes)
 
     if not token:
         return False
+    try:
+        # Todo decouple this
+        ship = providers.esi_openapi.client.Location.GetCharactersCharacterIdShip(
+            character_id=character_id,
+            token=token
+        ).result(force_refresh=force_refresh)
 
-    ship = providers.esi.client.Location.get_characters_character_id_ship(character_id=character_id,
-                                                                          token=token.valid_access_token()).result()
-    location = providers.esi.client.Location.get_characters_character_id_location(character_id=character_id,
-                                                                                  token=token.valid_access_token()).result()
-    location_id = location.get('solar_system_id')
-    location_flag = "solar_system"
-    location_type = "unlocked"
-    if location.get('structure_id') is not None:
-        location_id = location.get('structure_id')
-        location_flag = "item"
-        location_type = "hangar"
-    elif location.get('station_id') is not None:
-        location_id = location.get('station_id')
-        location_flag = "station"
-        location_type = "hangar"
-    current_ship = {
-        "item_id": ship.get('ship_item_id'),
-        "type_id": ship.get('ship_type_id'),
-        "name": ship.get('ship_name'),
-        "system_id": location.get('solar_system_id'),
-        "location_id": location_id,
-        "location_flag": location_flag,
-        "location_type": location_type,
-    }
-    return current_ship
+        location = providers.esi_openapi.client.Location.GetCharactersCharacterIdLocation(
+            character_id=character_id,
+            token=token
+        ).result(force_refresh=force_refresh)
+
+        return CharacterAsset.from_esi_location(audit_char, ship, location)
+    except HTTPNotModified:
+        return False
 
 
 def update_character_wallet(character_id, force_refresh=False):
@@ -1283,8 +1263,12 @@ def update_character_order_history(character_id, force_refresh=False):
 
 @shared_task
 def update_character_notifications(character_id, force_refresh=False):
+    """
+        Uses GetCharactersCharacterIdNotifications
+    """
     audit_char = CharacterAudit.objects.get(
-        character__character_id=character_id)
+        character__character_id=character_id
+    )
     logger.debug("Updating Notifications for: {}".format(
         audit_char.character.character_name))
 
@@ -1296,56 +1280,50 @@ def update_character_notifications(character_id, force_refresh=False):
         return "No Tokens"
 
     try:
-        notifications_op = providers.esi.client.Character.get_characters_character_id_notifications(
-            character_id=character_id)
-
-        notifications = etag_results(
-            notifications_op,
-            token,
-            force_refresh=force_refresh,
-            disable_verification=CorptoolsConfiguration.skip_verify_notifications()
-        )
+        notifications = providers.esi_openapi.client.Character.GetCharactersCharacterIdNotifications(
+            character_id=character_id,
+            token=token,
+        ).result(force_refresh=force_refresh)
 
         _st = time.perf_counter()
 
         last_five_hundred = list(
-            Notification.objects.filter(character=audit_char)
-            .order_by('-timestamp')[:500]
-            .values_list('notification_id', flat=True))
+            Notification.objects.filter(
+                character=audit_char
+            ).order_by(
+                '-timestamp'
+            )[:500].values_list(
+                'notification_id',
+                flat=True
+            )
+        )
 
         _creates = []
         _create_notifs = []
         for note in notifications:
-            if not note.get('notification_id') in last_five_hundred:
-                _creates.append(
-                    Notification(
-                        character=audit_char,
-                        notification_id=note.get('notification_id'),
-                        sender_id=note.get('sender_id'),
-                        sender_type=note.get('sender_type'),
-                        notification_text_id=note.get('notification_id'),
-                        timestamp=note.get('timestamp'),
-                        notification_type=sanitize_notification_type(
-                            note.get('type')
-                        ),
-                        is_read=note.get('is_read')
-                    )
+            if not note.notification_id in last_five_hundred:
+                _note, _text = Notification.from_esi_model(audit_char, note)
+                _creates.append(_note)
+                _create_notifs.append(_text)
 
-                )
-                _create_notifs.append(NotificationText(
-                    notification_id=note.get('notification_id'),
-                    notification_text=note.get('text')
-                )
-                )
         NotificationText.objects.bulk_create(
-            _create_notifs, ignore_conflicts=True, batch_size=500)
-        Notification.objects.bulk_create(_creates, batch_size=500)
-        logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_notifications {character_id}")
+            _create_notifs,
+            ignore_conflicts=True,
+            batch_size=500
+        )
+        Notification.objects.bulk_create(
+            _creates,
+            batch_size=500
+        )
 
-    except NotModifiedError:
-        logger.info("CT: No New notifications for: {}".format(
-            audit_char.character.character_name))
+        logger.debug(
+            f"CT_TIME: {time.perf_counter() - _st} update_character_notifications {character_id}"
+        )
+
+    except HTTPNotModified:
+        logger.info(
+            f"CT: No New notifications for: {audit_char.character.character_name}"
+        )
         pass
 
     audit_char.last_update_notif = timezone.now()

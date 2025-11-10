@@ -5,8 +5,9 @@ import networkx as nx
 from django.utils import timezone
 
 from esi.clients import EsiClientProvider
+from esi.openapi_clients import ESIClientProvider as ESIOpenApiProvider
 
-from . import __url__, __version__
+from . import __appname__, __url__, __version__
 from .task_helpers.skill_helpers import SkillListCache
 
 
@@ -264,3 +265,27 @@ class EveRouter():
 esi = CorpToolsESIClient(app_info_text=f"corptools/{__version__} ({__url__})")
 routes = EveRouter()
 skills = SkillListCache()
+
+esi_openapi = ESIOpenApiProvider(
+    compatibility_date="2025-08-26",
+    ua_appname=__appname__,
+    ua_url=__url__,
+    ua_version=__version__,
+    operations=[
+        # Character Asset
+        "GetCharactersCharacterIdAssets",
+        "PostCharactersCharacterIdAssetsNames",
+        "PostCharactersCharacterIdAssetsLocations",
+        # Character Location
+        "GetCharactersCharacterIdShip",
+        "GetCharactersCharacterIdLocation",
+        # Character Notification
+        "GetCharactersCharacterIdNotifications",
+        # Corporate Assets
+        "GetCorporationsCorporationIdAssets",
+        "PostCorporationsCorporationIdAssetsNames",
+        "PostCorporationsCorporationIdAssetsLocations",
+        # Corp Data
+        "GetCorporationsCorporationIdDivisions",
+    ]
+)

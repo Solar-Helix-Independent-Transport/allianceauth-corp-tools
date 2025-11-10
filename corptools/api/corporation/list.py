@@ -8,6 +8,7 @@ from esi.models import Token
 
 from corptools import app_settings, models
 from corptools.api import schema
+from corptools.tasks import update_corp
 
 
 class ListApiEndpoints:
@@ -142,3 +143,28 @@ class ListApiEndpoints:
                 }
                 output.append(_out)
             return output
+
+        @api.post(
+            "corporation/refresh",
+            response={200: schema.Message, 403: str},
+            tags=self.tags
+        )
+        def post_corp_refresh(request, corporation_id: int):
+            corp = models.CorporationAudit.objects.visible_to(
+                request.user
+            ).filter(
+                corporation__corporation_id=corporation_id
+            )
+
+            if not corp.exists():
+                return 403, _("Permission Denied")
+
+            force = app_settings.CT_USERS_CAN_FORCE_REFRESH or request.user.is_superuser
+
+            update_corp.apply_async(
+                args=[corporation_id],
+                kwargs={
+                    "force_refresh": force
+                },
+                priority=4)
+            return 200, {"message": "Requested Updates!"}

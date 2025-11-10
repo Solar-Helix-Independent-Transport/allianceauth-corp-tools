@@ -44,8 +44,8 @@ def update_corp_structures(self, corp_id, force_refresh=False, chain=[]):
     name="corptools.tasks.update_corp_assets"
 )
 @esi_error_retry
-def update_corp_assets(self, corp_id, chain=[]):
-    return corp_helpers.update_corp_assets(corp_id)
+def update_corp_assets(self, corp_id, force_refresh=False, chain=[]):
+    return corp_helpers.update_corp_assets(corp_id, force_refresh=force_refresh)
 
 
 @shared_task(
@@ -112,6 +112,7 @@ def update_corp_contracts(self, corp_id, force_refresh=False, chain=[]):
 def update_corp_industry_jobs(self, corp_id: int, force_refresh: bool = False, chain=[]) -> str:
     return corp_helpers.update_corporation_industry_jobs(corp_id, force_refresh=force_refresh)
 
+
 @shared_task(
     name="corptools.tasks.update_corp"
 )
@@ -123,11 +124,12 @@ def update_corp(corp_id, force_refresh=False):
     que.append(update_corp_wallet.si(corp_id))
     que.append(update_corp_structures.si(corp_id, force_refresh=force_refresh))
     que.append(update_corp_starbases.si(corp_id, force_refresh=force_refresh))
-    que.append(update_corp_assets.si(corp_id))
+    que.append(update_corp_assets.si(corp_id, force_refresh=force_refresh))
     que.append(update_corp_pocos.si(corp_id))
     que.append(update_corp_contracts.si(corp_id))
     que.append(update_corp_logins.si(corp_id))
-    que.append(update_corp_industry_jobs.si(corp_id, force_refresh=force_refresh))
+    que.append(update_corp_industry_jobs.si(
+        corp_id, force_refresh=force_refresh))
     Chain(que).apply_async(priority=6)
 
 

@@ -4,6 +4,7 @@ from . import CorptoolsTestCase
 
 
 class TestCorptoolsCorpAccessPerms(CorptoolsTestCase):
+
     def test_no_perms_get_self_u1(self):
         cs = CorporationAudit.objects.visible_to(self.user1)
         self.assertNotIn(self.cp1, cs)
@@ -111,10 +112,6 @@ class TestCorptoolsCorpAccessPerms(CorptoolsTestCase):
         # alt corp 4
         self.user3.user_permissions.add(self.own_corp_manager)
         self.user3.user_permissions.add(self.director_manager)
-        CharacterRoles.objects.create(
-            character=self.ca7,
-            director=True
-        )
         self.user3.refresh_from_db()
         cs = CorporationAudit.objects.visible_to(self.user3)
         self.assertNotIn(self.cp1, cs)
@@ -127,10 +124,6 @@ class TestCorptoolsCorpAccessPerms(CorptoolsTestCase):
         # alt corp 4
         self.user3.user_permissions.add(self.own_corp_manager)
         self.user3.user_permissions.add(self.director_manager)
-        CharacterRoles.objects.create(
-            character=self.ca7,
-            director=True
-        )
         self.user3.refresh_from_db()
 
         # swap alliance on char7 to corp 1
@@ -166,10 +159,6 @@ class TestCorptoolsCorpAccessPerms(CorptoolsTestCase):
         # own corp 3
         # alt corp 4
         self.user3.user_permissions.add(self.director_manager)
-        CharacterRoles.objects.create(
-            character=self.ca7,
-            director=True
-        )
         self.user3.refresh_from_db()
         cs = CorporationAudit.objects.visible_to(self.user3)
         self.assertNotIn(self.cp1, cs)

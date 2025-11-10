@@ -3,6 +3,8 @@ from model_utils import Choices
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from corptools.task_helpers import sanitize_notification_type
+
 from .audits import CharacterAudit, CorporationAudit
 from .eve_models import EveName
 
@@ -30,6 +32,27 @@ class Notification(models.Model):
         indexes = (
             models.Index(fields=['timestamp']),
             models.Index(fields=['notification_type'])
+        )
+
+    @classmethod
+    def from_esi_model(cls, character, model):
+        return (
+            cls(
+                character=character,
+                notification_id=model.notification_id,
+                sender_id=model.sender_id,
+                sender_type=model.sender_type,
+                notification_text_id=model.notification_id,
+                timestamp=model.timestamp,
+                notification_type=sanitize_notification_type(
+                    model.type
+                ),
+                is_read=model.is_read
+            ),
+            NotificationText(
+                notification_id=model.notification_id,
+                notification_text=model.text
+            )
         )
 
 
