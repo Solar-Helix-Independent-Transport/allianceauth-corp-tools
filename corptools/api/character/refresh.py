@@ -74,7 +74,7 @@ class RefreshApiEndpoints:
                         "force_refresh": force
                     },
                     priority=4)
-                cache.set(f"refresh-block-account-{character_id}", 1, 60*5)
+                cache.set(f"refresh-block-account-{character_id}", 1, 60*30)
                 eve_character_update.apply_async(
                     args=[cid], priority=4)
             return 200, {"message": "Requested Updates!"}
