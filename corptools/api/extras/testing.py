@@ -2,6 +2,8 @@ import pprint
 
 from ninja import NinjaAPI
 
+from django.core.cache import cache
+
 from corptools.task_helpers.char_tasks import get_token
 
 
@@ -200,13 +202,18 @@ class TestingApiEndpoints:
             # req, res = esi.client.Universe.GetUniverseCategoriesCategoryId(category_id=5).result(return_response=True)
             # print(res.headers)
 
-            req_scopes = ['esi-fleets.write_fleet.v1']
+            # req_scopes = ['esi-fleets.write_fleet.v1']
             cid = 755166922
             # token = get_token(cid, req_scopes)
             # req = esi.client.Character.GetCharactersCharacterIdNotifications(character_id=cid, token=token).result()
 
-            req_scopes = ['esi-assets.read_assets.v1']
+            # req_scopes = ['esi-assets.read_assets.v1']
+            # token = get_token(cid, req_scopes)
+            # req, res = esi.client.Assets.GetCharactersCharacterIdAssets(
+            #     character_id=cid, token=token).results(return_response=True, use_etag=False)
+            # cache.clear()
+            req_scopes = ['esi-characters.read_notifications.v1']
             token = get_token(cid, req_scopes)
-            req, res = esi.client.Assets.GetCharactersCharacterIdAssets(
-                character_id=cid, token=token).results(return_response=True, use_etag=False)
+            req, res = esi.client.Character.GetCharactersCharacterIdNotifications(
+                character_id=cid, token=token).results(return_response=True, use_cache=False, use_etag=False)
             return [req[:10]]
