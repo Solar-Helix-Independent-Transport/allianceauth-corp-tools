@@ -55,7 +55,7 @@ msgstr "Везде"
 
 #: corptools/api/character/assets.py:40
 msgid "AssetSafety"
-msgstr ""
+msgstr "Безопасность активов"
 
 #: corptools/api/character/assets.py:227
 #: corptools/templates/corptools/character/assets_lists.html:5
@@ -68,7 +68,7 @@ msgstr "Субкапитальные корабли"
 
 #: corptools/api/character/assets.py:231
 msgid "Noteable Assets"
-msgstr ""
+msgstr "Примечательные активы"
 
 #: corptools/api/character/assets.py:233
 #: corptools/templates/corptools/character/assets_lists.html:73
@@ -77,18 +77,18 @@ msgstr "Структуры"
 
 #: corptools/api/character/assets.py:235
 msgid "BPO"
-msgstr ""
+msgstr "БПО"
 
 #: corptools/api/character/assets.py:237
 #: corptools/templates/corptools/character/market.html:35
 #: corptools/templates/corptools/character/market.html:71
 msgid "Remaining"
-msgstr ""
+msgstr "Осталось"
 
 #: corptools/api/core/menu.py:24
 #: corptools/templates/corptools/character/char_menu.html:89
 msgid "Interactions"
-msgstr ""
+msgstr "Взаимодействия"
 
 #: corptools/api/core/menu.py:28
 msgid "Finances"
@@ -192,7 +192,7 @@ msgstr "Очередь навыков"
 
 #: corptools/api/core/menu.py:140
 msgid "Skill List Checks"
-msgstr ""
+msgstr "Проверки навыков"
 
 #: corptools/api/core/menu.py:144
 msgid "Admin"
@@ -201,7 +201,7 @@ msgstr "Admin"
 #: corptools/api/core/search.py:29 corptools/api/core/search.py:39
 #: corptools/api/core/search.py:50
 msgid "Hard no pall!"
-msgstr ""
+msgstr "Тяжело, чувак!"
 
 #: corptools/models.py:1018
 #, python-brace-format
@@ -225,6 +225,8 @@ msgid ""
 "Please check format for valid JSON. Hint: [\"skill name\": 4, \"skill name "
 "2\": 1]"
 msgstr ""
+"Пожалуйста, проверьте формат на соответствие JSON. Подсказка: [\"skill "
+"name\": 4, \"skill name 2\": 1]"
 
 #: corptools/models.py:1639
 #: corptools/templates/corptools/character/char_menu.html:17
@@ -247,7 +249,7 @@ msgstr "LP"
 
 #: corptools/templates/corptools/admin.html:5
 msgid "Corptools Configuration Info"
-msgstr ""
+msgstr "Информация о конфигурации Corptools"
 
 #: corptools/templates/corptools/admin.html:17
 msgid "Clear all cached Etags"
@@ -319,64 +321,64 @@ msgstr "Системы"
 
 #: corptools/templates/corptools/admin.html:458
 msgid "Gate Links"
-msgstr ""
+msgstr "Ссылки на ворота"
 
 #: corptools/templates/corptools/admin.html:464
 msgid "Jump Bridge Links"
-msgstr ""
+msgstr "Ссылки на джамп-бридж"
 
 #: corptools/templates/corptools/admin.html:482
 msgid "Corporation Audits"
-msgstr ""
+msgstr "Корпоративный аудит"
 
 #: corptools/templates/corptools/admin.html:488
 msgid "Character Audits (Active/Total)"
-msgstr ""
+msgstr "Аудит персонажей (активный/полный)"
 
 #: corptools/templates/corptools/admin.html:494
 #: corptools/templates/corptools/admin.html:527
 msgid "Skill Lists"
-msgstr ""
+msgstr "Списки навыков"
 
 #: corptools/templates/corptools/admin.html:507
 msgid "Character Task"
-msgstr ""
+msgstr "Задание для персонажей"
 
 #: corptools/templates/corptools/admin.html:513
 msgid "Corporation Task"
-msgstr ""
+msgstr "Корпоративная задача"
 
 #: corptools/templates/corptools/admin.html:521
 msgid "Create or Update Periodic Tasks"
-msgstr ""
+msgstr "Создание или обновление периодических задач"
 
 #: corptools/templates/corptools/admin.html:533
 msgid "Skill List Description"
-msgstr ""
+msgstr "Описание списка навыков"
 
 #: corptools/templates/corptools/admin.html:535
 msgid "This will show as the name of the Skill List"
-msgstr ""
+msgstr "Это будет отображаться как название списка навыков"
 
 #: corptools/templates/corptools/admin.html:543
 msgid "Browse"
-msgstr ""
+msgstr "Просматривать"
 
 #: corptools/templates/corptools/admin.html:546
 msgid "PYFA XML Skills required list"
-msgstr ""
+msgstr "Список необходимых навыков PYFA XML"
 
 #: corptools/templates/corptools/base.html:80
 msgid "Add All Token"
-msgstr ""
+msgstr "Добавить все токены"
 
 #: corptools/templates/corptools/character/assets_lists.html:22
 msgid "Sub-Capital Ships"
-msgstr ""
+msgstr "Суб-капитальные суда"
 
 #: corptools/templates/corptools/character/assets_lists.html:39
 msgid "Notable Others Assets"
-msgstr ""
+msgstr "Другие известные активы"
 
 #: corptools/templates/corptools/character/assets_lists.html:56
 msgid "BPO's"
@@ -384,21 +386,21 @@ msgstr "Оригиналы"
 
 #: corptools/templates/corptools/character/assets_lists.html:90
 msgid "Rest"
-msgstr ""
+msgstr "Остальное"
 
 #: corptools/templates/corptools/character/char_base.html:207
 #: corptools/templates/corptools/corp_menu.html:15
 #: corptools/templates/corptools/corporation/corp_base.html:209
 #: corptools/templates/corptools/menu.html:14
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Переключить навигацию"
 
 #: corptools/templates/corptools/character/char_base.html:212
 #: corptools/templates/corptools/corp_menu.html:20
 #: corptools/templates/corptools/corporation/corp_base.html:214
 #: corptools/templates/corptools/menu.html:19
 msgid "Account Audit"
-msgstr ""
+msgstr "Аудит счета"
 
 #: corptools/templates/corptools/character/char_base.html:224
 #: corptools/templates/corptools/corp_menu.html:33
@@ -427,7 +429,7 @@ msgstr "Новый интерфейс"
 #: corptools/templates/corptools/character/char_base.html:262
 #: corptools/templates/corptools/corporation/corp_base.html:274
 msgid "Linked characters"
-msgstr ""
+msgstr "Связанные персонажи"
 
 #: corptools/templates/corptools/character/char_base.html:274
 #: corptools/templates/corptools/corporation/corp_base.html:291
@@ -499,7 +501,7 @@ msgstr "Отношения"
 
 #: corptools/templates/corptools/character/contacts.html:15
 msgid "Labels"
-msgstr ""
+msgstr "Этикетки"
 
 #: corptools/templates/corptools/character/contacts.html:16
 #: corptools/templates/corptools/character/contacts.html:18
@@ -509,7 +511,7 @@ msgstr "Заблокировано"
 #: corptools/templates/corptools/character/contacts.html:17
 #: corptools/templates/corptools/character/contacts.html:19
 msgid "Watched"
-msgstr ""
+msgstr "Смотрели"
 
 #: corptools/templates/corptools/character/contacts.html:20
 msgid "Owner"
@@ -531,15 +533,15 @@ msgstr "Загрузить"
 
 #: corptools/templates/corptools/character/market.html:12
 msgid "Sell Order Total"
-msgstr ""
+msgstr "Общая сумма ордера на продажу"
 
 #: corptools/templates/corptools/character/market.html:20
 msgid "Buy Order Total"
-msgstr ""
+msgstr "Общая сумма ордера на покупку"
 
 #: corptools/templates/corptools/character/market.html:28
 msgid "Active Orders"
-msgstr ""
+msgstr "Активные ордера"
 
 #: corptools/templates/corptools/character/market.html:32
 #: corptools/templates/corptools/character/market.html:67
@@ -562,7 +564,7 @@ msgstr "Цена предмета"
 #: corptools/templates/corptools/character/market.html:73
 #: corptools/templates/corptools/character/wallet.html:21
 msgid "Character Filter"
-msgstr ""
+msgstr "Фильтр персонажей"
 
 #: corptools/templates/corptools/character/market.html:38
 #: corptools/templates/corptools/character/market.html:74
@@ -577,7 +579,7 @@ msgstr "день"
 #: corptools/templates/corptools/character/market.html:46
 #: corptools/templates/corptools/character/market.html:83
 msgid "of"
-msgstr ""
+msgstr "из"
 
 #: corptools/templates/corptools/character/market.html:51
 #: corptools/templates/corptools/character/market.html:88
@@ -595,7 +597,7 @@ msgstr "Завершенные заявки"
 
 #: corptools/templates/corptools/character/market.html:68
 msgid "State"
-msgstr ""
+msgstr "Состояние"
 
 #: corptools/templates/corptools/character/notifications.html:10
 #: corptools/templates/corptools/character/wallet.html:10
@@ -613,7 +615,7 @@ msgstr "Текст"
 
 #: corptools/templates/corptools/character/notifications.html:18
 msgid "Read"
-msgstr ""
+msgstr "Прочитать"
 
 #: corptools/templates/corptools/character/public.html:16
 #: corptools/templates/corptools/character/skills.html:42
@@ -628,7 +630,7 @@ msgstr "Isk"
 
 #: corptools/templates/corptools/character/public.html:27
 msgid "Joined"
-msgstr ""
+msgstr "Присоединился"
 
 #: corptools/templates/corptools/character/public.html:47
 msgid "No Data"
@@ -636,7 +638,7 @@ msgstr "Нет данных"
 
 #: corptools/templates/corptools/character/public.html:48
 msgid "You probably need to load a token, or wait for an update to run"
-msgstr ""
+msgstr "Возможно, вам нужно загрузить токен или дождаться запуска обновления"
 
 #: corptools/templates/corptools/character/roles.html:13
 msgid "Character Roles"
@@ -654,31 +656,31 @@ msgstr "Директор"
 
 #: corptools/templates/corptools/character/roles.html:20
 msgid "Accountant"
-msgstr ""
+msgstr "бухгалтер"
 
 #: corptools/templates/corptools/character/roles.html:21
 msgid "Station Manager"
-msgstr ""
+msgstr "Начальник станции"
 
 #: corptools/templates/corptools/character/roles.html:22
 msgid "Personnel Manager"
-msgstr ""
+msgstr "Менеджер по персоналу"
 
 #: corptools/templates/corptools/character/skills.html:24
 msgid "Doctrine Checker"
-msgstr ""
+msgstr "Проверка доктрин"
 
 #: corptools/templates/corptools/character/skills.html:36
 msgid "No Doctrines Loaded"
-msgstr ""
+msgstr "Доктрины не загружены"
 
 #: corptools/templates/corptools/character/skills.html:43
 msgid "Unallocated SP"
-msgstr ""
+msgstr "Нераспределенные SP"
 
 #: corptools/templates/corptools/character/skills.html:44
 msgid "Estimated Clone State"
-msgstr ""
+msgstr "Предполагаемое состояние клона"
 
 #: corptools/templates/corptools/character/skills.html:46
 msgid "Omega"
@@ -704,11 +706,11 @@ msgstr "Группа"
 
 #: corptools/templates/corptools/character/skills.html:75
 msgid "Queue"
-msgstr ""
+msgstr "Очередь"
 
 #: corptools/templates/corptools/character/skills.html:81
 msgid "Completion"
-msgstr ""
+msgstr "Завершение"
 
 #: corptools/templates/corptools/character/skills.html:82
 msgid "item"
@@ -720,7 +722,7 @@ msgstr "Не изучено"
 
 #: corptools/templates/corptools/character/skills.html:121
 msgid "Account Checks"
-msgstr ""
+msgstr "Проверки счетов"
 
 #: corptools/templates/corptools/character/status.html:31
 msgid "Dataset"
@@ -728,7 +730,7 @@ msgstr "Набор данных"
 
 #: corptools/templates/corptools/character/status.html:32
 msgid "Last Update"
-msgstr ""
+msgstr "Последнее обновление"
 
 #: corptools/templates/corptools/character/status.html:39
 #: corptools/templates/corptools/character/status.html:44
@@ -749,7 +751,7 @@ msgstr ""
 #: corptools/templates/corptools/corporation/corp_base.html:284
 #: corptools/templates/corptools/corporation/corp_base.html:286
 msgid "ago"
-msgstr ""
+msgstr "тому назад"
 
 #: corptools/templates/corptools/character/status.html:61
 msgid "Orders"
@@ -761,20 +763,20 @@ msgstr "Письма"
 
 #: corptools/templates/corptools/character/status.html:82
 msgid "Titles"
-msgstr ""
+msgstr "Названия"
 
 #: corptools/templates/corptools/character/status.html:92
 #: corptools/templates/corptools/corporation/corp_base.html:280
 msgid "Skill Que"
-msgstr ""
+msgstr "Очередь навыков"
 
 #: corptools/templates/corptools/character/wallet.html:15
 msgid "From"
-msgstr ""
+msgstr "От"
 
 #: corptools/templates/corptools/character/wallet.html:16
 msgid "To"
-msgstr ""
+msgstr "Для"
 
 #: corptools/templates/corptools/character/wallet.html:17
 msgid "Amount"
@@ -790,15 +792,15 @@ msgstr "Причина"
 
 #: corptools/templates/corptools/character/wallet.html:20
 msgid "Ref Type"
-msgstr ""
+msgstr "Тип ссылки"
 
 #: corptools/templates/corptools/character/wallet.html:48
 msgid "Interaction Map"
-msgstr ""
+msgstr "Карта взаимодействия"
 
 #: corptools/templates/corptools/character/wallet.html:54
 msgid "Toggle to"
-msgstr ""
+msgstr "Переключиться на"
 
 #: corptools/templates/corptools/character/wallet.html:54
 msgid "Isk Amount"
@@ -807,7 +809,7 @@ msgstr "Количество ISK"
 #: corptools/templates/corptools/corp_menu.html:27
 #: corptools/templates/corptools/menu.html:26
 msgid "DB Admin"
-msgstr ""
+msgstr "Администратор БД"
 
 #: corptools/templates/corptools/corp_menu.html:54
 #: corptools/templates/corptools/menu.html:58
@@ -816,19 +818,19 @@ msgstr "Альянс"
 
 #: corptools/templates/corptools/corp_menu.html:55
 msgid "Wallet Updates"
-msgstr ""
+msgstr "Обновления кошелька"
 
 #: corptools/templates/corptools/corp_menu.html:56
 msgid "Asset Updates"
-msgstr ""
+msgstr "Обновления активов"
 
 #: corptools/templates/corptools/corp_menu.html:57
 msgid "Structure Updates"
-msgstr ""
+msgstr "Обновления структуры"
 
 #: corptools/templates/corptools/corporation/corp_base.html:276
 msgid "title"
-msgstr ""
+msgstr "название"
 
 #: corptools/templates/corptools/dashboard.corptools.status.html:8
 msgid "Add Character"
@@ -837,44 +839,46 @@ msgstr "Добавить персонажа"
 #: corptools/templates/corptools/dashboards/fuel_dash.html:123
 #: corptools/templates/corptools/dashboards/metenox_dash.html:74
 msgid "No Structures Available"
-msgstr ""
+msgstr "Нет доступных структур"
 
 #: corptools/templates/corptools/fittings/characters.html:3
 msgid "Character Skill Checks"
-msgstr ""
+msgstr "Проверки навыков персонажа"
 
 #: corptools/templates/corptools/fittings/characters.html:21
 msgid "Skills Required"
-msgstr ""
+msgstr "Необходимые навыки"
 
 #: corptools/templates/corptools/fittings/characters.html:29
 msgid "Basic skills required to"
-msgstr ""
+msgstr "Базовые навыки, необходимые для"
 
 #: corptools/templates/corptools/fittings/characters.html:29
 msgid "sit in the hull"
-msgstr ""
+msgstr "сидит в корабле"
 
 #: corptools/templates/corptools/fittings/characters.html:29
 msgid "and"
-msgstr ""
+msgstr "а также"
 
 #: corptools/templates/corptools/fittings/characters.html:29
 msgid "fit the modules"
-msgstr ""
+msgstr "установите модули"
 
 #: corptools/templates/corptools/fittings/characters.html:31
 msgid "Extra skills may be required to use this fitting in fleets"
 msgstr ""
+"Для использования этого фита во флотах могут потребоваться дополнительные "
+"навыки"
 
 #: corptools/templates/corptools/menu.html:56
 msgid "Main Character"
-msgstr ""
+msgstr "Главный персонаж"
 
 #: corptools/templates/corptools/menu.html:59
 msgid "Alts"
-msgstr ""
+msgstr "Альты"
 
 #: corptools/validators.py:12
 msgid "This is not valid JSON, please check it and try again."
-msgstr ""
+msgstr "Это недействительный JSON, проверьте его и попробуйте еще раз."
