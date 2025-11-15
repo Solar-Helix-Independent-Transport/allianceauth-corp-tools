@@ -8,8 +8,8 @@ filters:
   - filter_type: file
     file_format: KEYVALUEJSON
     source_language: en
-    source_file: frontend/frontend/i18n/en/translation.json
-    translation_files_expression: frontend/frontend/i18n/<lang>/translation.json
+    source_file: frontend/i18n/en/translation.json
+    translation_files_expression: frontend/i18n/<lang>/translation.json
 
 settings:
   language_mapping:
