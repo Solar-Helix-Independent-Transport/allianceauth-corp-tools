@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-03 17:14+0800\n"
+"POT-Creation-Date: 2025-11-15 10:04+0000\n"
 "PO-Revision-Date: 2024-05-27 04:09+0000\n"
 "Last-Translator: Bandera Primary, 2025\n"
 "Language-Team: Ukrainian (https://app.transifex.com/alliance-auth/teams/107430/uk/)\n"
@@ -21,30 +21,33 @@ msgstr ""
 "Language: uk\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
-#: corptools/api/character/assets.py:30 corptools/api/character/assets.py:62
-#: corptools/api/character/assets.py:121 corptools/api/character/assets.py:170
-#: corptools/api/character/at_a_glance.py:40
-#: corptools/api/character/at_a_glance.py:162
-#: corptools/api/character/at_a_glance.py:198
+#: corptools/api/character/assets.py:30 corptools/api/character/assets.py:66
+#: corptools/api/character/assets.py:154 corptools/api/character/assets.py:205
+#: corptools/api/character/at_a_glance.py:43
+#: corptools/api/character/at_a_glance.py:61
+#: corptools/api/character/at_a_glance.py:97
+#: corptools/api/character/at_a_glance.py:127
 #: corptools/api/character/clones.py:29 corptools/api/character/finances.py:34
-#: corptools/api/character/finances.py:85
-#: corptools/api/character/finances.py:130
-#: corptools/api/character/finances.py:211
-#: corptools/api/character/finances.py:282
-#: corptools/api/character/finances.py:364
+#: corptools/api/character/finances.py:94
+#: corptools/api/character/finances.py:139
+#: corptools/api/character/finances.py:220
+#: corptools/api/character/finances.py:291
+#: corptools/api/character/finances.py:381
 #: corptools/api/character/interactions.py:33
 #: corptools/api/character/interactions.py:78
 #: corptools/api/character/interactions.py:136
 #: corptools/api/character/interactions.py:161
-#: corptools/api/character/mining.py:29 corptools/api/character/mining.py:49
-#: corptools/api/character/refresh.py:46 corptools/api/character/roles.py:28
-#: corptools/api/character/skills.py:29 corptools/api/character/skills.py:77
-#: corptools/api/character/skills.py:114 corptools/api/character/skills.py:171
-#: corptools/api/character/status.py:30 corptools/api/character/status.py:94
-#: corptools/api/character/status.py:120
-#: corptools/api/corporation/at_a_glance.py:48
-#: corptools/api/corporation/at_a_glance.py:168
-#: corptools/api/corporation/at_a_glance.py:202
+#: corptools/api/character/mining.py:29 corptools/api/character/mining.py:52
+#: corptools/api/character/refresh.py:47 corptools/api/character/roles.py:28
+#: corptools/api/character/skills.py:30 corptools/api/character/skills.py:78
+#: corptools/api/character/skills.py:115 corptools/api/character/skills.py:195
+#: corptools/api/character/status.py:30 corptools/api/character/status.py:105
+#: corptools/api/character/status.py:131
+#: corptools/api/corporation/at_a_glance.py:49
+#: corptools/api/corporation/at_a_glance.py:65
+#: corptools/api/corporation/at_a_glance.py:99
+#: corptools/api/corporation/at_a_glance.py:121
+#: corptools/api/corporation/at_a_glance.py:144
 #: corptools/api/corporation/status.py:66
 msgid "Permission Denied"
 msgstr "Доступ заборонено"
@@ -57,36 +60,31 @@ msgstr "Всюди"
 msgid "AssetSafety"
 msgstr "Система захисту активів"
 
-#: corptools/api/character/assets.py:227
-#: corptools/templates/corptools/character/assets_lists.html:5
+#: corptools/api/character/assets.py:262
 msgid "Capital Ships"
 msgstr "Капітальні кораблі"
 
-#: corptools/api/character/assets.py:229
+#: corptools/api/character/assets.py:264
 msgid "Subcaps Ships"
 msgstr "Підкапітальні кораблі"
 
-#: corptools/api/character/assets.py:231
+#: corptools/api/character/assets.py:266
 msgid "Noteable Assets"
 msgstr "Важливі активи"
 
-#: corptools/api/character/assets.py:233
-#: corptools/templates/corptools/character/assets_lists.html:73
+#: corptools/api/character/assets.py:268
 msgid "Structures"
 msgstr "Структури"
 
-#: corptools/api/character/assets.py:235
+#: corptools/api/character/assets.py:270
 msgid "BPO"
 msgstr ""
 
-#: corptools/api/character/assets.py:237
-#: corptools/templates/corptools/character/market.html:35
-#: corptools/templates/corptools/character/market.html:71
+#: corptools/api/character/assets.py:272
 msgid "Remaining"
 msgstr "Залишок"
 
 #: corptools/api/core/menu.py:24
-#: corptools/templates/corptools/character/char_menu.html:89
 msgid "Interactions"
 msgstr "Взаємодія"
 
@@ -94,12 +92,12 @@ msgstr "Взаємодія"
 msgid "Finances"
 msgstr "Фінанси"
 
-#: corptools/api/core/menu.py:32
+#: corptools/api/core/menu.py:32 corptools/templates/corptools/admin.html:214
 msgid "Industry"
 msgstr "Промисловість"
 
 #: corptools/api/core/menu.py:36
-#: corptools/templates/corptools/corp_menu.html:41
+#: corptools/templates/corptools/dashboard.corptools.status.html:5
 msgid "Characters"
 msgstr "Персонажі"
 
@@ -115,21 +113,15 @@ msgstr "Історія корпорацій"
 msgid "Contact"
 msgstr "Контакти"
 
-#: corptools/api/core/menu.py:57
-#: corptools/templates/corptools/character/char_menu.html:119
-#: corptools/templates/corptools/character/status.html:67
+#: corptools/api/core/menu.py:57 corptools/templates/corptools/admin.html:160
 msgid "Notifications"
 msgstr "Сповіщення"
 
 #: corptools/api/core/menu.py:69
-#: corptools/templates/corptools/character/char_menu.html:65
-#: corptools/templates/corptools/character/status.html:98
-#: corptools/templates/corptools/corporation/corp_base.html:232
 msgid "Wallet"
 msgstr "Гаманець"
 
 #: corptools/api/core/menu.py:77
-#: corptools/templates/corptools/character/wallet.html:41
 msgid "Wallet Activity"
 msgstr "Операції гаманця"
 
@@ -138,11 +130,10 @@ msgid "Contracts"
 msgstr "Контракти"
 
 #: corptools/api/core/menu.py:86
-#: corptools/templates/corptools/character/char_menu.html:60
 msgid "Market"
 msgstr "Ринок"
 
-#: corptools/api/core/menu.py:92
+#: corptools/api/core/menu.py:92 corptools/templates/corptools/admin.html:358
 msgid "Loyalty Points"
 msgstr "Пункти лояльності"
 
@@ -158,31 +149,19 @@ msgstr "Cписок активів"
 msgid "Mining Ledger"
 msgstr "Журнал видобутку"
 
-#: corptools/api/core/menu.py:114
-#: corptools/templates/corptools/character/char_menu.html:26
-#: corptools/templates/corptools/character/clones.html:25
-#: corptools/templates/corptools/character/status.html:49
-#: corptools/templates/corptools/corporation/corp_base.html:226
-#: corptools/templates/corptools/corporation/corp_base.html:282
+#: corptools/api/core/menu.py:114 corptools/templates/corptools/admin.html:310
 msgid "Clones"
 msgstr "Клони"
 
-#: corptools/api/core/menu.py:120
-#: corptools/templates/corptools/character/char_menu.html:38
-#: corptools/templates/corptools/character/roles.html:9
-#: corptools/templates/corptools/character/status.html:79
+#: corptools/api/core/menu.py:120 corptools/templates/corptools/admin.html:190
 msgid "Roles"
 msgstr "Ролі"
 
-#: corptools/api/core/menu.py:126
+#: corptools/api/core/menu.py:126 corptools/templates/corptools/admin.html:334
 msgid "Mail"
 msgstr "Пошта"
 
-#: corptools/api/core/menu.py:132
-#: corptools/templates/corptools/character/char_menu.html:43
-#: corptools/templates/corptools/character/status.html:88
-#: corptools/templates/corptools/corporation/corp_base.html:229
-#: corptools/templates/corptools/corporation/corp_base.html:278
+#: corptools/api/core/menu.py:132 corptools/templates/corptools/admin.html:286
 msgid "Skills"
 msgstr "Навички"
 
@@ -203,22 +182,23 @@ msgstr "Адміністратор"
 msgid "Hard no pall!"
 msgstr "Категорично ні!"
 
-#: corptools/models.py:1017
-#, python-brace-format
-msgid ""
-"Please enter a valid skill name for `{skill}`. Hint: a known character must "
-"have trained the skill for auth to know about it."
-msgstr ""
-"Будь ласка, введіть дійсну назву навику для {skill}. Підказка: відомий "
-"персонаж має вивчити цей навик, щоб авторизація могла її розпізнати."
+#: corptools/models/interactions.py:126
+msgid "Character"
+msgstr "Персонаж"
 
-#: corptools/models.py:1026
-#, python-brace-format
-msgid "Please enter a valid skill level for `{skill}`. Hint: between 0 and 5."
-msgstr ""
-"Будь ласка, введіть дійсний рівень навику для {skill}. Підказка: від 0 до 5."
+#: corptools/models/interactions.py:128
+msgid "NPC Corporation"
+msgstr "NPC корпорація"
 
-#: corptools/models.py:1030
+#: corptools/models/interactions.py:129
+msgid "LP"
+msgstr ""
+
+#: corptools/models/interactions.py:132
+msgid "Loyalty Point"
+msgstr "Пункт лояльності"
+
+#: corptools/models/skills.py:92
 msgid ""
 "Please check format for valid JSON. Hint: [\"skill name\": 4, \"skill name "
 "2\": 1]"
@@ -226,143 +206,222 @@ msgstr ""
 "Будь ласка, перевірте формат на валідний JSON. Підказка: [\"назва навички\":"
 " 4, \"назва навички 2\": 1]"
 
-#: corptools/models.py:1627
-#: corptools/templates/corptools/character/char_menu.html:17
-#: corptools/templates/corptools/character/notifications.html:15
-#: corptools/templates/corptools/character/roles.html:17
-msgid "Character"
-msgstr "Персонаж"
-
-#: corptools/models.py:1629
-msgid "NPC Corporation"
-msgstr "NPC корпорація"
-
-#: corptools/models.py:1630
-msgid "LP"
+#: corptools/templates/corptools/admin.html:3
+msgid "Corptools Admin"
 msgstr ""
 
-#: corptools/models.py:1633
-msgid "Loyalty Point"
-msgstr "Пункт лояльності"
-
-#: corptools/templates/corptools/admin.html:5
+#: corptools/templates/corptools/admin.html:10
 msgid "Corptools Configuration Info"
 msgstr "Інформація про конфігурацію Corptools"
 
-#: corptools/templates/corptools/admin.html:17
+#: corptools/templates/corptools/admin.html:18
+msgid "Manual Task Run"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:24
 msgid "Clear all cached Etags"
 msgstr "Очистити кешовані етаги"
 
-#: corptools/templates/corptools/admin.html:23
-msgid "Update EvE Map Data"
-msgstr "Оновлення даних EvE карти"
+#: corptools/templates/corptools/admin.html:25
+msgid "Wipe all the etags from cache to force new data pulls"
+msgstr ""
 
-#: corptools/templates/corptools/admin.html:29
+#: corptools/templates/corptools/admin.html:30
+msgid "Update EVE Map Data"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:31
+msgid "Force a full map update from ESI"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:36
 msgid "Force update all Citadel Locations"
 msgstr "Примусове оновлення розташування Citadel структур"
 
-#: corptools/templates/corptools/admin.html:35
+#: corptools/templates/corptools/admin.html:37
+msgid "Attempt to update all citadel names from ESI"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:42
 msgid "Force all character updates"
 msgstr "Примусове оновлення персонажів"
 
-#: corptools/templates/corptools/admin.html:41
+#: corptools/templates/corptools/admin.html:43
+msgid "Force updates to ALL character audits"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:48
 msgid "Force all corp updates"
 msgstr "Примусове оновлення корпорацій"
 
-#: corptools/templates/corptools/admin.html:47
-msgid "Update Eve Entirty Models"
-msgstr "Оновлення моделей Eve сутностей"
+#: corptools/templates/corptools/admin.html:49
+msgid "Force updates to ALL corporation audits"
+msgstr ""
 
-#: corptools/templates/corptools/admin.html:52
+#: corptools/templates/corptools/admin.html:54
+msgid "Update EVE Entity Models"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:55
+msgid "Force updates to ALL EVE entity names"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:60
 msgid "Submit"
 msgstr "Відправити"
 
-#: corptools/templates/corptools/admin.html:386
+#: corptools/templates/corptools/admin.html:67
+msgid "Corptools Module Configuration"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:74
+msgid "Module"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:75
+msgid "Enabled"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:76
+msgid "Include in Active"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:77
+msgid "Temp Disabled"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:82
+msgid "Assets"
+msgstr "Активи"
+
+#: corptools/templates/corptools/admin.html:84
+#: corptools/templates/corptools/admin.html:162
+msgid "(Validation Disabled)"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:86
+#: corptools/templates/corptools/admin.html:164
+msgid "(Validation Enabled)"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:112
+msgid "Standings"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:136
+msgid "Contacts"
+msgstr "Контакти"
+
+#: corptools/templates/corptools/admin.html:238
+msgid "Mining"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:262
+msgid "Wallets/Markets/Contracts"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:389
+msgid "EVE Models"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:395
 msgid "Entity Names"
 msgstr "Назви сутностей"
 
-#: corptools/templates/corptools/admin.html:392
+#: corptools/templates/corptools/admin.html:401
 msgid "Structure Names"
 msgstr "Назви структур"
 
-#: corptools/templates/corptools/admin.html:398
+#: corptools/templates/corptools/admin.html:407
 msgid "Categories"
 msgstr "Категорії"
 
-#: corptools/templates/corptools/admin.html:404
+#: corptools/templates/corptools/admin.html:413
 msgid "Groups"
 msgstr "Групи"
 
-#: corptools/templates/corptools/admin.html:410
+#: corptools/templates/corptools/admin.html:419
 msgid "Types"
 msgstr "Типи"
 
-#: corptools/templates/corptools/admin.html:416
+#: corptools/templates/corptools/admin.html:425
 msgid "Dogma Attributes"
 msgstr "Догма атрибути"
 
-#: corptools/templates/corptools/admin.html:422
+#: corptools/templates/corptools/admin.html:431
 msgid "Type Refine Material Outputs"
 msgstr "Типи перероблениx матеріалів"
 
-#: corptools/templates/corptools/admin.html:440
+#: corptools/templates/corptools/admin.html:443
+msgid "EVE Universe Models"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:449
 msgid "Regions"
 msgstr "Регіони"
 
-#: corptools/templates/corptools/admin.html:446
+#: corptools/templates/corptools/admin.html:455
 msgid "Constellations"
 msgstr "Сузір'я"
 
-#: corptools/templates/corptools/admin.html:452
+#: corptools/templates/corptools/admin.html:461
 msgid "Systems"
 msgstr "Cистеми"
 
-#: corptools/templates/corptools/admin.html:458
+#: corptools/templates/corptools/admin.html:467
 msgid "Gate Links"
 msgstr "Зв'язки воріт"
 
-#: corptools/templates/corptools/admin.html:464
+#: corptools/templates/corptools/admin.html:473
 msgid "Jump Bridge Links"
 msgstr "Зв'язки JB"
 
-#: corptools/templates/corptools/admin.html:482
+#: corptools/templates/corptools/admin.html:485
+msgid "Audit Models"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:491
 msgid "Corporation Audits"
 msgstr "Аудитів корпорацій"
 
-#: corptools/templates/corptools/admin.html:488
+#: corptools/templates/corptools/admin.html:497
 msgid "Character Audits (Active/Total)"
 msgstr "Аудитів персонажів (Активні/Загальні)"
 
-#: corptools/templates/corptools/admin.html:494
-#: corptools/templates/corptools/admin.html:527
+#: corptools/templates/corptools/admin.html:503
+#: corptools/templates/corptools/admin.html:536
 msgid "Skill Lists"
 msgstr "Списків навичок"
 
-#: corptools/templates/corptools/admin.html:507
+#: corptools/templates/corptools/admin.html:511
+msgid "Audit Tasks"
+msgstr ""
+
+#: corptools/templates/corptools/admin.html:516
 msgid "Character Task"
 msgstr "Завдань персонажів"
 
-#: corptools/templates/corptools/admin.html:513
+#: corptools/templates/corptools/admin.html:522
 msgid "Corporation Task"
 msgstr "Завдань корпорацій"
 
-#: corptools/templates/corptools/admin.html:521
+#: corptools/templates/corptools/admin.html:530
 msgid "Create or Update Periodic Tasks"
 msgstr "Створити або оновити періодичні завдання"
 
-#: corptools/templates/corptools/admin.html:533
+#: corptools/templates/corptools/admin.html:542
 msgid "Skill List Description"
 msgstr "Опис списку навичок"
 
-#: corptools/templates/corptools/admin.html:535
+#: corptools/templates/corptools/admin.html:544
 msgid "This will show as the name of the Skill List"
 msgstr "Це буде показано як назва списку навичок"
 
-#: corptools/templates/corptools/admin.html:543
+#: corptools/templates/corptools/admin.html:553
 msgid "Browse"
 msgstr "Вибрати"
 
-#: corptools/templates/corptools/admin.html:546
+#: corptools/templates/corptools/admin.html:557
 msgid "PYFA XML Skills required list"
 msgstr "Список навичок в форматі PYFA XML"
 
@@ -370,513 +429,82 @@ msgstr "Список навичок в форматі PYFA XML"
 msgid "Add All Token"
 msgstr "LДодати всі токени"
 
-#: corptools/templates/corptools/character/assets_lists.html:22
-msgid "Sub-Capital Ships"
-msgstr "Підкапітальні кораблі"
-
-#: corptools/templates/corptools/character/assets_lists.html:39
-msgid "Notable Others Assets"
-msgstr "Важливі інші активи"
-
-#: corptools/templates/corptools/character/assets_lists.html:56
-msgid "BPO's"
-msgstr "BPO"
-
-#: corptools/templates/corptools/character/assets_lists.html:90
-msgid "Rest"
-msgstr "Інше"
-
-#: corptools/templates/corptools/character/char_base.html:207
-#: corptools/templates/corptools/corp_menu.html:15
-#: corptools/templates/corptools/corporation/corp_base.html:209
-#: corptools/templates/corptools/menu.html:14
-msgid "Toggle navigation"
-msgstr "Перемкнути навігацію"
-
-#: corptools/templates/corptools/character/char_base.html:212
-#: corptools/templates/corptools/corp_menu.html:20
-#: corptools/templates/corptools/corporation/corp_base.html:214
-#: corptools/templates/corptools/menu.html:19
-msgid "Account Audit"
-msgstr "Аудит акаунту"
-
-#: corptools/templates/corptools/character/char_base.html:224
-#: corptools/templates/corptools/corp_menu.html:33
-#: corptools/templates/corptools/corporation/corp_base.html:240
-#: corptools/templates/corptools/menu.html:39
-msgid "Add Character Token"
-msgstr "Додати токен персонажа"
-
-#: corptools/templates/corptools/character/char_base.html:228
-#: corptools/templates/corptools/corp_menu.html:37
-#: corptools/templates/corptools/corporation/corp_base.html:244
-#: corptools/templates/corptools/menu.html:43
-msgid "Add Corporate Token"
-msgstr "Додати токен корпорації"
-
-#: corptools/templates/corptools/character/char_base.html:231
-#: corptools/templates/corptools/character/public.html:26
-#: corptools/templates/corptools/menu.html:32
-msgid "Corporations"
-msgstr "Корпорації"
-
-#: corptools/templates/corptools/character/char_base.html:235
-msgid "New UI"
-msgstr "Нова UI"
-
-#: corptools/templates/corptools/character/char_base.html:262
-#: corptools/templates/corptools/corporation/corp_base.html:274
-msgid "Linked characters"
-msgstr "Прив'язані персонажі"
-
-#: corptools/templates/corptools/character/char_base.html:274
-#: corptools/templates/corptools/corporation/corp_base.html:291
-msgid "More"
-msgstr "Більше"
-
-#: corptools/templates/corptools/character/char_base.html:277
-#: corptools/templates/corptools/corporation/corp_base.html:294
-msgid "Total Account ISK"
-msgstr "Сума ISK акаунту"
-
-#: corptools/templates/corptools/character/char_menu.html:5
-#: corptools/templates/corptools/corporation/corp_base.html:220
-msgid "Overview"
-msgstr "Огляд"
-
-#: corptools/templates/corptools/character/char_menu.html:8
-#: corptools/templates/corptools/character/status.html:38
-#: corptools/templates/corptools/corporation/corp_base.html:276
-msgid "Public Data"
-msgstr "Публічні дані"
-
-#: corptools/templates/corptools/character/char_menu.html:21
-#: corptools/templates/corptools/character/status.html:43
-#: corptools/templates/corptools/corporation/corp_base.html:223
-#: corptools/templates/corptools/corporation/corp_base.html:284
-msgid "Assets"
-msgstr "Активи"
-
-#: corptools/templates/corptools/character/char_menu.html:56
-msgid "Finance"
-msgstr "Фінанси"
-
-#: corptools/templates/corptools/character/char_menu.html:100
-#: corptools/templates/corptools/character/contacts.html:8
-#: corptools/templates/corptools/character/status.html:55
-msgid "Contacts"
-msgstr "Контакти"
-
-#: corptools/templates/corptools/character/clones.html:29
-msgid "ID"
-msgstr ""
-
-#: corptools/templates/corptools/character/clones.html:30
-#: corptools/templates/corptools/character/market.html:36
-#: corptools/templates/corptools/character/market.html:72
-msgid "Location"
-msgstr "Розташування"
-
-#: corptools/templates/corptools/character/clones.html:31
-msgid "Implants"
-msgstr "Імпланти"
-
-#: corptools/templates/corptools/character/clones.html:45
-msgid "None"
-msgstr "Відсутні"
-
-#: corptools/templates/corptools/character/clones.html:52
-msgid "No Clones"
-msgstr "Немає клонів"
-
-#: corptools/templates/corptools/character/contacts.html:13
-msgid "Name"
-msgstr "Ім'я"
-
-#: corptools/templates/corptools/character/contacts.html:14
-msgid "Standing"
-msgstr "Репутація"
-
-#: corptools/templates/corptools/character/contacts.html:15
-msgid "Labels"
-msgstr "Мітки"
-
-#: corptools/templates/corptools/character/contacts.html:16
-#: corptools/templates/corptools/character/contacts.html:18
-msgid "Blocked"
-msgstr "Заблоковано"
-
-#: corptools/templates/corptools/character/contacts.html:17
-#: corptools/templates/corptools/character/contacts.html:19
-msgid "Watched"
-msgstr "Відстежування"
-
-#: corptools/templates/corptools/character/contacts.html:20
-msgid "Owner"
-msgstr "Власник"
-
-#: corptools/templates/corptools/character/contacts.html:52
-#: corptools/templates/corptools/character/contacts.html:60
-msgid "Yes"
-msgstr "Так"
-
-#: corptools/templates/corptools/character/contacts.html:54
-#: corptools/templates/corptools/character/contacts.html:62
-msgid "No"
-msgstr "Ні"
-
-#: corptools/templates/corptools/character/doctrine_upload.html:5
-msgid "Upload"
-msgstr "Завантажити"
-
-#: corptools/templates/corptools/character/market.html:12
-msgid "Sell Order Total"
-msgstr "Загальна сума продажу"
-
-#: corptools/templates/corptools/character/market.html:20
-msgid "Buy Order Total"
-msgstr "Загальна сума покупки"
-
-#: corptools/templates/corptools/character/market.html:28
-msgid "Active Orders"
-msgstr "Активні ордери"
-
-#: corptools/templates/corptools/character/market.html:32
-#: corptools/templates/corptools/character/market.html:67
-#: corptools/templates/corptools/character/notifications.html:14
-#: corptools/templates/corptools/character/wallet.html:14
-msgid "Date"
-msgstr "Дата"
-
-#: corptools/templates/corptools/character/market.html:33
-#: corptools/templates/corptools/character/market.html:69
-msgid "Item"
-msgstr "Предмет"
-
-#: corptools/templates/corptools/character/market.html:34
-#: corptools/templates/corptools/character/market.html:70
-msgid "Item Price"
-msgstr "Ціна предмету"
-
-#: corptools/templates/corptools/character/market.html:37
-#: corptools/templates/corptools/character/market.html:73
-#: corptools/templates/corptools/character/wallet.html:21
-msgid "Character Filter"
-msgstr "Фільтр персонажів"
-
-#: corptools/templates/corptools/character/market.html:38
-#: corptools/templates/corptools/character/market.html:74
-msgid "Buy/Sell"
-msgstr "Купівля/продаж"
-
-#: corptools/templates/corptools/character/market.html:43
-#: corptools/templates/corptools/character/market.html:79
-msgid "day"
-msgstr "день"
-
-#: corptools/templates/corptools/character/market.html:46
-#: corptools/templates/corptools/character/market.html:83
-msgid "of"
-msgstr "з"
-
-#: corptools/templates/corptools/character/market.html:51
-#: corptools/templates/corptools/character/market.html:88
-msgid "Buy"
-msgstr "Купівля"
-
-#: corptools/templates/corptools/character/market.html:53
-#: corptools/templates/corptools/character/market.html:90
-msgid "Sell"
-msgstr "Продаж"
-
-#: corptools/templates/corptools/character/market.html:63
-msgid "Completed Orders"
-msgstr "Завершені ордери"
-
-#: corptools/templates/corptools/character/market.html:68
-msgid "State"
-msgstr "Cтатус"
-
-#: corptools/templates/corptools/character/notifications.html:10
-#: corptools/templates/corptools/character/wallet.html:10
-#: corptools/templates/corptools/corporation/corp_base.html:286
-msgid "Wallets"
-msgstr "Гаманці"
-
-#: corptools/templates/corptools/character/notifications.html:16
-msgid "Type"
-msgstr "Тип"
-
-#: corptools/templates/corptools/character/notifications.html:17
-msgid "Text"
-msgstr "Текст"
-
-#: corptools/templates/corptools/character/notifications.html:18
-msgid "Read"
-msgstr "Читати"
-
-#: corptools/templates/corptools/character/public.html:16
-#: corptools/templates/corptools/character/skills.html:42
-#: corptools/templates/corptools/character/status.html:24
-msgid "Total SP"
-msgstr "Сума CП"
-
-#: corptools/templates/corptools/character/public.html:18
-#: corptools/templates/corptools/character/status.html:25
-msgid "Isk"
-msgstr "ISK"
-
-#: corptools/templates/corptools/character/public.html:27
-msgid "Joined"
-msgstr "Приєднання"
-
-#: corptools/templates/corptools/character/public.html:47
-msgid "No Data"
-msgstr "Немає інформації"
-
-#: corptools/templates/corptools/character/public.html:48
-msgid "You probably need to load a token, or wait for an update to run"
-msgstr ""
-"Ймовірно, вам потрібно додати токен або зачекати, поки оновлення "
-"виконається."
-
-#: corptools/templates/corptools/character/roles.html:13
-msgid "Character Roles"
-msgstr "Ролі персонажів"
-
-#: corptools/templates/corptools/character/roles.html:18
-#: corptools/templates/corptools/corp_menu.html:53
-#: corptools/templates/corptools/menu.html:57
-msgid "Corporation"
-msgstr "Корпорація"
-
-#: corptools/templates/corptools/character/roles.html:19
-msgid "Director"
-msgstr "Директор"
-
-#: corptools/templates/corptools/character/roles.html:20
-msgid "Accountant"
-msgstr "Діловод"
-
-#: corptools/templates/corptools/character/roles.html:21
-msgid "Station Manager"
-msgstr "Менеджер станцій"
-
-#: corptools/templates/corptools/character/roles.html:22
-msgid "Personnel Manager"
-msgstr "Менеджер персоналу"
-
-#: corptools/templates/corptools/character/skills.html:24
-msgid "Doctrine Checker"
-msgstr "Перевірка доктрин"
-
-#: corptools/templates/corptools/character/skills.html:36
-msgid "No Doctrines Loaded"
-msgstr "Доктрин не завантажено"
-
-#: corptools/templates/corptools/character/skills.html:43
-msgid "Unallocated SP"
-msgstr "Вільне CП"
-
-#: corptools/templates/corptools/character/skills.html:44
-msgid "Estimated Clone State"
-msgstr "Оціночний статус клону"
-
-#: corptools/templates/corptools/character/skills.html:46
-msgid "Omega"
-msgstr "Омега"
-
-#: corptools/templates/corptools/character/skills.html:48
-msgid "Alpha"
-msgstr "Альфа"
-
-#: corptools/templates/corptools/character/skills.html:58
-#: corptools/templates/corptools/character/skills.html:79
-msgid "Skill"
-msgstr "Навик"
-
-#: corptools/templates/corptools/character/skills.html:59
-#: corptools/templates/corptools/character/skills.html:80
-msgid "Level"
-msgstr "Рівень"
-
-#: corptools/templates/corptools/character/skills.html:60
-msgid "Group"
-msgstr "Група"
-
-#: corptools/templates/corptools/character/skills.html:75
-msgid "Queue"
-msgstr "Черга"
-
-#: corptools/templates/corptools/character/skills.html:81
-msgid "Completion"
-msgstr "Завершення"
-
-#: corptools/templates/corptools/character/skills.html:82
-msgid "item"
-msgstr "предмет"
-
-#: corptools/templates/corptools/character/skills.html:96
-msgid "Not Training"
-msgstr "Не тренує"
-
-#: corptools/templates/corptools/character/skills.html:121
-msgid "Account Checks"
-msgstr "Перевірки акаунту"
-
-#: corptools/templates/corptools/character/status.html:31
-msgid "Dataset"
-msgstr "Набір даних"
-
-#: corptools/templates/corptools/character/status.html:32
-msgid "Last Update"
-msgstr "Останнє оновлення"
-
-#: corptools/templates/corptools/character/status.html:39
-#: corptools/templates/corptools/character/status.html:44
-#: corptools/templates/corptools/character/status.html:50
-#: corptools/templates/corptools/character/status.html:56
-#: corptools/templates/corptools/character/status.html:62
-#: corptools/templates/corptools/character/status.html:68
-#: corptools/templates/corptools/character/status.html:74
-#: corptools/templates/corptools/character/status.html:80
-#: corptools/templates/corptools/character/status.html:83
-#: corptools/templates/corptools/character/status.html:89
-#: corptools/templates/corptools/character/status.html:93
-#: corptools/templates/corptools/character/status.html:99
-#: corptools/templates/corptools/corporation/corp_base.html:276
-#: corptools/templates/corptools/corporation/corp_base.html:278
-#: corptools/templates/corptools/corporation/corp_base.html:280
-#: corptools/templates/corptools/corporation/corp_base.html:282
-#: corptools/templates/corptools/corporation/corp_base.html:284
-#: corptools/templates/corptools/corporation/corp_base.html:286
-msgid "ago"
-msgstr "назад"
-
-#: corptools/templates/corptools/character/status.html:61
-msgid "Orders"
-msgstr "Ордери"
-
-#: corptools/templates/corptools/character/status.html:73
-msgid "Mails"
-msgstr "Пошта"
-
-#: corptools/templates/corptools/character/status.html:82
-msgid "Titles"
-msgstr "Титули"
-
-#: corptools/templates/corptools/character/status.html:92
-#: corptools/templates/corptools/corporation/corp_base.html:280
-msgid "Skill Que"
-msgstr "Черга навичок"
-
-#: corptools/templates/corptools/character/wallet.html:15
-msgid "From"
-msgstr "Відправник"
-
-#: corptools/templates/corptools/character/wallet.html:16
-msgid "To"
-msgstr "Отримувач"
-
-#: corptools/templates/corptools/character/wallet.html:17
-msgid "Amount"
-msgstr "Сума"
-
-#: corptools/templates/corptools/character/wallet.html:18
-msgid "Balance"
-msgstr "Баланс"
-
-#: corptools/templates/corptools/character/wallet.html:19
-msgid "Reason"
-msgstr "Причина"
-
-#: corptools/templates/corptools/character/wallet.html:20
-msgid "Ref Type"
-msgstr "Тип"
-
-#: corptools/templates/corptools/character/wallet.html:48
-msgid "Interaction Map"
-msgstr "Мапа взаємодій"
-
-#: corptools/templates/corptools/character/wallet.html:54
-msgid "Toggle to"
-msgstr "Перемкнути на"
-
-#: corptools/templates/corptools/character/wallet.html:54
-msgid "Isk Amount"
-msgstr "Кількість ISK"
-
-#: corptools/templates/corptools/corp_menu.html:27
-#: corptools/templates/corptools/menu.html:26
-msgid "DB Admin"
-msgstr "Адміністратор БД"
-
-#: corptools/templates/corptools/corp_menu.html:54
-#: corptools/templates/corptools/menu.html:58
-msgid "Alliance"
-msgstr "Альянс"
-
-#: corptools/templates/corptools/corp_menu.html:55
-msgid "Wallet Updates"
-msgstr "Оновлення гаманця"
-
-#: corptools/templates/corptools/corp_menu.html:56
-msgid "Asset Updates"
-msgstr "Оновлення активів"
-
-#: corptools/templates/corptools/corp_menu.html:57
-msgid "Structure Updates"
-msgstr "Оновлення структур"
-
-#: corptools/templates/corptools/corporation/corp_base.html:276
-msgid "title"
-msgstr "заголовок"
-
 #: corptools/templates/corptools/dashboard.corptools.status.html:8
 msgid "Add Character"
 msgstr "Додати персонажа"
 
-#: corptools/templates/corptools/dashboards/fuel_dash.html:123
-#: corptools/templates/corptools/dashboards/metenox_dash.html:74
+#: corptools/templates/corptools/dashboards/fuel_dash.html:127
+#: corptools/templates/corptools/dashboards/metenox_dash.html:77
 msgid "No Structures Available"
 msgstr "Структури не доступні"
 
-#: corptools/templates/corptools/fittings/characters.html:3
-msgid "Character Skill Checks"
-msgstr "Перевірка навиків персонажа"
-
-#: corptools/templates/corptools/fittings/characters.html:21
-msgid "Skills Required"
-msgstr "Необхідні навик"
+#: corptools/templates/corptools/fittings/characters.html:6
+msgid "Character Base Skill Checks"
+msgstr ""
 
 #: corptools/templates/corptools/fittings/characters.html:29
-msgid "Basic skills required to"
-msgstr "Базові навики потрібні для"
-
-#: corptools/templates/corptools/fittings/characters.html:29
-msgid "sit in the hull"
-msgstr "сидить у кораблі"
-
-#: corptools/templates/corptools/fittings/characters.html:29
-msgid "and"
-msgstr "і"
-
-#: corptools/templates/corptools/fittings/characters.html:29
-msgid "fit the modules"
-msgstr "встановлення модулів"
+#: corptools/templates/corptools/fittings/characters.html:74
+msgid ""
+"Basic skills required to <b>sit in the hull</b> and <b>fit the modules</b>."
+msgstr ""
 
 #: corptools/templates/corptools/fittings/characters.html:31
-msgid "Extra skills may be required to use this fitting in fleets"
+#: corptools/templates/corptools/fittings/characters.html:76
+msgid ""
+"Extra skills <b>will</b> be required to use this fitting properly in fleets"
 msgstr ""
-"Додаткові навики можуть знадобитися для використання цього фітингу в флотах"
+
+#: corptools/templates/corptools/fittings/characters.html:51
+msgid "Base Skills Required"
+msgstr ""
+
+#: corptools/templates/corptools/menu.html:14
+msgid "Toggle navigation"
+msgstr "Перемкнути навігацію"
+
+#: corptools/templates/corptools/menu.html:19
+msgid "Account Audit"
+msgstr "Аудит акаунту"
+
+#: corptools/templates/corptools/menu.html:26
+msgid "DB Admin"
+msgstr "Адміністратор БД"
+
+#: corptools/templates/corptools/menu.html:32
+msgid "Corporations"
+msgstr "Корпорації"
+
+#: corptools/templates/corptools/menu.html:39
+msgid "Add Character Token"
+msgstr "Додати токен персонажа"
+
+#: corptools/templates/corptools/menu.html:43
+msgid "Add Corporate Token"
+msgstr "Додати токен корпорації"
 
 #: corptools/templates/corptools/menu.html:56
 msgid "Main Character"
 msgstr "Головний персонаж"
 
+#: corptools/templates/corptools/menu.html:57
+msgid "Corporation"
+msgstr "Корпорація"
+
+#: corptools/templates/corptools/menu.html:58
+msgid "Alliance"
+msgstr "Альянс"
+
 #: corptools/templates/corptools/menu.html:59
 msgid "Alts"
 msgstr "Альти"
+
+#: corptools/templates/corptools/top_menu.html:3
+msgid "Character Audit"
+msgstr ""
+
+#: corptools/templates/corptools/top_menu.html:6
+msgid "Corporate Audit"
+msgstr ""
 
 #: corptools/validators.py:12
 msgid "This is not valid JSON, please check it and try again."
