@@ -69,6 +69,13 @@ CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE = getattr(
 
 CT_CHAR_PAUSE_CONTRACTS = getattr(settings, 'CT_CHAR_PAUSE_CONTRACTS', False)
 
+# Extra scopes to add to character/corporation token requests
+CT_EXTRA_CHARACTER_SCOPES = getattr(
+    settings, 'CT_EXTRA_CHARACTER_SCOPES', [])
+
+CT_EXTRA_CORPORATION_SCOPES = getattr(
+    settings, 'CT_EXTRA_CORPORATION_SCOPES', [])
+
 # New scopes so existing all will fail so lets ignore this by default.
 CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE', True)
@@ -211,6 +218,9 @@ def get_character_scopes():
         _scopes += [
             'esi-characters.read_loyalty.v1',
         ]
+
+    # Add user-defined extra scopes
+    _scopes += CT_EXTRA_CHARACTER_SCOPES
 
     return list(set(_scopes))
 
@@ -368,7 +378,8 @@ _corp_scopes_industry_jobs = [
 
 CORP_REQUIRED_SCOPES = _corp_scopes_base + _corp_scopes_tracking + \
     _corp_scopes_structures + _corp_scopes_moons + \
-    _corp_scopes_wallets + _corp_scopes_assets
+    _corp_scopes_wallets + _corp_scopes_assets + \
+    CT_EXTRA_CORPORATION_SCOPES
 
 CT_BETA_UI = getattr(
     settings, 'CT_BETA_UI', False)

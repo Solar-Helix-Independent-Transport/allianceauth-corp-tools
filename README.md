@@ -195,6 +195,24 @@ this is to be able to lookup location names.
 | `CT_PAGINATION_SIZE`         | 30000                                                | Max items per page of data in the UI                                                                                                                         |
 | `CT_USERS_CAN_FORCE_REFRESH` | False                                                | Set to `True` to force cache invalidation on a regular user requesting updates from the UI. Superusers will always cache invalidate on requesting an update. |
 
+### Custom ESI Scopes
+
+You can add arbitrary ESI scopes to character or corporation token requests using these settings:
+
+```python
+# Add extra scopes to character token requests
+CT_EXTRA_CHARACTER_SCOPES = [
+    'esi-custom-scope.v1',
+]
+
+# Add extra scopes to corporation token requests
+CT_EXTRA_CORPORATION_SCOPES = [
+    'esi-corp-custom.v1',
+]
+```
+
+Both default to empty lists.
+
 ## Contributing
 
 Make sure you have signed the [License Agreement](https://developers.eveonline.com/resource/license-agreement) by logging in at https://developers.eveonline.com before submitting any pull requests. All bug fixes or features must not include extra superfluous formatting changes.
