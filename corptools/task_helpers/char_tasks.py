@@ -769,12 +769,18 @@ def get_current_ship_location(character_id, force_refresh=False):
         ship = providers.esi_openapi.client.Location.GetCharactersCharacterIdShip(
             character_id=character_id,
             token=token
-        ).result(force_refresh=force_refresh)
+        ).result(
+            force_refresh=force_refresh,
+            use_etag=False
+        )
 
         location = providers.esi_openapi.client.Location.GetCharactersCharacterIdLocation(
             character_id=character_id,
             token=token
-        ).result(force_refresh=force_refresh)
+        ).result(
+            force_refresh=force_refresh,
+            use_etag=False
+        )
 
         return CharacterAsset.from_esi_location(audit_char, ship, location)
     except HTTPNotModified:
