@@ -206,7 +206,7 @@ def update_corp_history(character_id, force_refresh=False):
             try:
                 _, _ = CorporationHistory.objects.update_or_create(
                     character=audit_char,
-                    record_id=corp.get('record_id'),
+                    record_id=corp.record_id,
                     defaults={
                         'corporation_id': corp.corporation_id,
                         'corporation_name': corp_name,
@@ -239,7 +239,8 @@ def update_corp_history(character_id, force_refresh=False):
 
 def update_character_skill_list(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
-        character__character_id=character_id)
+        character__character_id=character_id
+    )
     logger.debug(
         f"Updating Skills for: {audit_char.character.character_name}"
     )
@@ -322,10 +323,12 @@ def update_character_skill_queue(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
     try:
-        queue_op = providers.esi.client.Skills.get_characters_character_id_skillqueue(
-            character_id=character_id)
-
-        queue = etag_results(queue_op, token, force_refresh=force_refresh)
+        queue = providers.esi_openapi.client.Skills.GetCharactersCharacterIdSkillqueue(
+            character_id=character_id,
+            token=token
+        ).result(
+            force_refresh=force_refresh,
+        )
 
         _st = time.perf_counter()
         # Delete current SkillList
@@ -336,25 +339,27 @@ def update_character_skill_queue(character_id, force_refresh=False):
         items = []
         _check_skills = []
         for item in queue:
-            _check_skills.append(item.get('skill_id'))
-            queue_item = SkillQueue(character=audit_char,
-                                    finish_level=item.get('finished_level'),
-                                    queue_position=item.get('queue_position'),
-                                    skill_id=item.get('skill_id'),
-                                    skill_name_id=item.get('skill_id'),
-                                    finish_date=item.get('finish_date', None),
-                                    level_end_sp=item.get(
-                                        'level_end_sp', None),
-                                    level_start_sp=item.get(
-                                        'level_start_sp', None),
-                                    start_date=item.get('start_date', None),
-                                    training_start_sp=item.get('training_start_sp', None))
+            _check_skills.append(item.skill_id)
+            queue_item = SkillQueue(
+                character=audit_char,
+                finish_level=item.finished_level,
+                queue_position=item.queue_position,
+                skill_id=item.skill_id,
+                skill_name_id=item.skill_id,
+                finish_date=item.finish_date,
+                level_end_sp=item.level_end_sp,
+                level_start_sp=item.level_start_sp,
+                start_date=item.start_date,
+                training_start_sp=item.training_start_sp
+            )
             items.append(queue_item)
 
         EveItemType.objects.create_bulk_from_esi(_check_skills)
         SkillQueue.objects.bulk_create(items)
+
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_skill_queue {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_character_skill_queue {character_id}"
+        )
 
     except NotModifiedError:
         logger.info(
@@ -421,13 +426,15 @@ def update_character_assets(character_id, force_refresh=False):
         )
         if ship:
             logger.info(
-                f"CT: New ship for: {audit_char.character.character_name}")
+                f"CT: New ship for: {audit_char.character.character_name}"
+            )
             if ship.item_id not in item_ids:
                 if ship.type_id not in _current_type_ids:
                     _current_type_ids.append(ship.type_id)
 
                 if ship.location_id in location_names:
                     ship.location_name_id = ship.location_id
+
                 items.append(ship)
 
         EveItemType.objects.create_bulk_from_esi(_current_type_ids)
@@ -440,8 +447,10 @@ def update_character_assets(character_id, force_refresh=False):
             delete_query.delete()
 
         CharacterAsset.objects.bulk_create(items)
+
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_assets {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_character_assets {character_id}"
+        )
 
         # Locate assets in space!
         update_asset_locations(character_id, force_refresh=force_refresh)
@@ -451,7 +460,7 @@ def update_character_assets(character_id, force_refresh=False):
         except Exception as e:
             logger.error(e)
         try:
-            # Get den plannets!
+            # Get den planets!
             update_den_locations(character_id)
         except Exception as e:
             logger.error(e)
