@@ -189,41 +189,45 @@ def update_character_location(character_id, force_refresh=False):
 def update_corp_history(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
-    logger.debug("updating corp history for: {}".format(
-        audit_char.character.character_name))
+    logger.debug(
+        f"updating corp history for: {audit_char.character.character_name}"
+    )
     try:
-        corp_history_op = providers.esi.client.Character.get_characters_character_id_corporationhistory(
-            character_id=character_id)
-
-        corp_history = etag_results(
-            corp_history_op, None, force_refresh=force_refresh)
+        corp_history = providers.esi_openapi.client.Character.GetCharactersCharacterIdCorporationhistory(
+            character_id=character_id,
+        ).result(
+            force_refresh=force_refresh,
+        )
         _st = time.perf_counter()
         for corp in corp_history:
-            corp_name, created = EveName.objects.get_or_create_from_esi(
-                corp.get('corporation_id'))
+            corp_name, _ = EveName.objects.get_or_create_from_esi(
+                corp.corporation_id
+            )
             try:
-                history_item, created = CorporationHistory.objects.update_or_create(
+                _, _ = CorporationHistory.objects.update_or_create(
                     character=audit_char,
                     record_id=corp.get('record_id'),
                     defaults={
-                        'corporation_id': corp.get('corporation_id'),
+                        'corporation_id': corp.corporation_id,
                         'corporation_name': corp_name,
-                        'is_deleted': corp.get('is_deleted', False),
-                        'start_date': corp.get('start_date')
+                        'is_deleted': corp.is_deleted if corp.is_deleted else False,
+                        'start_date': corp.start_date
                     }
                 )
             except CorporationHistory.MultipleObjectsReturned:
                 logger.error(
                     (
-                        F"CT Corp History Duplicate - {audit_char.character.character_name} -"
-                        f" Bad Data: {corp}"
+                        f"CT Corp History Duplicate - {audit_char.character.character_name} -"
+                        f" Bad Data: {corp.model_dump_json(indent=2)}"
                     )
                 )
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_corp_history {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_corp_history {character_id}"
+        )
     except NotModifiedError:
-        logger.info("CT: No New pub data for: {}".format(
-            audit_char.character.character_name))
+        logger.info(
+            f"CT: No New pub data for: {audit_char.character.character_name}"
+        )
         pass
 
     audit_char.last_update_pub_data = timezone.now()
@@ -236,8 +240,9 @@ def update_corp_history(character_id, force_refresh=False):
 def update_character_skill_list(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
-    logger.debug("Updating Skills for: {}".format(
-        audit_char.character.character_name))
+    logger.debug(
+        f"Updating Skills for: {audit_char.character.character_name}"
+    )
 
     req_scopes = ['esi-skills.read_skills.v1']
 
