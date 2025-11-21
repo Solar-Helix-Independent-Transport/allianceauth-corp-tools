@@ -1,3 +1,4 @@
+import sys
 import time
 from datetime import timedelta
 
@@ -437,8 +438,10 @@ def update_character_assets(character_id, force_refresh=False):
             logger.error(e)
 
     except HTTPNotModified as e:
+        _, _, tb = sys.exc_info()
         logger.info(
-            f"CT: No New assets for: {audit_char.character.character_name}")
+            f"CT: No New assets for: {audit_char.character.character_name} - ({tb.tb_lineno})"
+        )
         pass
 
     audit_char.last_update_assets = timezone.now()
