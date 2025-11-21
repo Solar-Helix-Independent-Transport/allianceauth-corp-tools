@@ -80,21 +80,23 @@ def update_character_location(character_id, force_refresh=False):
         return "No Tokens"
 
     try:
-        location_op = providers.esi.client.Location.get_characters_character_id_location(
-            character_id=character_id)
-
-        loc_data = etag_results(
-            location_op, token, force_refresh=force_refresh)
+        location = providers.esi_openapi.client.Location.GetCharactersCharacterIdLocation(
+            character_id=character_id,
+            token=token
+        ).result(
+            force_refresh=force_refresh,
+            use_etag=False
+        )
         _st = time.perf_counter()
 
         loc_id = None
 
-        if loc_data['structure_id']:
-            loc_id = loc_data['structure_id']
-        elif loc_data['station_id']:
-            loc_id = loc_data['station_id']
+        if location.structure_id:
+            loc_id = location.structure_id
+        elif location.station_id:
+            loc_id = location.station_id
         else:
-            loc_id = loc_data['solar_system_id']
+            loc_id = location.solar_system_id
 
         _loc = fetch_location_name(loc_id, "solar_system", character_id)
 
@@ -108,33 +110,37 @@ def update_character_location(character_id, force_refresh=False):
             }
         )
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_location_location {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_character_location_location {character_id}"
+        )
 
     except NotModifiedError:
-        logger.info("CT: No New Location data for: {}".format(
-            audit_char.character.character_name))
+        logger.info(
+            f"CT: No New Location data for: {audit_char.character.character_name}"
+        )
         pass
 
     try:
-        ship_op = providers.esi.client.Location.get_characters_character_id_ship(
-            character_id=character_id)
-
-        ship_data = etag_results(
-            ship_op, token, force_refresh=force_refresh)
+        ship_data = providers.esi_openapi.client.Location.GetCharactersCharacterIdShip(
+            character_id=character_id,
+            token=token
+        ).result(
+            force_refresh=force_refresh,
+        )
         _st = time.perf_counter()
 
         ship, _ = EveItemType.objects.get_or_create_from_esi(
-            ship_data["ship_type_id"])
+            ship_data.ship_type_id)
 
         CharacterLocation.objects.update_or_create(
             character=audit_char,
             defaults={
                 "current_ship": ship,
-                "current_ship_name": ship_data["ship_name"],
+                "current_ship_name": ship_data.ship_name,
             }
         )
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_location_ship {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_character_location_ship {character_id}"
+        )
 
     except NotModifiedError:
         logger.info("CT: No New current ship data for: {}".format(
@@ -147,29 +153,31 @@ def update_character_location(character_id, force_refresh=False):
         token = get_token(character_id, req_scopes)
 
         if token:
-            online_op = providers.esi.client.Location.get_characters_character_id_online(
-                character_id=character_id)
-
-            ship_data = etag_results(
-                online_op, token, force_refresh=force_refresh)
+            online_data = providers.esi_openapi.client.Location.GetCharactersCharacterIdOnline(
+                character_id=character_id,
+                token=token
+            ).result(
+                force_refresh=force_refresh,
+            )
             _st = time.perf_counter()
 
-            if ship_data.get("last_login"):
-                audit_char.last_known_login = ship_data.get("last_login")
+            if online_data.last_login:
+                audit_char.last_known_login = online_data.last_login
 
             if ship_data.get("last_logout"):
-                audit_char.last_known_logoff = ship_data.get("last_logout")
+                audit_char.last_known_logoff = online_data.last_logout
 
             if ship_data.get("logins"):
-                audit_char.total_logins = ship_data.get("logins")
+                audit_char.total_logins = online_data.logins
 
             logger.debug(
-                f"CT_TIME: {time.perf_counter() - _st} update_character_location_last_online {character_id}")
+                f"CT_TIME: {time.perf_counter() - _st} update_character_location_last_online {character_id}"
+            )
 
     except NotModifiedError:
-        logger.info("CT: No New online data for: {}".format(
-            audit_char.character.character_name))
-        pass
+        logger.info(
+            f"CT: No New online data for: {audit_char.character.character_name}"
+        )
 
     audit_char.last_update_location = timezone.now()
     audit_char.save()

@@ -279,6 +279,7 @@ esi_openapi = ESIOpenApiProvider(
         # Character Location
         "GetCharactersCharacterIdShip",
         "GetCharactersCharacterIdLocation",
+        "GetCharactersCharacterIdOnline",
         # Character Notification
         "GetCharactersCharacterIdNotifications",
         # Corporate Assets
