@@ -291,6 +291,9 @@ esi_openapi = ESIOpenApiProvider(
         # Character Skills
         "GetCharactersCharacterIdSkills",
         "GetCharactersCharacterIdSkillqueue",
+        # Character Indy
+        "GetCharactersCharacterIdIndustryJobs",
+        "GetCharactersCharacterIdMining",
         # Corp Data
         "GetCorporationsCorporationIdDivisions",
     ]

@@ -1,9 +1,12 @@
-from django.db import models
+from typing import TYPE_CHECKING
 
-from esi.stubs import CharactersCharacterIdMiningGetItem
+from django.db import models
 
 from .audits import CharacterAudit
 from .eve_models import EveItemType, MapSystem
+
+if TYPE_CHECKING:
+    from esi.stubs import CharactersCharacterIdMiningGetItem
 
 
 class CharacterMiningLedger(models.Model):
@@ -15,7 +18,7 @@ class CharacterMiningLedger(models.Model):
     quantity = models.IntegerField()
 
     @staticmethod
-    def create_primary_key(character_id, mining_record: CharactersCharacterIdMiningGetItem):
+    def create_primary_key(character_id, mining_record: "CharactersCharacterIdMiningGetItem"):
         """
             TODO investigate something else...
         """
