@@ -164,10 +164,10 @@ def update_character_location(character_id, force_refresh=False):
             if online_data.last_login:
                 audit_char.last_known_login = online_data.last_login
 
-            if ship_data.get("last_logout"):
+            if online_data.last_logout:
                 audit_char.last_known_logoff = online_data.last_logout
 
-            if ship_data.get("logins"):
+            if online_data.logins:
                 audit_char.total_logins = online_data.logins
 
             logger.debug(
