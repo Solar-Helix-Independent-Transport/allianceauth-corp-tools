@@ -290,6 +290,7 @@ esi_openapi = ESIOpenApiProvider(
         "PostCorporationsCorporationIdAssetsLocations",
         # Character Skills
         "GetCharactersCharacterIdSkills",
+        "GetCharactersCharacterIdSkillqueue",
         # Corp Data
         "GetCorporationsCorporationIdDivisions",
     ]

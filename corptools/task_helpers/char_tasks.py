@@ -490,9 +490,11 @@ def update_character_assets_names(character_id):
         Uses PostCharactersCharacterIdAssetsNames
     """
     audit_char = CharacterAudit.objects.get(
-        character__character_id=character_id)
-    logger.debug("Updating Asset names for: {}".format(
-        audit_char.character.character_name))
+        character__character_id=character_id
+    )
+
+    logger.debug(
+        f"Updating Asset names for: {audit_char.character.character_name}")
 
     req_scopes = ['esi-assets.read_assets.v1']
 
@@ -562,22 +564,26 @@ def update_asset_locations(character_id, force_refresh=False):
         Uses PostCharactersCharacterIdAssetsLocations
     """
     audit_char = CharacterAudit.objects.get(
-        character__character_id=character_id)
-    logger.debug("Updating Asset locations for: {}".format(
-        audit_char.character.character_name))
-    catagories = [
+        character__character_id=character_id
+    )
+
+    logger.debug(
+        f"Updating Asset locations for: {audit_char.character.character_name}")
+
+    categories = [
         23,  # Starbases
         65,  # Structures
         40,  # Sov
         22,  # Deployables
     ]
+
     # These must be in space
     max_location_id = 35000000
     min_location_id = 30000000
 
     assets = CharacterAsset.objects.filter(
         character=audit_char,
-        type_name__group__category_id__in=catagories,
+        type_name__group__category_id__in=categories,
         location_id__gte=min_location_id,
         location_id__lte=max_location_id
     )
