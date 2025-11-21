@@ -251,45 +251,51 @@ def update_character_skill_list(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
     try:
-        skills_op = providers.esi.client.Skills.get_characters_character_id_skills(
-            character_id=character_id)
-
-        skills = etag_results(skills_op, token, force_refresh=force_refresh)
+        skills = providers.esi_openapi.client.Skills.GetCharactersCharacterIdSkills(
+            character_id=character_id,
+            token=token
+        ).result(
+            force_refresh=force_refresh,
+        )
 
         # Delete current SkillList
         _st = time.perf_counter()
         Skill.objects.filter(character=audit_char).delete()
 
-        SkillTotals.objects.update_or_create(character=audit_char,
-                                             defaults={
-                                                 'total_sp': skills.get('total_sp', 0),
-                                                 'unallocated_sp': skills.get('unallocated_sp', 0)
-                                             })
+        SkillTotals.objects.update_or_create(
+            character=audit_char,
+            defaults={
+                'total_sp': skills.total_sp,
+                'unallocated_sp': skills.unallocated_sp if skills.unallocated_sp else 0
+            }
+        )
 
-        SkillTotalHistory.objects.create(character=audit_char,
-                                         total_sp=skills.get('total_sp', 0),
-                                         unallocated_sp=skills.get(
-                                             'unallocated_sp', 0)
-                                         )
+        SkillTotalHistory.objects.create(
+            character=audit_char,
+            total_sp=skills.total_sp,
+            unallocated_sp=skills.unallocated_sp if skills.unallocated_sp else 0
+        )
 
         _check_skills = []
         _create_skills = []
-        for skill in skills.get('skills', []):
-            _check_skills.append(skill.get('skill_id'))
-            _skill = Skill(character=audit_char,
-                           skill_id=skill.get('skill_id'),
-                           skill_name_id=skill.get('skill_id'),
-                           active_skill_level=skill.get('active_skill_level'),
-                           skillpoints_in_skill=skill.get(
-                               'skillpoints_in_skill'),
-                           trained_skill_level=skill.get('trained_skill_level'))
-
+        for skill in skills.skills:
+            _check_skills.append(skill.skill_id)
+            _skill = Skill(
+                character=audit_char,
+                skill_id=skill.skill_id,
+                skill_name_id=skill.skill_id,
+                active_skill_level=skill.active_skill_level,
+                skillpoints_in_skill=skill.skillpoints_in_skill,
+                trained_skill_level=skill.trained_skill_level
+            )
             _create_skills.append(_skill)
 
         EveItemType.objects.create_bulk_from_esi(_check_skills)
         Skill.objects.bulk_create(_create_skills)
+
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_skill_list {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_character_skill_list {character_id}"
+        )
 
     except NotModifiedError:
         logger.info("CT: No New skills for: {}".format(

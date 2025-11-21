@@ -272,6 +272,8 @@ esi_openapi = ESIOpenApiProvider(
     ua_url=__url__,
     ua_version=__version__,
     operations=[
+        # Char Audits
+        "GetCharactersCharacterIdCorporationhistory",
         # Character Asset
         "GetCharactersCharacterIdAssets",
         "PostCharactersCharacterIdAssetsNames",
@@ -286,6 +288,8 @@ esi_openapi = ESIOpenApiProvider(
         "GetCorporationsCorporationIdAssets",
         "PostCorporationsCorporationIdAssetsNames",
         "PostCorporationsCorporationIdAssetsLocations",
+        # Character Skills
+        "GetCharactersCharacterIdSkills",
         # Corp Data
         "GetCorporationsCorporationIdDivisions",
     ]
