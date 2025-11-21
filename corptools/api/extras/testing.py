@@ -4,6 +4,8 @@ from ninja import NinjaAPI
 
 from django.core.cache import cache
 
+from esi.exceptions import HTTPNotModified
+
 from corptools.task_helpers.char_tasks import get_token
 
 
@@ -207,13 +209,20 @@ class TestingApiEndpoints:
             # token = get_token(cid, req_scopes)
             # req = esi.client.Character.GetCharactersCharacterIdNotifications(character_id=cid, token=token).result()
 
-            # req_scopes = ['esi-assets.read_assets.v1']
-            # token = get_token(cid, req_scopes)
-            # req, res = esi.client.Assets.GetCharactersCharacterIdAssets(
-            #     character_id=cid, token=token).results(return_response=True, use_etag=False)
-            # cache.clear()
-            req_scopes = ['esi-characters.read_notifications.v1']
+            req_scopes = ['esi-assets.read_assets.v1']
             token = get_token(cid, req_scopes)
-            req, res = esi.client.Character.GetCharactersCharacterIdNotifications(
-                character_id=cid, token=token).results(return_response=True, use_cache=False, use_etag=False)
+
+            req, res = esi.client.Assets.GetCharactersCharacterIdAssets(
+                character_id=cid, token=token, page=1).result(return_response=True, use_etag=False)
+
+            try:
+                req, res = esi.client.Assets.GetCharactersCharacterIdAssets(
+                    character_id=cid, token=token).results(return_response=True)
+            except HTTPNotModified:
+                pass
+            # cache.clear()
+            # req_scopes = ['esi-characters.read_notifications.v1']
+            # token = get_token(cid, req_scopes)
+            # req, res = esi.client.Character.GetCharactersCharacterIdNotifications(
+            #     character_id=cid, token=token).results(return_response=True, use_cache=False, use_etag=False)
             return [req[:10]]

@@ -37,7 +37,7 @@ class RefreshApiEndpoints:
 
             characters = get_alts_queryset(main)
             if character_id in characters.values_list('character_id', flat=True):
-                character.update_character.apply_async(
+                character.update_char_assets.apply_async(
                     args=[character_id],
                     kwargs={
                         "force_refresh": True

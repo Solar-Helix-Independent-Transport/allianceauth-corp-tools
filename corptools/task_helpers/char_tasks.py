@@ -370,6 +370,8 @@ def update_character_assets(character_id, force_refresh=False):
         ).results(
             force_refresh=force_refresh
         )
+        logger.info(
+            f"CT: New assets for: {audit_char.character.character_name}")
 
         _st = time.perf_counter()
         location_names = list(
@@ -398,6 +400,8 @@ def update_character_assets(character_id, force_refresh=False):
             force_refresh=force_refresh
         )
         if ship:
+            logger.info(
+                f"CT: New ship for: {audit_char.character.character_name}")
             if ship.item_id not in item_ids:
                 if ship.type_id not in _current_type_ids:
                     _current_type_ids.append(ship.type_id)
@@ -432,9 +436,9 @@ def update_character_assets(character_id, force_refresh=False):
         except Exception as e:
             logger.error(e)
 
-    except HTTPNotModified:
-        logger.info("CT: No New assets for: {}".format(
-            audit_char.character.character_name))
+    except HTTPNotModified as e:
+        logger.info(
+            f"CT: No New assets for: {audit_char.character.character_name}")
         pass
 
     audit_char.last_update_assets = timezone.now()
