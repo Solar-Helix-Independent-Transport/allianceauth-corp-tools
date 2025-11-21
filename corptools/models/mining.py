@@ -1,5 +1,7 @@
 from django.db import models
 
+from esi.stubs import CharactersCharacterIdMiningGetItem
+
 from .audits import CharacterAudit
 from .eve_models import EveItemType, MapSystem
 
@@ -13,8 +15,8 @@ class CharacterMiningLedger(models.Model):
     quantity = models.IntegerField()
 
     @staticmethod
-    def create_primary_key(character_id, mining_record):
+    def create_primary_key(character_id, mining_record: CharactersCharacterIdMiningGetItem):
         """
             TODO investigate something else...
         """
-        return f"{mining_record['date'].strftime('%Y%m%d')}-{mining_record['type_id']}-{character_id}-{mining_record['solar_system_id']}"
+        return f"{mining_record.date.strftime('%Y%m%d')}-{mining_record.type_id}-{character_id}-{mining_record.solar_system_id}"

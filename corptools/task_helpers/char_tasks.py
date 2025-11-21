@@ -228,7 +228,6 @@ def update_corp_history(character_id, force_refresh=False):
         logger.info(
             f"CT: No New pub data for: {audit_char.character.character_name}"
         )
-        pass
 
     audit_char.last_update_pub_data = timezone.now()
     audit_char.save()
@@ -299,9 +298,9 @@ def update_character_skill_list(character_id, force_refresh=False):
         )
 
     except NotModifiedError:
-        logger.info("CT: No New skills for: {}".format(
-            audit_char.character.character_name))
-        pass
+        logger.info(
+            f"CT: No New skills for: {audit_char.character.character_name}"
+        )
 
     audit_char.last_update_skills = timezone.now()
     audit_char.save()
@@ -367,7 +366,6 @@ def update_character_skill_queue(character_id, force_refresh=False):
                 audit_char.character.character_name
             )
         )
-        pass
 
     audit_char.last_update_skill_que = timezone.now()
     audit_char.save()
@@ -470,7 +468,6 @@ def update_character_assets(character_id, force_refresh=False):
         logger.info(
             f"CT: No New assets for: {audit_char.character.character_name} - ({tb.tb_lineno})"
         )
-        pass
 
     audit_char.last_update_assets = timezone.now()
     audit_char.save()
@@ -631,9 +628,9 @@ def update_asset_locations(character_id, force_refresh=False):
 
 def update_character_mining(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
-        character__character_id=character_id)
-    logger.debug("Updating Mining for: {}".format(
-        audit_char.character.character_name))
+        character__character_id=character_id
+    )
+    logger.debug(f"Updating Mining for: {audit_char.character.character_name}")
 
     req_scopes = ['esi-industry.read_character_mining.v1']
 
@@ -642,31 +639,40 @@ def update_character_mining(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
     try:
-        mining_op = providers.esi.client.Industry.get_characters_character_id_mining(
-            character_id=character_id)
-
-        ledger = etag_results(mining_op, token, force_refresh=force_refresh)
+        mining = providers.esi_openapi.client.Industry.GetCharactersCharacterIdMining(
+            character_id=character_id,
+            token=token
+        ).result(
+            force_refresh=force_refresh,
+        )
 
         _st = time.perf_counter()
-        existings_pks = set(CharacterMiningLedger.objects.filter(
-            character=audit_char, date__gte=timezone.now() - timedelta(days=30)
-        ).values_list("id", flat=True))
+        existing_pks = set(
+            CharacterMiningLedger.objects.filter(
+                character=audit_char,
+                date__gte=timezone.now() - timedelta(days=30)
+            ).values_list(
+                "id",
+                flat=True
+            )
+        )
+
         type_ids = set()
         new_events = []
         old_events = []
-        for event in ledger:
 
-            type_ids.add(event.get('type_id'))
+        for event in mining:
+            type_ids.add(event.type_id)
             pk = CharacterMiningLedger.create_primary_key(character_id, event)
             _e = CharacterMiningLedger(
-                character=audit_char,
                 id=pk,
-                date=event.get('date'),
-                type_name_id=event.get('type_id'),
-                system_id=event.get('solar_system_id'),
-                quantity=event.get('quantity')
+                character=audit_char,
+                date=event.date,
+                type_name_id=event.type_id,
+                system_id=event.solar_system_id,
+                quantity=event.quantity
             )
-            if pk in existings_pks:
+            if pk in existing_pks:
                 old_events.append(_e)
             else:
                 new_events.append(_e)
@@ -679,15 +685,18 @@ def update_character_mining(character_id, force_refresh=False):
 
         if len(old_events):
             CharacterMiningLedger.objects.bulk_update(
-                old_events, fields=['quantity'])
+                old_events,
+                fields=['quantity']
+            )
 
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_mining {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_character_mining {character_id}"
+        )
 
     except NotModifiedError:
-        logger.info("CT: No New Mining for: {}".format(
-            audit_char.character.character_name))
-        pass
+        logger.info(
+            f"CT: No New Mining for: {audit_char.character.character_name}"
+        )
 
     audit_char.last_update_mining = timezone.now()
     audit_char.save()
@@ -698,9 +707,11 @@ def update_character_mining(character_id, force_refresh=False):
 
 def update_character_industry_jobs(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
-        character__character_id=character_id)
-    logger.debug("Updating Industry Jobs for: {}".format(
-        audit_char.character.character_name))
+        character__character_id=character_id
+    )
+    logger.debug(
+        f"Updating Industry Jobs for: {audit_char.character.character_name}"
+    )
 
     req_scopes = ['esi-industry.read_character_jobs.v1']
 
@@ -709,61 +720,70 @@ def update_character_industry_jobs(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
     try:
-        indy_op = providers.esi.client.Industry.get_characters_character_id_industry_jobs(
-            character_id=character_id, include_completed=True)
-
-        jobs = etag_results(indy_op, token, force_refresh=force_refresh)
+        jobs = providers.esi_openapi.client.Industry.GetCharactersCharacterIdIndustryJobs(
+            character_id=character_id,
+            token=token
+        ).result(
+            force_refresh=force_refresh,
+        )
 
         _st = time.perf_counter()
-        existing_pks = set(CharacterIndustryJob.objects.filter(
-            character=audit_char
-        ).values_list("job_id", flat=True))
+        existing_pks = set(
+            CharacterIndustryJob.objects.filter(
+                character=audit_char
+            ).values_list(
+                "job_id",
+                flat=True
+            )
+        )
         type_ids = set()
         new_events = []
         # old_events = []
         for event in jobs:
-            type_ids.add(event.get('blueprint_type_id'))
-            if event.get('product_type_id'):
-                type_ids.add(event.get('product_type_id'))
+            type_ids.add(event.blueprint_type_id)
+            if event.product_type_id:
+                type_ids.add(event.product_type_id)
 
-            if event.get('job_id') in existing_pks:
+            if event.job_id in existing_pks:
                 _m = CharacterIndustryJob.objects.get(
-                    character=audit_char, job_id=event.get("job_id"))
-                _m.completed_character_id = event.get("completed_character_id")
-                _m.completed_date = event.get("completed_date")
-                _m.end_date = event.get("end_date")
-                _m.pause_date = event.get("pause_date")
-                _m.status = event.get("status")
-                _m.successful_runs = event.get("successful_runs")
+                    character=audit_char,
+                    job_id=event.job_id
+                )
+                _m.completed_character_id = event.completed_character_id
+                _m.completed_date = event.completed_date
+                _m.end_date = event.end_date
+                _m.pause_date = event.pause_date
+                _m.status = event.status
+                _m.successful_runs = event.successful_runs
                 _m.save()
                 continue
 
             _e = CharacterIndustryJob(
                 character=audit_char,
-                activity_id=event.get("activity_id"),
-                blueprint_id=event.get("blueprint_id"),
-                blueprint_location_id=event.get("blueprint_location_id"),
-                blueprint_type_id=event.get("blueprint_type_id"),
-                blueprint_type_name_id=event.get("blueprint_type_id"),
-                completed_character_id=event.get("completed_character_id"),
-                completed_date=event.get("completed_date"),
-                cost=event.get("cost"),
-                duration=event.get("duration"),
-                end_date=event.get("end_date"),
-                facility_id=event.get("facility_id"),
-                installer_id=event.get("installer_id"),
-                job_id=event.get("job_id"),
-                licensed_runs=event.get("licensed_runs"),
-                output_location_id=event.get("output_location_id"),
-                pause_date=event.get("pause_date"),
-                probability=event.get("probability"),
-                product_type_id=event.get("product_type_id"),
-                product_type_name_id=event.get("product_type_id"),
-                runs=event.get("runs"),
-                start_date=event.get("start_date"),
-                station_id=event.get("station_id"),
-                status=event.get("status"),
-                successful_runs=event.get("successful_runs")
+                activity_id=event.activity_id,
+                blueprint_id=event.blueprint_id,
+                blueprint_location_id=event.blueprint_location_id,
+                blueprint_type_id=event.blueprint_type_id,
+                blueprint_type_name_id=event.blueprint_type_id,
+                completed_character_id=event.completed_character_id,
+                completed_date=event.completed_date,
+                cost=event.cost,
+                duration=event.duration,
+                end_date=event.end_date,
+                facility_id=event.facility_id,
+                installer_id=event.installer_id,
+                job_id=event.job_id,
+                licensed_runs=event.licensed_runs,
+                output_location_id=event.output_location_id,
+                pause_date=event.pause_date,
+                probability=event.probability,
+                product_type_id=event.product_type_id,
+                product_type_name_id=event.product_type_id,
+                runs=event.runs,
+                start_date=event.start_date,
+                station_id=event.station_id,
+                status=event.status,
+                successful_runs=event.successful_runs
             )
             new_events.append(_e)
 
@@ -771,15 +791,18 @@ def update_character_industry_jobs(character_id, force_refresh=False):
 
         if len(new_events):
             CharacterIndustryJob.objects.bulk_create(
-                new_events, ignore_conflicts=True)
+                new_events,
+                ignore_conflicts=True
+            )
 
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_industry_jobs {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_character_industry_jobs {character_id}"
+        )
 
     except NotModifiedError:
-        logger.info("CT: No New Industry for: {}".format(
-            audit_char.character.character_name))
-        pass
+        logger.info(
+            "CT: No New Industry for: {audit_char.character.character_name}"
+        )
 
     audit_char.last_update_indy = timezone.now()
     audit_char.save()
