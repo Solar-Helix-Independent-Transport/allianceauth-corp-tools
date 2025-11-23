@@ -31,7 +31,7 @@ from .models import (
 from .tasks import (
     check_account, clear_all_etags, update_all_characters, update_all_corps,
     update_all_eve_names, update_all_locations, update_character, update_corp,
-    update_or_create_map,
+    update_models_from_sde,
 )
 
 logger = get_extension_logger(__name__)
@@ -251,7 +251,7 @@ def admin_run_tasks(request):
     if request.method == 'POST':
         if request.POST.get('run_universe'):
             messages.info(request, "Queued update_or_create_map")
-            update_or_create_map.apply_async(priority=6)
+            update_models_from_sde.apply_async(priority=6)
         if request.POST.get('run_update_all'):
             messages.info(request, "Queued update_all_characters")
             update_all_characters.apply_async(priority=6)
