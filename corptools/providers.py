@@ -296,5 +296,9 @@ esi_openapi = ESIOpenApiProvider(
         "GetCharactersCharacterIdMining",
         # Corp Data
         "GetCorporationsCorporationIdDivisions",
+        # Types
+        "GetUniverseTypesTypeId",
+        "GetUniverseGroupsGroupId",
+        "GetUniverseCategoriesCategoryId",
     ]
 )

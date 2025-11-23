@@ -320,7 +320,7 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
                 group_id=group_id
             ).result()
 
-            eve_group = EveItemGroup.from_esi_model(__item)
+            eve_group = EveItemGroup.from_esi_model(__group)
 
             if group_id not in _current_groups:
                 _groups_model_creates.append(eve_group)
