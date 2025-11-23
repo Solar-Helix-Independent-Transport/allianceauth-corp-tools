@@ -1,6 +1,11 @@
 import bz2
+import glob
+import os
+import shutil
+import zipfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+import httpx
 import requests
 from bravado.exception import HTTPForbidden
 
@@ -263,89 +268,102 @@ def process_category_from_esi(category_id):
 
 
 def process_bulk_types_from_esi(type_ids, update_models=False):
-    _items = set(type_ids)
     _items_processed = []
     _items_models_creates = []
     _items_models_updates = []
     _dogma_models_creates = []
+
     _groups = []
     _groups_model_creates = []
     _groups_model_updates = []
+
     _categories = []
     _categories_model_creates = []
     _categories_model_updates = []
 
-    _current_items = list(
+    _current_items = set(
         EveItemType.objects.all().values_list('type_id', flat=True)
     )
-    _current_groups = list(
+    _current_groups = set(
         EveItemGroup.objects.all().values_list('group_id', flat=True)
     )
-    _current_categories = list(
+    _current_categories = set(
         EveItemCategory.objects.all().values_list('category_id', flat=True)
     )
 
-    for item in _items:
-        if item not in _current_items or update_models:
-            __item, __item_new, __item_dogma = providers.esi._get_eve_type(
-                item, updates=_current_items
-            )
+    for type_id in set(type_ids):
+        if type_id not in _current_items or update_models:
+            __item = providers.esi_openapi.client.Universe.GetUniverseTypesTypeId(
+                type_id=type_id
+            ).result()
 
-            _items_processed.append(__item.type_id)
+            _items_processed.append(type_id)
 
-            if __item_new:
-                _items_models_creates.append(__item)
+            if __item.dogma_attributes:
+                for da in __item.dogma_attributes:
+                    _da = EveItemDogmaAttribute.from_esi_model(type_id, da)
+                    _dogma_models_creates.append(_da)
+
+            eve_type = EveItemType.from_esi_model(__item)
+
+            if type_id not in _current_items:
+                _items_models_creates.append(eve_type)
             else:
-                _items_models_updates.append(__item)
+                _items_models_updates.append(eve_type)
+
             if __item.group_id not in _current_groups or update_models:
                 _groups.append(__item.group_id)
 
-            _dogma_models_creates += __item_dogma
+    for group_id in set(_groups):
+        if group_id not in _current_groups or update_models:
+            __group = providers.esi_openapi.client.Universe.GetUniverseGroupsGroupId(
+                group_id=group_id
+            ).result()
 
-    for group in set(_groups):
-        if group not in _current_groups or update_models:
-            __group, __group_new, types = providers.esi._get_group(
-                group, updates=_current_groups
-            )
+            eve_group = EveItemGroup.from_esi_model(__item)
 
-            if __group_new:
-                _groups_model_creates.append(__group)
+            if group_id not in _current_groups:
+                _groups_model_creates.append(eve_group)
             else:
-                _groups_model_updates.append(__group)
+                _groups_model_updates.append(eve_group)
 
             if __group.category_id not in _current_categories or update_models:
                 _categories.append(__group.category_id)
 
-    for category in set(_categories):
-        __category, __category_new, groups = providers.esi._get_category(
-            category, updates=_current_categories
-        )
-        if __category_new:
-            _categories_model_creates.append(__category)
-        else:
-            _categories_model_updates.append(__category)
+    for category_id in set(_categories):
+        __category = providers.esi_openapi.client.Universe.GetUniverseCategoriesCategoryId(
+            category_id=category_id
+        ).result()
 
+        eve_category = EveItemCategory.from_esi_model(__category)
+
+        if category_id not in _current_categories:
+            _categories_model_creates.append(eve_category)
+        else:
+            _categories_model_updates.append(eve_category)
+
+    # Create Cats
     if len(_categories_model_creates) > 0:
         EveItemCategory.objects.bulk_create(
             _categories_model_creates,
-            batch_size=1000,
+            batch_size=500,
             ignore_conflicts=True
-        )  # bulk create
+        )
     if len(_categories_model_updates) > 0:
         EveItemCategory.objects.bulk_update(
             _categories_model_updates,
             ['name']
-        )  # bulk update
+        )
 
+    # Create Grps
     if len(_groups_model_creates) > 0:
         EveItemGroup.objects.bulk_create(
             _groups_model_creates,
-            batch_size=1000,
+            batch_size=500,
             ignore_conflicts=True
-        )  # bulk create
+        )
     if len(_groups_model_updates) > 0:
         EveItemGroup.objects.bulk_update(
-            # bulk update
             _groups_model_updates,
             [
                 'name',
@@ -354,12 +372,13 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
             batch_size=1000
         )
 
+    # Create Items
     if len(_items_models_creates) > 0:
         EveItemType.objects.bulk_create(
             _items_models_creates,
-            batch_size=1000,
+            batch_size=500,
             ignore_conflicts=True
-        )  # bulk create
+        )
     if len(_items_models_updates) > 0:
         EveItemType.objects.bulk_update(
             _items_models_updates,
@@ -374,8 +393,9 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
                 'published',
                 'radius'
             ]
-        )  # bulk update
+        )
 
+    # Create/Update Dogma
     if len(_dogma_models_creates) > 0:
         dogma_query = EveItemDogmaAttribute.objects.filter(
             eve_type_id__in=_items_processed
@@ -389,19 +409,13 @@ def process_bulk_types_from_esi(type_ids, update_models=False):
             ignore_conflicts=True
         )
 
-    output = "Category: (Updated:{}, Created:{}): " \
-             "Groups: (Updated:{}, Created:{}) " \
-             "Items: (Updated:{}, Created:{}, Dogma Attributes:{})".format(
-                 len(_categories_model_updates),
-                 len(_categories_model_creates),
-                 len(_groups_model_updates),
-                 len(_groups_model_creates),
-                 len(_items_models_updates),
-                 len(_items_models_creates),
-                 len(_dogma_models_creates))
-
+    output = (
+        f"Category: (Updated:{len(_categories_model_updates)}, Created:{len(_categories_model_creates)}): "
+        f"Groups: (Updated:{len(_groups_model_updates)}, Created:{len(_groups_model_creates)}) "
+        f"Items: (Updated:{len(_items_models_updates)}, Created:{len(_items_models_creates)}, "
+        f"Dogma Attributes:{len(_dogma_models_creates)})"
+    )
     logger.debug(output)
-
     return True
 
 

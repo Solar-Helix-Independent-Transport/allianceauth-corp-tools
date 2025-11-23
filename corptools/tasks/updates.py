@@ -18,6 +18,10 @@ from .. import app_settings, providers
 from ..models import (
     CharacterWalletJournalEntry, EveItemType, EveName, MapSystem, TypePrice,
 )
+from ..task_helpers.sde_tasks import (
+    SDE_PARTS_TO_UPDATE, delete_sde_folder, download_extract_sde,
+    process_section_of_sde,
+)
 from ..task_helpers.update_tasks import (
     load_system, process_category_from_esi, process_map_from_esi,
     set_error_count_flag, update_ore_comp_table_from_fuzzworks,
@@ -233,3 +237,50 @@ def update_wallet_currency(pk):
         reason = reason + " ISK"
         m.reason = reason
         m.save()
+
+
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.update_models_from_sde"
+)
+def update_models_from_sde(self, start_id: int = 0):
+    queue = [
+        fetch_sde.si(),
+    ]
+    for id in range(start_id, len(SDE_PARTS_TO_UPDATE)):
+        queue.append(
+            process_sde_section.si(id)
+        )
+    queue.append(
+        cleanup_sde.si()
+    )
+    queue
+    Chain(queue).apply_async()
+
+
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.process_sde_section"
+)
+def process_sde_section(self, id: int = 0):
+    process_section_of_sde(id)
+
+
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.fetch_sde"
+)
+def fetch_sde(self):
+    download_extract_sde()
+
+
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    name="corptools.tasks.cleanup_sde"
+)
+def cleanup_sde(self):
+    delete_sde_folder()
