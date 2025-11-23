@@ -448,7 +448,7 @@ class MapSystemPlanet(JSONModel):
 
     @classmethod
     def from_jsonl(cls, json_data, system_names):
-        name = f"{system_names[json_data.get("solarSystemID")]} {to_roman_numeral(json_data.get("celestialIndex"))}"
+        name = f"{system_names[json_data.get('solarSystemID')]} {to_roman_numeral(json_data.get('celestialIndex'))}"
         return cls(
             planet_id=json_data.get("_key"),
             system_id=json_data.get("solarSystemID"),
@@ -496,7 +496,7 @@ class MapSystemMoon(JSONModel):
 
     @classmethod
     def from_jsonl(cls, json_data, planet_names):
-        name = f"{planet_names[json_data.get("orbitID")]} - Moon {json_data.get("orbitIndex")}"
+        name = f"{planet_names[json_data.get('orbitID')]} - Moon {json_data.get('orbitIndex')}"
         return cls(
             moon_id=json_data.get("_key"),
             system_id=json_data.get("solarSystemID"),
