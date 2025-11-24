@@ -28,7 +28,6 @@ from ..models import (
     MapSystemPlanet, Notification, NotificationText, Skill, SkillQueue,
     SkillTotalHistory, SkillTotals,
 )
-from .etag_helpers import NotModifiedError
 
 logger = get_extension_logger(__name__)
 
@@ -1866,7 +1865,7 @@ def update_character_contracts(character_id, force_refresh=False):
             eve_names.add(c.issuer_id)
             eve_names.add(c.acceptor_id)
 
-            if c.get('contract_id') in contract_ids:
+            if c.contract_id in contract_ids:
                 contract_models_old.append(_contract_item)
             else:
                 contract_models_new.append(_contract_item)
@@ -1935,7 +1934,7 @@ def update_character_contract_items(character_id, contract_id, force_refresh=Fal
     if not token:
         return False
     try:
-        contracts = providers.esi_openapi.client.Contracts.GetContractsPublicItemsContractId(
+        contracts = providers.esi_openapi.client.Contracts.GetCharactersCharacterIdContractsContractIdItems(
             character_id=character_id,
             contract_id=contract_id,
             token=token

@@ -304,7 +304,7 @@ esi_openapi = ESIOpenApiProvider(
         "GetCharactersCharacterIdImplants",
         # Character Contracts
         "GetCharactersCharacterIdContracts",
-        "GetContractsPublicItemsContractId",
+        "GetCharactersCharacterIdContractsContractIdItems",
         # Character Wallets
         "GetCharactersCharacterIdWallet",
         "GetCharactersCharacterIdWalletJournal",
@@ -313,9 +313,11 @@ esi_openapi = ESIOpenApiProvider(
         "GetCharactersCharacterIdOrders",
         # Corp Data
         "GetCorporationsCorporationIdDivisions",
-        # Types
+        # Universe
         "GetUniverseTypesTypeId",
         "GetUniverseGroupsGroupId",
         "GetUniverseCategoriesCategoryId",
+        "PostUniverseNames",
+        "PostUniverseIds"
     ]
 )
