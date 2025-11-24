@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from model_utils import Choices
 
@@ -9,7 +9,10 @@ from .eve_models import EveItemType, MapRegion
 from .wallets import CorporationWalletDivision
 
 if TYPE_CHECKING:
-    from esi.stubs import CharactersCharacterIdOrdersGetItem
+    from esi.stubs import (
+        CharactersCharacterIdOrdersGetItem,
+        CharactersCharacterIdOrdersHistoryGetItem,
+    )
 
 
 class MarketOrder(models.Model):
@@ -57,7 +60,14 @@ class CharacterMarketOrder(MarketOrder):
     is_corporation = models.BooleanField()
 
     @classmethod
-    def from_esi_model(cls, character: CharacterAudit, esi_model: "CharactersCharacterIdOrdersGetItem"):
+    def from_esi_model(
+        cls,
+        character: CharacterAudit,
+        esi_model: Union[
+            "CharactersCharacterIdOrdersGetItem",
+            "CharactersCharacterIdOrdersHistoryGetItem"
+        ]
+    ):
         return cls(
             character=character,
             order_id=esi_model.order_id,
@@ -76,5 +86,5 @@ class CharacterMarketOrder(MarketOrder):
             volume_remain=esi_model.volume_remain,
             volume_total=esi_model.volume_total,
             is_corporation=esi_model.is_corporation,
-            state='active'
+            state=getattr(esi_model, "state", "active")
         )
