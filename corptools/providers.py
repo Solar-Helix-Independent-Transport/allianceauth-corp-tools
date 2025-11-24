@@ -294,14 +294,18 @@ esi_openapi = ESIOpenApiProvider(
         # Character Indy
         "GetCharactersCharacterIdIndustryJobs",
         "GetCharactersCharacterIdMining",
+        # Character Clones
+        "GetCharactersCharacterIdClones",
+        "GetCharactersCharacterIdImplants",
+        # Character Wallets
+        "GetCharactersCharacterIdWallet",
+        "GetCharactersCharacterIdWalletJournal",
+        "GetCharactersCharacterIdWalletTransactions",
         # Corp Data
         "GetCorporationsCorporationIdDivisions",
         # Types
         "GetUniverseTypesTypeId",
         "GetUniverseGroupsGroupId",
         "GetUniverseCategoriesCategoryId",
-        # Wallets
-        "GetCharactersCharacterIdWallet",
-        "GetCharactersCharacterIdWalletJournal",
     ]
 )

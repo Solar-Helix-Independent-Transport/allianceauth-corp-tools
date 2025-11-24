@@ -1013,6 +1013,13 @@ def update_character_clones(character_id, force_refresh=False):
             token=token
         ).result()
 
+        active_clone = providers.esi_openapi.client.Clones.GetCharactersCharacterIdImplants(
+            character_id=character_id,
+            token=token.valid_access_token()
+        ).result(
+            use_etag=False
+        )
+
         all_locations = list(EveLocation.objects.all(
         ).values_list('location_id', flat=True))
 
@@ -1062,13 +1069,6 @@ def update_character_clones(character_id, force_refresh=False):
                         type_name_id=implant
                     )
                 )
-
-        active_clone = providers.esi_openapi.client.Clones.GetCharactersCharacterIdImplants(
-            character_id=character_id,
-            token=token.valid_access_token()
-        ).result(
-            use_etag=False
-        )
 
         _jumpclone = JumpClone.objects.create(
             character=audit_char,
