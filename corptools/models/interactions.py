@@ -157,7 +157,7 @@ class CharacterContact(Contact):
 
     @classmethod
     def from_esi_model(cls, character: CharacterAudit, esi_model: "CharactersCharacterIdContactsGetItem"):
-        blocked = False if esi_model.is_watched is None else esi_model.is_blocked
+        blocked = False if esi_model.is_blocked is None else esi_model.is_blocked
         watched = False if esi_model.is_watched is None else esi_model.is_watched
         _mdl = cls(
             character=character,

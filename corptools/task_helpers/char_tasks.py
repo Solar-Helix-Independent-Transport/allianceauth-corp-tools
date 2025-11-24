@@ -907,7 +907,7 @@ def update_character_wallet(character_id, force_refresh=False):
 
         wallet_ballance = providers.esi_openapi.client.Wallet.GetCharactersCharacterIdWallet(
             character_id=character_id,
-            token=token.valid_access_token()
+            token=token
         ).result(
             use_etag=False
         )
@@ -949,7 +949,7 @@ def update_character_transactions(character_id, force_refresh=False):
     try:
         journal_items = providers.esi_openapi.client.Wallet.GetCharactersCharacterIdWalletTransactions(
             character_id=character_id,
-            token=token.valid_access_token()
+            token=token
         ).result(
             use_etag=False
         )
@@ -1015,7 +1015,7 @@ def update_character_clones(character_id, force_refresh=False):
 
         active_clone = providers.esi_openapi.client.Clones.GetCharactersCharacterIdImplants(
             character_id=character_id,
-            token=token.valid_access_token()
+            token=token
         ).result(
             use_etag=False
         )
@@ -1026,7 +1026,7 @@ def update_character_clones(character_id, force_refresh=False):
         home_loc = None  # Setting this to  none will force a lookup later on.
         try:
             home_loc = EveLocation.objects.get(
-                location_id=jump_clones.get('home_location').get('location_id')
+                location_id=jump_clones.home_location.location_id
             )
         except EveLocation.DoesNotExist:
             pass
@@ -1135,7 +1135,7 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
                 lp.corporation_id
             )
 
-            if lp.get('corporation_id') in existing_lp_corps:
+            if lp.corporation_id in existing_lp_corps:
                 existing = LoyaltyPoint.objects.get(
                     character=audit_char, corporation=lp_corp
                 )
@@ -1212,12 +1212,12 @@ def update_character_orders(character_id, force_refresh=False):
         tracked_ids = []
 
         for order in open_orders:
-            tracked_ids.append(order.get('order_id'))
+            tracked_ids.append(order.order_id)
 
-            if order.get('type_id') not in type_ids:
-                type_ids.append(order.get('type_id'))
+            if order.type_id not in type_ids:
+                type_ids.append(order.type_id)
 
-            _order = CharacterMarketOrder.from_esi_model(order)
+            _order = CharacterMarketOrder.from_esi_model(audit_char, order)
 
             if order.location_id in all_locations:
                 _order.location_name_id = order.location_id
@@ -1313,7 +1313,7 @@ def update_character_order_history(character_id, force_refresh=False):
             if order.type_id not in type_ids:
                 type_ids.append(order.type_id)
 
-            _order = CharacterMarketOrder.from_esi_model(order)
+            _order = CharacterMarketOrder.from_esi_model(audit_char, order)
 
             if order.location_id in all_locations:
                 _order.location_name_id = order.location_id
@@ -1715,11 +1715,11 @@ def update_character_contacts(character_id, force_refresh=False):
         _contacts_to_create = []
         _through_to_create = []
         for contact in contacts:  # update contacts
-            if contact.get('contact_id') not in _current_eve_ids:
+            if contact.contact_id not in _current_eve_ids:
                 EveName.objects.get_or_create_from_esi(
-                    contact.get('contact_id')
+                    contact.contact_id
                 )
-                _current_eve_ids.append(contact.get('contact_id'))
+                _current_eve_ids.append(contact.contact_id)
 
             _contact_item = CharacterContact.from_esi_model(
                 audit_char, contact)
@@ -1862,10 +1862,10 @@ def update_character_contracts(character_id, force_refresh=False):
         for c in contracts:  # update labels
             _contract_item = Contract.from_esi_model(audit_char, c)
 
-            eve_names.add(c.get('assignee_id'))
-            eve_names.add(c.get('issuer_corporation_id'))
-            eve_names.add(c.get('issuer_id'))
-            eve_names.add(c.get('acceptor_id'))
+            eve_names.add(c.assignee_id)
+            eve_names.add(c.issuer_corporation_id)
+            eve_names.add(c.issuer_id)
+            eve_names.add(c.acceptor_id)
 
             if c.get('contract_id') in contract_ids:
                 contract_models_old.append(_contract_item)
