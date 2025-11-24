@@ -865,67 +865,52 @@ def update_character_wallet(character_id, force_refresh=False):
         return "No Tokens"
 
     try:
-        journal_items_ob = providers.esi.client.Wallet.get_characters_character_id_wallet_journal(
-            character_id=character_id)
-
-        journal_items = etag_results(
-            journal_items_ob, token, force_refresh=force_refresh)
+        journal_items = providers.esi_openapi.client.Wallet.GetCharactersCharacterIdWalletJournal(
+            character_id=character_id,
+            token=token
+        ).result(
+            force_refresh=force_refresh,
+        )
 
         _st = time.perf_counter()
         _current_journal = CharacterWalletJournalEntry.objects.filter(
-            # TODO add time filter
-            character=audit_char).values_list('entry_id', flat=True)
+            entry_id__in=[  # only fetch the ones we care about to reduce DB loading/ram
+                e.id for e in journal_items
+            ],
+            character=audit_char
+        ).values_list('entry_id', flat=True)
+
         _current_eve_ids = list(
-            EveName.objects.all().values_list('eve_id', flat=True))
+            EveName.objects.all().values_list('eve_id', flat=True)
+        )
 
         _new_names = []
 
         items = []
         for item in journal_items:
-            if item.get('id') not in _current_journal:
-                if item.get('second_party_id') not in _current_eve_ids:
-                    _new_names.append(item.get('second_party_id'))
-                    _current_eve_ids.append(item.get('second_party_id'))
-                if item.get('first_party_id') not in _current_eve_ids:
-                    _new_names.append(item.get('first_party_id'))
-                    _current_eve_ids.append(item.get('first_party_id'))
+            if item.id not in _current_journal:
+                if item.second_party_id not in _current_eve_ids:
+                    _new_names.append(item.second_party_id)
+                    _current_eve_ids.append(item.second_party_id)
+                if item.first_party_id not in _current_eve_ids:
+                    _new_names.append(item.first_party_id)
+                    _current_eve_ids.append(item.first_party_id)
 
-                asset_item = CharacterWalletJournalEntry(character=audit_char,
-                                                         amount=item.get(
-                                                             'amount'),
-                                                         balance=item.get(
-                                                             'balance'),
-                                                         context_id=item.get(
-                                                             'context_id'),
-                                                         context_id_type=item.get(
-                                                             'context_id_type'),
-                                                         date=item.get('date'),
-                                                         description=item.get(
-                                                             'description'),
-                                                         first_party_id=item.get(
-                                                             'first_party_id'),
-                                                         first_party_name_id=item.get(
-                                                             'first_party_id'),
-                                                         entry_id=item.get(
-                                                             'id'),
-                                                         reason=item.get(
-                                                             'reason'),
-                                                         ref_type=item.get(
-                                                             'ref_type'),
-                                                         second_party_id=item.get(
-                                                             'second_party_id'),
-                                                         second_party_name_id=item.get(
-                                                             'second_party_id'),
-                                                         tax=item.get('tax'),
-                                                         tax_receiver_id=item.get(
-                                                             'tax_receiver_id'),
-                                                         )
-                items.append(asset_item)
+                items.append(
+                    CharacterWalletJournalEntry.from_esi_model(
+                        audit_char,
+                        item
+                    )
+                )
 
         created_names = EveName.objects.create_bulk_from_esi(_new_names)
 
-        wallet_ballance = providers.esi.client.Wallet.get_characters_character_id_wallet(character_id=character_id,
-                                                                                         token=token.valid_access_token()).result()
+        wallet_ballance = providers.esi_openapi.client.Wallet.GetCharactersCharacterIdWallet(
+            character_id=character_id,
+            token=token.valid_access_token()
+        ).result(
+            use_etag=False
+        )
 
         audit_char.balance = wallet_ballance
         audit_char.save()
@@ -937,9 +922,11 @@ def update_character_wallet(character_id, force_refresh=False):
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_wallet {character_id}")
     except NotModifiedError:
-        logger.info("CT: No New wallet data for: {}".format(
-            audit_char.character.character_name))
-        pass
+        logger.info(
+            "CT: No New wallet data for: {}".format(
+                audit_char.character.character_name
+            )
+        )
 
     audit_char.last_update_wallet = timezone.now()
     audit_char.save()

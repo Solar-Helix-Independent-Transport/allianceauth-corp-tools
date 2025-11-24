@@ -300,5 +300,8 @@ esi_openapi = ESIOpenApiProvider(
         "GetUniverseTypesTypeId",
         "GetUniverseGroupsGroupId",
         "GetUniverseCategoriesCategoryId",
+        # Wallets
+        "GetCharactersCharacterIdWallet",
+        "GetCharactersCharacterIdWalletJournal",
     ]
 )
