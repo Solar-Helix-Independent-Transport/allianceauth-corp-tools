@@ -1656,10 +1656,12 @@ def update_character_mail_headers(character_id, force_refresh=False):
 
 
 def update_character_contacts(character_id, force_refresh=False):
-    logger.debug("updating contacts for: %s" % str(character_id))
-
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
+
+    logger.debug(
+        f"Updating Notifications for: {audit_char.character.character_name}"
+    )
 
     req_scopes = ['esi-characters.read_contacts.v1']
 
@@ -1669,43 +1671,47 @@ def update_character_contacts(character_id, force_refresh=False):
         return False
 
     _current_eve_ids = list(
-        EveName.objects.all().values_list('eve_id', flat=True))
+        EveName.objects.all().values_list('eve_id', flat=True)
+    )
 
     try:
-        labels_op = providers.esi.client.Contacts.get_characters_character_id_contacts_labels(
-            character_id=character_id)
+        labels = providers.esi_openapi.client.Contacts.GetCharactersCharacterIdContactsLabels(
+            character_id=character_id,
+            token=token
+        ).result(
+            use_etag=False,
+            force_refresh=force_refresh
+        )
 
-        labels = etag_results(labels_op, token, force_refresh=force_refresh)
         _st = time.perf_counter()
 
         labels_to_create = []
 
         for label in labels:  # update labels
-            _label_item = CharacterContactLabel(
-                character=audit_char,
-                label_id=label.get('label_id'),
-                label_name=label.get('label_name'),
-            )
+            _label_item = CharacterContactLabel.from_esi_model(
+                audit_char, label)
             _label_item.build_id()
             labels_to_create.append(_label_item)
 
         CharacterContactLabel.objects.filter(character=audit_char).delete()
         CharacterContactLabel.objects.bulk_create(labels_to_create)
-        logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} CharacterContactLabel {character_id}")
 
-    except NotModifiedError:
-        logger.info("CT: No New labels for: {}".format(
-            audit_char.character.character_name))
-        pass
+        logger.debug(
+            f"CT_TIME: {time.perf_counter() - _st} CharacterContactLabel {character_id}"
+        )
+    except HTTPNotModified:
+        logger.info(
+            f"CT: No New old orders data for: {audit_char.character.character_name}"
+        )
 
     try:
-        contacts_op = providers.esi.client.Contacts.get_characters_character_id_contacts(
-            character_id=character_id)
-
-        contacts = etag_results(
-            contacts_op, token, force_refresh=force_refresh)
-        _st = time.perf_counter()
+        contacts = providers.esi_openapi.client.Contacts.GetCharactersCharacterIdContacts(
+            character_id=character_id,
+            token=token
+        ).result(
+            use_etag=False,
+            force_refresh=force_refresh
+        )
 
         ContactLabelThrough = CharacterContact.labels.through
         _contacts_to_create = []
@@ -1713,31 +1719,20 @@ def update_character_contacts(character_id, force_refresh=False):
         for contact in contacts:  # update contacts
             if contact.get('contact_id') not in _current_eve_ids:
                 EveName.objects.get_or_create_from_esi(
-                    contact.get('contact_id'))
+                    contact.get('contact_id')
+                )
                 _current_eve_ids.append(contact.get('contact_id'))
-            blocked = False if contact.get(
-                'is_blocked', False) is None else contact.get('is_blocked')
-            watched = False if contact.get(
-                'is_watched', False) is None else contact.get('is_watched')
-            _contact_item = CharacterContact(character=audit_char,
-                                             contact_id=contact.get(
-                                                 'contact_id'),
-                                             contact_type=contact.get(
-                                                 'contact_type'),
-                                             contact_name_id=contact.get(
-                                                 'contact_id'),
-                                             standing=contact.get('standing'),
-                                             blocked=blocked,
-                                             watched=watched)
 
-            _id = _contact_item.build_id()
+            _contact_item = CharacterContact.from_esi_model(
+                audit_char, contact)
+
             _contacts_to_create.append(_contact_item)
 
-            if contact.get('label_ids', False):  # add labels
-                for _label in contact.get('label_ids'):
+            if contact.label_ids:  # add labels
+                for _label in contact.label_ids:
                     _label_id = int(str(audit_char.id) + str(_label))
                     _lbl = ContactLabelThrough(
-                        charactercontact_id=_id,
+                        charactercontact_id=_contact_item.id,
                         charactercontactlabel_id=_label_id
                     )
                     _through_to_create.append(_lbl)
@@ -1746,12 +1741,15 @@ def update_character_contacts(character_id, force_refresh=False):
 
         CharacterContact.objects.bulk_create(_contacts_to_create)
         ContactLabelThrough.objects.bulk_create(_through_to_create)
-        logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_contacts {character_id}")
 
-    except NotModifiedError:
-        logger.info("CT: No New contacts for: {}".format(
-            audit_char.character.character_name))
+        logger.debug(
+            f"CT_TIME: {time.perf_counter() - _st} update_character_contacts {character_id}"
+        )
+
+    except HTTPNotModified:
+        logger.info(
+            f"CT: No New contacts for: {audit_char.character.character_name}"
+        )
         pass
 
     audit_char.last_update_contacts = timezone.now()
