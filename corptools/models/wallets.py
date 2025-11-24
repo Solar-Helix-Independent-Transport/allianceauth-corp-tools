@@ -1,11 +1,14 @@
+from typing import TYPE_CHECKING
+
 from model_utils import Choices
 
 from django.db import models
 
-from esi.stubs import CharactersCharacterIdWalletJournalGetItem
-
 from .audits import CharacterAudit, CorporationAudit, CorptoolsConfiguration
 from .eve_models import EveItemType, EveName
+
+if TYPE_CHECKING:
+    from esi.stubs import CharactersCharacterIdWalletJournalGetItem
 
 
 class WalletJournalEntry(models.Model):
