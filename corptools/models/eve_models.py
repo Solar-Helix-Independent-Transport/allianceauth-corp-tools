@@ -31,9 +31,19 @@ class EveName(models.Model):
 
     # optionals for character/corp
     corporation = models.ForeignKey(
-        'EveName', on_delete=models.SET_NULL, null=True, default=None, related_name="corp")
+        'EveName',
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+        related_name="corp"
+    )
     alliance = models.ForeignKey(
-        'EveName', on_delete=models.SET_NULL, null=True, default=None, related_name="alli")
+        'EveName',
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+        related_name="alli"
+    )
     last_update = models.DateTimeField(auto_now=True)
 
     CHARACTER = "character"
