@@ -1505,8 +1505,10 @@ def update_character_mail_body(character_id, mail_message, force_refresh=False):
     if not token:
         return False
 
-    details = providers.esi.client.Mail.get_characters_character_id_mail_mail_id(character_id=character_id, mail_id=mail_message.mail_id,
-                                                                                 token=token.valid_access_token()).result()
+    details = providers.esi.client.Mail.get_characters_character_id_mail_mail_id(
+        character_id=character_id, mail_id=mail_message.mail_id,
+        token=token.valid_access_token()
+    ).result()
 
     mail_message.body = details.get('body')
 

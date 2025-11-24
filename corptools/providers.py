@@ -274,6 +274,7 @@ esi_openapi = ESIOpenApiProvider(
     operations=[
         # Char Audits
         "GetCharactersCharacterIdCorporationhistory",
+        "GetCharactersCharacterIdRoles",
         # Character Asset
         "GetCharactersCharacterIdAssets",
         "PostCharactersCharacterIdAssetsNames",
@@ -282,8 +283,9 @@ esi_openapi = ESIOpenApiProvider(
         "GetCharactersCharacterIdShip",
         "GetCharactersCharacterIdLocation",
         "GetCharactersCharacterIdOnline",
-        # Character Notification
+        # Character Interactions
         "GetCharactersCharacterIdNotifications",
+        "GetCharactersCharacterIdLoyaltyPoints",
         # Corporate Assets
         "GetCorporationsCorporationIdAssets",
         "PostCorporationsCorporationIdAssetsNames",
@@ -301,6 +303,8 @@ esi_openapi = ESIOpenApiProvider(
         "GetCharactersCharacterIdWallet",
         "GetCharactersCharacterIdWalletJournal",
         "GetCharactersCharacterIdWalletTransactions",
+        "GetCharactersCharacterIdOrdersHistory",
+        "GetCharactersCharacterIdOrders",
         # Corp Data
         "GetCorporationsCorporationIdDivisions",
         # Types
