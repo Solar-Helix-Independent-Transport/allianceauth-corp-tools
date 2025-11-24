@@ -949,32 +949,39 @@ def update_character_transactions(character_id, force_refresh=False):
         return "No Tokens"
 
     try:
-        journal_items_ob = providers.esi.client.Wallet.get_characters_character_id_wallet_transactions(
-            character_id=character_id)
+        journal_items = providers.esi_openapi.client.Wallet.GetCharactersCharacterIdWalletTransactions(
+            character_id=character_id,
+            token=token.valid_access_token()
+        ).result(
+            use_etag=False
+        )
 
-        journal_items = etag_results(
-            journal_items_ob, token, force_refresh=force_refresh)
         _st = time.perf_counter()
 
         _current_journal = CharacterWalletJournalEntry.objects.filter(
             character=audit_char,
             context_id_type="market_transaction_id",
             # Max items from ESI
-            reason__exact="").values_list('context_id', flat=True)[:2500]
+            reason__exact=""
+        ).values_list(
+            'context_id',
+            flat=True
+        )[:2500]
 
         # _new_names = []
 
         # items = []
         for item in journal_items:
-            if item.get('transaction_id') in _current_journal:
+            if item.transaction_id in _current_journal:
                 type_name, _ = EveItemType.objects.get_or_create_from_esi(
-                    item.get('type_id'))
-                message = f"{item.get('quantity')}x {type_name.name} @ {item.get('unit_price'):,.2f} ISK"
+                    item.get('type_id')
+                )
+                message = f"{item.get('quantity')}x {type_name.name} @ {item.unit_price:,.2f} ISK"
                 CharacterWalletJournalEntry.objects.filter(
                     character=audit_char,
                     context_id_type="market_transaction_id",
                     reason__exact="",
-                    context_id=item.get('transaction_id')
+                    context_id=item.transaction_id
                 ).update(
                     reason=message
                 )
