@@ -19,17 +19,16 @@ from corptools.task_helpers.update_tasks import (
 
 from .. import providers
 from ..models import (
-    AssetCoordiante, CharacterAsset, CharacterAudit, CharacterContact,
-    CharacterContactLabel, CharacterIndustryJob, CharacterLocation,
-    CharacterMarketOrder, CharacterMiningLedger, CharacterRoles,
-    CharacterTitle, CharacterWalletJournalEntry, CharAssetCoordiante, Clone,
-    Contract, ContractItem, CorporationHistory, CorptoolsConfiguration,
-    EveItemType, EveLocation, EveName, Implant, JumpClone, LoyaltyPoint,
-    MailLabel, MailMessage, MailRecipient, MapSystemPlanet, Notification,
-    NotificationText, Skill, SkillQueue, SkillTotalHistory, SkillTotals,
+    CharacterAsset, CharacterAudit, CharacterContact, CharacterContactLabel,
+    CharacterIndustryJob, CharacterLocation, CharacterMarketOrder,
+    CharacterMiningLedger, CharacterRoles, CharacterTitle,
+    CharacterWalletJournalEntry, CharAssetCoordiante, Clone, Contract,
+    ContractItem, CorporationHistory, EveItemType, EveLocation, EveName,
+    Implant, JumpClone, LoyaltyPoint, MailLabel, MailMessage, MailRecipient,
+    MapSystemPlanet, Notification, NotificationText, Skill, SkillQueue,
+    SkillTotalHistory, SkillTotals,
 )
-from . import sanitize_location_flag, sanitize_notification_type
-from .etag_helpers import NotModifiedError, etag_results, openapi_etag_result
+from .etag_helpers import NotModifiedError
 
 logger = get_extension_logger(__name__)
 
@@ -921,7 +920,7 @@ def update_character_wallet(character_id, force_refresh=False):
             raise Exception("ESI Fail")
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_wallet {character_id}")
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             f"CT: No New wallet data for: {audit_char.character.character_name}"
         )
@@ -1483,7 +1482,7 @@ def update_character_roles(character_id, force_refresh=False):
             f"CT_TIME: {time.perf_counter() - _st} update_character_roles {character_id}"
         )
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             f"CT: No New roles for: {audit_char.character.character_name}"
         )
@@ -1904,7 +1903,7 @@ def update_character_contracts(character_id, force_refresh=False):
         if force_refresh:
             new_contract_ids += [c.contract_id for c in contract_models_old]
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             f"CT: No New Contracts for: {audit_char.character.character_name}"
         )
@@ -1965,7 +1964,7 @@ def update_character_contract_items(character_id, contract_id, force_refresh=Fal
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_contract_items {character_id}"
         )
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             f"CT: No New Contract items for: {audit_char.character.character_name}"
         )
