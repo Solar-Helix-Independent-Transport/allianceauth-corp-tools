@@ -113,7 +113,7 @@ def update_character_location(character_id, force_refresh=False):
             f"CT_TIME: {time.perf_counter() - _st} update_character_location_location {character_id}"
         )
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             f"CT: No New Location data for: {audit_char.character.character_name}"
         )
@@ -142,7 +142,7 @@ def update_character_location(character_id, force_refresh=False):
             f"CT_TIME: {time.perf_counter() - _st} update_character_location_ship {character_id}"
         )
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info("CT: No New current ship data for: {}".format(
             audit_char.character.character_name))
         pass
@@ -174,7 +174,7 @@ def update_character_location(character_id, force_refresh=False):
                 f"CT_TIME: {time.perf_counter() - _st} update_character_location_last_online {character_id}"
             )
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             f"CT: No New online data for: {audit_char.character.character_name}"
         )
@@ -224,7 +224,7 @@ def update_corp_history(character_id, force_refresh=False):
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_corp_history {character_id}"
         )
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             f"CT: No New pub data for: {audit_char.character.character_name}"
         )
@@ -297,7 +297,7 @@ def update_character_skill_list(character_id, force_refresh=False):
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_list {character_id}"
         )
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             f"CT: No New skills for: {audit_char.character.character_name}"
         )
@@ -360,7 +360,7 @@ def update_character_skill_queue(character_id, force_refresh=False):
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_queue {character_id}"
         )
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             "CT: No New skill queue for: {}".format(
                 audit_char.character.character_name
@@ -693,7 +693,7 @@ def update_character_mining(character_id, force_refresh=False):
             f"CT_TIME: {time.perf_counter() - _st} update_character_mining {character_id}"
         )
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             f"CT: No New Mining for: {audit_char.character.character_name}"
         )
@@ -799,9 +799,9 @@ def update_character_industry_jobs(character_id, force_refresh=False):
             f"CT_TIME: {time.perf_counter() - _st} update_character_industry_jobs {character_id}"
         )
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
-            "CT: No New Industry for: {audit_char.character.character_name}"
+            f"CT: No New Industry for: {audit_char.character.character_name}"
         )
 
     audit_char.last_update_indy = timezone.now()
@@ -923,9 +923,7 @@ def update_character_wallet(character_id, force_refresh=False):
             f"CT_TIME: {time.perf_counter() - _st} update_character_wallet {character_id}")
     except NotModifiedError:
         logger.info(
-            "CT: No New wallet data for: {}".format(
-                audit_char.character.character_name
-            )
+            f"CT: No New wallet data for: {audit_char.character.character_name}"
         )
 
     audit_char.last_update_wallet = timezone.now()
@@ -988,10 +986,10 @@ def update_character_transactions(character_id, force_refresh=False):
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_transactions {character_id}")
 
-    except NotModifiedError:
-        logger.info("CT: No New wallet data for: {}".format(
-            audit_char.character.character_name))
-        pass
+    except HTTPNotModified:
+        logger.info(
+            f"CT: No New wallet data for: {audit_char.character.character_name}"
+        )
 
     return f"CT: Finished market transactions for: {audit_char.character.character_name}"
 
@@ -1009,70 +1007,91 @@ def update_character_clones(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
 
-    jump_clones = providers.esi.client.Clones.get_characters_character_id_clones(character_id=character_id,
-                                                                                 token=token.valid_access_token()).result()
-
-    active_clone = providers.esi.client.Clones.get_characters_character_id_implants(character_id=character_id,
-                                                                                    token=token.valid_access_token()).result()
-
-    all_locations = list(EveLocation.objects.all(
-    ).values_list('location_id', flat=True))
-    clones = {}
-    clones[0] = active_clone
-
-    home_loc = None  # Setting this to  none will force a lookup later on.
     try:
-        home_loc = EveLocation.objects.get(
-            location_id=jump_clones.get('home_location').get('location_id'))
-    except EveLocation.DoesNotExist:
-        pass
+        jump_clones = providers.esi_openapi.client.Clones.GetCharactersCharacterIdClones(
+            character_id=character_id,
+            token=token
+        ).result()
 
-    char_clone, created = Clone.objects.update_or_create(character=audit_char,
-                                                         defaults={
-                                                             'last_clone_jump_date': jump_clones.get('last_clone_jump_date'),
-                                                             'last_station_change_date': jump_clones.get('last_station_change_date'),
-                                                             'location_id': jump_clones.get('home_location').get('location_id'),
-                                                             'location_type': jump_clones.get('home_location').get('location_type'),
-                                                             'location_name': home_loc
-                                                         })
+        all_locations = list(EveLocation.objects.all(
+        ).values_list('location_id', flat=True))
 
-    JumpClone.objects.filter(character=audit_char).delete()  # remove all
-    implants = []
-    type_ids = []
+        home_loc = None  # Setting this to  none will force a lookup later on.
+        try:
+            home_loc = EveLocation.objects.get(
+                location_id=jump_clones.get('home_location').get('location_id')
+            )
+        except EveLocation.DoesNotExist:
+            pass
 
-    for clone in jump_clones.get('jump_clones'):
-        _jumpclone = JumpClone(character=audit_char,
-                               jump_clone_id=clone.get('jump_clone_id'),
-                               location_id=clone.get('location_id'),
-                               location_type=clone.get('location_type'),
-                               name=clone.get('name'))
-        if clone.get('location_id') in all_locations:
-            _jumpclone.location_name_id = clone.get('location_id')
+        char_clone, created = Clone.objects.update_or_create(
+            character=audit_char,
+            defaults={
+                'last_clone_jump_date': jump_clones.last_clone_jump_date,
+                'last_station_change_date': jump_clones.last_station_change_date,
+                'location_id': jump_clones.home_location.location_id,
+                'location_type': jump_clones.home_location.location_type,
+                'location_name': home_loc
+            }
+        )
 
-        _jumpclone.save()
+        JumpClone.objects.filter(character=audit_char).delete()  # remove all
 
-        for implant in clone.get('implants'):
+        implants = []
+        type_ids = []
+
+        for clone in jump_clones.jump_clones:
+            _jumpclone = JumpClone(
+                character=audit_char,
+                jump_clone_id=clone.jump_clone_id,
+                location_id=clone.location_id,
+                location_type=clone.location_type,
+                name=clone.name
+            )
+            if clone.location_id in all_locations:
+                _jumpclone.location_name_id = clone.location_id
+
+            _jumpclone.save()
+
+            for implant in clone.implants:
+                if implant not in type_ids:
+                    type_ids.append(implant)
+                implants.append(
+                    Implant(
+                        clone=_jumpclone,
+                        type_name_id=implant
+                    )
+                )
+
+        active_clone = providers.esi_openapi.client.Clones.GetCharactersCharacterIdImplants(
+            character_id=character_id,
+            token=token.valid_access_token()
+        ).result(
+            use_etag=False
+        )
+
+        _jumpclone = JumpClone.objects.create(
+            character=audit_char,
+            jump_clone_id=0,
+            name="Active Clone"
+        )
+
+        for implant in active_clone:
             if implant not in type_ids:
                 type_ids.append(implant)
-            implants.append(Implant(clone=_jumpclone,
-                                    type_name_id=implant
-                                    )
-                            )
+            implants.append(
+                Implant(
+                    clone=_jumpclone,
+                    type_name_id=implant,
+                )
+            )
 
-    _jumpclone = JumpClone.objects.create(character=audit_char,
-                                          jump_clone_id=0,
-                                          name="Active Clone")
-
-    for implant in active_clone:
-        if implant not in type_ids:
-            type_ids.append(implant)
-        implants.append(Implant(clone=_jumpclone,
-                                type_name_id=implant,
-                                )
-                        )
-
-    EveItemType.objects.create_bulk_from_esi(type_ids)
-    Implant.objects.bulk_create(implants)
+        EveItemType.objects.create_bulk_from_esi(type_ids)
+        Implant.objects.bulk_create(implants)
+    except HTTPNotModified:
+        logger.info(
+            f"CT: No New Clone data for: {audit_char.character.character_name}"
+        )
 
     audit_char.last_update_clones = timezone.now()
     audit_char.save()
