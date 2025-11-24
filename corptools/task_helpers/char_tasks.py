@@ -1444,10 +1444,13 @@ def update_character_roles(character_id, force_refresh=False):
     if not token:
         return False
     try:
-        roles_op = providers.esi.client.Character.get_characters_character_id_roles(
-            character_id=character_id)
+        roles = providers.esi_openapi.client.Character.GetCharactersCharacterIdRoles(
+            character_id=character_id,
+            token=token,
+        ).result(
+            force_refresh=force_refresh
+        )
 
-        roles = etag_results(roles_op, token, force_refresh=force_refresh)
         _st = time.perf_counter()
 
         director = False
@@ -1455,33 +1458,35 @@ def update_character_roles(character_id, force_refresh=False):
         station_manager = False
         personnel_manager = False
 
-        if "Director" in roles.get('roles', []):
+        if "Director" in roles.roles:
             director = True
 
-        if "Accountant" in roles.get('roles', []):
+        if "Accountant" in roles.roles:
             accountant = True
 
-        if "Station_Manager" in roles.get('roles', []):
+        if "Station_Manager" in roles.roles:
             station_manager = True
 
-        if "Personnel_Manager" in roles.get('roles', []):
+        if "Personnel_Manager" in roles.roles:
             personnel_manager = True
 
-        role_model, create = CharacterRoles.objects.update_or_create(character=audit_char,
-                                                                     defaults={
-                                                                         "director": director,
-                                                                         "accountant": accountant,
-                                                                         "station_manager": station_manager,
-                                                                         "personnel_manager": personnel_manager
-                                                                     }
-                                                                     )
+        role_model, create = CharacterRoles.objects.update_or_create(
+            character=audit_char,
+            defaults={
+                "director": director,
+                "accountant": accountant,
+                "station_manager": station_manager,
+                "personnel_manager": personnel_manager
+            }
+        )
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_roles {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_character_roles {character_id}"
+        )
 
     except NotModifiedError:
-        logger.info("CT: No New roles for: {}".format(
-            audit_char.character.character_name))
-        pass
+        logger.info(
+            f"CT: No New roles for: {audit_char.character.character_name}"
+        )
 
     audit_char.last_update_roles = timezone.now()
     audit_char.save()
