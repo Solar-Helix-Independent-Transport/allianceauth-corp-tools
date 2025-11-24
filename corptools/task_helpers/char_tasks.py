@@ -1819,10 +1819,12 @@ def update_character_titles(character_id, force_refresh=False):
 
 
 def update_character_contracts(character_id, force_refresh=False):
-    logger.debug("updating contracts for: %s" % str(character_id))
-
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
+
+    logger.debug(
+        f"Updating Contracts for: {audit_char.character.character_name}"
+    )
 
     req_scopes = ['esi-contracts.read_character_contracts.v1']
 
@@ -1833,47 +1835,32 @@ def update_character_contracts(character_id, force_refresh=False):
     if not token:
         return False, []
     try:
-        contracts_op = providers.esi.client.Contracts.get_characters_character_id_contracts(
-            character_id=character_id)
 
-        contracts = etag_results(
-            contracts_op, token, force_refresh=force_refresh)
+        contracts = providers.esi_openapi.client.Contracts.GetCharactersCharacterIdContracts(
+            character_id=character_id,
+            token=token
+        ).results(
+            force_refresh=force_refresh
+        )
+
         _st = time.perf_counter()
 
         contract_models_new = []
         contract_models_old = []
+
         eve_names = set()
-        contract_ids = list(Contract.objects.filter(
-            character=audit_char).values_list("contract_id", flat=True))
-        for c in contracts:  # update labels
-            _contract_item = Contract(
-                id=Contract.build_pk(audit_char.id, c.get('contract_id')),
-                character=audit_char,
-                assignee_id=c.get('assignee_id'),
-                assignee_name_id=c.get('assignee_id'),
-                acceptor_id=c.get('acceptor_id'),
-                acceptor_name_id=c.get('acceptor_id'),
-                contract_id=c.get('contract_id'),
-                availability=c.get('availability'),
-                buyout=c.get('buyout'),
-                collateral=c.get('collateral'),
-                date_accepted=c.get('date_accepted'),
-                date_completed=c.get('date_completed'),
-                date_expired=c.get('date_expired'),
-                date_issued=c.get('date_issued'),
-                days_to_complete=c.get('days_to_complete'),
-                end_location_id=c.get('end_location_id'),
-                for_corporation=c.get('for_corporation'),
-                issuer_corporation_name_id=c.get('issuer_corporation_id'),
-                issuer_name_id=c.get('issuer_id'),
-                price=c.get('price'),
-                reward=c.get('reward'),
-                start_location_id=c.get('start_location_id'),
-                status=c.get('status'),
-                title=c.get('title'),
-                contract_type=c.get('type'),
-                volume=c.get('volume')
+
+        contract_ids = list(
+            Contract.objects.filter(
+                character=audit_char
+            ).values_list(
+                "contract_id",
+                flat=True
             )
+        )
+
+        for c in contracts:  # update labels
+            _contract_item = Contract.from_esi_model(audit_char, c)
 
             eve_names.add(c.get('assignee_id'))
             eve_names.add(c.get('issuer_corporation_id'))
@@ -1889,24 +1876,38 @@ def update_character_contracts(character_id, force_refresh=False):
 
         if len(contract_models_new) > 0:
             Contract.objects.bulk_create(
-                contract_models_new, batch_size=1000, ignore_conflicts=True)
+                contract_models_new,
+                ignore_conflicts=True
+            )
 
         if len(contract_models_old) > 0:
-            Contract.objects.bulk_update(contract_models_old, batch_size=1000,
-                                         fields=['date_accepted', 'date_completed', 'acceptor_id', 'date_expired', 'status',
-                                                 'assignee_name', 'acceptor_name', 'issuer_corporation_name', 'issuer_name'])
+            Contract.objects.bulk_update(
+                contract_models_old,
+                fields=[
+                    'date_accepted',
+                    'date_completed',
+                    'acceptor_id',
+                    'date_expired',
+                    'status',
+                    'assignee_name',
+                    'acceptor_name',
+                    'issuer_corporation_name',
+                    'issuer_name'
+                ]
+            )
 
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_contracts {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_character_contracts {character_id}"
+        )
 
         new_contract_ids = [c.contract_id for c in contract_models_new]
         if force_refresh:
             new_contract_ids += [c.contract_id for c in contract_models_old]
 
     except NotModifiedError:
-        logger.info("CT: No New Contracts for: {}".format(
-            audit_char.character.character_name))
-        pass
+        logger.info(
+            f"CT: No New Contracts for: {audit_char.character.character_name}"
+        )
 
     audit_char.last_update_contracts = timezone.now()
     audit_char.save()
@@ -1916,15 +1917,17 @@ def update_character_contracts(character_id, force_refresh=False):
 
 
 def update_character_contract_items(character_id, contract_id, force_refresh=False):
-    logger.debug("updating contract items for: %s (%s)" %
-                 (str(character_id), str(contract_id)))
-
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
 
+    logger.debug(
+        f"Updating Contract Items for: {audit_char.character.character_name} - {contract_id}"
+    )
+
     contract = Contract.objects.get(
         character=audit_char,
-        contract_id=contract_id)
+        contract_id=contract_id
+    )
 
     req_scopes = ['esi-contracts.read_character_contracts.v1']
 
@@ -1933,36 +1936,38 @@ def update_character_contract_items(character_id, contract_id, force_refresh=Fal
     if not token:
         return False
     try:
-        contracts_op = providers.esi.client.Contracts.get_characters_character_id_contracts_contract_id_items(
+        contracts = providers.esi_openapi.client.Contracts.GetContractsPublicItemsContractId(
             character_id=character_id,
-            contract_id=contract_id)
+            contract_id=contract_id,
+            token=token
+        ).results(
+            force_refresh=force_refresh
+        )
 
-        contracts = etag_results(
-            contracts_op, token, force_refresh=force_refresh)
         _st = time.perf_counter()
 
         contract_models_new = []
         _types = set()
+
         for c in contracts:  # update labels
-            _contract_item = ContractItem(
-                contract=contract,
-                is_included=c.get('is_included'),
-                is_singleton=c.get('is_singleton'),
-                quantity=c.get('quantity'),
-                raw_quantity=c.get('raw_quantity'),
-                record_id=c.get('record_id'),
-                type_name_id=c.get('type_id'),
-            )
-            _types.add(c.get('type_id'))
+            _contract_item = ContractItem.from_esi_model(contract, c)
+            _types.add(c.type_id)
             contract_models_new.append(_contract_item)
+
         EveItemType.objects.create_bulk_from_esi(list(_types))
+
         ContractItem.objects.bulk_create(
-            contract_models_new, batch_size=1000, ignore_conflicts=True)
+            contract_models_new,
+            batch_size=1000,
+            ignore_conflicts=True
+        )
+
         logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_contract_items {character_id}")
+            f"CT_TIME: {time.perf_counter() - _st} update_character_contract_items {character_id}"
+        )
     except NotModifiedError:
-        logger.info("CT: No New Contract items for: {}".format(
-            audit_char.character.character_name))
-        pass
+        logger.info(
+            f"CT: No New Contract items for: {audit_char.character.character_name}"
+        )
 
     return f"CT: Completed Contract items {str(contract_id)} for: {str(character_id)}"

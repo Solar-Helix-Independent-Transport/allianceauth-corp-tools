@@ -303,6 +303,8 @@ esi_openapi = ESIOpenApiProvider(
         "GetCharactersCharacterIdClones",
         "GetCharactersCharacterIdImplants",
         # Character Contracts
+        "GetCharactersCharacterIdContracts",
+        "GetContractsPublicItemsContractId",
         # Character Wallets
         "GetCharactersCharacterIdWallet",
         "GetCharactersCharacterIdWalletJournal",
