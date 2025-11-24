@@ -1660,7 +1660,7 @@ def update_character_contacts(character_id, force_refresh=False):
         character__character_id=character_id)
 
     logger.debug(
-        f"Updating Notifications for: {audit_char.character.character_name}"
+        f"Updating Contacts for: {audit_char.character.character_name}"
     )
 
     req_scopes = ['esi-characters.read_contacts.v1']
@@ -1679,7 +1679,6 @@ def update_character_contacts(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).result(
-            use_etag=False,
             force_refresh=force_refresh
         )
 
@@ -1709,7 +1708,6 @@ def update_character_contacts(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).result(
-            use_etag=False,
             force_refresh=force_refresh
         )
 
@@ -1760,10 +1758,12 @@ def update_character_contacts(character_id, force_refresh=False):
 
 
 def update_character_titles(character_id, force_refresh=False):
-    logger.debug("updating titles for: %s" % str(character_id))
-
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
+
+    logger.debug(
+        f"Updating Title for: {audit_char.character.character_name}"
+    )
 
     req_scopes = ['esi-characters.read_titles.v1']
 
@@ -1771,21 +1771,25 @@ def update_character_titles(character_id, force_refresh=False):
 
     if not token:
         return False
-    try:
-        titles_op = providers.esi.client.Character.get_characters_character_id_titles(
-            character_id=character_id)
 
-        titles = etag_results(titles_op, token, force_refresh=force_refresh)
+    try:
+        titles = providers.esi_openapi.client.Character.GetCharactersCharacterIdTitles(
+            character_id=character_id,
+            token=token
+        ).result(
+            force_refresh=force_refresh
+        )
+
         _st = time.perf_counter()
 
         title_models = []
-        for t in titles:  # update labels
-            _title_item, created = CharacterTitle.objects.update_or_create(
+        for t in titles:  # update titles
+            _title_item, _ = CharacterTitle.objects.update_or_create(
                 corporation_id=audit_char.character.corporation_id,
                 corporation_name=audit_char.character.corporation_name,
-                title_id=t.get('title_id'),
+                title_id=t.title_id,
                 defaults={
-                    "title": strip_tags(t.get('name'))
+                    "title": strip_tags(t.name)
                 }
             )
 
@@ -1797,13 +1801,15 @@ def update_character_titles(character_id, force_refresh=False):
             audit_char.characterroles.titles.remove(*rem_tits)
         else:
             audit_char.characterroles.titles.clear()
-        logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_titles {character_id}")
 
-    except NotModifiedError:
-        logger.info("CT: No New titles for: {}".format(
-            audit_char.character.character_name))
-        pass
+        logger.debug(
+            f"CT_TIME: {time.perf_counter() - _st} update_character_titles {character_id}"
+        )
+
+    except HTTPNotModified:
+        logger.info(
+            f"CT: No New titles for: {audit_char.character.character_name}"
+        )
 
     audit_char.last_update_titles = timezone.now()
     audit_char.save()
