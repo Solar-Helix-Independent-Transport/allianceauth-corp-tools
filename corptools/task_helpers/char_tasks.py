@@ -1367,8 +1367,9 @@ def update_character_notifications(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id
     )
-    logger.debug("Updating Notifications for: {}".format(
-        audit_char.character.character_name))
+    logger.debug(
+        f"Updating Notifications for: {audit_char.character.character_name}"
+    )
 
     req_scopes = ['esi-characters.read_notifications.v1']
 
@@ -1381,7 +1382,9 @@ def update_character_notifications(character_id, force_refresh=False):
         notifications = providers.esi_openapi.client.Character.GetCharactersCharacterIdNotifications(
             character_id=character_id,
             token=token,
-        ).result(force_refresh=force_refresh)
+        ).result(
+            force_refresh=force_refresh
+        )
 
         _st = time.perf_counter()
 
