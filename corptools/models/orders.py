@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from model_utils import Choices
 
 from django.db import models
@@ -5,6 +7,9 @@ from django.db import models
 from .audits import CharacterAudit, EveLocation
 from .eve_models import EveItemType, MapRegion
 from .wallets import CorporationWalletDivision
+
+if TYPE_CHECKING:
+    from esi.stubs import CharactersCharacterIdOrdersGetItem
 
 
 class MarketOrder(models.Model):
@@ -50,3 +55,26 @@ class CorporationMarketOrder(MarketOrder):
 class CharacterMarketOrder(MarketOrder):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
     is_corporation = models.BooleanField()
+
+    @classmethod
+    def from_esi_model(cls, character: CharacterAudit, esi_model: "CharactersCharacterIdOrdersGetItem"):
+        return cls(
+            character=character,
+            order_id=esi_model.order_id,
+            duration=esi_model.duration,
+            escrow=esi_model.escrow,
+            is_buy_order=esi_model.is_buy_order,
+            issued=esi_model.issued,
+            location_id=esi_model.location_id,
+            min_volume=esi_model.min_volume,
+            price=esi_model.price,
+            order_range=esi_model.range,
+            region_id=esi_model.region_id,
+            region_name_id=esi_model.region_id,
+            type_id=esi_model.type_id,
+            type_name_id=esi_model.type_id,
+            volume_remain=esi_model.volume_remain,
+            volume_total=esi_model.volume_total,
+            is_corporation=esi_model.is_corporation,
+            state='active'
+        )

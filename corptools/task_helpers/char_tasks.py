@@ -1173,9 +1173,11 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
 
 def update_character_orders(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
-        character__character_id=character_id)
-    logger.debug("Updating Market Orders for: {}".format(
-        audit_char.character.character_name))
+        character__character_id=character_id
+    )
+    logger.debug(
+        f"Updating Market Orders for: {audit_char.character.character_name}"
+    )
 
     req_scopes = ['esi-markets.read_character_orders.v1']
 
@@ -1184,22 +1186,29 @@ def update_character_orders(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
 
-    open_orders_op = providers.esi.client.Market.get_characters_character_id_orders(
-        character_id=character_id)
     try:
-        open_orders = etag_results(
-            open_orders_op, token, force_refresh=force_refresh)
+        open_orders = providers.esi_openapi.client.Market.GetCharactersCharacterIdOrders(
+            character_id=character_id,
+            token=token
+        ).results(
+            force_refresh=force_refresh
+        )
+
         _st = time.perf_counter()
 
-        open_ids = list(CharacterMarketOrder.objects.filter(
-            character=audit_char, state='active').values_list("order_id", flat=True))
-        all_locations = list(EveLocation.objects.all(
-        ).values_list('location_id', flat=True))
+        open_ids = list(
+            CharacterMarketOrder.objects.filter(
+                character=audit_char,
+                state='active'
+            ).values_list("order_id", flat=True)
+        )
+        all_locations = list(
+            EveLocation.objects.all().values_list('location_id', flat=True)
+        )
 
         updates = []
         creates = []
         type_ids = []
-
         tracked_ids = []
 
         for order in open_orders:
@@ -1208,31 +1217,12 @@ def update_character_orders(character_id, force_refresh=False):
             if order.get('type_id') not in type_ids:
                 type_ids.append(order.get('type_id'))
 
-            _order = CharacterMarketOrder(
-                character=audit_char,
-                order_id=order.get('order_id'),
-                duration=order.get('duration'),
-                escrow=order.get('escrow'),
-                is_buy_order=order.get('is_buy_order'),
-                issued=order.get('issued'),
-                location_id=order.get('location_id'),
-                min_volume=order.get('min_volume'),
-                price=order.get('price'),
-                order_range=order.get('range'),
-                region_id=order.get('region_id'),
-                region_name_id=order.get('region_id'),
-                type_id=order.get('type_id'),
-                type_name_id=order.get('type_id'),
-                volume_remain=order.get('volume_remain'),
-                volume_total=order.get('volume_total'),
-                is_corporation=order.get('is_corporation'),
-                state='active'
-            )
+            _order = CharacterMarketOrder.from_esi_model(order)
 
-            if order.get('location_id') in all_locations:
-                _order.location_name_id = order.get('location_id')
+            if order.location_id in all_locations:
+                _order.location_name_id = order.location_id
 
-            if order.get('order_id') in open_ids:
+            if order.order_id in open_ids:
                 updates.append(_order)
             else:
                 creates.append(_order)
@@ -1240,23 +1230,30 @@ def update_character_orders(character_id, force_refresh=False):
         EveItemType.objects.create_bulk_from_esi(type_ids)
 
         if len(updates) > 0:
-            CharacterMarketOrder.objects.bulk_update(updates, fields=['duration', 'escrow',
-                                                                      'min_volume',
-                                                                      'price',
-                                                                      'order_range',
-                                                                      'volume_remain',
-                                                                      'volume_total',
-                                                                      'state'])
+            CharacterMarketOrder.objects.bulk_update(
+                updates, fields=[
+                    'duration',
+                    'escrow',
+                    'min_volume',
+                    'price',
+                    'order_range',
+                    'volume_remain',
+                    'volume_total',
+                    'state'
+                ]
+            )
 
         if len(creates) > 0:
             CharacterMarketOrder.objects.bulk_create(creates)
-        logger.debug(
-            f"CT_TIME: {time.perf_counter() - _st} update_character_orders {character_id}")
 
-    except NotModifiedError:
-        logger.info("CT: No New orders data for: {}".format(
-            audit_char.character.character_name))
-        pass
+        logger.debug(
+            f"CT_TIME: {time.perf_counter() - _st} update_character_orders {character_id}"
+        )
+
+    except HTTPNotModified:
+        logger.info(
+            f"CT: No New orders data for: {audit_char.character.character_name}"
+        )
 
     audit_char.last_update_orders = timezone.now()
     audit_char.save()
