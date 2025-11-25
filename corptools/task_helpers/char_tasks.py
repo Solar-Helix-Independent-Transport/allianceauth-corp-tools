@@ -1735,8 +1735,10 @@ def update_character_contacts(character_id, force_refresh=False):
 
         CharacterContact.objects.filter(character=audit_char).delete()
 
-        CharacterContact.objects.bulk_create(_contacts_to_create)
-        ContactLabelThrough.objects.bulk_create(_through_to_create)
+        CharacterContact.objects.bulk_create(
+            _contacts_to_create, ignore_conflicts=True)
+        ContactLabelThrough.objects.bulk_create(
+            _through_to_create, ignore_conflicts=True)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_contacts {character_id}"
