@@ -858,7 +858,7 @@ def update_corp_asset_names(corp_id, force_refresh: bool = False):
         assets_names = providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsNames(
             corporation_id=corp_id,
             body=list(set([i.item_id for i in subset])),
-            token=token.valid_access_token()
+            token=token
         ).results(
             force_refresh=force_refresh
         )
@@ -925,7 +925,7 @@ def build_managed_asset_locations(self, corp_id, force_refresh: bool = True):
     if token:
         divs = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdDivisions(
             corporation_id=_corporation.corporation.corporation_id,
-            token=token.valid_access_token()
+            token=token
         ).result(
             force_refresh=force_refresh
         )
@@ -1018,7 +1018,7 @@ def build_managed_asset_locations(self, corp_id, force_refresh: bool = True):
             items = providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsNames(
                 body=c,
                 corporation_id=_corporation.corporation.corporation_id,
-                token=token.valid_access_token()
+                token=token
             ).result(
                 force_refresh=force_refresh
             )
@@ -1301,7 +1301,7 @@ def fetch_coordiantes(self, corp_id, force_refresh: bool = False):
         locations += providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsLocations(
             corporation_id=_corporation.corporation.corporation_id,
             body=id_chunk,
-            token=_token.valid_access_token()
+            token=_token
         ).result(
             force_refresh=force_refresh
         )

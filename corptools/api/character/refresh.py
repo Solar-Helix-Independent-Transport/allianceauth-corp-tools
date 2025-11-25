@@ -1,3 +1,5 @@
+import logging
+
 from ninja import NinjaAPI
 
 from django.core.cache import cache
@@ -11,6 +13,8 @@ from corptools import app_settings, models
 from corptools.api import schema
 from corptools.api.helpers import get_alts_queryset, get_main_character
 from corptools.tasks import character
+
+logger = logging.getLogger(__name__)
 
 
 class RefreshApiEndpoints:
@@ -32,7 +36,10 @@ class RefreshApiEndpoints:
             if not response:
                 return 403, _("Permission Denied")
 
-            if cache.get(f"refresh-block-{character_id}", False) and not request.user.is_superuser:
+            # and not request.user.is_superuser:
+            if cache.get(f"refresh-block-{character_id}", False):
+                logger.error(
+                    f"GO AWAY! Already Requested! {character_id} {request.user.username}")
                 return 200, {"message": "GO AWAY! Already Requested!"}
 
             characters = get_alts_queryset(main)
@@ -64,10 +71,13 @@ class RefreshApiEndpoints:
 
             force = app_settings.CT_USERS_CAN_FORCE_REFRESH or request.user.is_superuser
 
-            if cache.get(f"refresh-block-account-{character_id}", False) and not request.user.is_superuser:
+            # and not request.user.is_superuser:
+            if cache.get(f"refresh-block-account-{character_id}", False):
+                logger.error(
+                    f"GO AWAY! Already Requested! {character_id} {request.user.username}")
                 return 200, {"message": "GO AWAY! Already Requested!"}
 
-            for cid in characters.values_list('character_id', flat=True):
+            for cid in set(list(characters.values_list('character_id', flat=True))):
                 character.update_character.apply_async(
                     args=[cid],
                     kwargs={
