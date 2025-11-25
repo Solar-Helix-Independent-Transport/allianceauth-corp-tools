@@ -970,9 +970,9 @@ def update_character_transactions(character_id, force_refresh=False):
         for item in journal_items:
             if item.transaction_id in _current_journal:
                 type_name, _ = EveItemType.objects.get_or_create_from_esi(
-                    item.get('type_id')
+                    item.type_id
                 )
-                message = f"{item.get('quantity')}x {type_name.name} @ {item.unit_price:,.2f} ISK"
+                message = f"{item.quantity}x {type_name.name} @ {item.unit_price:,.2f} ISK"
                 CharacterWalletJournalEntry.objects.filter(
                     character=audit_char,
                     context_id_type="market_transaction_id",
