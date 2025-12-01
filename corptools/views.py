@@ -20,6 +20,7 @@ from esi.decorators import _check_callback, token_required
 from esi.views import sso_redirect
 
 from . import __version__, app_settings
+from .app_settings import CORP_REQUIRED_SCOPES
 from .api.corporation import dashboards
 from .forms import UploadForm
 from .models import (
@@ -35,38 +36,6 @@ from .tasks import (
 )
 
 logger = get_extension_logger(__name__)
-
-CORP_REQUIRED_SCOPES = [
-
-    # Tracking
-    'esi-corporations.track_members.v1',
-    'esi-corporations.read_titles.v1',
-    'esi-corporations.read_corporation_membership.v1',
-    'esi-killmails.read_corporation_killmails.v1',
-
-    # Moons
-    'esi-industry.read_corporation_mining.v1',
-
-    # Structures
-    'esi-planets.read_customs_offices.v1',
-    'esi-corporations.read_starbases.v1',
-    'esi-corporations.read_structures.v1',
-
-    # Wallets
-    'esi-wallet.read_corporation_wallets.v1',
-    'esi-markets.read_corporation_orders.v1',
-    'esi-industry.read_corporation_jobs.v1',
-    'esi-corporations.read_divisions.v1',
-
-    # Assets
-    'esi-assets.read_corporation_assets.v1',
-
-    # All...
-    'esi-search.search_structures.v1',
-    'esi-universe.read_structures.v1',
-    'esi-characters.read_corporation_roles.v1',
-
-]
 
 
 @login_required
