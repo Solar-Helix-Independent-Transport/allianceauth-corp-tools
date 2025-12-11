@@ -63,7 +63,8 @@ class WhereStuff(commands.Cog):
         try:
             has_any_perm(
                 ctx.author.id,
-                ['corptools.view_characteraudit']
+                ['corptools.view_characteraudit'],
+                ctx.guild
             )
 
             try:

@@ -16,7 +16,7 @@ module.exports = {
       extensions: [".js", ".jsx"],
     },
     trans: false,
-    lngs: ["en", "de", "es", "it-it", "ko-kr", "fr-fr", "nl-nl", "pl-pl", "ru", "uk", "zh-hans"],
+    lngs: ["en", "de", "es", "it-IT", "ko-KR", "fr-FR", "nl-NL", "pl-PL", "ru", "uk", "zh-Hans", "ja"],
     ns: ["translation"],
     defaultLng: "en",
     defaultNs: "translation",
