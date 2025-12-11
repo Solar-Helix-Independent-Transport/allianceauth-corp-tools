@@ -10,6 +10,9 @@ from django.core.cache import cache
 from django.utils import timezone
 
 from allianceauth.services.hooks import get_extension_logger
+from esi.exceptions import (
+    ESIBucketLimitException, HTTPClientError, HTTPServerError,
+)
 
 logger = get_extension_logger(__name__)
 
@@ -57,14 +60,17 @@ def esi_error_retry(func):
         try:
             _ret = func(*args, **kwargs)
         except Exception as e:
-            if isinstance(e, (HTTPError)):
+            if isinstance(e, (HTTPError, HTTPClientError, HTTPServerError)):  # Bravado, OpenAPI
                 code = e.status_code
-                if code == 420:
+                if code in (420, 429):
                     logger.warning(f"Hit ESI error limit! Pausing Tasks! {e}")
                     set_error_flag(60)
                     args[0].retry(countdown=61)
-            elif isinstance(e, (OSError)):
-                logger.warning(f"Hit ESI error limit! Pausing Tasks! {e}")
+            elif isinstance(e, (ESIBucketLimitException)):  # OpenAPI
+                logger.warning(f"Hit ESI rate bucket! Pausing Task! {e}")
+                args[0].retry(countdown=e.reset)
+            elif isinstance(e, (OSError)):  # Bravado
+                logger.warning(f"Hit ESI error! Skipping task! {e}")
             raise e
         return _ret
     return wrapper

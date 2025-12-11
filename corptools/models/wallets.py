@@ -1,9 +1,14 @@
+from typing import TYPE_CHECKING
+
 from model_utils import Choices
 
 from django.db import models
 
 from .audits import CharacterAudit, CorporationAudit, CorptoolsConfiguration
 from .eve_models import EveItemType, EveName
+
+if TYPE_CHECKING:
+    from esi.stubs import CharactersCharacterIdWalletJournalGetItem
 
 
 class WalletJournalEntry(models.Model):
@@ -88,6 +93,27 @@ class CharacterWalletJournalEntry(WalletJournalEntry):
         EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_first_party')
     second_party_name = models.ForeignKey(
         EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_second_party')
+
+    @classmethod
+    def from_esi_model(cls, character: CharacterAudit, esi_model: "CharactersCharacterIdWalletJournalGetItem"):
+        return cls(
+            character=character,
+            amount=esi_model.amount,
+            balance=esi_model.balance,
+            context_id=esi_model.context_id,
+            context_id_type=esi_model.context_id_type,
+            date=esi_model.date,
+            description=esi_model.description,
+            first_party_id=esi_model.first_party_id,
+            first_party_name_id=esi_model.first_party_id,
+            entry_id=esi_model.id,
+            reason=esi_model.reason,
+            ref_type=esi_model.ref_type,
+            second_party_id=esi_model.second_party_id,
+            second_party_name_id=esi_model.second_party_id,
+            tax=esi_model.tax,
+            tax_receiver_id=esi_model.tax_receiver_id,
+        )
 
 
 class CharacterBountyEvent(models.Model):

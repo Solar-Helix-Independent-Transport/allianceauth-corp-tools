@@ -1,10 +1,20 @@
+from typing import TYPE_CHECKING
+
 from model_utils import Choices
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from corptools.task_helpers import sanitize_notification_type
+
 from .audits import CharacterAudit, CorporationAudit
 from .eve_models import EveName
+
+if TYPE_CHECKING:
+    from esi.stubs import (
+        CharactersCharacterIdContactsGetItem,
+        CharactersCharacterIdContactsLabelsGetItem,
+    )
 
 
 class NotificationText(models.Model):
@@ -30,6 +40,27 @@ class Notification(models.Model):
         indexes = (
             models.Index(fields=['timestamp']),
             models.Index(fields=['notification_type'])
+        )
+
+    @classmethod
+    def from_esi_model(cls, character, model):
+        return (
+            cls(
+                character=character,
+                notification_id=model.notification_id,
+                sender_id=model.sender_id,
+                sender_type=model.sender_type,
+                notification_text_id=model.notification_id,
+                timestamp=model.timestamp,
+                notification_type=sanitize_notification_type(
+                    model.type
+                ),
+                is_read=model.is_read
+            ),
+            NotificationText(
+                notification_id=model.notification_id,
+                notification_text=model.text
+            )
         )
 
 
@@ -99,6 +130,16 @@ class CharacterContactLabel(ContactLabel):
         self.id = int(str(self.character_id) + str(self.label_id))
         return self.id
 
+    @classmethod
+    def from_esi_model(cls, character: CharacterAudit, esi_model: "CharactersCharacterIdContactsLabelsGetItem"):
+        _mdl = cls(
+            character=character,
+            label_id=esi_model.label_id,
+            label_name=esi_model.label_name,
+        )
+        _mdl.build_id()
+        return _mdl
+
 
 class CorporationContactLabel(ContactLabel):
     corporation = models.ForeignKey(CorporationAudit, on_delete=models.CASCADE)
@@ -113,6 +154,22 @@ class CharacterContact(Contact):
     def build_id(self):
         self.id = int(str(self.character_id) + str(self.contact_id))
         return self.id
+
+    @classmethod
+    def from_esi_model(cls, character: CharacterAudit, esi_model: "CharactersCharacterIdContactsGetItem"):
+        blocked = False if esi_model.is_blocked is None else esi_model.is_blocked
+        watched = False if esi_model.is_watched is None else esi_model.is_watched
+        _mdl = cls(
+            character=character,
+            contact_id=esi_model.contact_id,
+            contact_type=esi_model.contact_type,
+            contact_name_id=esi_model.contact_id,
+            standing=esi_model.standing,
+            blocked=blocked,
+            watched=watched,
+        )
+        _mdl.build_id()
+        return _mdl
 
 
 class CorporationContact(Contact):

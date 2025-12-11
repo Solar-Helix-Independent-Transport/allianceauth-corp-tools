@@ -7,7 +7,7 @@ from allianceauth.eveonline.models import (
 )
 from allianceauth.tests.auth_utils import AuthUtils
 
-from corptools.models import CharacterAudit, CorporationAudit
+from corptools.models import CharacterAudit, CharacterRoles, CorporationAudit
 
 
 class CorptoolsTestCase(TestCase):
@@ -144,3 +144,8 @@ class CorptoolsTestCase(TestCase):
             'guest_hr', 'corptools', 'characteraudit')
         cls.view_state_permission = Permission.objects.get_by_natural_key(
             'state_hr', 'corptools', 'characteraudit')
+
+        CharacterRoles.objects.create(
+            character=cls.ca7,
+            director=True
+        )

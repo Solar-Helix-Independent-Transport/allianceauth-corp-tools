@@ -1,10 +1,14 @@
 import time
 
 from bravado.exception import HTTPNotModified
+from httpx import Response
 
 from django.core.cache import cache
 
 from allianceauth.services.hooks import get_extension_logger
+from esi.exceptions import HTTPNotModified as NotModified
+from esi.models import Token
+from esi.openapi_clients import EsiOperation
 
 MAX_ETAG_LIFE = 60 * 60 * 24 * 7  # 7 Days
 
@@ -49,6 +53,18 @@ def set_etag_header(operation, headers):
         result = cache.set(etag_key, etag, MAX_ETAG_LIFE)
         logger.debug(
             f"ETag: set_etag {operation.operation.operation_id} - {stringify_params(operation)} - etag:{etag} - stored:{result}")
+
+
+def set_etag_header_openapi(
+        operation,
+        req
+):
+    etag_key = get_etag_key(operation)
+    etag = req.headers.get('ETag', None)
+    if etag is not None:
+        result = cache.set(etag_key, etag, MAX_ETAG_LIFE)
+        logger.debug(
+            f"ETag: set_etag {operation} - etag:{etag} - stored:{result}")
 
 
 def stringify_params(operation):
@@ -212,3 +228,76 @@ def etag_results(operation, token, force_refresh=False, disable_verification=Fal
     logger.debug(
         f"ESI_TIME: OVERALL {time.perf_counter() - _start_tm} {operation.operation.operation_id} {stringify_params(operation)}")
     return results
+
+
+def update_page_num(
+    operation: EsiOperation,
+    page_number: int
+):
+    if operation._has_page_param():
+        operation._kwargs["page"] = page_number
+    else:
+        pass
+
+
+def get_total_pages(res: Response):
+    return res.headers["X-Pages"]
+
+
+def single_page(
+    operation: EsiOperation,
+    force_refresh: bool
+):
+    if force_refresh:
+        del_etag_header(operation)
+
+    etag = get_etag_header(operation)
+    try:
+        data, res = operation.result(
+            etag=etag,
+            return_response=True
+        )
+    except NotModified as e:
+        logger.debug(
+            f"ETag: result Hit ETag - resetting ttl - {operation} - {etag}"
+        )
+        set_etag_header_openapi(operation, e)
+        raise NotModifiedError()
+
+    if etag == res.headers.get('ETag'):
+        logger.debug(
+            f"ETag: result Hit ETag from hard cache - resetting ttl - {operation} - {etag}"
+        )
+        set_etag_header_openapi(operation, res)
+        raise NotModifiedError()
+
+    set_etag_header_openapi(operation, res)
+
+    return data, res
+
+
+def openapi_etag_result(
+    operation: EsiOperation,
+    force_refresh=False,
+):
+    if operation._has_page_param():
+        page = 1
+        update_page_num(operation, page)
+        data, res = single_page(operation, force_refresh=force_refresh)
+        total_pages = int(get_total_pages(res))
+        logger.info(f"page {operation} pages {total_pages}")
+        while page < total_pages:
+            page += 1
+            update_page_num(operation, page)
+            if force_refresh:
+                del_etag_header(operation)
+            _data, res = single_page(operation, force_refresh=force_refresh)
+            if _data:
+                data += _data
+            logger.info(
+                f"page {operation} page {page}/{total_pages} - {len(_data)}")
+    else:
+        data, res = single_page(operation,  force_refresh=force_refresh)
+        set_etag_header_openapi(operation, res)
+
+    return data
