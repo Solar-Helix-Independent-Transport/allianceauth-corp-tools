@@ -7,7 +7,7 @@ from django.utils import timezone
 from esi.clients import EsiClientProvider
 from esi.openapi_clients import ESIClientProvider as ESIOpenApiProvider
 
-from . import __appname__, __url__, __version__
+from . import __appname__, __url__, __version__, app_settings
 from .task_helpers.skill_helpers import SkillListCache
 
 
@@ -266,8 +266,10 @@ esi = CorpToolsESIClient(app_info_text=f"corptools/{__version__} ({__url__})")
 routes = EveRouter()
 skills = SkillListCache()
 
+compat = "2025-08-26" if not app_settings.CT_COMPAT_DATE_OVERRIDE else app_settings.CT_COMPAT_DATE_OVERRIDE
+
 esi_openapi = ESIOpenApiProvider(
-    compatibility_date="2025-08-26",
+    compatibility_date=compat,
     ua_appname=__appname__,
     ua_url=__url__,
     ua_version=__version__,
