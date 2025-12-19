@@ -1294,6 +1294,7 @@ def fetch_coordiantes(self, corp_id, force_refresh: bool = False):
         return f"CT: COORDS No Tokens or Assets for {_corporation.corporation.corporation_name}"
 
     _all_ids = assets.values_list("item_id", flat=True)
+    locations = []
 
     locations = []
 
