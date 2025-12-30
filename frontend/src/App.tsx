@@ -6,6 +6,7 @@ import CharacterClones from "./Pages/Char/Clones";
 import CharacterContacts from "./Pages/Char/Contacts";
 import CharacterContracts from "./Pages/Char/Contracts";
 import CharacterDoctrine from "./Pages/Char/Doctrines";
+import CharacterFitCheck from "./Pages/Char/FitCheck";
 import CharacterLP from "./Pages/Char/LoyaltyPoints";
 import CharacterMail from "./Pages/Char/Mail";
 import Market from "./Pages/Char/Market";
@@ -106,6 +107,7 @@ function App() {
                 <Route path="account/skills" element={<CharacterSkills />} />
                 <Route path="account/skillqueue" element={<CharacterSkillQueues />} />
                 <Route path="account/doctrines" element={<CharacterDoctrine />} />
+                <Route path="account/fitcheck" element={<CharacterFitCheck />} />
                 <Route path="account/market" element={<Market />} />
                 <Route
                   path="account/standings"

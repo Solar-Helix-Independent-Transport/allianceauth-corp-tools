@@ -1,0 +1,153 @@
+import { PanelLoader } from "../../Components/Loaders/loaders";
+import { CharacterAllegiancePortrait } from "../../Components/EveImages/EveImages";
+import { TextFilter } from "../../Components/Helpers/TextFilter";
+import { DoctrineCheck } from "../../Components/Skills/DoctrineCheck";
+import { components } from "../../api/CtApi";
+import { getAccountDoctrines, getFitCheck } from "../../api/character";
+import { ChangeEvent, MouseEvent, useState } from "react";
+import { Form } from "react-bootstrap";
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
+import { useQuery } from "react-query";
+import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
+const CharacterFitCheck = () => {
+  const { t } = useTranslation();
+
+  const { characterID } = useParams();
+  const [fit, setFit] = useState("");
+  const { data, refetch } = useQuery(
+    ["getFitCheck", fit],
+    () => {
+      let out = getFitCheck(fit);
+      return out;
+    },
+    {
+      refetchOnWindowFocus: false,
+      enabled: false, // disable this query from automatically running
+    },
+  );
+
+  const [hideFailures, setHideFailures] = useState(false);
+
+  function fitUpdate(event: ChangeEvent) {
+    setFit(event.target?.value);
+  }
+
+  function fetchUpdate() {
+    refetch();
+  }
+  return (
+    <>
+      <h5 className="text-center">Fitting to Check</h5>
+      <div className="d-flex justify-content-center align-items-center flex-column">
+        <div className="w-100 mb-3" style={{ maxWidth: "650px" }}>
+          <Form.Control onChange={fitUpdate} as="textarea" rows={10} />
+          <Button className="w-100" onClick={fetchUpdate}>
+            Check
+          </Button>
+        </div>
+      </div>
+      <h5 className="text-center">{t("Status Key")}</h5>
+      <div className="d-flex justify-content-center align-items-center flex-column">
+        <table className="table">
+          <tr className="row align-items-center">
+            <td className="col align-items-center text-end">
+              <DoctrineCheck name="Passed" skill_reqs={[]} skill_list={{}} />
+            </td>
+            <td className="col align-items-center">
+              <p className="m-0">{t("All Skills Trained")}</p>
+            </td>
+          </tr>
+          <tr className="row align-items-center">
+            <td className="col align-items-center text-end">
+              <DoctrineCheck
+                name={t("Alpha Restricted")}
+                skill_reqs={{ "Some Skill Trained But Limited": 5 }}
+                skill_list={{
+                  "Some Skill Trained But Limited": {
+                    active_level: 4,
+                    trained_level: 5,
+                  },
+                }}
+              />
+            </td>
+            <td className="col align-items-center">
+              <p className="m-0 text-nowrap">
+                {t("Some Skills Restricted by Alpha State")}
+                <br />
+                {t("Click to Show More")}
+              </p>
+            </td>
+          </tr>
+          <tr className="row align-items-center">
+            <td className="col align-items-center text-end">
+              <DoctrineCheck
+                name="Failed"
+                skill_reqs={{ "Some Skill": 5 }}
+                skill_list={{ "Some Skill": { active_level: 1, trained_level: 1 } }}
+              />
+            </td>
+            <td className="col align-items-center">
+              <p className="m-0 text-nowrap">
+                {t("Some Missing Skills")}
+                <br />
+                {t("Click to Show More")}
+                <br />
+                {t("Click Copy for easy import in game")}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td colSpan={2}></td>
+          </tr>
+        </table>
+      </div>
+
+      {data ? (
+        <>
+          <hr />
+          <h5 className="text-center">Character Checks</h5>
+          <div className="d-flex justify-content-center align-items-center">
+            {Object.entries(data?.chars).map((name: any) => {
+              let reqs = name[1].doctrines?.fit ? name[1].doctrines?.fit : [];
+              return (
+                <>
+                  <DoctrineCheck name={name[0]} skill_reqs={reqs} skill_list={name[1].skills} />
+                </>
+              );
+            })}
+          </div>
+          <hr />
+
+          <h5 className="text-center">Required Skills</h5>
+          <div className="d-flex justify-content-center align-items-center">
+            <table>
+              <thead>
+                <th>Skill</th>
+                <th className="text-end">Level</th>
+              </thead>
+              <tbody>
+                {data.skills?.map((sk: any) => {
+                  return (
+                    <>
+                      <tr>
+                        <td>{sk.n}</td>
+                        <td className="text-end">{sk.l}</td>
+                      </tr>
+                    </>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : (
+        <PanelLoader title={t("Awaiting Fit")} message={t("")} />
+      )}
+    </>
+  );
+};
+
+export default CharacterFitCheck;
