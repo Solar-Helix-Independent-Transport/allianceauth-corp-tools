@@ -1,21 +1,14 @@
-import { PanelLoader } from "../../Components/Loaders/loaders";
-import { CharacterAllegiancePortrait } from "../../Components/EveImages/EveImages";
-import { TextFilter } from "../../Components/Helpers/TextFilter";
 import { DoctrineCheck } from "../../Components/Skills/DoctrineCheck";
-import { components } from "../../api/CtApi";
-import { getAccountDoctrines, getFitCheck } from "../../api/character";
-import { ChangeEvent, MouseEvent, useState } from "react";
+import { getFitCheck } from "../../api/character";
+import { ChangeEvent, useState } from "react";
 import { Form } from "react-bootstrap";
-import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { useQuery } from "react-query";
-import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const CharacterFitCheck = () => {
   const { t } = useTranslation();
 
-  const { characterID } = useParams();
   const [fit, setFit] = useState("");
   const { data, refetch } = useQuery(
     ["getFitCheck", fit],
@@ -29,9 +22,7 @@ const CharacterFitCheck = () => {
     },
   );
 
-  const [hideFailures, setHideFailures] = useState(false);
-
-  function fitUpdate(event: ChangeEvent) {
+  function fitUpdate(event: ChangeEvent | any) {
     setFit(event.target?.value);
   }
 
@@ -43,7 +34,7 @@ const CharacterFitCheck = () => {
       <h5 className="text-center">Fitting to Check</h5>
       <div className="d-flex justify-content-center align-items-center flex-column">
         <div className="w-100 mb-3" style={{ maxWidth: "650px" }}>
-          <Form.Control onChange={fitUpdate} as="textarea" rows={10} />
+          <Form.Control onChange={fitUpdate} as="textarea" rows={10} defaultValue={"EFT Fitting"} />
           <Button className="w-100" onClick={fetchUpdate}>
             Check
           </Button>
@@ -144,7 +135,10 @@ const CharacterFitCheck = () => {
           </div>
         </>
       ) : (
-        <PanelLoader title={t("Awaiting Fit")} message={t("")} />
+        <>
+          <hr />
+          <h5 className="text-center">Awaiting Fitting in EFT format</h5>
+        </>
       )}
     </>
   );

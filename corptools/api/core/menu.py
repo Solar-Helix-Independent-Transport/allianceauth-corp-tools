@@ -140,6 +140,10 @@ class MenuApiEndpoints:
                     "name": _("Skill List Checks"),
                     "link": "account/doctrines"
                 })
+                _char["links"].append({
+                    "name": _("Fitting Skill Checks"),
+                    "link": "account/fitcheck"
+                })
             admin = {
                 "name": _("Admin"),
                 "link": "/audit/admin"

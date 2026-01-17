@@ -3,6 +3,8 @@ import pprint
 from ninja import NinjaAPI
 
 from django.core.cache import cache
+from django.utils import timezone
+from django.utils.http import http_date
 
 from esi.exceptions import HTTPNotModified
 
@@ -189,40 +191,77 @@ class TestingApiEndpoints:
             #     token=token.valid_access_token()
             # )
             # print(etag1)
-            from esi import openapi_clients
-            esi = openapi_clients.ESIClientProvider(
-                compatibility_date="2025-08-26",
-                ua_appname="ack-testing-django-esi",
-                ua_version="0.0.1a1",
-                tags=["Character", "Assets"]
-            )
-            # try:
-            #     req, res = esi.client.Universe.GetUniverseCategoriesCategoryId(category_id=999999).result(use_etag=False, return_response=True)
-            # except Exception as e:
-            #     print(e)
+            # from esi import openapi_clients
+            # esi = openapi_clients.ESIClientProvider(
+            #     compatibility_date="2025-08-26",
+            #     ua_appname="ack-testing-django-esi",
+            #     ua_version="0.0.1a1",
+            #     tags=["Character", "Assets", "Skills"]
+            # )
+            # # try:
+            # #     req, res = esi.client.Universe.GetUniverseCategoriesCategoryId(category_id=999999).result(use_etag=False, return_response=True)
+            # # except Exception as e:
+            # #     print(e)
 
-            # req, res = esi.client.Universe.GetUniverseCategoriesCategoryId(category_id=5).result(return_response=True)
-            # print(res.headers)
+            # # req, res = esi.client.Universe.GetUniverseCategoriesCategoryId(category_id=5).result(return_response=True)
+            # # print(res.headers)
+            # from django.core.cache import cache
 
-            # req_scopes = ['esi-fleets.write_fleet.v1']
-            cid = 755166922
+            # req_scopes = ['esi-skills.read_skills.v1']
+            # cid = 755166922
             # token = get_token(cid, req_scopes)
+            # op = esi.client.Skills.GetCharactersCharacterIdSkills(character_id=cid, token=token)
+            # etag_key = op._etag_key()
+            # print("TTL_pre", cache.ttl(etag_key))
+            # try:
+            #     op.result(use_cache=False)
+            # except Exception:
+            #     pass
+            # print("TTL_post", cache.ttl(etag_key))
             # req = esi.client.Character.GetCharactersCharacterIdNotifications(character_id=cid, token=token).result()
 
-            req_scopes = ['esi-assets.read_assets.v1']
-            token = get_token(cid, req_scopes)
+            # req_scopes = ['esi-characters.read_corporation_roles.v1']
+            # token = get_token(cid, req_scopes)
+            # now = timezone.now()
+            # req = esi.client.Character.GetCharactersCharacterIdRoles(
+            #     character_id=cid,
+            #     token=token
+            # ).result(
+            #     use_cache=False,
+            #     use_etag=False,
+            #     extra_headers={
+            #         "If-Modified-Since": http_date(now.timestamp())
+            #     }
+            # )
 
-            req, res = esi.client.Assets.GetCharactersCharacterIdAssets(
-                character_id=cid, token=token, page=1).result(return_response=True, use_etag=False)
-
-            try:
-                req, res = esi.client.Assets.GetCharactersCharacterIdAssets(
-                    character_id=cid, token=token).results(return_response=True)
-            except HTTPNotModified:
-                pass
+            # try:
+            #     req, res = esi.client.Assets.GetCharactersCharacterIdAssets(
+            #         character_id=cid, token=token).results(return_response=True)
+            # except HTTPNotModified:
+            #     pass
             # cache.clear()
             # req_scopes = ['esi-characters.read_notifications.v1']
             # token = get_token(cid, req_scopes)
             # req, res = esi.client.Character.GetCharactersCharacterIdNotifications(
             #     character_id=cid, token=token).results(return_response=True, use_cache=False, use_etag=False)
-            return [req[:10]]
+            # return [req]
+
+            from django.core.cache import cache
+
+            from corptools.providers import esi_openapi
+            from corptools.task_helpers.char_tasks import (
+                update_character_skill_list,
+            )
+
+            def test_():
+                cid = 2117840319
+                op = esi_openapi.client.Skills.GetCharactersCharacterIdSkills(
+                    character_id=cid)
+                etag_key = op._etag_key()
+                print("TTL_pre", cache.ttl(etag_key))
+                try:
+                    update_character_skill_list(cid, force_refresh=False)
+                except Exception:
+                    pass
+                print("TTL_post", cache.ttl(etag_key))
+            test_()

@@ -94,7 +94,9 @@ const CharacterDoctrine = () => {
       {data ? (
         data.map((char: components["schemas"]["CharacterDoctrines"]) => {
           const doctrineCount = Object.entries(char.doctrines).length;
-          const filtered_doctrines = Object.entries(char.doctrines)?.reduce((output, [k, v]) => {
+          const filtered_doctrines = (
+            Object.entries(char.doctrines) as Array<[string, Object]>
+          )?.reduce((output, [k, v]) => {
             return (
               output ||
               ((!hideFailures || Object.entries(v).length === 0) &&
@@ -122,15 +124,17 @@ const CharacterDoctrine = () => {
                   <div className="d-flex flex-grow-1 justify-content-center flex-wrap">
                     {doctrineCount > 0 ? (
                       <>
-                        {Object.entries(char.doctrines).map(([k, v]) => {
-                          return (
-                            (!hideFailures || Object.entries(v).length === 0) &&
-                            (filter.length == 0 ||
-                              k.toLowerCase().includes(filter.toLocaleLowerCase())) && (
-                              <DoctrineCheck name={k} skill_reqs={v} skill_list={char.skills} />
-                            )
-                          );
-                        })}
+                        {(Object.entries(char.doctrines) as Array<[string, Object]>).map(
+                          ([k, v]) => {
+                            return (
+                              (!hideFailures || Object.entries(v).length === 0) &&
+                              (filter.length == 0 ||
+                                k.toLowerCase().includes(filter.toLocaleLowerCase())) && (
+                                <DoctrineCheck name={k} skill_reqs={v} skill_list={char.skills} />
+                              )
+                            );
+                          },
+                        )}
                       </>
                     ) : (
                       <p>{t("No Tokens")}</p>

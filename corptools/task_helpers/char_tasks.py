@@ -78,12 +78,9 @@ def update_character_location(character_id, force_refresh=False):
         return "No Tokens"
 
     try:
-        location = providers.esi_openapi.client.Location.GetCharactersCharacterIdLocation(
-            character_id=character_id,
-            token=token
-        ).result(
-            force_refresh=force_refresh,
-            use_etag=False
+        location = providers.esi_openapi.char_location(
+            character_id,
+            token
         )
         _st = time.perf_counter()
 
@@ -253,7 +250,7 @@ def update_character_skill_list(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).result(
-            force_refresh=force_refresh,
+            force_refresh=force_refresh
         )
 
         # Delete current SkillList

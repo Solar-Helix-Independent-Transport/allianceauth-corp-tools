@@ -863,7 +863,13 @@ class HomeStationFilter(FilterBase):
         verbose_name_plural = verbose_name
 
     evelocation = models.ManyToManyField(
-        EveLocation, blank=True, help_text="Limit filter to specific Structures")
+        EveLocation,
+        blank=True,
+        help_text="Limit filter to specific Structures",
+        limit_choices_to={
+            "managed": False
+        }
+    )
 
     def filter_query(self, users):
         character_list = CharacterOwnership.objects.filter(

@@ -73,7 +73,7 @@ const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boo
         columnHelper.accessor(`last_updates.${h}`, {
           header: h,
           cell: (cell) => {
-            return cell.getValue() ? <TimeAgo date={cell.getValue()} /> : t("Never");
+            return cell.getValue() ? <TimeAgo date={cell.getValue() as string} /> : t("Never");
           },
         }) as any,
       );

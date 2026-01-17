@@ -1,5 +1,4 @@
-from ninja import NinjaAPI, Schema
-from ninja.renderers import BaseRenderer
+from ninja import NinjaAPI
 
 from corptools.models.eve_models import EveItemDogmaAttribute, EveItemType
 from corptools.models.skills import SkillList

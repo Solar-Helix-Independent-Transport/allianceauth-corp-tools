@@ -62,10 +62,10 @@ def get_corp_token(corp_id: int, scopes: list, req_roles: Union[list, None, bool
     for token in tokens:
         try:
             if req_roles:  # There are endpoints with no requirements
-                roles = providers.esi.client.Character.get_characters_character_id_roles(
+                roles = providers.esi_openapi.client.Character.GetCharactersCharacterIdRoles(
                     character_id=token.character_id,
-                    token=token.valid_access_token()
-                ).result()
+                    token=token
+                ).result(use_etag=False)
 
                 has_roles = False
 

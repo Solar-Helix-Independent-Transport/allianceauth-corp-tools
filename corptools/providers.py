@@ -268,7 +268,25 @@ skills = SkillListCache()
 
 compat = "2025-08-26" if not app_settings.CT_COMPAT_DATE_OVERRIDE else app_settings.CT_COMPAT_DATE_OVERRIDE
 
-esi_openapi = ESIOpenApiProvider(
+
+class OpenAPI(ESIOpenApiProvider):
+    def char_location_op(self, character_id, token):
+        return self.client.Location.GetCharactersCharacterIdLocation(
+            character_id=character_id,
+            token=token
+        )
+
+    def char_location(self, character_id, token, force_refresh=False):
+        return self.char_location_op(
+            character_id,
+            token
+        ).result(
+            force_refresh=force_refresh,
+            use_etag=False
+        )
+
+
+esi_openapi = OpenAPI(
     compatibility_date=compat,
     ua_appname=__appname__,
     ua_url=__url__,
