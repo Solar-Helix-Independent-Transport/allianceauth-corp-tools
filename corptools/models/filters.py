@@ -866,9 +866,6 @@ class HomeStationFilter(FilterBase):
         EveLocation,
         blank=True,
         help_text="Limit filter to specific Structures",
-        limit_choices_to={
-            "managed": False
-        }
     )
 
     def filter_query(self, users):
