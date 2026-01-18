@@ -123,7 +123,7 @@ const CharacterFitCheck = () => {
         <>
           <hr />
           <h5 className="text-center">Character Checks</h5>
-          <div className="d-flex justify-content-center align-items-center">
+          <div className="d-flex justify-content-center align-items-center flex-wrap">
             {Object.entries(data?.chars).map((name: any) => {
               let reqs = name[1].doctrines?.fit ? name[1].doctrines?.fit : [];
               return (
