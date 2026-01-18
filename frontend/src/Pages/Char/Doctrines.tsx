@@ -31,7 +31,16 @@ const CharacterDoctrine = () => {
         <table className="table">
           <tr className="row align-items-center">
             <td className="col align-items-center text-end">
-              <DoctrineCheck name="Passed" skill_reqs={[]} skill_list={{}} />
+              <DoctrineCheck
+                name="Passed"
+                skill_reqs={{
+                  _meta: {
+                    total_sp: 100,
+                    trained_sp: 100,
+                  },
+                }}
+                skill_list={{}}
+              />
             </td>
             <td className="col align-items-center">
               <p className="m-0">{t("All Skills Trained")}</p>
@@ -41,7 +50,13 @@ const CharacterDoctrine = () => {
             <td className="col align-items-center text-end">
               <DoctrineCheck
                 name={t("Alpha Restricted")}
-                skill_reqs={{ "Some Skill Trained But Limited": 5 }}
+                skill_reqs={{
+                  _meta: {
+                    total_sp: 100,
+                    trained_sp: 100,
+                  },
+                  "Some Skill Trained But Limited": 5,
+                }}
                 skill_list={{
                   "Some Skill Trained But Limited": {
                     active_level: 4,
@@ -62,7 +77,13 @@ const CharacterDoctrine = () => {
             <td className="col align-items-center text-end">
               <DoctrineCheck
                 name="Failed"
-                skill_reqs={{ "Some Skill": 5 }}
+                skill_reqs={{
+                  _meta: {
+                    total_sp: 100,
+                    trained_sp: 30,
+                  },
+                  "Some Skill": 5,
+                }}
                 skill_list={{ "Some Skill": { active_level: 1, trained_level: 1 } }}
               />
             </td>
