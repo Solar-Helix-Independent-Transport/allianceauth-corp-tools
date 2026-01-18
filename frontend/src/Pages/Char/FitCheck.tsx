@@ -6,13 +6,14 @@ import Button from "react-bootstrap/Button";
 import { useQuery } from "react-query";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
+import { PanelLoader } from "../../Components/Loaders/loaders";
 
 const CharacterFitCheck = () => {
   const { t } = useTranslation();
   const { characterID } = useParams();
 
   const [fit, setFit] = useState("");
-  const { data, refetch } = useQuery(
+  const { data, refetch, isFetching, isFetched } = useQuery(
     ["getFitCheck", fit, characterID],
     () => {
       let out = getFitCheck(fit, characterID ? Number(characterID) : 0);
@@ -119,7 +120,7 @@ const CharacterFitCheck = () => {
         </table>
       </div>
 
-      {data ? (
+      {!isFetching && isFetched ? (
         <>
           <hr />
           <h5 className="text-center">Character Checks</h5>
@@ -160,7 +161,7 @@ const CharacterFitCheck = () => {
       ) : (
         <>
           <hr />
-          <h5 className="text-center">Awaiting Fitting in EFT format</h5>
+          <PanelLoader title={t("Checking EFT")} message={t("Please Wait")} />
         </>
       )}
     </>
