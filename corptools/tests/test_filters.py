@@ -181,22 +181,52 @@ class TestSecGroupBotFilters(TestCase):
                                                    name="Skill 1",
                                                    published=True,
                                                    group=skg1)
+        ct_models.EveItemDogmaAttribute.objects.create(
+            attribute_id=275,
+            eve_type=sk1,
+            value=5.0
+        )
+
         sk2 = ct_models.EveItemType.objects.create(type_id=2,
                                                    name="Skill 2",
                                                    published=True,
                                                    group=skg1)
+        ct_models.EveItemDogmaAttribute.objects.create(
+            attribute_id=275,
+            eve_type=sk2,
+            value=5.0
+        )
+
         sk3 = ct_models.EveItemType.objects.create(type_id=3,
                                                    name="Skill 3",
                                                    published=True,
                                                    group=skg1)
+        ct_models.EveItemDogmaAttribute.objects.create(
+            attribute_id=275,
+            eve_type=sk3,
+            value=5.0
+        )
+
         sk4 = ct_models.EveItemType.objects.create(type_id=4,
                                                    name="Skill 4",
                                                    published=True,
                                                    group=skg1)
+        ct_models.EveItemDogmaAttribute.objects.create(
+            attribute_id=275,
+            eve_type=sk4,
+            value=5.0
+        )
+
         sk5 = ct_models.EveItemType.objects.create(type_id=5,
                                                    name="Skill 5",
                                                    published=True,
                                                    group=skg1)
+        ct_models.EveItemDogmaAttribute.objects.create(
+            attribute_id=275,
+            eve_type=sk5,
+            value=5.0
+        )
+
         skc1 = ct_models.EveItemCategory.objects.create(category_id=1,
                                                         name="TestCat")
         skg2 = ct_models.EveItemGroup.objects.create(group_id=2,

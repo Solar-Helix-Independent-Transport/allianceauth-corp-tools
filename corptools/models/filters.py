@@ -556,13 +556,13 @@ class Skillfilter(FilterBase):
 
             for char in skill_tables:
                 for d_name, d_list in skill_list_base.items():
-                    if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                    if len(skill_tables[char]["doctrines"][d_name]) == 1:
                         skill_list_base[d_name]['pass'] = True
             if req_one.count() > 0:
                 single_pass = False
                 for char in skill_tables:
                     for d_name, d_list in skill_list_single.items():
-                        if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                        if len(skill_tables[char]["doctrines"][d_name]) == 1:
                             single_pass = True
                             break
 
@@ -604,7 +604,7 @@ class Skillfilter(FilterBase):
 
                 for char in skill_tables:
                     for d_name, d_list in skill_list_base.items():
-                        if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                        if len(skill_tables[char]["doctrines"][d_name]) == 1:
                             skill_list_base[d_name]['pass'] = True
                             message.append(f"{char}: {d_name}")
 
@@ -612,7 +612,7 @@ class Skillfilter(FilterBase):
                     single_pass = False
                     for char in skill_tables:
                         for d_name, d_list in skill_list_single.items():
-                            if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                            if len(skill_tables[char]["doctrines"][d_name]) == 1:
                                 single_pass = True
                                 message.append(f"{char}: {d_name}")
                                 break

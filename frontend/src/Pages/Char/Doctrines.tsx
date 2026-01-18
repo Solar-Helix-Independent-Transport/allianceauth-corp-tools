@@ -5,7 +5,7 @@ import { DoctrineCheck } from "../../Components/Skills/DoctrineCheck";
 import { components } from "../../api/CtApi";
 import { getAccountDoctrines } from "../../api/character";
 import { useState } from "react";
-import { Form } from "react-bootstrap";
+import Form from "react-bootstrap/Form";
 import Card from "react-bootstrap/Card";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
@@ -17,7 +17,7 @@ const CharacterDoctrine = () => {
   const { characterID } = useParams();
   const [filter, setDoctrineFilter] = useState("");
   const [hideFailures, setHideFailures] = useState(false);
-
+  const [hideCompletedPerc, setCompletedPerc] = useState(0);
   const { data } = useQuery({
     queryKey: ["doctrines", characterID],
     queryFn: () => getAccountDoctrines(Number(characterID)),
@@ -90,16 +90,30 @@ const CharacterDoctrine = () => {
           }}
           defaultChecked={hideFailures}
         />
+        <div className="d-flex flex-row text-nowrap" style={{ minWidth: "400px" }}>
+          <Form.Label className="me-2">Percentage Complete Filter</Form.Label>
+          <Form.Range
+            min={0}
+            max={100}
+            defaultValue={hideCompletedPerc}
+            onChange={(event: any) => {
+              setCompletedPerc(event.target.value);
+            }}
+          />
+          <Form.Label className="ms-2">{hideCompletedPerc} %</Form.Label>
+        </div>
       </div>
       {data ? (
         data.map((char: components["schemas"]["CharacterDoctrines"]) => {
           const doctrineCount = Object.entries(char.doctrines).length;
           const filtered_doctrines = (
-            Object.entries(char.doctrines) as Array<[string, Object]>
+            Object.entries(char.doctrines) as Array<[string, any]>
           )?.reduce((output, [k, v]) => {
             return (
               output ||
-              ((!hideFailures || Object.entries(v).length === 0) &&
+              ((!hideFailures || Object.entries(v).length === 1) &&
+                Math.floor((v?._meta?.trained_sp / v?._meta?.total_sp) * 100) >=
+                  hideCompletedPerc &&
                 (filter.length == 0 || k.toLowerCase().includes(filter.toLocaleLowerCase())))
             );
           }, false);
@@ -124,17 +138,18 @@ const CharacterDoctrine = () => {
                   <div className="d-flex flex-grow-1 justify-content-center flex-wrap">
                     {doctrineCount > 0 ? (
                       <>
-                        {(Object.entries(char.doctrines) as Array<[string, Object]>).map(
-                          ([k, v]) => {
-                            return (
-                              (!hideFailures || Object.entries(v).length === 0) &&
-                              (filter.length == 0 ||
-                                k.toLowerCase().includes(filter.toLocaleLowerCase())) && (
-                                <DoctrineCheck name={k} skill_reqs={v} skill_list={char.skills} />
-                              )
-                            );
-                          },
-                        )}
+                        {(Object.entries(char.doctrines) as Array<[string, any]>).map(([k, v]) => {
+                          console.log(k, v);
+                          return (
+                            (!hideFailures || Object.entries(v).length === 1) &&
+                            Math.floor((v?._meta?.trained_sp / v?._meta?.total_sp) * 100) >=
+                              hideCompletedPerc &&
+                            (filter.length == 0 ||
+                              k.toLowerCase().includes(filter.toLocaleLowerCase())) && (
+                              <DoctrineCheck name={k} skill_reqs={v} skill_list={char.skills} />
+                            )
+                          );
+                        })}
                       </>
                     ) : (
                       <p>{t("No Tokens")}</p>

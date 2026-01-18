@@ -33,6 +33,23 @@ class TestingApiEndpoints:
             return api.client.Alliance.get_alliances_alliance_id(alliance_id=1900696668)
 
         @api.get(
+            "/extras/test/skilltest",
+            tags=["Testing"]
+        )
+        def get_test_api_skilltests(request):
+            """
+                Not for real use!
+                this is kinda like bravado in use... no type hinting
+            """
+            if not request.user.is_superuser:
+                return 403, {"message": "Hard no pall!"}
+
+            from corptools.providers import skills
+            skills.get_and_cache_user(request.user.id, force_rebuild=True)
+
+            return skills.get_and_cache_user(request.user.id)
+
+        @api.get(
             "/extras/test/newapi2",
             tags=["Testing"]
         )

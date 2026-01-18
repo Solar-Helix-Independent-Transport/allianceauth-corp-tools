@@ -1,4 +1,5 @@
 import json
+import math
 from hashlib import md5
 
 from django.contrib.auth.models import User
@@ -60,11 +61,19 @@ class SkillListCache():
 
     def check_skill_lists(self, skill_lists, linked_characters):
         # build the arrays
-        from ..models import Skill  # TODO fix the recursive import
+        from ..models import (  # TODO fix the recursive import
+            EveItemDogmaAttribute, Skill,
+        )
 
-        skills = Skill.objects.filter(character__character__character_id__in=linked_characters)\
-            .select_related('skill_name', 'skill_name__group', 'character__character')\
-            .order_by('skill_name__name')
+        skills = Skill.objects.filter(
+            character__character__character_id__in=linked_characters
+        ).select_related(
+            'skill_name',
+            'skill_name__group',
+            'character__character'
+        ).order_by(
+            'skill_name__name'
+        )
 
         skill_tables = {}
         skill_list_base = {}
@@ -86,17 +95,46 @@ class SkillListCache():
             if skill.alpha:
                 skill_tables[char]["omega"] = False
 
+        all_skill_sp = {}
         for skl in skill_lists:
-            skill_list_base[skl.name] = skl.get_skills()
+            _s = skl.get_skills()
+            if _s:
+                if skl.name not in all_skill_sp:
+                    all_skill_sp[skl.name] = {}
+                # 250 * skillTimeConstant * sqrt(32)^(skillLevel - 1)
+                try:
+                    for _sk_n, _sk_l in _s.items():
+                        all_skill_sp[skl.name][_sk_n] = int(
+                            250 * EveItemDogmaAttribute.objects.get(
+                                eve_type__name=_sk_n,
+                                attribute_id=275
+                            ).value * math.sqrt(32) ** (int(_sk_l) - 1)
+                        )
+                except Exception as e:
+                    print(e)
+                    pass
+
+            skill_list_base[skl.name] = _s
 
         for char in skill_tables:
             skill_tables[char]["doctrines"] = {}
             for d_name, d_list in skill_list_base.items():
-                skill_tables[char]["doctrines"][d_name] = {}
+                skill_tables[char]["doctrines"][d_name] = {
+                    "_meta": {
+                        "total_sp": 0,
+                        "trained_sp": 0
+                    }
+                }
                 for skill, level in d_list.items():
                     level = int(level)
-                    if level > skill_tables[char]["skills"].get(skill, {}).get('active_level', 0):
+                    trained_skill = skill_tables[char]["skills"].get(skill, {})
+                    skill_tables[char]["doctrines"][d_name]["_meta"]["total_sp"] += all_skill_sp[d_name][skill]
+                    if level > trained_skill.get('active_level', 0):
                         skill_tables[char]["doctrines"][d_name][skill] = level
+                        skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += trained_skill.get(
+                            'sp_total', 0)
+                    else:
+                        skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += all_skill_sp[d_name][skill]
 
         # Join them all and ship it.
         return skill_tables

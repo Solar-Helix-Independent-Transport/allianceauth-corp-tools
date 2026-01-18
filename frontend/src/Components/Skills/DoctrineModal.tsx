@@ -21,21 +21,23 @@ export const DoctrineModal = ({ show, setShow, name, skill_reqs, skill_list }: a
       </Modal.Header>
       <Modal.Body>
         {Object.entries(skill_reqs).map(([k, v]) => {
-          let trained_level = 0;
-          let active_level = 0;
-          if (skill_list[k]) {
-            active_level = skill_list[k].active_level;
-            trained_level = skill_list[k].trained_level;
+          if (k !== "_meta") {
+            let trained_level = 0;
+            let active_level = 0;
+            if (skill_list[k]) {
+              active_level = skill_list[k].active_level;
+              trained_level = skill_list[k].trained_level;
+            }
+            return (
+              <SkillBlock
+                skill={k}
+                level={Number(v)}
+                active={active_level}
+                trained={trained_level}
+                className="w-100"
+              />
+            );
           }
-          return (
-            <SkillBlock
-              skill={k}
-              level={Number(v)}
-              active={active_level}
-              trained={trained_level}
-              className="w-100"
-            />
-          );
         })}
 
         <hr />

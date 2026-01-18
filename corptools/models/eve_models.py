@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _, ngettext_lazy
+from django.utils.translation import gettext_lazy as _
 
 from allianceauth.eveonline.evelinks import eveimageserver
 
