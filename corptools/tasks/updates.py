@@ -200,6 +200,24 @@ def update_prices_for_types(type_ids: list):
 # Bulk Updates
 
 
+@shared_task(name="corptools.tasks.clear_all_skill_caches")
+def clear_all_skill_caches():
+    try:
+        from django_redis import get_redis_connection
+        _client = get_redis_connection("default")
+    except (NotImplementedError, ModuleNotFoundError):
+        from django.core.cache import caches
+        default_cache = caches['default']
+        _client = default_cache.get_master_client()
+
+    keys = _client.keys(":?:SKILL_LISTS_*")
+    deleted = 0
+    if keys:
+        deleted = _client.delete(*keys)
+
+    return f" Deleted {deleted} skill cache keys"
+
+
 @shared_task(name="corptools.tasks.clear_all_etags")
 def clear_all_etags():
     try:
