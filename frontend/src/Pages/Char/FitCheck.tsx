@@ -34,7 +34,7 @@ const CharacterFitCheck = () => {
       <h5 className="text-center">Fitting to Check</h5>
       <div className="d-flex justify-content-center align-items-center flex-column">
         <div className="w-100 mb-3" style={{ maxWidth: "650px" }}>
-          <Form.Control onChange={fitUpdate} as="textarea" rows={10} defaultValue={"EFT Fitting"} />
+          <Form.Control onChange={fitUpdate} as="textarea" rows={10} />
           <Button className="w-100" onClick={fetchUpdate}>
             Check
           </Button>
