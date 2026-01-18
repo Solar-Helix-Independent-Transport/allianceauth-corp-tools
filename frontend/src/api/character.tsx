@@ -72,8 +72,8 @@ export async function getAccountDoctrines(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/doctrines", characterID);
 }
 
-export async function getFitCheck(body: string) {
-  const api = await axios.post(`/audit/api/extras/fitting2skills/`, body, {
+export async function getFitCheck(body: string, characterID: number) {
+  const api = await axios.post(`/audit/api/extras/fitting2skills/${characterID}`, body, {
     headers: {
       "X-CSRFToken": Cookies.get("csrftoken"),
       contentType: "text/plain",

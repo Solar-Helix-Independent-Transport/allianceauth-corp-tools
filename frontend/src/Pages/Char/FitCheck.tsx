@@ -5,15 +5,17 @@ import { Form } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import { useQuery } from "react-query";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
 
 const CharacterFitCheck = () => {
   const { t } = useTranslation();
+  const { characterID } = useParams();
 
   const [fit, setFit] = useState("");
   const { data, refetch } = useQuery(
     ["getFitCheck", fit],
     () => {
-      let out = getFitCheck(fit);
+      let out = getFitCheck(fit, characterID ? Number(characterID) : 0);
       return out;
     },
     {
@@ -41,11 +43,20 @@ const CharacterFitCheck = () => {
         </div>
       </div>
       <h5 className="text-center">{t("Status Key")}</h5>
-      <div className="d-flex justify-content-center align-items-center flex-column">
+      <div className="d-flex justify-content-center align-items-center flex-column flex-wrap">
         <table className="table">
           <tr className="row align-items-center">
             <td className="col align-items-center text-end">
-              <DoctrineCheck name="Passed" skill_reqs={[]} skill_list={{}} />
+              <DoctrineCheck
+                name="Passed"
+                skill_reqs={{
+                  _meta: {
+                    total_sp: 100,
+                    trained_sp: 100,
+                  },
+                }}
+                skill_list={{}}
+              />
             </td>
             <td className="col align-items-center">
               <p className="m-0">{t("All Skills Trained")}</p>
@@ -55,7 +66,13 @@ const CharacterFitCheck = () => {
             <td className="col align-items-center text-end">
               <DoctrineCheck
                 name={t("Alpha Restricted")}
-                skill_reqs={{ "Some Skill Trained But Limited": 5 }}
+                skill_reqs={{
+                  _meta: {
+                    total_sp: 100,
+                    trained_sp: 100,
+                  },
+                  "Some Skill Trained But Limited": 5,
+                }}
                 skill_list={{
                   "Some Skill Trained But Limited": {
                     active_level: 4,
@@ -76,7 +93,13 @@ const CharacterFitCheck = () => {
             <td className="col align-items-center text-end">
               <DoctrineCheck
                 name="Failed"
-                skill_reqs={{ "Some Skill": 5 }}
+                skill_reqs={{
+                  _meta: {
+                    total_sp: 100,
+                    trained_sp: 30,
+                  },
+                  "Some Skill": 5,
+                }}
                 skill_list={{ "Some Skill": { active_level: 1, trained_level: 1 } }}
               />
             </td>

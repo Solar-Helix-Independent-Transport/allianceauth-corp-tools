@@ -1,5 +1,6 @@
 from ninja import NinjaAPI
 
+from corptools.api.helpers import get_alts_queryset, get_main_character
 from corptools.models.eve_models import EveItemDogmaAttribute, EveItemType
 from corptools.models.skills import SkillList
 from corptools.task_helpers.skill_helpers import SkillListCache
@@ -112,7 +113,7 @@ class FittingsApiEndpoints:
             }
 
         @api.post(
-            "/extras/fitting2skills/",
+            "/extras/fitting2skills/{character_id}",
             response={200: dict, 403: str, 404: str, 500: str},
             tags=["Fittings"],
             openapi_extra={
@@ -128,10 +129,17 @@ class FittingsApiEndpoints:
                 }
             },
         )
-        def get_fitting_skills(request):
+        def get_fitting_skills(request, character_id: int):
             """
                 Turn a Fitting into a skill list and check characters on account.
             """
+            if character_id == 0:
+                character_id = request.user.profile.main_character.character_id
+            response, main = get_main_character(request, character_id)
+            if not response:
+                return 403, _("Permission Denied")
+            characters = get_alts_queryset(main)
+
             _in = str(request.body.decode())
             items = self.parse_eft_to_items(_in)
             _items = EveItemType.objects.filter(name__in=items)
@@ -180,10 +188,7 @@ class FittingsApiEndpoints:
 
             import json
             char_ids = list(
-                request.user.character_ownerships.all(
-                ).order_by(
-                    "-character__characteraudit__skilltotals__total_sp"
-                ).values_list('character__character_id', flat=True)[:15]
+                characters.values_list('character_id', flat=True)
             )
             checks = SkillListCache().check_skill_lists(
                 [
