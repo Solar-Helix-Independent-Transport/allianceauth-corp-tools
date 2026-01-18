@@ -136,7 +136,7 @@ const CharacterFitCheck = () => {
           <hr />
 
           <h5 className="text-center">Required Skills</h5>
-          <div className="d-flex justify-content-center align-items-center">
+          <div className="d-flex justify-content-center align-items-center flex-wrap">
             <table>
               <thead>
                 <th>Skill</th>

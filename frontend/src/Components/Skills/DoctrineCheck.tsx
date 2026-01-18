@@ -36,14 +36,15 @@ export const DoctrineCheck = ({ name, skill_reqs, skill_list }: any) => {
           <ButtonGroup>
             <Button {...style} size="sm" onClick={() => setShow(true)}>
               {name}
+              {completed ? (
+                <></>
+              ) : (
+                <span className="">
+                  {` - `}
+                  {Math.floor((_meta?.trained_sp / _meta?.total_sp) * 100)}%
+                </span>
+              )}
             </Button>
-            {completed ? (
-              <></>
-            ) : (
-              <Button {...style} size="sm" onClick={() => setShow(true)}>
-                {Math.floor((_meta?.trained_sp / _meta?.total_sp) * 100)}%
-              </Button>
-            )}
             {!alpha_check ? (
               <CopyToClipboard text={clipboard_text}>
                 <Button size="sm" variant="danger">
