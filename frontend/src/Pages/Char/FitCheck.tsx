@@ -13,7 +13,7 @@ const CharacterFitCheck = () => {
 
   const [fit, setFit] = useState("");
   const { data, refetch } = useQuery(
-    ["getFitCheck", fit],
+    ["getFitCheck", fit, characterID],
     () => {
       let out = getFitCheck(fit, characterID ? Number(characterID) : 0);
       return out;
