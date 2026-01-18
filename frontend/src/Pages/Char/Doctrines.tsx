@@ -80,7 +80,7 @@ const CharacterDoctrine = () => {
             <td colSpan={2}></td>
           </tr>
         </table>
-        <TextFilter setFilterText={setDoctrineFilter} labelText={t("Search:")} />
+        <TextFilter setFilterText={setDoctrineFilter} labelText={t("Search")} />
         <Form.Check
           type="switch"
           id="custom-switch"
