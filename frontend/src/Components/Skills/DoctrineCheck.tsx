@@ -39,10 +39,14 @@ export const DoctrineCheck = ({ name, skill_reqs, skill_list }: any) => {
               {completed ? (
                 <></>
               ) : (
-                <span className="">
-                  {` - `}
-                  {Math.floor((_meta?.trained_sp / _meta?.total_sp) * 100)}%
-                </span>
+                !alpha_check && (
+                  <>
+                    <span className="">
+                      {` - `}
+                      {Math.floor((_meta?.trained_sp / _meta?.total_sp) * 100)}%
+                    </span>
+                  </>
+                )
               )}
             </Button>
             {!alpha_check ? (

@@ -131,8 +131,11 @@ class SkillListCache():
                     skill_tables[char]["doctrines"][d_name]["_meta"]["total_sp"] += all_skill_sp[d_name][skill]
                     if level > trained_skill.get('active_level', 0):
                         skill_tables[char]["doctrines"][d_name][skill] = level
-                        skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += trained_skill.get(
-                            'sp_total', 0)
+                        if trained_skill.get('trained_level', 0) == trained_skill.get('active_level', 0):
+                            skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += trained_skill.get(
+                                'sp_total', 0)
+                        if trained_skill.get('active_level', 0) < trained_skill.get('trained_level', 0):
+                            skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += all_skill_sp[d_name][skill]
                     else:
                         skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += all_skill_sp[d_name][skill]
 

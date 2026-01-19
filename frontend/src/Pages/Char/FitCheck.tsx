@@ -122,45 +122,47 @@ const CharacterFitCheck = () => {
 
       {!isFetching && isFetched ? (
         <>
-          <hr />
-          <h5 className="text-center">Character Checks</h5>
-          <div className="d-flex justify-content-center align-items-center flex-wrap">
-            {Object.entries(data?.chars).map((name: any) => {
-              let reqs = name[1].doctrines?.fit ? name[1].doctrines?.fit : [];
-              return (
-                <>
-                  <DoctrineCheck name={name[0]} skill_reqs={reqs} skill_list={name[1].skills} />
-                </>
-              );
-            })}
-          </div>
-          <hr />
-
-          <h5 className="text-center">Required Skills</h5>
-          <div className="d-flex justify-content-center align-items-center flex-wrap">
-            <table>
-              <thead>
-                <th>Skill</th>
-                <th className="text-end">Level</th>
-              </thead>
-              <tbody>
-                {data.skills?.map((sk: any) => {
+          <div className="d-flex flex-wrap flex-sm-wrap flex-md-nowrap justify-content-center align-items-center">
+            <div className="card text-nowrap m-1" style={{ minWidth: "350px" }}>
+              <h5 className="card-header">Required Skills</h5>
+              <div className="card-body w-auto">
+                <table className="w-100">
+                  <thead>
+                    <th>Skill</th>
+                    <th className="text-end">Level</th>
+                  </thead>
+                  <tbody>
+                    {data.skills?.map((sk: any) => {
+                      return (
+                        <>
+                          <tr>
+                            <td>{sk.n}</td>
+                            <td className="text-end">{sk.l}</td>
+                          </tr>
+                        </>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div className="card m-1">
+              <h5 className="card-header">Character Checks</h5>
+              <div className="d-flex justify-content-center align-items-center flex-wrap">
+                {Object.entries(data?.chars).map((name: any) => {
+                  let reqs = name[1].doctrines?.fit ? name[1].doctrines?.fit : [];
                   return (
                     <>
-                      <tr>
-                        <td>{sk.n}</td>
-                        <td className="text-end">{sk.l}</td>
-                      </tr>
+                      <DoctrineCheck name={name[0]} skill_reqs={reqs} skill_list={name[1].skills} />
                     </>
                   );
                 })}
-              </tbody>
-            </table>
+              </div>
+            </div>
           </div>
         </>
       ) : (
         <>
-          <hr />
           <PanelLoader title={t("Checking EFT")} message={t("Please Wait")} />
         </>
       )}
