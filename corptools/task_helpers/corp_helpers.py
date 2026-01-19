@@ -70,7 +70,7 @@ def get_corp_token(corp_id: int, scopes: list, req_roles: Union[list, None, bool
                 has_roles = False
 
                 # do we have the roles.
-                for role in roles.get('roles', []):
+                for role in roles.roles:
                     if role in req_roles:
                         has_roles = True
                         break
