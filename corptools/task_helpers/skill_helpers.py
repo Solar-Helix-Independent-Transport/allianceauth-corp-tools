@@ -161,7 +161,7 @@ class SkillListCache():
                 cached_skills = json.loads(cached_skills)
                 # check what is in cache is valid
                 if cached_skills.get("doctrines", False) == skill_list_hash:
-                    cache.set(account_key, json.dumps(output_array),
+                    cache.set(account_key, json.dumps(cached_skills),
                               SKILL_CACHE_TIMEOUT_SECONDS)
                     return cached_skills  # Else build it.
 
