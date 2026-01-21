@@ -337,8 +337,8 @@ def update_char_location(self, character_id, force_refresh=False, chain=[]):
 def cache_user_skill_list(self, user_id, force_refresh=False, chain=[]):
     providers.skills.get_and_cache_user(
         user_id,
-        force_rebuild=True
-    )  # This needs to be rebuilt for everyone.
+        force_rebuild=force_refresh
+    )
 
 
 @shared_task(

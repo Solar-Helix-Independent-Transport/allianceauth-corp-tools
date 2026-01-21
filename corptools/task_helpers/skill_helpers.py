@@ -7,7 +7,7 @@ from django.core.cache import cache
 
 from allianceauth.authentication.models import CharacterOwnership
 
-SKILL_CACHE_TIMEOUT_SECONDS = 60 * 60 * 48  # 48h
+SKILL_CACHE_TIMEOUT_SECONDS = 60 * 60 * 24 * 7  # 48h
 SKILL_CACHE_HEADERS_KEY = "CT_SKILL_HEADER"
 SKILL_CACHE_USER_KEY = "SKILL_LISTS_{}"
 
@@ -161,6 +161,8 @@ class SkillListCache():
                 cached_skills = json.loads(cached_skills)
                 # check what is in cache is valid
                 if cached_skills.get("doctrines", False) == skill_list_hash:
+                    cache.set(account_key, json.dumps(output_array),
+                              SKILL_CACHE_TIMEOUT_SECONDS)
                     return cached_skills  # Else build it.
 
         # build the arrays
