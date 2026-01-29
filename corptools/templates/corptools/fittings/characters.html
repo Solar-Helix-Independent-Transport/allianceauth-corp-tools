@@ -36,8 +36,8 @@
             <p>
                 {{ c }}
                 <span class="float-end">
-                    <span class="badge {% if d.doctrines.fit|length > 0 %}bg-danger{% else %}bg-success{% endif %}">
-                        <span class="fa-solid {% if d.doctrines.fit|length > 0 %}fa-times{% else %}fa-check{% endif %} fa-fw"></span>
+                    <span class="badge {% if d.doctrines.fit|length > 1 %}bg-danger{% else %}bg-success{% endif %}">
+                        <span class="fa-solid {% if d.doctrines.fit|length > 1 %}fa-times{% else %}fa-check{% endif %} fa-fw"></span>
                     </span>
                 </span>
             </p>
