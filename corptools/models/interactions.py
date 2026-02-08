@@ -23,6 +23,7 @@ class NotificationText(models.Model):
 
 
 class Notification(models.Model):
+    id = models.BigAutoField(primary_key=True)
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
 
     notification_id = models.BigIntegerField()
