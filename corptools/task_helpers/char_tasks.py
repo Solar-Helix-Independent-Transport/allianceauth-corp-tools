@@ -1705,6 +1705,7 @@ def update_character_contacts(character_id, force_refresh=False):
         ).result(
             force_refresh=force_refresh
         )
+        _st = time.perf_counter()
 
         ContactLabelThrough = CharacterContact.labels.through
         _contacts_to_create = []
