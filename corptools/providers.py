@@ -352,5 +352,7 @@ esi_openapi = OpenAPI(
         # Corp Assets
         "PostCorporationsCorporationIdAssetsLocations",
         "GetCorporationsCorporationIdStructures",
+        # Corp Indy
+        "GetCorporationsCorporationIdIndustryJobs"
     ]
 )

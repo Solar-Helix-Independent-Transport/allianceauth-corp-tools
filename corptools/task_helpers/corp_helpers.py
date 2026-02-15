@@ -667,14 +667,12 @@ def update_corporation_industry_jobs(corp_id: int, force_refresh: bool = False) 
     _corporation: CorporationAudit = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
 
-    operation = providers.esi.client.Industry.get_corporations_corporation_id_industry_jobs(
-        corporation_id=_corporation.corporation.corporation_id, include_completed=True
-    )
-
     try:
-        industry_jobs = etag_results(
-            operation, token, force_refresh=force_refresh)
-    except NotModifiedError:
+        industry_jobs = providers.esi_openapi.client.Industry.GetCorporationsCorporationIdIndustryJobs(
+            corporation_id=_corporation.corporation.corporation_id,
+            include_completed=True
+        ).results(force_refresh=force_refresh)
+    except HTTPNotModified:
         _corporation.last_update_industry_jobs = timezone.now()
         _corporation.save()
         return f"No New industry job data for: {_corporation}"
@@ -684,57 +682,57 @@ def update_corporation_industry_jobs(corp_id: int, force_refresh: bool = False) 
         CorporationIndustryJob.objects.filter(
             corporation=_corporation,
             job_id__in=[
-                e.get("job_id") for e in industry_jobs
+                e.job_id for e in industry_jobs
             ]
         ).values_list("job_id", flat=True)
     )
     type_ids: set[int] = set()
     new_events = []
     for event in industry_jobs:
-        type_ids.add(event.get('blueprint_type_id'))
-        if event.get('product_type_id'):
-            type_ids.add(event.get('product_type_id'))
+        type_ids.add(event.blueprint_type_id)
+        if event.product_type_id:
+            type_ids.add(event.product_type_id)
 
-        if event.get('job_id') in existing_pks:
+        if event.job_id in existing_pks:
             _m: CorporationIndustryJob = CorporationIndustryJob.objects.get(
                 corporation=_corporation,
                 job_id=event.get("job_id")
             )
-            _m.completed_character_id = event.get("completed_character_id")
-            _m.completed_date = event.get("completed_date")
-            _m.end_date = event.get("end_date")
-            _m.pause_date = event.get("pause_date")
-            _m.status = event.get("status")
-            _m.successful_runs = event.get("successful_runs")
+            _m.completed_character_id = event.completed_character_id
+            _m.completed_date = event.completed_date
+            _m.end_date = event.end_date
+            _m.pause_date = event.pause_date
+            _m.status = event.status
+            _m.successful_runs = event.successful_runs
             _m.save()
             continue
 
         _e = CorporationIndustryJob(
             corporation=_corporation,
-            activity_id=event.get("activity_id"),
-            blueprint_id=event.get("blueprint_id"),
-            blueprint_location_id=event.get("blueprint_location_id"),
-            blueprint_type_id=event.get("blueprint_type_id"),
-            blueprint_type_name_id=event.get("blueprint_type_id"),
-            completed_character_id=event.get("completed_character_id"),
-            completed_date=event.get("completed_date"),
-            cost=event.get("cost"),
-            duration=event.get("duration"),
-            end_date=event.get("end_date"),
-            facility_id=event.get("facility_id"),
-            installer_id=event.get("installer_id"),
-            job_id=event.get("job_id"),
-            licensed_runs=event.get("licensed_runs"),
-            location_id=event.get("location_id"),
-            output_location_id=event.get("output_location_id"),
-            pause_date=event.get("pause_date"),
-            probability=event.get("probability"),
-            product_type_id=event.get("product_type_id"),
-            product_type_name_id=event.get("product_type_id"),
-            runs=event.get("runs"),
-            start_date=event.get("start_date"),
-            status=event.get("status"),
-            successful_runs=event.get("successful_runs")
+            activity_id=event.activity_id,
+            blueprint_id=event.blueprint_id,
+            blueprint_location_id=event.blueprint_location_id,
+            blueprint_type_id=event.blueprint_type_id,
+            blueprint_type_name_id=event.blueprint_type_id,
+            completed_character_id=event.completed_character_id,
+            completed_date=event.completed_date,
+            cost=event.cost,
+            duration=event.duration,
+            end_date=event.end_date,
+            facility_id=event.facility_id,
+            installer_id=event.installer_id,
+            job_id=event.job_id,
+            licensed_runs=event.licensed_runs,
+            location_id=event.location_id,
+            output_location_id=event.output_location_id,
+            pause_date=event.pause_date,
+            probability=event.probability,
+            product_type_id=event.product_type_id,
+            product_type_name_id=event.product_type_id,
+            runs=event.runs,
+            start_date=event.start_date,
+            status=event.status,
+            successful_runs=event.successful_runs
         )
 
         new_events.append(_e)
@@ -743,7 +741,9 @@ def update_corporation_industry_jobs(corp_id: int, force_refresh: bool = False) 
 
     if len(new_events):
         CorporationIndustryJob.objects.bulk_create(
-            new_events, ignore_conflicts=True)
+            new_events,
+            ignore_conflicts=True
+        )
 
     _corporation.last_change_industry_jobs = timezone.now()
     _corporation.last_update_industry_jobs = timezone.now()
@@ -799,8 +799,11 @@ def update_corp_assets(corp_id, force_refresh: bool = False):
     logger.debug("Updating Assets for: {}".format(
         audit_corp.corporation))
 
-    req_scopes = ['esi-assets.read_corporation_assets.v1',
-                  'esi-characters.read_corporation_roles.v1']
+    req_scopes = [
+        'esi-assets.read_corporation_assets.v1',
+        'esi-characters.read_corporation_roles.v1'
+    ]
+
     req_roles = ['Director']
 
     token = get_corp_token(corp_id, req_scopes, req_roles)
