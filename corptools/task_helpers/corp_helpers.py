@@ -21,16 +21,14 @@ from corptools.models import (
     AssetCoordiante, BridgeOzoneLevel, CharacterAudit, CorpAsset,
     CorporateContract, CorporateContractItem, CorporationAudit,
     CorporationIndustryJob, CorporationWalletDivision,
-    CorporationWalletJournalEntry, CorptoolsConfiguration,
-    EveItemDogmaAttribute, EveItemType, EveLocation, EveName, MapJumpBridge,
-    MapSystem, MapSystemMoon, MapSystemPlanet, Poco, Starbase, Structure,
-    StructureCelestial, StructureService,
+    CorporationWalletJournalEntry, EveItemType, EveLocation, EveName,
+    MapJumpBridge, MapSystem, MapSystemMoon, MapSystemPlanet, Poco, Starbase,
+    Structure, StructureCelestial, StructureService,
 )
 from corptools.task_helpers.etag_helpers import NotModifiedError, etag_results
 from corptools.task_helpers.update_tasks import fetch_location_name
 
 from .. import providers
-from . import sanitize_location_flag
 
 logger = get_extension_logger(__name__)
 
@@ -88,98 +86,124 @@ def get_corp_token(corp_id: int, scopes: list, req_roles: Union[list, None, bool
     return None
 
 
-# pagnated results
+# paginated results
 def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
     audit_corp = CorporationAudit.objects.get(
-        corporation__corporation_id=corp_id)
+        corporation__corporation_id=corp_id
+    )
 
     division = CorporationWalletDivision.objects.get(
-        corporation=audit_corp, division=wallet_division)
+        corporation=audit_corp,
+        division=wallet_division
+    )
 
-    logger.debug("Updating wallet transactions for: {} (Div: {})".format(
-        audit_corp.corporation.corporation_name, division))
+    logger.debug(
+        "Updating wallet transactions for: {} (Div: {})".format(
+            audit_corp.corporation.corporation_name,
+            division
+        )
+    )
 
-    req_scopes = ['esi-wallet.read_corporation_wallets.v1',
-                  'esi-characters.read_corporation_roles.v1']
+    req_scopes = [
+        'esi-wallet.read_corporation_wallets.v1',
+        'esi-characters.read_corporation_roles.v1'
+    ]
 
-    req_roles = ['CEO', 'Director', 'Accountant', 'Junior_Accountant']
+    req_roles = [
+        'CEO',
+        'Director',
+        'Accountant',
+        'Junior_Accountant'
+    ]
 
     token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
         return "No Tokens"
 
-    _current_journal = set(list(CorporationWalletJournalEntry.objects.filter(
-        division=division).order_by('-date').values_list('entry_id', flat=True)[:20000]))
-    _current_eve_ids = set(list(
-        EveName.objects.all().values_list('eve_id', flat=True)))
-
     current_page = 1
     total_pages = 1
     _new_names = []
+
+    # Loop pages one at a time to reduce ram use.
     while current_page <= total_pages:
-        journal_items = providers.esi.client.Wallet.get_corporations_corporation_id_wallets_division_journal(corporation_id=audit_corp.corporation.corporation_id,
-                                                                                                             division=wallet_division,
-                                                                                                             page=current_page,
-                                                                                                             token=token.valid_access_token())
-        journal_items.request_config.also_return_response = True
-        journal_items, headers = journal_items.result()
+        journal_items, headers = providers.esi_openapi.client.Wallet.GetCorporationsCorporationIdWalletsDivisionJournal(
+            corporation_id=audit_corp.corporation.corporation_id,
+            division=wallet_division,
+            page=current_page,
+            token=token
+        ).result(
+            return_response=True
+        )
+
+        _current_journal = set(
+            list(
+                CorporationWalletJournalEntry.objects.filter(
+                    entry_id__in=[ji.id for ji in journal_items],
+                    division=division
+                ).values_list(
+                    'entry_id',
+                    flat=True
+                )
+            )
+        )
+
+        _current_eve_ids = set()
+
+        for ji in journal_items:
+            _current_eve_ids.add(ji.second_party_id)
+            _current_eve_ids.add(ji.first_party_id)
+
+        _current_eve_ids = set(
+            EveName.objects.filter(
+                eve_id__in=list(_current_eve_ids)
+            ).values_list(
+                'eve_id',
+                flat=True
+            )
+        )
+
         total_pages = int(headers.headers['X-Pages'])
+
         logger.debug(
             f"CT: Corp {corp_id} Div {wallet_division}, Page:{current_page}/{total_pages} ({len(journal_items)})")
+
         _min_time = timezone.now()
+
         items = []
         for item in journal_items:
-            if _min_time > item.get('date'):
-                _min_time = item.get('date')
-
-            if item.get('id') not in _current_journal:
-                if item.get('second_party_id') not in _current_eve_ids:
-                    _new_names.append(item.get('second_party_id'))
-                    _current_eve_ids.add(item.get('second_party_id'))
-                if item.get('first_party_id') not in _current_eve_ids:
-                    _new_names.append(item.get('first_party_id'))
-                    _current_eve_ids.add(item.get('first_party_id'))
-                wallet_item = CorporationWalletJournalEntry(division=division,
-                                                            amount=item.get(
-                                                                'amount'),
-                                                            balance=item.get(
-                                                                'balance'),
-                                                            context_id=item.get(
-                                                                'context_id'),
-                                                            context_id_type=item.get(
-                                                                'context_id_type'),
-                                                            date=item.get(
-                                                                'date'),
-                                                            description=item.get(
-                                                                'description'),
-                                                            first_party_id=item.get(
-                                                                'first_party_id'),
-                                                            first_party_name_id=item.get(
-                                                                'first_party_id'),
-                                                            entry_id=item.get(
-                                                                'id'),
-                                                            reason=item.get(
-                                                                'reason'),
-                                                            ref_type=item.get(
-                                                                'ref_type'),
-                                                            second_party_id=item.get(
-                                                                'second_party_id'),
-                                                            second_party_name_id=item.get(
-                                                                'second_party_id'),
-                                                            tax=item.get(
-                                                                'tax'),
-                                                            tax_receiver_id=item.get(
-                                                                'tax_receiver_id'),
-                                                            )
+            if _min_time > item.date:
+                _min_time = item.date
+            if item.id not in _current_journal:
+                if item.second_party_id not in _current_eve_ids:
+                    _new_names.append(item.second_party_id)
+                    _current_eve_ids.add(item.second_party_id)
+                if item.first_party_id not in _current_eve_ids:
+                    _new_names.append(item.first_party_id)
+                    _current_eve_ids.add(item.first_party_id)
+                wallet_item = CorporationWalletJournalEntry(
+                    division=division,
+                    amount=item.amount,
+                    balance=item.balance,
+                    context_id=item.context_id,
+                    context_id_type=item.context_id_type,
+                    date=item.date,
+                    description=item.description,
+                    first_party_id=item.first_party_id,
+                    first_party_name_id=item.first_party_id,
+                    entry_id=item.id,
+                    reason=item.reason,
+                    ref_type=item.ref_type,
+                    second_party_id=item.second_party_id,
+                    second_party_name_id=item.second_party_id,
+                    tax=item.tax,
+                    tax_receiver_id=item.tax_receiver_id,
+                )
                 items.append(wallet_item)
-            # else:
-                # short cct
-                # if not full_update:
-                # total_pages = 0
-                # break
+
         logger.info(
             f"CT: Corp {corp_id} Div {wallet_division}, Page: {current_page}, New Transactions! {len(items)}, New Names {_new_names}")
+
         created_names = EveName.objects.create_bulk_from_esi(_new_names)
 
         if created_names:
@@ -190,7 +214,8 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
         current_page += 1
 
     logger.info(
-        f"CT: Corp {corp_id} Div {wallet_division}, OLDEST DATA! {audit_corp} {_min_time}")
+        f"CT: Corp {corp_id} Div {wallet_division}, OLDEST DATA! {audit_corp} {_min_time}"
+    )
 
 
 def update_corporation_transactions(corp_id, wallet_division, full_update=False):

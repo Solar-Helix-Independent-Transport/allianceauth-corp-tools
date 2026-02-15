@@ -338,6 +338,8 @@ esi_openapi = OpenAPI(
         "GetUniverseGroupsGroupId",
         "GetUniverseCategoriesCategoryId",
         "PostUniverseNames",
-        "PostUniverseIds"
+        "PostUniverseIds",
+        # Corp Wallets
+        "GetCorporationsCorporationIdWalletsDivisionJournal"
     ]
 )
