@@ -2,6 +2,7 @@ import re
 from typing import Union
 
 import requests
+from aiopenapi3 import HTTPError
 from celery import chain, shared_task
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -381,7 +382,7 @@ def update_corporation_pocos(corp_id, full_update=False):
 
         logger.info(
             f"{audit_corp.corporation.corporation_name}: Deleted {d} Pocos")
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info("CT: No New Poco data for: {}".format(
             audit_corp.corporation.corporation_name))
         pass
@@ -784,7 +785,7 @@ def update_character_logins_from_corp(corp_id):
             except CharacterAudit.DoesNotExist:
                 pass
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info("CT: No New Logins for: {}".format(
             audit_corp.corporation))
         pass
@@ -1132,7 +1133,8 @@ def build_managed_asset_locations(self, corp_id, force_refresh: bool = True):
 @shared_task(bind=True, base=QueueOnce)
 def build_jb_network(self):
     structures = Structure.objects.filter(type_id=35841).select_related(
-        "corporation__corporation", "system_name"
+        "corporation__corporation",
+        "system_name"
     ).prefetch_related('structureservice_set')
 
     # second_systems = set()
@@ -1142,13 +1144,17 @@ def build_jb_network(self):
         matches = re.findall(regex, s.name)
         matches = matches[0]
         output[matches[0]] = {}
-        output[matches[0]]["start"] = {"system": s.system_name,
-                                       "structure_id": s.structure_id,
-                                       "owner": s.corporation.corporation.alliance.alliance_id,
-                                       "name": s.name}
+        output[matches[0]]["start"] = {
+            "system": s.system_name,
+            "structure_id": s.structure_id,
+            "owner": s.corporation.corporation.alliance.alliance_id,
+            "name": s.name
+        }
         _exit = MapSystem.objects.get(name=matches[1])
-        output[matches[0]]["end"] = {"system": _exit,
-                                     "name": _exit.name}
+        output[matches[0]]["end"] = {
+            "system": _exit,
+            "name": _exit.name
+        }
 
     new_jbs = []
     for k, m in output.items():
@@ -1169,12 +1175,18 @@ def build_jb_network(self):
 
 def update_corporate_contracts(corp_id, force_refresh=False):
     _corporation = CorporationAudit.objects.get(
-        corporation__corporation_id=corp_id)
-    logger.debug("updating corporate contracts for: %s" %
-                 str(_corporation.corporation.corporation_name))
+        corporation__corporation_id=corp_id
+    )
 
-    req_scopes = ['esi-contracts.read_corporation_contracts.v1',
-                  'esi-characters.read_corporation_roles.v1']
+    logger.debug(
+        "updating corporate contracts for: %s" % str(
+            _corporation.corporation.corporation_name)
+    )
+
+    req_scopes = [
+        'esi-contracts.read_corporation_contracts.v1',
+        'esi-characters.read_corporation_roles.v1'
+    ]
 
     token = get_corp_token(corp_id, req_scopes, False)
 
@@ -1183,54 +1195,60 @@ def update_corporate_contracts(corp_id, force_refresh=False):
     if not token:
         return False, []
     try:
-        contracts_op = providers.esi.client.Contracts.get_corporations_corporation_id_contracts(
-            corporation_id=corp_id)
-
-        contracts = etag_results(
-            contracts_op, token, force_refresh=force_refresh)
+        contracts = providers.esi_openapi.client.Contracts.GetCorporationsCorporationIdContracts(
+            corporation_id=corp_id
+        ).results(
+            force_refresh=force_refresh
+        )
 
         contract_models_new = []
         contract_models_old = []
         eve_names = set()
-        contract_ids = list(CorporateContract.objects.filter(
-            corporation=_corporation).values_list("contract_id", flat=True))
+        contract_ids = list(
+            CorporateContract.objects.filter(
+                corporation=_corporation
+            ).values_list(
+                "contract_id",
+                flat=True
+            )
+        )
         for c in contracts:  # update labels
             _contract_item = CorporateContract(
                 id=CorporateContract.build_pk(
-                    _corporation.id, c.get('contract_id')),
+                    _corporation.id, c.contract_id),
                 corporation=_corporation,
-                assignee_id=c.get('assignee_id'),
-                assignee_name_id=c.get('assignee_id'),
-                acceptor_id=c.get('acceptor_id'),
-                acceptor_name_id=c.get('acceptor_id'),
-                contract_id=c.get('contract_id'),
-                availability=c.get('availability'),
-                buyout=c.get('buyout'),
-                collateral=c.get('collateral'),
-                date_accepted=c.get('date_accepted'),
-                date_completed=c.get('date_completed'),
-                date_expired=c.get('date_expired'),
-                date_issued=c.get('date_issued'),
-                days_to_complete=c.get('days_to_complete'),
-                end_location_id=c.get('end_location_id'),
-                for_corporation=c.get('for_corporation'),
-                issuer_corporation_name_id=c.get('issuer_corporation_id'),
-                issuer_name_id=c.get('issuer_id'),
-                price=c.get('price'),
-                reward=c.get('reward'),
-                start_location_id=c.get('start_location_id'),
-                status=c.get('status'),
-                title=c.get('title'),
-                contract_type=c.get('type'),
-                volume=c.get('volume')
+                assignee_id=c.assignee_id,
+                assignee_name_id=c.assignee_id,
+                acceptor_id=c.acceptor_id,
+                acceptor_name_id=c.acceptor_id,
+                contract_id=c.contract_id,
+                availability=c.availability,
+                buyout=c.buyout,
+                collateral=c.collateral,
+                date_accepted=c.date_accepted,
+                date_completed=c.date_completed,
+                date_expired=c.date_expired,
+                date_issued=c.date_issued,
+                days_to_complete=c.days_to_complete,
+                end_location_id=c.end_location_id,
+                for_corporation=c.for_corporation,
+                issuer_corporation_name_id=c.issuer_corporation_id,
+                issuer_name_id=c.issuer_id,
+                price=c.price,
+                reward=c.reward,
+                start_location_id=c.start_location_id,
+                status=c.status,
+                title=c.title,
+                contract_type=c.type,
+                volume=c.volume
             )
 
-            eve_names.add(c.get('assignee_id'))
-            eve_names.add(c.get('issuer_corporation_id'))
-            eve_names.add(c.get('issuer_id'))
-            eve_names.add(c.get('acceptor_id'))
+            eve_names.add(c.assignee_id)
+            eve_names.add(c.issuer_corporation_id)
+            eve_names.add(c.issuer_id)
+            eve_names.add(c.acceptor_id)
 
-            if c.get('contract_id') in contract_ids:
+            if c.contract_id in contract_ids:
                 contract_models_old.append(_contract_item)
             else:
                 contract_models_new.append(_contract_item)
@@ -1242,18 +1260,32 @@ def update_corporate_contracts(corp_id, force_refresh=False):
                 contract_models_new, batch_size=1000, ignore_conflicts=True)
 
         if len(contract_models_old) > 0:
-            CorporateContract.objects.bulk_update(contract_models_old, batch_size=1000,
-                                                  fields=['date_accepted', 'date_completed', 'acceptor_id', 'date_expired', 'status',
-                                                          'assignee_name', 'acceptor_name', 'issuer_corporation_name', 'issuer_name'])
+            CorporateContract.objects.bulk_update(
+                contract_models_old,
+                batch_size=1000,
+                fields=[
+                    'date_accepted',
+                    'date_completed',
+                    'acceptor_id',
+                    'date_expired',
+                    'status',
+                    'assignee_name',
+                    'acceptor_name',
+                    'issuer_corporation_name',
+                    'issuer_name'
+                ]
+            )
 
         new_contract_ids = [c.contract_id for c in contract_models_new]
         if force_refresh:
             new_contract_ids += [c.contract_id for c in contract_models_old]
 
-    except NotModifiedError:
-        logger.info("CT: No New Contracts for: {}".format(
-            _corporation.corporation.corporation_name))
-        pass
+    except HTTPNotModified:
+        logger.info(
+            "CT: No New Contracts for: {}".format(
+                _corporation.corporation.corporation_name
+            )
+        )
 
     _corporation.last_update_contracts = timezone.now()
     _corporation.save()
@@ -1266,32 +1298,38 @@ def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=Fa
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
 
-    logger.debug("updating contract items for: %s (%s)" %
-                 (str(_corporation.corporation.corporation_name), str(contract_id)))
+    logger.debug(
+        "updating contract items for: %s (%s)" % (
+            str(_corporation.corporation.corporation_name),
+            str(contract_id)
+        )
+    )
 
     contract = CorporateContract.objects.get(
         corporation=_corporation,
         contract_id=contract_id)
 
     if contract.status != "deleted":
-        req_scopes = ['esi-contracts.read_corporation_contracts.v1',
-                      'esi-characters.read_corporation_roles.v1']
+        req_scopes = [
+            'esi-contracts.read_corporation_contracts.v1',
+            'esi-characters.read_corporation_roles.v1'
+        ]
 
         token = get_corp_token(corp_id, req_scopes, False)
 
         if not token:
             return False
         try:
-            contracts_op = providers.esi.client.Contracts.get_corporations_corporation_id_contracts_contract_id_items(
-                corporation_id=corp_id,
-                contract_id=contract_id)
-
             try:
-                contracts = etag_results(
-                    contracts_op, token, force_refresh=force_refresh)
-            except NotModifiedError as e:
+                contracts_op = providers.esi_openapi.client.Contracts.GetCorporationsCorporationIdContractsContractIdItems(
+                    corporation_id=corp_id,
+                    contract_id=contract_id
+                ).results(
+                    force_refresh=force_refresh
+                )
+            except HTTPNotModified as e:
                 raise e
-            except Exception as e:
+            except HTTPError as e:
                 if e.status_code == 404:
                     logger.warning("CT: Contract items {} ({}) NOT FOUND ERROR".format(
                         str(_corporation.corporation.corporation_name), str(contract_id)))
@@ -1316,10 +1354,9 @@ def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=Fa
             EveItemType.objects.create_bulk_from_esi(list(_types))
             CorporateContractItem.objects.bulk_create(
                 contract_models_new, batch_size=1000, ignore_conflicts=True)
-        except NotModifiedError:
+        except HTTPNotModified:
             logger.info(
                 f"CT: No New Corporate Contract items {str(_corporation.corporation.corporation_name)} ({str(contract_id)})")
-            pass
 
     return f"CT: Completed Corporate Contract items {str(_corporation.corporation.corporation_name)} ({str(contract_id)})"
 
@@ -1327,7 +1364,8 @@ def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=Fa
 @shared_task(bind=True, base=QueueOnce)
 def fetch_coordiantes(self, corp_id, force_refresh: bool = False):
     _corporation = CorporationAudit.objects.get(
-        corporation__corporation_id=corp_id)
+        corporation__corporation_id=corp_id
+    )
 
     logger.info(
         f"CT: Starting Coords for {_corporation.corporation.corporation_name}")
@@ -1434,13 +1472,12 @@ def fetch_starbases(corp_id, force_refresh=True):  # Set true as we have bad dat
         logger.info(
             f"CT: No Tokens for Starbases for {_corporation.corporation.corporation_name}")
         return f"CT: No Tokens for Starbases for {_corporation.corporation.corporation_name}"
-
-    starbases_ob = providers.esi.client.Corporation.get_corporations_corporation_id_starbases(
-        corporation_id=_corporation.corporation.corporation_id,
-    )
     try:
-        starbases = etag_results(starbases_ob, _token,
-                                 force_refresh=force_refresh)
+
+        starbases = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdStarbases(
+            corporation_id=_corporation.corporation.corporation_id,
+            token=_token
+        ).results()
 
         if not len(starbases):
             # Remove them all!
@@ -1451,7 +1488,7 @@ def fetch_starbases(corp_id, force_refresh=True):  # Set true as we have bad dat
 
         ids = []
         for sb in starbases:
-            ids.append(sb['starbase_id'])
+            ids.append(sb.starbase_id)
 
         starbase_names = {}
 
@@ -1464,63 +1501,60 @@ def fetch_starbases(corp_id, force_refresh=True):  # Set true as we have bad dat
         )
 
         if _token_assets:
-            names = providers.esi.client.Assets.post_corporations_corporation_id_assets_names(
+            names = providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsNames(
                 corporation_id=_corporation.corporation.corporation_id,
                 item_ids=ids,
-                token=_token_assets.valid_access_token()
+                token=_token_assets
             ).result()
             for nm in names:
-                starbase_names[nm.get("item_id")] = nm.get("name")
+                starbase_names[nm.item_id] = nm.name
 
         for sb in starbases:
-            starbase = providers.esi.client.Corporation.get_corporations_corporation_id_starbases_starbase_id(
+            starbase = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdStarbasesStarbaseId(
                 corporation_id=_corporation.corporation.corporation_id,
-                starbase_id=sb.get("starbase_id"),
-                system_id=sb.get("system_id"),
-                token=_token.valid_access_token()
+                starbase_id=sb.starbase_id,
+                system_id=sb.system_id,
+                token=_token
             ).result()
 
             update_fields = {}
 
             if sb.get("moon_id"):
                 moon, _created = MapSystemMoon.objects.get_or_create_from_esi(
-                    sb.get("moon_id"))
+                    sb.moon_id)
                 update_fields["moon"] = moon
 
             eve_type, _created = EveItemType.objects.get_or_create_from_esi(
-                sb.get("type_id"))
+                sb.type_id)
 
             Starbase.objects.update_or_create(
-                starbase_id=sb.get("starbase_id"),
+                starbase_id=sb.starbase_id,
                 corporation=_corporation,
                 defaults={
-                    "name": starbase_names.get(sb.get("starbase_id")),
-                    "onlined_since": sb.get("onlined_since"),
-                    "reinforced_until": sb.get("reinforced_until"),
-                    "unanchor_at": sb.get("unanchor_at"),
-                    "state": sb.get("state"),
-                    "system_id": sb.get("system_id"),
+                    "name": starbase_names.get(sb.starbase_id),
+                    "onlined_since": sb.onlined_since,
+                    "reinforced_until": sb.reinforced_until,
+                    "unanchor_at": sb.unanchor_at,
+                    "state": sb.state,
+                    "system_id": sb.system_id,
                     "type_name": eve_type,
-                    "allow_alliance_members": starbase.get("allow_alliance_members"),
-                    "allow_corporation_members": starbase.get("allow_corporation_members"),
-                    "anchor": starbase.get("anchor"),
-                    "attack_if_at_war": starbase.get("attack_if_at_war"),
-                    "attack_if_other_security_status_dropping": starbase.get("attack_if_other_security_status_dropping"),
-                    "attack_security_status_threshold": starbase.get("attack_security_status_threshold"),
-                    "attack_standing_threshold": starbase.get("attack_standing_threshold"),
-                    "fuel_bay_take": starbase.get("fuel_bay_take"),
-                    "fuel_bay_view": starbase.get("fuel_bay_view"),
-                    "offline": starbase.get("offline"),
-                    "online": starbase.get("online"),
-                    "unanchor": starbase.get("unanchor"),
-                    "use_alliance_standings": starbase.get("use_alliance_standings"),
-                    "fuels": starbase.get("fuels", {}),
+                    "allow_alliance_members": starbase.allow_alliance_members,
+                    "allow_corporation_members": starbase.allow_corporation_members,
+                    "anchor": starbase.anchor,
+                    "attack_if_at_war": starbase.attack_if_at_war,
+                    "attack_if_other_security_status_dropping": starbase.attack_if_other_security_status_dropping,
+                    "attack_security_status_threshold": starbase.attack_security_status_threshold,
+                    "attack_standing_threshold": starbase.attack_standing_threshold,
+                    "fuel_bay_take": starbase.fuel_bay_take,
+                    "fuel_bay_view": starbase.fuel_bay_view,
+                    "offline": starbase.offline,
+                    "online": starbase.online,
+                    "unanchor": starbase.unanchor,
+                    "use_alliance_standings": starbase.use_alliance_standings,
+                    "fuels": starbase.fuels,
                     **update_fields
                 }
             )
-
-        # for id in ids:
-        #     get_local_assets(id)
 
         Starbase.objects.filter(
             corporation=_corporation,
@@ -1528,7 +1562,7 @@ def fetch_starbases(corp_id, force_refresh=True):  # Set true as we have bad dat
             starbase_id__in=ids
         ).delete()
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             f"CT: No New Starbases for {_corporation.corporation.corporation_name}")
         pass
