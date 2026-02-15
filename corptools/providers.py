@@ -353,6 +353,8 @@ esi_openapi = OpenAPI(
         "PostCorporationsCorporationIdAssetsLocations",
         "GetCorporationsCorporationIdStructures",
         # Corp Indy
-        "GetCorporationsCorporationIdIndustryJobs"
+        "GetCorporationsCorporationIdIndustryJobs",
+        # Corp Members
+        "GetCorporationsCorporationIdMembertracking"
     ]
 )

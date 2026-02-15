@@ -758,8 +758,10 @@ def update_character_logins_from_corp(corp_id):
     logger.debug("Updating Logins for: {}".format(
         audit_corp.corporation))
 
-    req_scopes = ['esi-corporations.track_members.v1',
-                  'esi-characters.read_corporation_roles.v1']
+    req_scopes = [
+        'esi-corporations.track_members.v1',
+        'esi-characters.read_corporation_roles.v1'
+    ]
     req_roles = ['Director']
 
     token = get_corp_token(corp_id, req_scopes, req_roles)
@@ -767,16 +769,17 @@ def update_character_logins_from_corp(corp_id):
     if not token:
         return "No Tokens"
     try:
-        tracking_op = providers.esi.client.Corporation.get_corporations_corporation_id_membertracking(
-            corporation_id=corp_id)
-        tracking = etag_results(tracking_op, token)
+        tracking = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdMembertracking(
+            corporation_id=corp_id,
+            token=token
+        ).results()
 
         for c in tracking:
             try:
                 ca = CharacterAudit.objects.get(
-                    character__character_id=c['character_id'])
-                ca.last_known_login = c.get('logon_date', None)
-                ca.last_known_logoff = c.get('logoff_date', None)
+                    character__character_id=c.character_id)
+                ca.last_known_login = c.logon_date
+                ca.last_known_logoff = c.logoff_date
                 ca.save()
             except CharacterAudit.DoesNotExist:
                 pass
