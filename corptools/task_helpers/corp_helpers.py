@@ -26,7 +26,6 @@ from corptools.models import (
     MapJumpBridge, MapSystem, MapSystemMoon, MapSystemPlanet, Poco, Starbase,
     Structure, StructureCelestial, StructureService,
 )
-from corptools.task_helpers.etag_helpers import NotModifiedError, etag_results
 from corptools.task_helpers.update_tasks import fetch_location_name
 
 from .. import providers
@@ -1408,7 +1407,7 @@ def fetch_coordiantes(self, corp_id, force_refresh: bool = False):
 
     locations = []
 
-    for id_chunk in providers.esi.chunk_ids(_all_ids):
+    for id_chunk in providers.esi_openapi.chunk_ids(_all_ids):
         locations += providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsLocations(
             corporation_id=_corporation.corporation.corporation_id,
             body=id_chunk,
