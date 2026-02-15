@@ -241,7 +241,8 @@ def update_corporation_transactions(corp_id, wallet_division, full_update=False)
     try:
         journal_items = providers.esi_openapi.client.Wallet.GetCorporationsCorporationIdWalletsDivisionTransactions(
             corporation_id=audit_corp.corporation.corporation_id,
-            division=wallet_division
+            division=wallet_division,
+            token=token
         ).results(
             force_refresh=full_update
         )
@@ -402,10 +403,13 @@ def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
     names = {}
 
     if token:
-        division_names = providers.esi.client.Corporation.get_corporations_corporation_id_divisions(corporation_id=audit_corp.corporation.corporation_id,
-                                                                                                    token=token.valid_access_token()).result()
-        for division in division_names.get('wallet'):
-            names[division.get('division')] = division.get('name')
+        division_names = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdDivisions(
+            corporation_id=audit_corp.corporation.corporation_id,
+            token=token
+        ).result()
+
+        for division in division_names.wallet:
+            names[division.division] = division.name
 
     req_roles = ['CEO', 'Director', 'Accountant', 'Junior_Accountant']
 
@@ -414,18 +418,27 @@ def update_corp_wallet_division(corp_id, full_update=False):  # pagnated results
     if not token:
         return "No Tokens"
 
-    divisions = providers.esi.client.Wallet.get_corporations_corporation_id_wallets(corporation_id=audit_corp.corporation.corporation_id,
-                                                                                    token=token.valid_access_token()).result()
+    divisions = providers.esi_openapi.client.Wallet.GetCorporationsCorporationIdWallets(
+        corporation_id=audit_corp.corporation.corporation_id,
+        token=token
+    ).result()
 
     for division in divisions:
-        _division_item, _created = CorporationWalletDivision.objects \
-            .update_or_create(corporation=audit_corp, division=division.get('division'),
-                              defaults={'balance': division.get('balance'),
-                                        'name': names.get(division.get('division'), "Unknown")})
+        _division_item, _created = CorporationWalletDivision.objects.update_or_create(
+            corporation=audit_corp,
+            division=division.get('division'),
+            defaults={
+                'balance': division.balance,
+                'name': names.get(division.division, "Unknown")
+            }
+        )
 
         if _division_item:
-            update_corp_wallet_journal(corp_id, division.get('division'),
-                                       full_update=full_update)  # inline not async
+            update_corp_wallet_journal(
+                corp_id,
+                division.get('division'),
+                full_update=full_update
+            )
 
     audit_corp.last_update_wallet = timezone.now()
     audit_corp.save()
@@ -438,33 +451,37 @@ def update_corp_structures(corp_id, force_refresh=False):  # pagnated results
 
     def _structures_db_update(_corporation, _structure, _name):
         str_type, _ = EveItemType.objects.get_or_create_from_esi(
-            _structure.get('type_id'))
+            _structure.type_id
+        )
+
         _structure_ob, _created = Structure.objects.update_or_create(
-            structure_id=_structure.get('structure_id'),
+            structure_id=_structure.structure_id,
             corporation=_corporation,
             defaults={
-                'fuel_expires': _structure.get('fuel_expires', None),
-                'next_reinforce_apply': _structure.get('next_reinforce_apply', None),
-                'next_reinforce_weekday': _structure.get('next_reinforce_weekday', None),
-                'profile_id': _structure.get('profile_id', None),
-                'reinforce_hour': _structure.get('reinforce_hour', None),
-                'reinforce_weekday': _structure.get('reinforce_weekday', None),
-                'state': _structure.get('state', None),
-                'state_timer_end': _structure.get('state_timer_end', None),
-                'state_timer_start': _structure.get('state_timer_start', None),
-                'system_id': _structure.get('system_id', None),
-                'type_id': _structure.get('type_id', None),
-                'unanchors_at': _structure.get('unanchors_at', None),
+                'fuel_expires': _structure.fuel_expires,
+                'next_reinforce_apply': _structure.next_reinforce_apply,
+                'next_reinforce_weekday': _structure.next_reinforce_weekday,
+                'profile_id': _structure.profile_id,
+                'reinforce_hour': _structure.reinforce_hour,
+                'reinforce_weekday': _structure.reinforce_weekday,
+                'state': _structure.state,
+                'state_timer_end': _structure.state_timer_end,
+                'state_timer_start': _structure.state_timer_start,
+                'system_id': _structure.system_id,
+                'type_id': _structure.type_id,
+                'unanchors_at': _structure.unanchors_at,
                 'name': _name,
-                'system_name_id': _structure.get('system_id', None),
+                'system_name_id': _structure.system_id,
                 'type_name': str_type
-            })
+            }
+        )
 
         if _structure_ob:
             # _asset = None
             _location = None
             celestial = StructureCelestial.objects.filter(
-                structure_id=_structure.get('structure_id'))
+                structure_id=_structure.structure_id
+            )
 
             if not celestial.exists():
                 try:
@@ -475,25 +492,26 @@ def update_corp_structures(corp_id, force_refresh=False):  # pagnated results
                     _token = get_corp_token(
                         _corporation.corporation.corporation_id, _req_scopes, _req_roles)
                     if _token:
-                        locations = providers.esi.client.Assets.post_corporations_corporation_id_assets_locations(
+                        locations = providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsLocations(
                             corporation_id=_corporation.corporation.corporation_id,
-                            item_ids=[_structure.get('structure_id')],
-                            token=token.valid_access_token()).result()
+                            item_ids=[_structure.structure_id],
+                            token=token
+                        ).result()
 
                         _location = locations[0]
 
-                        url = "https://www.fuzzwork.co.uk/api/nearestCelestial.php?x=%s&y=%s&z=%s&solarsystemid=%s" \
-                            % ((str(_location['position'].get('x'))),
-                               (str(_location['position'].get('y'))),
-                                (str(_location['position'].get('z'))),
-                                (str(_structure.get('system_id')))
-                               )
+                        url = "https://www.fuzzwork.co.uk/api/nearestCelestial.php?x=%s&y=%s&z=%s&solarsystemid=%s" % (
+                            (str(_location.position.x)),
+                            (str(_location.position.y)),
+                            (str(_location.position.z)),
+                            (str(_structure.system_id))
+                        )
 
                         r = requests.get(url)
                         fuzz_result = r.json()
 
                         celestial = StructureCelestial.objects.create(
-                            structure_id=_structure.get('structure_id'),
+                            structure_id=_structure.structure_id,
                             celestial_name=fuzz_result.get('itemName')
                         )
                 except ObjectDoesNotExist:
@@ -512,39 +530,48 @@ def update_corp_structures(corp_id, force_refresh=False):  # pagnated results
             else:
                 celestial = None
 
-            if _structure.get('services'):
+            if _structure.services:
                 db_services = StructureService.objects.filter(
                     structure=_structure_ob)
                 current_services = []
-                for service in _structure.get('services'):
-                    db_service = db_services.filter(name=service['name'])
+                for service in _structure.services:
+                    db_service = db_services.filter(name=service.name)
                     if db_service.exists():
                         if db_service.count() == 1:
-                            if db_service[0].state == service['state']:
+                            if db_service[0].state == service.state:
                                 current_services.append(db_service[0].id)
                                 pass
                             else:
-                                db_service.update(state=service['state'])
+                                db_service.update(state=service.state)
                                 current_services.append(db_service[0].id)
                         else:
-                            StructureService.objects.filter(structure=_structure_ob,
-                                                            name=service['name']).delete()
-                            new_service = StructureService.objects.create(structure=_structure_ob,
-                                                                          state=service['state'],
-                                                                          name=service['name'])
+                            StructureService.objects.filter(
+                                structure=_structure_ob,
+                                name=service.name
+                            ).delete()
+                            new_service = StructureService.objects.create(
+                                structure=_structure_ob,
+                                state=service.state,
+                                name=service.name
+                            )
                             current_services.append(new_service.id)
 
                     else:
-                        new_service = StructureService.objects.create(structure=_structure_ob,
-                                                                      state=service['state'],
-                                                                      name=service['name'])
+                        new_service = StructureService.objects.create(
+                            structure=_structure_ob,
+                            state=service.state,
+                            name=service.name
+                        )
                         current_services.append(new_service.id)
                 db_services.exclude(id__in=current_services).delete()
 
         return _structure_ob, _created
 
-    req_scopes = ['esi-corporations.read_structures.v1', 'esi-universe.read_structures.v1',
-                  'esi-characters.read_corporation_roles.v1']
+    req_scopes = [
+        'esi-corporations.read_structures.v1',
+        'esi-universe.read_structures.v1',
+        'esi-characters.read_corporation_roles.v1'
+    ]
 
     req_roles = ['Director', 'Station_Manager']
 
@@ -557,32 +584,36 @@ def update_corp_structures(corp_id, force_refresh=False):  # pagnated results
         corporation__corporation_id=corp_id)
 
     structure_ids = []
-    operation = providers.esi.client.Corporation.get_corporations_corporation_id_structures(
-        corporation_id=_corporation.corporation.corporation_id)
     try:
-        structures = etag_results(
-            operation, token, force_refresh=force_refresh)
-    except NotModifiedError:
+        structures = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdStructures(
+            corporation_id=_corporation.corporation.corporation_id,
+            token=token
+        ).results(
+            force_refresh=force_refresh
+        )
+    except HTTPNotModified:
         _corporation.last_update_structures = timezone.now()
         _corporation.save()
         return f"No New structure data for: {_corporation}"
 
     for structure in structures:
-        name = str(structure.get('structure_id'))
-        if structure.get('name'):
-            name = structure.get('name')
+        name = str(structure.structure_id)
+        if structure.name:
+            name = structure.name
             EveLocation.objects.update_or_create(
-                location_id=structure.get('structure_id'),
+                location_id=structure.structure_id,
                 defaults={
-                    "location_name": structure.get('name'),
-                    "system_id": structure.get('system_id'),
+                    "location_name": structure.name,
+                    "system_id": structure.system_id,
                 }
             )
         else:
             try:
-                structure_info = fetch_location_name(structure.get(
-                    'structure_id'), 'solar_system', token.character_id)
-
+                structure_info = fetch_location_name(
+                    structure.structure_id,
+                    'solar_system',
+                    token.character_id
+                )
             except Exception:
                 structure_info = False
             if structure_info:
@@ -598,9 +629,10 @@ def update_corp_structures(corp_id, force_refresh=False):  # pagnated results
 
         except MultipleObjectsReturned:
             id_of_first = Structure.objects.filter(
-                structure_id=structure.get('structure_id')).order_by("id")[0].id
-            Structure.objects.filter(structure_id=structure.get(
-                'structure_id')).exclude(id=id_of_first).delete()
+                structure_id=structure.structure_id
+            ).order_by("id")[0].id
+            Structure.objects.filter(
+                structure_id=structure.structure_id).exclude(id=id_of_first).delete()
             structure_ob, created = _structures_db_update(
                 _corporation,
                 structure,

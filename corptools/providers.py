@@ -347,7 +347,10 @@ esi_openapi = OpenAPI(
         # Corp Wallets
         "GetCorporationsCorporationIdWalletsDivisionJournal",
         "GetCorporationsCorporationIdWalletsDivisionTransactions",
+        "GetCorporationsCorporationIdDivisions",
+        "GetCorporationsCorporationIdWallets",
         # Corp Assets
         "PostCorporationsCorporationIdAssetsLocations",
+        "GetCorporationsCorporationIdStructures",
     ]
 )
