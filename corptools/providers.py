@@ -285,6 +285,11 @@ class OpenAPI(ESIOpenApiProvider):
             use_etag=False
         )
 
+    @staticmethod
+    def chunk_ids(lo, n=750):
+        for i in range(0, len(lo), n):
+            yield lo[i:i + n]
+
 
 esi_openapi = OpenAPI(
     compatibility_date=compat,
@@ -340,6 +345,9 @@ esi_openapi = OpenAPI(
         "PostUniverseNames",
         "PostUniverseIds",
         # Corp Wallets
-        "GetCorporationsCorporationIdWalletsDivisionJournal"
+        "GetCorporationsCorporationIdWalletsDivisionJournal",
+        "GetCorporationsCorporationIdWalletsDivisionTransactions",
+        # Corp Assets
+        "PostCorporationsCorporationIdAssetsLocations",
     ]
 )

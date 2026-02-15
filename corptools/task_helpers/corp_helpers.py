@@ -239,28 +239,31 @@ def update_corporation_transactions(corp_id, wallet_division, full_update=False)
         return "No Tokens"
 
     try:
-        journal_items_ob = providers.esi.client.Wallet.get_corporations_corporation_id_wallets_division_transactions(
+        journal_items = providers.esi_openapi.client.Wallet.GetCorporationsCorporationIdWalletsDivisionTransactions(
             corporation_id=audit_corp.corporation.corporation_id,
-            division=wallet_division)
-
-        journal_items = etag_results(
-            journal_items_ob, token, force_refresh=full_update)
+            division=wallet_division
+        ).results(
+            force_refresh=full_update
+        )
 
         _current_journal = CorporationWalletJournalEntry.objects.filter(
             character=audit_corp,
             context_id_type="market_transaction_id",
             # Max items from ESI
-            reason__exact="").values_list('context_id', flat=True)[:2500]
+            reason__exact=""
+        ).values_list(
+            'context_id',
+            flat=True
+        )[:2500]
 
-        # _new_names = []
-
-        # items = []
         for item in journal_items:
-            if item.get('transaction_id') in _current_journal:
+            if item.transaction_id in _current_journal:
+                # what is this doing???
                 type_name, _ = EveItemType.objects.get_or_create_from_esi(
-                    item.get('type_id'))
+                    item.type_id
+                )
 
-    except NotModifiedError:
+    except HTTPNotModified:
         logger.info(
             f"CT: No New market transaction data for: {audit_corp.corporation.corporation_name}")
         pass
@@ -272,8 +275,11 @@ def update_corporation_pocos(corp_id, full_update=False):
     audit_corp = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
 
-    logger.debug("Updating Pocos for: {}".format(
-        audit_corp.corporation.corporation_name))
+    logger.debug(
+        "Updating Pocos for: {}".format(
+            audit_corp.corporation.corporation_name
+        )
+    )
 
     req_scopes = ['esi-planets.read_customs_offices.v1']
 
@@ -285,23 +291,24 @@ def update_corporation_pocos(corp_id, full_update=False):
         return "No Tokens"
 
     try:
-        poco_ob = providers.esi.client.Planetary_Interaction.get_corporations_corporation_id_customs_offices(
-            corporation_id=audit_corp.corporation.corporation_id)
-
-        poco_data = etag_results(
-            poco_ob, token, force_refresh=full_update)
+        poco_data = providers.esi_openapi.client.Planetary_Interaction.GetCorporationsCorporationIdCustomsOffices(
+            corporation_id=audit_corp.corporation.corporation_id
+        ).results(force_update=full_update)
 
         # Get all Poco Names ( planet name here )
-        _all_ids = [p.get("office_id") for p in poco_data]
+        _all_ids = [p.office_id for p in poco_data]
 
         # Ensure all planets are in DB
-        _all_system_ids = [p.get("system_id") for p in poco_data]
+        _all_system_ids = [p.system_id for p in poco_data]
 
         _pids = []
         for system_id in _all_system_ids:
-            _s = providers.esi.client.Universe.get_universe_systems_system_id(
-                system_id=system_id).results()
-            _pids += [_p['planet_id'] for _p in _s.get('planets', [])]
+            _s = providers.esi_openapi.client.Universe.GetUniverseSystemsSystemId(
+                system_id=system_id
+            ).result()
+            _pids += [
+                _p.planet_id for _p in _s.planets
+            ]
 
         for _p in _pids:
             _, _ = MapSystemPlanet.objects.get_or_create_from_esi(_p)
@@ -311,11 +318,11 @@ def update_corporation_pocos(corp_id, full_update=False):
 
         _all_locations = []
 
-        for id_chunk in providers.esi.chunk_ids(_all_ids):
-            _all_locations += providers.esi.client.Assets.post_corporations_corporation_id_assets_locations(
+        for id_chunk in providers.esi_openapi.chunk_ids(_all_ids):
+            _all_locations += providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsLocations(
                 corporation_id=corp_id,
                 item_ids=id_chunk,
-                token=token_assets.valid_access_token()
+                token=token_assets
             ).result()
 
         _office_to_names = {}
@@ -325,13 +332,13 @@ def update_corporation_pocos(corp_id, full_update=False):
             ).annotate(
                 distance=Sqrt(
                     Power(
-                        n["position"]["x"] - F("x"),
+                        n.position.x - F("x"),
                         2
                     ) + Power(
-                        n["position"]["y"] - F("y"),
+                        n.position.y - F("y"),
                         2
                     ) + Power(
-                        n["position"]["z"] - F("z"),
+                        n.position.z - F("z"),
                         2
                     )
                 )
@@ -342,33 +349,34 @@ def update_corporation_pocos(corp_id, full_update=False):
 
         for poco in poco_data:
             Poco.objects.update_or_create(
-                office_id=poco.get('office_id'),
+                office_id=poco.office_id,
                 corporation=audit_corp,
                 defaults={
-                    "alliance_tax_rate": poco.get('alliance_tax_rate'),
-                    "allow_access_with_standings": poco.get('allow_access_with_standings'),
-                    "allow_alliance_access": poco.get('allow_alliance_access'),
-                    "bad_standing_tax_rate": poco.get('bad_standing_tax_rate'),
-                    "corporation_tax_rate": poco.get('corporation_tax_rate'),
-                    "excellent_standing_tax_rate": poco.get('excellent_standing_tax_rate'),
-                    "good_standing_tax_rate": poco.get('good_standing_tax_rate'),
-                    "neutral_standing_tax_rate": poco.get('neutral_standing_tax_rate'),
-                    "office_id": poco.get('office_id'),
-                    "reinforce_exit_end": poco.get('reinforce_exit_end'),
-                    "reinforce_exit_start": poco.get('reinforce_exit_start'),
-                    "standing_level": poco.get('standing_level'),
-                    "system_id": poco.get('system_id'),
-                    "system_name_id": poco.get('system_id'),
-                    "name": _office_to_names.get(poco.get('office_id')).name,
-                    "planet_id": _office_to_names.get(poco.get('office_id')).planet_id,
-                    "terrible_standing_tax_rate": poco.get('terrible_standing_tax_rate')
+                    "alliance_tax_rate": poco.alliance_tax_rate,
+                    "allow_access_with_standings": poco.allow_access_with_standings,
+                    "allow_alliance_access": poco.allow_alliance_access,
+                    "bad_standing_tax_rate": poco.bad_standing_tax_rate,
+                    "corporation_tax_rate": poco.corporation_tax_rate,
+                    "excellent_standing_tax_rate": poco.excellent_standing_tax_rate,
+                    "good_standing_tax_rate": poco.good_standing_tax_rate,
+                    "neutral_standing_tax_rate": poco.neutral_standing_tax_rate,
+                    "office_id": poco.office_id,
+                    "reinforce_exit_end": poco.reinforce_exit_end,
+                    "reinforce_exit_start": poco.reinforce_exit_start,
+                    "standing_level": poco.standing_level,
+                    "system_id": poco.system_id,
+                    "system_name_id": poco.system_id,
+                    "name": _office_to_names.get(poco.office_id).name,
+                    "planet_id": _office_to_names.get(poco.office_id).planet_id,
+                    "terrible_standing_tax_rate": poco.terrible_standing_tax_rate
                 }
             )
         logger.info(
             f"{audit_corp.corporation.corporation_name}: Created {len(poco_data)} Pocos")
 
         d = Poco.objects.filter(corporation=audit_corp).exclude(
-            office_id__in=_all_ids).delete()
+            office_id__in=_all_ids
+        ).delete()
 
         logger.info(
             f"{audit_corp.corporation.corporation_name}: Deleted {d} Pocos")
