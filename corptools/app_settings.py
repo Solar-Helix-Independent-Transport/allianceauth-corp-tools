@@ -1,3 +1,4 @@
+# Django
 from django.conf import settings
 
 CORPTOOLS_APP_NAME = getattr(settings, "CORPTOOLS_APP_NAME", "Character Audit")
@@ -371,16 +372,28 @@ CORP_REQUIRED_SCOPES = _corp_scopes_base + _corp_scopes_tracking + \
     _corp_scopes_wallets + _corp_scopes_assets
 
 CT_BETA_UI = getattr(
-    settings, 'CT_BETA_UI', False)
+    settings,
+    'CT_BETA_UI',
+    False
+)
 
 CT_PAGINATION_SIZE = getattr(
-    settings, 'CT_PAGINATION_SIZE', 30000)
+    settings,
+    'CT_PAGINATION_SIZE',
+    30000
+)
 
 CT_USERS_CAN_FORCE_REFRESH = getattr(
-    settings, 'CT_USERS_CAN_FORCE_REFRESH', False)
+    settings,
+    'CT_USERS_CAN_FORCE_REFRESH',
+    False
+)
 
 CT_TASK_SPREAD_DELAY = getattr(
-    settings, 'CT_TASK_SPREAD_DELAY', 1200)  # Default 20 minute spread
+    settings,
+    'CT_TASK_SPREAD_DELAY',
+    1200
+)  # Default 20 minute spread
 
 
 # DEVELOPER SETTINGS! DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING!!!

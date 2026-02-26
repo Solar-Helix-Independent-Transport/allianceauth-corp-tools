@@ -34,6 +34,7 @@ buildjs:
 
 package:
 	pip install -U hatch
+	pip install -U virtualenv==20.39.1
 	cd frontend/;yarn install;yarn build
 	rm -rf corptools/static/i18n
 	cp -r frontend/i18n corptools/static/i18n

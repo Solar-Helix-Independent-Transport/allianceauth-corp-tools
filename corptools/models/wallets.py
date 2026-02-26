@@ -1,13 +1,17 @@
+# Standard Library
 from typing import TYPE_CHECKING
 
+# Third Party
 from model_utils import Choices
 
+# Django
 from django.db import models
 
 from .audits import CharacterAudit, CorporationAudit, CorptoolsConfiguration
 from .eve_models import EveItemType, EveName
 
 if TYPE_CHECKING:
+    # Alliance Auth
     from esi.stubs import CharactersCharacterIdWalletJournalGetItem
 
 
@@ -85,6 +89,27 @@ class CorporationWalletJournalEntry(WalletJournalEntry):
             corps_vis = corps_vis | corps_holding
 
         return cls.objects.filter(division__corporation__in=corps_vis)
+
+    @staticmethod
+    def from_esi_model(division: CorporationWalletDivision, esi_model: "CharactersCharacterIdWalletJournalGetItem"):
+        return CorporationWalletJournalEntry(
+            division=division,
+            amount=esi_model.amount,
+            balance=esi_model.balance,
+            context_id=esi_model.context_id,
+            context_id_type=esi_model.context_id_type,
+            date=esi_model.date,
+            description=esi_model.description,
+            first_party_id=esi_model.first_party_id,
+            first_party_name_id=esi_model.first_party_id,
+            entry_id=esi_model.id,
+            reason=esi_model.reason,
+            ref_type=esi_model.ref_type,
+            second_party_id=esi_model.second_party_id,
+            second_party_name_id=esi_model.second_party_id,
+            tax=esi_model.tax,
+            tax_receiver_id=esi_model.tax_receiver_id,
+        )
 
 
 class CharacterWalletJournalEntry(WalletJournalEntry):

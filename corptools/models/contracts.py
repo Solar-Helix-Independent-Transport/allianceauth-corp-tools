@@ -1,11 +1,14 @@
+# Standard Library
 from typing import TYPE_CHECKING
 
+# Django
 from django.db import models
 
 from .audits import CharacterAudit, CorporationAudit, EveLocation
 from .eve_models import EveItemType, EveName
 
 if TYPE_CHECKING:
+    # Alliance Auth
     from esi.stubs import (
         CharactersCharacterIdContractsContractIdItemsGetItem,
         CharactersCharacterIdContractsGetItem,
@@ -195,6 +198,38 @@ class CorporateContract(models.Model):
     class Meta:
         unique_together = (("corporation", "contract_id"),)
 
+    @staticmethod
+    def from_esi_model(corporation: CorporationAudit, esi_model: "CharactersCharacterIdContractsGetItem"):
+        return CorporateContract(
+            id=CorporateContract.build_pk(
+                corporation.id, esi_model.contract_id),
+            corporation=corporation,
+            assignee_id=esi_model.assignee_id,
+            assignee_name_id=esi_model.assignee_id,
+            acceptor_id=esi_model.acceptor_id,
+            acceptor_name_id=esi_model.acceptor_id,
+            contract_id=esi_model.contract_id,
+            availability=esi_model.availability,
+            buyout=esi_model.buyout,
+            collateral=esi_model.collateral,
+            date_accepted=esi_model.date_accepted,
+            date_completed=esi_model.date_completed,
+            date_expired=esi_model.date_expired,
+            date_issued=esi_model.date_issued,
+            days_to_complete=esi_model.days_to_complete,
+            end_location_id=esi_model.end_location_id,
+            for_corporation=esi_model.for_corporation,
+            issuer_corporation_name_id=esi_model.issuer_corporation_id,
+            issuer_name_id=esi_model.issuer_id,
+            price=esi_model.price,
+            reward=esi_model.reward,
+            start_location_id=esi_model.start_location_id,
+            status=esi_model.status,
+            title=esi_model.title,
+            contract_type=esi_model.type,
+            volume=esi_model.volume
+        )
+
 
 class CorporateContractItem(models.Model):
     contract = models.ForeignKey(CorporateContract, on_delete=models.CASCADE)
@@ -207,3 +242,15 @@ class CorporateContractItem(models.Model):
 
     class Meta:
         unique_together = (("record_id", "contract"),)
+
+    @staticmethod
+    def from_esi_model(contract: CorporateContract, esi_model: "CharactersCharacterIdContractsContractIdItemsGetItem"):
+        return CorporateContractItem(
+            contract=contract,
+            is_included=esi_model.is_included,
+            is_singleton=esi_model.is_singleton,
+            quantity=esi_model.quantity,
+            raw_quantity=esi_model.raw_quantity,
+            record_id=esi_model.record_id,
+            type_name_id=esi_model.type_id,
+        )

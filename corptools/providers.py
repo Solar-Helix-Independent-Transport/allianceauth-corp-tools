@@ -1,9 +1,13 @@
+# Standard Library
 import re
 
+# Third Party
 import networkx as nx
 
+# Django
 from django.utils import timezone
 
+# Alliance Auth
 from esi.clients import EsiClientProvider
 from esi.openapi_clients import ESIClientProvider as ESIOpenApiProvider
 
@@ -21,6 +25,7 @@ class CorpToolsESIClient(EsiClientProvider):
             yield lo[i:i + n]
 
     def _get_category(self, category_id, updates=False):
+        # AA Example App
         from corptools.models import EveItemCategory
 
         _category = self.client.Universe.get_universe_categories_category_id(
@@ -38,6 +43,7 @@ class CorpToolsESIClient(EsiClientProvider):
         return category
 
     def _get_group(self, group_id, updates=False):
+        # AA Example App
         from corptools.models import EveItemGroup
 
         _group = self.client.Universe.get_universe_groups_group_id(
@@ -55,6 +61,7 @@ class CorpToolsESIClient(EsiClientProvider):
         return group
 
     def _get_eve_type(self, type_id, updates=False):
+        # AA Example App
         from corptools.models import EveItemDogmaAttribute, EveItemType
 
         eve_type = self.client.Universe.get_universe_types_type_id(
@@ -88,6 +95,7 @@ class CorpToolsESIClient(EsiClientProvider):
         return eve_type, dogma
 
     def _get_region(self, region_id, updates):
+        # AA Example App
         from corptools.models import MapRegion
 
         region = self.client.Universe.get_universe_regions_region_id(
@@ -103,6 +111,7 @@ class CorpToolsESIClient(EsiClientProvider):
             return False, region, constelations
 
     def _get_constellation(self, constellation_id, updates):
+        # AA Example App
         from corptools.models import MapConstellation
 
         constellation = self.client.Universe.get_universe_constellations_constellation_id(
@@ -119,6 +128,7 @@ class CorpToolsESIClient(EsiClientProvider):
             return False, constellation, systems
 
     def _get_system(self, system_id, updates):
+        # AA Example App
         from corptools.models import MapSystem
 
         system = self.client.Universe.get_universe_systems_system_id(
@@ -140,6 +150,7 @@ class CorpToolsESIClient(EsiClientProvider):
             return False, system, gates
 
     def _get_moon(self, moon_id, updates):
+        # AA Example App
         from corptools.models import MapSystemMoon
 
         moon = self.client.Universe.get_universe_moons_moon_id(
@@ -160,6 +171,7 @@ class CorpToolsESIClient(EsiClientProvider):
             return moon
 
     def _get_planet(self, planet_id, updates):
+        # AA Example App
         from corptools.models import MapSystemPlanet
 
         planet = self.client.Universe.get_universe_planets_planet_id(
@@ -350,10 +362,12 @@ esi_openapi = OpenAPI(
         "GetCorporationsCorporationIdDivisions",
         "GetCorporationsCorporationIdWallets",
         "GetCorporationsCorporationIdContracts",
+        "GetCorporationsCorporationIdContractsContractIdItems",
         # Corp Assets
         "GetCorporationsCorporationIdStructures",
         "GetCorporationsCorporationIdStarbases",
         "GetCorporationsCorporationIdStarbasesStarbaseId",
+        "GetCorporationsCorporationIdCustomsOffices",
         # Corp Indy
         "GetCorporationsCorporationIdIndustryJobs",
         # Corp Members

@@ -1,17 +1,24 @@
+# Standard Library
 import datetime
 from functools import wraps
 
+# Third Party
 from bravado.exception import HTTPError
 from celery import signature
 from celery.exceptions import Retry
 from celery_once import AlreadyQueued
 
+# Django
 from django.core.cache import cache
+from django.db.models import QuerySet
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 from esi.exceptions import (
-    ESIBucketLimitException, HTTPClientError, HTTPServerError,
+    ESIBucketLimitException,
+    HTTPClientError,
+    HTTPServerError,
 )
 
 logger = get_extension_logger(__name__)
@@ -97,3 +104,15 @@ def no_fail_chain(func):
                 raise excp
         return _ret
     return wrapper
+
+
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    total = 0
+    if isinstance(lst, list):
+        total = len(lst)
+    elif isinstance(lst, QuerySet):
+        total = lst.count()
+
+    for i in range(0, total, n):
+        yield lst[i:i + n]
