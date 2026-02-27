@@ -1,32 +1,62 @@
+# Standard Library
 import sys
 import time
 from datetime import timedelta
 
+# Third Party
 from celery import shared_task
 
+# Django
 from django.db.models import F
 from django.db.models.functions import Power, Sqrt
 from django.utils import timezone
 from django.utils.html import strip_tags
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 from esi.exceptions import HTTPNotModified
 from esi.models import Token
 
+# AA Example App
 from corptools.task_helpers.update_tasks import (
-    fetch_location_name, load_system,
+    fetch_location_name,
+    load_system,
 )
 
 from .. import providers
 from ..models import (
-    CharacterAsset, CharacterAudit, CharacterContact, CharacterContactLabel,
-    CharacterIndustryJob, CharacterLocation, CharacterMarketOrder,
-    CharacterMiningLedger, CharacterRoles, CharacterTitle,
-    CharacterWalletJournalEntry, CharAssetCoordiante, Clone, Contract,
-    ContractItem, CorporationHistory, EveItemType, EveLocation, EveName,
-    Implant, JumpClone, LoyaltyPoint, MailLabel, MailMessage, MailRecipient,
-    MapSystemPlanet, Notification, NotificationText, Skill, SkillQueue,
-    SkillTotalHistory, SkillTotals,
+    CharacterAsset,
+    CharacterAudit,
+    CharacterContact,
+    CharacterContactLabel,
+    CharacterIndustryJob,
+    CharacterLocation,
+    CharacterMarketOrder,
+    CharacterMiningLedger,
+    CharacterRoles,
+    CharacterTitle,
+    CharacterWalletJournalEntry,
+    CharAssetCoordiante,
+    Clone,
+    Contract,
+    ContractItem,
+    CorporationHistory,
+    EveItemType,
+    EveLocation,
+    EveName,
+    Implant,
+    JumpClone,
+    LoyaltyPoint,
+    MailLabel,
+    MailMessage,
+    MailRecipient,
+    MapSystemPlanet,
+    Notification,
+    NotificationText,
+    Skill,
+    SkillQueue,
+    SkillTotalHistory,
+    SkillTotals,
 )
 
 logger = get_extension_logger(__name__)
@@ -1500,12 +1530,13 @@ def update_character_mail_body(character_id, mail_message, force_refresh=False):
     if not token:
         return False
 
-    details = providers.esi.client.Mail.get_characters_character_id_mail_mail_id(
-        character_id=character_id, mail_id=mail_message.mail_id,
-        token=token.valid_access_token()
+    details = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMailMailId(
+        character_id=character_id,
+        mail_id=mail_message.mail_id,
+        token=token
     ).result()
 
-    mail_message.body = details.get('body')
+    mail_message.body = details.body
 
     return mail_message
 
@@ -1528,30 +1559,45 @@ def update_character_mail_headers(character_id, force_refresh=False):
         MailRecipient.objects.all().values_list('recipient_id', flat=True))
 
     # Mail Labels
-    labels = providers.esi.client.Mail.get_characters_character_id_mail_labels(character_id=character_id,
-                                                                               token=token.valid_access_token()).result()
+    labels = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMailLabels(
+        character_id=character_id,
+        token=token
+    ).result(
+        use_etag=False
+    )
 
-    for label in labels.get('labels'):
-        MailLabel.objects.update_or_create(character=audit_char,
-                                           label_id=label.get('label_id'),
-                                           defaults={
-                                               'label_name': label.get('name', None),
-                                               'label_color': label.get('color', None),
-                                               'unread_count': label.get('unread_count', None)
-                                           })
+    for label in labels.labels:
+        MailLabel.objects.update_or_create(
+            character=audit_char,
+            label_id=label.label_id,
+            defaults={
+                'label_name': label.name,
+                'label_color': label.color,
+                'unread_count': label.unread_count
+            }
+        )
 
     # Get all mail ids
     mail_ids = MailMessage.objects.filter(
-        character=audit_char).values_list("mail_id", flat=True)
+        character=audit_char
+    ).values_list(
+        "mail_id",
+        flat=True
+    )
+
     last_id = None
     while True:
         if last_id is None:
-            mail = providers.esi.client.Mail.get_characters_character_id_mail(character_id=character_id,
-                                                                              token=token.valid_access_token()).result()
+            mail = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMail(
+                character_id=character_id,
+                token=token
+            ).result()
         else:
-            mail = providers.esi.client.Mail.get_characters_character_id_mail(character_id=character_id,
-                                                                              last_mail_id=last_id,
-                                                                              token=token.valid_access_token()).result()
+            mail = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMail(
+                character_id=character_id,
+                last_mail_id=last_id,
+                token=token
+            ).result()
         if len(mail) == 0:
             # If there are 0 and this is not the first page, then we have reached the
             # end of retrievable mail.
@@ -1563,38 +1609,46 @@ def update_character_mail_headers(character_id, force_refresh=False):
         failed_ids = set()
         stop = False
         for msg in mail:
-            if msg.get('mail_id') == mail_ids:
+            if msg.mail_id == mail_ids:
                 if not force_refresh:
                     break
                 continue
 
             id_k = int(str(audit_char.character.character_id) +
-                       str(msg.get('mail_id')))
-            if msg.get('from', 0) not in _current_eve_ids:
-                if msg.get('from', 0) not in failed_ids:
+                       str(msg.mail_id))
+            if msg.from_ not in _current_eve_ids:
+                if msg.from_ not in failed_ids:
                     try:
-                        EveName.objects.get_or_create_from_esi(msg.get('from'))
-                        _current_eve_ids.append(msg.get('from', 0))
+                        EveName.objects.get_or_create_from_esi(msg.from_)
+                        _current_eve_ids.append(msg.from_)
                     except Exception:
-                        failed_ids.add(msg.get('from'))
+                        failed_ids.add(msg.from_)
                         pass
-            msg_obj = MailMessage(character=audit_char, id_key=id_k, mail_id=msg.get('mail_id'), from_id=msg.get('from', None),
-                                  is_read=msg.get('read', None), timestamp=msg.get('timestamp'),
-                                  subject=msg.get('subject', None), body=msg.get('body', None))
+            msg_obj = MailMessage(
+                character=audit_char,
+                id_key=id_k,
+                mail_id=msg.mail_id,
+                from_id=msg.from_,
+                is_read=msg.is_read,
+                timestamp=msg.timestamp,
+                subject=msg.subject,
+                body=None
+            )
 
-            from_name_id = msg.get('from', None)
+            from_name_id = msg.from_
             if from_name_id in _current_eve_ids:
-                msg_obj.from_name_id = msg.get('from', None)
+                msg_obj.from_name_id = msg.from_
 
             messages.append(msg_obj)
 
-            if msg.get('labels'):
-                labels = msg.get('labels')
-                m_l_map[msg.get('mail_id')] = labels
+            if msg.labels:
+                m_l_map[msg.mail_id] = msg.labels
 
-            m_r_map[msg.get('mail_id')] = [(r.get('recipient_id'), r.get('recipient_type'))
-                                           for r in msg.get('recipients')]
-            last_id = msg.get('mail_id')
+            m_r_map[msg.mail_id] = [
+                (r.recipient_id, r.recipient_type)
+                for r in msg.recipients
+            ]
+            last_id = msg.mail_id
 
         msgs = MailMessage.objects.bulk_create(
             messages, batch_size=1000, ignore_conflicts=True)

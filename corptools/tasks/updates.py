@@ -1,30 +1,45 @@
+# Standard Library
 import datetime
 import json
 from random import random
 
+# Third Party
 import requests
-from celery import chain as Chain, shared_task
+from celery import chain as Chain
+from celery import shared_task
 
+# Django
 from django.core.cache import cache
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.eveonline.providers import provider as eve_names
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
 
+# AA Example App
 from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
 
 from .. import app_settings, providers
 from ..models import (
-    CharacterWalletJournalEntry, EveItemType, EveName, MapSystem, TypePrice,
+    CharacterWalletJournalEntry,
+    EveItemType,
+    EveName,
+    MapSystem,
+    TypePrice,
 )
 from ..task_helpers.sde_tasks import (
-    SDE_PARTS_TO_UPDATE, delete_sde_folder, download_extract_sde,
+    SDE_PARTS_TO_UPDATE,
+    delete_sde_folder,
+    download_extract_sde,
     process_section_of_sde,
 )
 from ..task_helpers.update_tasks import (
-    load_system, process_category_from_esi, process_map_from_esi,
-    set_error_count_flag, update_ore_comp_table_from_fuzzworks,
+    load_system,
+    process_category_from_esi,
+    process_map_from_esi,
+    set_error_count_flag,
+    update_ore_comp_table_from_fuzzworks,
 )
 
 TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
@@ -150,7 +165,10 @@ def update_eve_name(self, id):
 
 @shared_task(name="corptools.tasks.process_all_categories")
 def process_all_categories():
-    categories = providers.esi.client.Universe.get_universe_categories().result()
+    categories = providers.esi_openapi.client.Universe.GetUniverseCategories(
+    ).result(
+        use_etag=False
+    )
     que = []
 
     for category in categories:
@@ -203,9 +221,11 @@ def update_prices_for_types(type_ids: list):
 @shared_task(name="corptools.tasks.clear_all_skill_caches")
 def clear_all_skill_caches():
     try:
+        # Third Party
         from django_redis import get_redis_connection
         _client = get_redis_connection("default")
     except (NotImplementedError, ModuleNotFoundError):
+        # Django
         from django.core.cache import caches
         default_cache = caches['default']
         _client = default_cache.get_master_client()
@@ -221,9 +241,11 @@ def clear_all_skill_caches():
 @shared_task(name="corptools.tasks.clear_all_etags")
 def clear_all_etags():
     try:
+        # Third Party
         from django_redis import get_redis_connection
         _client = get_redis_connection("default")
     except (NotImplementedError, ModuleNotFoundError):
+        # Django
         from django.core.cache import caches
         default_cache = caches['default']
         _client = default_cache.get_master_client()

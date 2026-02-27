@@ -1,151 +1,38 @@
+# Standard Library
 import bz2
-import glob
-import os
-import shutil
-import zipfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-import httpx
+# Third Party
 import requests
 from bravado.exception import HTTPForbidden
 
+# Django
 from django.core.cache import cache
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 from esi.models import Token
 
+# AA Example App
 from corptools import providers
 from corptools.models import (
-    EveItemCategory, EveItemDogmaAttribute, EveItemGroup, EveItemType,
-    EveLocation, InvTypeMaterials, MapConstellation, MapRegion, MapSystem,
-    MapSystemGate, MapSystemMoon, MapSystemPlanet,
+    EveItemCategory,
+    EveItemDogmaAttribute,
+    EveItemGroup,
+    EveItemType,
+    EveLocation,
+    InvTypeMaterials,
+    MapSystem,
+    MapSystemMoon,
+    MapSystemPlanet,
 )
 
 logger = get_extension_logger(__name__)
 
-# from celery.utils.debug import sample_mem, memdump
-
-
-def process_map_from_esi():
-    # sample_mem()
-    _regions = providers.esi.client.Universe.get_universe_regions().result()
-    _region_models_updates = []
-    _region_models_creates = []
-
-    _constelations = []
-    _constelation_model_updates = []
-    _constelation_model_creates = []
-
-    _systems = []
-    _system_models_updates = []
-    _system_models_creates = []
-
-    _gate_links_array = []
-
-    _processes = []
-    _current_regions = MapRegion.objects.all().values_list('region_id', flat=True)
-    with ThreadPoolExecutor(max_workers=20) as executor:
-        for region in _regions:
-            _processes.append(executor.submit(
-                providers.esi._get_region, region, _current_regions))
-
-    for task in as_completed(_processes):
-        __region_upd, __region_new, __constelation_list = task.result()
-        _constelations += __constelation_list
-        if __region_upd:
-            _region_models_updates.append(__region_upd)
-        if __region_new:
-            _region_models_creates.append(__region_new)
-
-    MapRegion.objects.bulk_update(_region_models_updates, [
-                                  'name', 'description'], batch_size=1000)  # bulk update
-    MapRegion.objects.bulk_create(
-        _region_models_creates, batch_size=1000, ignore_conflicts=True)  # bulk create
-    # sample_mem()
-    _processes = []
-    _current_constellations = MapConstellation.objects.all(
-    ).values_list('constellation_id', flat=True)
-    with ThreadPoolExecutor(max_workers=20) as executor:
-        for constellation in _constelations:
-            _processes.append(executor.submit(
-                providers.esi._get_constellation, constellation, _current_constellations))
-
-    for task in as_completed(_processes):
-        __constelation_upd, __constelation_new, __system_list = task.result()
-        _systems += __system_list
-        if __constelation_upd:
-            _constelation_model_updates.append(__constelation_upd)
-        if __constelation_new:
-            _constelation_model_creates.append(__constelation_new)
-
-    MapConstellation.objects.bulk_update(_constelation_model_updates, [
-                                         'name', 'region_id'], batch_size=1000)  # bulk update
-    MapConstellation.objects.bulk_create(
-        _constelation_model_creates, batch_size=1000, ignore_conflicts=True)  # bulk create
-    # sample_mem()
-    _processes = []
-    _current_systems = MapSystem.objects.all().values_list('system_id', flat=True)
-    with ThreadPoolExecutor(max_workers=50) as executor:
-        for system in _systems:
-            _processes.append(executor.submit(
-                providers.esi._get_system, system, _current_systems))
-
-    for task in as_completed(_processes):
-        __system_upd, __system_new, _gates = task.result()
-        if __system_upd:
-            _system_models_updates.append(__system_upd)
-        if __system_new:
-            _system_models_creates.append(__system_new)
-        if _gates:
-            _gate_links_array += _gates
-
-    MapSystem.objects.bulk_update(_system_models_updates, [
-                                  'name', 'constellation_id', 'star_id', 'security_class', 'x', 'y', 'z', 'security_status'], batch_size=1000)  # bulk update
-    MapSystem.objects.bulk_create(
-        _system_models_creates, batch_size=1000, ignore_conflicts=True)  # bulk update
-    # sample_mem()
-    _processes = []
-    _gate_links_array = set(_gate_links_array)
-    with ThreadPoolExecutor(max_workers=50) as executor:
-        for gate in _gate_links_array:
-            _processes.append(executor.submit(
-                providers.esi._get_stargate, gate))
-
-    _unique_gate_links = {}
-    gate_models = []
-    for task in as_completed(_processes):
-        _to_sys, _from_sys = task.result()
-        if _to_sys not in _unique_gate_links:
-            _unique_gate_links[_to_sys] = []
-        if _from_sys not in _unique_gate_links:
-            _unique_gate_links[_to_sys].append(_from_sys)
-            gate_models.append(MapSystemGate(
-                from_solar_system_id=_to_sys, to_solar_system_id=_from_sys))
-        elif _to_sys not in _unique_gate_links[_from_sys]:
-            _unique_gate_links[_to_sys].append(_from_sys)
-            gate_models.append(MapSystemGate(
-                from_solar_system_id=_to_sys, to_solar_system_id=_from_sys))
-
-    MapSystemGate.objects.all().delete()
-    MapSystemGate.objects.bulk_create(gate_models)
-    # sample_mem()
-    output = "Regions: (Updated:{}, Created:{}) " \
-             "Constellations: (Updated:{}, Created:{}) " \
-             "Systems: (Updated:{}, Created:{}) "\
-             "Gates: (Created: {}/{})".format(len(_region_models_updates),
-                                              len(_region_models_creates),
-                                              len(_constelation_model_updates),
-                                              len(_constelation_model_creates),
-                                              len(_system_models_updates),
-                                              len(_system_models_creates),
-                                              len(gate_models), len(_gate_links_array))
-    # memdump()
-    return output
-
 
 def update_ore_comp_table_from_fuzzworks():
     # prime the provider or th ram will go bye bye
-    providers.esi.client.Status.get_status().result()
+    providers.esi_openapi.client.Status.GetStatus().result()
     # Get needed SDE file
     inv_url = 'https://www.fuzzwork.co.uk/dump/latest/invTypeMaterials.csv.bz2'
 
@@ -180,7 +67,9 @@ def update_ore_comp_table_from_fuzzworks():
     # delete it all and start again
     InvTypeMaterials.objects.all().delete()
     InvTypeMaterials.objects.bulk_create(
-        ore_details, batch_size=500, ignore_conflicts=True)
+        ore_details, batch_size=500,
+        ignore_conflicts=True
+    )
 
 
 def process_category_from_esi(category_id):
@@ -257,12 +146,14 @@ def process_category_from_esi(category_id):
 
     output = "Category ({}): " \
              "Groups: (Updated:{}, Created:{}) " \
-             "Items: (Updated:{}, Created:{}, Dogma Attributes:{}".format(category_id,
-                                                                          len(_groups_model_updates),
-                                                                          len(_groups_model_creates),
-                                                                          len(_items_models_updates),
-                                                                          len(_items_models_creates),
-                                                                          len(_dogma_models_creates))
+             "Items: (Updated:{}, Created:{}, Dogma Attributes:{}".format(
+                 category_id,
+                 len(_groups_model_updates),
+                 len(_groups_model_creates),
+                 len(_items_models_updates),
+                 len(_items_models_creates),
+                 len(_dogma_models_creates)
+             )
 
     return output
 
@@ -462,16 +353,19 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
                            location_name=system.name,
                            system=system)
     elif 60000000 < location_id < 64000000:  # Station ID
-        station = providers.esi.client.Universe.get_universe_stations_station_id(
-            station_id=location_id).result()
-        system = MapSystem.objects.filter(system_id=station.get('system_id'))
+        station = providers.esi_openapi.client.Universe.GetUniverseStationsStationId(
+            station_id=location_id
+        ).result()
+        system = MapSystem.objects.filter(system_id=station.system_id)
         if not system.exists():
             logger.error("Unknown System, Have you populated the map?")
             # TODO Do i fire the map population task here?
             return None
-        return EveLocation(location_id=location_id,
-                           location_name=station.get('name'),
-                           system_id=station.get('system_id'))
+        return EveLocation(
+            location_id=location_id,
+            location_name=station.name,
+            system_id=station.system_id
+        )
 
     req_scopes = ['esi-universe.read_structures.v1']
 
@@ -482,36 +376,44 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
 
     else:  # Structure id?
         try:
-            structure = providers.esi.client.Universe.get_universe_structures_structure_id(
-                structure_id=location_id, token=token.valid_access_token()).result()
+            structure = providers.esi_openapi.client.Universe.GetUniverseStructuresStructureId(
+                structure_id=location_id,
+                token=token.valid_access_token()
+            ).result()
         except HTTPForbidden as e:  # no access
             if int(e.response.headers.get('x-esi-error-limit-remain')) < 50:
                 set_error_count_flag()
             logger.debug("Failed to get location:{}, Error:{}, Errors Remaining:{}, Time Remaining: {}".format(
-                location_id, e.message, e.response.headers.get('x-esi-error-limit-remain'), e.response.headers.get('x-esi-error-limit-reset')))
+                location_id,
+                e.message,
+                e.response.headers.get('x-esi-error-limit-remain'),
+                e.response.headers.get('x-esi-error-limit-reset')
+            )
+            )
             return None
         system = MapSystem.objects.filter(
-            system_id=structure.get('solar_system_id'))
+            system_id=structure.solar_system_id
+        )
         if not system.exists():
             logger.error("Unknown System, Have you populated the map?")
             # TODO Do i fire the map population task here?
             return None
         if current_loc:
-            existing.location_name = structure.get('name')
+            existing.location_name = structure.name
             return existing
         else:
             return EveLocation(location_id=location_id,
-                               location_name=structure.get('name'),
-                               system_id=structure.get('solar_system_id'))
+                               location_name=structure.name,
+                               system_id=structure.solar_system_id)
 
 
 def load_system(system_id, moons_update=False):
-    _sys = providers.esi.client.Universe.get_universe_systems_system_id(
+    _sys = providers.esi_openapi.client.Universe.GetUniverseSystemsSystemId(
         system_id=system_id
     ).result()
-    for p in _sys["planets"]:
-        MapSystemPlanet.objects.get_or_create_from_esi(p["planet_id"])
+    for p in _sys.planets:
+        MapSystemPlanet.objects.get_or_create_from_esi(p.planet_id)
         if "moons" in p and moons_update:
-            if p["moons"]:
-                for m in p["moons"]:
+            if p.moons:
+                for m in p.moons:
                     MapSystemMoon.objects.get_or_create_from_esi(m)
