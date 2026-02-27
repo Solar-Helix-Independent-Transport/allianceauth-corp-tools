@@ -136,7 +136,7 @@ class AssetsApiEndpoints:
                         "alliance_name": a.character.character.alliance_name
                     },
                     "item": {
-                        "id": a.type_name.type_id,
+                        "id": a.type_name.id,
                         "name": type_nm,
                         "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}",
                         "cat_id": a.type_name.group.id
@@ -184,7 +184,7 @@ class AssetsApiEndpoints:
                         "alliance_name": a.character.character.alliance_name
                     },
                     "item": {
-                        "id": a.type_name.type_id,
+                        "id": a.type_name.id,
                         "name": a.type_name.name,
                         "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}",
                         "cat_id": a.type_name.group.id

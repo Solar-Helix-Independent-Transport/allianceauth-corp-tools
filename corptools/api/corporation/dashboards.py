@@ -1,15 +1,24 @@
+# Standard Library
 import logging
 from typing import List
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.db.models import (
-    ExpressionWrapper, FloatField, OuterRef, Subquery, Sum,
+    ExpressionWrapper,
+    FloatField,
+    OuterRef,
+    Subquery,
+    Sum,
 )
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
+# AA Example App
 from corptools import models
 from corptools.api import schema
 from corptools.task_helpers.update_tasks import fetch_location_name
@@ -215,11 +224,11 @@ class DashboardApiEndpoints:
                     loc = a.location_name.location_name
                     try:
                         const = {
-                            "id": a.location_name.system.constellation_id,
+                            "id": a.location_name.system.id,
                             "name": a.location_name.system.constellation.name
                         }
                         region = {
-                            "id": a.location_name.system.constellation.region_id,
+                            "id": a.location_name.system.constellation.id,
                             "name": a.location_name.system.constellation.region.name
                         }
                     except Exception:
@@ -240,10 +249,10 @@ class DashboardApiEndpoints:
                         "alliance_name": a.character.character.alliance_name
                     },
                     "item": {
-                        "id": a.type_name.type_id,
+                        "id": a.type_name.id,
                         "name": type_nm,
                         "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}",
-                        "cat_id": a.type_name.group.category_id
+                        "cat_id": a.type_name.group.id
                     },
                     "quantity": a.quantity,
                     "id": a.item_id,
@@ -293,19 +302,19 @@ class DashboardApiEndpoints:
                     "owner": d.corporation.corporation,
                     "name": d.name,
                     "type": {
-                        "id": d.type_name.type_id,
+                        "id": d.type_name.id,
                         "name": d.type_name.name
                     },
                     "location": {
-                        "id": d.system_name.system_id,
+                        "id": d.system_name.id,
                         "name": d.system_name.name
                     },
                     "constellation": {
-                        "id": d.system_name.constellation.constellation_id,
+                        "id": d.system_name.constellation.id,
                         "name": d.system_name.constellation.name
                     },
                     "region": {
-                        "id": d.system_name.constellation.region.region_id,
+                        "id": d.system_name.constellation.region.id,
                         "name": d.system_name.constellation.region.name
                     },
                 },
@@ -336,7 +345,7 @@ class DashboardApiEndpoints:
             if _tid not in output[_lid]["contents"]:
                 output[_lid]["contents"][_tid] = {
                     "type": {
-                        "id": a.type_name.type_id,
+                        "id": a.type_name.id,
                         "name": a.type_name.name
                     },
                     "quantity": 0,

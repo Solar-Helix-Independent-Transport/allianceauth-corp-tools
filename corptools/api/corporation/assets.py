@@ -1,13 +1,18 @@
+# Standard Library
 import logging
 from typing import List
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.db.models import F, Q, Sum
 from django.db.models.functions import Length
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
+# AA Example App
 from corptools import models
 from corptools.api import schema
 
@@ -123,29 +128,29 @@ class AssetsApiEndpoints:
                         if a.location_name.system:
                             loc["solar_system"] = {
                                 "system": {
-                                    "id": a.location_name.system.system_id,
+                                    "id": a.location_name.system.id,
                                     "name": a.location_name.system.name
                                 },
                                 "constellation": {
-                                    "id": a.location_name.system.constellation.constellation_id,
+                                    "id": a.location_name.system.constellation.id,
                                     "name": a.location_name.system.constellation.name
                                 },
                                 "region": {
-                                    "id": a.location_name.system.constellation.region.region_id,
+                                    "id": a.location_name.system.constellation.region.id,
                                     "name": a.location_name.system.constellation.region.name
                                 },
                                 "security_status": a.location_name.system.security_status
                             }
                     output.append({
                         "item": {
-                            "id": a.type_name.type_id,
+                            "id": a.type_name.id,
                             "name": type_nm,
                             "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}",
-                            "cat_id": a.type_name.group.category.category_id
+                            "cat_id": a.type_name.group.category.id
                         },
                         "quantity": a.quantity,
                         "id": a.item_id,
-                        "expand": True if a.type_name.group.category.category_id in expandable_cats else False,
+                        "expand": True if a.type_name.group.category.id in expandable_cats else False,
                         "location": loc
                     })
 
@@ -191,13 +196,13 @@ class AssetsApiEndpoints:
 
                 output.append({
                     "item": {
-                        "id": a.type_name.type_id,
+                        "id": a.type_name.id,
                         "name": a.type_name.name,
                         "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}"
                     },
                     "quantity": a.quantity,
                     "id": a.item_id,
-                    "expand": True if a.type_name.group.category.category_id in expandable_cats else False,
+                    "expand": True if a.type_name.group.category.id in expandable_cats else False,
                     "location": {
                         "id": a.location_id,
                         "name": loc
@@ -241,7 +246,7 @@ class AssetsApiEndpoints:
             for a in assets:
                 output.append({
                     "item": {
-                        "id": a.type_name.type_id,
+                        "id": a.type_name.id,
                         "name": a.type_name.name,
                         "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}"
                     },
@@ -296,7 +301,7 @@ class AssetsApiEndpoints:
                 assets = assets.filter(Q(location_name_id=int(location_id)) | Q(
                     location_id__in=asset_locations) | Q(location_id=int(location_id)))
 
-            assets = assets.values('type_name__group__group_id')\
+            assets = assets.values('type_name__group__id')\
                 .annotate(grp_total=Sum('quantity'))\
                 .annotate(grp_name=F('type_name__group__name'))\
                 .annotate(grp_id=F('type_name__group_id'))\

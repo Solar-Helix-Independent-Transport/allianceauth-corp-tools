@@ -419,15 +419,11 @@ def update_character_assets(character_id, force_refresh=False):
         location_names = list(
             EveLocation.objects.all().values_list('location_id', flat=True))
 
-        _current_type_ids = []
         item_ids = []
         items = []
 
         for item in assets:
-            if item.type_id not in _current_type_ids:
-                _current_type_ids.append(item.type_id)
             item_ids.append(item.item_id)
-
             asset_item = CharacterAsset.from_esi_model(audit_char, item)
 
             # attach location name
@@ -446,9 +442,6 @@ def update_character_assets(character_id, force_refresh=False):
                 f"CT: New ship for: {audit_char.character.character_name}"
             )
             if ship.item_id not in item_ids:
-                if ship.type_id not in _current_type_ids:
-                    _current_type_ids.append(ship.type_id)
-
                 if ship.location_id in location_names:
                     ship.location_name_id = ship.location_id
 

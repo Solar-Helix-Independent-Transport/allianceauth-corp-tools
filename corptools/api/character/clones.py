@@ -1,9 +1,13 @@
+# Standard Library
 from typing import List
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.utils.translation import gettext as _
 
+# AA Example App
 from corptools import models
 from corptools.api import schema
 from corptools.api.helpers import get_alts_queryset, get_main_character
@@ -32,10 +36,19 @@ class CloneApiEndpoints:
 
             jump_clones = models.JumpClone.objects\
                 .filter(character__character__in=characters)\
-                .select_related('character__character', 'location_name').prefetch_related('implant_set', 'implant_set__type_name')
-            clones = models.Clone.objects\
-                .filter(character__character__in=characters)\
-                .select_related('character__character', 'location_name')
+                .select_related(
+                    'character__character',
+                    'location_name'
+                ).prefetch_related(
+                    'implant_set',
+                    'implant_set__type_name'
+                )
+            clones = models.Clone.objects.filter(
+                character__character__in=characters
+            ).select_related(
+                'character__character',
+                'location_name'
+            )
 
             table_data = {}
             for char in characters:
