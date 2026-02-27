@@ -1,20 +1,31 @@
+# Standard Library
 from datetime import timedelta
 
+# Third Party
 from ninja import Field, Schema
 from ninja.pagination import LimitOffsetPagination
 from ninja.types import DictStrAny
 
+# Django
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import F, Q, QuerySet, Sum
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 
+# AA Example App
 from corptools.constants.types import (
-    MINING_GAS_GROUPS, MINING_ICE_GROUPS, MINING_MOON_GROUPS,
-    MINING_ORE_GROUPS, RAT_CAPITAL_GROUPS, RAT_OFFICER_CRUISER_GROUPS,
-    RAT_OFFICER_FRIGATE_GROUPS, RAT_OFFICER_GROUPS, RAT_SUPER_GROUPS,
+    MINING_GAS_GROUPS,
+    MINING_ICE_GROUPS,
+    MINING_MOON_GROUPS,
+    MINING_ORE_GROUPS,
+    RAT_CAPITAL_GROUPS,
+    RAT_OFFICER_CRUISER_GROUPS,
+    RAT_OFFICER_FRIGATE_GROUPS,
+    RAT_OFFICER_GROUPS,
+    RAT_SUPER_GROUPS,
     RAT_TITAN_GROUPS,
 )
 
@@ -319,7 +330,7 @@ def glances_assets_character(characters):
 
     sp_assets = models.CharacterAsset.objects.filter(
         character__character__in=characters,
-        type_name__type_id__in=sp_types
+        type_name__id__in=sp_types
     ).values(
         'type_name__type_id'
     ).annotate(
@@ -328,7 +339,7 @@ def glances_assets_character(characters):
 
     den_assets = models.CharacterAsset.objects.filter(
         character__character__in=characters,
-        type_name__type_id=85230,
+        type_name__id=85230,
         location_type="solar_system"
     ).values(
         'type_name__type_id'
@@ -381,7 +392,7 @@ def glances_assets_corporation(characters, corp_id, user=None):
 
     sp_assets = models.CorpAsset.objects.filter(
         corporation__corporation__corporation_id=corp_id,
-        type_name__type_id__in=sp_types
+        type_name__id__in=sp_types
     ).values(
         'type_name__type_id'
     ).annotate(

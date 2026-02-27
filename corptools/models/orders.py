@@ -1,14 +1,18 @@
+# Standard Library
 from typing import TYPE_CHECKING, Union
 
+# Third Party
+from eve_sde.models import ItemType, Region
 from model_utils import Choices
 
+# Django
 from django.db import models
 
 from .audits import CharacterAudit, EveLocation
-from .eve_models import EveItemType, MapRegion
 from .wallets import CorporationWalletDivision
 
 if TYPE_CHECKING:
+    # Alliance Auth
     from esi.stubs import (
         CharactersCharacterIdOrdersGetItem,
         CharactersCharacterIdOrdersHistoryGetItem,
@@ -35,10 +39,18 @@ class MarketOrder(models.Model):
     order_range = models.CharField(max_length=30, choices=_range_enum)
     region_id = models.IntegerField()
     region_name = models.ForeignKey(
-        MapRegion, on_delete=models.SET_NULL, null=True, default=None)
+        Region,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )
     type_id = models.IntegerField()
     type_name = models.ForeignKey(
-        EveItemType, on_delete=models.SET_NULL, null=True, default=None)
+        ItemType,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )
     volume_remain = models.IntegerField()
     volume_total = models.IntegerField()
 

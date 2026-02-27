@@ -1,10 +1,16 @@
+# Standard Library
 import json
 import math
 from hashlib import md5
 
+# Third Party
+from eve_sde.models import TypeDogma
+
+# Django
 from django.contrib.auth.models import User
 from django.core.cache import cache
 
+# Alliance Auth
 from allianceauth.authentication.models import CharacterOwnership
 
 SKILL_CACHE_TIMEOUT_SECONDS = 60 * 60 * 24 * 7  # 48h
@@ -61,9 +67,7 @@ class SkillListCache():
 
     def check_skill_lists(self, skill_lists, linked_characters):
         # build the arrays
-        from ..models import (  # TODO fix the recursive import
-            EveItemDogmaAttribute, Skill,
-        )
+        from ..models import Skill
 
         skills = Skill.objects.filter(
             character__character__character_id__in=linked_characters
@@ -105,9 +109,9 @@ class SkillListCache():
                 try:
                     for _sk_n, _sk_l in _s.items():
                         all_skill_sp[skl.name][_sk_n] = int(
-                            250 * EveItemDogmaAttribute.objects.get(
-                                eve_type__name=_sk_n,
-                                attribute_id=275
+                            250 * TypeDogma.objects.get(
+                                item_type__name=_sk_n,
+                                dogma_attribute_id=275
                             ).value * math.sqrt(32) ** (int(_sk_l) - 1)
                         )
                 except Exception as e:

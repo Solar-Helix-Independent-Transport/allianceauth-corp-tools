@@ -91,7 +91,7 @@ class EveRouter():
         return result
 
 
-esi = CorpToolsESIClient(app_info_text=f"corptools/{__version__} ({__url__})")
+esi = None
 routes = EveRouter()
 skills = SkillListCache()
 
@@ -197,6 +197,9 @@ esi_openapi = OpenAPI(
         "GetUniverseStructuresStructureId",
         "GetUniverseSystemsSystemId",
         "GetStatus",
-        "GetUniverseCategories"
+        "GetUniverseCategories",
+        # moons
+        "GetCorporationCorporationIdMiningObservers",
+        "GetCorporationCorporationIdMiningObserversObserverId",
     ]
 )

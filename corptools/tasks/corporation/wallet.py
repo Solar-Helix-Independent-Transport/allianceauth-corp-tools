@@ -1,3 +1,6 @@
+# Third Party
+from eve_sde.models import ItemType
+
 # Django
 from django.utils import timezone
 
@@ -9,7 +12,6 @@ from corptools.models import (
     CorporationAudit,
     CorporationWalletDivision,
     CorporationWalletJournalEntry,
-    EveItemType,
     EveName,
 )
 
@@ -227,7 +229,7 @@ def update_corporation_transactions(corp_id, wallet_division, full_update=False)
     for item in journal_items:
         if item.transaction_id in _current_journal:
             # what is this doing???
-            type_name, _ = EveItemType.objects.get_or_create_from_esi(
+            type_name, _ = ItemType.objects.get_or_create_from_esi(
                 item.type_id
             )
 

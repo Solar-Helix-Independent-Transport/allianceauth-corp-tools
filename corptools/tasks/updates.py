@@ -5,8 +5,8 @@ from random import random
 
 # Third Party
 import requests
-from celery import chain as Chain
 from celery import shared_task
+from eve_sde.models import ItemType
 
 # Django
 from django.core.cache import cache
@@ -20,26 +20,14 @@ from allianceauth.services.tasks import QueueOnce
 # AA Example App
 from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
 
-from .. import app_settings, providers
+from .. import app_settings
 from ..models import (
     CharacterWalletJournalEntry,
-    EveItemType,
     EveName,
-    MapSystem,
     TypePrice,
 )
-from ..task_helpers.sde_tasks import (
-    SDE_PARTS_TO_UPDATE,
-    delete_sde_folder,
-    download_extract_sde,
-    process_section_of_sde,
-)
 from ..task_helpers.update_tasks import (
-    load_system,
-    process_category_from_esi,
-    process_map_from_esi,
     set_error_count_flag,
-    update_ore_comp_table_from_fuzzworks,
 )
 
 TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
@@ -48,34 +36,6 @@ TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
 logger = get_extension_logger(__name__)
 
 # Bulk Updates
-
-
-@shared_task(
-    name="corptools.tasks.update_or_create_map"
-)
-def update_or_create_map():
-    return process_map_from_esi()
-
-
-@shared_task(
-    name="corptools.tasks.update_ore_comp_table"
-)
-def update_ore_comp_table():
-    return update_ore_comp_table_from_fuzzworks()
-
-
-@shared_task(
-    name="corptools.tasks.update_category"
-)
-def update_category(category_id):
-    return process_category_from_esi(category_id)
-
-
-@shared_task(
-    name="corptools.tasks.process_ores_from_esi"
-)
-def process_ores_from_esi():
-    return process_category_from_esi(25)
 
 
 @shared_task(
@@ -163,22 +123,6 @@ def update_eve_name(self, id):
             name.save()
 
 
-@shared_task(name="corptools.tasks.process_all_categories")
-def process_all_categories():
-    categories = providers.esi_openapi.client.Universe.GetUniverseCategories(
-    ).result(
-        use_etag=False
-    )
-    que = []
-
-    for category in categories:
-        que.append(update_category.si(category))
-
-    Chain(que).apply_async(priority=8)
-
-    return f"Queued {len(que)} Tasks"
-
-
 @shared_task(name="corptools.tasks.run_housekeeping")
 def run_housekeeping():
     notifs = remove_old_notifications()
@@ -187,7 +131,7 @@ def run_housekeeping():
 
 @shared_task(name="corptools.tasks.update_all_raw_minerals")
 def update_all_raw_minerals():
-    _types = EveItemType.objects.filter(group__category_id=4)
+    _types = ItemType.objects.filter(group__category_id=4)
     return update_prices_for_types(list(_types.values_list("type_id", flat=True)))
 
 
@@ -204,7 +148,7 @@ def update_prices_for_types(type_ids: list):
     price_data = response.json()
     price_cache = {}
     for key, item in price_data.items():
-        obj, _ = EveItemType.objects.get_or_create_from_esi(key)
+        obj, _ = ItemType.objects.get_or_create_from_esi(key)
 
         ob, _ = TypePrice.objects.update_or_create(
             item=obj,
@@ -258,17 +202,6 @@ def clear_all_etags():
 
 
 @shared_task
-def load_planets_moons_from_esi():
-    for ss in MapSystem.objects.all():
-        load_system_from_esi.delay(ss.system_id)
-
-
-@shared_task
-def load_system_from_esi(system_id):
-    load_system(system_id, moons_update=True)
-
-
-@shared_task
 def update_wallet_currency(pk):
     m = CharacterWalletJournalEntry.objects.get(pk=pk)
     reason = m.reason
@@ -277,50 +210,3 @@ def update_wallet_currency(pk):
         reason = reason + " ISK"
         m.reason = reason
         m.save()
-
-
-@shared_task(
-    bind=True,
-    base=QueueOnce,
-    name="corptools.tasks.update_models_from_sde"
-)
-def update_models_from_sde(self, start_id: int = 0):
-    queue = [
-        fetch_sde.si(),
-    ]
-    for id in range(start_id, len(SDE_PARTS_TO_UPDATE)):
-        queue.append(
-            process_sde_section.si(id)
-        )
-    queue.append(
-        cleanup_sde.si()
-    )
-    queue
-    Chain(queue).apply_async()
-
-
-@shared_task(
-    bind=True,
-    base=QueueOnce,
-    name="corptools.tasks.process_sde_section"
-)
-def process_sde_section(self, id: int = 0):
-    process_section_of_sde(id)
-
-
-@shared_task(
-    bind=True,
-    base=QueueOnce,
-    name="corptools.tasks.fetch_sde"
-)
-def fetch_sde(self):
-    download_extract_sde()
-
-
-@shared_task(
-    bind=True,
-    base=QueueOnce,
-    name="corptools.tasks.cleanup_sde"
-)
-def cleanup_sde(self):
-    delete_sde_folder()

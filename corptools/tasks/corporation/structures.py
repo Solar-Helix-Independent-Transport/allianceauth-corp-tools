@@ -1,6 +1,7 @@
 # Third Party
 import requests
 from celery import shared_task
+from eve_sde.models import ItemType, Moon, Planet, SolarSystem
 
 # Django
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -15,17 +16,14 @@ from esi.exceptions import HTTPNotModified
 # AA Example App
 from corptools.models import (
     CorporationAudit,
-    EveItemType,
     EveLocation,
-    MapSystemMoon,
-    MapSystemPlanet,
     Poco,
     Starbase,
     Structure,
     StructureCelestial,
     StructureService,
 )
-from corptools.models.eve_models import MapJumpBridge, MapSystem
+from corptools.models.eve_models import MapJumpBridge
 from corptools.task_helpers.update_tasks import fetch_location_name
 
 from .. import providers
@@ -39,7 +37,7 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
     # logger.debug("Started structures for: %s" % (str(character_id)))
 
     def _structures_db_update(_corporation, _structure, _name):
-        str_type, _ = EveItemType.objects.get_or_create_from_esi(
+        str_type, _ = ItemType.objects.get_or_create_from_esi(
             _structure.type_id
         )
 
@@ -319,11 +317,11 @@ def corp_starbase_update(corp_id, force_refresh=True):  # Set true as we have ba
         update_fields = {}
 
         if sb.moon_id:
-            moon, _created = MapSystemMoon.objects.get_or_create_from_esi(
+            moon, _created = Moon.objects.get_or_create_from_esi(
                 sb.moon_id)
             update_fields["moon"] = moon
 
-        eve_type, _created = EveItemType.objects.get_or_create_from_esi(
+        eve_type, _created = ItemType.objects.get_or_create_from_esi(
             sb.type_id)
 
         Starbase.objects.update_or_create(
@@ -407,7 +405,7 @@ def corp_update_pocos(corp_id, full_update=False):
         ]
 
     for _p in _pids:
-        _, _ = MapSystemPlanet.objects.get_or_create_from_esi(_p)
+        _, _ = Planet.objects.get_or_create_from_esi(_p)
 
     token_assets = get_corp_token(
         corp_id, ['esi-assets.read_corporation_assets.v1'], req_roles)
@@ -424,7 +422,7 @@ def corp_update_pocos(corp_id, full_update=False):
     _office_to_names = {}
 
     for n in _all_locations:
-        nearest = MapSystemPlanet.objects.all(
+        nearest = Planet.objects.all(
         ).annotate(
             distance=Sqrt(
                 Power(
@@ -500,7 +498,7 @@ def build_jb_network(self):
             "owner": s.corporation.corporation.alliance.alliance_id,
             "name": s.name
         }
-        _exit = MapSystem.objects.get(name=matches[1])
+        _exit = SolarSystem.objects.get(name=matches[1])
         output[matches[0]]["end"] = {
             "system": _exit,
             "name": _exit.name

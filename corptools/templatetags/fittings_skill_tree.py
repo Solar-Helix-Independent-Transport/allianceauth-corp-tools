@@ -1,8 +1,14 @@
+# Third Party
+from eve_sde.models import DogmaAttribute, ItemType
+
+# Django
 from django import template
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
-from corptools.models import EveItemDogmaAttribute, EveItemType, SkillList
+# AA Example App
+from corptools.models import SkillList
 
 from ..task_helpers.skill_helpers import SkillListCache
 
@@ -14,6 +20,7 @@ logger = get_extension_logger(__name__)
 @register.inclusion_tag('corptools/fittings/characters.html', takes_context=True)
 def character_skill_overview(context) -> dict:
 
+    # Third Party
     from fittings.models import Fitting, FittingItem
     _fit = Fitting.objects.get(
         id=int(context.request.resolver_match.kwargs['fit_id']))
@@ -23,9 +30,9 @@ def character_skill_overview(context) -> dict:
     _skill_ids = [182, 183, 184, 1285, 1289, 1290]
     _level_ids = [277, 278, 279, 1286, 1287, 1288]
 
-    _types = EveItemDogmaAttribute.objects.filter(
+    _types = DogmaAttribute.objects.filter(
         eve_type_id__in=_items, attribute_id__in=_skill_ids + _level_ids)
-    _types = _types | EveItemDogmaAttribute.objects.filter(
+    _types = _types | DogmaAttribute.objects.filter(
         eve_type_id=_fit.ship_type_type_id, attribute_id__in=_skill_ids + _level_ids)
 
     required = {}
@@ -59,10 +66,11 @@ def character_skill_overview(context) -> dict:
     sk_check = {
 
     }
-    for t in EveItemType.objects.filter(type_id__in=list(sids)):
+    for t in ItemType.objects.filter(type_id__in=list(sids)):
         skills[t.type_id]["n"] = t.name
         sk_check[t.name] = skills[t.type_id]["l"]
 
+    # Standard Library
     import json
     char_ids = list(
         context.request.user.character_ownerships.all(

@@ -1,17 +1,22 @@
+# Standard Library
 import json
 import logging
 from datetime import timedelta
 from typing import List
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.db.models import F
 from django.db.models.functions import Power, Sqrt
 from django.http import HttpResponse
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
+# AA Example App
 from corptools import app_settings, models
 from corptools.api import schema
 from corptools.api.helpers import round_or_null
@@ -60,11 +65,11 @@ class StructureApiEndpoints:
                     "type": {"id": s.type_id,
                              "name": s.type_name.name},
                     "services": _ss,
-                    "location": {"id": s.system_name.system_id,
+                    "location": {"id": s.system_name.id,
                                  "name": s.system_name.name},
-                    "constellation": {"id": s.system_name.constellation.constellation_id,
+                    "constellation": {"id": s.system_name.constellation.id,
                                       "name": s.system_name.constellation.name},
-                    "region": {"id": s.system_name.constellation.region.region_id,
+                    "region": {"id": s.system_name.constellation.region.id,
                                "name": s.system_name.constellation.region.name},
                     "fuel_expiry": s.fuel_expires,
                     "state": s.state,
@@ -184,11 +189,11 @@ class StructureApiEndpoints:
                         "name": s.name,
                         "type": {"id": s.type_id,
                                  "name": s.type_name.name},
-                        "location": {"id": s.system_name.system_id,
+                        "location": {"id": s.system_name.id,
                                      "name": s.system_name.name},
-                        "constellation": {"id": s.system_name.constellation.constellation_id,
+                        "constellation": {"id": s.system_name.constellation.id,
                                           "name": s.system_name.constellation.name},
-                        "region": {"id": s.system_name.constellation.region.region_id,
+                        "region": {"id": s.system_name.constellation.region.id,
                                    "name": s.system_name.constellation.region.name},
                         "fuel_expiry": s.fuel_expires,
                         "state": s.state,
@@ -250,12 +255,12 @@ class StructureApiEndpoints:
 
                 if "Slot" in a.location_flag:
                     output[a.location_flag] = {
-                        "id": a.type_name.type_id,
+                        "id": a.type_name.id,
                         "name": a.type_name.name
                     }
                 elif "Tube" in a.location_flag:
                     output[a.location_flag] = {
-                        "id": a.type_name.type_id,
+                        "id": a.type_name.id,
                         "name": a.type_name.name
                     }
                 else:
@@ -263,7 +268,7 @@ class StructureApiEndpoints:
                         if a.location_flag not in output:
                             output[a.location_flag] = []
                         output[a.location_flag].append({
-                            "id": a.type_name.type_id,
+                            "id": a.type_name.id,
                             "name": a.type_name.name,
                             "qty": a.quantity
                         })
@@ -324,7 +329,7 @@ class StructureApiEndpoints:
                             "corporation_id": s.corporation.corporation.corporation_id
                         },
                         "name": s.name,
-                        "location": {"id": s.planet.planet_id,
+                        "location": {"id": s.planet.id,
                                      "name": s.planet.name,
                                      "region": s.system_name.constellation.region.name,
                                      "constellation": s.system_name.constellation.name},
@@ -393,21 +398,21 @@ class StructureApiEndpoints:
                 extras = {}
                 if s.moon:
                     extras["moon"] = {
-                        "id": s.moon.moon_id,
+                        "id": s.moon.id,
                         "name": s.moon.name
                     }
 
                 if s.system:
                     extras["system"] = {
-                        "id": s.system.system_id,
+                        "id": s.system.id,
                         "name": s.system.name
                     }
                     extras["constellation"] = {
-                        "id": s.system.constellation.constellation_id,
+                        "id": s.system.constellation.id,
                         "name": s.system.constellation.name
                     }
                     extras["region"] = {
-                        "id": s.system.constellation.region.region_id,
+                        "id": s.system.constellation.region.id,
                         "name": s.system.constellation.region.name
                     }
 
@@ -418,7 +423,7 @@ class StructureApiEndpoints:
                         "corporation_name": s.corporation.corporation.corporation_name,
                     },
                     "name": s.name,
-                    "type": {"id": s.type_name.type_id,
+                    "type": {"id": s.type_name.id,
                              "name": s.type_name.name},
                     "state": s.state,
                     "onlined_since": s.onlined_since,
@@ -494,7 +499,7 @@ class StructureApiEndpoints:
                     for d in distances:
                         assets_in_space.append({
                             "type": {
-                                "id": d.type_name.type_id,
+                                "id": d.type_name.id,
                                 "name": d.type_name.name
                             },
                             "distance": d.distance
@@ -510,7 +515,7 @@ class StructureApiEndpoints:
                             type_name = models.EveItemType.objects.get(
                                 type_id=f['type_id'])
                             assets_in_bay.append({
-                                "id": type_name.type_id,
+                                "id": type_name.id,
                                 "name": type_name.name,
                                 "qty": f['quantity']
                             })

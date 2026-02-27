@@ -1,17 +1,26 @@
 # flake8: noqa
+# Standard Library
 from datetime import timedelta
 
+# Third Party
+from eve_sde import models as sde_models
+
+# Django
 from django.contrib.auth.models import Group, User
 from django.db.models import F
 from django.test import TestCase
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.authentication.models import CharacterOwnership
 from allianceauth.eveonline.models import (
-    EveAllianceInfo, EveCharacter, EveCorporationInfo,
+    EveAllianceInfo,
+    EveCharacter,
+    EveCorporationInfo,
 )
 from allianceauth.tests.auth_utils import AuthUtils
 
+# AA Example App
 from corptools import models as ct_models
 
 
@@ -24,11 +33,11 @@ class TestSecGroupBotFilters(TestCase):
         User.objects.all().delete()
         CharacterOwnership.objects.all().delete()
         ct_models.EveLocation.objects.all().delete()
-        ct_models.MapRegion.objects.all().delete()
-        ct_models.MapConstellation.objects.all().delete()
-        ct_models.MapSystem.objects.all().delete()
-        ct_models.MapSystem.objects.all().delete()
         ct_models.Skill.objects.all().delete()
+
+        sde_models.Region.objects.all().delete()
+        sde_models.Constellation.objects.all().delete()
+        sde_models.SolarSystem.objects.all().delete()
 
         userids = range(1, 11)
 
@@ -107,198 +116,254 @@ class TestSecGroupBotFilters(TestCase):
                                                      alliance=cls.alli,)
 
         # add some systems
-        r1 = ct_models.MapRegion.objects.create(
+        r1 = sde_models.Region.objects.create(
             name="Test region 1",
             description="This region is junk at best, nothing is even in range",
-            region_id=1
+            id=1
         )
-        r2 = ct_models.MapRegion.objects.create(
+        r2 = sde_models.Region.objects.create(
             name="Test region 2",
             description="This region is a flood plain",
-            region_id=2
+            id=2
         )
-        r3 = ct_models.MapRegion.objects.create(
+        r3 = sde_models.Region.objects.create(
             name="Test region 3",
             description="This region is a fortress",
-            region_id=3)
+            id=3
+        )
 
-        c1 = ct_models.MapConstellation.objects.create(name="Test Constellation 1",
-                                                       constellation_id=1,
-                                                       region=r1)
-        c2 = ct_models.MapConstellation.objects.create(name="Test Constellation 2",
-                                                       constellation_id=2,
-                                                       region=r2)
-        c3 = ct_models.MapConstellation.objects.create(name="Test Constellation 3",
-                                                       constellation_id=3,
-                                                       region=r3)
-        s1 = ct_models.MapSystem.objects.create(name="Test System 1",
-                                                system_id=1,
-                                                security_status=0.0,
-                                                x=1,
-                                                y=1,
-                                                z=1,
-                                                security_class="g",
-                                                star_id=1,
-                                                constellation=c1)
-        s2 = ct_models.MapSystem.objects.create(name="Test System 2",
-                                                system_id=2,
-                                                security_status=0.0,
-                                                x=1,
-                                                y=1,
-                                                z=1,
-                                                security_class="g",
-                                                star_id=2,
-                                                constellation=c2)
-        s3 = ct_models.MapSystem.objects.create(name="Test System 3",
-                                                system_id=3,
-                                                security_status=0.0,
-                                                x=1,
-                                                y=1,
-                                                z=1,
-                                                security_class="g",
-                                                star_id=3,
-                                                constellation=c3)
+        c1 = sde_models.Constellation.objects.create(
+            name="Test Constellation 1",
+            id=1,
+            region=r1
+        )
+        c2 = sde_models.Constellation.objects.create(
+            name="Test Constellation 2",
+            id=2,
+            region=r2
+        )
+        c3 = sde_models.Constellation.objects.create(
+            name="Test Constellation 3",
+            id=3,
+            region=r3
+        )
+        s1 = sde_models.SolarSystem.objects.create(
+            name="Test System 1",
+            id=1,
+            security_status=0.0,
+            x=1,
+            y=1,
+            z=1,
+            security_class="g",
+            constellation=c1
+        )
+        s2 = sde_models.SolarSystem.objects.create(
+            name="Test System 2",
+            id=2,
+            security_status=0.0,
+            x=1,
+            y=1,
+            z=1,
+            security_class="g",
+            constellation=c2
+        )
+        s3 = sde_models.SolarSystem.objects.create(
+            name="Test System 3",
+            id=3,
+            security_status=0.0,
+            x=1,
+            y=1,
+            z=1,
+            security_class="g",
+            constellation=c3
+        )
 
         audits = []
         for uid in range(0, 17):  # 4,5,6,7
-            audits.append(ct_models.CharacterAudit.objects.create(character=characters[uid],
-                                                                  last_update_assets=timezone.now(),
-                                                                  last_update_clones=timezone.now(),
-                                                                  last_update_pub_data=timezone.now(),
-                                                                  last_update_skill_que=timezone.now(),
-                                                                  last_update_skills=timezone.now(),
-                                                                  last_update_wallet=timezone.now(),
-                                                                  last_update_orders=timezone.now(),
-                                                                  last_update_notif=timezone.now(),
-                                                                  last_update_roles=timezone.now(),
-                                                                  last_update_mails=timezone.now(),))
+            audits.append(
+                ct_models.CharacterAudit.objects.create(
+                    character=characters[uid],
+                    last_update_assets=timezone.now(),
+                    last_update_clones=timezone.now(),
+                    last_update_pub_data=timezone.now(),
+                    last_update_skill_que=timezone.now(),
+                    last_update_skills=timezone.now(),
+                    last_update_wallet=timezone.now(),
+                    last_update_orders=timezone.now(),
+                    last_update_notif=timezone.now(),
+                    last_update_roles=timezone.now(),
+                    last_update_mails=timezone.now(),
+                )
+            )
         audits.append(ct_models.CharacterAudit.objects.create(
             character=characters[17]))
 
-        skg1 = ct_models.EveItemGroup.objects.create(group_id=1,
-                                                     name="TestGroup")
-        sk1 = ct_models.EveItemType.objects.create(type_id=1,
-                                                   name="Skill 1",
-                                                   published=True,
-                                                   group=skg1)
-        ct_models.EveItemDogmaAttribute.objects.create(
-            attribute_id=275,
-            eve_type=sk1,
+        skg1 = sde_models.ItemGroup.objects.create(
+            id=1,
+            name="TestGroup"
+        )
+
+        sk1 = sde_models.ItemType.objects.create(
+            id=1,
+            name="Skill 1",
+            published=True,
+            group=skg1
+        )
+
+        sda1 = sde_models.DogmaAttribute.objects.create(
+            id=275,
+            name="Skill Level",
+            description="The level of the skill",
+            published=True
+        )
+
+        sde_models.TypeDogma.objects.create(
+            dogma_attribute=sda1,
+            item_type=sk1,
             value=5.0
         )
 
-        sk2 = ct_models.EveItemType.objects.create(type_id=2,
-                                                   name="Skill 2",
-                                                   published=True,
-                                                   group=skg1)
-        ct_models.EveItemDogmaAttribute.objects.create(
-            attribute_id=275,
-            eve_type=sk2,
+        sk2 = sde_models.ItemType.objects.create(
+            id=2,
+            name="Skill 2",
+            published=True,
+            group=skg1
+        )
+
+        sde_models.TypeDogma.objects.create(
+            dogma_attribute=sda1,
+            item_type=sk2,
             value=5.0
         )
 
-        sk3 = ct_models.EveItemType.objects.create(type_id=3,
-                                                   name="Skill 3",
-                                                   published=True,
-                                                   group=skg1)
-        ct_models.EveItemDogmaAttribute.objects.create(
-            attribute_id=275,
-            eve_type=sk3,
+        sk3 = sde_models.ItemType.objects.create(
+            id=3,
+            name="Skill 3",
+            published=True,
+            group=skg1
+        )
+        sde_models.TypeDogma.objects.create(
+            dogma_attribute=sda1,
+            item_type=sk3,
             value=5.0
         )
 
-        sk4 = ct_models.EveItemType.objects.create(type_id=4,
-                                                   name="Skill 4",
-                                                   published=True,
-                                                   group=skg1)
-        ct_models.EveItemDogmaAttribute.objects.create(
-            attribute_id=275,
-            eve_type=sk4,
+        sk4 = sde_models.ItemType.objects.create(
+            id=4,
+            name="Skill 4",
+            published=True,
+            group=skg1
+        )
+        sde_models.TypeDogma.objects.create(
+            dogma_attribute=sda1,
+            item_type=sk4,
             value=5.0
         )
 
-        sk5 = ct_models.EveItemType.objects.create(type_id=5,
-                                                   name="Skill 5",
-                                                   published=True,
-                                                   group=skg1)
-        ct_models.EveItemDogmaAttribute.objects.create(
-            attribute_id=275,
-            eve_type=sk5,
+        sk5 = sde_models.ItemType.objects.create(
+            id=5,
+            name="Skill 5",
+            published=True,
+            group=skg1
+        )
+        sde_models.TypeDogma.objects.create(
+            dogma_attribute=sda1,
+            item_type=sk5,
             value=5.0
         )
 
-        skc1 = ct_models.EveItemCategory.objects.create(category_id=1,
-                                                        name="TestCat")
-        skg2 = ct_models.EveItemGroup.objects.create(group_id=2,
-                                                     name="TestGroup",
-                                                     category=skc1)
-        a1 = ct_models.EveItemType.objects.create(type_id=10,
-                                                  name="Asset 1",
-                                                  published=True,
-                                                  group=skg2)
-        a2 = ct_models.EveItemType.objects.create(type_id=11,
-                                                  name="Asset 2",
-                                                  published=True)
-        a3 = ct_models.EveItemType.objects.create(type_id=12,
-                                                  name="Asset 3",
-                                                  published=True)
-        a4 = ct_models.EveItemType.objects.create(type_id=13,
-                                                  name="Asset 4",
-                                                  published=True)
-        a5 = ct_models.EveItemType.objects.create(type_id=14,
-                                                  name="Asset 5",
-                                                  published=True)
+        skc1 = sde_models.ItemCategory.objects.create(
+            id=1,
+            name="TestCat"
+        )
+        skg2 = sde_models.ItemGroup.objects.create(
+            id=2,
+            name="TestGroup",
+            category=skc1
+        )
+        a1 = sde_models.ItemType.objects.create(
+            id=10,
+            name="Asset 1",
+            published=True,
+            group=skg2
+        )
+        a2 = sde_models.ItemType.objects.create(
+            id=11,
+            name="Asset 2",
+            published=True
+        )
+        a3 = sde_models.ItemType.objects.create(
+            id=12,
+            name="Asset 3",
+            published=True
+        )
+        a4 = sde_models.ItemType.objects.create(
+            id=13,
+            name="Asset 4",
+            published=True
+        )
+        a5 = sde_models.ItemType.objects.create(
+            id=14,
+            name="Asset 5",
+            published=True
+        )
 
-        l1 = ct_models.EveLocation.objects.create(location_id=1,
-                                                  location_name="Test Location 1",
-                                                  system=s1)
-        l2 = ct_models.EveLocation.objects.create(location_id=2,
-                                                  location_name="Test Location 2",
-                                                  system=s2)
-        l3 = ct_models.EveLocation.objects.create(location_id=3,
-                                                  location_name="Test Location 3",
-                                                  system=s3)
+        l1 = ct_models.EveLocation.objects.create(
+            location_id=1,
+            location_name="Test Location 1",
+            system=s1
+        )
+        l2 = ct_models.EveLocation.objects.create(
+            location_id=2,
+            location_name="Test Location 2",
+            system=s2
+        )
+        l3 = ct_models.EveLocation.objects.create(
+            location_id=3,
+            location_name="Test Location 3",
+            system=s3
+        )
 
         ct_models.CharacterLocation.objects.create(
             character=audits[0],
             current_location=l1,
             current_ship=a1,
-            current_ship_name=f"Test Ship {a1.type_id} {a1.name}"
+            current_ship_name=f"Test Ship {a1.id} {a1.name}"
         )
 
         ct_models.CharacterLocation.objects.create(
             character=audits[1],
             current_location=l1,
             current_ship=a1,
-            current_ship_name=f"Test Ship {a1.type_id} {a1.name}"
+            current_ship_name=f"Test Ship {a1.id} {a1.name}"
         )
 
         ct_models.CharacterLocation.objects.create(
             character=audits[2],
             current_location=l2,
             current_ship=a1,
-            current_ship_name=f"Test Ship {a1.type_id} {a1.name}"
+            current_ship_name=f"Test Ship {a1.id} {a1.name}"
         )
 
         ct_models.CharacterLocation.objects.create(
             character=audits[3],
             current_location=l2,
             current_ship=a2,
-            current_ship_name=f"Test Ship {a2.type_id} {a2.name}"
+            current_ship_name=f"Test Ship {a2.id} {a2.name}"
         )
 
         ct_models.CharacterLocation.objects.create(
             character=audits[4],
             current_location=l3,
             current_ship=a2,
-            current_ship_name=f"Test Ship {a1.type_id} {a1.name}"
+            current_ship_name=f"Test Ship {a1.id} {a1.name}"
         )
 
         ct_models.CharacterLocation.objects.create(
             character=audits[5],
             current_location=l3,
             current_ship=a2,
-            current_ship_name=f"Test Ship {a1.type_id} {a1.name}"
+            current_ship_name=f"Test Ship {a1.id} {a1.name}"
         )
 
         ct_models.CharacterAsset.objects.create(item_id=0,
@@ -452,21 +517,21 @@ class TestSecGroupBotFilters(TestCase):
 
         for a in audits:
             ct_models.Skill.objects.create(character=a,
-                                           skill_id=sk2.type_id,
+                                           skill_id=sk2.id,
                                            skill_name=sk2,
                                            active_skill_level=0,
                                            trained_skill_level=5,
                                            skillpoints_in_skill=500)
 
         ct_models.Skill.objects.create(character=audits[0],
-                                       skill_id=sk1.type_id,
+                                       skill_id=sk1.id,
                                        skill_name=sk1,
                                        active_skill_level=5,
                                        trained_skill_level=5,
                                        skillpoints_in_skill=500)
 
         ct_models.Skill.objects.create(character=audits[9],
-                                       skill_id=sk1.type_id,
+                                       skill_id=sk1.id,
                                        skill_name=sk1,
                                        active_skill_level=5,
                                        trained_skill_level=5,
@@ -617,7 +682,7 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_assets_no_loc(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=10))
+        _filter.types.add(sde_models.ItemType.objects.get(id=10))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -644,7 +709,7 @@ class TestSecGroupBotFilters(TestCase):
             description="Something to tell user",
             reversed_logic=True
         )
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=10))
+        _filter.types.add(sde_models.ItemType.objects.get(id=10))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -668,8 +733,7 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_assets_no_loc_cat(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")
-        _filter.categories.add(
-            ct_models.EveItemCategory.objects.get(category_id=1))
+        _filter.categories.add(sde_models.ItemCategory.objects.get(id=1))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -696,8 +760,7 @@ class TestSecGroupBotFilters(TestCase):
             description="Something to tell user",
             reversed_logic=True
         )
-        _filter.categories.add(
-            ct_models.EveItemCategory.objects.get(category_id=1))
+        _filter.categories.add(sde_models.ItemCategory.objects.get(id=1))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -721,7 +784,7 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_assets_no_loc_grp(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")
-        _filter.groups.add(ct_models.EveItemGroup.objects.get(group_id=2))
+        _filter.groups.add(sde_models.ItemGroup.objects.get(id=2))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -748,7 +811,7 @@ class TestSecGroupBotFilters(TestCase):
             description="Something to tell user",
             reversed_logic=True
         )
-        _filter.groups.add(ct_models.EveItemGroup.objects.get(group_id=2))
+        _filter.groups.add(sde_models.ItemGroup.objects.get(id=2))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -772,9 +835,9 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_assets_loc(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.types.add(sde_models.ItemType.objects.get(id=11))
         _filter.systems.add(
-            ct_models.MapSystem.objects.get(name="Test System 1"))
+            sde_models.SolarSystem.objects.get(name="Test System 1"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -801,9 +864,9 @@ class TestSecGroupBotFilters(TestCase):
             description="Something to tell user",
             reversed_logic=True
         )
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.types.add(sde_models.ItemType.objects.get(id=11))
         _filter.systems.add(
-            ct_models.MapSystem.objects.get(name="Test System 1"))
+            sde_models.SolarSystem.objects.get(name="Test System 1"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -827,9 +890,9 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_assets_loc_con(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.types.add(sde_models.ItemType.objects.get(id=11))
         _filter.constellations.add(
-            ct_models.MapConstellation.objects.get(name="Test Constellation 1"))
+            sde_models.Constellation.objects.get(name="Test Constellation 1"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -856,9 +919,9 @@ class TestSecGroupBotFilters(TestCase):
             description="Something to tell user",
             reversed_logic=True
         )
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.types.add(sde_models.ItemType.objects.get(id=11))
         _filter.constellations.add(
-            ct_models.MapConstellation.objects.get(name="Test Constellation 1"))
+            sde_models.Constellation.objects.get(name="Test Constellation 1"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -882,9 +945,9 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_assets_loc_reg(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.types.add(sde_models.ItemType.objects.get(id=11))
         _filter.regions.add(
-            ct_models.MapRegion.objects.get(name="Test region 1"))
+            sde_models.Region.objects.get(name="Test region 1"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -911,9 +974,9 @@ class TestSecGroupBotFilters(TestCase):
             description="Something to tell user",
             reversed_logic=True
         )
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.types.add(sde_models.ItemType.objects.get(id=11))
         _filter.regions.add(
-            ct_models.MapRegion.objects.get(name="Test region 1"))
+            sde_models.Region.objects.get(name="Test region 1"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -937,9 +1000,9 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_assets_loc_2(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.types.add(sde_models.ItemType.objects.get(id=11))
         _filter.systems.add(
-            ct_models.MapSystem.objects.get(name="Test System 2"))
+            sde_models.SolarSystem.objects.get(name="Test System 2"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -965,9 +1028,9 @@ class TestSecGroupBotFilters(TestCase):
             description="Something to tell user",
             reversed_logic=True
         )
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.types.add(sde_models.ItemType.objects.get(id=11))
         _filter.systems.add(
-            ct_models.MapSystem.objects.get(name="Test System 2"))
+            sde_models.SolarSystem.objects.get(name="Test System 2"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -1594,9 +1657,9 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_in_ship_l1_a1(self):
         _filter = ct_models.CurrentShipFilter.objects.create(name="Ship in Location Test",
                                                              description="Something to tell user")
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=10))
+        _filter.types.add(sde_models.ItemType.objects.get(id=10))
         _filter.systems.add(
-            ct_models.MapSystem.objects.get(name="Test System 1"))
+            sde_models.SolarSystem.objects.get(name="Test System 1"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -1619,9 +1682,9 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_in_ship_l2_a1(self):
         _filter = ct_models.CurrentShipFilter.objects.create(name="Ship in Location Test",
                                                              description="Something to tell user")
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=10))
+        _filter.types.add(sde_models.ItemType.objects.get(id=10))
         _filter.systems.add(
-            ct_models.MapSystem.objects.get(name="Test System 2"))
+            sde_models.SolarSystem.objects.get(name="Test System 2"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -1644,7 +1707,7 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_in_ship_a1(self):
         _filter = ct_models.CurrentShipFilter.objects.create(name="Ship in Location Test",
                                                              description="Something to tell user")
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=10))
+        _filter.types.add(sde_models.ItemType.objects.get(id=10))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -1667,9 +1730,9 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_in_ship_c2_a1(self):
         _filter = ct_models.CurrentShipFilter.objects.create(name="Ship in Location Test",
                                                              description="Something to tell user")
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=10))
+        _filter.types.add(sde_models.ItemType.objects.get(id=10))
         _filter.constellations.add(
-            ct_models.MapConstellation.objects.get(name="Test Constellation 2"))
+            sde_models.Constellation.objects.get(name="Test Constellation 2"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -1692,9 +1755,9 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_in_ship_r3_a2(self):
         _filter = ct_models.CurrentShipFilter.objects.create(name="Ship in Location Test",
                                                              description="Something to tell user")
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=11))
+        _filter.types.add(sde_models.ItemType.objects.get(id=11))
         _filter.regions.add(
-            ct_models.MapRegion.objects.get(name="Test region 3"))
+            sde_models.Region.objects.get(name="Test region 3"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():
@@ -1717,9 +1780,9 @@ class TestSecGroupBotFilters(TestCase):
     def test_user_in_ship_r3_a3(self):
         _filter = ct_models.CurrentShipFilter.objects.create(name="Ship in Location Test",
                                                              description="Something to tell user")
-        _filter.types.add(ct_models.EveItemType.objects.get(type_id=12))
+        _filter.types.add(sde_models.ItemType.objects.get(id=12))
         _filter.regions.add(
-            ct_models.MapRegion.objects.get(name="Test region 3"))
+            sde_models.Region.objects.get(name="Test region 3"))
 
         users = {}
         for user in ct_models.CharacterAudit.objects.all():

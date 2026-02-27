@@ -2,6 +2,7 @@
 Alliance Auth Test Suite Django settings.
 """
 
+# Alliance Auth
 from allianceauth.project_template.project_name.settings.base import *  # noqa
 
 SITE_URL = "https://example.com"
@@ -10,9 +11,12 @@ CSRF_TRUSTED_ORIGINS = [SITE_URL]
 # Celery configuration
 CELERY_ALWAYS_EAGER = True  # Forces celery to run locally for testing
 
-INSTALLED_APPS += [  # noqa
+INSTALLED_APPS = ["modeltranslation",] + INSTALLED_APPS
+
+INSTALLED_APPS += [
     'corptools',
-    'networkx'
+    'networkx',
+    'eve_sde'
 ]
 
 ROOT_URLCONF = 'tests.urls'

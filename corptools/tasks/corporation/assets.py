@@ -5,40 +5,23 @@ from typing import Union
 # Third Party
 from aiopenapi3 import HTTPError
 from celery import chain, shared_task
+from eve_sde.models import ItemType
 
 # Django
 from django.db.models import F, Q
 from django.db.models.aggregates import Sum
-from django.db.models.functions import Power, Sqrt
-from django.utils import timezone
 
 # Alliance Auth
-from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
-from esi.errors import TokenError
-from esi.exceptions import HTTPNotModified
-from esi.models import Token
 
 # AA Example App
 from corptools.models import (
     AssetCoordiante,
     BridgeOzoneLevel,
-    CharacterAudit,
     CorpAsset,
-    CorporateContract,
-    CorporateContractItem,
     CorporationAudit,
-    CorporationIndustryJob,
-    CorporationWalletDivision,
-    CorporationWalletJournalEntry,
-    EveItemType,
     EveLocation,
-    EveName,
-    MapJumpBridge,
-    MapSystem,
-    MapSystemPlanet,
-    Poco,
     Structure,
 )
 from corptools.task_helpers.update_tasks import fetch_location_name
@@ -115,8 +98,6 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
             asset_item.location_name_id = item.location_id
 
         items.append(asset_item)
-
-    EveItemType.objects.create_bulk_from_esi(_current_type_ids)
 
     delete_query = CorpAsset.objects.filter(
         corporation=audit_corp)  # Flush Assets

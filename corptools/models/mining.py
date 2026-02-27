@@ -1,11 +1,16 @@
+# Standard Library
 from typing import TYPE_CHECKING
 
+# Third Party
+from eve_sde.models import ItemType, SolarSystem
+
+# Django
 from django.db import models
 
 from .audits import CharacterAudit
-from .eve_models import EveItemType, MapSystem
 
 if TYPE_CHECKING:
+    # Alliance Auth
     from esi.stubs import CharactersCharacterIdMiningGetItem
 
 
@@ -13,8 +18,8 @@ class CharacterMiningLedger(models.Model):
     id = models.CharField(max_length=50, primary_key=True)
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
     date = models.DateField()
-    type_name = models.ForeignKey(EveItemType, on_delete=models.CASCADE)
-    system = models.ForeignKey(MapSystem, on_delete=models.CASCADE)
+    type_name = models.ForeignKey(ItemType, on_delete=models.CASCADE)
+    system = models.ForeignKey(SolarSystem, on_delete=models.CASCADE)
     quantity = models.IntegerField()
 
     @staticmethod

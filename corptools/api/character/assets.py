@@ -1,10 +1,14 @@
+# Standard Library
 from typing import List
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.db.models import F, Q, Sum
 from django.utils.translation import gettext as _
 
+# AA Example App
 from corptools import models
 from corptools.api import schema
 from corptools.api.helpers import get_alts_queryset, get_main_character
@@ -31,8 +35,11 @@ class AssetsApiEndpoints:
 
             characters = get_alts_queryset(main)
 
-            asset_locs = models.CharacterAsset.objects.filter(character__character__in=characters,
-                                                              location_name__isnull=False).values_list('location_name').distinct()
+            asset_locs = models.CharacterAsset.objects.filter(
+                character__character__in=characters,
+                location_name__isnull=False).values_list(
+                    'location_name'
+            ).distinct()
             asset_locs = models.EveLocation.objects.filter(
                 location_id__in=asset_locs).order_by('location_name')
 
@@ -85,8 +92,10 @@ class AssetsApiEndpoints:
                     location_flag="AssetSafety").values_list('item_id')
                 assets = assets.filter(location_id__in=asset_locations)
             elif location_id != 0:
-                assets = assets.filter(Q(location_name_id=int(
-                    location_id)) | Q(location_id=int(location_id)))
+                assets = assets.filter(
+                    Q(location_name_id=int(location_id)) | Q(
+                        location_id=int(location_id))
+                )
 
             output = []
 
@@ -103,15 +112,15 @@ class AssetsApiEndpoints:
                     if a.location_name.system:
                         loc["solar_system"] = {
                             "system": {
-                                "id": a.location_name.system.system_id,
+                                "id": a.location_name.system.id,
                                 "name": a.location_name.system.name
                             },
                             "constellation": {
-                                "id": a.location_name.system.constellation.constellation_id,
+                                "id": a.location_name.system.constellation.id,
                                 "name": a.location_name.system.constellation.name
                             },
                             "region": {
-                                "id": a.location_name.system.constellation.region.region_id,
+                                "id": a.location_name.system.constellation.region.id,
                                 "name": a.location_name.system.constellation.region.name
                             },
                             "security_status": a.location_name.system.security_status
@@ -130,11 +139,12 @@ class AssetsApiEndpoints:
                         "id": a.type_name.type_id,
                         "name": type_nm,
                         "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}",
-                        "cat_id": a.type_name.group.category_id
+                        "cat_id": a.type_name.group.id
                     },
                     "quantity": a.quantity,
                     "id": a.item_id,
-                    "expand": True if a.type_name.group.category.category_id in expandable_cats else True if a.type_name_id == 60 else False,  # ships or asset wraps
+                    # ships or asset wraps
+                    "expand": True if a.type_name.group.category.id in expandable_cats else True if a.type_name_id == 60 else False,
                     "location": loc
                 })
 
@@ -177,7 +187,7 @@ class AssetsApiEndpoints:
                         "id": a.type_name.type_id,
                         "name": a.type_name.name,
                         "cat": f"{a.type_name.group.category.name} - {a.type_name.group.name}",
-                        "cat_id": a.type_name.group.category_id
+                        "cat_id": a.type_name.group.id
 
                     },
                     "quantity": a.quantity,
@@ -223,10 +233,13 @@ class AssetsApiEndpoints:
             elif location_id != 0:
                 asset_locations = assets.filter(
                     location_name_id=int(location_id)).values_list('item_id')
-                assets = assets.filter(Q(location_name_id=int(location_id)) | Q(
-                    location_id__in=asset_locations) | Q(location_id=int(location_id)))
+                assets = assets.filter(
+                    Q(location_name_id=int(location_id)) |
+                    Q(location_id__in=asset_locations) |
+                    Q(location_id=int(location_id))
+                )
 
-            assets = assets.values('type_name__group__group_id')\
+            assets = assets.values('type_name__group__id')\
                 .annotate(grp_total=Sum('quantity'))\
                 .annotate(grp_name=F('type_name__group__name'))\
                 .annotate(grp_id=F('type_name__group_id'))\

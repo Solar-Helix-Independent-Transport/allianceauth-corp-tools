@@ -1,12 +1,19 @@
 
+# Third Party
+from eve_sde.models import ItemType
+
+# Django
 from django.db import models
 
+# AA Example App
 from corptools.task_helpers import sanitize_location_flag
 
 from .audits import (
-    CharacterAudit, CorporationAudit, CorptoolsConfiguration, EveLocation,
+    CharacterAudit,
+    CorporationAudit,
+    CorptoolsConfiguration,
+    EveLocation,
 )
-from .eve_models import EveItemType
 
 
 class Asset(models.Model):
@@ -20,9 +27,17 @@ class Asset(models.Model):
     quantity = models.IntegerField()
     type_id = models.IntegerField()
     type_name = models.ForeignKey(
-        EveItemType, on_delete=models.SET_NULL, null=True, default=None)
+        ItemType,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )
     location_name = models.ForeignKey(
-        EveLocation, on_delete=models.SET_NULL, null=True, default=None)
+        EveLocation,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )
 
     # extra's
     name = models.CharField(max_length=255, null=True, default=None)

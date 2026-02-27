@@ -1,3 +1,6 @@
+# Third Party
+from eve_sde.models import ItemType
+
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
@@ -5,7 +8,6 @@ from allianceauth.services.hooks import get_extension_logger
 from corptools.models import (
     CorporationAudit,
     CorporationIndustryJob,
-    EveItemType,
 )
 
 from .. import providers
@@ -96,8 +98,6 @@ def corp_update_industry_jobs(corp_id: int, force_refresh: bool = False) -> str:
         )
 
         new_events.append(_e)
-
-    EveItemType.objects.create_bulk_from_esi(list(type_ids))
 
     if len(new_events):
         CorporationIndustryJob.objects.bulk_create(

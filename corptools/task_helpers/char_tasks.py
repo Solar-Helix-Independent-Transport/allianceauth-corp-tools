@@ -5,6 +5,7 @@ from datetime import timedelta
 
 # Third Party
 from celery import shared_task
+from eve_sde.models import ItemType, Planet
 
 # Django
 from django.db.models import F
@@ -20,7 +21,6 @@ from esi.models import Token
 # AA Example App
 from corptools.task_helpers.update_tasks import (
     fetch_location_name,
-    load_system,
 )
 
 from .. import providers
@@ -41,7 +41,6 @@ from ..models import (
     Contract,
     ContractItem,
     CorporationHistory,
-    EveItemType,
     EveLocation,
     EveName,
     Implant,
@@ -50,7 +49,6 @@ from ..models import (
     MailLabel,
     MailMessage,
     MailRecipient,
-    MapSystemPlanet,
     Notification,
     NotificationText,
     Skill,
@@ -153,7 +151,7 @@ def update_character_location(character_id, force_refresh=False):
         )
         _st = time.perf_counter()
 
-        ship, _ = EveItemType.objects.get_or_create_from_esi(
+        ship, _ = ItemType.objects.get_or_create_from_esi(
             ship_data.ship_type_id)
 
         CharacterLocation.objects.update_or_create(
@@ -314,8 +312,6 @@ def update_character_skill_list(character_id, force_refresh=False):
                 trained_skill_level=skill.trained_skill_level
             )
             _create_skills.append(_skill)
-
-        EveItemType.objects.create_bulk_from_esi(_check_skills)
         Skill.objects.bulk_create(_create_skills)
 
         logger.debug(
@@ -377,8 +373,6 @@ def update_character_skill_queue(character_id, force_refresh=False):
                 training_start_sp=item.training_start_sp
             )
             items.append(queue_item)
-
-        EveItemType.objects.create_bulk_from_esi(_check_skills)
         SkillQueue.objects.bulk_create(items)
 
         logger.debug(
@@ -459,8 +453,6 @@ def update_character_assets(character_id, force_refresh=False):
                     ship.location_name_id = ship.location_id
 
                 items.append(ship)
-
-        EveItemType.objects.create_bulk_from_esi(_current_type_ids)
 
         delete_query = CharacterAsset.objects.filter(
             character=audit_char
@@ -560,8 +552,7 @@ def update_den_locations(character_id, force_refresh=False):
         location_id__lte=max_location_id
     )
     for parent in parents:
-        load_system(parent.location_name.system.system_id)
-        distance = MapSystemPlanet.objects.filter(
+        distance = Planet.objects.filter(
             system=parent.location_name.system
         ).annotate(
             distance=Sqrt(
@@ -702,8 +693,6 @@ def update_character_mining(character_id, force_refresh=False):
             else:
                 new_events.append(_e)
 
-        EveItemType.objects.create_bulk_from_esi(list(type_ids))
-
         if len(new_events):
             CharacterMiningLedger.objects.bulk_create(
                 new_events, ignore_conflicts=True)
@@ -811,8 +800,6 @@ def update_character_industry_jobs(character_id, force_refresh=False):
                 successful_runs=event.successful_runs
             )
             new_events.append(_e)
-
-        EveItemType.objects.create_bulk_from_esi(list(type_ids))
 
         if len(new_events):
             CharacterIndustryJob.objects.bulk_create(
@@ -996,7 +983,7 @@ def update_character_transactions(character_id, force_refresh=False):
         # items = []
         for item in journal_items:
             if item.transaction_id in _current_journal:
-                type_name, _ = EveItemType.objects.get_or_create_from_esi(
+                type_name, _ = ItemType.objects.get_or_create_from_esi(
                     item.type_id
                 )
                 message = f"{item.quantity}x {type_name.name} @ {item.unit_price:,.2f} ISK"
@@ -1111,7 +1098,6 @@ def update_character_clones(character_id, force_refresh=False):
                 )
             )
 
-        EveItemType.objects.create_bulk_from_esi(type_ids)
         Implant.objects.bulk_create(implants)
     except HTTPNotModified:
         logger.info(
@@ -1252,8 +1238,6 @@ def update_character_orders(character_id, force_refresh=False):
             else:
                 creates.append(_order)
 
-        EveItemType.objects.create_bulk_from_esi(type_ids)
-
         if len(updates) > 0:
             CharacterMarketOrder.objects.bulk_update(
                 updates, fields=[
@@ -1347,8 +1331,6 @@ def update_character_order_history(character_id, force_refresh=False):
                 updates.append(_order)
             else:
                 creates.append(_order)
-
-        EveItemType.objects.create_bulk_from_esi(type_ids)
 
         if len(updates) > 0:
             CharacterMarketOrder.objects.bulk_update(
@@ -2005,8 +1987,6 @@ def update_character_contract_items(character_id, contract_id, force_refresh=Fal
             _contract_item = ContractItem.from_esi_model(contract, c)
             _types.add(c.type_id)
             contract_models_new.append(_contract_item)
-
-        EveItemType.objects.create_bulk_from_esi(list(_types))
 
         ContractItem.objects.bulk_create(
             contract_models_new,

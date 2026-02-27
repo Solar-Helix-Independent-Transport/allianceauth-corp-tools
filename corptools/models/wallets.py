@@ -2,13 +2,14 @@
 from typing import TYPE_CHECKING
 
 # Third Party
+from eve_sde.models import ItemType
 from model_utils import Choices
 
 # Django
 from django.db import models
 
 from .audits import CharacterAudit, CorporationAudit, CorptoolsConfiguration
-from .eve_models import EveItemType, EveName
+from .eve_models import EveName
 
 if TYPE_CHECKING:
     # Alliance Auth
@@ -157,7 +158,7 @@ class CharacterBountyStat(models.Model):
         related_name="stats"
     )
     type_name = models.ForeignKey(
-        EveItemType,
+        ItemType,
         on_delete=models.CASCADE
     )
     qty = models.IntegerField()

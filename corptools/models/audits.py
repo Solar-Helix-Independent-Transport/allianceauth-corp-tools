@@ -1,18 +1,22 @@
+# Standard Library
 import datetime
 import logging
 from typing import ClassVar
 
+# Third Party
+from eve_sde.models import ItemType, SolarSystem
 from solo.models import SingletonModel
 
+# Django
 from django.db import models
 from django.db.models import ExpressionWrapper, F, Func
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 
 from .. import app_settings
 from ..managers import AuditCharacterManager, AuditCorporationManager
-from .eve_models import EveItemType, MapSystem
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +25,11 @@ class EveLocation(models.Model):
     location_id = models.BigIntegerField(primary_key=True)
     location_name = models.CharField(max_length=255)
     system = models.ForeignKey(
-        MapSystem, on_delete=models.SET_NULL, null=True, default=None)
+        SolarSystem,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )
     last_update = models.DateTimeField(auto_now=True)
     managed = models.BooleanField(default=False)
     managed_corp = models.ForeignKey(
@@ -463,10 +471,27 @@ class CharacterLocation(models.Model):
         CharacterAudit, on_delete=models.CASCADE, related_name="location")
 
     current_location = models.ForeignKey(
-        EveLocation, on_delete=models.CASCADE, null=True, blank=True, default=None)
+        EveLocation,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        default=None
+    )
     current_ship = models.ForeignKey(
-        EveItemType, on_delete=models.CASCADE, null=True, blank=True, default=None)
+        ItemType,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        default=None
+    )
     current_ship_unique = models.BigIntegerField(
-        null=True, blank=True, default=None)
+        null=True,
+        blank=True,
+        default=None
+    )
     current_ship_name = models.TextField(
-        max_length=150, null=True, blank=True, default=None)
+        max_length=150,
+        null=True,
+        blank=True,
+        default=None
+    )

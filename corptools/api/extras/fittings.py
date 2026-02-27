@@ -1,7 +1,9 @@
+# Third Party
+from eve_sde.models import DogmaAttribute, ItemType
 from ninja import NinjaAPI
 
+# AA Example App
 from corptools.api.helpers import get_alts_queryset, get_main_character
-from corptools.models.eve_models import EveItemDogmaAttribute, EveItemType
 from corptools.models.skills import SkillList
 from corptools.task_helpers.skill_helpers import SkillListCache
 
@@ -56,6 +58,7 @@ class FittingsApiEndpoints:
             if not request.user.is_superuser:
                 return 403, {"message": "Hard no pall!"}
             try:
+                # Third Party
                 from fittings.models import Fitting, FittingItem
             except ImportError:
                 return 500, "Fittings module not found!"
@@ -70,9 +73,9 @@ class FittingsApiEndpoints:
             _skill_ids = [182, 183, 184, 1285, 1289, 1290]
             _level_ids = [277, 278, 279, 1286, 1287, 1288]
 
-            _types = models.EveItemDogmaAttribute.objects.filter(
+            _types = DogmaAttribute.objects.filter(
                 eve_type_id__in=_items, attribute_id__in=_skill_ids + _level_ids)
-            _types = _types | models.EveItemDogmaAttribute.objects.filter(
+            _types = _types | DogmaAttribute.objects.filter(
                 eve_type_id=_fit.ship_type_type_id, attribute_id__in=_skill_ids + _level_ids)
 
             required = {}
@@ -104,7 +107,7 @@ class FittingsApiEndpoints:
                             if s["level"] > skills[s["skill"]]["level"]:
                                 skills[s["skill"]]["level"] = s["level"]
                 out = {}
-                for t in models.EveItemType.objects.filter(type_id__in=list(skill_ids)):
+                for t in ItemType.objects.filter(type_id__in=list(skill_ids)):
                     out[t.name] = skills[t.type_id]['level']
 
             return {
@@ -142,12 +145,12 @@ class FittingsApiEndpoints:
 
             _in = str(request.body.decode())
             items = self.parse_eft_to_items(_in)
-            _items = EveItemType.objects.filter(name__in=items)
+            _items = ItemType.objects.filter(name__in=items)
 
             _skill_ids = [182, 183, 184, 1285, 1289, 1290]
             _level_ids = [277, 278, 279, 1286, 1287, 1288]
 
-            _types = EveItemDogmaAttribute.objects.filter(
+            _types = DogmaAttribute.objects.filter(
                 eve_type_id__in=_items, attribute_id__in=_skill_ids + _level_ids)
 
             required = {}
@@ -182,10 +185,11 @@ class FittingsApiEndpoints:
             sk_check = {
 
             }
-            for t in EveItemType.objects.filter(type_id__in=list(sids)):
+            for t in ItemType.objects.filter(type_id__in=list(sids)):
                 skills[t.type_id]["n"] = t.name
                 sk_check[t.name] = skills[t.type_id]["l"]
 
+            # Standard Library
             import json
             char_ids = list(
                 characters.values_list('character_id', flat=True)
@@ -220,7 +224,7 @@ class FittingsApiEndpoints:
             if not request.user.is_superuser:
                 return 403, {"message": "Hard no pall!"}
 
-            _types = models.EveItemDogmaAttribute.objects.filter(
+            _types = DogmaAttribute.objects.filter(
                 eve_type_id=type_id)
 
             dogma = {}

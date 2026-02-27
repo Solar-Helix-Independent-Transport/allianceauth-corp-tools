@@ -1,3 +1,6 @@
+# Third Party
+from eve_sde.models import ItemType
+
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 from esi.exceptions import HTTPNotModified
@@ -7,7 +10,6 @@ from corptools.models import (
     CorporateContract,
     CorporateContractItem,
     CorporationAudit,
-    EveItemType,
     EveName,
 )
 
@@ -141,7 +143,6 @@ def corp_contract_item_fetch(corp_id, contract_id, force_refresh=False):
                     contract, c)
                 _types.add(c.type_id)
                 contract_models_new.append(_contract_item)
-            EveItemType.objects.create_bulk_from_esi(list(_types))
             CorporateContractItem.objects.bulk_create(
                 contract_models_new, batch_size=1000, ignore_conflicts=True)
         except HTTPNotModified:

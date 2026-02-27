@@ -1,10 +1,24 @@
+# Standard Library
 import json
 import xml.etree.ElementTree as ET
 from datetime import timedelta
 
+# Third Party
 from celery.schedules import crontab
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
+from eve_sde.models import (
+    Constellation,
+    DogmaAttribute,
+    ItemCategory,
+    ItemGroup,
+    ItemType,
+    ItemTypeMaterials,
+    Region,
+    SolarSystem,
+    Stargate,
+)
 
+# Django
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
@@ -13,6 +27,7 @@ from django.template import TemplateDoesNotExist
 from django.urls import reverse
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.crontab.utils import offset_cron
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
 from allianceauth.services.hooks import get_extension_logger
@@ -23,15 +38,25 @@ from . import __version__, app_settings
 from .api.corporation import dashboards
 from .forms import UploadForm
 from .models import (
-    CharacterAudit, CorpAsset, CorporationAudit, CorptoolsConfiguration,
-    EveItemCategory, EveItemDogmaAttribute, EveItemGroup, EveItemType,
-    EveLocation, EveName, InvTypeMaterials, MapConstellation, MapJumpBridge,
-    MapRegion, MapSystem, MapSystemGate, SkillList, Structure,
+    CharacterAudit,
+    CorpAsset,
+    CorporationAudit,
+    CorptoolsConfiguration,
+    EveLocation,
+    EveName,
+    MapJumpBridge,
+    SkillList,
+    Structure,
 )
 from .tasks import (
-    check_account, clear_all_etags, update_all_characters, update_all_corps,
-    update_all_eve_names, update_all_locations, update_character, update_corp,
-    update_models_from_sde,
+    check_account,
+    clear_all_etags,
+    update_all_characters,
+    update_all_corps,
+    update_all_eve_names,
+    update_all_locations,
+    update_character,
+    update_corp,
 )
 
 logger = get_extension_logger(__name__)
@@ -196,15 +221,15 @@ def corptools_menu(request):
 def admin(request):
     # get available models
     names = EveName.objects.all().count()
-    types = EveItemType.objects.all().count()
-    dogma = EveItemDogmaAttribute.objects.all().count()
-    groups = EveItemGroup.objects.all().count()
-    categorys = EveItemCategory.objects.all().count()
-    type_mets = InvTypeMaterials.objects.count()
-    regions = MapRegion.objects.all().count()
-    constellations = MapConstellation.objects.all().count()
-    systems = MapSystem.objects.all().count()
-    gates = MapSystemGate.objects.all().count()
+    types = ItemType.objects.all().count()
+    dogma = DogmaAttribute.objects.all().count()
+    groups = ItemGroup.objects.all().count()
+    categorys = ItemCategory.objects.all().count()
+    type_mets = ItemTypeMaterials.objects.count()
+    regions = Region.objects.all().count()
+    constellations = Constellation.objects.all().count()
+    systems = SolarSystem.objects.all().count()
+    gates = Stargate.objects.all().count()
     location = EveLocation.objects.all().count()
     bridges = MapJumpBridge.objects.all().count()
 
@@ -249,9 +274,6 @@ def admin(request):
 @permission_required('corptools.admin')
 def admin_run_tasks(request):
     if request.method == 'POST':
-        if request.POST.get('run_universe'):
-            messages.info(request, "Queued update_or_create_map")
-            update_models_from_sde.apply_async(priority=6)
         if request.POST.get('run_update_all'):
             messages.info(request, "Queued update_all_characters")
             update_all_characters.apply_async(priority=6)
