@@ -109,7 +109,10 @@ const CharacterSkills = () => {
     return (
       <ErrorBoundary>
         <h5 className="text-center w-100">Skills Coverage (in percentage)</h5>
-        <p className="text-center w-100 text-muted">Top 10 Characters in Skill Points</p>
+        <p className="text-center w-100 text-muted small">
+          Top 10 Characters in Skill Points (Showing only where a character have at least 10% of a
+          group)
+        </p>
         <div className="w-100" style={{ height: "600px" }}>
           <SkillsRadarGraph characterID={Number(char_id)} />
         </div>

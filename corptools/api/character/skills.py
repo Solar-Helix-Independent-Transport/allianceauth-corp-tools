@@ -135,11 +135,15 @@ class SkillApiEndpoints:
 
             output = []
             for k, d in dict(sorted(character_skills.items())).items():
+                tot = 0
                 for c in character_names:
                     if c not in d:
                         d[c] = 0
-                    d[c] = round(d[c])
-                output.append(d)
+                    else:
+                        d[c] = round(d[c])
+                        tot = tot if tot > d[c] else d[c]
+                if tot > 10:
+                    output.append(d)
 
             return {"characters": list(character_names), "data": output}
 
