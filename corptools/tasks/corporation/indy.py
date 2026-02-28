@@ -37,7 +37,10 @@ def corp_update_industry_jobs(corp_id: int, force_refresh: bool = False) -> str:
         corporation_id=_corporation.corporation.corporation_id,
         include_completed=True,
         token=token
-    ).results(force_refresh=force_refresh)
+    ).results(
+        force_refresh=force_refresh,
+        store_cache=False
+    )
 
     existing_pks: set[int] = set(
         # only one we care about.

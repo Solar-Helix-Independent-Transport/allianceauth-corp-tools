@@ -45,7 +45,8 @@ def corp_contract_update(corp_id, force_refresh=False):
         corporation_id=corp_id,
         token=token
     ).results(
-        force_refresh=force_refresh
+        force_refresh=force_refresh,
+        store_cache=False
     )
 
     contract_models_new = []
@@ -133,7 +134,8 @@ def corp_contract_item_fetch(corp_id, contract_id, force_refresh=False):
                 contract_id=contract_id,
                 token=token
             ).results(
-                force_refresh=force_refresh
+                force_refresh=force_refresh,
+                store_cache=False
             )
 
             contract_models_new = []

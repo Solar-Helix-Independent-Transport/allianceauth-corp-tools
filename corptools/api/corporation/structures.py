@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import List
 
 # Third Party
+from eve_sde.models import TypeDogma
 from ninja import NinjaAPI
 
 # Django
@@ -273,9 +274,9 @@ class StructureApiEndpoints:
                             "qty": a.quantity
                         })
 
-            _dogma = models.EveItemDogmaAttribute.objects.filter(
-                eve_type_id=structure.first().type_id,
-                attribute_id__in=[12, 13, 14, 1137, 2216, 2056]
+            _dogma = TypeDogma.objects.filter(
+                item_type_id=structure.first().type_id,
+                dogma_attribute_id__in=[12, 13, 14, 1137, 2216, 2056]
             )
             slots = {"low": 8, "med": 8, "high": 8, "rig": 3,
                      "service": 0, "fighter": 0, "subsystem": 0}

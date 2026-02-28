@@ -34,7 +34,8 @@ def update_character_logins_from_corp(corp_id, full_update=False):
         corporation_id=corp_id,
         token=token
     ).results(
-        force_refresh=full_update
+        force_refresh=full_update,
+        store_cache=False
     )
 
     for c in tracking:

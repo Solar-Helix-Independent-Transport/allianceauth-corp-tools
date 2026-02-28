@@ -1,14 +1,17 @@
+# Standard Library
 import logging
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.core.cache import cache
 from django.utils.translation import gettext as _
 
-from allianceauth.eveonline.tasks import (
-    update_character as eve_character_update,
-)
+# Alliance Auth
+from allianceauth.eveonline.tasks import update_character as eve_character_update
 
+# AA Example App
 from corptools import app_settings, models
 from corptools.api import schema
 from corptools.api.helpers import get_alts_queryset, get_main_character
@@ -71,8 +74,8 @@ class RefreshApiEndpoints:
 
             force = app_settings.CT_USERS_CAN_FORCE_REFRESH or request.user.is_superuser
 
-            # and not request.user.is_superuser:
-            if cache.get(f"refresh-block-account-{character_id}", False):
+            #
+            if cache.get(f"refresh-block-account-{character_id}", False) and not request.user.is_superuser:
                 logger.error(
                     f"GO AWAY! Already Requested! {character_id} {request.user.username}")
                 return 200, {"message": "GO AWAY! Already Requested!"}

@@ -5,7 +5,7 @@ from random import random
 # Third Party
 from celery import chain as Chain
 from celery import shared_task
-from eve_sde.models import DogmaAttribute, ItemType
+from eve_sde.models import ItemType, TypeDogma
 
 # Django
 from django.core.exceptions import ObjectDoesNotExist
@@ -654,17 +654,17 @@ def update_char_wallet_bounty_text(self, character_id, entry_id, force_refresh=F
 
     for bty in entry.reason.split(","):
         b = bty.split(":")
-        ship_type, _ = ItemType.objects.get_or_create_from_esi(
-            b[0].strip()
+        ship_type = ItemType.objects.get(
+            id=b[0].strip()
         )
-        ship_dogma = DogmaAttribute.objects.filter(
-            eve_type_id=ship_type.type_id,
-            attribute_id=481
+        ship_dogma = TypeDogma.objects.filter(
+            item_type__id=ship_type.id,
+            dogma_attribute_id=481
         ).first()
         bounties.append(
             {
                 "msg": f"{b[1].strip()}x {ship_type.name} @ {ship_dogma.value:,.0f} ISK",
-                "type_id": ship_type.type_id,
+                "type_id": ship_type.id,
                 "qty": b[1].strip()
             }
         )

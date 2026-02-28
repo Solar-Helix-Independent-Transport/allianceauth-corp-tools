@@ -58,7 +58,8 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
         corporation_id=corp_id,
         token=token
     ).results(
-        force_refresh=force_refresh
+        force_refresh=force_refresh,
+        store_cache=False
     )
 
     location_names = list(
@@ -141,7 +142,8 @@ def build_managed_asset_locations(self, corp_id, force_refresh: bool = True):
             token=token
         ).result(
             force_refresh=force_refresh,
-            use_etag=False
+            use_etag=False,
+            store_cache=False
         )
         for d in divs.hangar:
             divisions[f"CorpSAG{d.division}"] = d.name

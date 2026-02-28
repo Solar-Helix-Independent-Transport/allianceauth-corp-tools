@@ -37,8 +37,8 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
     # logger.debug("Started structures for: %s" % (str(character_id)))
 
     def _structures_db_update(_corporation, _structure, _name):
-        str_type, _ = ItemType.objects.get_or_create_from_esi(
-            _structure.type_id
+        str_type = ItemType.objects.get(
+            id=_structure.type_id
         )
 
         _structure_ob, _created = Structure.objects.update_or_create(
@@ -175,7 +175,8 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
         corporation_id=_corporation.corporation.corporation_id,
         token=token
     ).results(
-        force_refresh=force_refresh
+        force_refresh=force_refresh,
+        store_cache=False
     )
 
     for structure in structures:
@@ -265,7 +266,8 @@ def corp_starbase_update(corp_id, force_refresh=True):  # Set true as we have ba
         corporation_id=_corporation.corporation.corporation_id,
         token=_token
     ).results(
-        force_refresh=force_refresh
+        force_refresh=force_refresh,
+        store_cache=False
     )
 
     if not len(starbases):
@@ -309,7 +311,8 @@ def corp_starbase_update(corp_id, force_refresh=True):  # Set true as we have ba
                 system_id=sb.system_id,
                 token=_token
             ).result(
-                force_refresh=force_refresh
+                force_refresh=force_refresh,
+                store_cache=False
             )
         except HTTPNotModified:
             continue
@@ -386,26 +389,12 @@ def corp_update_pocos(corp_id, full_update=False):
         corporation_id=audit_corp.corporation.corporation_id,
         token=token
     ).results(
-        force_refresh=full_update
+        force_refresh=full_update,
+        store_cache=False
     )
 
     # Get all Poco Names ( planet name here )
     _all_ids = [p.office_id for p in poco_data]
-
-    # Ensure all planets are in DB
-    _all_system_ids = [p.system_id for p in poco_data]
-
-    _pids = []
-    for system_id in _all_system_ids:
-        _s = providers.esi_openapi.client.Universe.GetUniverseSystemsSystemId(
-            system_id=system_id
-        ).result()
-        _pids += [
-            _p.planet_id for _p in _s.planets
-        ]
-
-    for _p in _pids:
-        _, _ = Planet.objects.get_or_create_from_esi(_p)
 
     token_assets = get_corp_token(
         corp_id, ['esi-assets.read_corporation_assets.v1'], req_roles)

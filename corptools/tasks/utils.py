@@ -20,6 +20,7 @@ from esi.exceptions import (
     HTTPClientError,
     HTTPServerError,
 )
+from esi.rate_limiting import interval_to_seconds
 
 logger = get_extension_logger(__name__)
 
@@ -116,3 +117,34 @@ def chunks(lst, n):
 
     for i in range(0, total, n):
         yield lst[i:i + n]
+
+
+def limit_to_rate(rate_limit):
+    """convert things like 100/15m or 10/s to a delay in seconds"""
+    lim = rate_limit.split("/")
+    if len(lim[1]) < 2:
+        secs = interval_to_seconds(f"1{lim[1]}")
+    else:
+        secs = interval_to_seconds(lim[1])
+    return secs/int(lim[0])
+
+
+def rate_limited_task_no_fail(rate_limit):
+    delay = limit_to_rate(rate_limit)
+
+    def decorator(func):
+        def rate_lim_wrapper(*args, **kwargs):
+            if args[0].request.retries == 0:
+                # If it's our first go we will wait for the rate limit time
+                args[0].retry(countdown=delay)
+            excp = None
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                excp = e
+                logger.exception(e)
+            finally:
+                if isinstance(excp, Retry):
+                    raise excp
+        return rate_lim_wrapper
+    return decorator

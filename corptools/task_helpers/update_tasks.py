@@ -1,18 +1,5 @@
-# Standard Library
-import bz2
-from concurrent.futures import ThreadPoolExecutor, as_completed
-
 # Third Party
-import requests
-from bravado.exception import HTTPForbidden
 from eve_sde.models import (
-    DogmaAttribute,
-    ItemCategory,
-    ItemGroup,
-    ItemType,
-    ItemTypeMaterials,
-    Moon,
-    Planet,
     SolarSystem,
 )
 
@@ -21,6 +8,7 @@ from django.core.cache import cache
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
+from esi.exceptions import HTTPClientError, HTTPNotModified
 from esi.models import Token
 
 # AA Example App
@@ -62,7 +50,7 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
         return EveLocation(location_id=location_id,
                            location_name="Asset Safety")
     elif 30000000 < location_id < 33000000:  # Solar System
-        system = SolarSystem.objects.filter(system_id=location_id)
+        system = SolarSystem.objects.filter(id=location_id)
         if not system.exists():
             logger.error("Unknown System, Have you populated the map?")
             # TODO Do i fire the map population task here?
@@ -76,7 +64,7 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
         station = providers.esi_openapi.client.Universe.GetUniverseStationsStationId(
             station_id=location_id
         ).result()
-        system = SolarSystem.objects.filter(system_id=station.system_id)
+        system = SolarSystem.objects.filter(id=station.system_id)
         if not system.exists():
             logger.error("Unknown System, Have you populated the map?")
             # TODO Do i fire the map population task here?
@@ -98,21 +86,22 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
         try:
             structure = providers.esi_openapi.client.Universe.GetUniverseStructuresStructureId(
                 structure_id=location_id,
-                token=token.valid_access_token()
-            ).result()
-        except HTTPForbidden as e:  # no access
-            if int(e.response.headers.get('x-esi-error-limit-remain')) < 50:
+                token=token
+            ).result(use_etag=False)
+        except HTTPClientError as e:  # no access
+            if int(e.headers.get('x-esi-error-limit-remain')) < 50:
                 set_error_count_flag()
-            logger.debug("Failed to get location:{}, Error:{}, Errors Remaining:{}, Time Remaining: {}".format(
-                location_id,
-                e.message,
-                e.response.headers.get('x-esi-error-limit-remain'),
-                e.response.headers.get('x-esi-error-limit-reset')
-            )
+            logger.debug(
+                "Failed to get location:{}, Error:{}, Errors Remaining:{}, Time Remaining: {}".format(
+                    location_id,
+                    e,
+                    e.headers.get('x-esi-error-limit-remain'),
+                    e.headers.get('x-esi-error-limit-reset')
+                )
             )
             return None
         system = SolarSystem.objects.filter(
-            system_id=structure.solar_system_id
+            id=structure.solar_system_id
         )
         if not system.exists():
             logger.error("Unknown System, Have you populated the map?")

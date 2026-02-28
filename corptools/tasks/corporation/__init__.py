@@ -12,7 +12,7 @@ from esi.exceptions import HTTPClientError, HTTPNotModified, HTTPServerError
 
 from ...models import CorporationAudit
 from .. import app_settings
-from ..utils import esi_error_retry, no_fail_chain
+from ..utils import esi_error_retry, no_fail_chain, rate_limited_task_no_fail
 from .assets import corp_update_assets
 from .characters import update_character_logins_from_corp
 from .contracts import corp_contract_item_fetch, corp_contract_update
@@ -100,9 +100,9 @@ def update_corp_starbases(self, corp_id, force_refresh=False, chain=[]):
     base=QueueOnce,
     name="corptools.tasks.update_corp_contract_items"
 )
-@no_fail_chain
+@rate_limited_task_no_fail("600/15m")
 @esi_error_retry
-def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=False, chain=[]):
+def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=False):
     try:
         return corp_contract_item_fetch(corp_id, contract_id, force_refresh=force_refresh)
     except HTTPNotModified:

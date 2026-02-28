@@ -38,7 +38,10 @@ def update_corp_wallet_divisions(corp_id, full_update=False):  # pagnated result
         division_names = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdDivisions(
             corporation_id=audit_corp.corporation.corporation_id,
             token=token
-        ).result(use_etag=False)
+        ).result(
+            use_etag=False,
+            store_cache=False
+        )
 
         for division in division_names.wallet:
             names[division.division] = division.name
@@ -54,7 +57,8 @@ def update_corp_wallet_divisions(corp_id, full_update=False):  # pagnated result
         corporation_id=audit_corp.corporation.corporation_id,
         token=token
     ).result(
-        force_refresh=full_update
+        force_refresh=full_update,
+        store_cache=False
     )
 
     for division in divisions:
@@ -125,7 +129,8 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
             token=token
         ).result(
             return_response=True,
-            force_refresh=full_update
+            force_refresh=full_update,
+            store_cache=False
         )
 
         _current_journal = set(
@@ -174,10 +179,10 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
             f"CT: Corp {corp_id} Div {wallet_division}, Page: {current_page}, New Transactions! {len(items)}, New Names {_new_names}")
 
         created_names = EveName.objects.create_bulk_from_esi(list(_new_names))
-
         if created_names:
             CorporationWalletJournalEntry.objects.bulk_create(items)
         else:
+            _new_names = set()
             raise Exception("DB Fail")
 
         current_page += 1
@@ -213,7 +218,8 @@ def update_corporation_transactions(corp_id, wallet_division, full_update=False)
         division=wallet_division,
         token=token
     ).results(
-        force_refresh=full_update
+        force_refresh=full_update,
+        store_cache=False
     )
 
     _current_journal = CorporationWalletJournalEntry.objects.filter(

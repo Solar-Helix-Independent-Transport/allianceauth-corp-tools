@@ -151,8 +151,7 @@ def update_character_location(character_id, force_refresh=False):
         )
         _st = time.perf_counter()
 
-        ship, _ = ItemType.objects.get_or_create_from_esi(
-            ship_data.ship_type_id)
+        ship = ItemType.objects.get(id=ship_data.ship_type_id)
 
         CharacterLocation.objects.update_or_create(
             character=audit_char,
@@ -278,7 +277,8 @@ def update_character_skill_list(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).result(
-            force_refresh=force_refresh
+            force_refresh=force_refresh,
+            store_cache=False
         )
 
         # Delete current SkillList
@@ -348,6 +348,7 @@ def update_character_skill_queue(character_id, force_refresh=False):
             token=token
         ).result(
             force_refresh=force_refresh,
+            store_cache=False
         )
 
         _st = time.perf_counter()
@@ -410,7 +411,8 @@ def update_character_assets(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).results(
-            force_refresh=force_refresh
+            force_refresh=force_refresh,
+            store_cache=False
         )
         logger.info(
             f"CT: New assets for: {audit_char.character.character_name}")
@@ -523,7 +525,7 @@ def update_character_assets_names(character_id):
             character_id=character_id,
             body=[i.item_id for i in subset],
             token=token
-        ).results()
+        ).result()
 
         id_list = {i.item_id: i.name for i in assets_names}
 
@@ -651,8 +653,9 @@ def update_character_mining(character_id, force_refresh=False):
         mining = providers.esi_openapi.client.Industry.GetCharactersCharacterIdMining(
             character_id=character_id,
             token=token
-        ).result(
+        ).results(
             force_refresh=force_refresh,
+            store_cache=False
         )
 
         _st = time.perf_counter()
@@ -732,6 +735,7 @@ def update_character_industry_jobs(character_id, force_refresh=False):
             token=token
         ).result(
             force_refresh=force_refresh,
+            store_cache=False
         )
 
         _st = time.perf_counter()
@@ -873,8 +877,9 @@ def update_character_wallet(character_id, force_refresh=False):
         journal_items = providers.esi_openapi.client.Wallet.GetCharactersCharacterIdWalletJournal(
             character_id=character_id,
             token=token
-        ).result(
+        ).results(
             force_refresh=force_refresh,
+            store_cache=False
         )
 
         _st = time.perf_counter()
@@ -914,7 +919,8 @@ def update_character_wallet(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).result(
-            use_etag=False
+            use_etag=False,
+            store_cache=False
         )
 
         audit_char.balance = wallet_ballance
@@ -956,7 +962,8 @@ def update_character_transactions(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).result(
-            use_etag=False
+            use_etag=False,
+            store_cache=False
         )
 
         _st = time.perf_counter()
@@ -976,9 +983,7 @@ def update_character_transactions(character_id, force_refresh=False):
         # items = []
         for item in journal_items:
             if item.transaction_id in _current_journal:
-                type_name, _ = ItemType.objects.get_or_create_from_esi(
-                    item.type_id
-                )
+                type_name = ItemType.objects.get(id=item.type_id)
                 message = f"{item.quantity}x {type_name.name} @ {item.unit_price:,.2f} ISK"
                 CharacterWalletJournalEntry.objects.filter(
                     character=audit_char,
@@ -1016,13 +1021,16 @@ def update_character_clones(character_id, force_refresh=False):
         jump_clones = providers.esi_openapi.client.Clones.GetCharactersCharacterIdClones(
             character_id=character_id,
             token=token
-        ).result()
+        ).result(
+            store_cache=False
+        )
 
         active_clone = providers.esi_openapi.client.Clones.GetCharactersCharacterIdImplants(
             character_id=character_id,
             token=token
         ).result(
-            use_etag=False
+            use_etag=False,
+            store_cache=False
         )
 
         all_locations = list(EveLocation.objects.all(
@@ -1128,7 +1136,8 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).results(
-            force_refresh=force_refresh
+            force_refresh=force_refresh,
+            store_cache=False
         )
 
         _bulkcreate = []
@@ -1194,8 +1203,9 @@ def update_character_orders(character_id, force_refresh=False):
         open_orders = providers.esi_openapi.client.Market.GetCharactersCharacterIdOrders(
             character_id=character_id,
             token=token
-        ).results(
-            force_refresh=force_refresh
+        ).result(
+            force_refresh=force_refresh,
+            store_cache=False
         )
 
         _st = time.perf_counter()
@@ -1284,7 +1294,8 @@ def update_character_order_history(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).results(
-            force_refresh=force_refresh
+            force_refresh=force_refresh,
+            store_cache=False
         )
         _st = time.perf_counter()
 
@@ -1383,7 +1394,8 @@ def update_character_notifications(character_id, force_refresh=False):
             character_id=character_id,
             token=token,
         ).result(
-            force_refresh=force_refresh
+            force_refresh=force_refresh,
+            store_cache=False
         )
 
         _st = time.perf_counter()
@@ -1448,7 +1460,8 @@ def update_character_roles(character_id, force_refresh=False):
             character_id=character_id,
             token=token,
         ).result(
-            force_refresh=force_refresh
+            force_refresh=force_refresh,
+            store_cache=False
         )
 
         _st = time.perf_counter()
@@ -1509,7 +1522,9 @@ def update_character_mail_body(character_id, mail_message, force_refresh=False):
         character_id=character_id,
         mail_id=mail_message.mail_id,
         token=token
-    ).result()
+    ).result(
+        store_cache=False
+    )
 
     mail_message.body = details.body
 
@@ -1538,7 +1553,8 @@ def update_character_mail_headers(character_id, force_refresh=False):
         character_id=character_id,
         token=token
     ).result(
-        use_etag=False
+        use_etag=False,
+        store_cache=False
     )
 
     for label in labels.labels:
@@ -1566,13 +1582,15 @@ def update_character_mail_headers(character_id, force_refresh=False):
             mail = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMail(
                 character_id=character_id,
                 token=token
-            ).result()
+            ).result(
+                store_cache=False)
         else:
             mail = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMail(
                 character_id=character_id,
                 last_mail_id=last_id,
                 token=token
-            ).result()
+            ).result(
+                store_cache=False)
         if len(mail) == 0:
             # If there are 0 and this is not the first page, then we have reached the
             # end of retrievable mail.
@@ -1703,7 +1721,8 @@ def update_character_contacts(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).result(
-            force_refresh=force_refresh
+            force_refresh=force_refresh,
+            store_cache=False
         )
 
         _st = time.perf_counter()
@@ -1731,8 +1750,9 @@ def update_character_contacts(character_id, force_refresh=False):
         contacts = providers.esi_openapi.client.Contacts.GetCharactersCharacterIdContacts(
             character_id=character_id,
             token=token
-        ).result(
-            force_refresh=force_refresh
+        ).results(
+            force_refresh=force_refresh,
+            store_cache=False
         )
         _st = time.perf_counter()
 
@@ -1804,7 +1824,8 @@ def update_character_titles(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).result(
-            force_refresh=force_refresh
+            force_refresh=force_refresh,
+            store_cache=False
         )
 
         _st = time.perf_counter()
@@ -1867,7 +1888,8 @@ def update_character_contracts(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).results(
-            force_refresh=force_refresh
+            force_refresh=force_refresh,
+            store_cache=False
         )
 
         _st = time.perf_counter()
@@ -1967,8 +1989,9 @@ def update_character_contract_items(character_id, contract_id, force_refresh=Fal
             character_id=character_id,
             contract_id=contract_id,
             token=token
-        ).results(
-            force_refresh=force_refresh
+        ).result(
+            force_refresh=force_refresh,
+            store_cache=False
         )
 
         _st = time.perf_counter()
