@@ -83,14 +83,14 @@ class SkillApiEndpoints:
             if not response:
                 return 403, _("Permission Denied")
 
-            characters = get_alts_queryset(main)
+            # characters = get_alts_queryset(main)
             skills = models.Skill.objects.filter(
-                # character__character__character_id=character_id
-                character__character__character_id__in=list(
-                    characters.order_by(
-                        "-characteraudit__skilltotals__total_sp"
-                    ).values_list("character_id", flat=True)[:10]
-                )
+                character__character__character_id=character_id
+                # character__character__character_id__in=list(
+                #     characters.order_by(
+                #         "-characteraudit__skilltotals__total_sp"
+                #     ).values_list("character_id", flat=True)[:10]
+                # )
             ).select_related(
                 'character__character',
                 'skill_name',
@@ -142,7 +142,7 @@ class SkillApiEndpoints:
                     else:
                         d[c] = round(d[c])
                         tot = tot if tot > d[c] else d[c]
-                if tot > 10:
+                if tot > 5:
                     output.append(d)
 
             return {"characters": list(character_names), "data": output}

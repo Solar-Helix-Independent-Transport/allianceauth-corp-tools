@@ -108,14 +108,6 @@ const CharacterSkills = () => {
 
     return (
       <ErrorBoundary>
-        <h5 className="text-center w-100">Skills Coverage (in percentage)</h5>
-        <p className="text-center w-100 text-muted small">
-          Top 10 Characters in Skill Points (Showing only where a character have at least 10% of a
-          group)
-        </p>
-        <div className="w-100" style={{ height: "600px" }}>
-          <SkillsRadarGraph characterID={Number(char_id)} />
-        </div>
         <SelectFilter
           setFilter={setCharacter}
           options={charOptions}
@@ -129,6 +121,13 @@ const CharacterSkills = () => {
           />
           <SelectFilter setFilter={setGroup} options={groups} labelText={t("Group Filter:")} />
           <TextFilter setFilterText={setFilter} labelText={t("Skill Filter:")} />
+        </div>
+        <h5 className="text-center w-100">Skills Coverage (in percentage)</h5>
+        <p className="text-center w-100 text-muted small">
+          Showing only where a character has at least 5% of a group
+        </p>
+        <div className="w-100" style={{ height: "600px" }}>
+          <SkillsRadarGraph characterID={Number(char_id)} />
         </div>
 
         <CharSkillGroups data={skill_data} />

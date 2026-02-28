@@ -41,7 +41,7 @@ export const SkillsRadarGraph = ({ characterID }: { characterID: number }) => {
       maxValue={100}
       fillOpacity={0.2}
       blendMode="normal"
-      curve="catmullRomClosed"
+      curve="cardinalClosed"
       // legends={[
       //     {
       //         anchor: 'top-left',
