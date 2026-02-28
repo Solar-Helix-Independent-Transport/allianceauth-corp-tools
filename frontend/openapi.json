@@ -866,6 +866,38 @@
         "security": [{ "SessionAuth": [] }]
       }
     },
+    "/audit/api/account/{character_id}/skillgraph": {
+      "get": {
+        "operationId": "corptools_api_character_skills_get_character_skillgraph",
+        "summary": "Get Character Skillgraph",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "additionalProperties": true, "title": "Response", "type": "object" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
     "/audit/api/account/{character_id}/skill/history": {
       "get": {
         "operationId": "corptools_api_character_skills_get_character_skill_history",
@@ -2202,11 +2234,18 @@
         "security": [{ "SessionAuth": [] }]
       }
     },
-    "/audit/api/extras/fitting2skills/": {
+    "/audit/api/extras/fitting2skills/{character_id}": {
       "post": {
         "operationId": "corptools_api_extras_fittings_get_fitting_skills",
         "summary": "Get Fitting Skills",
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2470,6 +2509,17 @@
       "get": {
         "operationId": "corptools_api_extras_testing_get_test_api_bravadosih",
         "summary": "Get Test Api Bravadosih",
+        "parameters": [],
+        "responses": { "200": { "description": "OK" } },
+        "description": "Not for real use!\nthis is kinda like bravado in use... no type hinting",
+        "tags": ["Testing"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
+    "/audit/api/extras/test/skilltest": {
+      "get": {
+        "operationId": "corptools_api_extras_testing_get_test_api_skilltests",
+        "summary": "Get Test Api Skilltests",
         "parameters": [],
         "responses": { "200": { "description": "OK" } },
         "description": "Not for real use!\nthis is kinda like bravado in use... no type hinting",

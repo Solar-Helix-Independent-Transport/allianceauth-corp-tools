@@ -64,6 +64,10 @@ export async function getCharacterSkills(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/skills", characterID);
 }
 
+export async function getCharacterSkillGraph(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/skillgraph", characterID);
+}
+
 export async function getCharacterSkillQueues(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/skillqueues", characterID);
 }

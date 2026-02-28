@@ -412,6 +412,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/account/{character_id}/skillgraph": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Skillgraph */
+    get: operations["corptools_api_character_skills_get_character_skillgraph"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/account/{character_id}/skill/history": {
     parameters: {
       query?: never;
@@ -1112,7 +1129,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/audit/api/extras/fitting2skills/": {
+  "/audit/api/extras/fitting2skills/{character_id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1219,6 +1236,27 @@ export interface paths {
      *     this is kinda like bravado in use... no type hinting
      */
     get: operations["corptools_api_extras_testing_get_test_api_bravadosih"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/extras/test/skilltest": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Test Api Skilltests
+     * @description Not for real use!
+     *     this is kinda like bravado in use... no type hinting
+     */
+    get: operations["corptools_api_extras_testing_get_test_api_skilltests"];
     put?: never;
     post?: never;
     delete?: never;
@@ -2623,6 +2661,39 @@ export interface operations {
       };
     };
   };
+  corptools_api_character_skills_get_character_skillgraph: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
   corptools_api_character_skills_get_character_skill_history: {
     parameters: {
       query?: never;
@@ -3945,12 +4016,14 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        character_id: number;
+      };
       cookie?: never;
     };
     requestBody: {
       content: {
-        "text/plain": string;
+        "text/plain": Record<string, never>;
       };
     };
     responses: {
@@ -4171,6 +4244,24 @@ export interface operations {
     };
   };
   corptools_api_extras_testing_get_test_api_bravadosih: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  corptools_api_extras_testing_get_test_api_skilltests: {
     parameters: {
       query?: never;
       header?: never;

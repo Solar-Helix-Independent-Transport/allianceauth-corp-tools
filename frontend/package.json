@@ -15,6 +15,7 @@
   "dependencies": {
     "@nivo/bar": "^0.88.0",
     "@nivo/core": "^0.88.0",
+    "@nivo/radar": "^0.99.0",
     "@tanstack/react-table": "^8.12.0",
     "@types/js-cookie": "^3.0.6",
     "@types/react-router-bootstrap": "^0.26.6",

@@ -8,6 +8,7 @@ import { getCharacterSkills } from "../../api/character";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
+import { SkillsRadarGraph } from "../../Components/Graphs/SkillGroups";
 
 const CharacterSkills = () => {
   const { t } = useTranslation();
@@ -107,6 +108,11 @@ const CharacterSkills = () => {
 
     return (
       <ErrorBoundary>
+        <h5 className="text-center w-100">Skills Coverage (in percentage)</h5>
+        <p className="text-center w-100 text-muted">Top 10 Characters in Skill Points</p>
+        <div className="w-100" style={{ height: "600px" }}>
+          <SkillsRadarGraph characterID={Number(char_id)} />
+        </div>
         <SelectFilter
           setFilter={setCharacter}
           options={charOptions}
