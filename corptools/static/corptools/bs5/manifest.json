@@ -1,51 +1,51 @@
 {
-  "_@app-libs-DXhbg6Rn.js": {
-    "file": "assets/@app-libs-DXhbg6Rn.js",
+  "_@app-libs-MUtQVhKZ.js": {
+    "file": "assets/@app-libs-MUtQVhKZ.js",
     "name": "@app-libs"
   },
-  "_@bootstrap-libs-BONWoPFC.js": {
-    "file": "assets/@bootstrap-libs-BONWoPFC.js",
+  "_@bootstrap-libs-BBHiSAMc.js": {
+    "file": "assets/@bootstrap-libs-BBHiSAMc.js",
     "name": "@bootstrap-libs",
     "imports": [
-      "_@app-libs-DXhbg6Rn.js"
+      "_@app-libs-MUtQVhKZ.js"
     ]
   },
-  "_@lang-libs-DWPHWEO1.js": {
-    "file": "assets/@lang-libs-DWPHWEO1.js",
+  "_@lang-libs-byhYGgjh.js": {
+    "file": "assets/@lang-libs-byhYGgjh.js",
     "name": "@lang-libs",
     "imports": [
-      "_@app-libs-DXhbg6Rn.js"
+      "_@app-libs-MUtQVhKZ.js"
     ],
     "dynamicImports": [
-      "_browser-ponyfill-492OUh8j.js"
+      "_browser-ponyfill-dj_eXM1S.js"
     ]
   },
-  "_@react-libs-CzwxobUb.js": {
-    "file": "assets/@react-libs-CzwxobUb.js",
+  "_@react-libs-BTz7l27V.js": {
+    "file": "assets/@react-libs-BTz7l27V.js",
     "name": "@react-libs",
     "imports": [
-      "_@app-libs-DXhbg6Rn.js",
-      "_@bootstrap-libs-BONWoPFC.js"
+      "_@app-libs-MUtQVhKZ.js",
+      "_@bootstrap-libs-BBHiSAMc.js"
     ]
   },
-  "_browser-ponyfill-492OUh8j.js": {
-    "file": "assets/browser-ponyfill-492OUh8j.js",
+  "_browser-ponyfill-dj_eXM1S.js": {
+    "file": "assets/browser-ponyfill-dj_eXM1S.js",
     "name": "browser-ponyfill",
     "isDynamicEntry": true,
     "imports": [
-      "_@app-libs-DXhbg6Rn.js"
+      "_@app-libs-MUtQVhKZ.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-DNgoxFbq.js",
+    "file": "assets/index-DiiXaxnh.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@app-libs-DXhbg6Rn.js",
-      "_@bootstrap-libs-BONWoPFC.js",
-      "_@react-libs-CzwxobUb.js",
-      "_@lang-libs-DWPHWEO1.js"
+      "_@app-libs-MUtQVhKZ.js",
+      "_@bootstrap-libs-BBHiSAMc.js",
+      "_@react-libs-BTz7l27V.js",
+      "_@lang-libs-byhYGgjh.js"
     ],
     "css": [
       "static/corptools/bs5/static/css/index-B7hQrVZ6.css"
