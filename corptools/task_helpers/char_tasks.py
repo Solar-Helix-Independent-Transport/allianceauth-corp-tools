@@ -1609,28 +1609,29 @@ def update_character_mail_headers(character_id, force_refresh=False):
 
             id_k = int(str(audit_char.character.character_id) +
                        str(msg.mail_id))
-            if msg.from_ not in _current_eve_ids:
-                if msg.from_ not in failed_ids:
+            if getattr(msg, "from") not in _current_eve_ids:
+                if getattr(msg, "from") not in failed_ids:
                     try:
-                        EveName.objects.get_or_create_from_esi(msg.from_)
-                        _current_eve_ids.append(msg.from_)
+                        EveName.objects.get_or_create_from_esi(
+                            getattr(msg, "from"))
+                        _current_eve_ids.append(getattr(msg, "from"))
                     except Exception:
-                        failed_ids.add(msg.from_)
+                        failed_ids.add(getattr(msg, "from"))
                         pass
             msg_obj = MailMessage(
                 character=audit_char,
                 id_key=id_k,
                 mail_id=msg.mail_id,
-                from_id=msg.from_,
+                from_id=getattr(msg, "from"),
                 is_read=msg.is_read,
                 timestamp=msg.timestamp,
                 subject=msg.subject,
                 body=None
             )
 
-            from_name_id = msg.from_
+            from_name_id = getattr(msg, "from")
             if from_name_id in _current_eve_ids:
-                msg_obj.from_name_id = msg.from_
+                msg_obj.from_name_id = getattr(msg, "from")
 
             messages.append(msg_obj)
 
@@ -1644,15 +1645,23 @@ def update_character_mail_headers(character_id, force_refresh=False):
             last_id = msg.mail_id
 
         msgs = MailMessage.objects.bulk_create(
-            messages, batch_size=1000, ignore_conflicts=True)
+            messages,
+            batch_size=1000,
+            ignore_conflicts=True
+        )
 
         LabelThroughModel = MailMessage.labels.through
         lms = []
         for _msg in msgs:
             if _msg.mail_id in m_l_map:
                 for label in m_l_map[_msg.mail_id]:
-                    lm = LabelThroughModel(mailmessage_id=_msg.id_key,
-                                           maillabel_id=MailLabel.objects.get(character=audit_char, label_id=label).pk)
+                    lm = LabelThroughModel(
+                        mailmessage_id=_msg.id_key,
+                        maillabel_id=MailLabel.objects.get(
+                            character=audit_char,
+                            label_id=label
+                        ).pk
+                    )
                     lms.append(lm)
 
         LabelThroughModel.objects.bulk_create(lms, ignore_conflicts=True)
