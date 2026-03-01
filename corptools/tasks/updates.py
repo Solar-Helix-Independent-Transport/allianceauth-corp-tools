@@ -1,26 +1,33 @@
+# Standard Library
 import datetime
 import json
 from random import random
 
+# Third Party
 import requests
-from celery import chain as Chain, shared_task
+from celery import shared_task
+from eve_sde.models import ItemType
 
+# Django
 from django.core.cache import cache
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.eveonline.providers import provider as eve_names
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
 
+# AA Example App
 from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
 
-from .. import app_settings, providers
+from .. import app_settings
 from ..models import (
-    CharacterWalletJournalEntry, EveItemType, EveName, MapSystem, TypePrice,
+    CharacterWalletJournalEntry,
+    EveName,
+    TypePrice,
 )
 from ..task_helpers.update_tasks import (
-    load_system, process_category_from_esi, process_map_from_esi,
-    set_error_count_flag, update_ore_comp_table_from_fuzzworks,
+    set_error_count_flag,
 )
 
 TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
@@ -29,34 +36,6 @@ TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
 logger = get_extension_logger(__name__)
 
 # Bulk Updates
-
-
-@shared_task(
-    name="corptools.tasks.update_or_create_map"
-)
-def update_or_create_map():
-    return process_map_from_esi()
-
-
-@shared_task(
-    name="corptools.tasks.update_ore_comp_table"
-)
-def update_ore_comp_table():
-    return update_ore_comp_table_from_fuzzworks()
-
-
-@shared_task(
-    name="corptools.tasks.update_category"
-)
-def update_category(category_id):
-    return process_category_from_esi(category_id)
-
-
-@shared_task(
-    name="corptools.tasks.process_ores_from_esi"
-)
-def process_ores_from_esi():
-    return process_category_from_esi(25)
 
 
 @shared_task(
@@ -144,19 +123,6 @@ def update_eve_name(self, id):
             name.save()
 
 
-@shared_task(name="corptools.tasks.process_all_categories")
-def process_all_categories():
-    categories = providers.esi.client.Universe.get_universe_categories().result()
-    que = []
-
-    for category in categories:
-        que.append(update_category.si(category))
-
-    Chain(que).apply_async(priority=8)
-
-    return f"Queued {len(que)} Tasks"
-
-
 @shared_task(name="corptools.tasks.run_housekeeping")
 def run_housekeeping():
     notifs = remove_old_notifications()
@@ -165,7 +131,7 @@ def run_housekeeping():
 
 @shared_task(name="corptools.tasks.update_all_raw_minerals")
 def update_all_raw_minerals():
-    _types = EveItemType.objects.filter(group__category_id=4)
+    _types = ItemType.objects.filter(group__category_id=4)
     return update_prices_for_types(list(_types.values_list("type_id", flat=True)))
 
 
@@ -182,7 +148,7 @@ def update_prices_for_types(type_ids: list):
     price_data = response.json()
     price_cache = {}
     for key, item in price_data.items():
-        obj, _ = EveItemType.objects.get_or_create_from_esi(key)
+        obj, _ = ItemType.objects.get_or_create_from_esi(key)
 
         ob, _ = TypePrice.objects.update_or_create(
             item=obj,
@@ -196,12 +162,34 @@ def update_prices_for_types(type_ids: list):
 # Bulk Updates
 
 
-@shared_task(name="corptools.tasks.clear_all_etags")
-def clear_all_etags():
+@shared_task(name="corptools.tasks.clear_all_skill_caches")
+def clear_all_skill_caches():
     try:
+        # Third Party
         from django_redis import get_redis_connection
         _client = get_redis_connection("default")
     except (NotImplementedError, ModuleNotFoundError):
+        # Django
+        from django.core.cache import caches
+        default_cache = caches['default']
+        _client = default_cache.get_master_client()
+
+    keys = _client.keys(":?:SKILL_LISTS_*")
+    deleted = 0
+    if keys:
+        deleted = _client.delete(*keys)
+
+    return f" Deleted {deleted} skill cache keys"
+
+
+@shared_task(name="corptools.tasks.clear_all_etags")
+def clear_all_etags():
+    try:
+        # Third Party
+        from django_redis import get_redis_connection
+        _client = get_redis_connection("default")
+    except (NotImplementedError, ModuleNotFoundError):
+        # Django
         from django.core.cache import caches
         default_cache = caches['default']
         _client = default_cache.get_master_client()
@@ -211,17 +199,6 @@ def clear_all_etags():
         deleted = _client.delete(*keys)
 
     return f"Deleted {deleted} etag keys"
-
-
-@shared_task
-def load_planets_moons_from_esi():
-    for ss in MapSystem.objects.all():
-        load_system_from_esi.delay(ss.system_id)
-
-
-@shared_task
-def load_system_from_esi(system_id):
-    load_system(system_id, moons_update=True)
 
 
 @shared_task

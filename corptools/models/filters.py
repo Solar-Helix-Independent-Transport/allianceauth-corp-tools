@@ -1,15 +1,29 @@
+# Standard Library
 import datetime
 import logging
 from collections import defaultdict
 
+# Third Party
+from eve_sde.models import (
+    Constellation,
+    ItemCategory,
+    ItemGroup,
+    ItemType,
+    Region,
+    SolarSystem,
+)
+
+# Django
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import F, Max, Min
 from django.utils import timezone
 from django.utils.formats import localize
-from django.utils.translation import gettext_lazy as _, ngettext_lazy
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
+# Alliance Auth
 from allianceauth.authentication.models import CharacterOwnership
 from allianceauth.eveonline.models import EveAllianceInfo, EveCorporationInfo
 
@@ -17,10 +31,6 @@ from .. import app_settings, providers
 from .assets import CharacterAsset
 from .audits import CharacterLocation, EveLocation
 from .clones import Clone, JumpClone
-from .eve_models import (
-    EveItemCategory, EveItemGroup, EveItemType, MapConstellation, MapRegion,
-    MapSystem,
-)
 from .interactions import CharacterTitle, CorporationHistory
 from .skills import SkillList, SkillTotals
 
@@ -271,22 +281,42 @@ class AssetsFilter(FilterBase):
         verbose_name_plural = verbose_name
     count_message_only = models.BooleanField(default=False)
 
-    types = models.ManyToManyField(EveItemType, blank=True,
-                                   help_text="Filter on Asset Types.")
-    groups = models.ManyToManyField(EveItemGroup, blank=True,
-                                    help_text="Filter on Asset Groups.")
-    categories = models.ManyToManyField(EveItemCategory, blank=True,
-                                        help_text="Filter on Asset Categories.")
+    types = models.ManyToManyField(
+        ItemType,
+        blank=True,
+        help_text="Filter on Asset Types."
+    )
+    groups = models.ManyToManyField(
+        ItemGroup,
+        blank=True,
+        help_text="Filter on Asset Groups."
+    )
+    categories = models.ManyToManyField(
+        ItemCategory,
+        blank=True,
+        help_text="Filter on Asset Categories."
+    )
 
-    systems = models.ManyToManyField(MapSystem, blank=True,
-                                     help_text="Limit filter to specific systems")
-    constellations = models.ManyToManyField(MapConstellation, blank=True,
-                                            help_text="Limit filter to specific constellations")
-    regions = models.ManyToManyField(MapRegion, blank=True,
-                                     help_text="Limit filter to specific regions")
+    systems = models.ManyToManyField(
+        SolarSystem,
+        blank=True,
+        help_text="Limit filter to specific systems"
+    )
+    constellations = models.ManyToManyField(
+        Constellation,
+        blank=True,
+        help_text="Limit filter to specific constellations"
+    )
+    regions = models.ManyToManyField(
+        Region,
+        blank=True,
+        help_text="Limit filter to specific regions"
+    )
 
     reversed_logic = models.BooleanField(
-        default=False, help_text="Negate the value of the filter, i.e. check for absence of assets")
+        default=False,
+        help_text="Negate the value of the filter, i.e. check for absence of assets"
+    )
 
     def filter_query(self, users):
         character_list = CharacterOwnership.objects.filter(user__in=users) \
@@ -323,17 +353,17 @@ class AssetsFilter(FilterBase):
             output.append(
                 models.Q(location_name__system__in=self.systems.all()))
             output.append(models.Q(
-                location_id__in=self.systems.all().values_list('system_id', flat=True)))
+                location_id__in=self.systems.all().values_list('id', flat=True)))
         if self.constellations.all().count() > 0:
             output.append(
                 models.Q(location_name__system__constellation__in=self.constellations.all()))
-            output.append(models.Q(location_id__in=MapSystem.objects.filter(
-                constellation__in=self.constellations.all()).values_list('system_id', flat=True)))
+            output.append(models.Q(location_id__in=SolarSystem.objects.filter(
+                constellation__in=self.constellations.all()).values_list('id', flat=True)))
         if self.regions.all().count() > 0:
             output.append(
                 models.Q(location_name__system__constellation__region__in=self.regions.all()))
-            output.append(models.Q(location_id__in=MapSystem.objects.filter(
-                constellation__region__in=self.regions.all()).values_list('system_id', flat=True)))
+            output.append(models.Q(location_id__in=SolarSystem.objects.filter(
+                constellation__region__in=self.regions.all()).values_list('id', flat=True)))
 
         if len(output) > 0:
             query = output.pop()
@@ -391,17 +421,32 @@ class CurrentShipFilter(FilterBase):
         verbose_name_plural = verbose_name
     count_message_only = models.BooleanField(default=False)
 
-    types = models.ManyToManyField(EveItemType, blank=True,
-                                   help_text="Filter on Ship Types.")
-    groups = models.ManyToManyField(EveItemGroup, blank=True,
-                                    help_text="Filter on Ship Groups.")
+    types = models.ManyToManyField(
+        ItemType,
+        blank=True,
+        help_text="Filter on Ship Types."
+    )
+    groups = models.ManyToManyField(
+        ItemGroup,
+        blank=True,
+        help_text="Filter on Ship Groups."
+    )
 
-    systems = models.ManyToManyField(MapSystem, blank=True,
-                                     help_text="Limit filter to specific systems")
-    constellations = models.ManyToManyField(MapConstellation, blank=True,
-                                            help_text="Limit filter to specific constellations")
-    regions = models.ManyToManyField(MapRegion, blank=True,
-                                     help_text="Limit filter to specific regions")
+    systems = models.ManyToManyField(
+        SolarSystem,
+        blank=True,
+        help_text="Limit filter to specific systems"
+    )
+    constellations = models.ManyToManyField(
+        Constellation,
+        blank=True,
+        help_text="Limit filter to specific constellations"
+    )
+    regions = models.ManyToManyField(
+        Region,
+        blank=True,
+        help_text="Limit filter to specific regions"
+    )
 
     def filter_query(self, users):
         character_list = CharacterOwnership.objects.filter(user__in=users) \
@@ -438,7 +483,7 @@ class CurrentShipFilter(FilterBase):
             output.append(
                 models.Q(
                     current_location__location_id__in=self.systems.all(
-                    ).values_list('system_id', flat=True)
+                    ).values_list('id', flat=True)
                 )
             )
         if self.constellations.all().count() > 0:
@@ -449,9 +494,9 @@ class CurrentShipFilter(FilterBase):
             )
             output.append(
                 models.Q(
-                    current_location__location_id__in=MapSystem.objects.filter(
+                    current_location__location_id__in=SolarSystem.objects.filter(
                         constellation__in=self.constellations.all()
-                    ).values_list('system_id', flat=True)
+                    ).values_list('id', flat=True)
                 )
             )
         if self.regions.all().count() > 0:
@@ -462,9 +507,9 @@ class CurrentShipFilter(FilterBase):
             )
             output.append(
                 models.Q(
-                    current_location__location_id__in=MapSystem.objects.filter(
+                    current_location__location_id__in=SolarSystem.objects.filter(
                         constellation__region__in=self.regions.all()
-                    ).values_list('system_id', flat=True)
+                    ).values_list('id', flat=True)
                 )
             )
 
@@ -556,13 +601,13 @@ class Skillfilter(FilterBase):
 
             for char in skill_tables:
                 for d_name, d_list in skill_list_base.items():
-                    if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                    if len(skill_tables[char]["doctrines"][d_name]) == 1:
                         skill_list_base[d_name]['pass'] = True
             if req_one.count() > 0:
                 single_pass = False
                 for char in skill_tables:
                     for d_name, d_list in skill_list_single.items():
-                        if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                        if len(skill_tables[char]["doctrines"][d_name]) == 1:
                             single_pass = True
                             break
 
@@ -581,6 +626,7 @@ class Skillfilter(FilterBase):
     def audit_filter(self, users):
         output = defaultdict(lambda: {"message": "No Data", "check": False})
         accounts = providers.skills.get_and_cache_users(users)
+        print(accounts)
         for uid, u in accounts.items():
             message = []
             skill_lists = self.required_skill_lists.all()
@@ -604,7 +650,7 @@ class Skillfilter(FilterBase):
 
                 for char in skill_tables:
                     for d_name, d_list in skill_list_base.items():
-                        if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                        if len(skill_tables[char]["doctrines"][d_name]) == 1:
                             skill_list_base[d_name]['pass'] = True
                             message.append(f"{char}: {d_name}")
 
@@ -612,7 +658,7 @@ class Skillfilter(FilterBase):
                     single_pass = False
                     for char in skill_tables:
                         for d_name, d_list in skill_list_single.items():
-                            if len(skill_tables[char]["doctrines"][d_name]) == 0:
+                            if len(skill_tables[char]["doctrines"][d_name]) == 1:
                                 single_pass = True
                                 message.append(f"{char}: {d_name}")
                                 break
@@ -863,7 +909,10 @@ class HomeStationFilter(FilterBase):
         verbose_name_plural = verbose_name
 
     evelocation = models.ManyToManyField(
-        EveLocation, blank=True, help_text="Limit filter to specific Structures")
+        EveLocation,
+        blank=True,
+        help_text="Limit filter to specific Structures",
+    )
 
     def filter_query(self, users):
         character_list = CharacterOwnership.objects.filter(

@@ -1,15 +1,21 @@
+# Standard Library
 from typing import List
 
+# Third Party
 from ninja import NinjaAPI
 from ninja.pagination import paginate
 
+# Django
 from django.db.models import Count, F, Sum
 from django.utils.translation import gettext_noop as _
 
+# AA Example App
 from corptools import models
 from corptools.api import schema
 from corptools.api.helpers import (
-    Paginator, get_alts_queryset, get_main_character,
+    Paginator,
+    get_alts_queryset,
+    get_main_character,
 )
 
 
@@ -161,7 +167,7 @@ class FinancesApiEndpoints:
                     "volume_remain": w.volume_remain,
                     "volume_total": w.volume_total,
                     "item": {
-                        "id": w.type_name.type_id,
+                        "id": w.type_name.id,
                         "name": w.type_name.name
                     },
                     "price": w.price,
@@ -185,7 +191,7 @@ class FinancesApiEndpoints:
                     "volume_remain": w.volume_remain,
                     "volume_total": w.volume_total,
                     "item": {
-                        "id": w.type_name.type_id,
+                        "id": w.type_name.id,
                         "name": w.type_name.name
                     },
                     "price": w.price,

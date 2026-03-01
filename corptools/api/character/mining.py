@@ -1,11 +1,15 @@
+# Standard Library
 from datetime import timedelta
 from typing import List, Optional
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+# AA Example App
 from corptools import models
 from corptools.api.helpers import get_alts_queryset, get_main_character
 
@@ -61,6 +65,7 @@ class MiningApiEndpoints:
 
             values = {}
             try:
+                # Third Party
                 from moons.helpers import OreHelper
                 values = OreHelper.get_ore_array_with_value()
             except Exception as e:
@@ -103,21 +108,21 @@ class MiningApiEndpoints:
                 t_vol += vol
                 value = 0
 
-                if w.type_name.type_id in values:
-                    value = w.quantity * values[w.type_name.type_id]["value"]
+                if w.type_name.id in values:
+                    value = w.quantity * values[w.type_name.id]["value"]
 
                 t_val += value
 
-                if w.type_name.type_id not in output[_d]["ores"]:
-                    output[_d]["ores"][w.type_name.type_id] = {
+                if w.type_name.id not in output[_d]["ores"]:
+                    output[_d]["ores"][w.type_name.id] = {
                         "name": w.type_name.name,
                         "group": w.type_name.group.name,
-                        "id": w.type_name.type_id,
+                        "id": w.type_name.id,
                         "volume": 0,
                         "value": value
                     }
-                output[_d]["ores"][w.type_name.type_id]["volume"] += vol
-                output[_d]["ores"][w.type_name.type_id]["value"] += value
+                output[_d]["ores"][w.type_name.id]["volume"] += vol
+                output[_d]["ores"][w.type_name.id]["value"] += value
                 output[_d]["volume"] += vol
                 output[_d]["value"] += value
 
@@ -127,9 +132,9 @@ class MiningApiEndpoints:
                         "name": w.character.character.character_name
                     }
 
-                if w.system.system_id not in output[_d]["systems"]:
-                    output[_d]["systems"][w.system.system_id] = {
-                        "id": w.system.system_id,
+                if w.system.id not in output[_d]["systems"]:
+                    output[_d]["systems"][w.system.id] = {
+                        "id": w.system.id,
                         "name": w.system.name
                     }
 

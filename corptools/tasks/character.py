@@ -1,15 +1,17 @@
-import ast
+# Standard Library
 import datetime
-import json
 from random import random
 
-import yaml
-from celery import chain as Chain, shared_task
+# Third Party
+from celery import chain as Chain
+from celery import shared_task
+from eve_sde.models import ItemType, TypeDogma
 
+# Django
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
@@ -18,21 +20,33 @@ from esi.models import Token
 
 from .. import app_settings, providers
 from ..models import (
-    CharacterAudit, CharacterBountyEvent, CharacterBountyStat,
-    CharacterWalletJournalEntry, CorptoolsConfiguration, EveItemDogmaAttribute,
-    EveItemType,
+    CharacterAudit,
+    CharacterBountyEvent,
+    CharacterBountyStat,
+    CharacterWalletJournalEntry,
+    CorptoolsConfiguration,
 )
 from ..task_helpers.char_tasks import (
-    update_character_assets, update_character_clones,
-    update_character_contacts, update_character_contract_items,
-    update_character_contracts, update_character_industry_jobs,
-    update_character_location, update_character_loyaltypoints,
-    update_character_mail_headers, update_character_mining,
-    update_character_notifications, update_character_order_history,
-    update_character_orders, update_character_roles,
-    update_character_skill_list, update_character_skill_queue,
-    update_character_titles, update_character_transactions,
-    update_character_wallet, update_corp_history,
+    update_character_assets,
+    update_character_clones,
+    update_character_contacts,
+    update_character_contract_items,
+    update_character_contracts,
+    update_character_industry_jobs,
+    update_character_location,
+    update_character_loyaltypoints,
+    update_character_mail_headers,
+    update_character_mining,
+    update_character_notifications,
+    update_character_order_history,
+    update_character_orders,
+    update_character_roles,
+    update_character_skill_list,
+    update_character_skill_queue,
+    update_character_titles,
+    update_character_transactions,
+    update_character_wallet,
+    update_corp_history,
 )
 from .locations import update_all_locations
 from .updates import update_all_eve_names
@@ -47,9 +61,11 @@ logger = get_extension_logger(__name__)
 @shared_task(name="corptools.tasks.clear_all_etags")
 def clear_all_etags():
     try:
+        # Third Party
         from django_redis import get_redis_connection
         _client = get_redis_connection("default")
     except (NotImplementedError, ModuleNotFoundError):
+        # Django
         from django.core.cache import caches
         default_cache = caches['default']
         _client = default_cache.get_master_client()
@@ -92,9 +108,17 @@ def re_que_corp_histories():
 
 @shared_task(bind=True, base=QueueOnce, name="corptools.tasks.process_corp_histories")
 def process_corp_histories(self):
-    cid = CharacterAudit.objects.all().order_by(
+    after = timezone.now() - datetime.timedelta(
+        hours=24*(app_settings.CT_CHAR_MAX_INACTIVE_DAYS-1)
+    )
+    cid = CharacterAudit.objects.filter(last_update_pub_data__lte=after).order_by(
         'last_update_pub_data'
-    ).first().character.character_id
+    )
+    if cid.exists():
+        cid = cid.first().character.character_id
+    else:
+        return "No characters to process"
+
     update_char_corp_history(cid)
     re_que_corp_histories.apply_async(countdown=2)
     return f"{(cid)} Character historys Updated"
@@ -336,7 +360,9 @@ def update_char_location(self, character_id, force_refresh=False, chain=[]):
 @esi_error_retry
 def cache_user_skill_list(self, user_id, force_refresh=False, chain=[]):
     providers.skills.get_and_cache_user(
-        user_id, force_rebuild=force_refresh)
+        user_id,
+        force_rebuild=force_refresh
+    )
 
 
 @shared_task(
@@ -636,17 +662,17 @@ def update_char_wallet_bounty_text(self, character_id, entry_id, force_refresh=F
 
     for bty in entry.reason.split(","):
         b = bty.split(":")
-        ship_type, _ = EveItemType.objects.get_or_create_from_esi(
-            b[0].strip()
+        ship_type = ItemType.objects.get(
+            id=b[0].strip()
         )
-        ship_dogma = EveItemDogmaAttribute.objects.filter(
-            eve_type_id=ship_type.type_id,
-            attribute_id=481
+        ship_dogma = TypeDogma.objects.filter(
+            item_type__id=ship_type.id,
+            dogma_attribute_id=481
         ).first()
         bounties.append(
             {
                 "msg": f"{b[1].strip()}x {ship_type.name} @ {ship_dogma.value:,.0f} ISK",
-                "type_id": ship_type.type_id,
+                "type_id": ship_type.id,
                 "qty": b[1].strip()
             }
         )

@@ -64,12 +64,28 @@ export async function getCharacterSkills(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/skills", characterID);
 }
 
+export async function getCharacterSkillGraph(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/skillgraph", characterID);
+}
+
 export async function getCharacterSkillQueues(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/skillqueues", characterID);
 }
 
 export async function getAccountDoctrines(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/doctrines", characterID);
+}
+
+export async function getFitCheck(body: string, characterID: number) {
+  const api = await axios.post(`/audit/api/extras/fitting2skills/${characterID}`, body, {
+    headers: {
+      "X-CSRFToken": Cookies.get("csrftoken"),
+      contentType: "text/plain",
+    },
+  });
+
+  console.log(api.data);
+  return api.data;
 }
 
 export async function getCharacterList() {

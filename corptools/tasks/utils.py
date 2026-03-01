@@ -1,15 +1,26 @@
+# Standard Library
 import datetime
 from functools import wraps
 
+# Third Party
 from bravado.exception import HTTPError
 from celery import signature
 from celery.exceptions import Retry
 from celery_once import AlreadyQueued
 
+# Django
 from django.core.cache import cache
+from django.db.models import QuerySet
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
+from esi.exceptions import (
+    ESIBucketLimitException,
+    HTTPClientError,
+    HTTPServerError,
+)
+from esi.rate_limiting import interval_to_seconds
 
 logger = get_extension_logger(__name__)
 
@@ -57,14 +68,17 @@ def esi_error_retry(func):
         try:
             _ret = func(*args, **kwargs)
         except Exception as e:
-            if isinstance(e, (HTTPError)):
+            if isinstance(e, (HTTPError, HTTPClientError, HTTPServerError)):  # Bravado, OpenAPI
                 code = e.status_code
-                if code == 420:
+                if code in (420, 429):
                     logger.warning(f"Hit ESI error limit! Pausing Tasks! {e}")
                     set_error_flag(60)
                     args[0].retry(countdown=61)
-            elif isinstance(e, (OSError)):
-                logger.warning(f"Hit ESI error limit! Pausing Tasks! {e}")
+            elif isinstance(e, (ESIBucketLimitException)):  # OpenAPI
+                logger.warning(f"Hit ESI rate bucket! Pausing Task! {e}")
+                args[0].retry(countdown=e.reset)
+            elif isinstance(e, (OSError)):  # Bravado
+                logger.warning(f"Hit ESI error! Skipping task! {e}")
             raise e
         return _ret
     return wrapper
@@ -91,3 +105,46 @@ def no_fail_chain(func):
                 raise excp
         return _ret
     return wrapper
+
+
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    total = 0
+    if isinstance(lst, list):
+        total = len(lst)
+    elif isinstance(lst, QuerySet):
+        total = lst.count()
+
+    for i in range(0, total, n):
+        yield lst[i:i + n]
+
+
+def limit_to_rate(rate_limit):
+    """convert things like 100/15m or 10/s to a delay in seconds"""
+    lim = rate_limit.split("/")
+    if len(lim[1]) < 2:
+        secs = interval_to_seconds(f"1{lim[1]}")
+    else:
+        secs = interval_to_seconds(lim[1])
+    return secs/int(lim[0])
+
+
+def rate_limited_task_no_fail(rate_limit):
+    delay = limit_to_rate(rate_limit)
+
+    def decorator(func):
+        def rate_lim_wrapper(*args, **kwargs):
+            if args[0].request.retries == 0:
+                # If it's our first go we will wait for the rate limit time
+                args[0].retry(countdown=delay)
+            excp = None
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                excp = e
+                logger.exception(e)
+            finally:
+                if isinstance(excp, Retry):
+                    raise excp
+        return rate_lim_wrapper
+    return decorator

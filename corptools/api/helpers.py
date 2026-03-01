@@ -1,20 +1,31 @@
+# Standard Library
 from datetime import timedelta
 
+# Third Party
 from ninja import Field, Schema
 from ninja.pagination import LimitOffsetPagination
 from ninja.types import DictStrAny
 
+# Django
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import F, Q, QuerySet, Sum
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 
+# AA Example App
 from corptools.constants.types import (
-    MINING_GAS_GROUPS, MINING_ICE_GROUPS, MINING_MOON_GROUPS,
-    MINING_ORE_GROUPS, RAT_CAPITAL_GROUPS, RAT_OFFICER_CRUISER_GROUPS,
-    RAT_OFFICER_FRIGATE_GROUPS, RAT_OFFICER_GROUPS, RAT_SUPER_GROUPS,
+    MINING_GAS_GROUPS,
+    MINING_ICE_GROUPS,
+    MINING_MOON_GROUPS,
+    MINING_ORE_GROUPS,
+    RAT_CAPITAL_GROUPS,
+    RAT_OFFICER_CRUISER_GROUPS,
+    RAT_OFFICER_FRIGATE_GROUPS,
+    RAT_OFFICER_GROUPS,
+    RAT_SUPER_GROUPS,
     RAT_TITAN_GROUPS,
 )
 
@@ -304,7 +315,7 @@ def glances_assets_character(characters):
         | Q(type_name__group_id=injector_grp),
         character__character__in=characters,
     ).values(
-        'type_name__group__group_id'
+        'type_name__group__id'
     ).annotate(
         grp_total=Sum('quantity')
     ).annotate(
@@ -319,19 +330,19 @@ def glances_assets_character(characters):
 
     sp_assets = models.CharacterAsset.objects.filter(
         character__character__in=characters,
-        type_name__type_id__in=sp_types
+        type_name__id__in=sp_types
     ).values(
-        'type_name__type_id'
+        'type_name__id'
     ).annotate(
         type_total=Sum('quantity')
     )
 
     den_assets = models.CharacterAsset.objects.filter(
         character__character__in=characters,
-        type_name__type_id=85230,
+        type_name__id=85230,
         location_type="solar_system"
     ).values(
-        'type_name__type_id'
+        'type_name__id'
     ).annotate(
         type_total=Sum('quantity')
     )
@@ -359,7 +370,7 @@ def glances_assets_corporation(characters, corp_id, user=None):
         | Q(type_name__group_id=injector_grp),
         corporation__corporation__corporation_id=corp_id,
     ).values(
-        'type_name__group__group_id'
+        'type_name__group__id'
     ).annotate(
         grp_total=Sum('quantity')
     ).annotate(
@@ -381,9 +392,9 @@ def glances_assets_corporation(characters, corp_id, user=None):
 
     sp_assets = models.CorpAsset.objects.filter(
         corporation__corporation__corporation_id=corp_id,
-        type_name__type_id__in=sp_types
+        type_name__id__in=sp_types
     ).values(
-        'type_name__type_id'
+        'type_name__id'
     ).annotate(
         type_total=Sum('quantity')
     )
@@ -439,7 +450,7 @@ def assets_glances(ship_assets, sp_assets):
 
     for group in ship_assets:
         # this is ugly... but functional...
-        grp = group["type_name__group__group_id"]
+        grp = group["type_name__group__id"]
 
         if grp in frig_groups:
             out_groups["frigate"] += group["grp_total"]
@@ -483,7 +494,7 @@ def assets_glances(ship_assets, sp_assets):
             out_groups["merc_den_grp"] += group["grp_total"]
 
     for sp_type in sp_assets:
-        _type = sp_type["type_name__type_id"]
+        _type = sp_type["type_name__id"]
         if _type == 40519:
             out_groups["extractor"] += sp_type["type_total"]
         elif _type == 85230:

@@ -1,3 +1,7 @@
+# THIS IS A BETA BRANCH
+
+It uses a future version of Django ESI, and has minimal Testing. Use at your own risk.
+
 # CorpTools
 
 [![CI](https://github.com/pvyParts/allianceauth-corp-tools/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/pvyParts/allianceauth-corp-tools/actions/workflows/main.yml) [![PyPI version](https://badge.fury.io/py/allianceauth-corptools.svg)](https://badge.fury.io/py/allianceauth-corptools) ![Discord](https://img.shields.io/discord/399006117012832262?label=Support%20Server)
@@ -128,14 +132,15 @@ All permissions are filtered by main character, if a person has neutral alts loa
 
 ### Corporate
 
-| Perm                    | Admin Site | Perm                                                                         | Description                        |
-| ----------------------- | ---------- | ---------------------------------------------------------------------------- | ---------------------------------- |
-| global_corp_manager     | nill       | Can access other character's data for characters in any corp/alliance/state. | Superuser level access             |
-| alliance_corp_manager   | nill       | Can access other character's data for own alliance.                          | Alliance only level access         |
-| own_corp_manager        | nill       | Can access other character's data for own corp.                              | Own Corp restricted level access   |
-| holding_corp_structures | nill       | Can access configured holding corp structure data.                           | Holding Corp Structure data access |
-| holding_corp_wallets    | nill       | Can access configured holding corp wallet data.                              | Holding Corp Structure data access |
-| holding_corp_assets     | nill       | Can access configured holding corp asset data.                               | Holding Corp Structure data access |
+| Perm                    | Admin Site | Perm                                                                         | Description                                                        |
+|-------------------------|------------|------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| global_corp_manager     | nill       | Can access other character's data for characters in any corp/alliance/state. | Superuser level access                                             |
+| alliance_corp_manager   | nill       | Can access other character's data for own alliance.                          | Alliance only level access                                         |
+| own_corp_manager        | nill       | Can access other character's data for own corp.                              | Own Corp restricted level access                                   |
+| show_if_director        | nill       | Can access all corporations's where character is a director.                 | Can access corporation audit where user has one director character |
+| holding_corp_structures | nill       | Can access configured holding corp structure data.                           | Holding Corp Structure data access                                 |
+| holding_corp_wallets    | nill       | Can access configured holding corp wallet data.                              | Holding Corp Structure data access                                 |
+| holding_corp_assets     | nill       | Can access configured holding corp asset data.                               | Holding Corp Structure data access                                 |
 
 Note: Configure the "Holding Corps" in the `Corptools Configuration` Admin Model. via the auth admin interface.
 

@@ -1,12 +1,17 @@
+# Standard Library
 from typing import List
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.db.models import F
 from django.utils.translation import gettext as _
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
+# AA Example App
 from corptools import models
 from corptools.api import schema
 
@@ -27,7 +32,7 @@ class SearchApiEndpoints:
         def get_system_search(request, search_text: str, limit: int = 10):
             if not request.user.is_superuser:
                 return 403, _("Hard no pall!")
-            return models.MapSystem.objects.filter(name__icontains=search_text).values("name", id=F("system_id"))[:limit]
+            return models.MapSystem.objects.filter(name__icontains=search_text).values("name", id=F("id"))[:limit]
 
         @api.get(
             "/search/location/{search_text}",
@@ -49,4 +54,4 @@ class SearchApiEndpoints:
             if not request.user.is_superuser:
                 return 403, _("Hard no pall!")
 
-            return models.EveItemGroup.objects.filter(name__icontains=search_text).values("name", id=F("group_id"))[:limit]
+            return models.EveItemGroup.objects.filter(name__icontains=search_text).values("name", id=F("id"))[:limit]

@@ -1,12 +1,15 @@
+# Standard Library
 import json
 
+# Third Party
+from eve_sde.models import ItemType
 from jsonschema import ValidationError
 
+# Django
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from .audits import CharacterAudit
-from .eve_models import EveItemType
 
 
 class SkillTotals(models.Model):
@@ -32,7 +35,11 @@ class Skill(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
     skill_id = models.IntegerField()
     skill_name = models.ForeignKey(
-        EveItemType, on_delete=models.CASCADE, null=True, default=None)
+        ItemType,
+        on_delete=models.CASCADE,
+        null=True,
+        default=None
+    )
     active_skill_level = models.IntegerField()
     skillpoints_in_skill = models.BigIntegerField()
     trained_skill_level = models.IntegerField()
@@ -56,7 +63,11 @@ class SkillQueue(models.Model):
     queue_position = models.IntegerField()
     skill_id = models.IntegerField()
     skill_name = models.ForeignKey(
-        EveItemType, on_delete=models.CASCADE, null=True, default=None)
+        ItemType,
+        on_delete=models.CASCADE,
+        null=True,
+        default=None
+    )
 
     # Fields that may or may not be present
     finish_date = models.DateTimeField(null=True, default=None)
@@ -74,7 +85,7 @@ def valid_skills(value):
     try:
         data = json.loads(value)
         for skill, level in data.items():
-            if not EveItemType.objects.filter(name=skill).exists():
+            if not ItemType.objects.filter(name=skill).exists():
                 raise ValidationError(
                     _(f'Please enter a valid skill name for `{skill}`. Hint: a known character must have trained the skill for auth to know about it.')
                 )
@@ -97,7 +108,10 @@ class SkillList(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=500, null=True, default=None)
     skill_list = models.TextField(
-        null=True, default="", validators=[valid_skills])
+        null=True,
+        default="",
+        validators=[valid_skills]
+    )
     show_on_audit = models.BooleanField(default=True)
     order_weight = models.IntegerField(default=0)
 

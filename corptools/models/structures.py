@@ -1,12 +1,15 @@
+# Standard Library
 import datetime
 
+# Third Party
+from eve_sde.models import ItemType, Moon, Planet, SolarSystem
 from model_utils import Choices
 
+# Django
 from django.db import models
 from django.utils import timezone
 
 from .audits import CorporationAudit, CorptoolsConfiguration
-from .eve_models import EveItemType, MapSystem, MapSystemMoon, MapSystemPlanet
 
 
 class BridgeOzoneLevel(models.Model):
@@ -47,11 +50,23 @@ class Structure(models.Model):
     # extra
     name = models.CharField(max_length=150)
     system_name = models.ForeignKey(
-        MapSystem, on_delete=models.SET_NULL, null=True, default=None)
+        SolarSystem,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )
     type_name = models.ForeignKey(
-        EveItemType, on_delete=models.SET_NULL, null=True, default=None)
+        ItemType,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )
     closest_celestial = models.ForeignKey(
-        StructureCelestial, on_delete=models.SET_NULL, null=True, default=None)
+        StructureCelestial,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )
     last_online_time = models.DateTimeField(null=True, default=None)
 
     @property
@@ -118,9 +133,17 @@ class Poco(models.Model):
                             default=None, blank=True)
 
     planet = models.ForeignKey(
-        MapSystemPlanet, on_delete=models.SET_NULL, null=True, default=None)
+        Planet,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )
     system_name = models.ForeignKey(
-        MapSystem, on_delete=models.SET_NULL, null=True, default=None)
+        SolarSystem,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )
 
     @classmethod
     def get_visible(cls, user):
@@ -153,19 +176,19 @@ class Starbase(models.Model):
     unanchor_at = models.DateTimeField(null=True, default=None)
 
     moon = models.ForeignKey(
-        MapSystemMoon,
+        Moon,
         on_delete=models.CASCADE,
         null=True,
         default=None
     )
     system = models.ForeignKey(
-        MapSystem,
+        SolarSystem,
         on_delete=models.CASCADE,
         null=True,
         default=None
     )
     type_name = models.ForeignKey(
-        EveItemType,
+        ItemType,
         on_delete=models.CASCADE,
         null=True,
         default=None

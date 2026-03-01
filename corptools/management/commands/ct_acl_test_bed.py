@@ -1,3 +1,4 @@
+# Django
 from django.core.management.base import BaseCommand
 
 
@@ -94,6 +95,7 @@ class Command(BaseCommand):
     help = 'Check '
 
     def handle(self, *args, **options):
+        # Standard Library
         import re
 
         regex = r"^([0-9\.]{10})\s{1}([0-9\:]{8})\s{1}(.*)\s{1}(added|removed|remove|changed)\s{1}([\w\W ]{1,32})( as | to | \()(member|manager|blocked|admin)( from )?(member|manager|blocked|admin)?"
@@ -117,14 +119,19 @@ class Command(BaseCommand):
             names.append([act, grp, nme, cng])
             lookup.add(nme)
 
-        from corptools.providers import esi
-        lookup = esi.client.Universe.post_universe_ids(
+        # AA Example App
+        from corptools.providers import esi_openapi
+        lookup = esi_openapi.client.Universe.PostUniverseIds(
             names=list(lookup)).results()
 
-        corps = [i["name"]
-                 for i in (lookup["corporations"] if lookup["corporations"] else [])]
-        allis = [i["name"]
-                 for i in (lookup["alliances"] if lookup["alliances"] else [])]
+        corps = [
+            i.name
+            for i in (lookup.corporations if lookup.corporations else [])
+        ]
+        allis = [
+            i.name
+            for i in (lookup.alliances if lookup.alliances else [])
+        ]
         for name in names:
             cat = "character"
             if name[2] in corps:

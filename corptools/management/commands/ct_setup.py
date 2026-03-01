@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 
 from allianceauth.crontab.utils import offset_cron
 
-from corptools.tasks import update_or_create_map
+from corptools.tasks import update_models_from_sde
 
 
 class Command(BaseCommand):
@@ -61,11 +61,11 @@ class Command(BaseCommand):
         self.stdout.write("Populating DB models!")
         if options['inline']:
             self.stdout.write("Running Tasks inline this may take some time!")
-            self.stdout.write("Starting Map Update")
-            update_or_create_map()
+            self.stdout.write("Starting Update")
+            update_models_from_sde()
             self.stdout.write("Done Tasks!")
         else:
             self.stdout.write("Sending Tasks to celery for processing!")
-            self.stdout.write("Sending Map Update Task")
-            update_or_create_map.apply_async(priority=6)
+            self.stdout.write("Sending Task")
+            update_models_from_sde.apply_async()
             self.stdout.write("Tasks Queued!")

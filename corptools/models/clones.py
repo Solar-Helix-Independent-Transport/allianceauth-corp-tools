@@ -1,9 +1,11 @@
+# Third Party
+from eve_sde.models import ItemType
 from model_utils import Choices
 
+# Django
 from django.db import models
 
 from .audits import CharacterAudit, EveLocation
-from .eve_models import EveItemType
 
 
 class Clone(models.Model):
@@ -13,7 +15,11 @@ class Clone(models.Model):
     last_station_change_date = models.DateTimeField(null=True, default=None)
     location_id = models.BigIntegerField()
     location_name = models.ForeignKey(
-        EveLocation, on_delete=models.SET_NULL, null=True, default=None)
+        EveLocation,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )
     _type_enum = Choices('station', 'structure')
     location_type = models.CharField(max_length=9, choices=_type_enum)
 
@@ -26,10 +32,18 @@ class JumpClone(models.Model):
     jump_clone_id = models.IntegerField(null=True, default=None)
     location_id = models.BigIntegerField(null=True, default=None)
     location_name = models.ForeignKey(
-        EveLocation, on_delete=models.SET_NULL, null=True, default=None)
+        EveLocation,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )
     _type_enum = Choices('station', 'structure')
     location_type = models.CharField(
-        max_length=9, choices=_type_enum, null=True, default=None)
+        max_length=9,
+        choices=_type_enum,
+        null=True,
+        default=None
+    )
     name = models.CharField(max_length=255, null=True, default=None)
 
 # Implant Model
@@ -38,4 +52,8 @@ class JumpClone(models.Model):
 class Implant(models.Model):
     clone = models.ForeignKey(JumpClone, on_delete=models.CASCADE)
     type_name = models.ForeignKey(
-        EveItemType, on_delete=models.SET_NULL, null=True, default=None)
+        ItemType,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None
+    )

@@ -51,6 +51,7 @@ class CorporationAudit(MenuItemHook):
         if any(
             request.user.has_perm(perm)
             for perm in [
+                "corptools.show_if_director",
                 "corptools.own_corp_manager",
                 "corptools.alliance_corp_manager",
                 "corptools.state_corp_manager",

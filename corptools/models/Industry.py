@@ -1,7 +1,10 @@
+# Third Party
+from eve_sde.models import ItemType
+
+# Django
 from django.db import models
 
 from .audits import CharacterAudit, CorporationAudit
-from .eve_models import EveItemType
 
 
 class CharacterIndustryJob(models.Model):
@@ -12,7 +15,12 @@ class CharacterIndustryJob(models.Model):
     blueprint_location_id = models.BigIntegerField()
     blueprint_type_id = models.BigIntegerField()
     blueprint_type_name = models.ForeignKey(
-        EveItemType, on_delete=models.SET_NULL, null=True, default=None, related_name="blueprint_type")
+        ItemType,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+        related_name="blueprint_type"
+    )
     completed_character_id = models.BigIntegerField(
         default=None, null=True, blank=True)
     completed_date = models.DateTimeField(default=None, null=True, blank=True)
@@ -29,7 +37,12 @@ class CharacterIndustryJob(models.Model):
     probability = models.FloatField(default=None, null=True, blank=True)
     product_type_id = models.IntegerField()
     product_type_name = models.ForeignKey(
-        EveItemType, on_delete=models.SET_NULL, null=True, default=None, related_name="product_type")
+        ItemType,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+        related_name="product_type"
+    )
 
     runs = models.IntegerField()
     start_date = models.DateTimeField()
@@ -49,7 +62,12 @@ class CorporationIndustryJob(models.Model):
     blueprint_location_id = models.BigIntegerField()
     blueprint_type_id = models.BigIntegerField()
     blueprint_type_name = models.ForeignKey(
-        EveItemType, on_delete=models.SET_NULL, null=True, default=None, related_name="corp_blueprint_type")
+        ItemType,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+        related_name="corp_blueprint_type"
+    )
     completed_character_id = models.BigIntegerField(
         default=None, null=True, blank=True)
     completed_date = models.DateTimeField(default=None, null=True, blank=True)
@@ -67,7 +85,12 @@ class CorporationIndustryJob(models.Model):
     probability = models.FloatField(default=None, null=True, blank=True)
     product_type_id = models.IntegerField()
     product_type_name = models.ForeignKey(
-        EveItemType, on_delete=models.SET_NULL, null=True, default=None, related_name="corp_product_type")
+        ItemType,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+        related_name="corp_product_type"
+    )
 
     runs = models.IntegerField()
     start_date = models.DateTimeField()

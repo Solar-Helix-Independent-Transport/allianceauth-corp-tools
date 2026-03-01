@@ -1,23 +1,30 @@
+# Standard Library
 import logging
 
+# Third Party
 from aadiscordbot.app_settings import get_all_servers
 from aadiscordbot.cogs.utils.autocompletes import search_characters
 from aadiscordbot.cogs.utils.decorators import (
-    has_any_perm, in_channels, sender_has_perm,
+    has_any_perm,
+    in_channels,
+    sender_has_perm,
 )
 from discord import option
 from discord.embeds import Embed
 from discord.ext import commands
 from pendulum.datetime import DateTime
 
+# Django
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
+# Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
 from esi.models import Token
 
+# AA Example App
 from corptools.models import EveItemType, MapSystem
-from corptools.providers import esi
+from corptools.providers import esi_openapi
 
 logger = logging.getLogger(__name__)
 
@@ -57,27 +64,42 @@ class Locator(commands.Cog):
 
             t = Token.get_token(alt.character.character_id, scopes)
             if t:
-                online = esi.client.Location.get_characters_character_id_online(character_id=alt.character.character_id,
-                                                                                token=t.valid_access_token()).result()
+                online = esi_openapi.client.Location.GetCharactersCharacterIdOnline(
+                    character_id=alt.character.character_id,
+                    token=t
+                ).result(
+                    use_etag=False
+                )
                 try:
-                    _alt['online'] = "**Online**" if online['online'] else "**Offline**"
+                    _alt['online'] = "**Online**" if online.online else "**Offline**"
                 except Exception:
                     pass
 
                 try:
-                    _alt['last_online'] = online['last_logout']
+                    _alt['last_online'] = online.last_logout
                 except Exception:
                     pass
 
-                location = esi.client.Location.get_characters_character_id_location(character_id=alt.character.character_id,
-                                                                                    token=t.valid_access_token()).result()
+                location = esi_openapi.client.Location.GetCharactersCharacterIdLocation(
+                    character_id=alt.character.character_id,
+                    token=t
+                ).result(
+                    use_etag=False
+                )
                 _alt['system'] = MapSystem.objects.get(
-                    system_id=location['solar_system_id']).name
+                    system_id=location.solar_system_id
+                ).name
 
-                ship = esi.client.Location.get_characters_character_id_ship(character_id=alt.character.character_id,
-                                                                            token=t.valid_access_token()).result()
+                ship = esi_openapi.client.Location.GetCharactersCharacterIdShip(
+                    character_id=alt.character.character_id,
+                    token=t
+                ).result(
+                    use_etag=False
+                )
+
                 shp, _ = EveItemType.objects.get_or_create_from_esi(
-                    ship['ship_type_id'])
+                    ship.ship_type_id
+                )
                 _alt['ship'] = shp
                 _alt['lookup'] = True
                 if online["online"]:
@@ -95,17 +117,21 @@ class Locator(commands.Cog):
                 altstr = []
                 for a in alt_grp:
                     if a['lookup']:
-                        altstr.append(f"[{a['cnm']}](https://evewho.com/character/{a['cid']}) "
-                                      f"*[ [{a['crpnm']}](https://evewho.com/corporation/{a['crpid']}) ]*: "
-                                      f"{a['online']}"
-                                      f" in [{a['system']}](https://evemaps.dotlan.net/system/{a['system'].replace(' ', '_')})"
-                                      f"\n ```Currently in a {a['ship']}"
-                                      f" Last Online: {a['last_online'].strftime('%Y-%m-%d %H:%M')}```")
+                        altstr.append(
+                            f"[{a['cnm']}](https://evewho.com/character/{a['cid']}) "
+                            f"*[ [{a['crpnm']}](https://evewho.com/corporation/{a['crpid']}) ]*: "
+                            f"{a['online']}"
+                            f" in [{a['system']}](https://evemaps.dotlan.net/system/{a['system'].replace(' ', '_')})"
+                            f"\n ```Currently in a {a['ship']}"
+                            f" Last Online: {a['last_online'].strftime('%Y-%m-%d %H:%M')}```"
+                        )
                     else:
-                        altstr.append(f"[{a['cnm']}](https://evewho.com/character/{a['cid']}) "
-                                      f"*[ [{a['crpnm']}](https://evewho.com/corporation/{a['crpid']}) ]*: "
-                                      f"Unknown No Tokens"
-                                      f"")
+                        altstr.append(
+                            f"[{a['cnm']}](https://evewho.com/character/{a['cid']}) "
+                            f"*[ [{a['crpnm']}](https://evewho.com/corporation/{a['crpid']}) ]*: "
+                            f"Unknown No Tokens"
+                            f""
+                        )
 
                 e = Embed(title=header)
                 e.description = "\n".join(altstr)

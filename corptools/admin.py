@@ -1,5 +1,7 @@
+# Third Party
 from solo.admin import SingletonModelAdmin
 
+# Django
 from django.apps import apps
 from django.contrib import admin
 from django.utils.html import format_html
@@ -15,91 +17,91 @@ class ConfigAdmin(SingletonModelAdmin):
     filter_horizontal = ["holding_corps"]
 
 
-@admin.register(models.MapSystem)
-class SystemAdmin(admin.ModelAdmin):
-    list_display = ['name', 'get_region', 'get_constellation']
-    search_fields = [
-        'name', 'constellation__region__name', 'constellation__name']
+# @admin.register(models.MapSystem)
+# class SystemAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'get_region', 'get_constellation']
+#     search_fields = [
+#         'name', 'constellation__region__name', 'constellation__name']
 
-    def get_region(self, obj):
-        return obj.constellation.region.name
+#     def get_region(self, obj):
+#         return obj.constellation.region.name
 
-    def get_constellation(self, obj):
-        return obj.constellation.name
+#     def get_constellation(self, obj):
+#         return obj.constellation.name
 
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related('constellation', 'constellation__region')
+#     def get_queryset(self, request):
+#         return super().get_queryset(request).select_related('constellation', 'constellation__region')
 
-    def get_model_perms(self, request):
-        return {}
-
-
-@admin.register(models.MapRegion)
-class MapRegionAdmin(admin.ModelAdmin):
-    list_display = ['name']
-    search_fields = ['name']
-
-    def get_model_perms(self, request):
-        return {}
+#     def get_model_perms(self, request):
+#         return {}
 
 
-@admin.register(models.MapConstellation)
-class MapConstellationAdmin(admin.ModelAdmin):
-    list_display = ['name', 'get_region']
-    search_fields = ['name', 'region__name']
+# @admin.register(models.MapRegion)
+# class MapRegionAdmin(admin.ModelAdmin):
+#     list_display = ['name']
+#     search_fields = ['name']
 
-    def get_region(self, obj):
-        return obj.region.name
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related('region')
-
-    def get_model_perms(self, request):
-        return {}
+#     def get_model_perms(self, request):
+#         return {}
 
 
-@admin.register(models.MapSystemMoon)
-class MapSystemMoonAdmin(admin.ModelAdmin):
-    list_display = ['name', 'get_region', 'get_constellation', 'get_system']
-    search_fields = ['name', 'system__constellation__region__name',
-                     'system__constellation__name', 'system__name']
+# @admin.register(models.MapConstellation)
+# class MapConstellationAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'get_region']
+#     search_fields = ['name', 'region__name']
 
-    def get_region(self, obj):
-        return obj.system.constellation.region.name
+#     def get_region(self, obj):
+#         return obj.region.name
 
-    def get_constellation(self, obj):
-        return obj.system.constellation.name
+#     def get_queryset(self, request):
+#         return super().get_queryset(request).select_related('region')
 
-    def get_system(self, obj):
-        return obj.system.name
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related('system__constellation__region', 'system__constellation', 'system')
-
-    def get_model_perms(self, request):
-        return {}
+#     def get_model_perms(self, request):
+#         return {}
 
 
-@admin.register(models.MapSystemPlanet)
-class PlanetSystemMoonAdmin(admin.ModelAdmin):
-    list_display = ['name', 'get_region', 'get_constellation', 'get_system']
-    search_fields = ['name', 'system__constellation__region__name',
-                     'system__constellation__name', 'system__name']
+# @admin.register(models.MapSystemMoon)
+# class MapSystemMoonAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'get_region', 'get_constellation', 'get_system']
+#     search_fields = ['name', 'system__constellation__region__name',
+#                      'system__constellation__name', 'system__name']
 
-    def get_region(self, obj):
-        return obj.system.constellation.region.name
+#     def get_region(self, obj):
+#         return obj.system.constellation.region.name
 
-    def get_constellation(self, obj):
-        return obj.system.constellation.name
+#     def get_constellation(self, obj):
+#         return obj.system.constellation.name
 
-    def get_system(self, obj):
-        return obj.system.name
+#     def get_system(self, obj):
+#         return obj.system.name
 
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related('system__constellation__region', 'system__constellation', 'system')
+#     def get_queryset(self, request):
+#         return super().get_queryset(request).select_related('system__constellation__region', 'system__constellation', 'system')
 
-    def get_model_perms(self, request):
-        return {}
+#     def get_model_perms(self, request):
+#         return {}
+
+
+# @admin.register(models.MapSystemPlanet)
+# class PlanetSystemMoonAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'get_region', 'get_constellation', 'get_system']
+#     search_fields = ['name', 'system__constellation__region__name',
+#                      'system__constellation__name', 'system__name']
+
+#     def get_region(self, obj):
+#         return obj.system.constellation.region.name
+
+#     def get_constellation(self, obj):
+#         return obj.system.constellation.name
+
+#     def get_system(self, obj):
+#         return obj.system.name
+
+#     def get_queryset(self, request):
+#         return super().get_queryset(request).select_related('system__constellation__region', 'system__constellation', 'system')
+
+#     def get_model_perms(self, request):
+#         return {}
 
 
 @admin.register(models.EveName)
@@ -147,7 +149,6 @@ class TitleAdmin(admin.ModelAdmin):
 
 
 class assetFilterAdmin(admin.ModelAdmin):
-
     list_display = ['__str__', '_types', '_groups', '_cats',
                     '_systems', '_constellations', '_regions']
 
@@ -243,7 +244,6 @@ class assetFilterAdmin(admin.ModelAdmin):
 
 
 class CurrentShipFilterAdmin(admin.ModelAdmin):
-
     list_display = ['__str__', '_types', '_groups',
                     '_systems', '_constellations', '_regions']
     filter_horizontal = ["types", "groups",
@@ -299,7 +299,6 @@ class CurrentShipFilterAdmin(admin.ModelAdmin):
 
 
 class skillsFilterAdmin(admin.ModelAdmin):
-
     list_display = ['__str__', '_required_skill_lists',
                     '_single_req_skill_lists']
     filter_horizontal = ["required_skill_lists",
@@ -348,12 +347,10 @@ class skillsFilterAdmin(admin.ModelAdmin):
 
 
 class TimeInCorpFilterAdmin(admin.ModelAdmin):
-
     list_display = ['__str__', 'days_in_corp', "reversed_logic"]
 
 
 class CharacterAgeFilterAdmin(admin.ModelAdmin):
-
     list_display = ['__str__', 'min_age', "reversed_logic"]
 
 
@@ -366,7 +363,6 @@ class rolesFilterAdmin(admin.ModelAdmin):
 
 
 class titleFilterAdmin(admin.ModelAdmin):
-
     list_display = ['__str__', 'titles']
 
 
@@ -376,11 +372,44 @@ class LoginAdmin(admin.ModelAdmin):
 
 
 class HomeStationFilterAdmin(admin.ModelAdmin):
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "evelocation":
+            data = set()
+            for f in models.EveLocation._meta.get_fields():
+                if f.auto_created and not f.concrete:
+                    data.update(
+                        set(
+                            f.related_model.objects.all().values_list(
+                                f.field.attname, flat=True).distinct()
+                        )
+                    )
+            kwargs["queryset"] = models.EveLocation.objects.filter(
+                location_id__in=list(data),
+                managed=False
+            )
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     filter_horizontal = ["evelocation"]
 
 
 class JumpCloneFilterAdmin(admin.ModelAdmin):
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "evelocation":
+            data = set()
+            for f in models.EveLocation._meta.get_fields():
+                if f.auto_created and not f.concrete:
+                    print(f)
+                    data.update(
+                        set(
+                            f.related_model.objects.all().values_list(
+                                f.field.attname, flat=True).distinct()
+                        )
+                    )
+            kwargs["queryset"] = models.EveLocation.objects.filter(
+                location_id__in=list(data),
+                managed=False
+            )
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     filter_horizontal = ["evelocation"]
 

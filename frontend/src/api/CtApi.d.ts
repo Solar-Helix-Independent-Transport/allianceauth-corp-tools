@@ -412,6 +412,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/account/{character_id}/skillgraph": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Skillgraph */
+    get: operations["corptools_api_character_skills_get_character_skillgraph"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/account/{character_id}/skill/history": {
     parameters: {
       query?: never;
@@ -746,6 +763,23 @@ export interface paths {
     get: operations["corptools_api_corporation_list_get_visible_corporation_status"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/refresh": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Post Corp Refresh */
+    post: operations["corptools_api_corporation_list_post_corp_refresh"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1095,6 +1129,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/extras/fitting2skills/{character_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Get Fitting Skills
+     * @description Turn a Fitting into a skill list and check characters on account.
+     */
+    post: operations["corptools_api_extras_fittings_get_fitting_skills"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/extras/dogma/{type_id}": {
     parameters: {
       query?: never;
@@ -1190,6 +1244,27 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/extras/test/skilltest": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Test Api Skilltests
+     * @description Not for real use!
+     *     this is kinda like bravado in use... no type hinting
+     */
+    get: operations["corptools_api_extras_testing_get_test_api_skilltests"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/extras/test/newapi2": {
     parameters: {
       query?: never;
@@ -1245,6 +1320,27 @@ export interface paths {
      *     this has type hinting
      */
     get: operations["corptools_api_extras_testing_get_test_api_openapi_4"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/extras/test/newapi5": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Test Api Oiaopenapi3
+     * @description Not for real use!
+     *     this has type hinting
+     */
+    get: operations["corptools_api_extras_testing_get_test_api_oiaopenapi3"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1597,7 +1693,9 @@ export interface components {
       /** Total Logins */
       total_logins?: number | null;
       /** Last Updates */
-      last_updates?: Record<string, never> | null;
+      last_updates?: {
+        [key: string]: unknown;
+      } | null;
     };
     /** CharacterRoles */
     CharacterRoles: {
@@ -1695,9 +1793,13 @@ export interface components {
     CharacterDoctrines: {
       character: components["schemas"]["Character"];
       /** Doctrines */
-      doctrines: Record<string, never>;
+      doctrines: {
+        [key: string]: unknown;
+      };
       /** Skills */
-      skills: Record<string, never>;
+      skills: {
+        [key: string]: unknown;
+      };
     };
     /** CharacterHistory */
     CharacterHistory: {
@@ -1774,7 +1876,9 @@ export interface components {
       /** Active */
       active: boolean;
       /** Last Updates */
-      last_updates?: Record<string, never> | null;
+      last_updates?: {
+        [key: string]: unknown;
+      } | null;
     };
     /** Metenox */
     Metenox: {
@@ -2345,7 +2449,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -2438,7 +2544,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -2475,7 +2583,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -2538,6 +2648,39 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["CharacterSkills"][];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_skills_get_character_skillgraph: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -2748,8 +2891,26 @@ export interface operations {
           "application/json": components["schemas"]["Message"];
         };
       };
+      /** @description Not Modified */
+      304: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
       /** @description Forbidden */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+      /** @description Not Found */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -2807,7 +2968,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -2838,7 +3001,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -2869,7 +3034,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -2900,7 +3067,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3159,6 +3328,37 @@ export interface operations {
       };
     };
   };
+  corptools_api_corporation_list_post_corp_refresh: {
+    parameters: {
+      query: {
+        corporation_id: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Message"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
   corptools_api_corporation_status_get_corporation_status: {
     parameters: {
       query?: never;
@@ -3207,7 +3407,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3381,7 +3583,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3412,7 +3616,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3539,7 +3745,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3570,7 +3778,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3601,7 +3811,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3632,7 +3844,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3663,7 +3877,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3694,7 +3910,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3727,7 +3945,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3758,7 +3978,64 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_extras_fittings_get_fitting_skills: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "text/plain": Record<string, never>;
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3807,7 +4084,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3930,7 +4209,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": {
+            [key: string]: unknown;
+          };
         };
       };
       /** @description Forbidden */
@@ -3963,6 +4244,24 @@ export interface operations {
     };
   };
   corptools_api_extras_testing_get_test_api_bravadosih: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  corptools_api_extras_testing_get_test_api_skilltests: {
     parameters: {
       query?: never;
       header?: never;
@@ -4023,6 +4322,24 @@ export interface operations {
       query?: {
         character_id?: number;
       };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  corptools_api_extras_testing_get_test_api_oiaopenapi3: {
+    parameters: {
+      query?: never;
       header?: never;
       path?: never;
       cookie?: never;

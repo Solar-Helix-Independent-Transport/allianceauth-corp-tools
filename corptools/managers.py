@@ -24,21 +24,21 @@ class EveNameManager(models.Manager):
         """gets bulk names with ESI"""
         if len(eve_ids) > 0:
             from corptools.models import EveName
-            chunk_size = 500
+            chunk_size = 990
             id_chunks = [eve_ids[i:i + chunk_size]
                          for i in range(0, len(eve_ids), chunk_size)]
             for chunk in id_chunks:
-                response = providers.esi.client.Universe.post_universe_names(
-                    ids=chunk
-                ).results()
+                response = providers.esi_openapi.client.Universe.PostUniverseNames(
+                    body=chunk
+                ).result()
                 new_names = []
                 logger.debug(
                     f"CT MAMANGER EveName: count in {len(chunk)} count out {len(response)}")
                 for entity in response:
                     new_names.append(EveName(
-                        eve_id=entity['id'],
-                        name=entity['name'],
-                        category=entity['category']
+                        eve_id=entity.id,
+                        name=entity.name,
+                        category=entity.category
                     ))
                 self.bulk_create(new_names, ignore_conflicts=True)
             return True
@@ -47,14 +47,14 @@ class EveNameManager(models.Manager):
     def update_or_create_from_esi(self, eve_id):
         """updates or create with ESI"""
         try:
-            response = providers.esi.client.Universe.post_universe_names(
-                ids=[eve_id]
+            response = providers.esi_openapi.client.Universe.PostUniverseNames(
+                body=[eve_id]
             ).result()
             entity, created = self.update_or_create(
-                eve_id=response[0]['id'],
+                eve_id=response[0].id,
                 defaults={
-                    'name': response[0]['name'],
-                    'category': response[0]['category'],
+                    'name': response[0].name,
+                    'category': response[0].category,
                 }
             )
         except Exception as e:
@@ -186,17 +186,15 @@ class EveItemTypeManager(models.Manager):
             entity = self.get(name=name)
             created = False
         except ObjectDoesNotExist:
-            ids = providers.esi.client.Universe.post_universe_ids(
-                names=[
-                    name
-                ],
-            ).results()
+            ids = providers.esi_openapi.client.Universe.PostUniverseIds(
+                body=[name]
+            ).result()
             id = None
-            if ids.get("inventory_types"):
-                for nm in ids.get("inventory_types"):
-                    if nm.get("id"):
-                        if nm.get("name") == name:
-                            id = nm.get("id")
+            if ids.inventory_types:
+                for nm in ids.inventory_types:
+                    if nm.id:
+                        if nm.name == name:
+                            id = nm.id
                             break
             if id:
                 entity, created = self.update_or_create_from_esi(id)
