@@ -190,6 +190,7 @@ esi_openapi = OpenAPI(
         # Corp Members
         "GetCorporationsCorporationIdMembertracking",
         # Mail endpoitns
+        "GetCharactersCharacterIdMailLabels",
         "GetCharactersCharacterIdMailMailId",
         "GetCharactersCharacterIdMail",
         # Misc
