@@ -108,9 +108,17 @@ def re_que_corp_histories():
 
 @shared_task(bind=True, base=QueueOnce, name="corptools.tasks.process_corp_histories")
 def process_corp_histories(self):
-    cid = CharacterAudit.objects.all().order_by(
+    after = timezone.now() - datetime.timedelta(
+        hours=24*(app_settings.CT_CHAR_MAX_INACTIVE_DAYS-1)
+    )
+    cid = CharacterAudit.objects.filter(last_update_pub_data__lte=after).order_by(
         'last_update_pub_data'
-    ).first().character.character_id
+    )
+    if cid.exists():
+        cid = cid.first().character.character_id
+    else:
+        return "No characters to process"
+
     update_char_corp_history(cid)
     re_que_corp_histories.apply_async(countdown=2)
     return f"{(cid)} Character historys Updated"
