@@ -108,7 +108,10 @@ class SkillList(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=500, null=True, default=None)
     skill_list = models.TextField(
-        null=True, default="", validators=[valid_skills])
+        null=True,
+        default="",
+        validators=[valid_skills]
+    )
     show_on_audit = models.BooleanField(default=True)
     order_weight = models.IntegerField(default=0)
 

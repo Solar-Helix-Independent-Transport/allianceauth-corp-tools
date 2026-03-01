@@ -3,6 +3,7 @@ import logging
 from typing import List
 
 # Third Party
+from eve_sde.models import ItemGroup
 from ninja import NinjaAPI
 
 # Django
@@ -303,10 +304,16 @@ class AssetsApiEndpoints:
 
             assets = assets.values('type_name__group__id')\
                 .annotate(grp_total=Sum('quantity'))\
-                .annotate(grp_name=F('type_name__group__name'))\
                 .annotate(grp_id=F('type_name__group_id'))\
                 .annotate(cat_id=F('type_name__group__category_id'))\
                 .order_by('-grp_total')
+
+            _names = ItemGroup.objects.filter(
+                id__in=assets.values_list('grp_id', flat=True)
+            )
+            group_names = {}
+            for g in _names:
+                group_names[g.id] = g.name
 
             capital_asset_groups = []
             subcap_asset_groups = []
@@ -317,7 +324,7 @@ class AssetsApiEndpoints:
 
             for grp in assets:
                 _grp = {
-                    "label": grp['grp_name'],
+                    "label": group_names.get(grp['grp_id'], grp['grp_id']),
                     "value": grp['grp_total'],
                 }
                 if grp['grp_id'] in capital_groups:

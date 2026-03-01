@@ -281,17 +281,17 @@ class StructureApiEndpoints:
             slots = {"low": 8, "med": 8, "high": 8, "rig": 3,
                      "service": 0, "fighter": 0, "subsystem": 0}
             for d in _dogma:
-                if d.attribute_id == 12:
+                if d.dogma_attribute_id == 12:
                     slots["low"] = d.value
-                if d.attribute_id == 13:
+                if d.dogma_attribute_id == 13:
                     slots["med"] = d.value
-                if d.attribute_id == 14:
+                if d.dogma_attribute_id == 14:
                     slots["high"] = d.value
-                if d.attribute_id == 1137:
+                if d.dogma_attribute_id == 1137:
                     slots["rig"] = d.value
-                if d.attribute_id == 2216:
+                if d.dogma_attribute_id == 2216:
                     slots["fighter"] = d.value
-                if d.attribute_id == 2056:
+                if d.dogma_attribute_id == 2056:
                     slots["service"] = d.value
 
             return {

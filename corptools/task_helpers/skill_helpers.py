@@ -84,12 +84,16 @@ class SkillListCache():
 
         for skill in skills:
             char = skill.character.character.character_name
-            grp = skill.skill_name.group.name
+            grp = skill.skill_name.group.name_en
             if char not in skill_tables:
                 skill_tables[char] = {
-                    "character_id": skill.character.character.character_id, "omega": True, "skills": {}, "queue": []}
+                    "character_id": skill.character.character.character_id,
+                    "omega": True,
+                    "skills": {},
+                    "queue": []
+                }
 
-            skill_tables[char]["skills"][skill.skill_name.name] = {
+            skill_tables[char]["skills"][skill.skill_name.name_en] = {
                 "grp": grp,
                 "sp_total": skill.skillpoints_in_skill,
                 "active_level": skill.active_skill_level,
@@ -149,11 +153,20 @@ class SkillListCache():
     def get_and_cache_user(self, user_id, force_rebuild=False):
         from ..models import SkillList  # TODO fix the recursive import
 
-        linked_characters = User.objects.get(id=user_id).character_ownerships.all(
-        ).values_list('character__character_id', flat=True)
+        linked_characters = User.objects.get(
+            id=user_id
+        ).character_ownerships.all(
+        ).values_list(
+            'character__character_id',
+            flat=True
+        )
+
         skill_lists = SkillList.objects.all().order_by('order_weight', 'name')
+
         skill_list_hash = self._get_skill_list_hash(
-            skill_lists.values_list('name'))
+            skill_lists.values_list('name')
+        )
+
         account_key = self._build_account_cache_key(linked_characters)
         cached_header = cache.get(SKILL_CACHE_HEADERS_KEY, False)
         skill_lists_up_to_date = cached_header == skill_list_hash
@@ -176,7 +189,9 @@ class SkillListCache():
 
         # Join them all and ship it.
         output_array["skills_list"] = self.check_skill_lists(
-            skill_lists, linked_characters)
+            skill_lists,
+            linked_characters
+        )
 
         out = json.dumps(output_array)
         cache.set(account_key, out, SKILL_CACHE_TIMEOUT_SECONDS)

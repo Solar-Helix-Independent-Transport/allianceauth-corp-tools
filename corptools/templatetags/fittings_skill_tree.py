@@ -23,9 +23,14 @@ def character_skill_overview(context) -> dict:
     # Third Party
     from fittings.models import Fitting, FittingItem
     _fit = Fitting.objects.get(
-        id=int(context.request.resolver_match.kwargs['fit_id']))
+        id=int(context.request.resolver_match.kwargs['fit_id'])
+    )
     _items = FittingItem.objects.filter(
-        fit=_fit).values_list("type_id", flat=True)
+        fit=_fit
+    ).values_list(
+        "type_id",
+        flat=True
+    )
 
     _skill_ids = [182, 183, 184, 1285, 1289, 1290]
     _level_ids = [277, 278, 279, 1286, 1287, 1288]
@@ -71,8 +76,8 @@ def character_skill_overview(context) -> dict:
 
     }
     for t in ItemType.objects.filter(id__in=list(sids)):
-        skills[t.id]["n"] = t.name
-        sk_check[t.name] = skills[t.id]["l"]
+        skills[t.id]["n"] = t.name_en
+        sk_check[t.name_en] = skills[t.id]["l"]
 
     # Standard Library
     import json
