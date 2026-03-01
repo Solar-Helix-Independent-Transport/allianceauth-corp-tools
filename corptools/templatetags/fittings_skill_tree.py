@@ -77,6 +77,7 @@ def character_skill_overview(context) -> dict:
     }
     for t in ItemType.objects.filter(id__in=list(sids)):
         skills[t.id]["n"] = t.name_en
+        skills[t.id]["n_t"] = t.name
         sk_check[t.name_en] = skills[t.id]["l"]
 
     # Standard Library
@@ -100,7 +101,7 @@ def character_skill_overview(context) -> dict:
         del (d["skills"])
 
     response = {
-        "skills": list(sorted(skills.values(), key=lambda item: item["n"])),
+        "skills": list(sorted(skills.values(), key=lambda item: item["n_t"])),
         "chars": dict(sorted(checks.items()))
     }
     context["skills"] = response
