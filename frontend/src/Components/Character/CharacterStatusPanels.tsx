@@ -83,7 +83,7 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                   <Button
                     variant="secondary"
                     size="sm"
-                    href={`https://zkillboard.com/character/${char.character.character_id}`}
+                    href={`https://zkillboard.com/character/${char.character.character_id}/`}
                     target="_blank"
                   >
                     zKill
