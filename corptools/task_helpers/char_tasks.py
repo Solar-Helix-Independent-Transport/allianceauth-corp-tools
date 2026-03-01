@@ -1544,9 +1544,11 @@ def update_character_mail_headers(character_id, force_refresh=False):
         return False
 
     _current_eve_ids = list(
-        EveName.objects.all().values_list('eve_id', flat=True))
+        EveName.objects.all().values_list('eve_id', flat=True)
+    )
     _current_mail_rec = list(
-        MailRecipient.objects.all().values_list('recipient_id', flat=True))
+        MailRecipient.objects.all().values_list('recipient_id', flat=True)
+    )
 
     # Mail Labels
     labels = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMailLabels(
@@ -1574,27 +1576,49 @@ def update_character_mail_headers(character_id, force_refresh=False):
     ).values_list(
         "mail_id",
         flat=True
+    ).order_by(
+        "mail_id"
     )
 
     last_id = None
+    if mail_ids.exists() and not force_refresh:
+        last_id = mail_ids[0]
     while True:
         if last_id is None:
             mail = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMail(
                 character_id=character_id,
                 token=token
             ).result(
-                store_cache=False)
+                store_cache=False
+            )
         else:
             mail = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMail(
                 character_id=character_id,
                 last_mail_id=last_id,
                 token=token
             ).result(
-                store_cache=False)
+                store_cache=False
+            )
         if len(mail) == 0:
             # If there are 0 and this is not the first page, then we have reached the
             # end of retrievable mail.
             break
+
+        names_to_create = set()
+        for msg in mail:
+            if getattr(msg, "from") not in _current_eve_ids:
+                names_to_create.add(getattr(msg, "from"))
+
+            for recip in msg.recipients:
+                if recip.recipient_type != "mailing_list":
+                    names_to_create.add(recip.recipient_id)
+        try:
+            EveName.objects.create_bulk_from_esi(list(names_to_create))
+            _current_eve_ids += list(names_to_create)
+        except Exception as e:
+            logger.error(
+                f"Error Bulk creating eve names for mail headers: {e}")
+            # doing it the hard way...
 
         messages = []
         m_l_map = {}
@@ -1613,11 +1637,14 @@ def update_character_mail_headers(character_id, force_refresh=False):
                 if getattr(msg, "from") not in failed_ids:
                     try:
                         EveName.objects.get_or_create_from_esi(
-                            getattr(msg, "from"))
+                            getattr(msg, "from")
+                        )
                         _current_eve_ids.append(getattr(msg, "from"))
-                    except Exception:
+                    except Exception as e:
+                        logger.error(
+                            f"Error creating eve name for mail header: {e} {vars(msg)}")
                         failed_ids.add(getattr(msg, "from"))
-                        pass
+
             msg_obj = MailMessage(
                 character=audit_char,
                 id_key=id_k,
@@ -1678,10 +1705,13 @@ def update_character_mail_headers(character_id, force_refresh=False):
                             _current_eve_ids.append(recip)
                         recip_name = recip
                     if recip not in _current_mail_rec or force_refresh:
-                        MailRecipient.objects.update_or_create(recipient_id=recip,
-                                                               defaults={
-                                                                   "recipient_name_id": recip_name,
-                                                                   "recipient_type": r_type})
+                        MailRecipient.objects.update_or_create(
+                            recipient_id=recip,
+                            defaults={
+                                "recipient_name_id": recip_name,
+                                "recipient_type": r_type
+                            }
+                        )
                         if not force_refresh:
                             _current_mail_rec.append(recip)
 
