@@ -112,7 +112,7 @@ class MiningApiEndpoints:
 
                 t_val += value
 
-                if w.type_name.type_id not in output[_d]["ores"]:
+                if w.type_name.id not in output[_d]["ores"]:
                     output[_d]["ores"][w.type_name.id] = {
                         "name": w.type_name.name,
                         "group": w.type_name.group.name,
