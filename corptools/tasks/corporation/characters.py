@@ -8,12 +8,12 @@ from allianceauth.services.hooks import get_extension_logger
 from corptools.models import CharacterAudit, CorporationAudit
 
 from .. import providers
-from .utils import get_corp_token, update_corp_audit
+from .utils import NoTokens, get_corp_token, update_corp_audit
 
 logger = get_extension_logger(__name__)
 
 
-@update_corp_audit(update_field="last_update_tracking")
+@update_corp_audit(update_field="tracking")
 def update_character_logins_from_corp(corp_id, full_update=False):
     audit_corp = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
@@ -29,7 +29,7 @@ def update_character_logins_from_corp(corp_id, full_update=False):
     token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
-        return "No Tokens"
+        raise NoTokens("Character Tracking")
     tracking = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdMembertracking(
         corporation_id=corp_id,
         token=token

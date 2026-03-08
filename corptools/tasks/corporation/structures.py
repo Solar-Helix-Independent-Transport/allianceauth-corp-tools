@@ -27,12 +27,12 @@ from corptools.models.eve_models import MapJumpBridge
 from corptools.task_helpers.update_tasks import fetch_location_name
 
 from .. import providers
-from .utils import get_corp_token, update_corp_audit
+from .utils import NoTokens, get_corp_token, update_corp_audit
 
 logger = get_extension_logger(__name__)
 
 
-@update_corp_audit(update_field="last_update_structures")
+@update_corp_audit(update_field="structures")
 def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
     # logger.debug("Started structures for: %s" % (str(character_id)))
 
@@ -165,7 +165,7 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
     token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
-        return "No Tokens"
+        raise NoTokens("Structures")
 
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
@@ -242,7 +242,7 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
 # Medium: 200/hr, 8333 max units for 41.7 hours
 # Large: 400/hr, 16666 max units for 41.7 hours
 
-@update_corp_audit(update_field="last_update_starbases")
+@update_corp_audit(update_field="starbases")
 def corp_starbase_update(corp_id, force_refresh=True):  # Set true as we have bad data
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
@@ -365,7 +365,7 @@ def corp_starbase_update(corp_id, force_refresh=True):  # Set true as we have ba
     return f"CT: Completed Starbases for {_corporation.corporation.corporation_name}"
 
 
-@update_corp_audit(update_field="last_update_pocos")
+@update_corp_audit(update_field="pocos")
 def corp_update_pocos(corp_id, full_update=False):
     audit_corp = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
@@ -383,7 +383,7 @@ def corp_update_pocos(corp_id, full_update=False):
     token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
-        return "No Tokens"
+        raise NoTokens("Poco")
 
     poco_data = providers.esi_openapi.client.Planetary_Interaction.GetCorporationsCorporationIdCustomsOffices(
         corporation_id=audit_corp.corporation.corporation_id,

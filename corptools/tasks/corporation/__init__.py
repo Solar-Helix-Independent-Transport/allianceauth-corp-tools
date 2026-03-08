@@ -187,7 +187,7 @@ def update_corp(corp_id, force_refresh=False):
 def update_all_corps(force_refresh=False):
     corps = CorporationAudit.objects.all().select_related('corporation')
     for corp in corps:
-        countdown = 1 if force_refresh else random()*app_settings.CT_TASK_SPREAD_DELAY*2
+        countdown = 1  # if force_refresh else random()*app_settings.CT_TASK_SPREAD_DELAY*2
         update_corp.apply_async(
             args=[corp.corporation.corporation_id],
             kwargs={

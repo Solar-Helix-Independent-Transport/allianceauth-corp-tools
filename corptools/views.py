@@ -283,7 +283,11 @@ def admin_run_tasks(request):
         if request.POST.get('run_corp_updates'):
             messages.info(request, "Queued update_all_corps")
             update_all_corps.apply_async(
-                priority=6, kwargs={"force_refresh": True})
+                priority=6,
+                kwargs={
+                    "force_refresh": False
+                }
+            )
         if request.POST.get('run_locations'):
             messages.info(request, "Queued update_all_locations")
             update_all_locations.apply_async(priority=6)

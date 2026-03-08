@@ -28,12 +28,12 @@ from corptools.task_helpers.update_tasks import fetch_location_name
 
 from .. import providers
 from ..utils import chunks
-from .utils import get_corp_token, update_corp_audit
+from .utils import NoTokens, get_corp_token, update_corp_audit
 
 logger = get_extension_logger(__name__)
 
 
-@update_corp_audit(update_field="last_update_assets")
+@update_corp_audit(update_field="assets")
 def corp_update_assets(corp_id, force_refresh: bool = False):
     audit_corp = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
@@ -50,7 +50,7 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
     token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
-        return "No Tokens"
+        raise NoTokens("Assets")
 
     failed_locations = []
 

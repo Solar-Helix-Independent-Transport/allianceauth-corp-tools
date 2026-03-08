@@ -11,12 +11,12 @@ from corptools.models import (
 )
 
 from .. import providers
-from .utils import get_corp_token, update_corp_audit
+from .utils import NoTokens, get_corp_token, update_corp_audit
 
 logger = get_extension_logger(__name__)
 
 
-@update_corp_audit(update_field="last_update_industry_jobs")
+@update_corp_audit(update_field="industry_jobs")
 def corp_update_industry_jobs(corp_id: int, force_refresh: bool = False) -> str:
     """
     https://developers.eveonline.com/api-explorer#/operations/GetCorporationsCorporationIdIndustryJobs
@@ -28,7 +28,7 @@ def corp_update_industry_jobs(corp_id: int, force_refresh: bool = False) -> str:
     token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
-        return "No Tokens"
+        raise NoTokens("Indy")
 
     _corporation: CorporationAudit = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
@@ -61,7 +61,7 @@ def corp_update_industry_jobs(corp_id: int, force_refresh: bool = False) -> str:
         if event.job_id in existing_pks:
             _m: CorporationIndustryJob = CorporationIndustryJob.objects.get(
                 corporation=_corporation,
-                job_id=event.get("job_id")
+                job_id=event.job_id
             )
             _m.completed_character_id = event.completed_character_id
             _m.completed_date = event.completed_date

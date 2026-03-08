@@ -16,12 +16,12 @@ from corptools.models import (
 )
 
 from .. import providers
-from .utils import get_corp_token, get_eve_ids, update_corp_audit
+from .utils import NoTokens, get_corp_token, get_eve_ids, update_corp_audit
 
 logger = get_extension_logger(__name__)
 
 
-@update_corp_audit(update_field="last_update_wallet")
+@update_corp_audit(update_field="wallet")
 def update_corp_wallet_divisions(corp_id, full_update=False):  # pagnated results
     # logger.debug("Started wallet divs for: %s" % str(character_id))
     audit_corp = CorporationAudit.objects.get(
@@ -51,7 +51,7 @@ def update_corp_wallet_divisions(corp_id, full_update=False):  # pagnated result
     token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
-        return "No Tokens"
+        raise NoTokens("Wallet Divs")
 
     divisions = providers.esi_openapi.client.Wallet.GetCorporationsCorporationIdWallets(
         corporation_id=audit_corp.corporation.corporation_id,
@@ -81,7 +81,7 @@ def update_corp_wallet_divisions(corp_id, full_update=False):  # pagnated result
     return f"Finished wallet divs for: {audit_corp.corporation.corporation_name}"
 
 
-@update_corp_audit(update_field="last_update_wallet")
+@update_corp_audit(update_field="wallet")
 def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
     audit_corp = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id
@@ -114,7 +114,7 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
     token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
-        return "No Tokens"
+        raise NoTokens("Wallet Div")
 
     current_page = 1
     total_pages = 1
@@ -192,7 +192,7 @@ def update_corp_wallet_journal(corp_id, wallet_division, full_update=False):
     )
 
 
-@update_corp_audit(update_field="last_update_wallet")
+@update_corp_audit(update_field="wallet")
 def update_corporation_transactions(corp_id, wallet_division, full_update=False):
     audit_corp = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
@@ -211,7 +211,7 @@ def update_corporation_transactions(corp_id, wallet_division, full_update=False)
     token = get_corp_token(corp_id, req_scopes, req_roles)
 
     if not token:
-        return "No Tokens"
+        raise NoTokens("Transactions")
 
     journal_items = providers.esi_openapi.client.Wallet.GetCorporationsCorporationIdWalletsDivisionTransactions(
         corporation_id=audit_corp.corporation.corporation_id,

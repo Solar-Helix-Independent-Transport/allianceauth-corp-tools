@@ -14,12 +14,12 @@ from corptools.models import (
 )
 
 from .. import providers
-from .utils import get_corp_token, update_corp_audit
+from .utils import NoTokens, get_corp_token, update_corp_audit
 
 logger = get_extension_logger(__name__)
 
 
-@update_corp_audit(update_field="last_update_contracts")
+@update_corp_audit(update_field="contracts")
 def corp_contract_update(corp_id, force_refresh=False):
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id
@@ -40,7 +40,8 @@ def corp_contract_update(corp_id, force_refresh=False):
     new_contract_ids = []
 
     if not token:
-        return False, []
+        raise NoTokens("Contracts")
+
     contracts = providers.esi_openapi.client.Contracts.GetCorporationsCorporationIdContracts(
         corporation_id=corp_id,
         token=token
@@ -127,7 +128,7 @@ def corp_contract_item_fetch(corp_id, contract_id, force_refresh=False):
         token = get_corp_token(corp_id, req_scopes, False)
 
         if not token:
-            return False
+            return
         try:
             contracts = providers.esi_openapi.client.Contracts.GetCorporationsCorporationIdContractsContractIdItems(
                 corporation_id=corp_id,

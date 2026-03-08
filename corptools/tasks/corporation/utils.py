@@ -19,13 +19,16 @@ from .. import providers
 logger = get_extension_logger(__name__)
 
 
+class NoTokens(Exception):
+    pass
+
+
 def update_corp_audit(update_field: str = ""):
     def decorator(function):
         def wrapper(*args, **kwargs):
             audit_corp = CorporationAudit.objects.get(
                 corporation__corporation_id=args[0]
             )
-
             try:
                 result = function(*args, **kwargs)
                 try:
@@ -35,14 +38,18 @@ def update_corp_audit(update_field: str = ""):
                         audit_corp, f"last_change_{update_field}", timezone.now())
                 except Exception:
                     pass
+                audit_corp.save()
                 return result
             except HTTPNotModified:
                 logger.info(f"Not modified {function} {args} {kwargs}")
                 setattr(audit_corp, update_field, timezone.now())
+                audit_corp.save()
             except HTTPError as e:
                 logger.error(f"HTTPError {function} {args} {kwargs} {e}")
+            except NoTokens as e:
+                logger.error(
+                    f"No Token Found For {audit_corp.corporation.corporation_name} - {e}")
 
-            audit_corp.save()
             return
         return wrapper
     return decorator
