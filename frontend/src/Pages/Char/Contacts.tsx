@@ -65,7 +65,7 @@ const CharacterContacts = () => {
                 <Button
                   variant="link"
                   size="sm"
-                  href={`https://zkillboard.com/${cell.getValue().cat}/${cell.getValue().id}`}
+                  href={`https://zkillboard.com/${cell.getValue().cat}/${cell.getValue().id}/`}
                   target="_blank"
                 >
                   zKill
