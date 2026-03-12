@@ -3,7 +3,6 @@ import datetime
 from functools import wraps
 
 # Third Party
-from bravado.exception import HTTPError
 from celery import signature
 from celery.exceptions import Retry
 from celery_once import AlreadyQueued
@@ -68,7 +67,7 @@ def esi_error_retry(func):
         try:
             _ret = func(*args, **kwargs)
         except Exception as e:
-            if isinstance(e, (HTTPError, HTTPClientError, HTTPServerError)):  # Bravado, OpenAPI
+            if isinstance(e, (HTTPClientError, HTTPServerError)):  # Bravado, OpenAPI
                 code = e.status_code
                 if code in (420, 429):
                     logger.warning(f"Hit ESI error limit! Pausing Tasks! {e}")
