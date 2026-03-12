@@ -27,7 +27,7 @@ const CharacterWalletActivity = () => {
           {cell.getValue()}
           <a
             className="btn btn-sm btn-primary"
-            href={`https://zkillboard.com/${cell.row.original.firstParty.cat}/${cell.row.original.firstParty.id}`}
+            href={`https://zkillboard.com/${cell.row.original.firstParty.cat}/${cell.row.original.firstParty.id}/`}
           >
             <i className="fa fa-external-link" aria-hidden="true"></i>
           </a>
@@ -41,7 +41,7 @@ const CharacterWalletActivity = () => {
           {cell.getValue()}
           <a
             className="btn btn-sm btn-primary"
-            href={`https://zkillboard.com/${cell.row.original.secondParty.cat}/${cell.row.original.secondParty.id}`}
+            href={`https://zkillboard.com/${cell.row.original.secondParty.cat}/${cell.row.original.secondParty.id}/`}
           >
             <i className="fa fa-external-link" aria-hidden="true"></i>
           </a>
