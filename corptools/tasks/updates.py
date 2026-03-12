@@ -13,7 +13,7 @@ from django.core.cache import cache
 from django.utils import timezone
 
 # Alliance Auth
-from allianceauth.eveonline.providers import provider as eve_names
+from allianceauth.eveonline.providers import open_api_provider as eve_names
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
 
