@@ -103,7 +103,7 @@ def update_eve_name(self, id):
                         corporation.save()
                     name.corporation = corporation
                 name.save()
-            if name.category == EveName.ALLIANCE:
+            if name.category == EveName.CORPORATION:
                 update = eve_names.get_corp(id)
                 name.name = update.corporation_name
                 if update.alliance:
