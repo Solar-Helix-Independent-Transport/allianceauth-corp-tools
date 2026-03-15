@@ -274,7 +274,7 @@ def update_character(self, char_id, force_refresh=False):
 
     # Spread out updates over 10 min to try be nice to ESI?
     delay = random() * app_settings.CT_TASK_SPREAD_DELAY
-    if force_refresh or True:
+    if force_refresh:
         delay = 1  # If forced GO NOW!
 
     enqueue_next_task(que, delay=delay)
