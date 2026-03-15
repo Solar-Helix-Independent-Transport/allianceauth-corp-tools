@@ -320,12 +320,10 @@ def corp_starbase_update(corp_id, force_refresh=True):  # Set true as we have ba
         update_fields = {}
 
         if sb.moon_id:
-            moon, _created = Moon.objects.get_or_create_from_esi(
-                sb.moon_id)
+            moon = Moon.objects.get(id=sb.moon_id)
             update_fields["moon"] = moon
 
-        eve_type, _created = ItemType.objects.get_or_create_from_esi(
-            sb.type_id)
+        eve_type = ItemType.objects.get(id=sb.type_id)
 
         Starbase.objects.update_or_create(
             starbase_id=sb.starbase_id,
