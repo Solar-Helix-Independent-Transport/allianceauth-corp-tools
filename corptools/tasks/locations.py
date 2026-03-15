@@ -1,18 +1,30 @@
+# Standard Library
 import datetime
 import json
+from datetime import timezone as tz
 
+# Third Party
 from celery import shared_task
 
+# Django
 from django.core.cache import cache
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
 
 from ..models import (
-    CharacterAsset, CharacterAudit, CharacterMarketOrder, Clone, Contract,
-    CorpAsset, CorporateContract, EveLocation, JumpClone,
+    CharacterAsset,
+    CharacterAudit,
+    CharacterMarketOrder,
+    Clone,
+    Contract,
+    CorpAsset,
+    CorporateContract,
+    EveLocation,
+    JumpClone,
 )
 from ..task_helpers.update_tasks import fetch_location_name
 from .utils import esi_error_retry, no_fail_chain
@@ -52,9 +64,9 @@ def location_get(location_id):
     if data.get('date') is not False:
         try:
             data['date'] = datetime.datetime.strptime(
-                data.get('date'), TZ_STRING).replace(tzinfo=timezone.utc)
+                data.get('date'), TZ_STRING).replace(tzinfo=tz.utc)
         except Exception:
-            data['date'] = datetime.datetime.min.replace(tzinfo=timezone.utc)
+            data['date'] = datetime.datetime.min.replace(tzinfo=tz.utc)
     return data
 
 

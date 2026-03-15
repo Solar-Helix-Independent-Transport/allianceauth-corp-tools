@@ -6,6 +6,7 @@ from functools import wraps
 from celery import signature
 from celery.exceptions import Retry
 from celery_once import AlreadyQueued
+from httpx import RequestError
 
 # Django
 from django.core.cache import cache
@@ -76,6 +77,9 @@ def esi_error_retry(func):
             elif isinstance(e, (ESIBucketLimitException)):  # OpenAPI
                 logger.warning(f"Hit ESI rate bucket! Pausing Task! {e}")
                 args[0].retry(countdown=e.reset)
+            elif isinstance(e, RequestError):
+                logger.warning(f"Uncaught Error from HTTPX, Retrying... {e}")
+                args[0].retry(countdown=30)
             elif isinstance(e, (OSError)):  # Bravado
                 logger.warning(f"Hit ESI error! Skipping task! {e}")
             raise e

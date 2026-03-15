@@ -962,7 +962,6 @@ def update_character_transactions(character_id, force_refresh=False):
             character_id=character_id,
             token=token
         ).result(
-            use_etag=False,
             store_cache=False
         )
 
@@ -1517,17 +1516,17 @@ def update_character_mail_body(character_id, mail_message, force_refresh=False):
 
     if not token:
         return False
-
-    details = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMailMailId(
-        character_id=character_id,
-        mail_id=mail_message.mail_id,
-        token=token
-    ).result(
-        store_cache=False
-    )
-
-    mail_message.body = details.body
-
+    try:
+        details = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMailMailId(
+            character_id=character_id,
+            mail_id=mail_message.mail_id,
+            token=token
+        ).result(
+            store_cache=False
+        )
+        mail_message.body = details.body
+    except HTTPNotModified:
+        pass
     return mail_message
 
 
@@ -1584,24 +1583,28 @@ def update_character_mail_headers(character_id, force_refresh=False):
     if mail_ids.exists() and not force_refresh:
         last_id = mail_ids[0]
     while True:
-        if last_id is None:
-            mail = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMail(
-                character_id=character_id,
-                token=token
-            ).result(
-                store_cache=False
-            )
-        else:
-            mail = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMail(
-                character_id=character_id,
-                last_mail_id=last_id,
-                token=token
-            ).result(
-                store_cache=False
-            )
-        if len(mail) == 0:
-            # If there are 0 and this is not the first page, then we have reached the
-            # end of retrievable mail.
+        try:
+            if last_id is None:
+                mail = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMail(
+                    character_id=character_id,
+                    token=token
+                ).result(
+                    store_cache=False
+                )
+            else:
+                mail = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMail(
+                    character_id=character_id,
+                    last_mail_id=last_id,
+                    token=token
+                ).result(
+                    store_cache=False
+                )
+            if len(mail) == 0:
+                # If there are 0 and this is not the first page, then we have reached the
+                # end of retrievable mail.
+                break
+        except HTTPNotModified:
+            # No New messages
             break
 
         names_to_create = set()
@@ -1626,7 +1629,7 @@ def update_character_mail_headers(character_id, force_refresh=False):
         failed_ids = set()
         stop = False
         for msg in mail:
-            if msg.mail_id == mail_ids:
+            if msg.mail_id in mail_ids:
                 if not force_refresh:
                     break
                 continue
