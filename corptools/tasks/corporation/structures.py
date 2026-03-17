@@ -324,7 +324,13 @@ def corp_starbase_update(corp_id, force_refresh=True):  # Set true as we have ba
             update_fields["moon"] = moon
 
         eve_type = ItemType.objects.get(id=sb.type_id)
-
+        
+        # Convert to Dict until we manage the new OpenAPI Object in our API Structures
+        fuels = [
+            {"type_id": fuel.type_id, "quantity": fuel.quantity}
+            for fuel in (starbase.fuels or [])
+        ]
+        
         Starbase.objects.update_or_create(
             starbase_id=sb.starbase_id,
             corporation=_corporation,
@@ -349,7 +355,7 @@ def corp_starbase_update(corp_id, force_refresh=True):  # Set true as we have ba
                 "online": starbase.online,
                 "unanchor": starbase.unanchor,
                 "use_alliance_standings": starbase.use_alliance_standings,
-                "fuels": starbase.fuels,
+                "fuels": fuels,
                 **update_fields
             }
         )
