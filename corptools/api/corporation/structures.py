@@ -14,6 +14,8 @@ from django.db.models.functions import Power, Sqrt
 from django.http import HttpResponse
 from django.utils import timezone
 
+from eve_sde.models import ItemType
+
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
@@ -513,7 +515,7 @@ class StructureApiEndpoints:
                             # This is bad and i should feel bad....
                             # TODO save this correctly...
                             # TODO investigate if i can do this via assets betterer
-                            type_name = models.EveItemType.objects.get(
+                            type_name = ItemType.objects.get(
                                 type_id=f['type_id'])
                             assets_in_bay.append({
                                 "id": type_name.id,
