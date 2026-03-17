@@ -516,7 +516,7 @@ class StructureApiEndpoints:
                             # TODO save this correctly...
                             # TODO investigate if i can do this via assets betterer
                             type_name = ItemType.objects.get(
-                                type_id=f['type_id'])
+                                id=f['type_id'])
                             assets_in_bay.append({
                                 "id": type_name.id,
                                 "name": type_name.name,
