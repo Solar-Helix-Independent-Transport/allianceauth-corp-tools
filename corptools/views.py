@@ -97,10 +97,12 @@ CORP_REQUIRED_SCOPES = [
 @login_required
 @token_required(scopes=app_settings.get_character_scopes())
 def add_char(request, token):
-    CharacterAudit.objects.update_or_create(
+    ca, _ = CharacterAudit.objects.update_or_create(
         character=EveCharacter.objects.get_character_by_id(token.character_id))
     update_character.apply_async(args=[token.character_id], kwargs={
                                  "force_refresh": True}, priority=6)
+    messages.success(
+        request, f"Update Tasks for `{ca.character.character_name}` added to queue.")
     return redirect('corptools:reactmain', character_id=token.character_id)
 
 
@@ -115,6 +117,9 @@ def add_corp(request, token):
                                                                        })
     CorporationAudit.objects.update_or_create(corporation=corp)
     update_all_corps.apply_async(priority=6)
+    messages.success(
+        request, f"Update Tasks for `{corp.corporation_name}` added to queue.")
+
     return redirect('corptools:corp_react')
 
 
@@ -147,7 +152,8 @@ def add_corp_section(request, *args, **kwargs):
                                                                            })
         CorporationAudit.objects.update_or_create(corporation=corp)
         update_corp.apply_async(priority=6, args=[char.corporation_id])
-
+        messages.success(
+            request, f"Update Tasks for `{corp.corporation_name}` added to queue.")
         return redirect("{}#status".format(reverse('corptools:corp_react')))
 
     scopes = app_settings._corp_scopes_base
