@@ -126,6 +126,7 @@ esi_openapi = OpenAPI(
     ua_url=__url__,
     ua_version=__version__,
     operations=[
+        "GetCorporationsCorporationId",
         # Char Audits
         "GetCharactersCharacterIdCorporationhistory",
         "GetCharactersCharacterIdRoles",
