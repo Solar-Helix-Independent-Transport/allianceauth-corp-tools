@@ -1,21 +1,35 @@
+# Third Party
 from celery.schedules import crontab
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
+from eve_sde.models import EveSDE
 
+# Django
 from django.core.management.base import BaseCommand
+from django.utils.timezone import now, timedelta
 
+# Alliance Auth
 from allianceauth.crontab.utils import offset_cron
-
-from corptools.tasks import update_models_from_sde
 
 
 class Command(BaseCommand):
     help = 'Bootstrap the CorpTools Module'
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument('--inline', action='store_true',
                             help='Run update in this Console not via Celery')
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
+
+        last_sde_update = EveSDE.objects.all().first().last_check_date
+
+        print(" Running a check for eve_sde data freshness...")
+        if last_sde_update is None or last_sde_update < now() - timedelta(days=1):
+            print(last_sde_update)
+            raise Exception(
+                "The eve_sde app has not been updated in the last 24h.\n"
+                "Please run the `esde_load_sde` management command to sync the data before running this command.")
+        print(" eve_sde data is up to date. Proceeding with command...")
+
         self.stdout.write("Configuring Tasks!")
 
         schedule_a = CrontabSchedule.from_schedule(
@@ -57,15 +71,3 @@ class Command(BaseCommand):
                 'enabled': True
             }
         )
-
-        self.stdout.write("Populating DB models!")
-        if options['inline']:
-            self.stdout.write("Running Tasks inline this may take some time!")
-            self.stdout.write("Starting Update")
-            update_models_from_sde()
-            self.stdout.write("Done Tasks!")
-        else:
-            self.stdout.write("Sending Tasks to celery for processing!")
-            self.stdout.write("Sending Task")
-            update_models_from_sde.apply_async()
-            self.stdout.write("Tasks Queued!")
