@@ -1,4 +1,5 @@
 # Standard Library
+import os
 import re
 
 # Third Party
@@ -120,8 +121,11 @@ class OpenAPI(ESIOpenApiProvider):
             yield lo[i:i + n]
 
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
 esi_openapi = OpenAPI(
     compatibility_date=compat,
+    spec_file=f"{dir_path}/openapi.json",
     ua_appname=__appname__,
     ua_url=__url__,
     ua_version=__version__,

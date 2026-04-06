@@ -1,13 +1,18 @@
+# Standard Library
 import pprint
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.core.cache import cache
 from django.utils import timezone
 from django.utils.http import http_date
 
+# Alliance Auth
 from esi.exceptions import HTTPNotModified
 
+# AA Example App
 from corptools.task_helpers.char_tasks import get_token
 
 
@@ -27,6 +32,7 @@ class TestingApiEndpoints:
             if not request.user.is_superuser:
                 return 403, {"message": "Hard no pall!"}
 
+            # Alliance Auth
             from esi.clients import OpenAPIEsiClientProvider
             api = OpenAPIEsiClientProvider()
 
@@ -44,6 +50,7 @@ class TestingApiEndpoints:
             if not request.user.is_superuser:
                 return 403, {"message": "Hard no pall!"}
 
+            # AA Example App
             from corptools.providers import skills
             skills.get_and_cache_user(request.user.id, force_rebuild=True)
 
@@ -61,9 +68,11 @@ class TestingApiEndpoints:
             if not request.user.is_superuser:
                 return 403, {"message": "Hard no pall!"}
 
+            # Alliance Auth
             from esi.clients import OpenAPIEsiClientProvider
             api = OpenAPIEsiClientProvider()
 
+            # Alliance Auth
             from esi.client.api import AllianceApi
 
             return AllianceApi(api.client).get_alliances_alliance_id(alliance_id=1900696668)
@@ -80,6 +89,7 @@ class TestingApiEndpoints:
             if not request.user.is_superuser:
                 return 403, {"message": "Hard no pall!"}
 
+            # AA Example App
             from corptools.models import EveItemType
             item, created = EveItemType.objects.get_or_create_from_esi_name(
                 name)
@@ -101,6 +111,7 @@ class TestingApiEndpoints:
             if not request.user.is_superuser:
                 return 403, {"message": "Hard no pall!"}
 
+            # AA Example App
             from corptools.task_helpers.char_tasks import (
                 update_character_assets,
             )
@@ -251,34 +262,36 @@ class TestingApiEndpoints:
             #     }
             # )
 
-            # try:
-            #     req, res = esi.client.Assets.GetCharactersCharacterIdAssets(
-            #         character_id=cid, token=token).results(return_response=True)
-            # except HTTPNotModified:
-            #     pass
-            # cache.clear()
-            # req_scopes = ['esi-characters.read_notifications.v1']
-            # token = get_token(cid, req_scopes)
-            # req, res = esi.client.Character.GetCharactersCharacterIdNotifications(
-            #     character_id=cid, token=token).results(return_response=True, use_cache=False, use_etag=False)
-            # return [req]
+            # from django.core.cache import cache
 
-            from django.core.cache import cache
+            # from corptools.providers import esi_openapi
+            # from corptools.task_helpers.char_tasks import (
+            #     update_character_skill_list,
+            # )
 
-            from corptools.providers import esi_openapi
-            from corptools.task_helpers.char_tasks import (
-                update_character_skill_list,
+            # def test_():
+            #     cid = 2117840319
+            #     op = esi_openapi.client.Skills.GetCharactersCharacterIdSkills(
+            #         character_id=cid)
+            #     etag_key = op._etag_key()
+            #     print("TTL_pre", cache.ttl(etag_key))
+            #     try:
+            #         update_character_skill_list(cid, force_refresh=False)
+            #     except Exception:
+            #         pass
+            #     print("TTL_post", cache.ttl(etag_key))
+            # test_()
+
+            req_scopes = ['esi-universe.read_structures.v1']
+            cid = 755166922
+            token = get_token(cid, req_scopes)
+
+            from ...providers import esi_openapi
+            out = esi_openapi.client.Universe.GetUniverseStructuresStructureId(
+                structure_id=1046318756657,
+                token=token
+            ).result(
+                use_etag=False,
+                use_cache=False
             )
-
-            def test_():
-                cid = 2117840319
-                op = esi_openapi.client.Skills.GetCharactersCharacterIdSkills(
-                    character_id=cid)
-                etag_key = op._etag_key()
-                print("TTL_pre", cache.ttl(etag_key))
-                try:
-                    update_character_skill_list(cid, force_refresh=False)
-                except Exception:
-                    pass
-                print("TTL_post", cache.ttl(etag_key))
-            test_()
+            print(out)
