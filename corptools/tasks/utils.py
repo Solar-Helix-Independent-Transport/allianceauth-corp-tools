@@ -68,18 +68,18 @@ def esi_error_retry(func):
         try:
             _ret = func(*args, **kwargs)
         except Exception as e:
-            if isinstance(e, (HTTPClientError, HTTPServerError)):  # Bravado, OpenAPI
+            if isinstance(e, (ESIBucketLimitException)):  # OpenAPI
+                logger.warning(f"Hit ESI rate bucket! Pausing Task! {e}")
+                args[0].retry(countdown=e.reset)
+            elif isinstance(e, (HTTPClientError, HTTPServerError)):  # OpenAPI
                 code = e.status_code
                 if code in (420, 429):
                     logger.warning(f"Hit ESI error limit! Pausing Tasks! {e}")
                     set_error_flag(60)
                     args[0].retry(countdown=61)
-            elif isinstance(e, (ESIBucketLimitException)):  # OpenAPI
-                logger.warning(f"Hit ESI rate bucket! Pausing Task! {e}")
-                args[0].retry(countdown=e.reset)
-            elif isinstance(e, RequestError):
+            elif isinstance(e, RequestError):  # HTTPX
                 logger.warning(f"Uncaught Error from HTTPX, Retrying... {e}")
-                args[0].retry(countdown=30)
+                args[0].retry(countdown=300)
             elif isinstance(e, (OSError)):  # Bravado
                 logger.warning(f"Hit ESI error! Skipping task! {e}")
             raise e

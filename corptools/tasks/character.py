@@ -94,7 +94,8 @@ def update_subset_of_characters(self, subset=48, min_runs=15, force=False):
         update_character.apply_async(args=[char.character.character_id], kwargs={
                                      "force_refresh": force})
 
-    update_all_eve_names.apply_async(priority=7, kwargs={"chunk": 500})
+    # Rethink these tasks from the ground up.
+    # update_all_eve_names.apply_async(priority=7, kwargs={"chunk": 500})
 
     process_corp_histories.apply_async(priority=6)
 
@@ -120,8 +121,8 @@ def process_corp_histories(self):
         return "No characters to process"
 
     update_char_corp_history(cid)
-    re_que_corp_histories.apply_async(countdown=2)
-    return f"{(cid)} Character historys Updated"
+    re_que_corp_histories.apply_async(countdown=1)
+    return f"{(cid)} corporation history updated"
 
 
 @shared_task(name="corptools.tasks.check_account")
