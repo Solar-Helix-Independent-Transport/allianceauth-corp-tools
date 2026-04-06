@@ -95,7 +95,7 @@ esi = None
 routes = EveRouter()
 skills = SkillListCache()
 
-compat = "2025-08-26" if not app_settings.CT_COMPAT_DATE_OVERRIDE else app_settings.CT_COMPAT_DATE_OVERRIDE
+compat = "2025-12-16" if not app_settings.CT_COMPAT_DATE_OVERRIDE else app_settings.CT_COMPAT_DATE_OVERRIDE
 
 
 class OpenAPI(ESIOpenApiProvider):
