@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 
 from allianceauth.crontab.utils import offset_cron
 
-from corptools.tasks import update_models_from_sde
+from eve_sde.tasks import update_models_from_sde
 
 
 class Command(BaseCommand):
