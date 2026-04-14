@@ -17,7 +17,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options) -> None:
 
-        last_sde_update = EveSDE.objects.all().first().last_check_date
+        sde_record = EveSDE.objects.all().first()
+        last_sde_update = sde_record.last_check_date if sde_record is not None else None
 
         print(" Running a check for eve_sde data freshness...")
         if last_sde_update is None or last_sde_update < now() - timedelta(days=1):
