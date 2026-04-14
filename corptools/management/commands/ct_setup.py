@@ -15,10 +15,6 @@ from allianceauth.crontab.utils import offset_cron
 class Command(BaseCommand):
     help = 'Bootstrap the CorpTools Module'
 
-    def add_arguments(self, parser) -> None:
-        parser.add_argument('--inline', action='store_true',
-                            help='Run update in this Console not via Celery')
-
     def handle(self, *args, **options) -> None:
 
         last_sde_update = EveSDE.objects.all().first().last_check_date
