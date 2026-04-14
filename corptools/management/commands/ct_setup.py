@@ -5,7 +5,8 @@ from eve_sde.models import EveSDE
 
 # Django
 from django.core.management.base import BaseCommand
-from django.utils.timezone import now, timedelta
+from django.utils.timezone import now
+from datetime import timedelta
 
 # Alliance Auth
 from allianceauth.crontab.utils import offset_cron
