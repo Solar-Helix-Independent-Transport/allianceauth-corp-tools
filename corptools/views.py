@@ -2,6 +2,7 @@
 import json
 import xml.etree.ElementTree as ET
 from datetime import timedelta
+from math import ceil
 
 # Third Party
 from celery.schedules import crontab
@@ -36,6 +37,7 @@ from esi.views import sso_redirect
 
 from . import __version__, app_settings
 from .api.corporation import dashboards
+from .api.helpers import format_hours_as_duration
 from .forms import UploadForm
 from .models import (
     CharacterAudit,
@@ -494,10 +496,15 @@ def fuel_levels(request):
     ).prefetch_related('structureservice_set')
 
     structure_tree = []
+    metenox_hourly_gas = app_settings.CT_CHAR_METENOX_GAS_USE_HOURLY
     total_hourly_fuel = 0
+    # Builds fuel consumption tree for visible structures with metenox projections
     for s in all_structures:
         structure_hourly_fuel = 0
         structure_type = 99
+        current_metenox_gas = 0
+        current_metenox_gas_hourly = 0
+        current_metenox_gas_hours = 0
 
         if s.type_id in cit:
             structure_type = 0
@@ -514,10 +521,14 @@ def fuel_levels(request):
                 total_hourly_fuel += fuel_use
                 structure_hourly_fuel += fuel_use
 
+        rounded_hourly_fuel = ceil(structure_hourly_fuel)
         hours = 0
 
         if s.fuel_expires is not None:
-            hours = (s.fuel_expires - timezone.now()).total_seconds() // 3600
+            hours = max(
+                ceil((s.fuel_expires - timezone.now()).total_seconds() / 3600),
+                0
+            )
 
         extras = None
 
@@ -535,27 +546,45 @@ def fuel_levels(request):
                 out["name"] = itm.type_name.name
                 out["qty"] += itm.quantity
 
+            current_metenox_gas = out["qty"]
+            current_metenox_gas_hourly = metenox_hourly_gas
+            current_metenox_gas_hours = max(
+                ceil(current_metenox_gas / current_metenox_gas_hourly),
+                0
+            )
             out["expires"] = timezone.now() + timedelta(hours=out["qty"] /
-                                                        app_settings.CT_CHAR_METENOX_GAS_USE_HOURLY)
+                                                        metenox_hourly_gas)
             if out['qty'] > 0:
                 extras = out
 
+        current_blocks = max(hours * rounded_hourly_fuel, 0)
         structure_tree.append(
             {
                 'structure': s,
-                'fuel_req': structure_hourly_fuel,
-                "current_blocks": int(hours * structure_hourly_fuel),
+                # Expose hourly/day/month usage so the dashboard can total
+                # filtered rows client-side without re-querying the server.
+                'fuel_req': rounded_hourly_fuel,
+                'fuel_req_day': rounded_hourly_fuel * 24,
+                'fuel_req_30d': rounded_hourly_fuel * 720,
+                'gas_req': current_metenox_gas_hourly,
+                'gas_req_day': current_metenox_gas_hourly * 24,
+                'gas_req_30d': current_metenox_gas_hourly * 720,
+                "current_blocks": current_blocks,
                 "extra_fuel_info": extras,
+                "metenox_gas_hourly": current_metenox_gas_hourly,
+                "current_metenox_gas": current_metenox_gas,
+                "block_hours_left": hours,
+                "gas_hours_left": current_metenox_gas_hours,
+                "block_duration_left": format_hours_as_duration(hours),
+                "gas_duration_left": format_hours_as_duration(current_metenox_gas_hours),
                 "90day": max(
-                    int(
-                        (
-                            structure_hourly_fuel * 90 * 24
-                        ) - (
-                            hours * structure_hourly_fuel
-                        )
-                    ),
+                    (rounded_hourly_fuel * 90 * 24) - current_blocks,
                     0
-                )
+                ),
+                "gas_90day": max(
+                    (current_metenox_gas_hourly * 90 * 24) - current_metenox_gas,
+                    0
+                ),
             }
         )
 

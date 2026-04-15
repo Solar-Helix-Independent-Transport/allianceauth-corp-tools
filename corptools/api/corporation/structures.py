@@ -2,6 +2,7 @@
 import json
 import logging
 from datetime import timedelta
+from math import ceil
 from typing import List
 
 # Third Party
@@ -22,7 +23,7 @@ from allianceauth.services.hooks import get_extension_logger
 # AA Example App
 from corptools import app_settings, models
 from corptools.api import schema
-from corptools.api.helpers import round_or_null
+from corptools.api.helpers import format_hours_as_duration, round_or_null
 
 logger = get_extension_logger(__name__)
 
@@ -133,10 +134,15 @@ class StructureApiEndpoints:
             ).prefetch_related('structureservice_set')
 
             structure_tree = []
+            metenox_hourly_gas = app_settings.CT_CHAR_METENOX_GAS_USE_HOURLY
             total_hourly_fuel = 0
+            # Builds structure tree with fuel requirements and expiration projections
             for s in all_structures:
                 structure_hourly_fuel = 0
                 structure_type = 99
+                current_metenox_gas = 0
+                current_metenox_gas_hourly = 0
+                current_metenox_gas_hours = 0
 
                 if s.type_id in cit:
                     structure_type = 0
@@ -153,11 +159,15 @@ class StructureApiEndpoints:
                         total_hourly_fuel += fuel_use
                         structure_hourly_fuel += fuel_use
 
+                rounded_hourly_fuel = ceil(structure_hourly_fuel)
                 hours = 0
 
                 if s.fuel_expires is not None:
-                    hours = (s.fuel_expires - timezone.now()
-                             ).total_seconds() // 3600
+                    hours = max(
+                        ceil((s.fuel_expires - timezone.now()
+                              ).total_seconds() / 3600),
+                        0
+                    )
 
                 extras = None
 
@@ -175,13 +185,20 @@ class StructureApiEndpoints:
                         out["name"] = itm.type_name.name
                         out["qty"] += itm.quantity
 
+                    current_metenox_gas = out["qty"]
+                    current_metenox_gas_hourly = metenox_hourly_gas
+                    current_metenox_gas_hours = max(
+                        ceil(current_metenox_gas / current_metenox_gas_hourly),
+                        0
+                    )
                     out["expires"] = timezone.now() + timedelta(
                         hours=out["qty"] /
-                        app_settings.CT_CHAR_METENOX_GAS_USE_HOURLY
+                        metenox_hourly_gas
                     )
                     if out['qty'] > 0:
                         extras = out
 
+                current_blocks = max(hours * rounded_hourly_fuel, 0)
                 structure_tree.append(
                     {
                         "id": s.structure_id,
@@ -201,19 +218,30 @@ class StructureApiEndpoints:
                         "fuel_expiry": s.fuel_expires,
                         "state": s.state,
                         "state_expiry": s.state_timer_end,
-                        'fuel_req': structure_hourly_fuel,
-                        "current_blocks": int(hours * structure_hourly_fuel),
+                        # Match the dashboard payload so API consumers can
+                        # reuse the same hourly/day/month and refuel math.
+                        'fuel_req': rounded_hourly_fuel,
+                        'fuel_req_day': rounded_hourly_fuel * 24,
+                        'fuel_req_30d': rounded_hourly_fuel * 720,
+                        'gas_req': current_metenox_gas_hourly,
+                        'gas_req_day': current_metenox_gas_hourly * 24,
+                        'gas_req_30d': current_metenox_gas_hourly * 720,
+                        "current_blocks": current_blocks,
                         "extra_fuel_info": extras,
+                        "metenox_gas_hourly": current_metenox_gas_hourly,
+                        "current_metenox_gas": current_metenox_gas,
+                        "block_hours_left": hours,
+                        "gas_hours_left": current_metenox_gas_hours,
+                        "block_duration_left": format_hours_as_duration(hours),
+                        "gas_duration_left": format_hours_as_duration(current_metenox_gas_hours),
                         "90day": max(
-                            int(
-                                (
-                                    structure_hourly_fuel * 90 * 24
-                                ) - (
-                                    hours * structure_hourly_fuel
-                                )
-                            ),
+                            (rounded_hourly_fuel * 90 * 24) - current_blocks,
                             0
-                        )
+                        ),
+                        "gas_90day": max(
+                            (current_metenox_gas_hourly * 90 * 24) - current_metenox_gas,
+                            0
+                        ),
                     }
                 )
 
