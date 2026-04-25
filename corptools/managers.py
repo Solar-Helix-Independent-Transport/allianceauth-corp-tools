@@ -1,6 +1,8 @@
+# Django
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
+# Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 
@@ -23,6 +25,7 @@ class EveNameManager(models.Manager):
     def create_bulk_from_esi(self, eve_ids):
         """gets bulk names with ESI"""
         if len(eve_ids) > 0:
+            # AA Example App
             from corptools.models import EveName
             chunk_size = 990
             id_chunks = [eve_ids[i:i + chunk_size]
@@ -204,6 +207,7 @@ class EveItemTypeManager(models.Manager):
 
     def create_bulk_from_esi(self, eve_ids):
         """gets or creates with ESI"""
+        # AA Example App
         from corptools.task_helpers.update_tasks import (
             process_bulk_types_from_esi,
         )
@@ -212,6 +216,7 @@ class EveItemTypeManager(models.Manager):
 
     def update_or_create_from_esi(self, eve_id):
         """updates or create with ESI"""
+        # AA Example App
         from corptools.models import EveItemDogmaAttribute, EveItemGroup
 
         try:
@@ -239,7 +244,7 @@ class EveItemTypeManager(models.Manager):
                 dogma_query._raw_delete(dogma_query.db)
 
             EveItemDogmaAttribute.objects.bulk_create(
-                dogma, batch_size=1000, ignore_conflicts=True)  # bulk create
+                dogma, batch_size=app_settings.CT_DB_BULK_CREATE_BATCH_SIZE, ignore_conflicts=True)  # bulk create
         except Exception as e:
             logger.exception(f'ESI Error id {eve_id} - {e}')
             raise e
@@ -259,6 +264,7 @@ class EveGroupManager(models.Manager):
 
     def update_or_create_from_esi(self, eve_id):
         """updates or create with ESI"""
+        # AA Example App
         from corptools.models import EveItemCategory
 
         try:

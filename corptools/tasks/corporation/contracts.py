@@ -6,6 +6,7 @@ from allianceauth.services.hooks import get_extension_logger
 from esi.exceptions import HTTPNotModified
 
 # AA Example App
+from corptools.app_settings import CT_DB_BULK_CREATE_BATCH_SIZE
 from corptools.models import (
     CorporateContract,
     CorporateContractItem,
@@ -77,12 +78,12 @@ def corp_contract_update(corp_id, force_refresh=False):
 
     if len(contract_models_new) > 0:
         CorporateContract.objects.bulk_create(
-            contract_models_new, batch_size=1000, ignore_conflicts=True)
+            contract_models_new, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE, ignore_conflicts=True)
 
     if len(contract_models_old) > 0:
         CorporateContract.objects.bulk_update(
             contract_models_old,
-            batch_size=1000,
+            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
             fields=[
                 'date_accepted',
                 'date_completed',
@@ -147,7 +148,7 @@ def corp_contract_item_fetch(corp_id, contract_id, force_refresh=False):
                 _types.add(c.type_id)
                 contract_models_new.append(_contract_item)
             CorporateContractItem.objects.bulk_create(
-                contract_models_new, batch_size=1000, ignore_conflicts=True)
+                contract_models_new, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE, ignore_conflicts=True)
         except HTTPNotModified:
             logger.info(
                 f"CT: No New Corporate Contract items {str(_corporation.corporation.corporation_name)} ({str(contract_id)})")

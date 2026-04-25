@@ -19,6 +19,7 @@ from esi.exceptions import HTTPNotModified
 from esi.models import Token
 
 # AA Example App
+from corptools.app_settings import CT_DB_BULK_CREATE_BATCH_SIZE
 from corptools.task_helpers.update_tasks import (
     fetch_location_name,
 )
@@ -1348,13 +1349,13 @@ def update_character_order_history(character_id, force_refresh=False):
                     'volume_total',
                     'state'
                 ],
-                batch_size=1000
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
             )
 
         if len(creates) > 0:
             CharacterMarketOrder.objects.bulk_create(
                 creates,
-                batch_size=1000
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
             )
 
         logger.debug(
@@ -1421,11 +1422,11 @@ def update_character_notifications(character_id, force_refresh=False):
         NotificationText.objects.bulk_create(
             _create_notifs,
             ignore_conflicts=True,
-            batch_size=500
+            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
         )
         Notification.objects.bulk_create(
             _creates,
-            batch_size=500
+            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
         )
 
         logger.debug(
@@ -1676,7 +1677,7 @@ def update_character_mail_headers(character_id, force_refresh=False):
 
         msgs = MailMessage.objects.bulk_create(
             messages,
-            batch_size=1000,
+            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
             ignore_conflicts=True
         )
 
@@ -2048,7 +2049,7 @@ def update_character_contract_items(character_id, contract_id, force_refresh=Fal
 
         ContractItem.objects.bulk_create(
             contract_models_new,
-            batch_size=1000,
+            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
             ignore_conflicts=True
         )
 

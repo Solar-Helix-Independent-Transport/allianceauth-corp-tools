@@ -16,6 +16,7 @@ from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
 
 # AA Example App
+from corptools.app_settings import CT_DB_BULK_CREATE_BATCH_SIZE
 from corptools.models import (
     AssetCoordiante,
     BridgeOzoneLevel,
@@ -106,7 +107,8 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
         # with coords we need to care about the fkeys/signals
         delete_query.delete()
 
-    CorpAsset.objects.bulk_create(items)
+    CorpAsset.objects.bulk_create(
+        items, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
     try:
         corp_update_asset_names(corp_id)
     except Exception as e:
