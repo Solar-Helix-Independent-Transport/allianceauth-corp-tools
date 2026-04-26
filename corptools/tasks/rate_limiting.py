@@ -7,9 +7,17 @@ from django.core.cache import cache
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
-from esi.rate_limiting import interval_to_seconds
 
 logger = get_extension_logger(__name__)
+
+seconds_per_unit = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+
+
+def interval_to_seconds(s) -> int:
+    if len(s) == 1:
+        return seconds_per_unit[s[-1]]
+    else:
+        return int(s[:-1]) * seconds_per_unit[s[-1]]
 
 
 def force_string(kwargs):
@@ -50,10 +58,7 @@ def task_bucket_slug_key(task, kwargs, restrict_to=None):
 def limit_to_rate(rate_limit):
     """convert things like 100/15m or 10/s to a delay in seconds"""
     lim = rate_limit.split("/")
-    if len(lim[1]) < 2:
-        secs = interval_to_seconds(f"1{lim[1]}")
-    else:
-        secs = interval_to_seconds(lim[1])
+    secs = interval_to_seconds(lim[1])
     return secs/int(lim[0])
 
 
