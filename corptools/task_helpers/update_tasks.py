@@ -89,7 +89,7 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
                 token=token
             ).result(use_etag=False)
         except HTTPClientError as e:  # no access
-            if int(e.headers.get('x-esi-error-limit-remain')) < 50:
+            if int(e.headers.get('x-esi-error-limit-remain', 0)) < 50:
                 set_error_count_flag()
             logger.debug(
                 "Failed to get location:{}, Error:{}, Errors Remaining:{}, Time Remaining: {}".format(
