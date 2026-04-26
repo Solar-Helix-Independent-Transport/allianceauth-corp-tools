@@ -104,6 +104,8 @@ class TaskRateLimiter:
     def check_bucket(self, bucket: TaskRateLimitBucket) -> None:
         try:
             with cache.lock(self._slug_to_lock(bucket.slug), timeout=bucket.ttl):
+                # Use a lock to prevent dupes from multiple workers
+                # worst case we go a bit slower
                 timeout = self.get_bucket(bucket)
                 if timeout > 0:
                     raise TaskBucketLimitException(bucket, timeout)
