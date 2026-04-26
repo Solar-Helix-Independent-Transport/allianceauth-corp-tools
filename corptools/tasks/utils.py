@@ -161,26 +161,8 @@ def rate_limited_task(rate: str, keys: list | None = None):
             except TaskBucketLimitException as ex:
                 delay = ex.reset
                 task.request.retries = task.request.retries - 1
-                # logger.info(
-                #     "Throttling task %s (%s) via decorator for %ss",
-                #     task.name,
-                #     task.request.id,
-                #     delay,
-                # )
                 return task.retry(countdown=delay)
             else:
                 return func(*args, **kwargs)
         return wrapper
     return decorator_func
-
-
-@shared_task(
-    bind=True,
-    name="corptools.tasks.dummy_task"
-)
-@rate_limited_task("100/5m")
-def sleep_task(self):
-    # Standard Library
-    import time
-    time.sleep(1)
-    return f"Slept for 1 seconds **********************************"

@@ -50,7 +50,7 @@ from ..task_helpers.char_tasks import (
 )
 from .locations import update_all_locations
 from .updates import update_all_eve_names
-from .utils import enqueue_next_task, esi_error_retry, no_fail_chain
+from .utils import enqueue_next_task, esi_error_retry, no_fail_chain, rate_limited_task
 
 TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -558,9 +558,14 @@ def update_char_mail(self, character_id, force_refresh=False, chain=[]):
     },
     name="corptools.tasks.update_char_contract_items"
 )
+@rate_limited_task("600/15m", keys=["character_id"])
+@esi_error_retry
 def update_char_contract_items(self, character_id, contract_id, force_refresh=False):
     return update_character_contract_items(
-        character_id, contract_id, force_refresh=force_refresh)
+        character_id,
+        contract_id,
+        force_refresh=force_refresh
+    )
 
 
 @shared_task(
