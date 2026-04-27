@@ -110,6 +110,33 @@ def round_or_null(value, digits=2):
         return value
 
 
+def format_hours_as_duration(hours: int) -> str:
+    # Keep the fuel dashboard's long-form hour display local to corptools
+    # instead of changing Django's global time filters for every template.
+    hours = max(int(hours or 0), 0)
+    units = (
+        ("month", 30 * 24),
+        ("day", 24),
+        ("hour", 1),
+    )
+    parts = []
+
+    for label, unit_hours in units:
+        if hours >= unit_hours or (label == "hour" and not parts):
+            value, hours = divmod(hours, unit_hours)
+            if value:
+                suffix = "" if value == 1 else "s"
+                parts.append(f"{value} {label}{suffix}")
+
+    if not parts:
+        return "0 hours"
+    if len(parts) == 1:
+        return parts[0]
+    if len(parts) == 2:
+        return " and ".join(parts)
+    return f"{', '.join(parts[:-1])}, and {parts[-1]}"
+
+
 def wallet_check(characters, types, first_parties=None, minimum_amount=None, look_back=30):
     start_date = timezone.now() - timedelta(days=look_back)
     if isinstance(types, str):
