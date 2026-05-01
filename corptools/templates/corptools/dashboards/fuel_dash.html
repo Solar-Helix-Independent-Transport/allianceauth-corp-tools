@@ -7,20 +7,19 @@
 {% endblock %}
 
 {% block content %}
-
     {% if structures %}
-        <div class="fuel-dashboard">
-            <div class="">
-                <div class="card-body p-3">
-                    <div class="dashboard-hero">
+        <div class="">
+            <div class="d-none d-sm-none d-md-none d-lg-flex card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between">
                         <div>
-                            <p class="dashboard-kicker mb-2">Corporation Logistics</p>
-                            <h2 class="dashboard-title mb-2">Structure and Fuel Stats</h2>
-                            <p class="dashboard-subtitle mb-0">
+                            <h6 class="text-uppercase small text-muted fw-bold mb-2">Corporation Logistics</h6>
+                            <h2 class="mb-2">Structure and Fuel Stats</h2>
+                            <p class="small text-muted mb-0">
                                 Filter structures, review block and Magmatic Gas demand, and size refuels from one view.
                             </p>
                         </div>
-                        <div class="dashboard-control card border-0 shadow-sm">
+                        <div class="card border-success shadow-sm">
                             <div class="card-body p-3">
                                 <label for="fuelDuration" class="form-label mb-2">Refuel for days</label>
                                 <input
@@ -31,136 +30,151 @@
                                     step="1"
                                     value="90"
                                 >
-                                <div id="fuelDurationSummary" class="dashboard-control-note mt-2">Minimum 30 days.</div>
+                                <div id="fuelDurationSummary" class="text-secondary small mt-2">Minimum 30 days.</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row g-3 mt-2">
-                        <div class="col-6 col-md-4 col-xxl-2">
-                            <div class="stats-tile h-100">
-                                <div class="stats-tile-label">Filtered Structures</div>
-                                <div id="total_str" class="stats-tile-value">0</div>
+                    <div class="d-flex flex-row mt-2">
+                        <div class="card m-2 flex-fill">
+                            <div class="card-body h-100">
+                                <div class="text-uppercase small text-muted fw-bold">Filtered Structures</div>
+                                <h2 id="total_str" class="fw-bold">0</h2>
                             </div>
                         </div>
-                        <div class="col-6 col-md-4 col-xxl-2">
-                            <div class="stats-tile h-100">
-                                <div class="stats-tile-label">Systems</div>
-                                <div id="total_system" class="stats-tile-value">0</div>
+                        <div class="card m-2 flex-fill">
+                            <div class="card-body h-100">
+                                <div class="text-uppercase small text-muted fw-bold">Systems</div>
+                                <h2 id="total_system" class="fw-bold">0</h2>
                             </div>
                         </div>
-                        <div class="col-6 col-md-4 col-xxl-2">
-                            <div class="stats-tile h-100">
-                                <div class="stats-tile-label">Constellations</div>
-                                <div id="total_const" class="stats-tile-value">0</div>
+                        <div class="card m-2 flex-fill">
+                            <div class="card-body h-100">
+                                <div class="text-uppercase small text-muted fw-bold">Constellations</div>
+                                <h2 id="total_const" class="fw-bold">0</h2>
                             </div>
                         </div>
-                        <div class="col-6 col-md-4 col-xxl-2">
-                            <div class="stats-tile h-100">
-                                <div class="stats-tile-label">Regions</div>
-                                <div id="total_region" class="stats-tile-value">0</div>
+                        <div class="card m-2 flex-fill">
+                            <div class="card-body h-100">
+                                <div class="text-uppercase small text-muted fw-bold">Regions</div>
+                                <h2 id="total_region" class="fw-bold">0</h2>
                             </div>
                         </div>
-                        <div class="col-6 col-md-4 col-xxl-2">
-                            <div class="stats-tile h-100">
-                                <div class="stats-tile-label">Current Blocks</div>
-                                <div id="total_current_blocks" class="stats-tile-value">0</div>
+                        <div class="card m-2 flex-fill">
+                            <div class="card-body h-100">
+                                <div class="text-uppercase small text-muted fw-bold">Current Blocks</div>
+                                <h2 id="total_current_blocks" class="fw-bold">0</h2>
                             </div>
                         </div>
-                        <div class="col-6 col-md-4 col-xxl-2">
-                            <div class="stats-tile h-100">
-                                <div class="stats-tile-label">Current Magmatic Gas</div>
-                                <div id="total_current_gas" class="stats-tile-value">0</div>
+                        <div class="card m-2 flex-fill">
+                            <div class="card-body h-100">
+                                <div class="text-uppercase small text-muted fw-bold">Current Magmatic Gas</div>
+                                <h2 id="total_current_gas" class="fw-bold">0</h2>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row g-3 mt-1">
-                        <div class="col-12 col-xl-4">
-                            <div class="stats-panel h-100">
-                                <div class="stats-panel-header">
-                                    <div>
-                                        <div class="stats-panel-kicker">Fuel Demand</div>
-                                        <h3 class="stats-panel-title">Blocks Usage</h3>
-                                    </div>
+                    <div class="d-flex mt-1">
+                        <div class="card m-2 flex-fill">
+                            <div class="card-body d-flex flex-column h-100">
+                                <div>
+                                    <div class="text-uppercase small text-muted fw-bold mb-2">Fuel Demand</div>
+                                    <h5 class="fw-bold">Blocks Usage</h5>
                                 </div>
-                                <div class="usage-metric-layout mt-3">
-                                    <div class="usage-metric-stack">
-                                        <div class="usage-metric-item usage-metric-item-compact">
-                                            <span class="usage-metric-label">Per Hour</span>
-                                            <span id="total_block_hour" class="usage-metric-value">0</span>
+                                <div class="d-flex flex-fill mt-1">
+                                    <div class="d-flex flex-column">
+                                        <div class="card m-1 flex-grow-1">
+                                            <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between">
+                                                <span class="text-uppercase small fw-bold me-3">Per Hour</span>
+                                                <h3 id="total_block_hour" class="fw-bold ms-3">0</h3>
+                                            </div>
                                         </div>
-                                        <div class="usage-metric-item usage-metric-item-compact">
-                                            <span class="usage-metric-label">Per Day</span>
-                                            <span id="total_block_day" class="usage-metric-value">0</span>
+                                        <div class="card m-1 my-3 flex-grow-1">
+                                            <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between">
+                                                <span class="text-uppercase small fw-bold me-3">Per Day</span>
+                                                <h3 id="total_block_day" class="fw-bold ms-3">0</h3>
+                                            </div>
                                         </div>
-                                        <div class="usage-metric-item usage-metric-item-compact">
-                                            <span class="usage-metric-label">Per Month</span>
-                                            <span id="total_block_month" class="usage-metric-value">0</span>
-                                        </div>
-                                    </div>
-                                    <div class="usage-metric-item usage-metric-item-highlight usage-metric-item-feature">
-                                        <span class="usage-metric-label">Refuel For <span id="totalDaysTitle">90d</span></span>
-                                        <span id="total_fuel_refuel" class="usage-metric-value">0</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-xl-4">
-                            <div class="stats-panel h-100">
-                                <div class="stats-panel-header">
-                                    <div>
-                                        <div class="stats-panel-kicker">Fuel Demand</div>
-                                        <h3 class="stats-panel-title">Magmatic Gas Usage</h3>
-                                    </div>
-                                </div>
-                                <div class="usage-metric-layout mt-3">
-                                    <div class="usage-metric-stack">
-                                        <div class="usage-metric-item usage-metric-item-compact">
-                                            <span class="usage-metric-label">Per Hour</span>
-                                            <span id="total_gas_hour" class="usage-metric-value">0</span>
-                                        </div>
-                                        <div class="usage-metric-item usage-metric-item-compact">
-                                            <span class="usage-metric-label">Per Day</span>
-                                            <span id="total_gas_day" class="usage-metric-value">0</span>
-                                        </div>
-                                        <div class="usage-metric-item usage-metric-item-compact">
-                                            <span class="usage-metric-label">Per Month</span>
-                                            <span id="total_gas_month" class="usage-metric-value">0</span>
+                                        <div class="card m-1 flex-grow-1">
+                                            <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between">
+                                                <span class="text-uppercase small fw-bold me-3">Per Month</span>
+                                                <h3 id="total_block_month" class="fw-bold ms-3">0</h3>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="usage-metric-item usage-metric-item-highlight usage-metric-item-feature">
-                                        <span class="usage-metric-label">Refuel For <span id="totalGasDaysTitle">90d</span></span>
-                                        <span id="total_gas_refuel" class="usage-metric-value">0</span>
+                                    <div class="card m-1 ms-3 flex-grow-1 bg-primary bg-opacity-10 border-primary border-opacity-50 align-items-center justify-content-center">
+                                        <div class="align-items-center">
+                                            <div class="text-uppercase small text-muted fw-bold mb-2">Refuel For <span id="totalDaysTitle">90d</span></div>
+                                            <h3 id="total_fuel_refuel" class="fw-bold">0</h3>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-xl-4">
-                            <div class="stats-panel h-100">
-                                <div class="stats-panel-header">
-                                    <div>
-                                        <div class="stats-panel-kicker">Filtered Inventory</div>
-                                        <h3 class="stats-panel-title">Structure Mix</h3>
+                        <div class="card m-2 flex-fill">
+                            <div class="card-body d-flex flex-column h-100">
+                                <div>
+                                    <div class="text-uppercase small text-muted fw-bold mb-2">Fuel Demand</div>
+                                    <h5 class="fw-bold">Magmatic Gas Usage</h5>
+                                </div>
+                                <div class="d-flex flex-fill mt-1">
+                                    <div class="d-flex flex-column">
+                                        <div class="card m-1 flex-grow-1">
+                                            <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between">
+                                                <span class="text-uppercase small fw-bold me-3">Per Hour</span>
+                                                <h3 id="total_gas_hour" class="fw-bold ms-3">0</h3>
+                                            </div>
+                                        </div>
+                                        <div class="card m-1 flex-grow-1">
+                                            <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between">
+                                                <span class="text-uppercase small fw-bold me-3">Per Day</span>
+                                                <h3 id="total_gas_day" class="fw-bold ms-3">0</h3>
+                                            </div>
+                                        </div>
+                                        <div class="card m-1 flex-grow-1">
+                                            <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between">
+                                                <span class="text-uppercase small fw-bold me-3">Per Month</span>
+                                                <h3 id="total_gas_month" class="fw-bold ms-3">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card m-1 ms-3 flex-grow-1 bg-primary bg-opacity-10 border-primary border-opacity-50 align-items-center justify-content-center">
+                                        <div class="align-items-center">
+                                            <span class="text-uppercase small text-muted fw-bold mb-2">Refuel For <span id="totalGasDaysTitle">90d</span></span>
+                                            <h3 id="total_gas_refuel" class="fw-bold">0</h3>
+                                        </div>
                                     </div>
                                 </div>
-                                <div id="structure_type_breakdown" class="structure-type-list mt-3"></div>
+                            </div>
+                        </div>
+                        <div class="card m-2 flex-fill">
+                            <div class="card-body h-100">
+                                <div class="stats-panel-header">
+                                    <div>
+                                        <div class="text-uppercase small text-muted fw-bold mb-2">Filtered Inventory</div>
+                                        <h5 class="fw-bold">Structure Mix</h5>
+                                    </div>
+                                </div>
+                                <table id="structure_type_breakdown" class="table table-hover mt-3"></table>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="">
-                <div class="p-3">
+            <div class="card shadow-sm fuel-dashboard-card">
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table id="table-structs" class="table align-middle mb-0 fuel-struct-table">
+                        <table id="table-structs" class="table align-middle mb-0 fuel-struct-table text-nowrap">
                             <thead>
                                 <tr>
                                     <th></th>
+                                    <th></th>
                                     <th>Structure</th>
                                     <th class="text-center">Blocks Usage</th>
+                                    <th class="text-center">Blocks Refuel</th>
                                     <th class="text-center">Gas Usage</th>
+                                    <th class="text-center">Gas Refuel</th>
                                     <th class="text-center">Current Stock</th>
                                     <th>Time Left</th>
                                     <th class="services-column">Services</th>
@@ -189,71 +203,102 @@
                                         data-region="{{ structure.structure.system_name.constellation.region.name }}"
                                         data-corp="{{ structure.structure.corporation.corporation.corporation_name }}"
                                         data-type-name="{{ structure.structure.type_name.name }}">
-                                        <td class="structure-icon-cell">
-                                            <img class="structure-icon" src="https://image.eveonline.com/Type/{{ structure.structure.type_id }}_64.png" alt="{{ structure.structure.type_name.name }}">
+                                        <td></td>
+                                        <td class="table-middle">
+                                            <div class="d-none d-md-flex w-100 h-100 align-items-center justify-content-between">
+                                                <img class="structure-icon" src="https://image.eveonline.com/Type/{{ structure.structure.type_id }}_64.png" alt="{{ structure.structure.type_name.name }}">
+                                            </div>
                                         </td>
-                                        <td>
-                                            <div class="structure-name">{{ structure.structure.name }}</div>
-                                            <div class="structure-meta">{{ structure.structure.type_name.name }}</div>
-                                            <div class="structure-submeta">{{ structure.structure.corporation.corporation.corporation_name }} - {{ structure.structure.system_name.name }}</div>
+                                        <td class="table-middle">
+                                            <p class="fw-bold m-0 p-0">{{ structure.structure.name }}</p>
+                                            <p class="m-0 p-0">{{ structure.structure.type_name.name }}</p>
+                                            <p class="text-muted small m-0 p-0">{{ structure.structure.corporation.corporation.corporation_name }} - {{ structure.structure.system_name.name }}</p>
                                         </td>
-                                        <td class="text-center usage-cell">
-                                            <div class="table-metric-layout">
-                                                <div class="table-metric-stack">
-                                                <div class="table-metric-item table-metric-item-compact">
-                                                    <span class="table-metric-label">Per Hour</span>
-                                                    <span class="table-metric-value">{{ structure.fuel_req|intcomma }}</span>
+                                        <td class="table-middle">
+                                            <div class="d-flex">
+                                                <div class="d-flex flex-column flex-fill">
+                                                    <div class="card m-1">
+                                                        <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between py-1">
+                                                            <p class="text-uppercase small fw-bold text-muted me-1 m-0 text-nowrap">Per Hour</p>
+                                                            <p id="total_gas_hour" class="fw-bold ms-3 m-0 text-nowrap">{{ structure.fuel_req|intcomma }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card m-1">
+                                                        <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between py-1">
+                                                            <p class="text-uppercase small fw-bold text-muted me-1 mb-0 text-nowrap">Per Day</p>
+                                                            <p id="total_gas_day" class="fw-bold ms-3 m-0 text-nowrap">{{ structure.fuel_req_day|intcomma }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card m-1">
+                                                        <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between py-1">
+                                                            <p class="text-uppercase small fw-bold text-muted me-1 m-0 text-nowrap">Per Month</p>
+                                                            <p id="total_gas_month" class="fw-bold ms-3 m-0 text-nowrap">{{ structure.fuel_req_30d|intcomma }}</p>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div class="table-metric-item table-metric-item-compact">
-                                                    <span class="table-metric-label">Per Day</span>
-                                                    <span class="table-metric-value">{{ structure.fuel_req_day|intcomma }}</span>
+                                        </td>
+                                        <td class="table-middle">
+                                            <div class="d-flex">
+                                                <div class="card w-100 m-1 bg-primary bg-opacity-10 border-primary border-opacity-50 align-items-center justify-content-center py-1">
+                                                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                                                        <p class="text-uppercase small text-muted fw-bold mb-1 mb-0 text-nowrap">Refuel For <span class="fw-bold">90d</span></p>
+                                                        <p class="fw-bold mb-0 text-nowrap blocks-till">{{ structure.90day|intcomma }}</p>
+                                                    </div>
                                                 </div>
-                                                <div class="table-metric-item table-metric-item-compact">
-                                                    <span class="table-metric-label">Per Month</span>
-                                                    <span class="table-metric-value">{{ structure.fuel_req_30d|intcomma }}</span>
-                                                </div>
-                                                </div>
-                                                <div class="table-metric-item table-metric-item-accent table-metric-item-feature">
-                                                    <span class="table-metric-label">Refuel For <span class="duration-title">90d</span></span>
-                                                    <span class="table-metric-value blocks-till">{{ structure.90day|intcomma }}</span>
+                                        </td>
+                                        <td class="table-middle">
+                                            <div class="d-flex flex-fill">
+                                                <div class="d-flex flex-column flex-fill">
+                                                    <div class="card m-1">
+                                                        <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between py-1">
+                                                            <p class="text-uppercase small fw-bold text-muted me-1 m-0 text-nowrap">Per Hour</p>
+                                                            <p id="total_gas_hour" class="fw-bold ms-3 m-0 text-nowrap">{{ structure.gas_req|intcomma }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card m-1">
+                                                        <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between py-1">
+                                                            <p class="text-uppercase small fw-bold text-muted me-1 m-0 text-nowrap">Per Day</p>
+                                                            <p id="total_gas_day" class="fw-bold ms-3 m-0 text-nowrap">{{ structure.gas_req_day|intcomma }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card m-1">
+                                                        <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between py-1">
+                                                            <p class="text-uppercase small fw-bold text-muted me-1 m-0 text-nowrap">Per Month</p>
+                                                            <p id="total_gas_month" class="fw-bold ms-3 m-0 text-nowrap">{{ structure.gas_req_30d|intcomma }}</p>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="text-center usage-cell">
-                                            <div class="table-metric-layout">
-                                                <div class="table-metric-stack">
-                                                <div class="table-metric-item table-metric-item-compact">
-                                                    <span class="table-metric-label">Per Hour</span>
-                                                    <span class="table-metric-value">{{ structure.gas_req|intcomma }}</span>
-                                                </div>
-                                                <div class="table-metric-item table-metric-item-compact">
-                                                    <span class="table-metric-label">Per Day</span>
-                                                    <span class="table-metric-value">{{ structure.gas_req_day|intcomma }}</span>
-                                                </div>
-                                                <div class="table-metric-item table-metric-item-compact">
-                                                    <span class="table-metric-label">Per Month</span>
-                                                    <span class="table-metric-value">{{ structure.gas_req_30d|intcomma }}</span>
-                                                </div>
-                                                </div>
-                                                <div class="table-metric-item table-metric-item-accent table-metric-item-feature">
-                                                    <span class="table-metric-label">Refuel For <span class="duration-title">90d</span></span>
-                                                    <span class="table-metric-value gas-till">{{ structure.gas_90day|intcomma }}</span>
+                                        <td class="table-middle">
+                                            <div class="d-flex flex-fill">
+                                                <div class="card w-100 m-1 bg-primary bg-opacity-10 border-primary border-opacity-50 align-items-center justify-content-center py-1">
+                                                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                                                        <p class="text-uppercase small text-muted fw-bold mb-1 mb-0 text-nowrap">Refuel For <span class="fw-bold">90d</span></p>
+                                                        <p class="fw-bold mb-0 text-nowrap gas-till">{{ structure.gas_90day|intcomma }}</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="text-center">
-                                            <div class="stock-grid">
-                                                <div class="stock-item">
-                                                    <span class="stock-label">Current Blocks</span>
-                                                    <span class="stock-value">{{ structure.current_blocks|intcomma }}</span>
+                                        <td class="table-middle">
+                                            <div class="d-flex flex-column flex-fill">
+                                                <div class="card m-1">
+                                                    <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between py-1">
+                                                        <p class="text-uppercase small fw-bold text-muted me-1 m-1 text-nowrap">Blocks</p>
+                                                        <p id="total_gas_hour" class="fw-bold ms-3 m-0 text-nowrap">{{ structure.current_blocks|intcomma }}</p>
+                                                    </div>
                                                 </div>
-                                                <div class="stock-item">
-                                                    <span class="stock-label">Current Gas</span>
-                                                    <span class="stock-value">{{ structure.current_metenox_gas|intcomma }}</span>
-                                                </div>
+                                                {% if structure.current_metenox_gas > 0 %}
+                                                    <div class="card m-1">
+                                                        <div class="card-body bg-secondary bg-opacity-10 d-flex flex-row align-items-center justify-content-between py-1">
+                                                            <p class="text-uppercase small fw-bold text-muted me-1 m-1 text-nowrap">Gas</p>
+                                                            <p id="total_gas_day" class="fw-bold ms-3 m-0 text-nowrap ">{{ structure.current_metenox_gas|intcomma }}</p>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="table-middle">
                                             {% if structure.extra_fuel_info %}
                                                 <div class="fuel-expiry-section">
                                                     <div class="fuel-expiry-label">Blocks</div>
@@ -280,7 +325,7 @@
                                                 </div>
                                             {% endif %}
                                         </td>
-                                        <td class="services-column">
+                                        <td class="table-middle">
                                             <div class="services-cell">
                                                 {% for service in structure.structure.structureservice_set.all %}
                                                     {% if service.state == 'online' %}
@@ -312,229 +357,243 @@
 {% block extra_javascript %}
     {% include "bundles/datatables-js-bs5.html" %}
     {% include "bundles/filterdropdown-js.html" %}
+    <script src="https://cdn.datatables.net/responsive/3.0.8/js/dataTables.responsive.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.8/js/responsive.dataTables.js"></script>
 
+    <script>
+        function numberWithCommas(x) {
+            return (Number(x) || 0).toLocaleString('en-US');
+        }
+
+        $(document).ready(function() {
+            const durationTitles = document.querySelectorAll('.duration-title, #totalDaysTitle, #totalGasDaysTitle');
+            const fuelDurationInput = document.getElementById('fuelDuration');
+            const fuelDurationSummary = document.getElementById('fuelDurationSummary');
+            const tableElement = document.getElementById('table-structs');
+            const tableWrapper = tableElement.closest('.table-responsive');
+            const structureTypeBreakdown = document.getElementById('structure_type_breakdown');
+            const defaultRefuelDays = 90;
+            const minimumRefuelDays = 30;
+
+            // Keep refuel sizing on the original day-based flow and enforce the
+            // same 30-day floor when the dashboard recalculates totals.
+            function getRefuelDays(value, fallbackDays) {
+                const parsed = Number(value);
+
+                if (!Number.isFinite(parsed)) {
+                    return fallbackDays;
+                }
+                return Math.max(Math.ceil(parsed), minimumRefuelDays);
+            }
+
+            function updateDurationTitles(durationLabel) {
+                durationTitles.forEach(function(elem) {
+                    elem.innerText = durationLabel;
+                });
+            }
+
+            function updateFuelDurationSummary(refuelDays) {
+                fuelDurationSummary.innerText = 'Minimum 30 days. Current window: ' + refuelDays + 'd.';
+            }
+
+            function calculateRefuelNeed(hourly, currentStock, hours) {
+                return Math.max(Math.ceil((hourly * hours) - currentStock), 0);
+            }
+
+            // Recalculate each row against the selected target so filtered totals
+            // and visible row values stay in sync without another server request.
+            function recalculateRowRefuel(row, hours) {
+                const blockHourly = Number(row.dataset.blockHourly || 0);
+                const blockCurrent = Number(row.dataset.blockCurrent || 0);
+                const gasHourly = Number(row.dataset.gasHourly || 0);
+                const gasCurrent = Number(row.dataset.gasCurrent || 0);
+                const blockRefuel = calculateRefuelNeed(blockHourly, blockCurrent, hours);
+                const gasRefuel = calculateRefuelNeed(gasHourly, gasCurrent, hours);
+                const blockCell = row.querySelector('.blocks-till');
+                const gasCell = row.querySelector('.gas-till');
+
+                row.dataset.blockRefuel = blockRefuel;
+                row.dataset.gasRefuel = gasRefuel;
+
+                if (blockCell) {
+                    blockCell.innerText = numberWithCommas(blockRefuel);
+                }
+                if (gasCell) {
+                    gasCell.innerText = numberWithCommas(gasRefuel);
+                }
+            }
+
+        function renderTypeBreakdown(typeCounts) {
+            const entries = Object.entries(typeCounts).sort(function(a, b) {
+                if (b[1] !== a[1]) {
+                    return b[1] - a[1];
+                }
+                return a[0].localeCompare(b[0]);
+            });
+
+            if (!entries.length) {
+                structureTypeBreakdown.innerHTML = '<tr class="structure-type-empty"><td colspan=2>No structures in the current filter.</td></tr>';
+                return;
+            }
+
+            structureTypeBreakdown.innerHTML = entries.map(function(entry) {
+                return '<tr ><td class="small py-1">' + entry[0] + '</td><td class="small py-1 text-end">' + numberWithCommas(entry[1]) + '</td></tr>';
+            }).join('');
+        }
+
+        function updateDashboardStats(table) {
+            const rows = table.rows({ search: 'applied' }).nodes().toArray();
+            const systems = new Set();
+            const constellations = new Set();
+            const regions = new Set();
+            const typeCounts = {};
+            const totals = {
+                structures: 0,
+                currentBlocks: 0,
+                currentGas: 0,
+                blockHour: 0,
+                blockDay: 0,
+                blockMonth: 0,
+                blockRefuel: 0,
+                gasHour: 0,
+                gasDay: 0,
+                gasMonth: 0,
+                gasRefuel: 0
+            };
+
+            rows.forEach(function(row) {
+                totals.structures += 1;
+                totals.currentBlocks += Number(row.dataset.blockCurrent || 0);
+                totals.currentGas += Number(row.dataset.gasCurrent || 0);
+                totals.blockHour += Number(row.dataset.blockHourly || 0);
+                totals.blockDay += Number(row.dataset.blockDay || 0);
+                totals.blockMonth += Number(row.dataset.blockMonth || 0);
+                totals.blockRefuel += Number(row.dataset.blockRefuel || 0);
+                totals.gasHour += Number(row.dataset.gasHourly || 0);
+                totals.gasDay += Number(row.dataset.gasDay || 0);
+                totals.gasMonth += Number(row.dataset.gasMonth || 0);
+                totals.gasRefuel += Number(row.dataset.gasRefuel || 0);
+
+                if (row.dataset.system) {
+                systems.add(row.dataset.system);
+                }
+                if (row.dataset.constellation) {
+                constellations.add(row.dataset.constellation);
+                }
+                if (row.dataset.region) {
+                regions.add(row.dataset.region);
+                }
+                if (row.dataset.typeName) {
+                typeCounts[row.dataset.typeName] = (typeCounts[row.dataset.typeName] || 0) + 1;
+                }
+            });
+
+            document.getElementById('total_str').innerText = numberWithCommas(totals.structures);
+            document.getElementById('total_system').innerText = numberWithCommas(systems.size);
+            document.getElementById('total_const').innerText = numberWithCommas(constellations.size);
+            document.getElementById('total_region').innerText = numberWithCommas(regions.size);
+            document.getElementById('total_current_blocks').innerText = numberWithCommas(totals.currentBlocks);
+            document.getElementById('total_current_gas').innerText = numberWithCommas(totals.currentGas);
+            document.getElementById('total_block_hour').innerText = numberWithCommas(totals.blockHour);
+            document.getElementById('total_block_day').innerText = numberWithCommas(totals.blockDay);
+            document.getElementById('total_block_month').innerText = numberWithCommas(totals.blockMonth);
+            document.getElementById('total_fuel_refuel').innerText = numberWithCommas(totals.blockRefuel);
+            document.getElementById('total_gas_hour').innerText = numberWithCommas(totals.gasHour);
+            document.getElementById('total_gas_day').innerText = numberWithCommas(totals.gasDay);
+            document.getElementById('total_gas_month').innerText = numberWithCommas(totals.gasMonth);
+            document.getElementById('total_gas_refuel').innerText = numberWithCommas(totals.gasRefuel);
+
+            renderTypeBreakdown(typeCounts);
+        }
+
+        function updateTableDensity() {
+            if (!tableWrapper) {
+                return;
+            }
+
+            // If the table starts to overrun its card, squeeze the services column first.
+            tableElement.classList.remove('fuel-table-tight', 'fuel-table-tightest');
+            if (tableWrapper.scrollWidth > tableWrapper.clientWidth + 1) {
+                tableElement.classList.add('fuel-table-tight');
+            }
+            if (tableWrapper.scrollWidth > tableWrapper.clientWidth + 1) {
+                tableElement.classList.add('fuel-table-tightest');
+            }
+        }
+
+        function refreshDashboard(table, overrideDays, syncInputValue) {
+            const currentDays = getRefuelDays(fuelDurationInput.value, defaultRefuelDays);
+            const refuelDays = getRefuelDays(
+            typeof overrideDays === 'undefined' ? currentDays : overrideDays,
+            currentDays
+            );
+            const durationLabel = refuelDays + 'd';
+
+            if (syncInputValue) {
+                fuelDurationInput.value = refuelDays;
+            }
+            updateDurationTitles(durationLabel);
+            updateFuelDurationSummary(refuelDays);
+            Array.from(tableElement.querySelectorAll('tbody tr')).forEach(function(row) {
+                recalculateRowRefuel(row, refuelDays * 24);
+            });
+            updateDashboardStats(table);
+            updateTableDensity();
+        }
+
+        const table = $('#table-structs').DataTable({
+            filterDropDown: {
+                columns: [
+                    { idx: 11 },
+                    { idx: 12 },
+                    { idx: 13 },
+                    { idx: 14 },
+                    { idx: 10 }
+                ],
+                bootstrap: true,
+                bootstrap_version: 5
+            },
+            columnDefs: [
+                { width: '15px', targets: [ 0, ] },
+                { width: '100px', targets: [ 1, ] },
+                { width: '175px', targets: [ 4, 6 ] },
+                { searchable: false, targets: [ 0, 1 ] },
+                { orderable: false, targets: [ 0, 1, 3, 4, 5, 6, 7 ] },
+                { visible: false, targets: [ 10, 11, 12, 13, 14 ] },
+                { responsivePriority: 2, targets: [ 4, 6 ] },
+                { responsivePriority: 1, targets: [ 0, 2, 8, ] }
+            ],
+            order: [[2, 'asc']],
+            paging: false,
+            responsive: true,
+            pageLength: -1,
+            drawCallback: function() {
+                refreshDashboard(this.api(), undefined, false);
+            }
+        });
+
+        fuelDurationInput.addEventListener('input', function(e) {
+            if (e.target.value !== '') {
+                refreshDashboard(table, e.target.value, false);
+            }
+            });
+            fuelDurationInput.addEventListener('change', function(e) {
+                refreshDashboard(table, e.target.value, true);
+            });
+            window.addEventListener('resize', function() {
+                updateTableDensity();
+            });
+            refreshDashboard(table, undefined, true);
+        });
+    </script>
 {% endblock extra_javascript %}
-{% block extra_script %}
-    function numberWithCommas(x) {
-    return (Number(x) || 0).toLocaleString('en-US');
-    }
-
-    $(document).ready(function() {
-    const durationTitles = document.querySelectorAll('.duration-title, #totalDaysTitle, #totalGasDaysTitle');
-    const fuelDurationInput = document.getElementById('fuelDuration');
-    const fuelDurationSummary = document.getElementById('fuelDurationSummary');
-    const tableElement = document.getElementById('table-structs');
-    const tableWrapper = tableElement.closest('.table-responsive');
-    const structureTypeBreakdown = document.getElementById('structure_type_breakdown');
-    const defaultRefuelDays = 90;
-    const minimumRefuelDays = 30;
-
-    // Keep refuel sizing on the original day-based flow and enforce the
-    // same 30-day floor when the dashboard recalculates totals.
-    function getRefuelDays(value, fallbackDays) {
-    const parsed = Number(value);
-
-    if (!Number.isFinite(parsed)) {
-    return fallbackDays;
-    }
-    return Math.max(Math.ceil(parsed), minimumRefuelDays);
-    }
-
-    function updateDurationTitles(durationLabel) {
-    durationTitles.forEach(function(elem) {
-    elem.innerText = durationLabel;
-    });
-    }
-
-    function updateFuelDurationSummary(refuelDays) {
-    fuelDurationSummary.innerText = 'Minimum 30 days. Current window: ' + refuelDays + 'd.';
-    }
-
-    function calculateRefuelNeed(hourly, currentStock, hours) {
-    return Math.max(Math.ceil((hourly * hours) - currentStock), 0);
-    }
-
-    // Recalculate each row against the selected target so filtered totals
-    // and visible row values stay in sync without another server request.
-    function recalculateRowRefuel(row, hours) {
-    const blockHourly = Number(row.dataset.blockHourly || 0);
-    const blockCurrent = Number(row.dataset.blockCurrent || 0);
-    const gasHourly = Number(row.dataset.gasHourly || 0);
-    const gasCurrent = Number(row.dataset.gasCurrent || 0);
-    const blockRefuel = calculateRefuelNeed(blockHourly, blockCurrent, hours);
-    const gasRefuel = calculateRefuelNeed(gasHourly, gasCurrent, hours);
-    const blockCell = row.querySelector('.blocks-till');
-    const gasCell = row.querySelector('.gas-till');
-
-    row.dataset.blockRefuel = blockRefuel;
-    row.dataset.gasRefuel = gasRefuel;
-
-    if (blockCell) {
-    blockCell.innerText = numberWithCommas(blockRefuel);
-    }
-    if (gasCell) {
-    gasCell.innerText = numberWithCommas(gasRefuel);
-    }
-    }
-
-    function renderTypeBreakdown(typeCounts) {
-    const entries = Object.entries(typeCounts).sort(function(a, b) {
-    if (b[1] !== a[1]) {
-    return b[1] - a[1];
-    }
-    return a[0].localeCompare(b[0]);
-    });
-
-    if (!entries.length) {
-    structureTypeBreakdown.innerHTML = '<div class="structure-type-empty">No structures in the current filter.</div>';
-    return;
-    }
-
-    structureTypeBreakdown.innerHTML = entries.map(function(entry) {
-    return '<div class="structure-type-item"><span class="structure-type-name">' + entry[0] + '</span><span class="structure-type-count">' + numberWithCommas(entry[1]) + '</span></div>';
-    }).join('');
-    }
-
-    function updateDashboardStats(table) {
-    const rows = table.rows({ search: 'applied' }).nodes().toArray();
-    const systems = new Set();
-    const constellations = new Set();
-    const regions = new Set();
-    const typeCounts = {};
-    const totals = {
-    structures: 0,
-    currentBlocks: 0,
-    currentGas: 0,
-    blockHour: 0,
-    blockDay: 0,
-    blockMonth: 0,
-    blockRefuel: 0,
-    gasHour: 0,
-    gasDay: 0,
-    gasMonth: 0,
-    gasRefuel: 0
-    };
-
-    rows.forEach(function(row) {
-    totals.structures += 1;
-    totals.currentBlocks += Number(row.dataset.blockCurrent || 0);
-    totals.currentGas += Number(row.dataset.gasCurrent || 0);
-    totals.blockHour += Number(row.dataset.blockHourly || 0);
-    totals.blockDay += Number(row.dataset.blockDay || 0);
-    totals.blockMonth += Number(row.dataset.blockMonth || 0);
-    totals.blockRefuel += Number(row.dataset.blockRefuel || 0);
-    totals.gasHour += Number(row.dataset.gasHourly || 0);
-    totals.gasDay += Number(row.dataset.gasDay || 0);
-    totals.gasMonth += Number(row.dataset.gasMonth || 0);
-    totals.gasRefuel += Number(row.dataset.gasRefuel || 0);
-
-    if (row.dataset.system) {
-    systems.add(row.dataset.system);
-    }
-    if (row.dataset.constellation) {
-    constellations.add(row.dataset.constellation);
-    }
-    if (row.dataset.region) {
-    regions.add(row.dataset.region);
-    }
-    if (row.dataset.typeName) {
-    typeCounts[row.dataset.typeName] = (typeCounts[row.dataset.typeName] || 0) + 1;
-    }
-    });
-
-    document.getElementById('total_str').innerText = numberWithCommas(totals.structures);
-    document.getElementById('total_system').innerText = numberWithCommas(systems.size);
-    document.getElementById('total_const').innerText = numberWithCommas(constellations.size);
-    document.getElementById('total_region').innerText = numberWithCommas(regions.size);
-    document.getElementById('total_current_blocks').innerText = numberWithCommas(totals.currentBlocks);
-    document.getElementById('total_current_gas').innerText = numberWithCommas(totals.currentGas);
-    document.getElementById('total_block_hour').innerText = numberWithCommas(totals.blockHour);
-    document.getElementById('total_block_day').innerText = numberWithCommas(totals.blockDay);
-    document.getElementById('total_block_month').innerText = numberWithCommas(totals.blockMonth);
-    document.getElementById('total_fuel_refuel').innerText = numberWithCommas(totals.blockRefuel);
-    document.getElementById('total_gas_hour').innerText = numberWithCommas(totals.gasHour);
-    document.getElementById('total_gas_day').innerText = numberWithCommas(totals.gasDay);
-    document.getElementById('total_gas_month').innerText = numberWithCommas(totals.gasMonth);
-    document.getElementById('total_gas_refuel').innerText = numberWithCommas(totals.gasRefuel);
-
-    renderTypeBreakdown(typeCounts);
-    }
-
-    function updateTableDensity() {
-    if (!tableWrapper) {
-    return;
-    }
-
-    // If the table starts to overrun its card, squeeze the services column first.
-    tableElement.classList.remove('fuel-table-tight', 'fuel-table-tightest');
-    if (tableWrapper.scrollWidth > tableWrapper.clientWidth + 1) {
-    tableElement.classList.add('fuel-table-tight');
-    }
-    if (tableWrapper.scrollWidth > tableWrapper.clientWidth + 1) {
-    tableElement.classList.add('fuel-table-tightest');
-    }
-    }
-
-    function refreshDashboard(table, overrideDays, syncInputValue) {
-    const currentDays = getRefuelDays(fuelDurationInput.value, defaultRefuelDays);
-    const refuelDays = getRefuelDays(
-    typeof overrideDays === 'undefined' ? currentDays : overrideDays,
-    currentDays
-    );
-    const durationLabel = refuelDays + 'd';
-
-    if (syncInputValue) {
-    fuelDurationInput.value = refuelDays;
-    }
-    updateDurationTitles(durationLabel);
-    updateFuelDurationSummary(refuelDays);
-    Array.from(tableElement.querySelectorAll('tbody tr')).forEach(function(row) {
-    recalculateRowRefuel(row, refuelDays * 24);
-    });
-    updateDashboardStats(table);
-    updateTableDensity();
-    }
-
-    const table = $('#table-structs').DataTable({
-    filterDropDown: {
-    columns: [{ idx: 11 }, { idx: 7 }, { idx: 8 }, { idx: 9 }, { idx: 10 }],
-    bootstrap: true,
-    bootstrap_version: 5
-    },
-    columnDefs: [
-    { searchable: false, targets: [0] },
-    { orderable: false, targets: [0, 2, 3, 4, 5, 6] },
-    { visible: false, targets: [7, 8, 9, 10, 11] },
-    { width: "100px", targets: [0] }
-    ],
-    order: [[1, 'asc']],
-    paging: false,
-    responsive: true,
-    pageLength: -1,
-    drawCallback: function() {
-    refreshDashboard(this.api(), undefined, false);
-    }
-    });
-
-    fuelDurationInput.addEventListener('input', function(e) {
-    if (e.target.value !== '') {
-    refreshDashboard(table, e.target.value, false);
-    }
-    });
-
-    fuelDurationInput.addEventListener('change', function(e) {
-    refreshDashboard(table, e.target.value, true);
-    });
-
-    window.addEventListener('resize', function() {
-    updateTableDensity();
-    });
-
-    refreshDashboard(table, undefined, true);
-    });
-{% endblock extra_script %}
 {% block extra_css %}
     <style>
+        table.dataTable > tbody > tr.child ul.dtr-details {
+            width: 100%;
+            display: inline-block; /* Helps with width constraints */
+        }
+
         .fuel-struct-table {
             table-layout: fixed;
             width: 100%;
@@ -907,4 +966,6 @@
         }
     </style>
     {% include "bundles/datatables-css-bs5.html" %}
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.8/css/responsive.dataTables.css"></link>
+
 {% endblock extra_css %}
