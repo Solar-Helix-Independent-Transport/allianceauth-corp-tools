@@ -102,7 +102,7 @@ class Locator(commands.Cog):
                 )
                 _alt['ship'] = shp
                 _alt['lookup'] = True
-                if online["online"]:
+                if online.online:
                     alt_online.append(_alt)
                 else:
                     alt_offline.append(_alt)
