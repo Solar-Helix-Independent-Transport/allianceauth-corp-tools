@@ -355,11 +355,8 @@
     {% endif %}
 {% endblock content %}
 {% block extra_javascript %}
-    {% include "bundles/datatables-js-bs5.html" %}
+    <script src="https://cdn.datatables.net/v/bs5/dt-2.3.8/cc-1.2.1/r-3.0.8/datatables.min.js" integrity="sha384-Y6GNdV0CxRTzEGqwMvHv1oclGmXanGUi2dBa89rua1XgRzPB2IlI61fVFRk0HkYH" crossorigin="anonymous"></script>
     {% include "bundles/filterdropdown-js.html" %}
-    <script src="https://cdn.datatables.net/responsive/3.0.8/js/dataTables.responsive.js"></script>
-    <script src="https://cdn.datatables.net/responsive/3.0.8/js/responsive.dataTables.js"></script>
-
     <script>
         function numberWithCommas(x) {
             return (Number(x) || 0).toLocaleString('en-US');
@@ -965,7 +962,6 @@
             }
         }
     </style>
-    {% include "bundles/datatables-css-bs5.html" %}
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.8/css/responsive.dataTables.css"></link>
+<link href="https://cdn.datatables.net/v/bs5/dt-2.3.8/cc-1.2.1/r-3.0.8/datatables.min.css" rel="stylesheet" integrity="sha384-+9NeGNgSJ4ZoXdmjEdPLcqMFs4KPcfHHAYubysfmcZV2v+V3O/AVI496iO3VTB6U" crossorigin="anonymous">
 
 {% endblock extra_css %}
