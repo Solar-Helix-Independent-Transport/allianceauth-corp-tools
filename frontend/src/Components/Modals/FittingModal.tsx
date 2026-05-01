@@ -511,7 +511,7 @@ export const FittingModalBase = ({ ship, data, showModal, setShowModal, isFetchi
           <Modal.Title>{ship?.name}</Modal.Title>
         </Modal.Header>
         {isFetching || !data ? (
-          <PanelLoader title={t("Laoding Fit")} message={t("Please Wait")} />
+          <PanelLoader title={t("Loading Fit")} message={t("Please Wait")} />
         ) : (
           <div className="d-flex">
             <div className="m-3">

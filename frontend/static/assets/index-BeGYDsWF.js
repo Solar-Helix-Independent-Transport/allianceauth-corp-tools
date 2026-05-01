@@ -12318,7 +12318,7 @@ const Qf = "/static/corptools/bs5/static/img/tyrannis-DSq5_x0q.png",
         children: [
           i.jsx(_.Header, { children: i.jsx(_.Title, { children: e == null ? void 0 : e.name }) }),
           o
-            ? i.jsx(oe, { title: r("Laoding Fit"), message: r("Please Wait") })
+            ? i.jsx(oe, { title: r("Loading Fit"), message: r("Please Wait") })
             : i.jsxs("div", {
                 className: "d-flex",
                 children: [
@@ -13995,9 +13995,9 @@ const Xg = ({ start: e, end: t }) =>
         r.accessor("corporation_tax_rate", { header: e("Corporations") }),
         r.accessor("terrible_standing_tax_rate", { header: e("Terrible") }),
         r.accessor("bad_standing_tax_rate", { header: e("Bad") }),
-        r.accessor("neutral_standing_tax_rate", { header: e("Nuetral") }),
+        r.accessor("neutral_standing_tax_rate", { header: e("Neutral") }),
         r.accessor("good_standing_tax_rate", { header: e("Good") }),
-        r.accessor("excellent_standing_tax_rate", { header: e("Excelent") }),
+        r.accessor("excellent_standing_tax_rate", { header: e("Excellent") }),
         r.accessor("reinforce_exit_start", { header: e("Ref Exit Start") }),
         r.accessor("reinforce_exit_end", { header: e("Ref Exit End") }),
       ];
