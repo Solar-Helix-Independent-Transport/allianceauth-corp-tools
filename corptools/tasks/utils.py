@@ -7,14 +7,17 @@ from time import time
 from typing import Any, Callable
 
 # Third Party
+from aiopenapi3.errors import RequestError as RequestError
 from celery import Task, shared_task, signature
 from celery.exceptions import Retry
-from celery_once import AlreadyQueued, QueueOnce
-from httpx import RequestError
+from celery_once import AlreadyQueued
+from eve_sde.tasks import check_for_sde_updates
+from httpx import RequestError as httpx_RequestError
 
 # Django
 from django.core.cache import cache
 from django.db.models import QuerySet
+from django.db.utils import IntegrityError
 from django.utils import timezone
 
 # Alliance Auth
@@ -24,7 +27,6 @@ from esi.exceptions import (
     HTTPClientError,
     HTTPServerError,
 )
-from esi.rate_limiting import ESIRateLimitBucket, interval_to_seconds
 
 # AA Example App
 from corptools.tasks.rate_limiting import (
@@ -89,11 +91,17 @@ def esi_error_retry(func):
                     logger.warning(f"Hit ESI error limit! Pausing Tasks! {e}")
                     set_error_flag(60)
                     args[0].retry(countdown=61)
-            elif isinstance(e, RequestError):  # HTTPX
-                logger.warning(f"Uncaught Error from HTTPX, Retrying... {e}")
+            elif isinstance(e, (RequestError, httpx_RequestError)):  # Generic Request Errors
+                logger.warning(f"Uncaught RequestError, Retrying... {e}")
                 args[0].retry(countdown=300)
             elif isinstance(e, (OSError)):  # Bravado
                 logger.warning(f"Hit ESI error! Skipping task! {e}")
+            elif isinstance(e, (IntegrityError)):
+                logger.warning(
+                    f"Hit DB Integrity Error! SDE not up to date? retrying in 15 minutes! {e}")
+                check_for_sde_updates.apply_async(priority=1)
+                if args[0].retires < 3:
+                    args[0].retry(countdown=900)
             raise e
         return _ret
     return wrapper
