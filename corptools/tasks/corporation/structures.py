@@ -432,7 +432,7 @@ def corp_update_pocos(corp_id, full_update=False):
         ).order_by(
             "distance"
         ).first()
-        _office_to_names[n['item_id']] = nearest
+        _office_to_names[n.item_id] = nearest
 
     for poco in poco_data:
         Poco.objects.update_or_create(
