@@ -69,13 +69,13 @@ const CorporationPocos = () => {
       header: () => <span className="ms-auto">{t("Bad")}</span>,
     }),
     columnHelper.accessor("neutral_standing_tax_rate", {
-      header: () => <span className="ms-auto">{t("Nuetral")}</span>,
+      header: () => <span className="ms-auto">{t("Neutral")}</span>,
     }),
     columnHelper.accessor("good_standing_tax_rate", {
       header: () => <span className="ms-auto">{t("Good")}</span>,
     }),
     columnHelper.accessor("excellent_standing_tax_rate", {
-      header: () => <span className="ms-auto">{t("Excelent")}</span>,
+      header: () => <span className="ms-auto">{t("Excellent")}</span>,
     }),
     columnHelper.accessor("reinforce_exit_start", {
       header: () => <span className="ms-auto">{t("Ref Exit Start")}</span>,
