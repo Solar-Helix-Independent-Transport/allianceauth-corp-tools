@@ -8,7 +8,7 @@ from typing import Any, Callable
 
 # Third Party
 from aiopenapi3.errors import RequestError as RequestError
-from celery import Task, shared_task, signature
+from celery import Task, signature
 from celery.exceptions import Retry
 from celery_once import AlreadyQueued
 from eve_sde.tasks import check_for_sde_updates
