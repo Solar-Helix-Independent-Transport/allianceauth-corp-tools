@@ -5,6 +5,7 @@
 {% block header_nav_collapse_left %}
     {% include 'corptools/top_menu.html' %}
 {% endblock %}
+{% block page_title %}{% translate "Fuel Dashboard" %}{% endblock %}
 
 {% block content %}
     {% if structures %}
@@ -170,7 +171,7 @@
                                 <tr>
                                     <th></th>
                                     <th></th>
-                                    <th>Structure</th>
+                                    <th class="all">Structure</th>
                                     <th class="text-center">Blocks Usage</th>
                                     <th class="text-center">Blocks Refuel</th>
                                     <th class="text-center">Gas Usage</th>
