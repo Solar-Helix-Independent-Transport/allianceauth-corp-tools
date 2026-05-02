@@ -81,6 +81,10 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
         if item.location_id not in location_names:
             try:
                 if item.location_id not in failed_locations:
+                    """ this is bad
+                        This is causing the 420 issues
+                        TODO Fix this. make it similar/same as the character updates
+                    """
                     new_name = fetch_location_name(
                         item.location_id,
                         item.location_flag,
