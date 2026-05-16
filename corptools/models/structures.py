@@ -98,8 +98,8 @@ class Structure(models.Model):
         if user.has_perm("corptools.holding_corp_structures"):
             corps_holding = CorptoolsConfiguration.get_solo().holding_corp_qs()
             corps_vis = corps_vis | corps_holding
-        update_time_filter = timezone.now() - datetime.timedelta(days=7)
-        return cls.objects.filter(corporation__in=corps_vis, corporation__last_update_structures__gte=update_time_filter)
+        #update_time_filter = timezone.now() - datetime.timedelta(days=7)
+        return cls.objects.filter(corporation__in=corps_vis)
 
 
 class Poco(models.Model):
