@@ -2037,9 +2037,9 @@ javascript-time-ago@^2.3.7, javascript-time-ago@^2.5.10:
   dependencies:
     relative-time-format "^1.1.12"
 
-js-cookie@^3.0.5:
-  version "3.0.5"
-  resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-3.0.5.tgz#0b7e2fd0c01552c58ba86e0841f94dc2557dcdbc"
+js-cookie@^3.0.7:
+  version "3.0.7"
+  resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-3.0.7.tgz#0a53abfc459c8e89c85d7a38eb6cb68714965b8c"
 
 js-sha3@0.8.0:
   version "0.8.0"

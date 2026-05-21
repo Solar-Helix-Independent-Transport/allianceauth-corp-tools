@@ -27,7 +27,7 @@
     "i18next-browser-languagedetector": "^8.0.3",
     "i18next-http-backend": "^3.0.5",
     "javascript-time-ago": "^2.5.10",
-    "js-cookie": "^3.0.5",
+    "js-cookie": "^3.0.7",
     "nuqs": "^2.4.3",
     "openapi-fetch": "^0.10.4",
     "rc-slider": "^11.1.8",
