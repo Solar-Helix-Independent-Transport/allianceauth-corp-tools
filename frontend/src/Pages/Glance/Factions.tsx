@@ -1,5 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
+import {
+  IconStatusDiv,
+  statusProps,
+  COMPACT_NUM_FORMAT,
+} from "../../Components/Cards/IconStatusCard";
 import { loadGlanceFactionData } from "../../api/character";
 import { loadCorpGlanceFactionData } from "../../api/corporation";
 import Amarr from "../../assets/amarr_128.png";
@@ -12,7 +16,9 @@ import Card from "react-bootstrap/Card";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
-export const Factions = ({ data }: any) => {
+const fmtLP = (v: any) => Number(v).toLocaleString("en-US", COMPACT_NUM_FORMAT);
+
+export const Factions = ({ data, isLoading = false }: any) => {
   const { t } = useTranslation();
 
   return (
@@ -26,45 +32,32 @@ export const Factions = ({ data }: any) => {
           <div className="d-flex flex-wrap justify-content-center">
             <IconStatusDiv
               iconSrc={Amarr}
-              cardVariant={data?.factions?.amarr ? "success" : undefined}
-              textVariant={data?.factions?.amarr ? "success" : "muted"}
-              text={data?.factions?.amarr ? data?.factions?.amarr : "-"}
+              {...statusProps(data?.factions?.amarr, isLoading)}
               toolTipText={t("Number of detected alts in Amarr Militia")}
             />
             <IconStatusDiv
               iconSrc={Gal}
-              cardVariant={data?.factions?.gallente ? "success" : undefined}
-              textVariant={data?.factions?.gallente ? "success" : "muted"}
-              text={data?.factions?.gallente ? data?.factions?.gallente : "-"}
+              {...statusProps(data?.factions?.gallente, isLoading)}
               toolTipText={t("Number of detected alts in Gallente Militia")}
             />
             <IconStatusDiv
               iconSrc={Min}
-              cardVariant={data?.factions?.minmatar ? "success" : undefined}
-              textVariant={data?.factions?.minmatar ? "success" : "muted"}
-              text={data?.factions?.minmatar ? data?.factions?.minmatar : "-"}
+              {...statusProps(data?.factions?.minmatar, isLoading)}
               toolTipText={t("Number of detected alts in Minmatar Militia")}
             />
-
             <IconStatusDiv
               iconSrc={Cal}
-              cardVariant={data?.factions?.caldari ? "success" : undefined}
-              textVariant={data?.factions?.caldari ? "success" : "muted"}
-              text={data?.factions?.caldari ? data?.factions?.caldari : "-"}
+              {...statusProps(data?.factions?.caldari, isLoading)}
               toolTipText={t("Number of detected alts in Caldari Militia")}
             />
             <IconStatusDiv
-              cardVariant={data?.factions?.angel ? "success" : undefined}
-              textVariant={data?.factions?.angel ? "success" : "muted"}
               iconSrc={"https://images.evetech.net/corporations/500011/logo?size=128"}
-              text={data?.factions?.angel ? data?.factions?.angel : "-"}
+              {...statusProps(data?.factions?.angel, isLoading)}
               toolTipText={t("Number of detected alts in Angel Cartel Militia")}
             />
             <IconStatusDiv
-              cardVariant={data?.factions?.guristas ? "success" : undefined}
-              textVariant={data?.factions?.guristas ? "success" : "muted"}
               iconSrc={"https://images.evetech.net/corporations/500010/logo?size=128"}
-              text={data?.factions?.guristas ? data?.factions?.guristas : "-"}
+              {...statusProps(data?.factions?.guristas, isLoading)}
               toolTipText={t("Number of detected alts in Guristas Militia")}
             />
           </div>
@@ -75,24 +68,14 @@ export const Factions = ({ data }: any) => {
               <Card.Title>{t("Evermarks")}</Card.Title>
             </Card.Header>
             <div className="d-flex h-100 align-items-center flex-wrap justify-content-center">
-              {data?.lp?.evermark?.map((lp_data: any) => {
-                return (
-                  <IconStatusDiv
-                    iconSrc={`https://images.evetech.net/corporations/${lp_data.corp_id}/logo?size=128`}
-                    text={
-                      lp_data?.lp
-                        ? lp_data?.lp?.toLocaleString("en-US", {
-                            maximumFractionDigits: 2,
-                            notation: "compact",
-                            compactDisplay: "short",
-                          })
-                        : "?"
-                    }
-                    textVariant="muted"
-                    toolTipText={lp_data.corp_name}
-                  />
-                );
-              })}
+              {data?.lp?.evermark?.map((lp_data: any) => (
+                <IconStatusDiv
+                  key={lp_data.corp_id}
+                  iconSrc={`https://images.evetech.net/corporations/${lp_data.corp_id}/logo?size=128`}
+                  {...statusProps(lp_data?.lp, isLoading, "secondary", fmtLP)}
+                  toolTipText={lp_data.corp_name}
+                />
+              ))}
             </div>
           </Card>
         )}
@@ -100,41 +83,20 @@ export const Factions = ({ data }: any) => {
           <Card.Header className="text-center">
             <Card.Title>{t("Loyalty Points")}</Card.Title>
           </Card.Header>
-
           <div className="d-flex h-100 align-items-center flex-wrap justify-content-center">
             <IconStatusDiv
               iconSrc={FW}
-              text={
-                data?.lp?.total
-                  ? data?.lp?.total?.toLocaleString("en-US", {
-                      maximumFractionDigits: 2,
-                      notation: "compact",
-                      compactDisplay: "short",
-                    })
-                  : "0"
-              }
-              textVariant={data?.lp?.total ? "success" : undefined}
-              cardVariant={data?.lp?.total ? "success" : undefined}
+              {...statusProps(data?.lp?.total, isLoading, "secondary", fmtLP)}
               toolTipText={t("Total LP")}
             />
-            {data?.lp?.top_five?.map((lp_data: any) => {
-              return (
-                <IconStatusDiv
-                  iconSrc={`https://images.evetech.net/corporations/${lp_data.corp_id}/logo?size=128`}
-                  text={
-                    lp_data?.lp
-                      ? lp_data?.lp?.toLocaleString("en-US", {
-                          maximumFractionDigits: 2,
-                          notation: "compact",
-                          compactDisplay: "short",
-                        })
-                      : "?"
-                  }
-                  textVariant="muted"
-                  toolTipText={lp_data.corp_name}
-                />
-              );
-            })}
+            {data?.lp?.top_five?.map((lp_data: any) => (
+              <IconStatusDiv
+                key={lp_data.corp_id}
+                iconSrc={`https://images.evetech.net/corporations/${lp_data.corp_id}/logo?size=128`}
+                {...statusProps(lp_data?.lp, isLoading, "secondary", fmtLP)}
+                toolTipText={lp_data.corp_name}
+              />
+            ))}
           </div>
         </Card>
       </div>
@@ -145,19 +107,19 @@ export const Factions = ({ data }: any) => {
 export const CharacterGlancesFactions = () => {
   const { characterID } = useParams();
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["glances", "faction", characterID],
     queryFn: () => loadGlanceFactionData(characterID ? Number(characterID) : 0),
     refetchOnWindowFocus: false,
   });
-  return <Factions {...{ data }} />;
+  return <Factions {...{ data, isLoading }} />;
 };
 
 export const CorporationGlancesFactions = ({ corporationID = 0 }) => {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["glances", "corp", "faction", corporationID],
     queryFn: () => loadCorpGlanceFactionData(corporationID),
     refetchOnWindowFocus: false,
   });
-  return <Factions {...{ data }} />;
+  return <Factions {...{ data, isLoading }} />;
 };

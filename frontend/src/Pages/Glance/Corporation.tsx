@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
+import { IconStatusDiv, COMPACT_NUM_FORMAT } from "../../Components/Cards/IconStatusCard";
 import { loadCorpGlanceStatusData } from "../../api/corporation";
 import Isk from "../../assets/isk_128.png";
 import Omega from "../../assets/omega_128.png";
@@ -24,11 +24,7 @@ export const CorporationGlancesInfo = ({ corporationID = 0 }) => {
           cardVariant={data?.characters?.liquid < 1000000 ? "warning" : undefined}
           iconSrc={Isk}
           textVariant={data?.characters?.liquid < 1000000 ? "warning" : undefined}
-          text={`${data?.characters?.liquid?.toLocaleString("en-US", {
-            maximumFractionDigits: 2,
-            notation: "compact",
-            compactDisplay: "short",
-          })} ISK`}
+          text={`${data?.characters?.liquid?.toLocaleString("en-US", COMPACT_NUM_FORMAT)} ISK`}
           isLoading={isLoading}
           toolTipText={t("Total Liquid Isk across all characters and alts in corporation")}
         />

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
+import { IconStatusDiv, COMPACT_NUM_FORMAT } from "../../Components/Cards/IconStatusCard";
 import { loadCharacterStatus } from "../../api/character";
 // import Asteroid from "../../../assets/asteroid_64.png";
 // import NPC from "../../../assets/npcbattleship_32.png";
@@ -50,11 +50,7 @@ export const CharacterGlancesAccount = () => {
           cardVariant={isk < 1000000 ? "warning" : "success"}
           iconSrc={Isk}
           textVariant={isk < 1000000 ? "warning" : "success"}
-          text={`${isk?.toLocaleString("en-US", {
-            maximumFractionDigits: 2,
-            notation: "compact",
-            compactDisplay: "short",
-          })} ISK`}
+          text={`${isk?.toLocaleString("en-US", COMPACT_NUM_FORMAT)} ISK`}
           isLoading={isLoading}
           toolTipText={t("Total Liquid Isk across all characters")}
         />
@@ -63,11 +59,7 @@ export const CharacterGlancesAccount = () => {
           cardVariant={sp < 1000000 ? "warning" : "success"}
           iconSrc={Skills}
           textVariant={sp < 1000000 ? "warning" : "success"}
-          text={`${sp?.toLocaleString("en-US", {
-            maximumFractionDigits: 2,
-            notation: "compact",
-            compactDisplay: "short",
-          })} SP`}
+          text={`${sp?.toLocaleString("en-US", COMPACT_NUM_FORMAT)} SP`}
           isLoading={isLoading}
           toolTipText={t("Total SP across all characters")}
         />
