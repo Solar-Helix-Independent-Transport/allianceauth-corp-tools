@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { Form } from "react-bootstrap";
+import WalletActivityChord from "../../Components/Graphs/WalletActivityChord";
 
 const CharacterWalletActivity = () => {
   const { t } = useTranslation();
@@ -67,17 +68,16 @@ const CharacterWalletActivity = () => {
   });
   return (
     <>
-      <Form.Check
-        type="switch"
-        id="custom-switch"
-        label={t("Show Own Account Activity")}
-        className="float-end"
-        onChange={(event: any) => {
-          setShowAll(event.target.checked);
-        }}
-        defaultChecked={showAll}
-      />
-
+      <div className="d-flex justify-content-end mb-2">
+        <Form.Check
+          type="switch"
+          id="custom-switch"
+          label={t("Show Own Account Activity")}
+          onChange={(event: any) => setShowAll(event.target.checked)}
+          defaultChecked={showAll}
+        />
+      </div>
+      <WalletActivityChord data={data_out ?? []} />
       <TableWrapper data={data_out} {...{ isFetching, columns }} />
     </>
   );
