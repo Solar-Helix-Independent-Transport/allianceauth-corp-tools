@@ -207,5 +207,18 @@ esi_openapi = OpenAPI(
         # moons
         "GetCorporationCorporationIdMiningObservers",
         "GetCorporationCorporationIdMiningObserversObserverId",
+
+        # Used in 3rd party tools
+        "PostUiOpenwindowInformation",
+
+        # 2026-05-19, endpoints added for all the new OpenAPI fun stuff!
+        "GetCorporationsStructuresSovereigntyHubsListing",
+        "GetCorporationsStructuresSovereigntyHubsDetail",
+        "GetCorporationsStructuresSkyhooksListing",
+        "GetCorporationsStructuresSkyhooksDetail",
+        "GetCharactersStructuresMercenaryDensListing",
+        "GetCharactersStructuresMercenaryDensDetail",
+        "GetCharactersAccessListsListing",
+        "GetCharactersAccessListsDetail"
     ]
 )
