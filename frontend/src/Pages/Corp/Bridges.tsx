@@ -1,5 +1,5 @@
 import { loadBridges } from "../../api/corporation";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { PanelLoader } from "../../Components/Loaders/loaders";
 import { Card } from "react-bootstrap";
 import { BridgeLink } from "../../Components/Corporation/BridgeLink";

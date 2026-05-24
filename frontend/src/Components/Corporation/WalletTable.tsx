@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import TableWrapper from "../Tables/BaseTable/TableWrapper";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { loadWallet } from "../../api/corporation";
 
 const CorporationWalletTable = ({

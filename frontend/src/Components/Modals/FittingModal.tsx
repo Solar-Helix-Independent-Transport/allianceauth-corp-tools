@@ -32,7 +32,7 @@ import s3 from "../../assets/fittings/3s.png";
 import s4 from "../../assets/fittings/4s.png";
 import s5 from "../../assets/fittings/5s.png";
 import { Card, Modal } from "react-bootstrap";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { loadStructureFit } from "../../api/corporation";
 import { PanelLoader } from "../Loaders/loaders";
 import { useTranslation } from "react-i18next";

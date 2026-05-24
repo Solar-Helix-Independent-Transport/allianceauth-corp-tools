@@ -4,7 +4,7 @@ import { components } from "../../api/CtApi";
 import { getCharacterList } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 

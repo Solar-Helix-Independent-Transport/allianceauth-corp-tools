@@ -1,6 +1,6 @@
 import StructuresTable from "../../Components/Corporation/Structures";
 import { loadAllStructures } from "../../api/corporation";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 const Structures = () => {
   const { data, isFetching } = useQuery({

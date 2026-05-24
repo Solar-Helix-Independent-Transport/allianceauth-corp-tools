@@ -6,7 +6,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
 import { Badge, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterMail = () => {
@@ -15,14 +15,12 @@ const CharacterMail = () => {
   const [showModal, setModal] = useState(false);
   const [modalData, setData] = useState(null);
 
-  const { isFetching, data } = useQuery(
-    ["mail", characterID],
-    () => loadMail(Number(characterID)),
-    {
-      initialData: [],
-      refetchOnWindowFocus: false,
-    },
-  );
+  const { isFetching, data } = useQuery({
+    queryKey: ["mail", characterID],
+    queryFn: () => loadMail(Number(characterID)),
+    initialData: [],
+    refetchOnWindowFocus: false,
+  });
 
   const columnHelper = createColumnHelper<any>();
 

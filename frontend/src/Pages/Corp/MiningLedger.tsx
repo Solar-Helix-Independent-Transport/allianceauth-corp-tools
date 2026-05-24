@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { LoadAgregatedMining } from "../../api/corporation";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import LedgerGraph from "../../Components/Graphs/LedgerGraph";
 import { PanelLoader } from "../../Components/Loaders/loaders";
 import { useState } from "react";

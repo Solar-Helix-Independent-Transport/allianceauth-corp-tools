@@ -1,14 +1,14 @@
 import { ResponsiveRadar } from "@nivo/radar";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getCharacterSkillGraph } from "../../api/character";
 import { getCSSVariable } from "./GraphHelpers";
 
 export const SkillsRadarGraph = ({ characterID }: { characterID: number }) => {
-  const { isLoading, error, data } = useQuery(
-    ["skillgraph", characterID ? Number(characterID) : 0],
-    () => getCharacterSkillGraph(characterID ? Number(characterID) : 0),
-    { refetchOnWindowFocus: false },
-  );
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["skillgraph", characterID ? Number(characterID) : 0],
+    queryFn: () => getCharacterSkillGraph(characterID ? Number(characterID) : 0),
+    refetchOnWindowFocus: false,
+  });
   const bg = getCSSVariable("--bs-body-bg");
   const txt = getCSSVariable("--bs-body-color");
   const bdr = getCSSVariable("--bs-light-border-subtle");

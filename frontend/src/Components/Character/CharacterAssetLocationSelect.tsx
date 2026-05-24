@@ -1,5 +1,5 @@
 import { loadAssetLocations } from "../../api/character";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import Select from "react-select";
 
 const colourStyles = {
@@ -21,11 +21,11 @@ const CharacterAssetLocationSelect = ({
   characterID: number;
   setLocation: any;
 }) => {
-  const { isLoading, data } = useQuery(
-    ["asset_loc", characterID],
-    () => loadAssetLocations(characterID),
-    { refetchOnWindowFocus: false },
-  );
+  const { isLoading, data } = useQuery({
+    queryKey: ["asset_loc", characterID],
+    queryFn: () => loadAssetLocations(characterID),
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <Select

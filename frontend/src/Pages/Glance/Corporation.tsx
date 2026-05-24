@@ -5,7 +5,7 @@ import Isk from "../../assets/isk_128.png";
 import Omega from "../../assets/omega_128.png";
 import Unknowns from "../../assets/unknown_64.png";
 import styles from "./AtAGlance.module.css";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 export const CorporationGlancesInfo = ({ corporationID = 0 }) => {
   const { t } = useTranslation();

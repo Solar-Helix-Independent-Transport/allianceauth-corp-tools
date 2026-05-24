@@ -3,7 +3,7 @@ import { getFitCheck } from "../../api/character";
 import { ChangeEvent, useState } from "react";
 import { Form } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { PanelLoader } from "../../Components/Loaders/loaders";
@@ -13,17 +13,15 @@ const CharacterFitCheck = () => {
   const { characterID } = useParams();
 
   const [fit, setFit] = useState("");
-  const { data, refetch, isFetching, isFetched } = useQuery(
-    ["getFitCheck", fit, characterID],
-    () => {
+  const { data, refetch, isFetching, isFetched } = useQuery({
+    queryKey: ["getFitCheck", fit, characterID],
+    queryFn: () => {
       let out = getFitCheck(fit, characterID ? Number(characterID) : 0);
       return out;
     },
-    {
-      refetchOnWindowFocus: false,
-      enabled: false, // disable this query from automatically running
-    },
-  );
+    refetchOnWindowFocus: false,
+    enabled: false,
+  });
 
   function fitUpdate(event: ChangeEvent | any) {
     setFit(event.target?.value);

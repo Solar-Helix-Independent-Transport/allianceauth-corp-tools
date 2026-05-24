@@ -9,7 +9,7 @@ import Gal from "../../assets/gallente_128.png";
 import Min from "../../assets/minmatar128.png";
 import styles from "./AtAGlance.module.css";
 import Card from "react-bootstrap/Card";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 export const Factions = ({ data }: any) => {

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { LoadAllStarbases } from "../../api/corporation";
 import { CorporationLogo } from "../../Components/EveImages/EveImages";
 import { TimeTill } from "../../Components/Helpers/TimeTill";

@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { loadDivisions } from "../../api/corporation";
 import { Badge } from "react-bootstrap";
 import { useTranslation } from "react-i18next";

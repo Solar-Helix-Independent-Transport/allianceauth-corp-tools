@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import CorporationAssetLocationSelect from "../../Components/Corporation/CorpAssetLocationSelect";
 import CorpSelect from "../../Components/Corporation/CorporationSelect";
 import { loadAssetList } from "../../api/corporation";

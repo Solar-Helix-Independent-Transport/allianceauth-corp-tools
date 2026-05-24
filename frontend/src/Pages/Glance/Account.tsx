@@ -8,7 +8,7 @@ import Omega from "../../assets/omega_128.png";
 import Skills from "../../assets/skillInjector_64.png";
 import Unknowns from "../../assets/unknown_64.png";
 import styles from "./AtAGlance.module.css";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 export const CharacterGlancesAccount = () => {

@@ -9,7 +9,7 @@ import Supercarrier from "../../assets/superCarrier_32.png";
 import Titan from "../../assets/titan_32.png";
 import styles from "./AtAGlance.module.css";
 import Card from "react-bootstrap/Card";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 export const Ratting = ({ data, isLoading }: any) => {

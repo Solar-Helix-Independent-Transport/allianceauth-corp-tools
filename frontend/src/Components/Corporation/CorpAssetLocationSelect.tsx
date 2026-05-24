@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import Select from "react-select";
 import { loadAssetLocations } from "../../api/corporation";
 
@@ -21,9 +21,10 @@ const CorporationAssetLocationSelect = ({
   corporationID: number;
   setLocation: any;
 }) => {
-  const { isLoading, data } = useQuery(["corp_asset_loc", corporationID], () =>
-    loadAssetLocations(corporationID),
-  );
+  const { isLoading, data } = useQuery({
+    queryKey: ["corp_asset_loc", corporationID],
+    queryFn: () => loadAssetLocations(corporationID),
+  });
 
   return (
     <Select

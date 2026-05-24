@@ -19,7 +19,7 @@ import Planet from "../../assets/planet_128.png";
 import Triglavian from "../../assets/triglavian_128.png";
 import styles from "./AtAGlance.module.css";
 import Card from "react-bootstrap/Card";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 const ActivitiesPVE = ({ data, isLoading }: any) => {

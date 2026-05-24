@@ -4,7 +4,7 @@ import { components } from "../../api/CtApi";
 import { getCharacterClones } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Button, Modal, Table } from "react-bootstrap";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import React from "react";

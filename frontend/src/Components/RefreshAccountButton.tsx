@@ -1,22 +1,20 @@
 import { postAccountRefresh } from "../api/character";
 import styles from "./RefreshAccountButton.module.css";
 import Button from "react-bootstrap/Button";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 export const RefreshCharButton = () => {
   const { characterID } = useParams();
 
-  const { refetch, isFetching } = useQuery(
-    "my_key",
-    () => {
+  const { refetch, isFetching } = useQuery({
+    queryKey: ["my_key"],
+    queryFn: () => {
       return postAccountRefresh(characterID ? Number(characterID) : 0);
     },
-    {
-      refetchOnWindowFocus: false,
-      enabled: false, // disable this query from automatically running
-    },
-  );
+    refetchOnWindowFocus: false,
+    enabled: false,
+  });
   async function refreshChar() {
     return await refetch();
   }

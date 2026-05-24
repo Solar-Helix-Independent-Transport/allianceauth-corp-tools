@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { loadWalletActivity } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { Form } from "react-bootstrap";

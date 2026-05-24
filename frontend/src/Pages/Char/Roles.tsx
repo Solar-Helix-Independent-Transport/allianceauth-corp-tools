@@ -5,7 +5,7 @@ import { components } from "../../api/CtApi";
 import { getCharacterRoles } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Badge } from "react-bootstrap";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterRoles = () => {
