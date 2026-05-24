@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { useQueryState } from "nuqs";
 import CorpSelect from "../../Components/Corporation/CorporationSelect";
 import RefTypeSelect from "../../Components/Corporation/RefTypeSelect";
 import CorporationWalletTable from "../../Components/Corporation/WalletTable";
@@ -8,14 +9,15 @@ import CorpDivisions from "../../Components/Corporation/Divisions";
 
 const CorporationWallets = () => {
   const { t } = useTranslation();
-  const [corporationID, setCorporation] = useState<number>(0);
+  const [cidStr] = useQueryState("cid");
+  const corporationID = Number(cidStr) || 0;
   const [refTypes, setRefs] = useState("");
   return (
     <>
       <div className="m-3 d-flex align-items-center my-1">
         <h6 className="me-1">{t("Corporation Filter")}</h6>
         <div className="flex-grow-1">
-          <CorpSelect {...{ setCorporation }} />
+          <CorpSelect />
         </div>
       </div>
       <div className="m-3 d-flex align-items-center my-1">

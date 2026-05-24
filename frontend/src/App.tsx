@@ -84,8 +84,8 @@ function App() {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        <NuqsAdapter>
-          <Router>
+        <Router>
+          <NuqsAdapter>
             <Routes>
               <Route path="audit/r/:characterID/" element={<CharacterAudit />}>
                 <Route index element={<Navigate to="account/overview" replace />} />
@@ -170,8 +170,8 @@ function App() {
               </Route>
               <Route path="*" element={<Navigate to="audit/r/0" replace />} />
             </Routes>
-          </Router>
-        </NuqsAdapter>
+          </NuqsAdapter>
+        </Router>
       </QueryClientProvider>
     </React.StrictMode>
   );

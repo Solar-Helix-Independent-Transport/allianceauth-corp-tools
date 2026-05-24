@@ -34,7 +34,7 @@ export const DropdownMenuItem = ({ link }: any) => {
     <Nav.Item as="li">
       <NavDropdown.Item
         as={Link}
-        to={`${BASEURL}${link.link}`}
+        to={{ pathname: `${BASEURL}${link.link}`, search: path.search }}
         id={link.name}
         key={link.name}
         active={hit}
@@ -50,7 +50,13 @@ export const MenuItem = ({ link }: any) => {
   const hit = path.pathname.endsWith(link.link);
   return (
     <Nav.Item as="li">
-      <Nav.Link as={Link} to={`${BASEURL}${link.link}`} id={link.name} key={link.name} active={hit}>
+      <Nav.Link
+        as={Link}
+        to={{ pathname: `${BASEURL}${link.link}`, search: path.search }}
+        id={link.name}
+        key={link.name}
+        active={hit}
+      >
         {link.name}
       </Nav.Link>
     </Nav.Item>
