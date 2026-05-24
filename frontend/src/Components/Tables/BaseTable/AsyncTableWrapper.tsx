@@ -12,8 +12,8 @@ const AsyncTableWrapper = ({
   columns: ColumnDef<any, any>[];
 }) => {
   const { data, isFetching } = useQuery({
-    queryKey: queryFn,
-    queryFn: queryKey,
+    queryKey: queryKey,
+    queryFn: queryFn,
     refetchOnWindowFocus: false,
   });
 
