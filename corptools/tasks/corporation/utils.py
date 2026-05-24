@@ -14,7 +14,7 @@ from esi.models import Token
 # AA Example App
 from corptools.models import CorporationAudit, EveName
 
-from .. import providers
+from ... import providers
 
 logger = get_extension_logger(__name__)
 
@@ -87,7 +87,8 @@ def get_corp_token(corp_id: int, scopes: list, req_roles: Union[list, None, bool
                     character_id=token.character_id,
                     token=token
                 ).result(
-                    use_etag=False
+                    use_etag=False,
+                    use_cache=True
                 )
 
                 has_roles = False

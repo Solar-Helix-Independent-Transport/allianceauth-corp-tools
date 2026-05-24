@@ -31,6 +31,11 @@ CT_CHAR_LOCATIONS_MODULE = getattr(settings, 'CT_CHAR_LOCATIONS_MODULE', True)
 CT_CHAR_FLEET_MODULE = getattr(settings, 'CT_CHAR_FLEET_MODULE', True)
 CT_CHAR_MAIL_MODULE = getattr(settings, 'CT_CHAR_MAIL_MODULE', False)
 CT_CHAR_HELPER_MODULE = getattr(settings, 'CT_CHAR_HELPER_MODULE', True)
+
+CT_CHAR_STRUCTURES_MODULE = getattr(
+    settings, 'CT_CHAR_STRUCTURES_MODULE', True)
+CT_CHAR_ACL_MODULE = getattr(settings, 'CT_CHAR_ACL_MODULE', True)
+
 CT_CHAR_OPPORTUNITIES = False
 CT_CHAR_LOYALTYPOINTS_MODULE = getattr(
     settings, 'CT_CHAR_LOYALTYPOINTS_MODULE', True)
@@ -213,6 +218,16 @@ def get_character_scopes():
             'esi-characters.read_loyalty.v1',
         ]
 
+    if CT_CHAR_STRUCTURES_MODULE:
+        _scopes += [
+            'esi-structures.read_character.v1',
+        ]
+
+    if CT_CHAR_ACL_MODULE:
+        _scopes += [
+            'esi-access.read_lists.v1',
+        ]
+
     return list(set(_scopes))
 
 
@@ -366,10 +381,14 @@ _corp_scopes_industry_jobs = [
     'esi-industry.read_corporation_jobs.v1'
 ]
 
+_corp_scopes_sov = [
+    "esi-structures.read_corporation.v1",
+
+]
 
 CORP_REQUIRED_SCOPES = _corp_scopes_base + _corp_scopes_tracking + \
     _corp_scopes_structures + _corp_scopes_moons + \
-    _corp_scopes_wallets + _corp_scopes_assets
+    _corp_scopes_wallets + _corp_scopes_assets + _corp_scopes_sov
 
 CT_BETA_UI = getattr(
     settings,

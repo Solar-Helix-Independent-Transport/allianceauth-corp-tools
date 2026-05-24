@@ -56,6 +56,10 @@ def enqueue_next_task(chain, delay=1):
         break
 
 
+def get_error_count_flag():
+    return cache.get("esi_errors_timeout", False)
+
+
 def set_error_flag(timeout):
     tout = timezone.now() + datetime.timedelta(seconds=timeout)
     cache.set("esi_error_timeout", tout, timeout=timeout + 1)

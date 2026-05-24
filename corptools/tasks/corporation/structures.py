@@ -26,7 +26,7 @@ from corptools.models import (
 from corptools.models.eve_models import MapJumpBridge
 from corptools.task_helpers.update_tasks import fetch_location_name
 
-from .. import providers
+from ... import providers
 from .utils import NoTokens, get_corp_token, update_corp_audit
 
 logger = get_extension_logger(__name__)

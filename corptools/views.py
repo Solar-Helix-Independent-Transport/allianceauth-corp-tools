@@ -137,6 +137,7 @@ def add_corp_section(request, *args, **kwargs):
     pocos = request.GET.get('p', False)
     contracts = request.GET.get('c', False)
     industry_jobs = request.GET.get('i', False)
+    sovereignty = request.GET.get('sov', False)
 
     # if we're coming back from SSO with a new token, return it
     token = _check_callback(request)
@@ -187,6 +188,9 @@ def add_corp_section(request, *args, **kwargs):
 
     if industry_jobs:
         scopes += app_settings._corp_scopes_industry_jobs
+
+    if sovereignty:
+        scopes += app_settings._corp_scopes_sov
 
     # user has selected to add a new token
     return sso_redirect(request, scopes=scopes)
@@ -284,7 +288,13 @@ def admin_run_tasks(request):
     if request.method == 'POST':
         if request.POST.get('run_update_all'):
             messages.info(request, "Queued update_all_characters")
-            update_all_characters.apply_async(priority=6)
+            update_all_characters.apply_async(
+                priority=6,
+                kwargs={
+                    "force_refresh": False,
+                    "now": True
+                }
+            )
         if request.POST.get('run_update_eve_models'):
             messages.info(request, "Queued update_all_eve_names")
             update_all_eve_names.apply_async(priority=6)

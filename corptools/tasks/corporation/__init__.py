@@ -1,6 +1,3 @@
-# Standard Library
-from random import random
-
 # Third Party
 from celery import chain as Chain
 from celery import shared_task
@@ -23,9 +20,6 @@ from .structures import (
     corp_update_pocos,
 )
 from .wallet import update_corp_wallet_divisions
-
-TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
-
 
 logger = get_extension_logger(__name__)
 

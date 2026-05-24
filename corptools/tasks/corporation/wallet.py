@@ -15,7 +15,7 @@ from corptools.models import (
     EveName,
 )
 
-from .. import providers
+from ... import providers
 from .utils import NoTokens, get_corp_token, get_eve_ids, update_corp_audit
 
 logger = get_extension_logger(__name__)
