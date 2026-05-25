@@ -1,4 +1,5 @@
 # Standard Library
+from functools import wraps
 from typing import Union
 
 # Django
@@ -25,6 +26,7 @@ class NoTokens(Exception):
 
 def update_corp_audit(update_field: str = ""):
     def decorator(function):
+        @wraps(function)
         def wrapper(*args, **kwargs):
             audit_corp = CorporationAudit.objects.get(
                 corporation__corporation_id=args[0]
@@ -113,8 +115,8 @@ def get_eve_ids(ids: list | set):
     return set(
         EveName.objects.filter(
             eve_id__in=list(ids)
-        ).distinct().values_list(
+        ).values_list(
             'eve_id',
-            'name'
+            flat=True
         )
     )

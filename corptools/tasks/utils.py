@@ -104,7 +104,7 @@ def esi_error_retry(func):
                 logger.warning(
                     f"Hit DB Integrity Error! SDE not up to date? retrying in 15 minutes! {e}")
                 check_for_sde_updates.apply_async(priority=1)
-                if args[0].retires < 3:
+                if args[0].retries < 3:
                     sig = inspect.signature(func)
 
                     if "force_refresh" in sig.parameters:
