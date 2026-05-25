@@ -82,7 +82,7 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
                         locations = providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsLocations(
                             corporation_id=_corporation.corporation.corporation_id,
                             item_ids=[_structure.structure_id],
-                            token=token
+                            token=_token
                         ).result()
 
                         _location = locations[0]
