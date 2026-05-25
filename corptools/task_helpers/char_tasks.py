@@ -61,12 +61,6 @@ from ..models import (
 logger = get_extension_logger(__name__)
 
 
-# def chunks(lst, n):
-#     """Yield successive n-sized chunks from lst."""
-#     for i in range(0, len(lst), n):
-#         yield lst[i:i + n]
-
-
 def get_token(character_id: int, scopes: list) -> "Token":
     """Helper method to get a valid token for a specific character with specific scopes.
 
@@ -452,12 +446,8 @@ def update_character_assets(character_id, force_refresh=False):
 
                 items.append(ship)
 
-        delete_query = CharacterAsset.objects.filter(
-            character=audit_char
-        )  # Flush Assets
-        if delete_query.exists():
-            # We now have some FKeys so slow it down...
-            delete_query.delete()
+        # We now have some FKeys so slow it down...
+        CharacterAsset.objects.filter(character=audit_char).delete()
 
         CharacterAsset.objects.bulk_create(
             items, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
@@ -1232,15 +1222,8 @@ def update_character_orders(character_id, force_refresh=False):
 
         updates = []
         creates = []
-        type_ids = []
-        tracked_ids = []
 
         for order in open_orders:
-            tracked_ids.append(order.order_id)
-
-            if order.type_id not in type_ids:
-                type_ids.append(order.type_id)
-
             _order = CharacterMarketOrder.from_esi_model(audit_char, order)
 
             if order.location_id in all_locations:
@@ -1328,16 +1311,8 @@ def update_character_order_history(character_id, force_refresh=False):
 
         updates = []
         creates = []
-        type_ids = []
-
-        tracked_ids = []
 
         for order in order_history:
-            tracked_ids.append(order.order_id)
-
-            if order.type_id not in type_ids:
-                type_ids.append(order.type_id)
-
             _order = CharacterMarketOrder.from_esi_model(audit_char, order)
 
             if order.location_id in all_locations:
