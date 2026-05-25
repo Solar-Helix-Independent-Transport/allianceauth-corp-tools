@@ -1,9 +1,13 @@
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.utils.translation import gettext as _
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
+# AA Example App
 from corptools import app_settings, models
 from corptools.api import helpers, schema
 
@@ -30,7 +34,7 @@ class StatusApiEndpoints:
                 c = corp.first()
                 _updates = {}
                 for grp in app_settings.get_corp_update_attributes():
-                    _updates[grp[0]] = getattr(c, grp[1])
+                    _updates[grp[0]] = c.get_update_time(grp[1])
                 all_id = None
                 all_nm = None
                 if c.corporation.alliance:

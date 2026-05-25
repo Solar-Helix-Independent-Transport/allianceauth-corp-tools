@@ -233,96 +233,64 @@ def get_character_scopes():
 
 def get_character_update_attributes():
     _attribs = [
-        # Base
-        ("Public Data", 'last_update_pub_data'),
+        ("Public Data", 'pub_data'),
     ]
 
     if CT_CHAR_CONTACTS_MODULE:
-        _attribs += [
-            # Contacts
-            ("Contacts", 'last_update_contacts'),
-        ]
+        _attribs += [("Contacts", 'contacts')]
 
     if CT_CHAR_LOCATIONS_MODULE:
-        _attribs += [
-            # Location
-            ("Location", 'last_update_location'),
-        ]
+        _attribs += [("Location", 'location')]
 
     if CT_CHAR_NOTIFICATIONS_MODULE:
         _attribs += [
-            # Notifications
-            ("Notifications", 'last_update_notif'),
-        ]
-    if CT_CHAR_NOTIFICATIONS_MODULE:
-        _attribs += [
-            # Notifications
-            ("Mining", 'last_update_mining'),
+            ("Notifications", 'notif'),
+            ("Mining", 'mining'),
         ]
 
     if CT_CHAR_ROLES_MODULE:
         _attribs += [
-            # Roles
-            ("Roles", 'last_update_roles'),
-            ("Titles", 'last_update_titles'),
+            ("Roles", 'roles'),
+            ("Titles", 'titles'),
         ]
 
     if CT_CHAR_WALLET_MODULE:
         _attribs += [
-            # Wallet / Market /  Contracts
-            ("Wallet", 'last_update_wallet'),
-            ("Orders", 'last_update_orders'),
+            ("Wallet", 'wallet'),
+            ("Orders", 'orders'),
         ]
 
     if CT_CHAR_INDUSTRY_MODULE:
-        _attribs += [
-            # Roles
-            ("Industry", 'last_update_indy'),
-        ]
+        _attribs += [("Industry", 'indy')]
 
     if CT_CHAR_LOYALTYPOINTS_MODULE:
-        _attribs += [
-            ("LP", 'last_update_loyaltypoints'),
-        ]
+        _attribs += [("LP", 'loyaltypoints')]
 
     if CT_CHAR_ASSETS_MODULE:
-        _attribs += [
-            # Assets
-            ("Assets", 'last_update_assets'),
-        ]
+        _attribs += [("Assets", 'assets')]
 
     if CT_CHAR_SKILLS_MODULE:
         _attribs += [
-            # Skills
-            ("Skills", 'last_update_skills'),
-            ("Skill Queue", 'last_update_skill_que')
+            ("Skills", 'skills'),
+            ("Skill Queue", 'skill_que'),
         ]
 
     if CT_CHAR_CLONES_MODULE:
-        _attribs += [
-            # Clones
-            ("Clones", 'last_update_clones'),
-        ]
+        _attribs += [("Clones", 'clones')]
 
     if CT_CHAR_MAIL_MODULE:
-        _attribs += [
-            # Mail
-            ("Mail", 'last_update_mails'),
-        ]
+        _attribs += [("Mail", 'mails')]
 
     return _attribs
 
 
 def get_corp_update_attributes():
-    _attribs = [
-        # Base
-        ["Assets", 'last_update_assets', "a"],
-        ("Structures", 'last_update_structures', "s"),
-        ("Wallet", 'last_update_wallet', "w"),
-        ("Moons Observations", 'last_update_observers', "m")
+    return [
+        ("Assets", 'assets', "a"),
+        ("Structures", 'structures', "s"),
+        ("Wallet", 'wallet', "w"),
+        ("Moons Observations", 'observers', "m"),
     ]
-
-    return _attribs
 
 
 _corp_scopes_base = [

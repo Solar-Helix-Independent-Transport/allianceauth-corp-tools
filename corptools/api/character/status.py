@@ -1,10 +1,14 @@
+# Standard Library
 from typing import List
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.db.models import F, Sum
 from django.utils.translation import gettext as _
 
+# AA Example App
 from corptools import app_settings, models
 from corptools.api import schema
 from corptools.api.helpers import get_alts_queryset, get_main_character
@@ -72,8 +76,8 @@ class StatusApiEndpoints:
                 try:
                     _updates = {}
                     for grp in app_settings.get_character_update_attributes():
-                        _updates[grp[0]] = getattr(
-                            character.characteraudit, grp[1])
+                        _updates[grp[0]] = character.characteraudit.get_update_time(
+                            grp[1])
                     _o.update({
                         "isk": character.characteraudit.balance,
                         "active": character.characteraudit.is_active(),

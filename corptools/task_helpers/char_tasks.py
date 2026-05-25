@@ -202,7 +202,7 @@ def update_character_location(character_id, force_refresh=False):
             f"CT: No New online data for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_location = timezone.now()
+    audit_char.set_update_time("location")
     audit_char.save()
     audit_char.is_active()
 
@@ -252,7 +252,7 @@ def update_corp_history(character_id, force_refresh=False):
             f"CT: No New pub data for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_pub_data = timezone.now()
+    audit_char.set_update_time("pub_data")
     audit_char.save()
     audit_char.is_active()
 
@@ -324,7 +324,7 @@ def update_character_skill_list(character_id, force_refresh=False):
             f"CT: No New skills for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_skills = timezone.now()
+    audit_char.set_update_time("skills")
     audit_char.save()
     audit_char.is_active()
 
@@ -388,7 +388,7 @@ def update_character_skill_queue(character_id, force_refresh=False):
             )
         )
 
-    audit_char.last_update_skill_que = timezone.now()
+    audit_char.set_update_time("skill_que")
     audit_char.save()
     audit_char.is_active()
 
@@ -482,7 +482,7 @@ def update_character_assets(character_id, force_refresh=False):
             f"CT: No New assets for: {audit_char.character.character_name} - ({tb.tb_lineno})"
         )
 
-    audit_char.last_update_assets = timezone.now()
+    audit_char.set_update_time("assets")
     audit_char.save()
     audit_char.is_active()
 
@@ -709,7 +709,7 @@ def update_character_mining(character_id, force_refresh=False):
             f"CT: No New Mining for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_mining = timezone.now()
+    audit_char.set_update_time("mining")
     audit_char.save()
     audit_char.is_active()
 
@@ -814,7 +814,7 @@ def update_character_industry_jobs(character_id, force_refresh=False):
             f"CT: No New Industry for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_indy = timezone.now()
+    audit_char.set_update_time("indy")
     audit_char.save()
     audit_char.is_active()
 
@@ -938,7 +938,7 @@ def update_character_wallet(character_id, force_refresh=False):
             f"CT: No New wallet data for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_wallet = timezone.now()
+    audit_char.set_update_time("wallet")
     audit_char.save()
     audit_char.is_active()
 
@@ -1105,7 +1105,7 @@ def update_character_clones(character_id, force_refresh=False):
             f"CT: No New Clone data for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_clones = timezone.now()
+    audit_char.set_update_time("clones")
     audit_char.save()
     audit_char.is_active()
 
@@ -1177,7 +1177,7 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
             f"CT: No New LP data for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_loyaltypoints = timezone.now()
+    audit_char.set_update_time("loyaltypoints")
     audit_char.save()
     audit_char.is_active()
 
@@ -1267,7 +1267,7 @@ def update_character_orders(character_id, force_refresh=False):
             f"CT: No New orders data for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_orders = timezone.now()
+    audit_char.set_update_time("orders")
     audit_char.save()
     audit_char.is_active()
 
@@ -1439,7 +1439,7 @@ def update_character_notifications(character_id, force_refresh=False):
         )
         pass
 
-    audit_char.last_update_notif = timezone.now()
+    audit_char.set_update_time("notif")
     audit_char.save()
     audit_char.is_active()
 
@@ -1501,7 +1501,7 @@ def update_character_roles(character_id, force_refresh=False):
             f"CT: No New roles for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_roles = timezone.now()
+    audit_char.set_update_time("roles")
     audit_char.save()
     audit_char.is_active()
 
@@ -1729,7 +1729,7 @@ def update_character_mail_headers(character_id, force_refresh=False):
             # Break the while loop if we reach the last mail message that is in the db.
             break
 
-    audit_char.last_update_mails = timezone.now()
+    audit_char.set_update_time("mails")
     audit_char.save()
     audit_char.is_active()
 
@@ -1840,7 +1840,7 @@ def update_character_contacts(character_id, force_refresh=False):
         )
         pass
 
-    audit_char.last_update_contacts = timezone.now()
+    audit_char.set_update_time("contacts")
     audit_char.save()
     audit_char.is_active()
 
@@ -1902,7 +1902,7 @@ def update_character_titles(character_id, force_refresh=False):
             f"CT: No New titles for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_titles = timezone.now()
+    audit_char.set_update_time("titles")
     audit_char.save()
     audit_char.is_active()
 
@@ -2001,7 +2001,7 @@ def update_character_contracts(character_id, force_refresh=False):
             f"CT: No New Contracts for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_contracts = timezone.now()
+    audit_char.set_update_time("contracts")
     audit_char.save()
     audit_char.is_active()
 

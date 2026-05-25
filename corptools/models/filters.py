@@ -872,7 +872,7 @@ class LastLoginfilter(FilterBase):
     def audit_filter(self, users):
         valid_logins = timezone.now(
         ) - datetime.timedelta(days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS)
-        co = CharacterOwnership.objects.filter(user__in=users, character__characteraudit__last_update_login__gte=valid_logins).select_related(
+        co = CharacterOwnership.objects.filter(user__in=users, character__characteraudit__update_timestamps__login__gte=valid_logins.isoformat()).select_related(
             "character__characteraudit", "character", "user__profile__main_character")
 
         chars = {}

@@ -95,8 +95,8 @@ def process_corp_histories(self):
         hours=24 * (app_settings.CT_CHAR_MAX_INACTIVE_DAYS - 1)
     )
     oldest = CharacterAudit.objects.filter(
-        last_update_pub_data__lte=after
-    ).order_by('last_update_pub_data').first()
+        update_timestamps__pub_data__lte=after.isoformat()
+    ).order_by('update_timestamps__pub_data').first()
 
     if oldest is None:
         return "No characters to process"
@@ -154,64 +154,64 @@ def update_character(self, char_id, force_refresh=False, now=False):
         ))
 
     if app_settings.CT_CHAR_ROLES_MODULE and not ct_conf.disable_update_roles:
-        if _needs_update(character.last_update_roles, skip_date, force_refresh, min_date):
+        if _needs_update(character.get_update_time("roles"), skip_date, force_refresh, min_date):
             que.append(update_char_roles.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
-        if _needs_update(character.last_update_titles, skip_date, force_refresh, min_date):
+        if _needs_update(character.get_update_time("titles"), skip_date, force_refresh, min_date):
             que.append(update_char_titles.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
 
     if app_settings.CT_CHAR_NOTIFICATIONS_MODULE and not ct_conf.disable_update_notif:
-        if _needs_update(character.last_update_notif, skip_date, force_refresh, min_date):
+        if _needs_update(character.get_update_time("notif"), skip_date, force_refresh, min_date):
             que.append(update_char_notifications.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
 
     if app_settings.CT_CHAR_ASSETS_MODULE and not ct_conf.disable_update_assets:
-        if _needs_update(character.last_update_assets, skip_date, force_refresh, min_date):
+        if _needs_update(character.get_update_time("assets"), skip_date, force_refresh, min_date):
             que.append(update_char_assets.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
 
     if app_settings.CT_CHAR_SKILLS_MODULE and not ct_conf.disable_update_skills:
-        if _needs_update(character.last_update_skills, skip_date, force_refresh, min_date):
+        if _needs_update(character.get_update_time("skills"), skip_date, force_refresh, min_date):
             que.append(update_char_skill_list.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
-        if _needs_update(character.last_update_skill_que, skip_date, force_refresh, min_date):
+        if _needs_update(character.get_update_time("skill_que"), skip_date, force_refresh, min_date):
             que.append(update_char_skill_queue.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
 
     if app_settings.CT_CHAR_CLONES_MODULE and not ct_conf.disable_update_clones:
-        if _needs_update(character.last_update_clones, skip_date, force_refresh, min_date):
+        if _needs_update(character.get_update_time("clones"), skip_date, force_refresh, min_date):
             que.append(update_char_clones.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
 
     if app_settings.CT_CHAR_CONTACTS_MODULE and not ct_conf.disable_update_contacts:
-        if _needs_update(character.last_update_contacts, skip_date, force_refresh, min_date):
+        if _needs_update(character.get_update_time("contacts"), skip_date, force_refresh, min_date):
             que.append(update_char_contacts.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
 
     if app_settings.CT_CHAR_MINING_MODULE and not ct_conf.disable_update_mining:
-        if _needs_update(character.last_update_mining, skip_date, force_refresh, min_date):
+        if _needs_update(character.get_update_time("mining"), skip_date, force_refresh, min_date):
             que.append(update_char_mining_ledger.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
 
     if app_settings.CT_CHAR_WALLET_MODULE and not ct_conf.disable_update_wallet:
-        if _needs_update(character.last_update_wallet, skip_date, force_refresh, min_date):
+        if _needs_update(character.get_update_time("wallet"), skip_date, force_refresh, min_date):
             que.append(update_char_wallet.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
             que.append(update_char_transactions.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
-        if _needs_update(character.last_update_orders, skip_date, force_refresh, min_date):
+        if _needs_update(character.get_update_time("orders"), skip_date, force_refresh, min_date):
             que.append(update_char_orders.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
@@ -219,7 +219,7 @@ def update_character(self, char_id, force_refresh=False, now=False):
                 character.character.character_id, force_refresh=force_refresh
             ))
         if force_refresh or not app_settings.CT_CHAR_PAUSE_CONTRACTS:
-            if _needs_update(character.last_update_contracts, skip_date, force_refresh, min_date):
+            if _needs_update(character.get_update_time("contracts"), skip_date, force_refresh, min_date):
                 que.append(update_char_contracts.si(
                     character.character.character_id, force_refresh=force_refresh
                 ))
@@ -251,7 +251,7 @@ def update_character(self, char_id, force_refresh=False, now=False):
     # cache_user_skill_list must be last — it uses a non-character-level QueueOnce key
     # and will stall the chain for other characters on the same account if placed earlier.
     if app_settings.CT_CHAR_SKILLS_MODULE and not ct_conf.disable_update_skills:
-        if _needs_update(character.last_update_skills, skip_date, force_refresh, min_date):
+        if _needs_update(character.get_update_time("skills"), skip_date, force_refresh, min_date):
             try:
                 que.append(cache_user_skill_list.s(
                     character.character.character_ownership.user_id,

@@ -99,7 +99,7 @@ class Structure(models.Model):
             corps_holding = CorptoolsConfiguration.get_solo().holding_corp_qs()
             corps_vis = corps_vis | corps_holding
         update_time_filter = timezone.now() - datetime.timedelta(days=7)
-        return cls.objects.filter(corporation__in=corps_vis, corporation__last_update_structures__gte=update_time_filter)
+        return cls.objects.filter(corporation__in=corps_vis, corporation__update_timestamps__structures__gte=update_time_filter.isoformat())
 
 
 class Poco(models.Model):

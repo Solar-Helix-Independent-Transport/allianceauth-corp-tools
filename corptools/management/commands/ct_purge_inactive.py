@@ -1,10 +1,14 @@
+# Standard Library
 from datetime import timedelta
 
+# Django
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.authentication.models import State
 
+# AA Example App
 from corptools.app_settings import CT_CHAR_NOTIFICATIONS_MODULE
 from corptools.models import CharacterAudit
 
@@ -63,7 +67,7 @@ class Command(BaseCommand):
             if CT_CHAR_NOTIFICATIONS_MODULE:
                 start_time = timezone.now() - timedelta(days=14)
                 _c = CharacterAudit.objects.filter(
-                    last_update_notif__lte=start_time
+                    update_timestamps__notif__lte=start_time.isoformat()
                 )
                 self.stdout.write(f"Purging {_c.count()} inactive Characters")
                 for _d in _c:

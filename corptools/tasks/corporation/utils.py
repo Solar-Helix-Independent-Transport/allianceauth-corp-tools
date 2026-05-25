@@ -31,18 +31,15 @@ def update_corp_audit(update_field: str = ""):
             )
             try:
                 result = function(*args, **kwargs)
-                try:
-                    setattr(
-                        audit_corp, f"last_update_{update_field}", timezone.now())
-                    setattr(
-                        audit_corp, f"last_change_{update_field}", timezone.now())
-                except Exception:
-                    pass
+                now = timezone.now().isoformat()
+                audit_corp.update_timestamps[update_field] = now
+                audit_corp.change_timestamps[update_field] = now
                 audit_corp.save()
                 return result
             except HTTPNotModified:
                 logger.info(f"Not modified {function} {args} {kwargs}")
-                setattr(audit_corp, update_field, timezone.now())
+                audit_corp.update_timestamps[update_field] = timezone.now(
+                ).isoformat()
                 audit_corp.save()
             except HTTPError as e:
                 logger.error(f"HTTPError {function} {args} {kwargs} {e}")

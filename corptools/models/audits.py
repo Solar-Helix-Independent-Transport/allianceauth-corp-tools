@@ -9,7 +9,6 @@ from solo.models import SingletonModel
 
 # Django
 from django.db import models
-from django.db.models import ExpressionWrapper, F, Func
 from django.utils import timezone
 
 # Alliance Auth
@@ -190,59 +189,7 @@ class CharacterAudit(models.Model):
 
     character = models.OneToOneField(EveCharacter, on_delete=models.CASCADE)
 
-    last_update_pub_data = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_skills = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_skill_que = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_clones = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_contacts = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_contracts = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_assets = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_wallet = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_orders = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_notif = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_roles = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_titles = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_mails = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_location = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_loyaltypoints = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_mining = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_indy = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_login = models.DateTimeField(
-        null=True, default=None, blank=True)
+    update_timestamps = models.JSONField(default=dict)
 
     balance = models.DecimalField(
         max_digits=20, decimal_places=2, null=True, default=None)
@@ -266,6 +213,18 @@ class CharacterAudit(models.Model):
                        ('state_hr', 'Can access other character\'s data for own state.'),
                        ('guest_hr', 'Can access guest users\'s data for HR purposes.'),
                        ('global_hr', 'Can access other character\'s data for characters in any corp/alliance/state.'))
+        indexes = [
+            models.Index(fields=['active']),
+        ]
+
+    def get_update_time(self, key: str) -> datetime.datetime | None:
+        val = self.update_timestamps.get(key)
+        if val is None:
+            return None
+        return datetime.datetime.fromisoformat(val)
+
+    def set_update_time(self, key: str) -> None:
+        self.update_timestamps[key] = timezone.now().isoformat()
 
     def is_active(self):
         time_ref = timezone.now() - datetime.timedelta(days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS)
@@ -275,38 +234,38 @@ class CharacterAudit(models.Model):
             is_active = True
             if app_settings.CT_CHAR_ACTIVE_IGNORE_CORP_HISTORY and not ct_conf.disable_update_pub_data:
                 is_active = is_active and check_date(
-                    self.last_update_pub_data, time_ref)
+                    self.get_update_time('pub_data'), time_ref)
             if app_settings.CT_CHAR_ASSETS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE and not ct_conf.disable_update_assets:
                 is_active = is_active and check_date(
-                    self.last_update_assets, time_ref)
+                    self.get_update_time('assets'), time_ref)
             if app_settings.CT_CHAR_CLONES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE and not ct_conf.disable_update_clones:
                 is_active = is_active and check_date(
-                    self.last_update_clones, time_ref)
+                    self.get_update_time('clones'), time_ref)
             if app_settings.CT_CHAR_SKILLS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE and not ct_conf.disable_update_skills:
                 is_active = is_active and check_date(
-                    self.last_update_skills, time_ref)
+                    self.get_update_time('skills'), time_ref)
                 is_active = is_active and check_date(
-                    self.last_update_skill_que, time_ref)
+                    self.get_update_time('skill_que'), time_ref)
             if app_settings.CT_CHAR_WALLET_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE and not ct_conf.disable_update_wallet:
                 is_active = is_active and check_date(
-                    self.last_update_wallet, time_ref)
+                    self.get_update_time('wallet'), time_ref)
                 is_active = is_active and check_date(
-                    self.last_update_orders, time_ref)
+                    self.get_update_time('orders'), time_ref)
             if app_settings.CT_CHAR_NOTIFICATIONS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_NOTIFICATIONS_MODULE and not ct_conf.disable_update_notif:
                 is_active = is_active and check_date(
-                    self.last_update_notif, time_ref)
+                    self.get_update_time('notif'), time_ref)
             if app_settings.CT_CHAR_ROLES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE and not ct_conf.disable_update_roles:
                 is_active = is_active and check_date(
-                    self.last_update_roles, time_ref)
+                    self.get_update_time('roles'), time_ref)
             if app_settings.CT_CHAR_MAIL_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE and not ct_conf.disable_update_mails:
                 is_active = is_active and check_date(
-                    self.last_update_mails, time_ref)
+                    self.get_update_time('mails'), time_ref)
             if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE and not ct_conf.disable_update_loyaltypoints:
                 is_active = is_active and check_date(
-                    self.last_update_loyaltypoints, time_ref)
+                    self.get_update_time('loyaltypoints'), time_ref)
             if app_settings.CT_CHAR_MINING_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE and not ct_conf.disable_update_mining:
                 is_active = is_active and check_date(
-                    self.last_update_mining, time_ref)
+                    self.get_update_time('mining'), time_ref)
 
             if self.active != is_active:
                 self.active = is_active
@@ -319,84 +278,9 @@ class CharacterAudit(models.Model):
 
     @classmethod
     def get_oldest_qs(cls):
-        time_ref = timezone.now() - datetime.timedelta(
-            days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS * 3
-        )
-
-        ct_conf = CorptoolsConfiguration.get_solo()
-        qs = []
-
-        if app_settings.CT_CHAR_ASSETS_MODULE and not (
-            app_settings.CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE or ct_conf.disable_update_assets
-        ):
-            qs.append(Func(F('last_update_assets'), function='UNIX_TIMESTAMP'))
-
-        if app_settings.CT_CHAR_CLONES_MODULE and not (
-            app_settings.CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE or ct_conf.disable_update_clones
-        ):
-            qs.append(Func(F('last_update_clones'), function='UNIX_TIMESTAMP'))
-
-        if app_settings.CT_CHAR_SKILLS_MODULE and not (
-           app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE or ct_conf.disable_update_skills
-        ):  # NOQA E124
-            qs.append(Func(F('last_update_skills'), function='UNIX_TIMESTAMP'))
-            qs.append(Func(F('last_update_skill_que'),
-                      function='UNIX_TIMESTAMP'))
-
-        if app_settings.CT_CHAR_WALLET_MODULE and not (
-           app_settings.CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE or ct_conf.disable_update_wallet
-        ):  # NOQA E124
-            qs.append(Func(F('last_update_wallet'), function='UNIX_TIMESTAMP'))
-            qs.append(Func(F('last_update_orders'), function='UNIX_TIMESTAMP'))
-
-        if app_settings.CT_CHAR_NOTIFICATIONS_MODULE and not (
-           app_settings.CT_CHAR_ACTIVE_IGNORE_NOTIFICATIONS_MODULE or ct_conf.disable_update_notif
-        ):  # NOQA E124
-            qs.append(Func(F('last_update_notif'), function='UNIX_TIMESTAMP'))
-
-        if app_settings.CT_CHAR_ROLES_MODULE and not (
-            app_settings.CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE or ct_conf.disable_update_roles
-        ):
-            qs.append(Func(F('last_update_roles'), function='UNIX_TIMESTAMP'))
-
-        if app_settings.CT_CHAR_MAIL_MODULE and not (
-            app_settings.CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE or ct_conf.disable_update_mails
-        ):
-            qs.append(Func(F('last_update_mails'), function='UNIX_TIMESTAMP'))
-
-        if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not (
-            app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE or ct_conf.disable_update_loyaltypoints
-        ):
-            qs.append(Func(F('last_update_loyaltypoints'),
-                      function='UNIX_TIMESTAMP'))
-
-        if app_settings.CT_CHAR_MINING_MODULE and not (
-            app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE or ct_conf.disable_update_mining
-        ):
-            qs.append(Func(F('last_update_mining'), function='UNIX_TIMESTAMP'))
-
-        tot = len(qs)
-
-        qout = qs.pop()
-
-        for q in qs:
-            qout = qout + q
-
-        query = cls.objects.annotate(
-            avg_date=Func(
-                ExpressionWrapper(
-                    qout / tot,
-                    output_field=models.BigIntegerField()
-                ),
-                function='FROM_UNIXTIME',
-                output_field=models.DateTimeField()
-            )
-        ).filter(
+        return cls.objects.filter(
             character__character_ownership__isnull=False,
-            avg_date__gte=time_ref
-        ).order_by("avg_date")
-
-        return query
+        ).order_by('update_timestamps__pub_data')
 
 
 class CorporationAudit(models.Model):
@@ -406,51 +290,17 @@ class CorporationAudit(models.Model):
     corporation = models.OneToOneField(
         EveCorporationInfo, on_delete=models.CASCADE)
 
-    last_update_pub_data = models.DateTimeField(
-        null=True, default=None, blank=True)
-    last_change_pub_data = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_assets = models.DateTimeField(
-        null=True, default=None, blank=True)
-    last_change_assets = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_structures = models.DateTimeField(
-        null=True, default=None, blank=True)
-    last_change_structures = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_moons = models.DateTimeField(
-        null=True, default=None, blank=True)
-    last_change_moons = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_observers = models.DateTimeField(
-        null=True, default=None, blank=True)
-    last_change_observers = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_wallet = models.DateTimeField(
-        null=True, default=None, blank=True)
-    last_change_wallet = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_contracts = models.DateTimeField(
-        null=True, default=None, blank=True)
-    last_change_contracts = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_industry_jobs = models.DateTimeField(
-        null=True, default=None, blank=True)
-    last_change_industry_jobs = models.DateTimeField(
-        null=True, default=None, blank=True)
-
-    last_update_known_login = models.DateTimeField(
-        null=True, default=None, blank=True)
+    update_timestamps = models.JSONField(default=dict)
+    change_timestamps = models.JSONField(default=dict)
 
     def __str__(self):
         return f"{self.corporation.corporation_name}'s Corporation Data"
+
+    def get_update_time(self, key: str) -> datetime.datetime | None:
+        val = self.update_timestamps.get(key)
+        if val is None:
+            return None
+        return datetime.datetime.fromisoformat(val)
 
     class Meta:
         permissions = (

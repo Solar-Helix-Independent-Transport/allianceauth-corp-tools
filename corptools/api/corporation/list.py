@@ -1,11 +1,16 @@
+# Standard Library
 from typing import List
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.db.models import Q
 
+# Alliance Auth
 from esi.models import Token
 
+# AA Example App
 from corptools import app_settings, models
 from corptools.api import schema
 from corptools.tasks import update_corp
@@ -120,7 +125,7 @@ class ListApiEndpoints:
                 _updates = {}
                 for grp in app_settings.get_corp_update_attributes():
                     _updates[grp[0]] = {
-                        "update": getattr(c, grp[1]),
+                        "update": c.get_update_time(grp[1]),
                         "chars": corp_chars[c.corporation.corporation_id][grp[2]]["c"],
                         "tokens": corp_chars[c.corporation.corporation_id][grp[2]]["t"]
                     }
