@@ -313,7 +313,8 @@ def update_character_skill_list(character_id, force_refresh=False):
                 trained_skill_level=skill.trained_skill_level
             )
             _create_skills.append(_skill)
-        Skill.objects.bulk_create(_create_skills)
+        Skill.objects.bulk_create(
+            _create_skills, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_list {character_id}"
@@ -375,7 +376,8 @@ def update_character_skill_queue(character_id, force_refresh=False):
                 training_start_sp=item.training_start_sp
             )
             items.append(queue_item)
-        SkillQueue.objects.bulk_create(items)
+        SkillQueue.objects.bulk_create(
+            items, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_queue {character_id}"
@@ -457,7 +459,8 @@ def update_character_assets(character_id, force_refresh=False):
             # We now have some FKeys so slow it down...
             delete_query.delete()
 
-        CharacterAsset.objects.bulk_create(items)
+        CharacterAsset.objects.bulk_create(
+            items, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_assets {character_id}"
@@ -633,7 +636,8 @@ def update_asset_locations(character_id, force_refresh=False):
                 )
             )
 
-    CharAssetCoordiante.objects.bulk_create(new_models, ignore_conflicts=True)
+    CharAssetCoordiante.objects.bulk_create(
+        new_models, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
     return f"CT: Finished asset locations for: {audit_char.character.character_name}"
 
@@ -692,12 +696,13 @@ def update_character_mining(character_id, force_refresh=False):
 
         if len(new_events):
             CharacterMiningLedger.objects.bulk_create(
-                new_events, ignore_conflicts=True)
+                new_events, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         if len(old_events):
             CharacterMiningLedger.objects.bulk_update(
                 old_events,
-                fields=['quantity']
+                fields=['quantity'],
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
             )
 
         logger.debug(
@@ -802,7 +807,8 @@ def update_character_industry_jobs(character_id, force_refresh=False):
         if len(new_events):
             CharacterIndustryJob.objects.bulk_create(
                 new_events,
-                ignore_conflicts=True
+                ignore_conflicts=True,
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
             )
 
         logger.debug(
@@ -928,7 +934,8 @@ def update_character_wallet(character_id, force_refresh=False):
         audit_char.save()
 
         if created_names:
-            CharacterWalletJournalEntry.objects.bulk_create(items)
+            CharacterWalletJournalEntry.objects.bulk_create(
+                items, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
         else:
             raise Exception("ESI Fail")
         logger.debug(
@@ -1099,7 +1106,8 @@ def update_character_clones(character_id, force_refresh=False):
                 )
             )
 
-        Implant.objects.bulk_create(implants)
+        Implant.objects.bulk_create(
+            implants, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
     except HTTPNotModified:
         logger.info(
             f"CT: No New Clone data for: {audit_char.character.character_name}"
@@ -1166,10 +1174,12 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
         LoyaltyPoint.objects.bulk_create(
             _bulkcreate,
             ignore_conflicts=True,
+            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
         )
         LoyaltyPoint.objects.bulk_update(
             _bulkupdate,
-            fields=['amount']
+            fields=['amount'],
+            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
         )
 
     except HTTPNotModified:
@@ -1252,11 +1262,13 @@ def update_character_orders(character_id, force_refresh=False):
                     'volume_remain',
                     'volume_total',
                     'state'
-                ]
+                ],
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
             )
 
         if len(creates) > 0:
-            CharacterMarketOrder.objects.bulk_create(creates)
+            CharacterMarketOrder.objects.bulk_create(
+                creates, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_orders {character_id}"
@@ -1695,7 +1707,8 @@ def update_character_mail_headers(character_id, force_refresh=False):
                     )
                     lms.append(lm)
 
-        LabelThroughModel.objects.bulk_create(lms, ignore_conflicts=True)
+        LabelThroughModel.objects.bulk_create(
+            lms, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         RecipThroughModel = MailMessage.recipients.through
         rms = []
@@ -1723,7 +1736,8 @@ def update_character_mail_headers(character_id, force_refresh=False):
                         mailmessage_id=_msg.id_key, mailrecipient_id=recip)
                     rms.append(rm)
 
-        RecipThroughModel.objects.bulk_create(rms, ignore_conflicts=True)
+        RecipThroughModel.objects.bulk_create(
+            rms, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         if stop is True:
             # Break the while loop if we reach the last mail message that is in the db.
@@ -1779,7 +1793,8 @@ def update_character_contacts(character_id, force_refresh=False):
             labels_to_create.append(_label_item)
 
         CharacterContactLabel.objects.filter(character=audit_char).delete()
-        CharacterContactLabel.objects.bulk_create(labels_to_create)
+        CharacterContactLabel.objects.bulk_create(
+            labels_to_create, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} CharacterContactLabel {character_id}"
@@ -1826,9 +1841,9 @@ def update_character_contacts(character_id, force_refresh=False):
         CharacterContact.objects.filter(character=audit_char).delete()
 
         CharacterContact.objects.bulk_create(
-            _contacts_to_create, ignore_conflicts=True)
+            _contacts_to_create, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
         ContactLabelThrough.objects.bulk_create(
-            _through_to_create, ignore_conflicts=True)
+            _through_to_create, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_contacts {character_id}"
@@ -1969,7 +1984,8 @@ def update_character_contracts(character_id, force_refresh=False):
         if len(contract_models_new) > 0:
             Contract.objects.bulk_create(
                 contract_models_new,
-                ignore_conflicts=True
+                ignore_conflicts=True,
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
             )
 
         if len(contract_models_old) > 0:
@@ -1985,7 +2001,8 @@ def update_character_contracts(character_id, force_refresh=False):
                     'acceptor_name',
                     'issuer_corporation_name',
                     'issuer_name'
-                ]
+                ],
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
             )
 
         logger.debug(
