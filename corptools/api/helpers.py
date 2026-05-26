@@ -10,6 +10,7 @@ from ninja.types import DictStrAny
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import F, Q, QuerySet, Sum
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 # Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
@@ -92,6 +93,20 @@ def get_alts_queryset(main_char):
         return EveCharacter.objects.filter(id__in=linked_characters)
     except ObjectDoesNotExist:
         return EveCharacter.objects.filter(pk=main_char.pk)
+
+
+def resolve_character(request, character_id):
+    """Resolve character_id=0, check access, return (error, main_char, alts_qs).
+
+    On success error is None. On failure error is a (403, message) tuple and
+    main_char / alts_qs are None.
+    """
+    if character_id == 0:
+        character_id = request.user.profile.main_character.character_id
+    response, main = get_main_character(request, character_id)
+    if not response:
+        return (403, _("Permission Denied")), None, None
+    return None, main, get_alts_queryset(main)
 
 
 def get_corporation_characters(request, corporation_id):
@@ -321,13 +336,6 @@ def glances_gas_check(characters):
     ).aggregate(
         total=Sum(F("quantity") * F("type_name__volume"))
     )["total"]
-
-
-def roundFloat(input):
-    if input:
-        return int(input)
-    else:
-        return input
 
 
 def glances_assets_character(characters):

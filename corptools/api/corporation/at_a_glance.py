@@ -1,21 +1,35 @@
+# Standard Library
 from datetime import datetime
 
+# Third Party
 from ninja import NinjaAPI
 
-from django.db.models import F, Q, Sum
+# Django
+from django.db.models import F, Sum
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
+# AA Example App
 from corptools import models
-# from corptools.api import schema
+from corptools.api import schema
 from corptools.api.helpers import (
-    get_corporation_characters, glance_incursion_check,
-    glances_assets_corporation, glances_gas_check, glances_ice_check,
-    glances_industry_check, glances_market_check, glances_missions_check,
-    glances_moon_check, glances_ore_check, glances_pi_check,
-    glances_pochven_check, glances_ratting_check, roundFloat,
+    get_corporation_characters,
+    glance_incursion_check,
+    glances_assets_corporation,
+    glances_gas_check,
+    glances_ice_check,
+    glances_industry_check,
+    glances_market_check,
+    glances_missions_check,
+    glances_moon_check,
+    glances_ore_check,
+    glances_pi_check,
+    glances_pochven_check,
+    glances_ratting_check,
+    round_or_null,
 )
 
 logger = get_extension_logger(__name__)
@@ -36,7 +50,7 @@ class CorpGlanceApiEndpoints:
     def __init__(self, api: NinjaAPI):
         @api.get(
             "corporation/{corporation_id}/glance/assets",
-            response={200: dict, 403: str},
+            response={200: schema.GlanceCorporateAssets, 403: str},
             tags=self.tags
         )
         def get_glance_assets_corp(request, corporation_id: int):
@@ -52,7 +66,7 @@ class CorpGlanceApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/glance/activities/pve",
-            response={200: dict, 403: str},
+            response={200: schema.GlancePveActivities, 403: str},
             tags=self.tags
         )
         def get_glance_activities_pve(request, corporation_id: int):
@@ -64,29 +78,18 @@ class CorpGlanceApiEndpoints:
             if not check_permisions(corporation_id, request.user):
                 return 403, _("Permission Denied")
 
-            output = {}
-
-            output["ratting"] = roundFloat(
-                glances_ratting_check(characters)
-            )
-            output["incursion"] = roundFloat(
-                glance_incursion_check(characters)
-            )
-            output["pochven"] = roundFloat(
-                glances_pochven_check(characters)
-            )
-            output["mission"] = roundFloat(
-                glances_missions_check(characters)
-            )
-
-            output["market"] = glances_market_check(characters)
-            output["industry"] = glances_industry_check(characters)
-
-            return output
+            return {
+                "ratting": round_or_null(glances_ratting_check(characters)),
+                "incursion": round_or_null(glance_incursion_check(characters)),
+                "pochven": round_or_null(glances_pochven_check(characters)),
+                "mission": round_or_null(glances_missions_check(characters)),
+                "market": round_or_null(glances_market_check(characters)),
+                "industry": glances_industry_check(characters),
+            }
 
         @api.get(
             "corporation/{corporation_id}/glance/activities/indy",
-            response={200: dict, 403: str},
+            response={200: schema.GlanceIndyActivities, 403: str},
             tags=self.tags
         )
         def get_glance_activities_indy(request, corporation_id: int):
@@ -98,17 +101,15 @@ class CorpGlanceApiEndpoints:
             if not check_permisions(corporation_id, request.user):
                 return 403, _("Permission Denied")
 
-            output = {}
-
-            output["market"] = glances_market_check(characters)
-            output["industry"] = glances_industry_check(characters)
-            output["pi"] = glances_pi_check(characters)
-
-            return output
+            return {
+                "market": round_or_null(glances_market_check(characters)),
+                "industry": glances_industry_check(characters),
+                "pi": round_or_null(glances_pi_check(characters)),
+            }
 
         @api.get(
             "corporation/{corporation_id}/glance/activities/mining",
-            response={200: dict, 403: str},
+            response={200: schema.GlanceMiningActivities, 403: str},
             tags=self.tags
         )
         def get_glance_activities(request, corporation_id: int):
@@ -120,18 +121,16 @@ class CorpGlanceApiEndpoints:
             if not check_permisions(corporation_id, request.user):
                 return 403, _("Permission Denied")
 
-            output = {}
-
-            output["mining_ore"] = roundFloat(glances_ore_check(characters))
-            output["mining_moon"] = roundFloat(glances_moon_check(characters))
-            output["mining_gas"] = roundFloat(glances_gas_check(characters))
-            output["mining_ice"] = roundFloat(glances_ice_check(characters))
-
-            return output
+            return {
+                "mining_ore": round_or_null(glances_ore_check(characters)),
+                "mining_moon": round_or_null(glances_moon_check(characters)),
+                "mining_gas": round_or_null(glances_gas_check(characters)),
+                "mining_ice": round_or_null(glances_ice_check(characters)),
+            }
 
         @api.get(
             "corporation/{corporation_id}/glance/faction",
-            response={200: dict, 403: str},
+            response={200: schema.GlanceFaction, 403: str},
             tags=self.tags
         )
         def get_glance_factions(request, corporation_id: int):
@@ -159,10 +158,8 @@ class CorpGlanceApiEndpoints:
                 }
             }
 
-            # Check for any militia stuff
             for character in characters:
                 if character.faction_id is not None:
-                    # check_faction
                     if character.faction_id == 500003:
                         output["factions"]["amarr"] += 1
                     elif character.faction_id == 500010:
@@ -188,7 +185,6 @@ class CorpGlanceApiEndpoints:
             ).order_by("-total_lp")[:5]
 
             for lp in account_lp:
-                # Evermarks and anything future
                 if lp.get('corp_id') in [1000419,]:
                     output["lp"]["evermark"].append({
                         "corp_id": lp.get("corp_id"),

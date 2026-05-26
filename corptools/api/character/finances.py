@@ -7,15 +7,14 @@ from ninja.pagination import paginate
 
 # Django
 from django.db.models import Count, F, Sum
-from django.utils.translation import gettext_noop as _
+from django.utils.translation import gettext as _
 
 # AA Example App
 from corptools import models
 from corptools.api import schema
 from corptools.api.helpers import (
     Paginator,
-    get_alts_queryset,
-    get_main_character,
+    resolve_character,
 )
 
 
@@ -32,14 +31,10 @@ class FinancesApiEndpoints:
         )
         @paginate(Paginator)
         def get_character_wallet(request, character_id: int, **kwargs):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
             character_list = list(
                 characters.values_list("character_id", flat=True))
 
@@ -57,9 +52,8 @@ class FinancesApiEndpoints:
                 own_account = False
                 if (w.second_party_id in character_list and w.first_party_id in character_list):
                     own_account = True
-                msg = w.reason
-                if hasattr(w, "msg"):
-                    msg = w.msg.message
+                _msg = getattr(w, "msg", None)
+                msg = _msg.message if _msg is not None else w.reason
 
                 output.append(
                     {
@@ -92,14 +86,9 @@ class FinancesApiEndpoints:
             tags=self.tags
         )
         def get_character_orders(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             orders = models.CharacterMarketOrder.objects\
                 .filter(character__character__in=characters)\
@@ -137,14 +126,9 @@ class FinancesApiEndpoints:
             tags=self.tags
         )
         def get_character_market(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             market_data_current = models.CharacterMarketOrder.objects\
                 .filter(character__character__in=characters, state="active")\
@@ -172,7 +156,7 @@ class FinancesApiEndpoints:
                     },
                     "price": w.price,
                     "escrow": w.escrow,
-                    "buy_order": True if w.is_buy_order else False,
+                    "buy_order": w.is_buy_order,
                 }
                 if w.location_name:
                     o['location'] = {
@@ -196,7 +180,7 @@ class FinancesApiEndpoints:
                     },
                     "price": w.price,
                     "escrow": w.escrow,
-                    "buy_order": True if w.is_buy_order else False,
+                    "buy_order": w.is_buy_order,
                 }
                 if w.location_name:
                     o['location'] = {
@@ -209,6 +193,7 @@ class FinancesApiEndpoints:
 
         @api.get(
             "account/{character_id}/wallet/activity",
+            response={200: List[schema.WalletActivityEntry], 403: str},
             tags=self.tags
         )
         def get_character_wallet_activity(request, character_id: int):
@@ -216,16 +201,12 @@ class FinancesApiEndpoints:
                     or request.user.has_perm("corptools.state_corp_manager")
                     or request.user.has_perm("corptools.alliance_corp_manager")
                     or request.user.has_perm("corptools.own_corp_manager")):
-                return []
-
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
                 return 403, _("Permission Denied")
 
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
+
             character_list = list(
                 characters.values_list("character_id", flat=True))
 
@@ -289,14 +270,9 @@ class FinancesApiEndpoints:
             tags=self.tags
         )
         def get_character_contracts(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             character_list = list(
                 characters.values_list("character_id", flat=True))
@@ -379,14 +355,9 @@ class FinancesApiEndpoints:
             tags=self.tags
         )
         def get_character_loyalty_Points(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             lp = models.LoyaltyPoint.objects.filter(character__character__in=characters)\
                 .select_related('character__character', "corporation")

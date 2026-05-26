@@ -1,12 +1,16 @@
+# Standard Library
 from typing import List
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.utils.translation import gettext as _
 
+# AA Example App
 from corptools import models
 from corptools.api import schema
-from corptools.api.helpers import get_alts_queryset, get_main_character
+from corptools.api.helpers import resolve_character
 
 
 class RolesApiEndpoints:
@@ -20,14 +24,9 @@ class RolesApiEndpoints:
             tags=self.tags
         )
         def get_character_roles(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             roles_data = models.CharacterRoles.objects\
                 .filter(character__character__in=characters)\

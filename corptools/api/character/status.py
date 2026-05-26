@@ -11,7 +11,7 @@ from django.utils.translation import gettext as _
 # AA Example App
 from corptools import app_settings, models
 from corptools.api import schema
-from corptools.api.helpers import get_alts_queryset, get_main_character
+from corptools.api.helpers import resolve_character
 
 
 class StatusApiEndpoints:
@@ -26,14 +26,9 @@ class StatusApiEndpoints:
             tags=self.tags
         )
         def get_character_status(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             char_skill_total = models.Skill.objects\
                 .filter(character__character__in=characters)\
@@ -126,15 +121,9 @@ class StatusApiEndpoints:
             tags=self.tags
         )
         def get_character_pubdata(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             corp_histories = models.CorporationHistory.objects\
                 .filter(character__character__in=characters)\
