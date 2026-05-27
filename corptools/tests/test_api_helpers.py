@@ -2,6 +2,7 @@
 from unittest import mock
 
 # Django
+from django.contrib.auth.models import Permission
 from django.test import TestCase
 
 # AA Example App
@@ -11,6 +12,7 @@ from corptools.api.helpers import (
     get_alts_queryset,
     get_corporation_characters,
     mining_check,
+    resolve_character,
     round_or_null,
     wallet_check,
 )
@@ -294,3 +296,76 @@ class TestMiningCheck(CorptoolsTestCase):
         characters = [self.char1, self.char2]
         qry = mining_check(characters, [463], look_back=7)
         self.assertEqual(qry.count(), 0)
+
+
+# ---------------------------------------------------------------------------
+# resolve_character
+# ---------------------------------------------------------------------------
+
+
+class TestResolveCharacter(CorptoolsTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.view_module = Permission.objects.get_by_natural_key(
+            'view_characteraudit', 'corptools', 'characteraudit')
+
+    def _req(self, user):
+        r = mock.Mock()
+        r.user = user
+        return r
+
+    def test_zero_resolves_to_own_main(self):
+        self.user1.user_permissions.add(self.view_module)
+        self.user1.refresh_from_db()
+        err, main, alts = resolve_character(self._req(self.user1), 0)
+        self.assertIsNone(err)
+        self.assertEqual(main, self.char1)
+
+    def test_explicit_own_character_returns_success(self):
+        self.user1.user_permissions.add(self.view_module)
+        self.user1.refresh_from_db()
+        err, main, alts = resolve_character(
+            self._req(self.user1), self.char1.character_id)
+        self.assertIsNone(err)
+        self.assertEqual(main, self.char1)
+        self.assertIsNotNone(alts)
+
+    def test_alts_queryset_includes_all_linked_characters(self):
+        # user1 owns char1 (main) and char2 (alt)
+        self.user1.user_permissions.add(self.view_module)
+        self.user1.refresh_from_db()
+        err, main, alts = resolve_character(
+            self._req(self.user1), self.char1.character_id)
+        self.assertIsNone(err)
+        self.assertIn(self.char1, alts)
+        self.assertIn(self.char2, alts)
+
+    def test_no_view_perm_returns_403_tuple(self):
+        err, main, alts = resolve_character(
+            self._req(self.user1), self.char1.character_id)
+        self.assertIsNotNone(err)
+        self.assertEqual(err[0], 403)
+        self.assertIsNone(main)
+        self.assertIsNone(alts)
+
+    def test_other_user_char_without_hr_returns_403_tuple(self):
+        # user1 has view perm but no HR — cannot access user2's char3
+        self.user1.user_permissions.add(self.view_module)
+        self.user1.refresh_from_db()
+        err, main, alts = resolve_character(
+            self._req(self.user1), self.char3.character_id)
+        self.assertIsNotNone(err)
+        self.assertEqual(err[0], 403)
+        self.assertIsNone(main)
+        self.assertIsNone(alts)
+
+    def test_corp_hr_allows_same_corp_access(self):
+        # user2 (char3, corp2) + corp_hr can access char4 (corp2, no owner)
+        self.user2.user_permissions.add(self.view_module)
+        self.user2.user_permissions.add(self.view_corp_permission)
+        self.user2.refresh_from_db()
+        err, main, alts = resolve_character(
+            self._req(self.user2), self.char4.character_id)
+        self.assertIsNone(err)
+        self.assertEqual(main, self.char4)
