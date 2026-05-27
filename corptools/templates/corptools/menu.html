@@ -29,7 +29,7 @@
                     {% endif %}
                     {% if perms.corptools.alliance_corp_manager or perms.corptools.global_corp_manager or perms.corptools.state_corp_manager %}
                         <li class=>
-                            <a href="{% url 'corptools:corp_menu' %}">{% translate "Corporations" %}</a>
+                            <a href="{% url 'corptools:corp_react' %}">{% translate "Corporations" %}</a>
                             <li>
                             {% endif %}
 
@@ -62,12 +62,12 @@
                                 {% for char,alts in characters.items %}
                                     <tr>
                                         <td>
-                                            <a href="{% url 'corptools:overview' char %}">
+                                            <a href="{% url 'corptools:reactmain' char %}">
                                                 <img class="ra-avatar img-circle" src="{{ alts.main.portrait_url_64 }}">
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="{% url 'corptools:overview' char %}">{{ alts.main.character_name }}</a>
+                                        <a href="{% url 'corptools:reactmain' char %}">{{ alts.main.character_name }}</a>
                                     </td>
                                     <td>{{ alts.main.corporation_name }}</td>
                                     <td>{{ alts.main.alliance_name }}</td>

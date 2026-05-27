@@ -197,38 +197,6 @@ def add_corp_section(request, *args, **kwargs):
 
 
 @login_required
-@permission_required('corptools.view_characteraudit')
-def corptools_menu(request):
-    # get available models
-    cas = CharacterAudit.objects.visible_to(request.user)\
-        .select_related('character__character_ownership__user__profile__main_character',
-                        'character__characteraudit')\
-        .prefetch_related('character__character_ownership__user__character_ownerships')\
-        .prefetch_related('character__character_ownership__user__character_ownerships__character')\
-        .prefetch_related('character__character_ownership__user__character_ownerships__character__characteraudit')\
-
-
-    chars = {}
-    orphans = []
-    for char in cas:
-        try:
-            main = char.character.character_ownership.user.profile.main_character
-            if main:
-                if main.character_name not in chars:
-                    chars[str(main.character_id)] = {'main': main,
-                                                     'audit': char}
-            else:
-                orphans.append(char)
-        except ObjectDoesNotExist:
-            orphans.append(char)
-
-    if len(chars) == 1:
-        return redirect('corptools:overview', chars[list(chars.keys())[0]]['main'].character_id)
-
-    return render(request, 'corptools/menu.html', context={'characters': chars, 'orphans': orphans})
-
-
-@login_required
 @permission_required('corptools.admin')
 def admin(request):
     # get available models
@@ -416,13 +384,6 @@ def skill_list_editor(request):
 
 
 @login_required
-def update_account(request, character_id):
-    check_account.apply_async(args=[character_id], priority=6)
-    messages.success(request, "Requested an update task.")
-    return redirect('corptools:view')
-
-
-@login_required
 def react_menu(request):
     return redirect('corptools:reactlegacymain', request.user.profile.main_character.character_id)
 
@@ -449,14 +410,14 @@ def react_main(request, character_id):
     return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
 
 
-@login_required
-def v3_ui_render(request, character_id):
-    return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
+# @login_required
+# def v3_ui_render(request, character_id):
+#     return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
 
 
-@login_required
-def react_corp(request):
-    return render(request, 'corptools/corporation/react_base.html', context={"version": __version__, "app_name": "corptools/corp", "page_title": "Corporation Audit"})
+# @login_required
+# def react_corp(request):
+#     return render(request, 'corptools/corporation/react_base.html', context={"version": __version__, "app_name": "corptools/corp", "page_title": "Corporation Audit"})
 
 
 @login_required

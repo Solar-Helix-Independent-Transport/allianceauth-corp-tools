@@ -67,8 +67,6 @@ class RefreshApiEndpoints:
             if err:
                 return err
 
-            characters = get_alts_queryset(main)
-
             force = app_settings.CT_USERS_CAN_FORCE_REFRESH or request.user.is_superuser
 
             if cache.get(f"refresh-block-account-{character_id}", False) and not request.user.is_superuser:

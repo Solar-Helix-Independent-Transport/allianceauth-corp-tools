@@ -268,6 +268,7 @@ class DashboardApiEndpoints:
 
             return output
 
+    @staticmethod
     def get_dashboard_drills_levels(request):
         perms = (
             request.user.has_perm('corptools.own_corp_manager')

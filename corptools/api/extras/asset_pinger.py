@@ -1,9 +1,13 @@
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.db.models import Q
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
+# AA Example App
 from corptools import models
 from corptools.api import schema
 
@@ -20,7 +24,8 @@ class AssetPingApiEndpoints:
             ammo_exclusions_cat = [8]
             filter_charges = True
             assets = models.CharacterAsset.objects.filter(
-                Q(location_name_id__in=systems + structures) | Q(location_name__system_id__in=systems + structures)
+                Q(location_name_id__in=systems +
+                  structures) | Q(location_name__system_id__in=systems + structures)
             ).exclude(
                 type_name__group_id__in=ignore_groups
             ).select_related(
@@ -29,7 +34,6 @@ class AssetPingApiEndpoints:
                 'character__character',
                 'character__character__character_ownership',
                 'character__character__character_ownership__user',
-                'character__character__character_ownership__user__discord',
                 'character__character__character_ownership__user__profile__main_character',
                 'location_name'
             ).order_by("-type_name__volume"
@@ -77,6 +81,7 @@ class AssetPingApiEndpoints:
             if not request.user.is_superuser:
                 return 403, "Hard no pall!"
 
+            # Third Party
             from aadiscordbot.tasks import send_message
             from discord import Embed
 

@@ -29,7 +29,7 @@ class MiningApiEndpoints:
             if err:
                 return err
 
-            return characters
+            return {"characters": list(characters.values("character_id", "character_name"))}
 
         @api.get(
             "account/{character_id}/mining",

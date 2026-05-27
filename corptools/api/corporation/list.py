@@ -36,8 +36,7 @@ class ListApiEndpoints:
             if (request.user.has_perm("corptools.holding_corp_wallets")
                 or request.user.has_perm("corptools.holding_corp_assets")
                     or request.user.has_perm("corptools.holding_corp_structures")):
-                corps_holding = models.CorptoolsConfiguration.objects.get(
-                    id=1).holding_corp_qs()
+                corps_holding = models.CorptoolsConfiguration.get_solo().holding_corp_qs()
                 corps = corps | corps_holding
 
             chars = models.CharacterAudit.objects.filter(

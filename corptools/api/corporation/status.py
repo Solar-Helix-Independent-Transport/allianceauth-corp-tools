@@ -96,13 +96,13 @@ class StatusApiEndpoints:
                     output["characters"]["known_in_corp"] += 1
 
                 try:
-                    output["characters"]["liquid"] += character.characteraudit.balance
+                    output["characters"]["liquid"] += character.characteraudit.balance or 0
                     if not character.characteraudit.is_active():
                         output["characters"]["bad"] += 1
                 except models.CharacterAudit.DoesNotExist:
                     output["characters"]["bad"] += 1
 
-            output["characters"]["liquid"] = helpers.roundFloat(
+            output["characters"]["liquid"] = helpers.round_or_null(
                 output["characters"]["liquid"]
             )
 

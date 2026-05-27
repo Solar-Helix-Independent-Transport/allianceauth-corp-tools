@@ -60,7 +60,7 @@ class FittingsApiEndpoints:
             try:
                 # Third Party
                 from fittings.models import Fitting, FittingItem
-            except ImportError:
+            except (ImportError, RuntimeError):
                 return 500, "Fittings module not found!"
             try:
                 _fit = Fitting.objects.get(
