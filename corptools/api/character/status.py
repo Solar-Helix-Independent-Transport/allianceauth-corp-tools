@@ -97,6 +97,7 @@ class StatusApiEndpoints:
 
         @api.get(
             "account/{character_id}/qs",
+            response={200: List, 403: str},
             tags=self.tags
         )
         def get_qs_test(request, character_id: int, total=500):

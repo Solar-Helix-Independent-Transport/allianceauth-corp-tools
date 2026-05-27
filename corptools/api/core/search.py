@@ -26,7 +26,7 @@ class SearchApiEndpoints:
 
         @api.get(
             "/search/system/{search_text}",
-            response={200: List[schema.EveName]},
+            response={200: List[schema.EveName], 403: str},
             tags=["Search"]
         )
         def get_system_search(request, search_text: str, limit: int = 10):
@@ -36,7 +36,7 @@ class SearchApiEndpoints:
 
         @api.get(
             "/search/location/{search_text}",
-            response={200: List[schema.EveName]},
+            response={200: List[schema.EveName], 403: str},
             tags=["Search"]
         )
         def get_location_search(request, search_text: str, limit: int = 10):
@@ -47,7 +47,7 @@ class SearchApiEndpoints:
 
         @api.get(
             "/search/item/group/{search_text}",
-            response={200: List[schema.EveName]},
+            response={200: List[schema.EveName], 403: str},
             tags=["Search"]
         )
         def get_group_search(request, search_text: str, limit: int = 10):

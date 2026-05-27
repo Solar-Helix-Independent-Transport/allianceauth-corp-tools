@@ -22,6 +22,7 @@ class TestingApiEndpoints:
     def __init__(self, api: NinjaAPI):
         @api.get(
             "/extras/test/skilltest",
+            response={200: dict, 403: str},
             tags=["Testing"]
         )
         def get_test_api_skilltests(request):
@@ -30,7 +31,7 @@ class TestingApiEndpoints:
                 this is kinda like bravado in use... no type hinting
             """
             if not request.user.is_superuser:
-                return 403, {"message": "Hard no pall!"}
+                return 403, "Permission Denied"
 
             # AA Example App
             from corptools.providers import skills
@@ -40,6 +41,7 @@ class TestingApiEndpoints:
 
         @api.get(
             "/extras/test/newapi5",
+            response={200: dict, 403: str},
             tags=["Testing"]
         )
         def get_test_api_oiaopenapi3(request):
@@ -48,7 +50,7 @@ class TestingApiEndpoints:
                 this has type hinting
             """
             if not request.user.is_superuser:
-                return 403, {"message": "Hard no pall!"}
+                return 403, "Permission Denied"
             # from aiopenapi3 import OpenAPI
 
             # from esi.clients import EsiClientProvider
