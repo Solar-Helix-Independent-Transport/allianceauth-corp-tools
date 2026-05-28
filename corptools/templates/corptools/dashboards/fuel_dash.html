@@ -32,6 +32,10 @@
                                     value="90"
                                 >
                                 <div id="fuelDurationSummary" class="text-secondary small mt-2">Minimum 30 days.</div>
+                                <div class="form-check form-switch mt-3">
+                                    <input class="form-check-input" type="checkbox" id="hideNoRefuelToggle">
+                                    <label class="form-check-label small" for="hideNoRefuelToggle">Hide structures not needing refuel</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -380,6 +384,7 @@
             const defaultRefuelDays = 90;
             const minimumRefuelDays = 30;
             let gasColumnsVisible = true;
+            let hideNoRefuel = false;
 
             // Keep refuel sizing on the original day-based flow and enforce the
             // same 30-day floor when the dashboard recalculates totals.
@@ -595,6 +600,21 @@
             drawCallback: function() {
                 refreshDashboard(this.api(), undefined, false);
             }
+        });
+
+        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            if (settings.nTable !== tableElement) return true;
+            if (!hideNoRefuel) return true;
+            const row = settings.aoData[dataIndex].nTr;
+            if (!row) return true;
+            const blockRefuel = Number(row.dataset.blockRefuel || 0);
+            const gasRefuel = Number(row.dataset.gasRefuel || 0);
+            return blockRefuel > 0 || gasRefuel > 0;
+        });
+
+        document.getElementById('hideNoRefuelToggle').addEventListener('change', function() {
+            hideNoRefuel = this.checked;
+            table.draw();
         });
 
         tableElement.addEventListener('click', function(e) {
