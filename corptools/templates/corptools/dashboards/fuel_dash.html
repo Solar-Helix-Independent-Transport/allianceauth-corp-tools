@@ -67,7 +67,7 @@
                                 <h2 id="total_current_blocks" class="fw-bold">0</h2>
                             </div>
                         </div>
-                        <div class="card m-2 flex-fill">
+                        <div class="card m-2 flex-fill" id="gas-summary-tile">
                             <div class="card-body h-100">
                                 <div class="text-uppercase small text-muted fw-bold">Current Magmatic Gas</div>
                                 <h2 id="total_current_gas" class="fw-bold">0</h2>
@@ -112,7 +112,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card m-2 flex-fill">
+                        <div class="card m-2 flex-fill" id="gas-stats-card">
                             <div class="card-body d-flex flex-column h-100">
                                 <div>
                                     <div class="text-uppercase small text-muted fw-bold mb-2">Fuel Demand</div>
@@ -189,6 +189,7 @@
                             <tbody>
                                 {% for structure in structures %}
                                     <tr class="structure-row"
+                                        data-type-id="{{ structure.structure.type_id }}"
                                         data-block-hourly="{{ structure.fuel_req }}"
                                         data-block-day="{{ structure.fuel_req_day }}"
                                         data-block-month="{{ structure.fuel_req_30d }}"
@@ -372,6 +373,7 @@
             const structureTypeBreakdown = document.getElementById('structure_type_breakdown');
             const defaultRefuelDays = 90;
             const minimumRefuelDays = 30;
+            let gasColumnsVisible = true;
 
             // Keep refuel sizing on the original day-based flow and enforce the
             // same 30-day floor when the dashboard recalculates totals.
@@ -502,6 +504,25 @@
             document.getElementById('total_gas_refuel').innerText = numberWithCommas(totals.gasRefuel);
 
             renderTypeBreakdown(typeCounts);
+            updateGasVisibility(table, rows);
+        }
+
+        function updateGasVisibility(table, rows) {
+            const hasMetenox = rows.some(function(row) {
+                return row.dataset.typeId === '81826';
+            });
+            const gasTile = document.getElementById('gas-summary-tile');
+            const gasCard = document.getElementById('gas-stats-card');
+            if (gasTile) {
+                gasTile.classList.toggle('d-none', !hasMetenox);
+            }
+            if (gasCard) {
+                gasCard.classList.toggle('d-none', !hasMetenox);
+            }
+            if (hasMetenox !== gasColumnsVisible) {
+                gasColumnsVisible = hasMetenox;
+                table.columns([5, 6]).visible(hasMetenox);
+            }
         }
 
         function updateTableDensity() {

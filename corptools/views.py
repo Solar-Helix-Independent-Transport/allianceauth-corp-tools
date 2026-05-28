@@ -461,7 +461,9 @@ def fuel_levels(request):
 
     flex_fuel_types = [81143]
 
-    all_structures = Structure.get_visible(request.user).select_related(
+    all_structures = Structure.get_visible(
+        request.user
+    ).select_related(
         'corporation', 'corporation__corporation', 'system_name', 'type_name',
         'system_name__constellation', 'system_name__constellation__region'
     ).prefetch_related('structureservice_set')
