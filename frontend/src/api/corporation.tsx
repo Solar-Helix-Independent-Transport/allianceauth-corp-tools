@@ -107,6 +107,12 @@ export async function loadDens() {
   return api.data;
 }
 
+export async function loadSovHubs() {
+  const api = await axios.get(`/audit/api/corp/sovhubs`);
+  console.log(`get sovhubs in api`);
+  return api.data;
+}
+
 export async function loadSov() {
   const api = await axios.get(`/audit/api/dashboard/sov`);
   console.log(`get sov in api`);
