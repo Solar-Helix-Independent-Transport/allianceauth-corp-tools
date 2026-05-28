@@ -454,7 +454,7 @@ def corp_update_pocos(corp_id, full_update=False):
                 "system_id": poco.system_id,
                 "system_name_id": poco.system_id,
                 "name": _office_to_names.get(poco.office_id).name,
-                "planet_id": _office_to_names.get(poco.office_id).planet_id,
+                "planet_id": _office_to_names.get(poco.office_id).id,
                 "terrible_standing_tax_rate": poco.terrible_standing_tax_rate
             }
         )
