@@ -463,8 +463,6 @@ def fuel_levels(request):
 
     all_structures = Structure.get_visible(
         request.user
-    ).exclude(
-        type_id__in=fle
     ).select_related(
         'corporation', 'corporation__corporation', 'system_name', 'type_name',
         'system_name__constellation', 'system_name__constellation__region'
