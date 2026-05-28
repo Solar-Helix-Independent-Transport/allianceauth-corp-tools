@@ -37,17 +37,22 @@ class TestEveNameManagerGetOrCreateFromEsi(TestCase):
     @patch("corptools.managers.providers")
     def test_not_found_calls_esi_and_creates(self, mock_providers):
         mock_result = SimpleNamespace(
-            id=2001, name="New Pilot", category="character")
+            id=2001,
+            name="New Pilot",
+            category="character"
+        )
         mock_providers.esi_openapi.client.Universe.PostUniverseNames.return_value.result.return_value = [
-            mock_result]
+            mock_result
+        ]
 
         entity, created = EveName.objects.get_or_create_from_esi(2001)
 
         self.assertTrue(created)
         self.assertEqual(entity.eve_id, 2001)
         self.assertEqual(entity.name, "New Pilot")
-        mock_providers.esi_openapi.client.Universe.PostUniverseNames.assert_called_once_with(body=[
-                                                                                             2001])
+        mock_providers.esi_openapi.client.Universe.PostUniverseNames.assert_called_once_with(
+            body=[2001]
+        )
 
 
 class TestEveNameManagerCreateBulkFromEsi(TestCase):
@@ -60,16 +65,19 @@ class TestEveNameManagerCreateBulkFromEsi(TestCase):
     @patch("corptools.managers.providers")
     def test_non_empty_list_calls_esi_and_bulk_creates(self, mock_providers):
         mock_result = SimpleNamespace(
-            id=3001, name="Bulk Corp", category="corporation")
+            id=3001,
+            name="Bulk Corp",
+            category="corporation"
+        )
         mock_providers.esi_openapi.client.Universe.PostUniverseNames.return_value.result.return_value = [
-            mock_result]
-
+            mock_result
+        ]
         result = EveName.objects.create_bulk_from_esi([3001])
-
         self.assertTrue(result)
         self.assertTrue(EveName.objects.filter(eve_id=3001).exists())
-        mock_providers.esi_openapi.client.Universe.PostUniverseNames.assert_called_once_with(body=[
-                                                                                             3001])
+        mock_providers.esi_openapi.client.Universe.PostUniverseNames.assert_called_once_with(
+            body=[3001]
+        )
 
     @patch("corptools.managers.providers")
     def test_large_list_is_chunked(self, mock_providers):
