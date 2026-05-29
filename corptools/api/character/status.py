@@ -1,13 +1,17 @@
+# Standard Library
 from typing import List
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.db.models import F, Sum
 from django.utils.translation import gettext as _
 
+# AA Example App
 from corptools import app_settings, models
 from corptools.api import schema
-from corptools.api.helpers import get_alts_queryset, get_main_character
+from corptools.api.helpers import resolve_character
 
 
 class StatusApiEndpoints:
@@ -22,14 +26,9 @@ class StatusApiEndpoints:
             tags=self.tags
         )
         def get_character_status(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             char_skill_total = models.Skill.objects\
                 .filter(character__character__in=characters)\
@@ -72,8 +71,8 @@ class StatusApiEndpoints:
                 try:
                     _updates = {}
                     for grp in app_settings.get_character_update_attributes():
-                        _updates[grp[0]] = getattr(
-                            character.characteraudit, grp[1])
+                        _updates[grp[0]] = character.characteraudit.get_update_time(
+                            grp[1])
                     _o.update({
                         "isk": character.characteraudit.balance,
                         "active": character.characteraudit.is_active(),
@@ -98,6 +97,7 @@ class StatusApiEndpoints:
 
         @api.get(
             "account/{character_id}/qs",
+            response={200: List, 403: str},
             tags=self.tags
         )
         def get_qs_test(request, character_id: int, total=500):
@@ -122,15 +122,9 @@ class StatusApiEndpoints:
             tags=self.tags
         )
         def get_character_pubdata(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             corp_histories = models.CorporationHistory.objects\
                 .filter(character__character__in=characters)\

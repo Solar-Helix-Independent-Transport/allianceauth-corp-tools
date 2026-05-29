@@ -11,7 +11,7 @@ from django.utils.translation import gettext as _
 
 # AA Example App
 from corptools import models
-from corptools.api.helpers import get_alts_queryset, get_main_character
+from corptools.api.helpers import resolve_character
 
 
 class MiningApiEndpoints:
@@ -25,16 +25,11 @@ class MiningApiEndpoints:
             tags=["Account"]
         )
         def get_all_characters_character_mining(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
-
-            return characters
+            return {"characters": list(characters.values("character_id", "character_name"))}
 
         @api.get(
             "account/{character_id}/mining",
@@ -45,17 +40,12 @@ class MiningApiEndpoints:
                                  character_id: int,
                                  filter_characters: Optional[List[int]] = [],
                                  look_back: Optional[int] = 0):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             if look_back <= 1:
                 look_back = models.CorptoolsConfiguration.get_solo().aggregate_lookback
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
 
             if len(filter_characters):
                 characters = characters.exclude(

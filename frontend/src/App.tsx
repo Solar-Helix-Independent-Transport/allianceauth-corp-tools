@@ -25,7 +25,7 @@ import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import React from "react";
 import { Card } from "react-bootstrap";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { NuqsAdapter } from "nuqs/adapters/react-router";
 
@@ -44,6 +44,7 @@ import CorporationPocos from "./Pages/Corp/Pocos";
 import CorporationStatus from "./Pages/Corp/Status";
 import CorporationStarbases from "./Pages/Corp/Starbases";
 import CorporationMiningLedger from "./Pages/Corp/MiningLedger";
+import CorporationSovereigntyHubs from "./Pages/Corp/SovereigntyHubs";
 import Dens from "./Pages/Corp/Dens";
 
 TimeAgo.addDefaultLocale(en);
@@ -84,8 +85,8 @@ function App() {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        <NuqsAdapter>
-          <Router>
+        <Router>
+          <NuqsAdapter>
             <Routes>
               <Route path="audit/r/:characterID/" element={<CharacterAudit />}>
                 <Route index element={<Navigate to="account/overview" replace />} />
@@ -141,23 +142,8 @@ function App() {
                 <Route path="starbases" element={<CorporationStarbases />} />
                 <Route path="bridges" element={<Bridges />} />
                 <Route path="dens" element={<Dens />} />
+                <Route path="sovhubs" element={<CorporationSovereigntyHubs />} />
                 {/* <Route path="fuel" element={<Bridges />} /> */}
-                {/* <Route
-                  path="bridges"
-                  element={
-                    <Card>
-                      <Card.Body className="text-center">This is fuel.</Card.Body>
-                    </Card>
-                  }
-                />
-                <Route
-                  path="sov"
-                  element={
-                    <Card>
-                      <Card.Body className="text-center">This is sov.</Card.Body>
-                    </Card>
-                  }
-                /> */}
                 <Route
                   path="*"
                   element={
@@ -170,8 +156,8 @@ function App() {
               </Route>
               <Route path="*" element={<Navigate to="audit/r/0" replace />} />
             </Routes>
-          </Router>
-        </NuqsAdapter>
+          </NuqsAdapter>
+        </Router>
       </QueryClientProvider>
     </React.StrictMode>
   );

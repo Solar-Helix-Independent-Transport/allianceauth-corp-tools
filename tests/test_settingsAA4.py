@@ -2,8 +2,25 @@
 Alliance Auth Test Suite Django settings.
 """
 
+# Standard Library
+import os
+
 # Alliance Auth
 from allianceauth.project_template.project_name.settings.base import *  # noqa
+
+# Include the tests/templates directory so allianceauth/base.html is available for legacy views.
+TEMPLATES[0]["DIRS"].insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "templates"))
+
+# Use plain StaticFilesStorage so tests don't require a pre-built staticfiles manifest.
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 SITE_URL = "https://example.com"
 CSRF_TRUSTED_ORIGINS = [SITE_URL]

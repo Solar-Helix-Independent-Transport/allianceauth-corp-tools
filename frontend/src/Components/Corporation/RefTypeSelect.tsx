@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import Select from "react-select";
 import { loadRefTypes } from "../../api/corporation";
 import { useQueryState } from "nuqs";

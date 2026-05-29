@@ -183,16 +183,18 @@ class TestSecGroupBotFilters(TestCase):
             audits.append(
                 ct_models.CharacterAudit.objects.create(
                     character=characters[uid],
-                    last_update_assets=timezone.now(),
-                    last_update_clones=timezone.now(),
-                    last_update_pub_data=timezone.now(),
-                    last_update_skill_que=timezone.now(),
-                    last_update_skills=timezone.now(),
-                    last_update_wallet=timezone.now(),
-                    last_update_orders=timezone.now(),
-                    last_update_notif=timezone.now(),
-                    last_update_roles=timezone.now(),
-                    last_update_mails=timezone.now(),
+                    update_timestamps={
+                        "assets": timezone.now().isoformat(),
+                        "clones": timezone.now().isoformat(),
+                        "pub_data": timezone.now().isoformat(),
+                        "skill_que": timezone.now().isoformat(),
+                        "skills": timezone.now().isoformat(),
+                        "wallet": timezone.now().isoformat(),
+                        "orders": timezone.now().isoformat(),
+                        "notif": timezone.now().isoformat(),
+                        "roles": timezone.now().isoformat(),
+                        "mails": timezone.now().isoformat(),
+                    },
                 )
             )
         audits.append(ct_models.CharacterAudit.objects.create(
@@ -1502,14 +1504,21 @@ class TestSecGroupBotFilters(TestCase):
                                                            description="Something to tell user",
                                                            days_since_login=30)
 
-        c1 = ct_models.CharacterAudit.objects.filter(
+        now_iso = timezone.now().isoformat()
+        c1_qs = ct_models.CharacterAudit.objects.filter(
             character__character_ownership__user_id=1)
-        c1.update(last_known_login=timezone.now() -
-                  timedelta(days=60), last_update_login=timezone.now())
-        c2 = ct_models.CharacterAudit.objects.filter(
+        c1_qs.update(last_known_login=timezone.now() - timedelta(days=60))
+        c1 = list(c1_qs)
+        for ca in c1:
+            ca.update_timestamps["login"] = now_iso
+        ct_models.CharacterAudit.objects.bulk_update(c1, ["update_timestamps"])
+        c2_qs = ct_models.CharacterAudit.objects.filter(
             character__character_ownership__user_id=2)
-        c2.update(last_known_login=timezone.now() -
-                  timedelta(days=15), last_update_login=timezone.now())
+        c2_qs.update(last_known_login=timezone.now() - timedelta(days=15))
+        c2 = list(c2_qs)
+        for ca in c2:
+            ca.update_timestamps["login"] = now_iso
+        ct_models.CharacterAudit.objects.bulk_update(c2, ["update_timestamps"])
 
         users = []
         for user in ct_models.CharacterAudit.objects.all():
@@ -1532,14 +1541,21 @@ class TestSecGroupBotFilters(TestCase):
                                                            description="Something to tell user",
                                                            days_since_login=30)
 
-        c1 = ct_models.CharacterAudit.objects.filter(
+        now_iso = timezone.now().isoformat()
+        c1_qs = ct_models.CharacterAudit.objects.filter(
             character__character_ownership__user_id=1)
-        c1.update(last_known_login=timezone.now() -
-                  timedelta(days=60), last_update_login=timezone.now())
-        c2 = ct_models.CharacterAudit.objects.filter(
+        c1_qs.update(last_known_login=timezone.now() - timedelta(days=60))
+        c1 = list(c1_qs)
+        for ca in c1:
+            ca.update_timestamps["login"] = now_iso
+        ct_models.CharacterAudit.objects.bulk_update(c1, ["update_timestamps"])
+        c2_qs = ct_models.CharacterAudit.objects.filter(
             character__character_ownership__user_id=2)
-        c2.update(last_known_login=timezone.now() -
-                  timedelta(days=15), last_update_login=timezone.now())
+        c2_qs.update(last_known_login=timezone.now() - timedelta(days=15))
+        c2 = list(c2_qs)
+        for ca in c2:
+            ca.update_timestamps["login"] = now_iso
+        ct_models.CharacterAudit.objects.bulk_update(c2, ["update_timestamps"])
 
         users = []
         for user in ct_models.CharacterAudit.objects.all():
@@ -1565,14 +1581,21 @@ class TestSecGroupBotFilters(TestCase):
                                                            days_since_login=30,
                                                            no_data_pass=True)
 
-        c1 = ct_models.CharacterAudit.objects.filter(
+        now_iso = timezone.now().isoformat()
+        c1_qs = ct_models.CharacterAudit.objects.filter(
             character__character_ownership__user_id=1)
-        c1.update(last_known_login=timezone.now() -
-                  timedelta(days=60), last_update_login=timezone.now())
-        c2 = ct_models.CharacterAudit.objects.filter(
+        c1_qs.update(last_known_login=timezone.now() - timedelta(days=60))
+        c1 = list(c1_qs)
+        for ca in c1:
+            ca.update_timestamps["login"] = now_iso
+        ct_models.CharacterAudit.objects.bulk_update(c1, ["update_timestamps"])
+        c2_qs = ct_models.CharacterAudit.objects.filter(
             character__character_ownership__user_id=2)
-        c2.update(last_known_login=timezone.now() -
-                  timedelta(days=15), last_update_login=timezone.now())
+        c2_qs.update(last_known_login=timezone.now() - timedelta(days=15))
+        c2 = list(c2_qs)
+        for ca in c2:
+            ca.update_timestamps["login"] = now_iso
+        ct_models.CharacterAudit.objects.bulk_update(c2, ["update_timestamps"])
 
         users = []
         for user in ct_models.CharacterAudit.objects.all():
@@ -1596,14 +1619,21 @@ class TestSecGroupBotFilters(TestCase):
                                                            days_since_login=30,
                                                            no_data_pass=True)
 
-        c1 = ct_models.CharacterAudit.objects.filter(
+        now_iso = timezone.now().isoformat()
+        c1_qs = ct_models.CharacterAudit.objects.filter(
             character__character_ownership__user_id=1)
-        c1.update(last_known_login=timezone.now() -
-                  timedelta(days=60), last_update_login=timezone.now())
-        c2 = ct_models.CharacterAudit.objects.filter(
+        c1_qs.update(last_known_login=timezone.now() - timedelta(days=60))
+        c1 = list(c1_qs)
+        for ca in c1:
+            ca.update_timestamps["login"] = now_iso
+        ct_models.CharacterAudit.objects.bulk_update(c1, ["update_timestamps"])
+        c2_qs = ct_models.CharacterAudit.objects.filter(
             character__character_ownership__user_id=2)
-        c2.update(last_known_login=timezone.now() -
-                  timedelta(days=15), last_update_login=timezone.now())
+        c2_qs.update(last_known_login=timezone.now() - timedelta(days=15))
+        c2 = list(c2_qs)
+        for ca in c2:
+            ca.update_timestamps["login"] = now_iso
+        ct_models.CharacterAudit.objects.bulk_update(c2, ["update_timestamps"])
 
         users = []
         for user in ct_models.CharacterAudit.objects.all():
@@ -1629,14 +1659,21 @@ class TestSecGroupBotFilters(TestCase):
                                                            days_since_login=30,
                                                            main_corp_only=True)
 
-        c1 = ct_models.CharacterAudit.objects.filter(
+        now_iso = timezone.now().isoformat()
+        c1_qs = ct_models.CharacterAudit.objects.filter(
             id__gte=11)  # All the alts
-        c1.update(last_known_login=timezone.now() -
-                  timedelta(days=15), last_update_login=timezone.now())
-        c2 = ct_models.CharacterAudit.objects.filter(
+        c1_qs.update(last_known_login=timezone.now() - timedelta(days=15))
+        c1 = list(c1_qs)
+        for ca in c1:
+            ca.update_timestamps["login"] = now_iso
+        ct_models.CharacterAudit.objects.bulk_update(c1, ["update_timestamps"])
+        c2_qs = ct_models.CharacterAudit.objects.filter(
             character__character_ownership__user_id=2)
-        c2.update(last_known_login=timezone.now() -
-                  timedelta(days=15), last_update_login=timezone.now())
+        c2_qs.update(last_known_login=timezone.now() - timedelta(days=15))
+        c2 = list(c2_qs)
+        for ca in c2:
+            ca.update_timestamps["login"] = now_iso
+        ct_models.CharacterAudit.objects.bulk_update(c2, ["update_timestamps"])
 
         users = []
         for user in ct_models.CharacterAudit.objects.all():

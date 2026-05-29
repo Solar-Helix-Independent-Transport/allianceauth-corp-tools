@@ -26,7 +26,7 @@ from corptools.models import (
 from corptools.models.eve_models import MapJumpBridge
 from corptools.task_helpers.update_tasks import fetch_location_name
 
-from .. import providers
+from ... import providers
 from .utils import NoTokens, get_corp_token, update_corp_audit
 
 logger = get_extension_logger(__name__)
@@ -82,7 +82,7 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
                         locations = providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsLocations(
                             corporation_id=_corporation.corporation.corporation_id,
                             item_ids=[_structure.structure_id],
-                            token=token
+                            token=_token
                         ).result()
 
                         _location = locations[0]
@@ -454,7 +454,7 @@ def corp_update_pocos(corp_id, full_update=False):
                 "system_id": poco.system_id,
                 "system_name_id": poco.system_id,
                 "name": _office_to_names.get(poco.office_id).name,
-                "planet_id": _office_to_names.get(poco.office_id).planet_id,
+                "planet_id": _office_to_names.get(poco.office_id).id,
                 "terrible_standing_tax_rate": poco.terrible_standing_tax_rate
             }
         )

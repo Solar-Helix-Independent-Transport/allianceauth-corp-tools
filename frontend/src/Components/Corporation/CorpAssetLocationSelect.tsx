@@ -1,4 +1,5 @@
-import { useQuery } from "react-query";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Select from "react-select";
 import { loadAssetLocations } from "../../api/corporation";
 
@@ -21,17 +22,31 @@ const CorporationAssetLocationSelect = ({
   corporationID: number;
   setLocation: any;
 }) => {
-  const { isLoading, data } = useQuery(["corp_asset_loc", corporationID], () =>
-    loadAssetLocations(corporationID),
-  );
+  const { isLoading, data } = useQuery({
+    queryKey: ["corp_asset_loc", corporationID],
+    queryFn: () => loadAssetLocations(corporationID),
+  });
+
+  const [selected, setSelected] = useState<any>(null);
+
+  useEffect(() => {
+    if (data?.length) {
+      setSelected(data[0]);
+      setLocation(data[0].value);
+    }
+  }, [data]);
 
   return (
     <Select
       isLoading={isLoading}
       styles={colourStyles}
       options={data}
-      isDisabled={!corporationID ? true : false}
-      onChange={(e: any) => setLocation(e.value)}
+      value={selected}
+      isDisabled={!corporationID}
+      onChange={(e: any) => {
+        setSelected(e);
+        setLocation(e.value);
+      }}
     />
   );
 };

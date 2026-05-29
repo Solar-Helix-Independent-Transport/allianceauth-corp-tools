@@ -1,5 +1,5 @@
 import BaseTable from "../Components/Tables/BaseTable/BaseTable";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 interface AsyncTableProps {
   apiParams: Array<any>;

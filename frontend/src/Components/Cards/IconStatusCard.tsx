@@ -1,4 +1,3 @@
-import Card from "react-bootstrap/Card";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Spinner from "react-bootstrap/Spinner";
 import Tooltip from "react-bootstrap/Tooltip";
@@ -31,15 +30,27 @@ type IconStatusCardProps = {
   toolTipText?: string;
 };
 
-const showOverlay = (toolTipText: string | undefined) => {
-  return toolTipText ? (
-    <Tooltip placement={"top"} id={toolTipText} style={{ position: "fixed" }}>
-      {toolTipText}
-    </Tooltip>
-  ) : (
-    <></>
-  );
+export const COMPACT_NUM_FORMAT: Intl.NumberFormatOptions = {
+  maximumFractionDigits: 2,
+  notation: "compact",
+  compactDisplay: "short",
 };
+
+export function statusProps(
+  value: any,
+  isLoading: boolean,
+  emptyVariant = "secondary",
+  format?: (v: any) => string,
+) {
+  const active = Boolean(value);
+  const variant = active ? "success" : isLoading ? undefined : emptyVariant;
+  return {
+    isLoading,
+    text: (active ? (format ? format(value) : String(value)) : "-") as string,
+    textVariant: variant as IconStatusCardProps["textVariant"],
+    cardVariant: variant as IconStatusCardProps["cardVariant"],
+  };
+}
 
 export const IconStatusDiv = ({
   iconSrc,
@@ -50,54 +61,42 @@ export const IconStatusDiv = ({
   isLoading,
   toolTipText,
 }: IconStatusCardProps) => {
-  return (
-    <OverlayTrigger trigger={["hover", "focus"]} overlay={showOverlay(toolTipText)}>
+  const inner = (
+    <div
+      className={`d-flex m-1 ${text ? "pt-2" : ""} flex-column align-items-center`}
+      style={{ minWidth: "64px" }}
+    >
       <div
-        className={`d-flex m-1 ${text ? "pt-2" : ""} flex-column align-items-center`}
-        style={{ minWidth: "64px" }}
+        className={`${styles.imgBg} border border-${cardVariant} ${borderVariant === "thick" ? "border-5" : "border-3"}`}
       >
-        <div
-          // style={{ borderColor: `var(--bs-${cardVariant})` }}
-          className={`${styles.imgBg} border border-${cardVariant} ${borderVariant == "thick" ? "border-5" : "border-3"}`}
-        >
-          <img
-            className="m-1"
-            style={{ borderRadius: "30%" }}
-            src={iconSrc}
-            height={text || isLoading ? 32 : 64}
-            width={text || isLoading ? 32 : 64}
-          />
-        </div>
-        {!isLoading ? (
-          text && <h6 className={`text-${textVariant} text-nowrap mx-1`}>{text}</h6>
-        ) : (
-          <Spinner animation="border" size="sm" />
-        )}
+        <img
+          className="m-1"
+          style={{ borderRadius: "30%" }}
+          src={iconSrc}
+          height={text || isLoading ? 32 : 64}
+          width={text || isLoading ? 32 : 64}
+        />
       </div>
-    </OverlayTrigger>
+      {!isLoading ? (
+        text && <h6 className={`text-${textVariant} text-nowrap mx-1`}>{text}</h6>
+      ) : (
+        <Spinner animation="border" size="sm" />
+      )}
+    </div>
   );
-};
 
-export const IconStatusCard = ({
-  iconSrc,
-  text,
-  cardVariant,
-  textVariant,
-  isLoading,
-  borderVariant,
-  toolTipText,
-}: IconStatusCardProps) => {
+  if (!toolTipText) return inner;
+
   return (
-    <Card className={`m-2 border-0 ${text || (isLoading && "pt-2")}`}>
-      <IconStatusDiv
-        iconSrc={iconSrc}
-        text={text}
-        textVariant={textVariant}
-        cardVariant={cardVariant}
-        borderVariant={borderVariant}
-        isLoading={isLoading}
-        toolTipText={toolTipText}
-      />
-    </Card>
+    <OverlayTrigger
+      trigger={["hover", "focus"]}
+      overlay={
+        <Tooltip placement="top" id={toolTipText} style={{ position: "fixed" }}>
+          {toolTipText}
+        </Tooltip>
+      }
+    >
+      {inner}
+    </OverlayTrigger>
   );
 };

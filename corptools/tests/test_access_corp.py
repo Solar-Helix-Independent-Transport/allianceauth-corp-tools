@@ -3,6 +3,22 @@ from ..models.interactions import CharacterRoles
 from . import CorptoolsTestCase
 
 
+class TestCorporationManagerMissingBranches(CorptoolsTestCase):
+
+    def test_superuser_sees_all(self):
+        self.user1.is_superuser = True
+        self.user1.save()
+        cs = CorporationAudit.objects.visible_to(self.user1)
+        self.assertIn(self.cp1, cs)
+        self.assertIn(self.cp2, cs)
+        self.assertIn(self.cp3, cs)
+        self.assertIn(self.cp4, cs)
+
+    def test_no_main_char_returns_empty(self):
+        cs = CorporationAudit.objects.visible_to(self.user4)
+        self.assertEqual(cs.count(), 0)
+
+
 class TestCorptoolsCorpAccessPerms(CorptoolsTestCase):
 
     def test_no_perms_get_self_u1(self):

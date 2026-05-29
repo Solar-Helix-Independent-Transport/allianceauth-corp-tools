@@ -9,5 +9,6 @@ from .interactions import *
 from .mining import *
 from .orders import *
 from .skills import *
+from .sovereignty import *
 from .structures import *
 from .wallets import *

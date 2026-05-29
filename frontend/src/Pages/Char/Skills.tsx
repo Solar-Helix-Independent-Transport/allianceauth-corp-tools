@@ -6,7 +6,7 @@ import { ErrorLoader, PanelLoader } from "../../Components/Loaders/loaders";
 import CharSkillGroups from "../../Components/Skills/CharacterSkills";
 import { getCharacterSkills } from "../../api/character";
 import { useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { SkillsRadarGraph } from "../../Components/Graphs/SkillGroups";
 
@@ -18,11 +18,11 @@ const CharacterSkills = () => {
   const [skill_filter, setFilter] = useState("");
   const [level_filter, setLevel] = useState(-1);
 
-  const { isLoading, error, data } = useQuery(
-    ["skills", characterID],
-    () => getCharacterSkills(characterID ? Number(characterID) : 0),
-    { refetchOnWindowFocus: false },
-  );
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["skills", characterID],
+    queryFn: () => getCharacterSkills(characterID ? Number(characterID) : 0),
+    refetchOnWindowFocus: false,
+  });
 
   if (isLoading) return <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />;
 

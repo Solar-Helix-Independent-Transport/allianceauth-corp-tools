@@ -1,9 +1,13 @@
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.utils.translation import gettext as _
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
+# AA Example App
 from corptools import app_settings, models
 from corptools.api import helpers, schema
 
@@ -30,7 +34,7 @@ class StatusApiEndpoints:
                 c = corp.first()
                 _updates = {}
                 for grp in app_settings.get_corp_update_attributes():
-                    _updates[grp[0]] = getattr(c, grp[1])
+                    _updates[grp[0]] = c.get_update_time(grp[1])
                 all_id = None
                 all_nm = None
                 if c.corporation.alliance:
@@ -92,13 +96,13 @@ class StatusApiEndpoints:
                     output["characters"]["known_in_corp"] += 1
 
                 try:
-                    output["characters"]["liquid"] += character.characteraudit.balance
+                    output["characters"]["liquid"] += character.characteraudit.balance or 0
                     if not character.characteraudit.is_active():
                         output["characters"]["bad"] += 1
                 except models.CharacterAudit.DoesNotExist:
                     output["characters"]["bad"] += 1
 
-            output["characters"]["liquid"] = helpers.roundFloat(
+            output["characters"]["liquid"] = helpers.round_or_null(
                 output["characters"]["liquid"]
             )
 

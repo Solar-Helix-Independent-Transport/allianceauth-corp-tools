@@ -1,7 +1,87 @@
+# Alliance Auth
 from allianceauth.authentication.models import State
 
 from ..models import CharacterAudit
 from . import CorptoolsTestCase
+
+
+class TestCharacterManagerMissingBranches(CorptoolsTestCase):
+
+    def test_superuser_visible_to_sees_all(self):
+        self.user1.is_superuser = True
+        self.user1.save()
+        cs = CharacterAudit.objects.visible_to(self.user1)
+        self.assertIn(self.ca1, cs)
+        self.assertIn(self.ca3, cs)
+        self.assertIn(self.ca5, cs)
+        self.assertIn(self.ca7, cs)
+
+    def test_global_hr_visible_to_sees_all(self):
+        self.user1.user_permissions.add(self.view_all_permission)
+        self.user1.refresh_from_db()
+        cs = CharacterAudit.objects.visible_to(self.user1)
+        self.assertIn(self.ca1, cs)
+        self.assertIn(self.ca3, cs)
+        self.assertIn(self.ca5, cs)
+
+    def test_no_main_char_visible_to_returns_empty(self):
+        cs = CharacterAudit.objects.visible_to(self.user4)
+        self.assertEqual(cs.count(), 0)
+
+    def test_alliance_hr_no_alliance_falls_back_to_corp(self):
+        # user1's main (char1) is in corp1 which has no alliance
+        self.user1.user_permissions.add(self.view_alliance_permission)
+        self.user1.refresh_from_db()
+        cs = CharacterAudit.objects.visible_to(self.user1)
+        self.assertIn(self.ca1, cs)
+        self.assertIn(self.ca2, cs)
+        self.assertNotIn(self.ca3, cs)
+        self.assertNotIn(self.ca5, cs)
+
+    def test_corp_hr_with_alliance_hr_skips_corp_dupe(self):
+        # When a user has both corp_hr and alliance_hr the corp_hr else-branch
+        # is skipped (pass) to avoid redundant filtering.
+        self.user2.user_permissions.add(self.view_corp_permission)
+        self.user2.user_permissions.add(self.view_alliance_permission)
+        self.user2.refresh_from_db()
+        cs = CharacterAudit.objects.visible_to(self.user2)
+        self.assertIn(self.ca3, cs)
+        self.assertIn(self.ca4, cs)
+
+    def test_superuser_visible_eve_characters_sees_all(self):
+        self.user1.is_superuser = True
+        self.user1.save()
+        cs = CharacterAudit.objects.visible_eve_characters(self.user1)
+        self.assertIn(self.ca1.character, cs)
+        self.assertIn(self.ca3.character, cs)
+        self.assertIn(self.ca5.character, cs)
+
+    def test_global_hr_visible_eve_characters_sees_all(self):
+        self.user1.user_permissions.add(self.view_all_permission)
+        self.user1.refresh_from_db()
+        cs = CharacterAudit.objects.visible_eve_characters(self.user1)
+        self.assertIn(self.ca1.character, cs)
+        self.assertIn(self.ca3.character, cs)
+
+    def test_no_main_char_visible_eve_characters_returns_empty(self):
+        cs = CharacterAudit.objects.visible_eve_characters(self.user4)
+        self.assertEqual(cs.count(), 0)
+
+    def test_alliance_hr_no_alliance_falls_back_to_corp_ec(self):
+        self.user1.user_permissions.add(self.view_alliance_permission)
+        self.user1.refresh_from_db()
+        cs = CharacterAudit.objects.visible_eve_characters(self.user1)
+        self.assertIn(self.ca1.character, cs)
+        self.assertIn(self.ca2.character, cs)
+        self.assertNotIn(self.ca3.character, cs)
+
+    def test_corp_hr_with_alliance_hr_skips_corp_dupe_ec(self):
+        self.user2.user_permissions.add(self.view_corp_permission)
+        self.user2.user_permissions.add(self.view_alliance_permission)
+        self.user2.refresh_from_db()
+        cs = CharacterAudit.objects.visible_eve_characters(self.user2)
+        self.assertIn(self.ca3.character, cs)
+        self.assertIn(self.ca4.character, cs)
 
 
 class TestCorptoolsCharAccessPerms(CorptoolsTestCase):

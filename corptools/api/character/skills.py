@@ -13,7 +13,7 @@ from django.utils.translation import gettext as _
 # AA Example App
 from corptools import models, providers
 from corptools.api import schema
-from corptools.api.helpers import get_alts_queryset, get_main_character
+from corptools.api.helpers import resolve_character
 
 
 class SkillApiEndpoints:
@@ -28,14 +28,9 @@ class SkillApiEndpoints:
             tags=self.tags
         )
         def get_character_skills(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             skills = models.Skill.objects.filter(character__character__in=characters)\
                 .select_related('character__character', 'skill_name', "skill_name__group")
@@ -78,12 +73,10 @@ class SkillApiEndpoints:
         def get_character_skillgraph(request, character_id: int):
             if character_id == 0:
                 character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
+            err, main, _ = resolve_character(request, character_id)
+            if err:
+                return err
 
-            if not response:
-                return 403, _("Permission Denied")
-
-            # characters = get_alts_queryset(main)
             skills = models.Skill.objects.filter(
                 character__character__character_id=character_id
                 # character__character__character_id__in=list(
@@ -153,14 +146,9 @@ class SkillApiEndpoints:
             tags=self.tags
         )
         def get_character_skill_history(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             skill_history = models.SkillTotalHistory.objects.filter(character__character__in=characters)\
                 .select_related('character__character').order_by("date")
@@ -190,14 +178,9 @@ class SkillApiEndpoints:
             tags=self.tags
         )
         def get_character_skillqueues(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             now = timezone.now()
 
@@ -270,14 +253,9 @@ class SkillApiEndpoints:
             tags=self.tags
         )
         def get_character_doctrines(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             skilllists = providers.skills.get_and_cache_user(
                 main.character_ownership.user_id)

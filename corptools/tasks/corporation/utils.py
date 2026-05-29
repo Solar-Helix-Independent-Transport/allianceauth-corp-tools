@@ -1,4 +1,5 @@
 # Standard Library
+from functools import wraps
 from typing import Union
 
 # Django
@@ -14,7 +15,7 @@ from esi.models import Token
 # AA Example App
 from corptools.models import CorporationAudit, EveName
 
-from .. import providers
+from ... import providers
 
 logger = get_extension_logger(__name__)
 
@@ -25,24 +26,22 @@ class NoTokens(Exception):
 
 def update_corp_audit(update_field: str = ""):
     def decorator(function):
+        @wraps(function)
         def wrapper(*args, **kwargs):
             audit_corp = CorporationAudit.objects.get(
                 corporation__corporation_id=args[0]
             )
             try:
                 result = function(*args, **kwargs)
-                try:
-                    setattr(
-                        audit_corp, f"last_update_{update_field}", timezone.now())
-                    setattr(
-                        audit_corp, f"last_change_{update_field}", timezone.now())
-                except Exception:
-                    pass
+                now = timezone.now().isoformat()
+                audit_corp.update_timestamps[update_field] = now
+                audit_corp.change_timestamps[update_field] = now
                 audit_corp.save()
                 return result
             except HTTPNotModified:
                 logger.info(f"Not modified {function} {args} {kwargs}")
-                setattr(audit_corp, update_field, timezone.now())
+                audit_corp.update_timestamps[update_field] = timezone.now(
+                ).isoformat()
                 audit_corp.save()
             except HTTPError as e:
                 logger.error(f"HTTPError {function} {args} {kwargs} {e}")
@@ -87,7 +86,8 @@ def get_corp_token(corp_id: int, scopes: list, req_roles: Union[list, None, bool
                     character_id=token.character_id,
                     token=token
                 ).result(
-                    use_etag=False
+                    use_etag=False,
+                    use_cache=True
                 )
 
                 has_roles = False
@@ -115,8 +115,8 @@ def get_eve_ids(ids: list | set):
     return set(
         EveName.objects.filter(
             eve_id__in=list(ids)
-        ).distinct().values_list(
+        ).values_list(
             'eve_id',
-            'name'
+            flat=True
         )
     )

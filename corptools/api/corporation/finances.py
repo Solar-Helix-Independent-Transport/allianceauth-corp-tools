@@ -1,10 +1,14 @@
+# Standard Library
 import logging
-from typing import List
+from typing import List, Union
 
+# Third Party
 from ninja import NinjaAPI
 
+# Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
+# AA Example App
 from corptools import models
 from corptools.api import schema
 
@@ -18,6 +22,7 @@ class FinancesApiEndpoints:
     def __init__(self, api: NinjaAPI):
         @api.get(
             "corporation/wallettypes",
+            response={200: List[str], 403: str},
             tags=self.tags
         )
         def get_corporation_wallet_types(request):

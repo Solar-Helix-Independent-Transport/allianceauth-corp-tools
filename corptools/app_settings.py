@@ -31,6 +31,11 @@ CT_CHAR_LOCATIONS_MODULE = getattr(settings, 'CT_CHAR_LOCATIONS_MODULE', True)
 CT_CHAR_FLEET_MODULE = getattr(settings, 'CT_CHAR_FLEET_MODULE', True)
 CT_CHAR_MAIL_MODULE = getattr(settings, 'CT_CHAR_MAIL_MODULE', False)
 CT_CHAR_HELPER_MODULE = getattr(settings, 'CT_CHAR_HELPER_MODULE', True)
+
+CT_CHAR_STRUCTURES_MODULE = getattr(
+    settings, 'CT_CHAR_STRUCTURES_MODULE', True)
+CT_CHAR_ACL_MODULE = getattr(settings, 'CT_CHAR_ACL_MODULE', True)
+
 CT_CHAR_OPPORTUNITIES = False
 CT_CHAR_LOYALTYPOINTS_MODULE = getattr(
     settings, 'CT_CHAR_LOYALTYPOINTS_MODULE', True)
@@ -213,101 +218,85 @@ def get_character_scopes():
             'esi-characters.read_loyalty.v1',
         ]
 
+    if CT_CHAR_STRUCTURES_MODULE:
+        _scopes += [
+            'esi-structures.read_character.v1',
+        ]
+
+    if CT_CHAR_ACL_MODULE:
+        _scopes += [
+            'esi-access.read_lists.v1',
+        ]
+
     return list(set(_scopes))
 
 
 def get_character_update_attributes():
     _attribs = [
-        # Base
-        ("Public Data", 'last_update_pub_data'),
+        ("Public Data", 'pub_data'),
     ]
 
     if CT_CHAR_CONTACTS_MODULE:
-        _attribs += [
-            # Contacts
-            ("Contacts", 'last_update_contacts'),
-        ]
+        _attribs += [("Contacts", 'contacts')]
 
     if CT_CHAR_LOCATIONS_MODULE:
-        _attribs += [
-            # Location
-            ("Location", 'last_update_location'),
-        ]
+        _attribs += [("Location", 'location')]
 
     if CT_CHAR_NOTIFICATIONS_MODULE:
         _attribs += [
-            # Notifications
-            ("Notifications", 'last_update_notif'),
-        ]
-    if CT_CHAR_NOTIFICATIONS_MODULE:
-        _attribs += [
-            # Notifications
-            ("Mining", 'last_update_mining'),
+            ("Notifications", 'notif'),
+            ("Mining", 'mining'),
         ]
 
     if CT_CHAR_ROLES_MODULE:
         _attribs += [
-            # Roles
-            ("Roles", 'last_update_roles'),
-            ("Titles", 'last_update_titles'),
+            ("Roles", 'roles'),
+            ("Titles", 'titles'),
         ]
 
     if CT_CHAR_WALLET_MODULE:
         _attribs += [
-            # Wallet / Market /  Contracts
-            ("Wallet", 'last_update_wallet'),
-            ("Orders", 'last_update_orders'),
+            ("Wallet", 'wallet'),
+            ("Orders", 'orders'),
         ]
 
     if CT_CHAR_INDUSTRY_MODULE:
-        _attribs += [
-            # Roles
-            ("Industry", 'last_update_indy'),
-        ]
+        _attribs += [("Industry", 'indy')]
 
     if CT_CHAR_LOYALTYPOINTS_MODULE:
-        _attribs += [
-            ("LP", 'last_update_loyaltypoints'),
-        ]
+        _attribs += [("LP", 'loyaltypoints')]
 
     if CT_CHAR_ASSETS_MODULE:
-        _attribs += [
-            # Assets
-            ("Assets", 'last_update_assets'),
-        ]
+        _attribs += [("Assets", 'assets')]
 
     if CT_CHAR_SKILLS_MODULE:
         _attribs += [
-            # Skills
-            ("Skills", 'last_update_skills'),
-            ("Skill Queue", 'last_update_skill_que')
+            ("Skills", 'skills'),
+            ("Skill Queue", 'skill_que'),
         ]
 
     if CT_CHAR_CLONES_MODULE:
-        _attribs += [
-            # Clones
-            ("Clones", 'last_update_clones'),
-        ]
+        _attribs += [("Clones", 'clones')]
 
     if CT_CHAR_MAIL_MODULE:
-        _attribs += [
-            # Mail
-            ("Mail", 'last_update_mails'),
-        ]
+        _attribs += [("Mail", 'mails')]
 
     return _attribs
 
 
 def get_corp_update_attributes():
-    _attribs = [
-        # Base
-        ["Assets", 'last_update_assets', "a"],
-        ("Structures", 'last_update_structures', "s"),
-        ("Wallet", 'last_update_wallet', "w"),
-        ("Moons Observations", 'last_update_observers', "m")
+    return [
+        ("Assets", 'assets', "a"),
+        ("Structures", 'structures', "s"),
+        ("Starbases", 'starbases', "s"),
+        ("POCOs", 'pocos', "s"),
+        ("Wallet", 'wallet', "w"),
+        ("Contracts", 'contracts', "w"),
+        ("Industry Jobs", 'industry_jobs', "w"),
+        ("Moon Observations", 'observers', "m"),
+        ("Tracking", 'tracking', "a"),
+        ("Sovereignty Hubs", 'sovereignty_hubs', "s"),
     ]
-
-    return _attribs
 
 
 _corp_scopes_base = [
@@ -366,10 +355,14 @@ _corp_scopes_industry_jobs = [
     'esi-industry.read_corporation_jobs.v1'
 ]
 
+_corp_scopes_sov = [
+    "esi-structures.read_corporation.v1",
+
+]
 
 CORP_REQUIRED_SCOPES = _corp_scopes_base + _corp_scopes_tracking + \
     _corp_scopes_structures + _corp_scopes_moons + \
-    _corp_scopes_wallets + _corp_scopes_assets
+    _corp_scopes_wallets + _corp_scopes_assets + _corp_scopes_sov
 
 CT_BETA_UI = getattr(
     settings,

@@ -11,7 +11,7 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 function MyTooltip({ message }: { message: String }) {
@@ -30,13 +30,11 @@ const CharHeader = () => {
     borderRadius: `25%`,
   };
 
-  const { data } = useQuery(
-    ["status", characterID],
-    () => loadCharacterStatus(characterID ? Number(characterID) : 0),
-    {
-      refetchOnWindowFocus: false,
-    },
-  );
+  const { data } = useQuery({
+    queryKey: ["status", characterID],
+    queryFn: () => loadCharacterStatus(characterID ? Number(characterID) : 0),
+    refetchOnWindowFocus: false,
+  });
 
   const bad_chars = data?.characters
     .filter((char: any) => !char.active)

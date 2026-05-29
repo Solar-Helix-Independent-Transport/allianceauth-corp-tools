@@ -2,7 +2,8 @@ import { useTranslation } from "react-i18next";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
-import { useQuery } from "react-query";
+import { useQueryState } from "nuqs";
+import { useQuery } from "@tanstack/react-query";
 import CorporationAssetLocationSelect from "../../Components/Corporation/CorpAssetLocationSelect";
 import CorpSelect from "../../Components/Corporation/CorporationSelect";
 import { loadAssetList } from "../../api/corporation";
@@ -13,7 +14,8 @@ import { SecurityStatusBadge } from "../../Components/SecurityStatusBadge";
 const CorporationAssets = () => {
   const { t } = useTranslation();
 
-  const [corporationID, setCorporation] = useState<number>(0);
+  const [cidStr] = useQueryState("cid");
+  const corporationID = Number(cidStr) || 0;
   const [locationID, setLocation] = useState<number>(0);
 
   const { data, isFetching } = useQuery({
@@ -58,7 +60,7 @@ const CorporationAssets = () => {
       <div className="m-3 d-flex align-items-center my-1">
         <h6 className="me-1">{t("Corporation Filter")}</h6>
         <div className="flex-grow-1">
-          <CorpSelect {...{ setCorporation }} />
+          <CorpSelect />
         </div>
       </div>
       <div className="m-3 d-flex align-items-center">

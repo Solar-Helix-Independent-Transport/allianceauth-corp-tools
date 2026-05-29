@@ -10,7 +10,7 @@ from corptools.models import (
     CorporationIndustryJob,
 )
 
-from .. import providers
+from ... import providers
 from .utils import NoTokens, get_corp_token, update_corp_audit
 
 logger = get_extension_logger(__name__)

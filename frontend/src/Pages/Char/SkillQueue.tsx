@@ -5,18 +5,18 @@ import { getCharacterSkillQueues } from "../../api/character";
 import { useState } from "react";
 import { Form, FormGroup, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import ReactTimeAgo from "react-time-ago";
 
 const CharacterSkillQueues = () => {
   const { t } = useTranslation();
   const { characterID } = useParams();
-  const { isLoading, isFetching, error, data } = useQuery(
-    ["skills", "queue", characterID],
-    () => getCharacterSkillQueues(characterID ? Number(characterID) : 0),
-    { refetchOnWindowFocus: false },
-  );
+  const { isLoading, isFetching, error, data } = useQuery({
+    queryKey: ["skills", "queue", characterID],
+    queryFn: () => getCharacterSkillQueues(characterID ? Number(characterID) : 0),
+    refetchOnWindowFocus: false,
+  });
 
   const [activeFilter, setActive] = useState(true);
   const [pausedFilter, setPaused] = useState(true);

@@ -69,9 +69,11 @@ repos:
         exclude: |
           (?x)(
             \.min\.css|
+            \.map|
             \.min\.js|
             \.po|
             \.mo|
+            \.json|
             swagger\.json
           )
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python

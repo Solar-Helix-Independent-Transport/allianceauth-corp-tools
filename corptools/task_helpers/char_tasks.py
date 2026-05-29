@@ -61,12 +61,6 @@ from ..models import (
 logger = get_extension_logger(__name__)
 
 
-# def chunks(lst, n):
-#     """Yield successive n-sized chunks from lst."""
-#     for i in range(0, len(lst), n):
-#         yield lst[i:i + n]
-
-
 def get_token(character_id: int, scopes: list) -> "Token":
     """Helper method to get a valid token for a specific character with specific scopes.
 
@@ -202,7 +196,7 @@ def update_character_location(character_id, force_refresh=False):
             f"CT: No New online data for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_location = timezone.now()
+    audit_char.set_update_time("location")
     audit_char.save()
     audit_char.is_active()
 
@@ -252,7 +246,7 @@ def update_corp_history(character_id, force_refresh=False):
             f"CT: No New pub data for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_pub_data = timezone.now()
+    audit_char.set_update_time("pub_data")
     audit_char.save()
     audit_char.is_active()
 
@@ -313,7 +307,8 @@ def update_character_skill_list(character_id, force_refresh=False):
                 trained_skill_level=skill.trained_skill_level
             )
             _create_skills.append(_skill)
-        Skill.objects.bulk_create(_create_skills)
+        Skill.objects.bulk_create(
+            _create_skills, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_list {character_id}"
@@ -324,7 +319,7 @@ def update_character_skill_list(character_id, force_refresh=False):
             f"CT: No New skills for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_skills = timezone.now()
+    audit_char.set_update_time("skills")
     audit_char.save()
     audit_char.is_active()
 
@@ -375,7 +370,8 @@ def update_character_skill_queue(character_id, force_refresh=False):
                 training_start_sp=item.training_start_sp
             )
             items.append(queue_item)
-        SkillQueue.objects.bulk_create(items)
+        SkillQueue.objects.bulk_create(
+            items, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_queue {character_id}"
@@ -388,7 +384,7 @@ def update_character_skill_queue(character_id, force_refresh=False):
             )
         )
 
-    audit_char.last_update_skill_que = timezone.now()
+    audit_char.set_update_time("skill_que")
     audit_char.save()
     audit_char.is_active()
 
@@ -450,14 +446,11 @@ def update_character_assets(character_id, force_refresh=False):
 
                 items.append(ship)
 
-        delete_query = CharacterAsset.objects.filter(
-            character=audit_char
-        )  # Flush Assets
-        if delete_query.exists():
-            # We now have some FKeys so slow it down...
-            delete_query.delete()
+        # We now have some FKeys so slow it down...
+        CharacterAsset.objects.filter(character=audit_char).delete()
 
-        CharacterAsset.objects.bulk_create(items)
+        CharacterAsset.objects.bulk_create(
+            items, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_assets {character_id}"
@@ -482,7 +475,7 @@ def update_character_assets(character_id, force_refresh=False):
             f"CT: No New assets for: {audit_char.character.character_name} - ({tb.tb_lineno})"
         )
 
-    audit_char.last_update_assets = timezone.now()
+    audit_char.set_update_time("assets")
     audit_char.save()
     audit_char.is_active()
 
@@ -633,7 +626,8 @@ def update_asset_locations(character_id, force_refresh=False):
                 )
             )
 
-    CharAssetCoordiante.objects.bulk_create(new_models, ignore_conflicts=True)
+    CharAssetCoordiante.objects.bulk_create(
+        new_models, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
     return f"CT: Finished asset locations for: {audit_char.character.character_name}"
 
@@ -692,12 +686,13 @@ def update_character_mining(character_id, force_refresh=False):
 
         if len(new_events):
             CharacterMiningLedger.objects.bulk_create(
-                new_events, ignore_conflicts=True)
+                new_events, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         if len(old_events):
             CharacterMiningLedger.objects.bulk_update(
                 old_events,
-                fields=['quantity']
+                fields=['quantity'],
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
             )
 
         logger.debug(
@@ -709,7 +704,7 @@ def update_character_mining(character_id, force_refresh=False):
             f"CT: No New Mining for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_mining = timezone.now()
+    audit_char.set_update_time("mining")
     audit_char.save()
     audit_char.is_active()
 
@@ -802,7 +797,8 @@ def update_character_industry_jobs(character_id, force_refresh=False):
         if len(new_events):
             CharacterIndustryJob.objects.bulk_create(
                 new_events,
-                ignore_conflicts=True
+                ignore_conflicts=True,
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
             )
 
         logger.debug(
@@ -814,7 +810,7 @@ def update_character_industry_jobs(character_id, force_refresh=False):
             f"CT: No New Industry for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_indy = timezone.now()
+    audit_char.set_update_time("indy")
     audit_char.save()
     audit_char.is_active()
 
@@ -928,7 +924,8 @@ def update_character_wallet(character_id, force_refresh=False):
         audit_char.save()
 
         if created_names:
-            CharacterWalletJournalEntry.objects.bulk_create(items)
+            CharacterWalletJournalEntry.objects.bulk_create(
+                items, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
         else:
             raise Exception("ESI Fail")
         logger.debug(
@@ -938,7 +935,7 @@ def update_character_wallet(character_id, force_refresh=False):
             f"CT: No New wallet data for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_wallet = timezone.now()
+    audit_char.set_update_time("wallet")
     audit_char.save()
     audit_char.is_active()
 
@@ -1099,13 +1096,14 @@ def update_character_clones(character_id, force_refresh=False):
                 )
             )
 
-        Implant.objects.bulk_create(implants)
+        Implant.objects.bulk_create(
+            implants, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
     except HTTPNotModified:
         logger.info(
             f"CT: No New Clone data for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_clones = timezone.now()
+    audit_char.set_update_time("clones")
     audit_char.save()
     audit_char.is_active()
 
@@ -1166,10 +1164,12 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
         LoyaltyPoint.objects.bulk_create(
             _bulkcreate,
             ignore_conflicts=True,
+            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
         )
         LoyaltyPoint.objects.bulk_update(
             _bulkupdate,
-            fields=['amount']
+            fields=['amount'],
+            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
         )
 
     except HTTPNotModified:
@@ -1177,7 +1177,7 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
             f"CT: No New LP data for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_loyaltypoints = timezone.now()
+    audit_char.set_update_time("loyaltypoints")
     audit_char.save()
     audit_char.is_active()
 
@@ -1222,15 +1222,8 @@ def update_character_orders(character_id, force_refresh=False):
 
         updates = []
         creates = []
-        type_ids = []
-        tracked_ids = []
 
         for order in open_orders:
-            tracked_ids.append(order.order_id)
-
-            if order.type_id not in type_ids:
-                type_ids.append(order.type_id)
-
             _order = CharacterMarketOrder.from_esi_model(audit_char, order)
 
             if order.location_id in all_locations:
@@ -1252,11 +1245,13 @@ def update_character_orders(character_id, force_refresh=False):
                     'volume_remain',
                     'volume_total',
                     'state'
-                ]
+                ],
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
             )
 
         if len(creates) > 0:
-            CharacterMarketOrder.objects.bulk_create(creates)
+            CharacterMarketOrder.objects.bulk_create(
+                creates, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_orders {character_id}"
@@ -1267,7 +1262,7 @@ def update_character_orders(character_id, force_refresh=False):
             f"CT: No New orders data for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_orders = timezone.now()
+    audit_char.set_update_time("orders")
     audit_char.save()
     audit_char.is_active()
 
@@ -1316,16 +1311,8 @@ def update_character_order_history(character_id, force_refresh=False):
 
         updates = []
         creates = []
-        type_ids = []
-
-        tracked_ids = []
 
         for order in order_history:
-            tracked_ids.append(order.order_id)
-
-            if order.type_id not in type_ids:
-                type_ids.append(order.type_id)
-
             _order = CharacterMarketOrder.from_esi_model(audit_char, order)
 
             if order.location_id in all_locations:
@@ -1439,7 +1426,7 @@ def update_character_notifications(character_id, force_refresh=False):
         )
         pass
 
-    audit_char.last_update_notif = timezone.now()
+    audit_char.set_update_time("notif")
     audit_char.save()
     audit_char.is_active()
 
@@ -1501,7 +1488,7 @@ def update_character_roles(character_id, force_refresh=False):
             f"CT: No New roles for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_roles = timezone.now()
+    audit_char.set_update_time("roles")
     audit_char.save()
     audit_char.is_active()
 
@@ -1695,7 +1682,8 @@ def update_character_mail_headers(character_id, force_refresh=False):
                     )
                     lms.append(lm)
 
-        LabelThroughModel.objects.bulk_create(lms, ignore_conflicts=True)
+        LabelThroughModel.objects.bulk_create(
+            lms, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         RecipThroughModel = MailMessage.recipients.through
         rms = []
@@ -1723,13 +1711,14 @@ def update_character_mail_headers(character_id, force_refresh=False):
                         mailmessage_id=_msg.id_key, mailrecipient_id=recip)
                     rms.append(rm)
 
-        RecipThroughModel.objects.bulk_create(rms, ignore_conflicts=True)
+        RecipThroughModel.objects.bulk_create(
+            rms, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         if stop is True:
             # Break the while loop if we reach the last mail message that is in the db.
             break
 
-    audit_char.last_update_mails = timezone.now()
+    audit_char.set_update_time("mails")
     audit_char.save()
     audit_char.is_active()
 
@@ -1779,7 +1768,8 @@ def update_character_contacts(character_id, force_refresh=False):
             labels_to_create.append(_label_item)
 
         CharacterContactLabel.objects.filter(character=audit_char).delete()
-        CharacterContactLabel.objects.bulk_create(labels_to_create)
+        CharacterContactLabel.objects.bulk_create(
+            labels_to_create, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} CharacterContactLabel {character_id}"
@@ -1826,9 +1816,9 @@ def update_character_contacts(character_id, force_refresh=False):
         CharacterContact.objects.filter(character=audit_char).delete()
 
         CharacterContact.objects.bulk_create(
-            _contacts_to_create, ignore_conflicts=True)
+            _contacts_to_create, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
         ContactLabelThrough.objects.bulk_create(
-            _through_to_create, ignore_conflicts=True)
+            _through_to_create, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_contacts {character_id}"
@@ -1840,7 +1830,7 @@ def update_character_contacts(character_id, force_refresh=False):
         )
         pass
 
-    audit_char.last_update_contacts = timezone.now()
+    audit_char.set_update_time("contacts")
     audit_char.save()
     audit_char.is_active()
 
@@ -1902,7 +1892,7 @@ def update_character_titles(character_id, force_refresh=False):
             f"CT: No New titles for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_titles = timezone.now()
+    audit_char.set_update_time("titles")
     audit_char.save()
     audit_char.is_active()
 
@@ -1969,7 +1959,8 @@ def update_character_contracts(character_id, force_refresh=False):
         if len(contract_models_new) > 0:
             Contract.objects.bulk_create(
                 contract_models_new,
-                ignore_conflicts=True
+                ignore_conflicts=True,
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
             )
 
         if len(contract_models_old) > 0:
@@ -1985,7 +1976,8 @@ def update_character_contracts(character_id, force_refresh=False):
                     'acceptor_name',
                     'issuer_corporation_name',
                     'issuer_name'
-                ]
+                ],
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
             )
 
         logger.debug(
@@ -2001,7 +1993,7 @@ def update_character_contracts(character_id, force_refresh=False):
             f"CT: No New Contracts for: {audit_char.character.character_name}"
         )
 
-    audit_char.last_update_contracts = timezone.now()
+    audit_char.set_update_time("contracts")
     audit_char.save()
     audit_char.is_active()
 

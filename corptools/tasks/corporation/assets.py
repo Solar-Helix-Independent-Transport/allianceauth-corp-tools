@@ -27,7 +27,7 @@ from corptools.models import (
 )
 from corptools.task_helpers.update_tasks import fetch_location_name
 
-from .. import providers
+from ... import providers
 from ..utils import chunks
 from .utils import NoTokens, get_corp_token, update_corp_audit
 

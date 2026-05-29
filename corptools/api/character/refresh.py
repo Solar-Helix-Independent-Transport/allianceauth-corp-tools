@@ -14,7 +14,7 @@ from allianceauth.eveonline.tasks import update_character as eve_character_updat
 # AA Example App
 from corptools import app_settings, models
 from corptools.api import schema
-from corptools.api.helpers import get_alts_queryset, get_main_character
+from corptools.api.helpers import resolve_character
 from corptools.tasks import character
 
 logger = logging.getLogger(__name__)
@@ -34,10 +34,9 @@ class RefreshApiEndpoints:
         def post_characters_refresh(request, character_id: int):
             if character_id == 0:
                 character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             # and not request.user.is_superuser:
             if cache.get(f"refresh-block-{character_id}", False):
@@ -45,7 +44,6 @@ class RefreshApiEndpoints:
                     f"GO AWAY! Already Requested! {character_id} {request.user.username}")
                 return 200, {"message": "GO AWAY! Already Requested!"}
 
-            characters = get_alts_queryset(main)
             if character_id in characters.values_list('character_id', flat=True):
                 character.update_char_assets.apply_async(
                     args=[character_id],
@@ -65,16 +63,12 @@ class RefreshApiEndpoints:
         def post_account_refresh(request, character_id: int):
             if character_id == 0:
                 character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             force = app_settings.CT_USERS_CAN_FORCE_REFRESH or request.user.is_superuser
 
-            #
             if cache.get(f"refresh-block-account-{character_id}", False) and not request.user.is_superuser:
                 logger.error(
                     f"GO AWAY! Already Requested! {character_id} {request.user.username}")

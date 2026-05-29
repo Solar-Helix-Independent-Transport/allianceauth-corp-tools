@@ -32,6 +32,10 @@
                                     value="90"
                                 >
                                 <div id="fuelDurationSummary" class="text-secondary small mt-2">Minimum 30 days.</div>
+                                <div class="form-check form-switch mt-3">
+                                    <input class="form-check-input" type="checkbox" id="hideNoRefuelToggle">
+                                    <label class="form-check-label small" for="hideNoRefuelToggle">Hide structures not needing refuel</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -67,7 +71,7 @@
                                 <h2 id="total_current_blocks" class="fw-bold">0</h2>
                             </div>
                         </div>
-                        <div class="card m-2 flex-fill">
+                        <div class="card m-2 flex-fill" id="gas-summary-tile">
                             <div class="card-body h-100">
                                 <div class="text-uppercase small text-muted fw-bold">Current Magmatic Gas</div>
                                 <h2 id="total_current_gas" class="fw-bold">0</h2>
@@ -112,7 +116,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card m-2 flex-fill">
+                        <div class="card m-2 flex-fill" id="gas-stats-card">
                             <div class="card-body d-flex flex-column h-100">
                                 <div>
                                     <div class="text-uppercase small text-muted fw-bold mb-2">Fuel Demand</div>
@@ -189,6 +193,7 @@
                             <tbody>
                                 {% for structure in structures %}
                                     <tr class="structure-row"
+                                        data-type-id="{{ structure.structure.type_id }}"
                                         data-block-hourly="{{ structure.fuel_req }}"
                                         data-block-day="{{ structure.fuel_req_day }}"
                                         data-block-month="{{ structure.fuel_req_30d }}"
@@ -242,8 +247,11 @@
                                             <div class="d-flex">
                                                 <div class="card w-100 m-1 bg-primary bg-opacity-10 border-primary border-opacity-50 align-items-center justify-content-center py-1">
                                                     <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                                                        <p class="text-uppercase small text-muted fw-bold mb-1 mb-0 text-nowrap">Refuel For <span class="fw-bold">90d</span></p>
-                                                        <p class="fw-bold mb-0 text-nowrap blocks-till">{{ structure.90day|intcomma }}</p>
+                                                        <p class="text-uppercase small text-muted fw-bold mb-1 mb-0 text-nowrap">Refuel For <span class="fw-bold duration-title">90d</span></p>
+                                                        <div class="d-flex align-items-center gap-1">
+                                                            <p class="fw-bold mb-0 text-nowrap blocks-till">{{ structure.90day|intcomma }}</p>
+                                                            <button class="btn btn-sm copy-refuel-btn p-0 ms-1 text-muted lh-1" type="button" title="Copy"><i class="fas fa-copy"></i></button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                         </td>
@@ -275,8 +283,11 @@
                                             <div class="d-flex flex-fill">
                                                 <div class="card w-100 m-1 bg-primary bg-opacity-10 border-primary border-opacity-50 align-items-center justify-content-center py-1">
                                                     <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                                                        <p class="text-uppercase small text-muted fw-bold mb-1 mb-0 text-nowrap">Refuel For <span class="fw-bold">90d</span></p>
-                                                        <p class="fw-bold mb-0 text-nowrap gas-till">{{ structure.gas_90day|intcomma }}</p>
+                                                        <p class="text-uppercase small text-muted fw-bold mb-1 mb-0 text-nowrap">Refuel For <span class="fw-bold duration-title">90d</span></p>
+                                                        <div class="d-flex align-items-center gap-1">
+                                                            <p class="fw-bold mb-0 text-nowrap gas-till">{{ structure.gas_90day|intcomma }}</p>
+                                                            <button class="btn btn-sm copy-refuel-btn p-0 ms-1 text-muted lh-1" type="button" title="Copy"><i class="fas fa-copy"></i></button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -372,6 +383,8 @@
             const structureTypeBreakdown = document.getElementById('structure_type_breakdown');
             const defaultRefuelDays = 90;
             const minimumRefuelDays = 30;
+            let gasColumnsVisible = true;
+            let hideNoRefuel = false;
 
             // Keep refuel sizing on the original day-based flow and enforce the
             // same 30-day floor when the dashboard recalculates totals.
@@ -502,6 +515,25 @@
             document.getElementById('total_gas_refuel').innerText = numberWithCommas(totals.gasRefuel);
 
             renderTypeBreakdown(typeCounts);
+            updateGasVisibility(table, rows);
+        }
+
+        function updateGasVisibility(table, rows) {
+            const hasMetenox = rows.some(function(row) {
+                return row.dataset.typeId === '81826';
+            });
+            const gasTile = document.getElementById('gas-summary-tile');
+            const gasCard = document.getElementById('gas-stats-card');
+            if (gasTile) {
+                gasTile.classList.toggle('d-none', !hasMetenox);
+            }
+            if (gasCard) {
+                gasCard.classList.toggle('d-none', !hasMetenox);
+            }
+            if (hasMetenox !== gasColumnsVisible) {
+                gasColumnsVisible = hasMetenox;
+                table.columns([5, 6]).visible(hasMetenox);
+            }
         }
 
         function updateTableDensity() {
@@ -532,7 +564,7 @@
             }
             updateDurationTitles(durationLabel);
             updateFuelDurationSummary(refuelDays);
-            Array.from(tableElement.querySelectorAll('tbody tr')).forEach(function(row) {
+            Array.from(tableElement.querySelectorAll('tbody tr.structure-row')).forEach(function(row) {
                 recalculateRowRefuel(row, refuelDays * 24);
             });
             updateDashboardStats(table);
@@ -561,13 +593,41 @@
                 { responsivePriority: 2, targets: [ 4, 6 ] },
                 { responsivePriority: 1, targets: [ 0, 2, 8, ] }
             ],
-            order: [[2, 'asc']],
+            order: [[8, 'asc']],
             paging: false,
             responsive: true,
             pageLength: -1,
             drawCallback: function() {
                 refreshDashboard(this.api(), undefined, false);
             }
+        });
+
+        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            if (settings.nTable !== tableElement) return true;
+            if (!hideNoRefuel) return true;
+            const row = settings.aoData[dataIndex].nTr;
+            if (!row) return true;
+            const blockRefuel = Number(row.dataset.blockRefuel || 0);
+            const gasRefuel = Number(row.dataset.gasRefuel || 0);
+            return blockRefuel > 0 || gasRefuel > 0;
+        });
+
+        document.getElementById('hideNoRefuelToggle').addEventListener('change', function() {
+            hideNoRefuel = this.checked;
+            table.draw();
+        });
+
+        tableElement.addEventListener('click', function(e) {
+            const btn = e.target.closest('.copy-refuel-btn');
+            if (!btn) return;
+            const numEl = btn.closest('.d-flex').querySelector('.blocks-till, .gas-till');
+            if (!numEl) return;
+            const raw = numEl.innerText.replace(/,/g, '');
+            navigator.clipboard.writeText(raw).then(function() {
+                const icon = btn.querySelector('i');
+                icon.classList.replace('fa-copy', 'fa-check');
+                setTimeout(function() { icon.classList.replace('fa-check', 'fa-copy'); }, 1000);
+            });
         });
 
         fuelDurationInput.addEventListener('input', function(e) {

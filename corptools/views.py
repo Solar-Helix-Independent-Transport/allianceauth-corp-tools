@@ -137,6 +137,7 @@ def add_corp_section(request, *args, **kwargs):
     pocos = request.GET.get('p', False)
     contracts = request.GET.get('c', False)
     industry_jobs = request.GET.get('i', False)
+    sovereignty = request.GET.get('sov', False)
 
     # if we're coming back from SSO with a new token, return it
     token = _check_callback(request)
@@ -188,40 +189,11 @@ def add_corp_section(request, *args, **kwargs):
     if industry_jobs:
         scopes += app_settings._corp_scopes_industry_jobs
 
+    if sovereignty:
+        scopes += app_settings._corp_scopes_sov
+
     # user has selected to add a new token
     return sso_redirect(request, scopes=scopes)
-
-
-@login_required
-@permission_required('corptools.view_characteraudit')
-def corptools_menu(request):
-    # get available models
-    cas = CharacterAudit.objects.visible_to(request.user)\
-        .select_related('character__character_ownership__user__profile__main_character',
-                        'character__characteraudit')\
-        .prefetch_related('character__character_ownership__user__character_ownerships')\
-        .prefetch_related('character__character_ownership__user__character_ownerships__character')\
-        .prefetch_related('character__character_ownership__user__character_ownerships__character__characteraudit')\
-
-
-    chars = {}
-    orphans = []
-    for char in cas:
-        try:
-            main = char.character.character_ownership.user.profile.main_character
-            if main:
-                if main.character_name not in chars:
-                    chars[str(main.character_id)] = {'main': main,
-                                                     'audit': char}
-            else:
-                orphans.append(char)
-        except ObjectDoesNotExist:
-            orphans.append(char)
-
-    if len(chars) == 1:
-        return redirect('corptools:overview', chars[list(chars.keys())[0]]['main'].character_id)
-
-    return render(request, 'corptools/menu.html', context={'characters': chars, 'orphans': orphans})
 
 
 @login_required
@@ -284,7 +256,13 @@ def admin_run_tasks(request):
     if request.method == 'POST':
         if request.POST.get('run_update_all'):
             messages.info(request, "Queued update_all_characters")
-            update_all_characters.apply_async(priority=6)
+            update_all_characters.apply_async(
+                priority=6,
+                kwargs={
+                    "force_refresh": False,
+                    "now": True
+                }
+            )
         if request.POST.get('run_update_eve_models'):
             messages.info(request, "Queued update_all_eve_names")
             update_all_eve_names.apply_async(priority=6)
@@ -406,13 +384,6 @@ def skill_list_editor(request):
 
 
 @login_required
-def update_account(request, character_id):
-    check_account.apply_async(args=[character_id], priority=6)
-    messages.success(request, "Requested an update task.")
-    return redirect('corptools:view')
-
-
-@login_required
 def react_menu(request):
     return redirect('corptools:reactlegacymain', request.user.profile.main_character.character_id)
 
@@ -439,14 +410,14 @@ def react_main(request, character_id):
     return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
 
 
-@login_required
-def v3_ui_render(request, character_id):
-    return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
+# @login_required
+# def v3_ui_render(request, character_id):
+#     return render(request, 'corptools/character/react_base.html', context={"version": __version__, "app_name": "corptools/char", "page_title": "Character Audit"})
 
 
-@login_required
-def react_corp(request):
-    return render(request, 'corptools/corporation/react_base.html', context={"version": __version__, "app_name": "corptools/corp", "page_title": "Corporation Audit"})
+# @login_required
+# def react_corp(request):
+#     return render(request, 'corptools/corporation/react_base.html', context={"version": __version__, "app_name": "corptools/corp", "page_title": "Corporation Audit"})
 
 
 @login_required
@@ -490,7 +461,9 @@ def fuel_levels(request):
 
     flex_fuel_types = [81143]
 
-    all_structures = Structure.get_visible(request.user).select_related(
+    all_structures = Structure.get_visible(
+        request.user
+    ).select_related(
         'corporation', 'corporation__corporation', 'system_name', 'type_name',
         'system_name__constellation', 'system_name__constellation__region'
     ).prefetch_related('structureservice_set')

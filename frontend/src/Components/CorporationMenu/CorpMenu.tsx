@@ -36,6 +36,10 @@ const CorpMenu = () => {
           name: t("Starbases"),
           link: `starbases`,
         },
+        {
+          name: t("Sovereignty Hubs"),
+          link: `sovhubs`,
+        },
       ],
     },
     {

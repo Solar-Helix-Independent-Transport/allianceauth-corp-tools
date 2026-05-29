@@ -1,7 +1,7 @@
 import CharMenu from "./CharMenu";
 import axios from "axios";
 import ReactDOM from "react-dom";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 const menuRoot = document.getElementById("nav-left");
 

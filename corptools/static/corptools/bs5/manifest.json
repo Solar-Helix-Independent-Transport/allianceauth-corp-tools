@@ -1,54 +1,53 @@
 {
-  "_@app-libs-MUtQVhKZ.js": {
-    "file": "assets/@app-libs-MUtQVhKZ.js",
-    "name": "@app-libs"
-  },
-  "_@bootstrap-libs-BBHiSAMc.js": {
-    "file": "assets/@bootstrap-libs-BBHiSAMc.js",
-    "name": "@bootstrap-libs",
+  "_@app-libs-DFEpFFOz.js": {
+    "file": "assets/@app-libs-DFEpFFOz.js",
+    "name": "@app-libs",
     "imports": [
-      "_@app-libs-MUtQVhKZ.js"
+      "_@bootstrap-libs-ImuiW0wy.js"
     ]
   },
-  "_@lang-libs-byhYGgjh.js": {
-    "file": "assets/@lang-libs-byhYGgjh.js",
+  "_@bootstrap-libs-ImuiW0wy.js": {
+    "file": "assets/@bootstrap-libs-ImuiW0wy.js",
+    "name": "@bootstrap-libs"
+  },
+  "_@lang-libs-Dsi3yCx2.js": {
+    "file": "assets/@lang-libs-Dsi3yCx2.js",
     "name": "@lang-libs",
     "imports": [
-      "_@app-libs-MUtQVhKZ.js"
+      "_@bootstrap-libs-ImuiW0wy.js"
     ],
     "dynamicImports": [
-      "_browser-ponyfill-dj_eXM1S.js"
+      "_browser-ponyfill-BOOJORMJ.js"
     ]
   },
-  "_@react-libs-BTz7l27V.js": {
-    "file": "assets/@react-libs-BTz7l27V.js",
+  "_@react-libs-DY9EJBm1.js": {
+    "file": "assets/@react-libs-DY9EJBm1.js",
     "name": "@react-libs",
     "imports": [
-      "_@app-libs-MUtQVhKZ.js",
-      "_@bootstrap-libs-BBHiSAMc.js"
+      "_@bootstrap-libs-ImuiW0wy.js"
     ]
   },
-  "_browser-ponyfill-dj_eXM1S.js": {
-    "file": "assets/browser-ponyfill-dj_eXM1S.js",
+  "_browser-ponyfill-BOOJORMJ.js": {
+    "file": "assets/browser-ponyfill-BOOJORMJ.js",
     "name": "browser-ponyfill",
     "isDynamicEntry": true,
     "imports": [
-      "_@app-libs-MUtQVhKZ.js"
+      "_@bootstrap-libs-ImuiW0wy.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-DiiXaxnh.js",
+    "file": "assets/index-9N2faqyQ.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@app-libs-MUtQVhKZ.js",
-      "_@bootstrap-libs-BBHiSAMc.js",
-      "_@react-libs-BTz7l27V.js",
-      "_@lang-libs-byhYGgjh.js"
+      "_@bootstrap-libs-ImuiW0wy.js",
+      "_@react-libs-DY9EJBm1.js",
+      "_@app-libs-DFEpFFOz.js",
+      "_@lang-libs-Dsi3yCx2.js"
     ],
     "css": [
-      "static/corptools/bs5/static/css/index-B7hQrVZ6.css"
+      "static/corptools/bs5/static/css/index-BaaDWewh.css"
     ],
     "assets": [
       "static/corptools/bs5/static/img/omega_128-B8POqXI6.png",
@@ -81,11 +80,11 @@
       "static/corptools/bs5/static/img/6m-DKVPLsUc.png",
       "static/corptools/bs5/static/img/7m-BLe6olY4.png",
       "static/corptools/bs5/static/img/8m-hxd_N3hx.png",
-      "static/corptools/bs5/static/img/8l-UbnNMK0o.png",
-      "static/corptools/bs5/static/img/7l-Dql_h1Xo.png",
-      "static/corptools/bs5/static/img/6l-Ciemt68W.png",
-      "static/corptools/bs5/static/img/5l-DtBLoe7X.png",
       "static/corptools/bs5/static/img/4l-BsWsNOjS.png",
+      "static/corptools/bs5/static/img/5l-DtBLoe7X.png",
+      "static/corptools/bs5/static/img/6l-Ciemt68W.png",
+      "static/corptools/bs5/static/img/7l-Dql_h1Xo.png",
+      "static/corptools/bs5/static/img/8l-UbnNMK0o.png",
       "static/corptools/bs5/static/img/3r-BEm9rD6Q.png",
       "static/corptools/bs5/static/img/1s-3LB3dveW.png",
       "static/corptools/bs5/static/img/2s-DLD5F1oU.png",

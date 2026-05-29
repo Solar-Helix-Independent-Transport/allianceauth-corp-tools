@@ -348,3 +348,124 @@ class CorpStatus(Schema):
 class PingStats(Schema):
     members: int
     structures: List[str] = None
+
+
+class GlanceAssets(Schema):
+    frigate: int = 0
+    destroyer: int = 0
+    cruiser: int = 0
+    battlecruiser: int = 0
+    battleship: int = 0
+    carrier: int = 0
+    fax: int = 0
+    dread: int = 0
+    supercarrier: int = 0
+    titan: int = 0
+    mining: int = 0
+    hauler: int = 0
+    indy_command: int = 0
+    capital_indy: int = 0
+    injector: int = 0
+    extractor: int = 0
+    citadel: int = 0
+    eng_comp: int = 0
+    refinary: int = 0
+    flex: int = 0
+    merc_den_grp: int = 0
+    merc_den: int = 0
+
+
+class GlanceCorporateAssets(Schema):
+    corporate: GlanceAssets
+    character: GlanceAssets
+
+
+class GlanceActivities(Schema):
+    ratting: Optional[float] = None
+    incursion: Optional[float] = None
+    pochven: Optional[float] = None
+    mission: Optional[float] = None
+    market: Optional[float] = None
+    industry: Optional[int] = None
+    pi: Optional[float] = None
+    mining_ore: Optional[float] = None
+    mining_moon: Optional[float] = None
+    mining_gas: Optional[float] = None
+    mining_ice: Optional[float] = None
+
+
+class GlancePveActivities(Schema):
+    ratting: Optional[float] = None
+    incursion: Optional[float] = None
+    pochven: Optional[float] = None
+    mission: Optional[float] = None
+    market: Optional[float] = None
+    industry: Optional[int] = None
+
+
+class GlanceIndyActivities(Schema):
+    market: Optional[float] = None
+    industry: Optional[int] = None
+    pi: Optional[float] = None
+
+
+class GlanceMiningActivities(Schema):
+    mining_ore: Optional[float] = None
+    mining_moon: Optional[float] = None
+    mining_gas: Optional[float] = None
+    mining_ice: Optional[float] = None
+
+
+class GlanceRatting(Schema):
+    subcap: Optional[int] = None
+    capital: Optional[int] = None
+    supers: Optional[int] = None
+    titans: Optional[int] = None
+    officer: Optional[int] = None
+    officer_cruiser: Optional[int] = None
+    officer_frigate: Optional[int] = None
+
+
+class GlanceFactionLP(Schema):
+    corp_id: Optional[int] = None
+    lp: Optional[int] = None
+    corp_name: Optional[str] = None
+
+
+class GlanceFactionLPSummary(Schema):
+    total: Optional[int] = None
+    evermark: List[GlanceFactionLP] = []
+    top_five: List[GlanceFactionLP] = []
+
+
+class GlanceFactionCounts(Schema):
+    amarr: int = 0
+    caldari: int = 0
+    gallente: int = 0
+    minmatar: int = 0
+    angel: int = 0
+    guristas: int = 0
+
+
+class GlanceFaction(Schema):
+    factions: GlanceFactionCounts
+    lp: GlanceFactionLPSummary
+
+
+class WalletActivityParty(Schema):
+    cat: Optional[str] = None
+    id: Optional[int] = None
+    cid: Optional[int] = None
+    cn: Optional[str] = None
+    aid: Optional[str] = None
+    an: Optional[int] = None
+
+
+class WalletActivityEntry(Schema):
+    fpn: Optional[str] = None
+    firstParty: WalletActivityParty
+    spn: Optional[str] = None
+    secondParty: WalletActivityParty
+    value: int
+    interactions: int
+    own_account: bool = False

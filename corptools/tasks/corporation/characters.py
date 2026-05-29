@@ -7,7 +7,7 @@ from allianceauth.services.hooks import get_extension_logger
 # AA Example App
 from corptools.models import CharacterAudit, CorporationAudit
 
-from .. import providers
+from ... import providers
 from .utils import NoTokens, get_corp_token, update_corp_audit
 
 logger = get_extension_logger(__name__)
@@ -48,8 +48,11 @@ def update_character_logins_from_corp(corp_id, full_update=False):
         except CharacterAudit.DoesNotExist:
             pass
 
-    all_chars = CharacterAudit.objects.filter(
-        character__corporation_id=corp_id)
-    all_chars.update(last_update_login=timezone.now())
+    all_chars = list(CharacterAudit.objects.filter(
+        character__corporation_id=corp_id))
+    now = timezone.now().isoformat()
+    for ca in all_chars:
+        ca.update_timestamps["login"] = now
+    CharacterAudit.objects.bulk_update(all_chars, ["update_timestamps"])
 
     return f"Finished Logins for: {audit_corp.corporation}"

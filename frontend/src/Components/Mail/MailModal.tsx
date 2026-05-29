@@ -2,18 +2,16 @@ import { useTranslation } from "react-i18next";
 import { getMailBody } from "../../api/character";
 import { DateToFields, StrToFields } from "../Modals/ModalFields";
 import { Badge, Button, Modal } from "react-bootstrap";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 function MailModal({ msg_data, shown, setShown }: any) {
   const { t } = useTranslation();
 
-  const { isFetching, error, data } = useQuery(
-    ["mailBody", msg_data?.character_id, msg_data?.mail_id],
-    () => getMailBody(msg_data?.character_id, msg_data?.mail_id),
-    {
-      refetchOnWindowFocus: false,
-    },
-  );
+  const { isFetching, error, data } = useQuery({
+    queryKey: ["mailBody", msg_data?.character_id, msg_data?.mail_id],
+    queryFn: () => getMailBody(msg_data?.character_id, msg_data?.mail_id),
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <Modal

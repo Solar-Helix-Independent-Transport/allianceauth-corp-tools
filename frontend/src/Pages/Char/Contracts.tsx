@@ -6,7 +6,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 const CharacterContracts = () => {

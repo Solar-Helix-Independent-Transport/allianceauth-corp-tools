@@ -9,7 +9,6 @@ from celery import shared_task
 from eve_sde.models import ItemType
 
 # Django
-from django.core.cache import cache
 from django.utils import timezone
 
 try:
@@ -24,30 +23,15 @@ except ImportError:
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
 
-# AA Example App
-from corptools.task_helpers.housekeeping_tasks import remove_old_notifications
-
 from .. import app_settings
-from ..models import (
-    CharacterWalletJournalEntry,
-    EveName,
-    TypePrice,
-)
-from ..task_helpers.update_tasks import (
-    set_error_count_flag,
-)
-
-TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
-
+from ..models import EveName, TypePrice
+from ..task_helpers.update_tasks import set_error_count_flag
+from .utils import get_error_count_flag
 
 logger = get_extension_logger(__name__)
 
-# Bulk Updates
 
-
-@shared_task(
-    name="corptools.tasks.update_all_eve_names"
-)
+@shared_task(name="corptools.tasks.update_all_eve_names")
 def update_all_eve_names(chunk=False):
     needs_update = timezone.now() - datetime.timedelta(days=30)
     en = EveName.objects.filter(last_update__lte=needs_update)
@@ -59,10 +43,6 @@ def update_all_eve_names(chunk=False):
             priority=7,
             countdown=random() * app_settings.CT_TASK_SPREAD_DELAY
         )
-
-
-def get_error_count_flag():
-    return cache.get("esi_errors_timeout", False)
 
 
 @shared_task(
@@ -130,12 +110,6 @@ def update_eve_name(self, id):
             name.save()
 
 
-@shared_task(name="corptools.tasks.run_housekeeping")
-def run_housekeeping():
-    notifs = remove_old_notifications()
-    return notifs
-
-
 @shared_task(name="corptools.tasks.update_all_raw_minerals")
 def update_all_raw_minerals():
     _types = ItemType.objects.filter(group__category_id=4)
@@ -144,9 +118,7 @@ def update_all_raw_minerals():
 
 @shared_task(name="corptools.tasks.update_prices_for_types")
 def update_prices_for_types(type_ids: list):
-    logger.info(
-        "Pulling values from Jita @`buy`-`weightedAverage`"
-    )
+    logger.info("Pulling values from Jita @`buy`-`weightedAverage`")
     _str = str(type_ids.pop())
     for i in type_ids:
         _str += f",{i}"
@@ -156,64 +128,9 @@ def update_prices_for_types(type_ids: list):
     price_cache = {}
     for key, item in price_data.items():
         obj, _ = ItemType.objects.get_or_create_from_esi(key)
-
-        ob, _ = TypePrice.objects.update_or_create(
+        TypePrice.objects.update_or_create(
             item=obj,
-            defaults={
-                "price": float(item['buy']["weightedAverage"])
-            }
+            defaults={"price": float(item['buy']["weightedAverage"])}
         )
         price_cache[obj.name] = float(item['buy']["weightedAverage"])
     return json.dumps(price_cache, indent=2)
-
-# Bulk Updates
-
-
-@shared_task(name="corptools.tasks.clear_all_skill_caches")
-def clear_all_skill_caches():
-    try:
-        # Third Party
-        from django_redis import get_redis_connection
-        _client = get_redis_connection("default")
-    except (NotImplementedError, ModuleNotFoundError):
-        # Django
-        from django.core.cache import caches
-        default_cache = caches['default']
-        _client = default_cache.get_master_client()
-
-    keys = _client.keys(":?:SKILL_LISTS_*")
-    deleted = 0
-    if keys:
-        deleted = _client.delete(*keys)
-
-    return f" Deleted {deleted} skill cache keys"
-
-
-@shared_task(name="corptools.tasks.clear_all_etags")
-def clear_all_etags():
-    try:
-        # Third Party
-        from django_redis import get_redis_connection
-        _client = get_redis_connection("default")
-    except (NotImplementedError, ModuleNotFoundError):
-        # Django
-        from django.core.cache import caches
-        default_cache = caches['default']
-        _client = default_cache.get_master_client()
-
-    keys = _client.keys(":?:etag-*")
-    if keys:
-        deleted = _client.delete(*keys)
-
-    return f"Deleted {deleted} etag keys"
-
-
-@shared_task
-def update_wallet_currency(pk):
-    m = CharacterWalletJournalEntry.objects.get(pk=pk)
-    reason = m.reason
-    if not reason.endswith("ISK"):
-        reason = reason.replace(" @ $", " @ ")
-        reason = reason + " ISK"
-        m.reason = reason
-        m.save()

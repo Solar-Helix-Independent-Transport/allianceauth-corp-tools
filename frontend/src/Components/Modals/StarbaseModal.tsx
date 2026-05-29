@@ -2,7 +2,7 @@ import { DateToFields, StrToFields } from "./ModalFields";
 import { Button, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import StarbaseModalTable from "./StarbaseModalTable";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { loadStarbaseFit } from "../../api/corporation";
 import { TypeIcon } from "../EveImages/EveImages";
 import styles from "../../Pages/Glance/AtAGlance.module.css";

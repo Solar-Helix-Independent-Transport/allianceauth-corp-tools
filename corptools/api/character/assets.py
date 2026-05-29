@@ -11,7 +11,7 @@ from django.utils.translation import gettext as _
 # AA Example App
 from corptools import models
 from corptools.api import schema
-from corptools.api.helpers import get_alts_queryset, get_main_character
+from corptools.api.helpers import resolve_character
 
 
 class AssetsApiEndpoints:
@@ -26,14 +26,9 @@ class AssetsApiEndpoints:
             tags=self.tags
         )
         def get_character_asset_locations(request, character_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             asset_locs = models.CharacterAsset.objects.filter(
                 character__character__in=characters,
@@ -65,14 +60,9 @@ class AssetsApiEndpoints:
         def get_character_asset_list(request, character_id: int, location_id: int):
             expandable_cats = [2, 6]
 
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             assets = models.CharacterAsset.objects\
                 .filter((Q(blueprint_copy=None) | Q(blueprint_copy=False)),
@@ -156,14 +146,9 @@ class AssetsApiEndpoints:
             tags=self.tags
         )
         def get_character_asset_contents(request, character_id: int, item_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             assets = models.CharacterAsset.objects\
                 .filter(character__character__in=characters).select_related(
@@ -207,14 +192,9 @@ class AssetsApiEndpoints:
             tags=self.tags
         )
         def get_character_asset_groups(request, character_id: int, location_id: int):
-            if character_id == 0:
-                character_id = request.user.profile.main_character.character_id
-            response, main = get_main_character(request, character_id)
-
-            if not response:
-                return 403, _("Permission Denied")
-
-            characters = get_alts_queryset(main)
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
 
             capital_groups = [30, 547, 659, 1538, 485, 902, 513, 883, 77283]
             subcap_cat = [6]
