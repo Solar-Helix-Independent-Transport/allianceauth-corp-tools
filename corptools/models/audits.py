@@ -302,6 +302,12 @@ class CorporationAudit(models.Model):
             return None
         return datetime.datetime.fromisoformat(val)
 
+    def get_change_time(self, key: str) -> datetime.datetime | None:
+        val = self.change_timestamps.get(key)
+        if val is None:
+            return None
+        return datetime.datetime.fromisoformat(val)
+
     class Meta:
         permissions = (
             ('own_corp_manager',

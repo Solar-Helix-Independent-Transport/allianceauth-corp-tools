@@ -288,8 +288,14 @@ def get_corp_update_attributes():
     return [
         ("Assets", 'assets', "a"),
         ("Structures", 'structures', "s"),
+        ("Starbases", 'starbases', "s"),
+        ("POCOs", 'pocos', "s"),
         ("Wallet", 'wallet', "w"),
-        ("Moons Observations", 'observers', "m"),
+        ("Contracts", 'contracts', "w"),
+        ("Industry Jobs", 'industry_jobs', "w"),
+        ("Moon Observations", 'observers', "m"),
+        ("Tracking", 'tracking', "a"),
+        ("Sovereignty Hubs", 'sovereignty_hubs', "s"),
     ]
 
 

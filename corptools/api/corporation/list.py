@@ -125,6 +125,7 @@ class ListApiEndpoints:
                 for grp in app_settings.get_corp_update_attributes():
                     _updates[grp[0]] = {
                         "update": c.get_update_time(grp[1]),
+                        "change": c.get_change_time(grp[1]),
                         "chars": corp_chars[c.corporation.corporation_id][grp[2]]["c"],
                         "tokens": corp_chars[c.corporation.corporation_id][grp[2]]["t"]
                     }
