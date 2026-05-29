@@ -156,7 +156,7 @@ class TestUpdateCorp(CorptoolsTestCase):
     def test_chain_contains_all_eight_sub_tasks(self, mock_chain_cls):
         update_corp(123)
         tasks = mock_chain_cls.call_args[0][0]
-        self.assertEqual(len(tasks), 8)
+        self.assertEqual(len(tasks), 9)
 
     @patch("corptools.tasks.corporation.Chain")
     def test_force_refresh_propagated_to_chain(self, mock_chain_cls):
