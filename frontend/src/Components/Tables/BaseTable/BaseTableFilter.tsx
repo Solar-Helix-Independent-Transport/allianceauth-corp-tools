@@ -1,6 +1,7 @@
 import Styles from "./BaseTableFilter.module.css";
 import { Column, Table as ReactTable, Row } from "@tanstack/react-table";
 import { Button, Dropdown, Form, OverlayTrigger, Popover } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 const isHTML = RegExp.prototype.test.bind(/(<([^>]+)>)/i);
 
@@ -15,6 +16,7 @@ export const NameObjectArrayFilterFn = (row: Row<any>, columnId: string, filterV
 };
 
 export const NumberFilter = ({ column }: { column: Column<any, any> }) => {
+  const { t } = useTranslation();
   const columnFilterValue = column.getFilterValue();
   const fromToNumber = columnFilterValue as [string, string];
 
@@ -27,17 +29,17 @@ export const NumberFilter = ({ column }: { column: Column<any, any> }) => {
           onChange={(e) =>
             column.setFilterValue((old: [number, number]) => [e.target.value, old?.[1]])
           }
-          placeholder={`Min`}
+          placeholder={t("Min")}
           className="form-control"
         />
-        <p className="text-center">to</p>
+        <p className="text-center">{t("to")}</p>
         <input
           type="number"
           value={fromToNumber?.[1] ?? ""}
           onChange={(e) =>
             column.setFilterValue((old: [number, number]) => [old?.[0], e.target.value])
           }
-          placeholder={`Max`}
+          placeholder={t("Max")}
           className="form-control"
         />
         <Button
@@ -65,7 +67,7 @@ export const NumberFilter = ({ column }: { column: Column<any, any> }) => {
             className={Styles.searchInput}
             readOnly={true}
             type="text"
-            placeholder="Set Range"
+            placeholder={t("Set Range")}
             value={
               typeof fromToNumber?.[0] != "undefined" || typeof fromToNumber?.[1] != "undefined"
                 ? `${
@@ -112,13 +114,14 @@ export const NumberFilter = ({ column }: { column: Column<any, any> }) => {
 };
 
 export const BoolFilter = ({ column }: { column: Column<any, any> }) => {
+  const { t } = useTranslation();
   const passFail = column.getFilterValue();
 
   const popoverBool = (
     <Popover id="popover-positioned-top">
       <div className={`${Styles.radioWrapper} p-2`}>
         <Form.Check
-          label="True"
+          label={t("True")}
           name="group1"
           type="radio"
           id="radio-true"
@@ -127,7 +130,7 @@ export const BoolFilter = ({ column }: { column: Column<any, any> }) => {
           }}
         />
         <Form.Check
-          label="False"
+          label={t("False")}
           name="group1"
           type="radio"
           id="radio-false"
@@ -160,8 +163,8 @@ export const BoolFilter = ({ column }: { column: Column<any, any> }) => {
             className={Styles.searchInput}
             readOnly={true}
             type="text"
-            placeholder="Filter"
-            value={typeof passFail === "undefined" ? undefined : passFail ? "True" : "False"}
+            placeholder={t("Filter")}
+            value={typeof passFail === "undefined" ? undefined : passFail ? t("True") : t("False")}
           />
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -195,6 +198,7 @@ export const BoolFilter = ({ column }: { column: Column<any, any> }) => {
 };
 
 export const TextFilter = ({ column }: { column: Column<any, any> }) => {
+  const { t } = useTranslation();
   return (
     <form
       onReset={() => {
@@ -205,7 +209,7 @@ export const TextFilter = ({ column }: { column: Column<any, any> }) => {
         <Form.Control
           className={Styles.searchInput}
           type="text"
-          placeholder="Search"
+          placeholder={t("Search")}
           onChange={(event) => {
             column.setFilterValue(event.target.value ? event.target.value : "");
           }}
@@ -245,6 +249,7 @@ export const TextFilter = ({ column }: { column: Column<any, any> }) => {
 //   return allItems;
 // }
 export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
+  const { t } = useTranslation();
   const sortedUniqueValues = Array.from(column.getFacetedUniqueValues().keys()).sort();
   const currentFilterValue = column.getFilterValue() as string;
   const isObjectorHTML =
@@ -298,7 +303,7 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
                   }
                 })
               ) : (
-                <Dropdown.Item disabled>Start typing to search.</Dropdown.Item>
+                <Dropdown.Item disabled>{t("Start typing to search.")}</Dropdown.Item>
               )}
             </>
           </Dropdown.Menu>
@@ -315,7 +320,7 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
           <Form.Control
             className={Styles.searchInput}
             type="text"
-            placeholder="Search"
+            placeholder={t("Search")}
             value={typeof currentFilterValue === "undefined" ? undefined : currentFilterValue}
             onChange={(event) => {
               column.setFilterValue(event.target.value ? event.target.value : "");

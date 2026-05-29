@@ -1,4 +1,5 @@
 import styles from "./Loader.module.css";
+import { useTranslation } from "react-i18next";
 
 export interface LoaderProps extends Partial<HTMLElement> {
   message?: string;
@@ -9,19 +10,21 @@ export const LdsLoader = ({ className = "" }: { className?: string }) => {
   return <div className={className + " " + styles.ldsDualRing}></div>;
 };
 
-export const PanelLoader = (props: LoaderProps = { title: "Loading..." }) => {
+export const PanelLoader = (props: LoaderProps = {}) => {
+  const { t } = useTranslation();
   return (
     <div className={styles.flexContainer}>
       <div className="text-center">
         <LdsLoader />
-        <h3>{props.title && props.title}</h3>
+        <h3>{props.title ?? t("Loading...")}</h3>
         <p>{props.message && props.message}</p>
       </div>
     </div>
   );
 };
 
-export const ErrorLoader = (props: LoaderProps = { title: "Error Loading Component" }) => {
+export const ErrorLoader = (props: LoaderProps = {}) => {
+  const { t } = useTranslation();
   return (
     <div className={styles.flexContainer}>
       <div className="text-center">
@@ -38,7 +41,7 @@ export const ErrorLoader = (props: LoaderProps = { title: "Error Loading Compone
             <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
           </svg>
         </div>
-        <h3>{props.title && props.title}</h3>
+        <h3>{props.title ?? t("Error Loading Component")}</h3>
         <p>{props.message && props.message}</p>
         <p></p>
       </div>
@@ -46,7 +49,8 @@ export const ErrorLoader = (props: LoaderProps = { title: "Error Loading Compone
   );
 };
 
-export const CorpLoader = (props: LoaderProps = { title: "Select Corporation" }) => {
+export const CorpLoader = (props: LoaderProps = {}) => {
+  const { t } = useTranslation();
   return (
     <div className={styles.flexContainer}>
       <div className="text-center">
@@ -65,7 +69,7 @@ export const CorpLoader = (props: LoaderProps = { title: "Select Corporation" })
             />
           </svg>
         </div>
-        <h3>{props.title && props.title}</h3>
+        <h3>{props.title ?? t("Select Corporation")}</h3>
         <p>{props.message && props.message}</p>
       </div>
     </div>

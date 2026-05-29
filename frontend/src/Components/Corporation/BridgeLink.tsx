@@ -1,5 +1,6 @@
 import styles from "./BridgeLink.module.css";
 import { Badge, OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 function MyTooltip({ message }: any) {
   return (
@@ -10,6 +11,7 @@ function MyTooltip({ message }: any) {
 }
 
 export const BridgeLink = ({ start, end }: any) => {
+  const { t } = useTranslation();
   return (
     <div className="bridge-div d-flex col-xs-12 my-3">
       {start.system_name ? (
@@ -32,7 +34,7 @@ export const BridgeLink = ({ start, end }: any) => {
           {start.active ? (
             <></>
           ) : (
-            <OverlayTrigger placement="top" overlay={MyTooltip({ message: "Gate Offline!" })}>
+            <OverlayTrigger placement="top" overlay={MyTooltip({ message: t("Gate Offline!") })}>
               <i className="far fa-times-circle"></i>
             </OverlayTrigger>
           )}
@@ -40,7 +42,7 @@ export const BridgeLink = ({ start, end }: any) => {
       ) : (
         <>
           <div className={`${styles.start} ${styles.gateInactive}`}>
-            <h4>Unknown</h4>
+            <h4>{t("Unknown")}</h4>
           </div>
           <i className="flex-child far fa-question-circle"></i>
         </>
@@ -89,7 +91,7 @@ export const BridgeLink = ({ start, end }: any) => {
               </div>
             </>
           ) : (
-            <OverlayTrigger placement="top" overlay={MyTooltip({ message: "Gate Offline!" })}>
+            <OverlayTrigger placement="top" overlay={MyTooltip({ message: t("Gate Offline!") })}>
               <i className="far fa-times-circle"></i>
             </OverlayTrigger>
           )}
@@ -99,7 +101,7 @@ export const BridgeLink = ({ start, end }: any) => {
           <OverlayTrigger
             placement="top"
             overlay={MyTooltip({
-              message: "Gate not found in the Audit Module!",
+              message: t("Gate not found in the Audit Module!"),
             })}
           >
             <i className="align-self-center far fa-question-circle"></i>
@@ -109,7 +111,7 @@ export const BridgeLink = ({ start, end }: any) => {
             style={{ justifyContent: "center" }}
             className={`d-flex flex-column ${styles.end} ${styles.gateInactive}`}
           >
-            <h4>Unknown</h4>
+            <h4>{t("Unknown")}</h4>
           </div>
         </>
       )}

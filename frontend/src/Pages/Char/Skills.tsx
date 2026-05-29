@@ -97,7 +97,7 @@ const CharacterSkills = () => {
       groupOptions.add(skill.group);
     });
 
-    const groups = [{ value: "All", label: "All" }].concat(
+    const groups = [{ value: "All", label: t("All") }].concat(
       [...groupOptions.values()].sort().map((grp: any) => {
         return {
           value: grp,
@@ -122,9 +122,9 @@ const CharacterSkills = () => {
           <SelectFilter setFilter={setGroup} options={groups} labelText={t("Group Filter:")} />
           <TextFilter setFilterText={setFilter} labelText={t("Skill Filter:")} />
         </div>
-        <h5 className="text-center w-100">Skills Coverage (in percentage)</h5>
+        <h5 className="text-center w-100">{t("Skills Coverage (in percentage)")}</h5>
         <p className="text-center w-100 text-muted small">
-          Showing only where a character has at least 5% of a group
+          {t("Showing only where a character has at least 5% of a group")}
         </p>
         <div className="w-100" style={{ height: "600px" }}>
           <SkillsRadarGraph characterID={Number(char_id)} />

@@ -48,13 +48,13 @@ const CharacterContacts = () => {
       },
     }),
     columnHelper.accessor("standing", {
-      header: "Standing",
+      header: t("Standing"),
     }),
     columnHelper.accessor("contact.cat", {
-      header: "Type",
+      header: t("Type"),
     }),
     columnHelper.accessor("contact", {
-      header: "Links",
+      header: t("Links"),
       enableSorting: false,
       enableColumnFilter: false,
       cell: (cell) => {
@@ -131,7 +131,7 @@ const CharacterContacts = () => {
           <Form.Check // prettier-ignore
             type="switch"
             id="custom-switch"
-            label="Show NPC Contacts"
+            label={t("Show NPC Contacts")}
             onChange={(event: any) => {
               setShowNPC(event.target.checked);
             }}

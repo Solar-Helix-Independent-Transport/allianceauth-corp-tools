@@ -36,15 +36,15 @@
     ]
   },
   "index.html": {
-    "file": "assets/index-9N2faqyQ.js",
+    "file": "assets/index-x61APWvl.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
     "imports": [
       "_@bootstrap-libs-ImuiW0wy.js",
+      "_@lang-libs-Dsi3yCx2.js",
       "_@react-libs-DY9EJBm1.js",
-      "_@app-libs-DFEpFFOz.js",
-      "_@lang-libs-Dsi3yCx2.js"
+      "_@app-libs-DFEpFFOz.js"
     ],
     "css": [
       "static/corptools/bs5/static/css/index-BaaDWewh.css"

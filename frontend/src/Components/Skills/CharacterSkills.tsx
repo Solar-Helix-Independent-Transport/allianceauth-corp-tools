@@ -2,8 +2,10 @@ import ErrorBoundary from "../Helpers/ErrorBoundary";
 import { PanelLoader } from "../Loaders/loaders";
 import { SkillGroup } from "./SkillGroup";
 import Accordion from "react-bootstrap/Accordion";
+import { useTranslation } from "react-i18next";
 
 const CharSkillGroups = ({ data }: any) => {
+  const { t } = useTranslation();
   const groupByKey = (list: any, key: any) =>
     list?.reduce(
       (hash: any, obj: any) => ({
@@ -16,7 +18,7 @@ const CharSkillGroups = ({ data }: any) => {
   const skills_data = groupByKey(data, "group");
 
   if (Object.entries(skills_data).length === 0) {
-    return <PanelLoader title="Nothing Found" />;
+    return <PanelLoader title={t("Nothing Found")} />;
   }
   return (
     <ErrorBoundary>

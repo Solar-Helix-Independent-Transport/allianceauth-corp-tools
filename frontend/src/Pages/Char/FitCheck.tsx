@@ -32,12 +32,12 @@ const CharacterFitCheck = () => {
   }
   return (
     <>
-      <h5 className="text-center">Fitting to Check</h5>
+      <h5 className="text-center">{t("Fitting to Check")}</h5>
       <div className="d-flex justify-content-center align-items-center flex-column">
         <div className="w-100 mb-3" style={{ maxWidth: "650px" }}>
           <Form.Control onChange={fitUpdate} as="textarea" rows={10} />
           <Button className="w-100" onClick={fetchUpdate}>
-            Check
+            {t("Check")}
           </Button>
         </div>
       </div>
@@ -122,12 +122,12 @@ const CharacterFitCheck = () => {
         <>
           <div className="d-flex flex-wrap flex-sm-wrap flex-md-nowrap justify-content-center align-items-center">
             <div className="card text-nowrap m-1" style={{ minWidth: "350px" }}>
-              <h5 className="card-header">Required Skills</h5>
+              <h5 className="card-header">{t("Required Skills")}</h5>
               <div className="card-body w-auto">
                 <table className="w-100">
                   <thead>
-                    <th>Skill</th>
-                    <th className="text-end">Level</th>
+                    <th>{t("Skill")}</th>
+                    <th className="text-end">{t("Level")}</th>
                   </thead>
                   <tbody>
                     {data.skills?.map((sk: any) => {
@@ -145,7 +145,7 @@ const CharacterFitCheck = () => {
               </div>
             </div>
             <div className="card m-1">
-              <h5 className="card-header">Character Checks</h5>
+              <h5 className="card-header">{t("Character Checks")}</h5>
               <div className="d-flex justify-content-center align-items-center flex-wrap">
                 {Object.entries(data?.chars).map((name: any) => {
                   let reqs = name[1].doctrines?.fit ? name[1].doctrines?.fit : [];

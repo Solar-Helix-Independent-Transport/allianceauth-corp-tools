@@ -4,8 +4,10 @@ import { PanelLoader } from "../../Components/Loaders/loaders";
 import { Card } from "react-bootstrap";
 import { BridgeLink } from "../../Components/Corporation/BridgeLink";
 import { BridgeHeader } from "../../Components/Corporation/BridgeHeader";
+import { useTranslation } from "react-i18next";
 
 const Bridges = () => {
+  const { t } = useTranslation();
   const { data, isFetching } = useQuery({
     queryKey: ["bridges"],
     queryFn: () => loadBridges(),
@@ -46,7 +48,7 @@ const Bridges = () => {
   ) : isFetching ? (
     <PanelLoader />
   ) : (
-    <PanelLoader message="No Bridges Found" />
+    <PanelLoader message={t("No Bridges Found")} />
   );
 };
 

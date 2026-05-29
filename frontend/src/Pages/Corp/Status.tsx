@@ -61,27 +61,31 @@ const CorporationStatus = () => {
               <div>
                 <OverlayTrigger
                   trigger={["hover", "focus"]}
-                  overlay={<Tooltip style={{ position: "fixed" }}>Last polled from ESI</Tooltip>}
+                  overlay={
+                    <Tooltip style={{ position: "fixed" }}>{t("Last polled from ESI")}</Tooltip>
+                  }
                 >
                   <i className="fa-solid fa-arrows-rotate me-1 text-muted" />
                 </OverlayTrigger>
                 {upd.update ? (
                   <ReactTimeAgo date={Date.parse(upd.update)} />
                 ) : (
-                  <span className="text-warning">Never</span>
+                  <span className="text-warning">{t("Never")}</span>
                 )}
               </div>
               <div>
                 <OverlayTrigger
                   trigger={["hover", "focus"]}
-                  overlay={<Tooltip style={{ position: "fixed" }}>Last time data changed</Tooltip>}
+                  overlay={
+                    <Tooltip style={{ position: "fixed" }}>{t("Last time data changed")}</Tooltip>
+                  }
                 >
                   <i className="fa-solid fa-database me-1 text-muted" />
                 </OverlayTrigger>
                 {upd.change ? (
                   <ReactTimeAgo date={Date.parse(upd.change)} />
                 ) : (
-                  <span className="text-warning">Never</span>
+                  <span className="text-warning">{t("Never")}</span>
                 )}
               </div>
             </div>

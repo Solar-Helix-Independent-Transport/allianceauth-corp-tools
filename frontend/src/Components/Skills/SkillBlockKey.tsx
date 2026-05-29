@@ -5,7 +5,7 @@ export const SkillBlockKey = () => {
 
   return (
     <div className="d-flex flex-column w-100">
-      <h5 className="text-center">Key</h5>
+      <h5 className="text-center">{t("Key")}</h5>
       <div className="d-flex text-center justify-content-center">
         <div className="m-3">
           <p>{t("Trained Level")}</p>

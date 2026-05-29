@@ -2,8 +2,10 @@ import { ResponsiveRadar } from "@nivo/radar";
 import { useQuery } from "@tanstack/react-query";
 import { getCharacterSkillGraph } from "../../api/character";
 import { getCSSVariable } from "./GraphHelpers";
+import { useTranslation } from "react-i18next";
 
 export const SkillsRadarGraph = ({ characterID }: { characterID: number }) => {
+  const { t } = useTranslation();
   const { isLoading, error, data } = useQuery({
     queryKey: ["skillgraph", characterID ? Number(characterID) : 0],
     queryFn: () => getCharacterSkillGraph(characterID ? Number(characterID) : 0),
@@ -22,9 +24,9 @@ export const SkillsRadarGraph = ({ characterID }: { characterID: number }) => {
   // Keys looks likt
   // ["Name 1", "Name 2", "Name 3", ...]
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div>{t("Loading...")}</div>;
 
-  if (error) return <div>Error loading data</div>;
+  if (error) return <div>{t("Error loading data")}</div>;
 
   // const data = data
   return (
