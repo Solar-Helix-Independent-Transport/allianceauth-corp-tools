@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
-import { createColumnHelper } from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { loadStatus } from "../../api/corporation";
 import { CorporationLogo } from "../../Components/EveImages/EveImages";
@@ -18,7 +18,7 @@ const CorporationStatus = () => {
 
   const columnHelper = createColumnHelper<any>();
 
-  let columns = [
+  let columns: ColumnDef<any, any>[] = [
     columnHelper.accessor("corporation.corporation_name", {
       header: t("Corporation"),
       cell: (cell) => (

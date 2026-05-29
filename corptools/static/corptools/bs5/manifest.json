@@ -1,53 +1,53 @@
 {
-  "_@app-libs-Bd4R5cpc.js": {
-    "file": "assets/@app-libs-Bd4R5cpc.js",
+  "_@app-libs-DFEpFFOz.js": {
+    "file": "assets/@app-libs-DFEpFFOz.js",
     "name": "@app-libs",
     "imports": [
-      "_@bootstrap-libs-BRrRnLYg.js"
+      "_@bootstrap-libs-ImuiW0wy.js"
     ]
   },
-  "_@bootstrap-libs-BRrRnLYg.js": {
-    "file": "assets/@bootstrap-libs-BRrRnLYg.js",
+  "_@bootstrap-libs-ImuiW0wy.js": {
+    "file": "assets/@bootstrap-libs-ImuiW0wy.js",
     "name": "@bootstrap-libs"
   },
-  "_@lang-libs-D8pQLTii.js": {
-    "file": "assets/@lang-libs-D8pQLTii.js",
+  "_@lang-libs-Dsi3yCx2.js": {
+    "file": "assets/@lang-libs-Dsi3yCx2.js",
     "name": "@lang-libs",
     "imports": [
-      "_@bootstrap-libs-BRrRnLYg.js"
+      "_@bootstrap-libs-ImuiW0wy.js"
     ],
     "dynamicImports": [
-      "_browser-ponyfill-DaK5m3Ll.js"
+      "_browser-ponyfill-BOOJORMJ.js"
     ]
   },
-  "_@react-libs-Bcu33oml.js": {
-    "file": "assets/@react-libs-Bcu33oml.js",
+  "_@react-libs-DY9EJBm1.js": {
+    "file": "assets/@react-libs-DY9EJBm1.js",
     "name": "@react-libs",
     "imports": [
-      "_@bootstrap-libs-BRrRnLYg.js"
+      "_@bootstrap-libs-ImuiW0wy.js"
     ]
   },
-  "_browser-ponyfill-DaK5m3Ll.js": {
-    "file": "assets/browser-ponyfill-DaK5m3Ll.js",
+  "_browser-ponyfill-BOOJORMJ.js": {
+    "file": "assets/browser-ponyfill-BOOJORMJ.js",
     "name": "browser-ponyfill",
     "isDynamicEntry": true,
     "imports": [
-      "_@bootstrap-libs-BRrRnLYg.js"
+      "_@bootstrap-libs-ImuiW0wy.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-tdYKT-0T.js",
+    "file": "assets/index-50ua6F-5.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@bootstrap-libs-BRrRnLYg.js",
-      "_@react-libs-Bcu33oml.js",
-      "_@app-libs-Bd4R5cpc.js",
-      "_@lang-libs-D8pQLTii.js"
+      "_@bootstrap-libs-ImuiW0wy.js",
+      "_@react-libs-DY9EJBm1.js",
+      "_@app-libs-DFEpFFOz.js",
+      "_@lang-libs-Dsi3yCx2.js"
     ],
     "css": [
-      "static/corptools/bs5/static/css/index-JUOPiVMy.css"
+      "static/corptools/bs5/static/css/index-BaaDWewh.css"
     ],
     "assets": [
       "static/corptools/bs5/static/img/omega_128-B8POqXI6.png",
@@ -80,11 +80,11 @@
       "static/corptools/bs5/static/img/6m-DKVPLsUc.png",
       "static/corptools/bs5/static/img/7m-BLe6olY4.png",
       "static/corptools/bs5/static/img/8m-hxd_N3hx.png",
-      "static/corptools/bs5/static/img/8l-UbnNMK0o.png",
-      "static/corptools/bs5/static/img/7l-Dql_h1Xo.png",
-      "static/corptools/bs5/static/img/6l-Ciemt68W.png",
-      "static/corptools/bs5/static/img/5l-DtBLoe7X.png",
       "static/corptools/bs5/static/img/4l-BsWsNOjS.png",
+      "static/corptools/bs5/static/img/5l-DtBLoe7X.png",
+      "static/corptools/bs5/static/img/6l-Ciemt68W.png",
+      "static/corptools/bs5/static/img/7l-Dql_h1Xo.png",
+      "static/corptools/bs5/static/img/8l-UbnNMK0o.png",
       "static/corptools/bs5/static/img/3r-BEm9rD6Q.png",
       "static/corptools/bs5/static/img/1s-3LB3dveW.png",
       "static/corptools/bs5/static/img/2s-DLD5F1oU.png",
