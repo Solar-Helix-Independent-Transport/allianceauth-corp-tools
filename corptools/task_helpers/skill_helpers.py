@@ -31,12 +31,13 @@ class SkillListCache():
 
     def get_and_cache_users(self, users):
         from ..models import SkillList  # TODO fix the recursive import
+        from ..tasks.character.skills import cache_user_skill_list
 
         linked_characters = CharacterOwnership.objects.filter(user__in=users).values(
             'user_id', 'character__character_name', 'character__character_id')
         skill_lists = SkillList.objects.all().order_by('order_weight', 'name')
         skill_list_hash = self._get_skill_list_hash(
-            skill_lists.values_list('name'))
+            skill_lists.values_list('name', flat=True))
         cached_header = cache.get(SKILL_CACHE_HEADERS_KEY, False)
         skill_lists_up_to_date = cached_header == skill_list_hash
 
@@ -48,20 +49,23 @@ class SkillListCache():
                 u['character__character_id'])
 
         for u, c in user_chars.items():
-            if skill_lists_up_to_date:
-                cache_key = self._build_account_cache_key(c['chars'])
-                cached_skills = cache.get(cache_key, False)
+            cache_key = self._build_account_cache_key(c['chars'])
+            cached_skills = cache.get(cache_key, False)
 
-                if cached_skills is not False:  # check if cached at all?
-                    cached_skills = json.loads(cached_skills)
-                    if cached_skills.get("doctrines", False) != skill_list_hash:
-                        c['data'] = self.get_and_cache_user(u)
-                    else:
-                        c['data'] = cached_skills
-                else:
-                    c['data'] = self.get_and_cache_user(u)
+            if cached_skills is not False:
+                cached_skills = json.loads(cached_skills)
+                c['data'] = cached_skills
+                if not skill_lists_up_to_date or cached_skills.get("doctrines", False) != skill_list_hash:
+                    cache_user_skill_list.apply_async(
+                        kwargs={"user_id": u, "force_refresh": True},
+                        priority=9
+                    )
             else:
-                c['data'] = self.get_and_cache_user(u)
+                c['data'] = self.get_and_cache_user(
+                    u,
+                    skill_lists=skill_lists,
+                    skill_list_hash=skill_list_hash,
+                )
 
         return user_chars
 
@@ -103,9 +107,26 @@ class SkillListCache():
             if skill.alpha:
                 skill_tables[char]["omega"] = False
 
-        all_skill_sp = {}
+        # Gather all skill names across every list in one pass, then bulk-fetch
+        # TypeDogma values with a single query instead of one per skill.
+        skill_list_skills = {}
+        all_skill_names = set()
         for skl in skill_lists:
             _s = skl.get_skills()
+            skill_list_skills[skl.name] = _s
+            if _s:
+                all_skill_names.update(_s.keys())
+
+        dogma_map = dict(
+            TypeDogma.objects.filter(
+                item_type__name__in=all_skill_names,
+                dogma_attribute_id=275
+            ).select_related("item_type").values_list("item_type__name", "value")
+        ) if all_skill_names else {}
+
+        all_skill_sp = {}
+        for skl in skill_lists:
+            _s = skill_list_skills[skl.name]
             if _s:
                 if skl.name not in all_skill_sp:
                     all_skill_sp[skl.name] = {}
@@ -113,10 +134,8 @@ class SkillListCache():
                 try:
                     for _sk_n, _sk_l in _s.items():
                         all_skill_sp[skl.name][_sk_n] = int(
-                            250 * TypeDogma.objects.get(
-                                item_type__name=_sk_n,
-                                dogma_attribute_id=275
-                            ).value * math.sqrt(32) ** (int(_sk_l) - 1)
+                            250 * dogma_map[_sk_n] *
+                            math.sqrt(32) ** (int(_sk_l) - 1)
                         )
                 except Exception as e:
                     print(e)
@@ -150,8 +169,14 @@ class SkillListCache():
         # Join them all and ship it.
         return skill_tables
 
-    def get_and_cache_user(self, user_id, force_rebuild=False):
+    def get_and_cache_user(self, user_id, skill_lists=None, skill_list_hash=None, force_rebuild=False):
         from ..models import SkillList  # TODO fix the recursive import
+
+        if skill_lists is None:
+            skill_lists = SkillList.objects.all().order_by('order_weight', 'name')
+            skill_list_hash = self._get_skill_list_hash(
+                skill_lists.values_list('name', flat=True)
+            )
 
         linked_characters = User.objects.get(
             id=user_id
@@ -159,12 +184,6 @@ class SkillListCache():
         ).values_list(
             'character__character_id',
             flat=True
-        )
-
-        skill_lists = SkillList.objects.all().order_by('order_weight', 'name')
-
-        skill_list_hash = self._get_skill_list_hash(
-            skill_lists.values_list('name')
         )
 
         account_key = self._build_account_cache_key(linked_characters)

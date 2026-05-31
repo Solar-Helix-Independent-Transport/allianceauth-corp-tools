@@ -581,40 +581,33 @@ class Skillfilter(FilterBase):
     def process_filter(self, user: User):
         try:  # avatar 11567
             skills_list = providers.skills.get_and_cache_user(user.id)
-            skill_lists = self.required_skill_lists.all()
-            req_one = self.single_req_skill_lists.all()
-            if skill_lists.count() == 0 and req_one.count() == 0:
+            skill_lists = list(self.required_skill_lists.all())
+            req_one = list(self.single_req_skill_lists.all())
+            req_one_count = len(req_one)
+            if len(skill_lists) == 0 and req_one_count == 0:
                 return False
 
-            skill_list_base = {}
-            for skl in skill_lists:
-                skill_list_base[skl.name] = {}
-                skill_list_base[skl.name]['pass'] = False
-
-            if req_one.count() > 0:
-                skill_list_single = {}
-                for skl in req_one:
-                    skill_list_single[skl.name] = {}
-                    skill_list_single[skl.name]['pass'] = False
+            skill_list_base = {skl.name: {'pass': False}
+                               for skl in skill_lists}
+            skill_list_single = {skl.name: {'pass': False} for skl in req_one}
 
             skill_tables = skills_list.get("skills_list")
 
             for char in skill_tables:
-                for d_name, d_list in skill_list_base.items():
+                for d_name in skill_list_base:
                     if len(skill_tables[char]["doctrines"][d_name]) == 1:
                         skill_list_base[d_name]['pass'] = True
-            if req_one.count() > 0:
-                single_pass = False
+
+            single_pass = False
+            if req_one_count > 0:
                 for char in skill_tables:
-                    for d_name, d_list in skill_list_single.items():
+                    for d_name in skill_list_single:
                         if len(skill_tables[char]["doctrines"][d_name]) == 1:
                             single_pass = True
                             break
 
-            result = True
-            for skill_list, skills_result in skill_list_base.items():
-                result = result and skills_result['pass']
-            if req_one.count() > 0:
+            result = all(s['pass'] for s in skill_list_base.values())
+            if req_one_count > 0:
                 return result and single_pass
             else:
                 return result
@@ -625,56 +618,47 @@ class Skillfilter(FilterBase):
 
     def audit_filter(self, users):
         output = defaultdict(lambda: {"message": "No Data", "check": False})
+
+        skill_lists = list(self.required_skill_lists.all())
+        req_one = list(self.single_req_skill_lists.all())
+        req_one_count = len(req_one)
+        if len(skill_lists) == 0 and req_one_count == 0:
+            return False
+
         accounts = providers.skills.get_and_cache_users(users)
-        print(accounts)
         for uid, u in accounts.items():
             message = []
-            skill_lists = self.required_skill_lists.all()
-            req_one = self.single_req_skill_lists.all()
-            if skill_lists.count() == 0 and req_one.count() == 0:
-                return False
-
-            skill_list_base = {}
-            for skl in skill_lists:
-                skill_list_base[skl.name] = {}
-                skill_list_base[skl.name]['pass'] = False
-
-            if req_one.count() > 0:
-                skill_list_single = {}
-                for skl in req_one:
-                    skill_list_single[skl.name] = {}
-                    skill_list_single[skl.name]['pass'] = False
+            skill_list_base = {skl.name: {'pass': False}
+                               for skl in skill_lists}
+            skill_list_single = {skl.name: {'pass': False} for skl in req_one}
 
             try:
                 skill_tables = u['data'].get("skills_list")
 
                 for char in skill_tables:
-                    for d_name, d_list in skill_list_base.items():
+                    for d_name in skill_list_base:
                         if len(skill_tables[char]["doctrines"][d_name]) == 1:
                             skill_list_base[d_name]['pass'] = True
                             message.append(f"{char}: {d_name}")
 
-                if req_one.count() > 0:
-                    single_pass = False
+                single_pass = False
+                if req_one_count > 0:
                     for char in skill_tables:
-                        for d_name, d_list in skill_list_single.items():
+                        for d_name in skill_list_single:
                             if len(skill_tables[char]["doctrines"][d_name]) == 1:
                                 single_pass = True
                                 message.append(f"{char}: {d_name}")
                                 break
 
-                result = True
-                for skill_list, skills_result in skill_list_base.items():
-                    result = result and skills_result['pass']
+                result = all(s['pass'] for s in skill_list_base.values())
                 _msg = "<br>".join(message)
                 if self.count_message_only:
                     _msg = len(message)
-                if req_one.count() > 0:
-                    output[uid] = {'check': result and single_pass,
-                                   'message': _msg}
+                if req_one_count > 0:
+                    output[uid] = {
+                        'check': result and single_pass, 'message': _msg}
                 else:
-                    output[uid] = {'check': result,
-                                   'message': _msg}
+                    output[uid] = {'check': result, 'message': _msg}
             except KeyError:
                 pass
 
