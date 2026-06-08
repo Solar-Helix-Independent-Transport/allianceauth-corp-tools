@@ -137,11 +137,11 @@ class HighestSPFilter(FilterBase):
             return False
 
     def audit_filter(self, users):
-        co = CharacterOwnership.objects.filter(
-            user__in=users).select_related('user', 'character')
+        co = CharacterOwnership.objects.filter(user__in=users)
         chars = {}
         all_sp = SkillTotals.objects.filter(
-            character__character__in=co.values_list('character'))
+            character__character__in=co.values_list('character')
+        ).select_related('character__character__character_ownership__user')
     # total_sp = models.BigIntegerField()
     # unallocated_sp = models.IntegerField(null=True, default=None)
 
@@ -319,25 +319,26 @@ class AssetsFilter(FilterBase):
     )
 
     def filter_query(self, users):
-        character_list = CharacterOwnership.objects.filter(user__in=users) \
-            .select_related('character', 'character__characteraudit')
-        cnt_types = self.types.all().count()
-        cnt_groups = self.groups.all().count()
-        cnt_cats = self.categories.all().count()
+        character_list = CharacterOwnership.objects.filter(user__in=users)
+        types = list(self.types.all())
+        groups = list(self.groups.all())
+        categories = list(self.categories.all())
+        systems = list(self.systems.all())
+        constellations = list(self.constellations.all())
+        regions = list(self.regions.all())
 
         character_count = CharacterAsset.objects.filter(
             character__character__in=character_list.values_list('character'))
         output = []
 
-        if cnt_types > 0:
-            output.append(models.Q(type_name__in=self.types.all()))
+        if types:
+            output.append(models.Q(type_name__in=types))
 
-        if cnt_groups > 0:
-            output.append(models.Q(type_name__group__in=self.groups.all()))
+        if groups:
+            output.append(models.Q(type_name__group__in=groups))
 
-        if cnt_cats > 0:
-            output.append(
-                models.Q(type_name__group__category__in=self.categories.all()))
+        if categories:
+            output.append(models.Q(type_name__group__category__in=categories))
 
         if len(output) == 0:
             return False
@@ -349,21 +350,20 @@ class AssetsFilter(FilterBase):
 
         output = []
 
-        if self.systems.all().count() > 0:
+        if systems:
+            system_ids = [s.id for s in systems]
+            output.append(models.Q(location_name__system__in=systems))
+            output.append(models.Q(location_id__in=system_ids))
+        if constellations:
             output.append(
-                models.Q(location_name__system__in=self.systems.all()))
-            output.append(models.Q(
-                location_id__in=self.systems.all().values_list('id', flat=True)))
-        if self.constellations.all().count() > 0:
-            output.append(
-                models.Q(location_name__system__constellation__in=self.constellations.all()))
+                models.Q(location_name__system__constellation__in=constellations))
             output.append(models.Q(location_id__in=SolarSystem.objects.filter(
-                constellation__in=self.constellations.all()).values_list('id', flat=True)))
-        if self.regions.all().count() > 0:
+                constellation__in=constellations).values_list('id', flat=True)))
+        if regions:
             output.append(
-                models.Q(location_name__system__constellation__region__in=self.regions.all()))
+                models.Q(location_name__system__constellation__region__in=regions))
             output.append(models.Q(location_id__in=SolarSystem.objects.filter(
-                constellation__region__in=self.regions.all()).values_list('id', flat=True)))
+                constellation__region__in=regions).values_list('id', flat=True)))
 
         if len(output) > 0:
             query = output.pop()
@@ -449,20 +449,22 @@ class CurrentShipFilter(FilterBase):
     )
 
     def filter_query(self, users):
-        character_list = CharacterOwnership.objects.filter(user__in=users) \
-            .select_related('character', "character__characteraudit")
-        cnt_types = self.types.all().count()
-        cnt_groups = self.groups.all().count()
+        character_list = CharacterOwnership.objects.filter(user__in=users)
+        types = list(self.types.all())
+        groups = list(self.groups.all())
+        systems = list(self.systems.all())
+        constellations = list(self.constellations.all())
+        regions = list(self.regions.all())
 
         character_count = CharacterLocation.objects.filter(
             character__character__in=character_list.values_list('character'))
         output = []
 
-        if cnt_types > 0:
-            output.append(models.Q(current_ship__in=self.types.all()))
+        if types:
+            output.append(models.Q(current_ship__in=types))
 
-        if cnt_groups > 0:
-            output.append(models.Q(current_ship__group__in=self.groups.all()))
+        if groups:
+            output.append(models.Q(current_ship__group__in=groups))
 
         if len(output) == 0:
             return False
@@ -474,44 +476,27 @@ class CurrentShipFilter(FilterBase):
 
         output = []
 
-        if self.systems.all().count() > 0:
+        if systems:
+            system_ids = [s.id for s in systems]
+            output.append(models.Q(current_location__system__in=systems))
             output.append(
-                models.Q(
-                    current_location__system__in=self.systems.all()
-                )
-            )
+                models.Q(current_location__location_id__in=system_ids))
+        if constellations:
             output.append(
-                models.Q(
-                    current_location__location_id__in=self.systems.all(
-                    ).values_list('id', flat=True)
-                )
-            )
-        if self.constellations.all().count() > 0:
+                models.Q(current_location__system__constellation__in=constellations))
+            output.append(models.Q(
+                current_location__location_id__in=SolarSystem.objects.filter(
+                    constellation__in=constellations
+                ).values_list('id', flat=True)
+            ))
+        if regions:
             output.append(
-                models.Q(
-                    current_location__system__constellation__in=self.constellations.all()
-                )
-            )
-            output.append(
-                models.Q(
-                    current_location__location_id__in=SolarSystem.objects.filter(
-                        constellation__in=self.constellations.all()
-                    ).values_list('id', flat=True)
-                )
-            )
-        if self.regions.all().count() > 0:
-            output.append(
-                models.Q(
-                    current_location__system__constellation__region__in=self.regions.all()
-                )
-            )
-            output.append(
-                models.Q(
-                    current_location__location_id__in=SolarSystem.objects.filter(
-                        constellation__region__in=self.regions.all()
-                    ).values_list('id', flat=True)
-                )
-            )
+                models.Q(current_location__system__constellation__region__in=regions))
+            output.append(models.Q(
+                current_location__location_id__in=SolarSystem.objects.filter(
+                    constellation__region__in=regions
+                ).values_list('id', flat=True)
+            ))
 
         if len(output) > 0:
             query = output.pop()
@@ -627,23 +612,18 @@ class Skillfilter(FilterBase):
         output = defaultdict(lambda: {"message": "No Data", "check": False})
         accounts = providers.skills.get_and_cache_users(users)
         print(accounts)
+
+        skill_lists = list(self.required_skill_lists.all())
+        req_one = list(self.single_req_skill_lists.all())
+        if not skill_lists and not req_one:
+            return False
+
         for uid, u in accounts.items():
             message = []
-            skill_lists = self.required_skill_lists.all()
-            req_one = self.single_req_skill_lists.all()
-            if skill_lists.count() == 0 and req_one.count() == 0:
-                return False
 
-            skill_list_base = {}
-            for skl in skill_lists:
-                skill_list_base[skl.name] = {}
-                skill_list_base[skl.name]['pass'] = False
-
-            if req_one.count() > 0:
-                skill_list_single = {}
-                for skl in req_one:
-                    skill_list_single[skl.name] = {}
-                    skill_list_single[skl.name]['pass'] = False
+            skill_list_base = {skl.name: {'pass': False}
+                               for skl in skill_lists}
+            skill_list_single = {skl.name: {'pass': False} for skl in req_one}
 
             try:
                 skill_tables = u['data'].get("skills_list")
@@ -654,10 +634,10 @@ class Skillfilter(FilterBase):
                             skill_list_base[d_name]['pass'] = True
                             message.append(f"{char}: {d_name}")
 
-                if req_one.count() > 0:
-                    single_pass = False
+                single_pass = False
+                if req_one:
                     for char in skill_tables:
-                        for d_name, d_list in skill_list_single.items():
+                        for d_name in skill_list_single:
                             if len(skill_tables[char]["doctrines"][d_name]) == 1:
                                 single_pass = True
                                 message.append(f"{char}: {d_name}")
@@ -669,12 +649,11 @@ class Skillfilter(FilterBase):
                 _msg = "<br>".join(message)
                 if self.count_message_only:
                     _msg = len(message)
-                if req_one.count() > 0:
-                    output[uid] = {'check': result and single_pass,
-                                   'message': _msg}
+                if req_one:
+                    output[uid] = {
+                        'check': result and single_pass, 'message': _msg}
                 else:
-                    output[uid] = {'check': result,
-                                   'message': _msg}
+                    output[uid] = {'check': result, 'message': _msg}
             except KeyError:
                 pass
 
@@ -772,7 +751,7 @@ class Rolefilter(FilterBase):
         for q in queries:
             query |= q
 
-        co = co.filter(query)
+        co = co.filter(query).select_related('user', 'character')
 
         chars = {}
         for c in co:
@@ -815,8 +794,10 @@ class Titlefilter(FilterBase):
             return False
 
     def audit_filter(self, users):
-        co = CharacterOwnership.objects.filter(user__in=users,
-                                               character__characteraudit__characterroles__titles__in=[self.titles])
+        co = CharacterOwnership.objects.filter(
+            user__in=users,
+            character__characteraudit__characterroles__titles__in=[self.titles]
+        ).select_related('user', 'character')
 
         chars = {}
         for c in co:
@@ -915,18 +896,21 @@ class HomeStationFilter(FilterBase):
     )
 
     def filter_query(self, users):
-        character_list = CharacterOwnership.objects.filter(
-            user__in=users).select_related('character', "character__characteraudit")
+        character_list = CharacterOwnership.objects.filter(user__in=users)
+        evelocation = list(self.evelocation.all())
 
         character_count = Clone.objects.filter(
             character__character__in=character_list.values_list('character'))
 
         output = []
 
-        if self.evelocation.all().count() > 0:
-            output.append(models.Q(location_name__in=self.evelocation.all()))
-            output.append(models.Q(
-                location_id__in=self.evelocation.all().values_list('location_id', flat=True)))
+        if evelocation:
+            output.append(models.Q(location_name__in=evelocation))
+            output.append(
+                models.Q(
+                    location_id__in=[el.location_id for el in evelocation]
+                )
+            )
 
         if len(output) > 0:
             query = output.pop()
@@ -947,15 +931,24 @@ class HomeStationFilter(FilterBase):
             return False
 
     def audit_filter(self, users):
-        co = self.filter_query(users).values("character__character__character_ownership__user",
-                                             "character__character__character_name", "location_id")
+        co = list(
+            self.filter_query(users).values(
+                "character__character__character_ownership__user",
+                "character__character__character_name", "location_id"
+            )
+        )
+        location_ids = {c['location_id'] for c in co}
+        eve_locations = {
+            el.location_id: el.location_name
+            for el in EveLocation.objects.filter(location_id__in=location_ids)
+        }
         chars = defaultdict(dict)
         for c in co:
             uid = c["character__character__character_ownership__user"]
             char_name = c["character__character__character_name"]
-            # This might be able to be optimized during the query. But theres no FK to work with?
-            clone_location = EveLocation.objects.get(
-                location_id=c['location_id']).location_name
+            # No FK between Clone.location_id and EveLocation, so we prefetch manually above
+            clone_location = eve_locations.get(
+                c['location_id'], str(c['location_id']))
             if char_name not in chars[uid]:
                 chars[uid][char_name] = []
             chars[uid][char_name].append(clone_location)
@@ -985,18 +978,21 @@ class JumpCloneFilter(FilterBase):
         EveLocation, blank=True, help_text="Limit filter to specific Structures")
 
     def filter_query(self, users):
-        character_list = CharacterOwnership.objects.filter(
-            user__in=users).select_related('character', "character__characteraudit")
+        character_list = CharacterOwnership.objects.filter(user__in=users)
+        evelocation = list(self.evelocation.all())
 
         character_count = JumpClone.objects.filter(
             character__character__in=character_list.values_list('character'))
 
         output = []
 
-        if self.evelocation.all().count() > 0:
-            output.append(models.Q(location_name__in=self.evelocation.all()))
-            output.append(models.Q(
-                location_id__in=self.evelocation.all().values_list('location_id', flat=True)))
+        if evelocation:
+            output.append(models.Q(location_name__in=evelocation))
+            output.append(
+                models.Q(
+                    location_id__in=[el.location_id for el in evelocation]
+                )
+            )
 
         if len(output) > 0:
             query = output.pop()
@@ -1017,15 +1013,24 @@ class JumpCloneFilter(FilterBase):
             return False
 
     def audit_filter(self, users):
-        co = self.filter_query(users).values("character__character__character_ownership__user",
-                                             "character__character__character_name", "location_id")
+        co = list(
+            self.filter_query(users).values(
+                "character__character__character_ownership__user",
+                "character__character__character_name", "location_id"
+            )
+        )
+        location_ids = {c['location_id'] for c in co}
+        eve_locations = {
+            el.location_id: el.location_name
+            for el in EveLocation.objects.filter(location_id__in=location_ids)
+        }
         chars = defaultdict(dict)
         for c in co:
             uid = c["character__character__character_ownership__user"]
             char_name = c["character__character__character_name"]
-            # This might be able to be optimized during the query. But theres no FK to work with?
-            clone_location = EveLocation.objects.get(
-                location_id=c['location_id']).location_name
+            # No FK between JumpClone.location_id and EveLocation, so we prefetch manually above
+            clone_location = eve_locations.get(
+                c['location_id'], str(c['location_id']))
             if char_name not in chars[uid]:
                 chars[uid][char_name] = []
             chars[uid][char_name].append(clone_location)
@@ -1078,7 +1083,8 @@ class CharacterAgeFilter(FilterBase):
         logic = self.reversed_logic
         co = users.annotate(
             min_timestamp=Min(
-                'profile__main_character__characteraudit__corporationhistory__start_date')
+                'profile__main_character__characteraudit__corporationhistory__start_date'
+            )
         ).values("id", "min_timestamp")
 
         chars = defaultdict(lambda: {})
