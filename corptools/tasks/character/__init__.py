@@ -73,7 +73,7 @@ def update_all_characters(force_refresh=False, now=False):
 @shared_task(bind=True, base=QueueOnce, name="corptools.tasks.update_subset_of_characters")
 def update_subset_of_characters(self, subset=48, min_runs=15, force=False):
     amount_of_updates = max(
-        CharacterAudit.objects.all().count() / subset, min_runs)
+        CharacterAudit.objects.all().count() // subset, min_runs)
     characters = CharacterAudit.get_oldest_qs()[:amount_of_updates]
     for char in characters:
         update_character.apply_async(

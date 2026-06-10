@@ -63,6 +63,113 @@ class TestUpdateAllCharacters(CorptoolsTestCase):
             self.assertTrue(call_kwargs["kwargs"]["force_refresh"])
 
 
+class TestGetOldestQs(CorptoolsTestCase):
+    def test_excludes_characters_without_ownership(self):
+        result = CharacterAudit.get_oldest_qs()
+        pks = {ca.pk for ca in result}
+        self.assertNotIn(self.ca8.pk, pks)
+
+    def test_characters_with_ownership_are_included(self):
+        result = CharacterAudit.get_oldest_qs()
+        pks = {ca.pk for ca in result}
+        self.assertIn(self.ca1.pk, pks)
+        self.assertIn(self.ca2.pk, pks)
+
+    def test_no_timestamps_included_and_sorted_first(self):
+        recent = timezone.now().isoformat()
+        self.ca1.update_timestamps = {}
+        self.ca1.save()
+        self.ca2.update_timestamps = {"wallet": recent, "skills": recent}
+        self.ca2.save()
+
+        result = CharacterAudit.get_oldest_qs()
+        pks = [ca.pk for ca in result]
+        self.assertIn(self.ca1.pk, pks)
+        self.assertLess(pks.index(self.ca1.pk), pks.index(self.ca2.pk))
+
+    def test_orders_older_average_first(self):
+        old = (timezone.now() - datetime.timedelta(days=5)).isoformat()
+        recent = (timezone.now() - datetime.timedelta(hours=1)).isoformat()
+        self.ca1.update_timestamps = {"wallet": old, "skills": old}
+        self.ca1.save()
+        self.ca2.update_timestamps = {"wallet": recent, "skills": recent}
+        self.ca2.save()
+
+        result = CharacterAudit.get_oldest_qs()
+        pks = [ca.pk for ca in result]
+        self.assertLess(pks.index(self.ca1.pk), pks.index(self.ca2.pk))
+
+    def test_excludes_characters_beyond_time_window(self):
+        # CT_CHAR_MAX_INACTIVE_DAYS=3 → window is now - 9 days
+        too_old = (timezone.now() - datetime.timedelta(days=15)).isoformat()
+        self.ca1.update_timestamps = {"wallet": too_old, "skills": too_old}
+        self.ca1.save()
+
+        result = CharacterAudit.get_oldest_qs()
+        pks = {ca.pk for ca in result}
+        self.assertNotIn(self.ca1.pk, pks)
+
+    def test_characters_within_time_window_are_included(self):
+        recent = (timezone.now() - datetime.timedelta(days=5)).isoformat()
+        self.ca1.update_timestamps = {"wallet": recent}
+        self.ca1.save()
+
+        result = CharacterAudit.get_oldest_qs()
+        pks = {ca.pk for ca in result}
+        self.assertIn(self.ca1.pk, pks)
+
+    def test_config_disabled_module_keys_excluded_from_average(self):
+        config = CorptoolsConfiguration.get_solo()
+        config.disable_update_skills = True
+        config.save()
+
+        old = (timezone.now() - datetime.timedelta(days=5)).isoformat()
+        recent = (timezone.now() - datetime.timedelta(hours=1)).isoformat()
+        # ca1 only has skills timestamps (disabled) → no active keys → sorts first
+        self.ca1.update_timestamps = {"skills": old, "skill_que": old}
+        self.ca1.save()
+        self.ca2.update_timestamps = {"wallet": recent}
+        self.ca2.save()
+
+        result = CharacterAudit.get_oldest_qs()
+        pks = [ca.pk for ca in result]
+        self.assertLess(pks.index(self.ca1.pk), pks.index(self.ca2.pk))
+
+    def test_ignored_module_keys_excluded_from_average(self):
+        with patch("corptools.models.audits.app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE", True):
+            old = (timezone.now() - datetime.timedelta(days=5)).isoformat()
+            recent = (timezone.now() - datetime.timedelta(hours=1)).isoformat()
+            self.ca1.update_timestamps = {"skills": old, "skill_que": old}
+            self.ca1.save()
+            self.ca2.update_timestamps = {"wallet": recent}
+            self.ca2.save()
+
+            result = CharacterAudit.get_oldest_qs()
+            pks = [ca.pk for ca in result]
+            self.assertLess(pks.index(self.ca1.pk), pks.index(self.ca2.pk))
+
+    def test_mixed_timestamps_average_determines_order(self):
+        # ca1: one old, one recent → avg is middling
+        # ca2: both recent → avg is very recent
+        # ca3: both old → avg is oldest → sorts first
+        old = (timezone.now() - datetime.timedelta(days=7)).isoformat()
+        mid = (timezone.now() - datetime.timedelta(days=4)).isoformat()
+        recent = (timezone.now() - datetime.timedelta(hours=1)).isoformat()
+
+        self.ca1.update_timestamps = {"wallet": old, "skills": recent}
+        self.ca1.save()
+        self.ca2.update_timestamps = {"wallet": recent, "skills": recent}
+        self.ca2.save()
+        self.ca3.update_timestamps = {"wallet": old, "skills": mid}
+        self.ca3.save()
+
+        result = CharacterAudit.get_oldest_qs()
+        pks = [ca.pk for ca in result]
+        # ca3 avg ≈ 5.5 days ago, ca1 avg ≈ 3.5 days ago, ca2 avg ≈ now
+        self.assertLess(pks.index(self.ca3.pk), pks.index(self.ca1.pk))
+        self.assertLess(pks.index(self.ca1.pk), pks.index(self.ca2.pk))
+
+
 class TestUpdateSubsetOfCharacters(CorptoolsTestCase):
     @patch("corptools.tasks.character.process_corp_histories")
     @patch("corptools.tasks.character.update_character")
@@ -71,6 +178,17 @@ class TestUpdateSubsetOfCharacters(CorptoolsTestCase):
         self.assertGreater(mock_task.apply_async.call_count, 0)
         mock_corps.apply_async.assert_called_once_with(priority=6)
         self.assertIn("Queued", result)
+
+    @patch("corptools.tasks.character.process_corp_histories")
+    @patch("corptools.tasks.character.update_character")
+    @patch("corptools.tasks.character.CharacterAudit.get_oldest_qs")
+    @patch("corptools.tasks.character.CharacterAudit.objects")
+    def test_slice_is_integer_when_count_exceeds_min_runs(self, mock_objects, mock_qs, mock_task, mock_corps):
+        mock_objects.all.return_value.count.return_value = 1000
+        mock_qs.return_value.__getitem__ = MagicMock(return_value=[])
+        update_subset_of_characters(subset=48, min_runs=15)
+        slice_arg = mock_qs.return_value.__getitem__.call_args[0][0]
+        self.assertIsInstance(slice_arg.stop, int)
 
 
 class TestReQueCorpHistories(TestCase):

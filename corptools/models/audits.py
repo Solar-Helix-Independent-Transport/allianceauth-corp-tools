@@ -278,9 +278,67 @@ class CharacterAudit(models.Model):
 
     @classmethod
     def get_oldest_qs(cls):
-        return cls.objects.filter(
+        time_ref = timezone.now() - datetime.timedelta(
+            days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS * 3
+        )
+        ct_conf = CorptoolsConfiguration.get_solo()
+
+        keys = []
+        if app_settings.CT_CHAR_ASSETS_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE or ct_conf.disable_update_assets
+        ):
+            keys.append('assets')
+        if app_settings.CT_CHAR_CLONES_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE or ct_conf.disable_update_clones
+        ):
+            keys.append('clones')
+        if app_settings.CT_CHAR_SKILLS_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE or ct_conf.disable_update_skills
+        ):
+            keys.extend(['skills', 'skill_que'])
+        if app_settings.CT_CHAR_WALLET_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE or ct_conf.disable_update_wallet
+        ):
+            keys.extend(['wallet', 'orders'])
+        if app_settings.CT_CHAR_NOTIFICATIONS_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_NOTIFICATIONS_MODULE or ct_conf.disable_update_notif
+        ):
+            keys.append('notif')
+        if app_settings.CT_CHAR_ROLES_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE or ct_conf.disable_update_roles
+        ):
+            keys.append('roles')
+        if app_settings.CT_CHAR_MAIL_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE or ct_conf.disable_update_mails
+        ):
+            keys.append('mails')
+        if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE or ct_conf.disable_update_loyaltypoints
+        ):
+            keys.append('loyaltypoints')
+        if app_settings.CT_CHAR_MINING_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE or ct_conf.disable_update_mining
+        ):
+            keys.append('mining')
+
+        time_ref_epoch = time_ref.timestamp()
+
+        def avg_epoch(ca):
+            vals = [ca.update_timestamps[k]
+                    for k in keys if ca.update_timestamps.get(k)]
+            if not vals:
+                return 0.0
+            return sum(datetime.datetime.fromisoformat(v).timestamp() for v in vals) / len(vals)
+
+        qs = cls.objects.filter(
             character__character_ownership__isnull=False,
-        ).order_by('update_timestamps__pub_data')
+        ).select_related('character')
+
+        return sorted(
+            (ca for ca in qs if avg_epoch(ca) >= time_ref_epoch or not any(
+                ca.update_timestamps.get(k) for k in keys)),
+            key=avg_epoch,
+        )
 
 
 class CorporationAudit(models.Model):
