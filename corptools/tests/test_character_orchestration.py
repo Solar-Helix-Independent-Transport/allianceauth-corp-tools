@@ -119,6 +119,7 @@ class TestGetOldestQs(CorptoolsTestCase):
         self.assertIn(self.ca1.pk, pks)
 
     def test_config_disabled_module_keys_excluded_from_average(self):
+        self.addCleanup(CorptoolsConfiguration.clear_cache)
         config = CorptoolsConfiguration.get_solo()
         config.disable_update_skills = True
         config.save()
