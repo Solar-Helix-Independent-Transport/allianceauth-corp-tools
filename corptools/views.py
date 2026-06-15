@@ -27,10 +27,13 @@ from django.shortcuts import redirect, render
 from django.template import TemplateDoesNotExist
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
 from allianceauth.crontab.utils import offset_cron
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
+from allianceauth.framework.datatables import DataTablesView
 from allianceauth.services.hooks import get_extension_logger
 from esi.decorators import _check_callback, token_required
 from esi.views import sso_redirect
@@ -214,7 +217,7 @@ def admin(request):
     bridges = MapJumpBridge.objects.all().count()
 
     characters = CharacterAudit.objects.all().count()
-    actives = CharacterAudit.get_oldest_qs().count()
+    actives = len(CharacterAudit.get_oldest_qs())
     skilllists = SkillList.objects.all().count()
     corpations = CorporationAudit.objects.all().count()
 
@@ -418,6 +421,85 @@ def react_main(request, character_id):
 # @login_required
 # def react_corp(request):
 #     return render(request, 'corptools/corporation/react_base.html', context={"version": __version__, "app_name": "corptools/corp", "page_title": "Corporation Audit"})
+
+
+def _get_char_update_ts_columns():
+    ct_conf = CorptoolsConfiguration.get_solo()
+    cols = []
+    if not ct_conf.disable_update_pub_data:
+        cols.append(('pub_data', _('Public Data')))
+    if app_settings.CT_CHAR_ASSETS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE and not ct_conf.disable_update_assets:
+        cols.append(('assets', _('Assets')))
+    if app_settings.CT_CHAR_CLONES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE and not ct_conf.disable_update_clones:
+        cols.append(('clones', _('Clones')))
+    if app_settings.CT_CHAR_SKILLS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE and not ct_conf.disable_update_skills:
+        cols.append(('skills', _('Skills')))
+        cols.append(('skill_que', _('Skill Queue')))
+    if app_settings.CT_CHAR_WALLET_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE and not ct_conf.disable_update_wallet:
+        cols.append(('wallet', _('Wallet')))
+        cols.append(('orders', _('Orders')))
+    if app_settings.CT_CHAR_NOTIFICATIONS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_NOTIFICATIONS_MODULE and not ct_conf.disable_update_notif:
+        cols.append(('notif', _('Notifications')))
+    if app_settings.CT_CHAR_ROLES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE and not ct_conf.disable_update_roles:
+        cols.append(('roles', _('Roles')))
+    if app_settings.CT_CHAR_MAIL_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE and not ct_conf.disable_update_mails:
+        cols.append(('mails', _('Mail')))
+    if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE and not ct_conf.disable_update_loyaltypoints:
+        cols.append(('loyaltypoints', _('Loyalty Points')))
+    if app_settings.CT_CHAR_MINING_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE and not ct_conf.disable_update_mining:
+        cols.append(('mining', _('Mining')))
+    return cols
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(permission_required('corptools.admin'), name='dispatch')
+class CharacterUpdateDashData(DataTablesView):
+    model = CharacterAudit
+
+    _FIXED_COLUMNS = [
+        ('character__character_name', 'corptools/stubs/char_updates/character.html'),
+        ('character__character_ownership__user__profile__main_character__character_name',
+         'corptools/stubs/char_updates/main.html'),
+        ('character__character_ownership__user__profile__main_character__corporation_name',
+         'corptools/stubs/char_updates/corporation.html'),
+        ('character__character_ownership__user__profile__main_character__alliance_name',
+         'corptools/stubs/char_updates/alliance.html'),
+        ('active', 'corptools/stubs/char_updates/active.html'),
+    ]
+
+    @property
+    def columns(self):
+        cols = list(self._FIXED_COLUMNS)
+        for key, _ in _get_char_update_ts_columns():
+            ts_tmpl = (
+                '{{% if row.update_timestamps.{key} %}}'
+                '<span class="ts-cell" data-ts="{{{{ row.update_timestamps.{key} }}}}"></span>'
+                '{{% else %}}—{{% endif %}}'
+            ).format(key=key)
+            cols.append(('update_timestamps__' + key, ts_tmpl))
+        return cols
+
+    def get_model_qs(self, request, *args, **kwargs):
+        qs = CharacterAudit.objects.visible_to(request.user).filter(
+            character__character_ownership__isnull=False,
+        ).select_related(
+            'character',
+            'character__character_ownership',
+            'character__character_ownership__user',
+            'character__character_ownership__user__profile',
+            'character__character_ownership__user__profile__main_character',
+        )
+        filter_active = request.GET.get('filter_active', '')
+        if filter_active != '':
+            qs = qs.filter(active=(filter_active == '1'))
+        return qs
+
+
+@login_required
+@permission_required('corptools.admin')
+def character_update_dashboard(request):
+    headers = [display for _, display in _get_char_update_ts_columns()]
+    return render(request, 'corptools/dashboards/character_updates_dash.html', {'headers': headers})
 
 
 @login_required

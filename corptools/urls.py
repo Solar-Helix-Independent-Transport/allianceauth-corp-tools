@@ -51,5 +51,9 @@ urlpatterns = [
         re_path(r'^dashboard/fuel', views.fuel_levels, name='fuel_dashboard'),
         re_path(r'^dashboard/metenox', views.metenox_levels,
                 name='drill_dashboard'),
+        path('dashboard/character-updates/', views.character_update_dashboard,
+             name='character_update_dashboard'),
+        path('dashboard/character-updates/data/',
+             views.CharacterUpdateDashData.as_view(), name='char_updates_data'),
     ])),
 ]

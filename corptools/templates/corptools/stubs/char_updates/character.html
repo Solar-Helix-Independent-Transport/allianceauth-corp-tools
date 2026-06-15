@@ -1,0 +1,12 @@
+<div class="d-flex align-items-center gap-2">
+    <img src="https://image.eveonline.com/Character/{{ row.character.character_id }}_32.png" width="32" height="32" class="rounded flex-shrink-0" alt="{{ row.character.character_name }}">
+    <div>
+        {{ row.character.character_name }}
+        <div class="d-flex align-items-center gap-1 text-muted small">
+            <img src="https://image.eveonline.com/Corporation/{{ row.character.corporation_id }}_32.png" width="16" height="16" alt="{{ row.character.corporation_name }}">
+            {{ row.character.corporation_name }}{% if row.character.alliance_id %}
+            <img src="https://image.eveonline.com/Alliance/{{ row.character.alliance_id }}_32.png" width="16" height="16" alt="{{ row.character.alliance_name }}" class="ms-1">
+            {{ row.character.alliance_name }}{% endif %}
+        </div>
+    </div>
+</div>

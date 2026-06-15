@@ -1,0 +1,127 @@
+{% extends "allianceauth/base-bs5.html" %}
+{% load i18n %}
+{% load aa_i18n %}
+{% block header_nav_collapse_left %}
+    {% include "corptools/top_menu.html" %}
+{% endblock header_nav_collapse_left %}
+{% block page_title %}{% translate "Character Update Dashboard" %}{% endblock page_title %}
+
+{% block content %}
+<h2 class="text-center">{% translate "Character Update Dashboard" %}</h2>
+<hr>
+<div class="mb-3 d-flex align-items-center gap-2">
+    <label for="filter-active" class="fw-bold mb-0">{% translate "Active" %}:</label>
+    <select id="filter-active" class="form-select w-auto">
+        <option value="">{% translate "All" %}</option>
+        <option value="1">{% translate "Active" %}</option>
+        <option value="0">{% translate "Inactive" %}</option>
+    </select>
+</div>
+<table id="table-char-updates" class="table table-sm table-hover" style="width:100%">
+    <thead>
+        <tr>
+            <th>{% translate "Character" %}</th>
+            <th>{% translate "Main" %}</th>
+            <th>{% translate "Main Corporation" %}</th>
+            <th>{% translate "Main Alliance" %}</th>
+            <th class="text-center">{% translate "Active" %}</th>
+            {% for header in headers %}
+            <th>{{ header }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+</table>
+{% endblock content %}
+
+{% block extra_css %}
+    {% include "bundles/datatables-2-css-bs5.html" %}
+    {% include "bundles/datatables-2-columncontrol-css-bs5.html" %}
+{% endblock extra_css %}
+
+{% block extra_javascript %}
+    {% get_datatables_language_static LANGUAGE_CODE as DT_LANG_PATH %}
+    {% include "bundles/datatables-2-js-bs5.html" %}
+    {% include "bundles/datatables-2-columncontrol-js-bs5.html" %}
+    <script>
+        $(document).ready(() => {
+            const custom_dt_filter = { active: $('#filter-active') };
+
+            const tsColCount = {{ headers|length }};
+
+            // Build timestamp column defs (indices 5 onwards)
+            const tsColDefs = [];
+            for (let i = 5; i < 5 + tsColCount; i++) {
+                tsColDefs.push({ targets: [i], searchable: false, columnControl: [], width: '50px' });
+            }
+
+            const dt = new DataTable('#table-char-updates', {
+                language: {
+                    url: '{{ DT_LANG_PATH }}',
+                    processing: `{% include "framework/datatables/process-indicator.html" %}`
+                },
+                layout: {
+                    topStart: 'pageLength',
+                    topEnd: 'search',
+                    bottomStart: 'info',
+                    bottomEnd: 'paging'
+                },
+                ordering: {
+                    handler: true,
+                    indicators: false,
+                },
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '{% url "corptools:char_updates_data" %}',
+                    data: (data) => {
+                        const filters = Object.fromEntries(
+                            Object.entries(custom_dt_filter).map(([k, $el]) => [`filter_${k}`, $el.val()])
+                        );
+                        return {...data, ...filters};
+                    },
+                    error: (xhr, error) => console.error('Error fetching data:', xhr, error)
+                },
+                columnDefs: [
+                    {
+                        targets: [0, 1, 2, 3],
+                        columnControl: [
+                            { target: 0, content: [] },
+                            { target: 1, content: ['search'] },
+                        ],
+                    },
+                    {
+                        targets: [4],
+                        searchable: false,
+                        columnControl: [],
+                    },
+                    ...tsColDefs,
+                ],
+                order: [[0, 'asc']],
+                pageLength: 25,
+                scrollX: true,
+                initComplete: () => {
+                    Object.values(custom_dt_filter).forEach(($el) => {
+                        $el.on('change', () => dt.draw());
+                    });
+                },
+            });
+
+            // Format ISO timestamp cells as relative time after each draw
+            dt.on('draw', () => {
+                document.querySelectorAll('.ts-cell').forEach(el => {
+                    const ts = el.dataset.ts;
+                    if (!ts) return;
+                    const date = new Date(ts);
+                    const diff = Math.floor((Date.now() - date) / 1000);
+                    const stale = diff > 86400;
+                    let ago;
+                    if (diff < 60) ago = diff + 's';
+                    else if (diff < 3600) ago = Math.floor(diff / 60) + 'm';
+                    else if (diff < 86400) ago = Math.floor(diff / 3600) + 'h';
+                    else ago = Math.floor(diff / 86400) + 'd';
+                    el.innerHTML = `<span class="${stale ? 'text-danger' : 'text-success'}" title="${date.toUTCString()}">${ago} ago</span>`;
+                });
+            });
+        });
+    </script>
+{% endblock extra_javascript %}

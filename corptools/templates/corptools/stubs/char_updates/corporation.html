@@ -1,0 +1,1 @@
+{% with main=row.character.character_ownership.user.profile.main_character %}{% if main %}<img src="https://image.eveonline.com/Corporation/{{ main.corporation_id }}_32.png" width="24" height="24" class="me-1" alt="{{ main.corporation_name }}">{{ main.corporation_name }}{% else %}{{ row.character.corporation_name }}{% endif %}{% endwith %}

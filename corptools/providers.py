@@ -125,7 +125,8 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 esi_openapi = OpenAPI(
     compatibility_date=compat,
-    spec_file=f"{dir_path}/openapi.json",
+    # Overide for local spec!
+    # spec_file=f"{dir_path}/openapi.json",
     ua_appname=__appname__,
     ua_url=__url__,
     ua_version=__version__,
