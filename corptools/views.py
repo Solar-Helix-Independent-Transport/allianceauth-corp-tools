@@ -7,17 +7,6 @@ from math import ceil
 # Third Party
 from celery.schedules import crontab
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
-from eve_sde.models import (
-    Constellation,
-    DogmaAttribute,
-    ItemCategory,
-    ItemGroup,
-    ItemType,
-    ItemTypeMaterials,
-    Region,
-    SolarSystem,
-    Stargate,
-)
 
 # Django
 from django.contrib import messages
@@ -54,8 +43,9 @@ from .models import (
     Structure,
 )
 from .tasks import (
+    ETAG_CLEAR_GROUPS,
     check_account,
-    clear_all_etags,
+    clear_etags_for_operation,
     update_all_characters,
     update_all_corps,
     update_all_eve_names,
@@ -202,17 +192,7 @@ def add_corp_section(request, *args, **kwargs):
 @login_required
 @permission_required('corptools.admin')
 def admin(request):
-    # get available models
     names = EveName.objects.all().count()
-    types = ItemType.objects.all().count()
-    dogma = DogmaAttribute.objects.all().count()
-    groups = ItemGroup.objects.all().count()
-    categorys = ItemCategory.objects.all().count()
-    type_mets = ItemTypeMaterials.objects.count()
-    regions = Region.objects.all().count()
-    constellations = Constellation.objects.all().count()
-    systems = SolarSystem.objects.all().count()
-    gates = Stargate.objects.all().count()
     location = EveLocation.objects.all().count()
     bridges = MapJumpBridge.objects.all().count()
 
@@ -228,26 +208,18 @@ def admin(request):
 
     context = {
         "names": names,
-        "types": types,
-        "dogma": dogma,
-        "groups": groups,
-        "categorys": categorys,
+        "location": location,
+        "bridges": bridges,
         "characters": characters,
         "active_chars": actives,
         "skilllists": skilllists,
         "corpations": corpations,
-        "type_mets": type_mets,
-        "regions": regions,
-        "constellations": constellations,
-        "systems": systems,
-        "location": location,
-        "bridges": bridges,
-        "gates": gates,
         "char_tasks": char_tasks,
         "corp_tasks": corp_tasks,
         "form": UploadForm(),
         "ct_config": CorptoolsConfiguration.get_solo(),
-        "app_settings": app_settings
+        "app_settings": app_settings,
+        "etag_clear_groups": ETAG_CLEAR_GROUPS,
     }
 
     return render(request, 'corptools/admin.html', context=context)
@@ -280,9 +252,15 @@ def admin_run_tasks(request):
         if request.POST.get('run_locations'):
             messages.info(request, "Queued update_all_locations")
             update_all_locations.apply_async(priority=6)
-        if request.POST.get('run_clear_etag'):
-            messages.info(request, "Queued clear_all_etags")
-            clear_all_etags.apply_async(priority=1)
+        etag_groups = request.POST.getlist('etag_groups')
+        if etag_groups:
+            valid_groups = [g for g in etag_groups if g in ETAG_CLEAR_GROUPS]
+            if valid_groups:
+                labels = ", ".join(
+                    ETAG_CLEAR_GROUPS[g]["label"] for g in valid_groups)
+                messages.info(request, f"Queued etag clear for: {labels}")
+                clear_etags_for_operation.apply_async(
+                    priority=1, kwargs={"group_keys": valid_groups})
 
     return redirect('corptools:admin')
 

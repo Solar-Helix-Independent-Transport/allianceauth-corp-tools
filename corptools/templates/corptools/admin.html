@@ -20,18 +20,6 @@
                 <hr>
                 {% csrf_token %}
                 <div class="form-check mb-3">
-                    <input type="checkbox" name="run_clear_etag" class="form-check-input" id="run_clear_etag">
-                    <label class="form-check-label" for="run_clear_etag">{% translate "Clear all cached Etags" %}</label>
-                    <div class="form-text">{% translate "Wipe all the etags from cache to force new data pulls" %}</div>
-                </div>
-
-                <div class="form-check mb-3">
-                    <input type="checkbox" name="run_universe" class="form-check-input" id="run_universe">
-                    <label class="form-check-label" for="run_universe">{% translate "Update EVE Map Data" %}</label>
-                    <div class="form-text">{% translate "Force a full map update from ESI" %}</div>
-                </div>
-
-                <div class="form-check mb-3">
                     <input type="checkbox" name="run_locations" class="form-check-input" id="run_locations">
                     <label class="form-check-label" for="run_locations">{% translate "Force update all Citadel Locations" %}</label>
                     <div class="form-text">{% translate "Attempt to update all citadel names from ESI" %}</div>
@@ -60,6 +48,24 @@
                 <input type="submit" value="{% translate "Submit" %}" class="btn btn-primary w-100 mt-auto">
             </div>
         <!-- </div> -->
+    </form>
+    <form action="{% url 'corptools:run_tasks' %}" method="post" class="card m-2 flex-grow-1">
+        <div class="card-body">
+            <h5 class="card-title text-center">
+                {% translate "Clear Specific ETags" %}
+            </h5>
+            <hr>
+            {% csrf_token %}
+            {% for key, group in etag_clear_groups.items %}
+            <div class="form-check mb-2">
+                <input type="checkbox" name="etag_groups" value="{{ key }}" class="form-check-input" id="etag_{{ key }}">
+                <label class="form-check-label" for="etag_{{ key }}">{{ group.label }}</label>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="card-footer">
+            <input type="submit" value="{% translate "Clear Selected ETags" %}" class="btn btn-warning w-100 mt-auto">
+        </div>
     </form>
     <div class="card m-2 flex-grow-1">
         <div class="card-body">
@@ -386,102 +392,6 @@
     <div class="card m-2 flex-grow-1" style="min-width: 350px;">
         <div class="card-body">
             <h5 class="card-title text-center">
-                {% translate "EVE Models" %}
-            </h5>
-            <hr>
-            <div>
-                <table class="table">
-                    <tr>
-                        <td class="">{% translate "Entity Names" %}</td>
-                        <td class="text-end">
-                            {{ names }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="">{% translate "Structure Names" %}</td>
-                        <td class="text-end">
-                            {{ location }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="">{% translate "Categories" %}</td>
-                        <td class="text-end">
-                            {{ categorys }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="">{% translate "Groups" %}</td>
-                        <td class="text-end">
-                            {{ groups }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="">{% translate "Types" %}</td>
-                        <td class="text-end">
-                            {{ types }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="">{% translate "Dogma Attributes" %}</td>
-                        <td class="text-end">
-                            {{ dogma }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="">{% translate "Type Refine Material Outputs" %}</td>
-                        <td class="text-end">
-                            {{ type_mets }}
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="card m-2 flex-grow-1" style="min-width: 350px;">
-        <div class="card-body">
-            <h5 class="card-title text-center">
-                {% translate "EVE Universe Models" %}
-            </h5>
-            <hr>
-            <div>
-                <table class="table">
-                    <tr>
-                        <td class="">{% translate "Regions" %}</td>
-                        <td class="text-end">
-                            {{ regions }}/112
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="">{% translate "Constellations" %}</td>
-                        <td class="text-end">
-                            {{ constellations }}/1174
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="">{% translate "Systems" %}</td>
-                        <td class="text-end">
-                            {{ systems }}/8436
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="">{% translate "Gate Links" %}</td>
-                        <td class="text-end">
-                            {{ gates }}/6888
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="">{% translate "Jump Bridge Links" %}</td>
-                        <td class="text-end">
-                            {{ bridges }}
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="card m-2 flex-grow-1" style="min-width: 350px;">
-        <div class="card-body">
-            <h5 class="card-title text-center">
                 {% translate "Audit Models" %}
             </h5>
             <hr>
@@ -489,21 +399,27 @@
                 <table class="table">
                     <tr>
                         <td class="">{% translate "Corporation Audits" %}</td>
-                        <td class="text-end">
-                            {{ corpations }}
-                        </td>
+                        <td class="text-end">{{ corpations }}</td>
                     </tr>
                     <tr>
                         <td class="">{% translate "Character Audits (Active/Total)" %}</td>
-                        <td class="text-end">
-                            {{active_chars}} / {{ characters }}
-                        </td>
+                        <td class="text-end">{{ active_chars }} / {{ characters }}</td>
                     </tr>
                     <tr>
                         <td class="">{% translate "Skill Lists" %}</td>
-                        <td class="text-end">
-                            {{ skilllists }}
-                        </td>
+                        <td class="text-end">{{ skilllists }}</td>
+                    </tr>
+                    <tr>
+                        <td class="">{% translate "Entity Names" %}</td>
+                        <td class="text-end">{{ names }}</td>
+                    </tr>
+                    <tr>
+                        <td class="">{% translate "Structure Names" %}</td>
+                        <td class="text-end">{{ location }}</td>
+                    </tr>
+                    <tr>
+                        <td class="">{% translate "Jump Bridge Links" %}</td>
+                        <td class="text-end">{{ bridges }}</td>
                     </tr>
                 </table>
             </div>
