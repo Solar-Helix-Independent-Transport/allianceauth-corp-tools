@@ -37,7 +37,7 @@ const CharHeader = () => {
   });
 
   const bad_chars = data?.characters
-    .filter((char: any) => !char.active)
+    ?.filter((char: any) => !char.active)
     .map((char: any) => char.character.character_name);
 
   if (data?.main) {
