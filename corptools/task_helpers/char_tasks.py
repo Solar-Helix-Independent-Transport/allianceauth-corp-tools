@@ -1519,7 +1519,6 @@ def update_character_mail_body(character_id, mail_message, force_refresh=False):
 
 
 def update_character_mail_headers(character_id, force_refresh=False):
-    # This function will deal with ALL mail related updates
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
 
@@ -1530,10 +1529,11 @@ def update_character_mail_headers(character_id, force_refresh=False):
     if not token:
         return False
 
-    _current_eve_ids = list(
+    # Sets for O(1) membership checks throughout
+    _current_eve_ids = set(
         EveName.objects.all().values_list('eve_id', flat=True)
     )
-    _current_mail_rec = list(
+    _current_mail_rec = set(
         MailRecipient.objects.all().values_list('recipient_id', flat=True)
     )
 
@@ -1557,19 +1557,23 @@ def update_character_mail_headers(character_id, force_refresh=False):
             }
         )
 
-    # Get all mail ids
-    mail_ids = MailMessage.objects.filter(
-        character=audit_char
-    ).values_list(
-        "mail_id",
-        flat=True
-    ).order_by(
-        "mail_id"
+    # Materialise to a set so `in` checks are O(1) rather than per-iteration DB queries
+    mail_id_set = set(
+        MailMessage.objects.filter(
+            character=audit_char
+        ).values_list("mail_id", flat=True)
     )
 
+    # Pre-load label map to avoid a MailLabel.objects.get query per labelled mail
+    label_pk_map = {
+        ml.label_id: ml.pk
+        for ml in MailLabel.objects.filter(character=audit_char)
+    }
+
+    # Always start from the newest page; the stop condition handles resumption.
+    # Using the oldest stored mail_id as last_mail_id (previous behaviour) caused ESI
+    # to return mail older than anything we had, silently skipping all new mail.
     last_id = None
-    if mail_ids.exists() and not force_refresh:
-        last_id = mail_ids[0]
     while True:
         try:
             if last_id is None:
@@ -1588,11 +1592,8 @@ def update_character_mail_headers(character_id, force_refresh=False):
                     store_cache=False
                 )
             if len(mail) == 0:
-                # If there are 0 and this is not the first page, then we have reached the
-                # end of retrievable mail.
                 break
         except HTTPNotModified:
-            # No New messages
             break
 
         names_to_create = set()
@@ -1605,11 +1606,10 @@ def update_character_mail_headers(character_id, force_refresh=False):
                     names_to_create.add(recip.recipient_id)
         try:
             EveName.objects.create_bulk_from_esi(list(names_to_create))
-            _current_eve_ids += list(names_to_create)
+            _current_eve_ids.update(names_to_create)
         except Exception as e:
             logger.error(
                 f"Error Bulk creating eve names for mail headers: {e}")
-            # doing it the hard way...
 
         messages = []
         m_l_map = {}
@@ -1617,8 +1617,9 @@ def update_character_mail_headers(character_id, force_refresh=False):
         failed_ids = set()
         stop = False
         for msg in mail:
-            if msg.mail_id in mail_ids:
+            if msg.mail_id in mail_id_set:
                 if not force_refresh:
+                    stop = True
                     break
                 continue
 
@@ -1630,7 +1631,7 @@ def update_character_mail_headers(character_id, force_refresh=False):
                         EveName.objects.get_or_create_from_esi(
                             getattr(msg, "from")
                         )
-                        _current_eve_ids.append(getattr(msg, "from"))
+                        _current_eve_ids.add(getattr(msg, "from"))
                     except Exception as e:
                         logger.error(
                             f"Error creating eve name for mail header: {e} {vars(msg)}")
@@ -1673,14 +1674,11 @@ def update_character_mail_headers(character_id, force_refresh=False):
         for _msg in msgs:
             if _msg.mail_id in m_l_map:
                 for label in m_l_map[_msg.mail_id]:
-                    lm = LabelThroughModel(
-                        mailmessage_id=_msg.id_key,
-                        maillabel_id=MailLabel.objects.get(
-                            character=audit_char,
-                            label_id=label
-                        ).pk
-                    )
-                    lms.append(lm)
+                    if label in label_pk_map:
+                        lms.append(LabelThroughModel(
+                            mailmessage_id=_msg.id_key,
+                            maillabel_id=label_pk_map[label]
+                        ))
 
         LabelThroughModel.objects.bulk_create(
             lms, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
@@ -1694,7 +1692,7 @@ def update_character_mail_headers(character_id, force_refresh=False):
                     if r_type != "mailing_list":
                         if recip not in _current_eve_ids:
                             EveName.objects.get_or_create_from_esi(recip)
-                            _current_eve_ids.append(recip)
+                            _current_eve_ids.add(recip)
                         recip_name = recip
                     if recip not in _current_mail_rec or force_refresh:
                         MailRecipient.objects.update_or_create(
@@ -1705,28 +1703,22 @@ def update_character_mail_headers(character_id, force_refresh=False):
                             }
                         )
                         if not force_refresh:
-                            _current_mail_rec.append(recip)
+                            _current_mail_rec.add(recip)
 
-                    rm = RecipThroughModel(
-                        mailmessage_id=_msg.id_key, mailrecipient_id=recip)
-                    rms.append(rm)
+                    rms.append(RecipThroughModel(
+                        mailmessage_id=_msg.id_key, mailrecipient_id=recip))
 
         RecipThroughModel.objects.bulk_create(
             rms, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
-        if stop is True:
-            # Break the while loop if we reach the last mail message that is in the db.
+        if stop:
             break
 
     audit_char.set_update_time("mails")
     audit_char.save()
     audit_char.is_active()
 
-    if len(mail_ids) == 0:
-        logger.debug(f"No new mails for {character_id}")
-        return
-
-    return mail_ids
+    return f"CT: Finished mail headers for: {audit_char.character.character_name}"
 
 
 def update_character_contacts(character_id, force_refresh=False):
