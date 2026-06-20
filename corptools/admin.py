@@ -398,7 +398,6 @@ class JumpCloneFilterAdmin(admin.ModelAdmin):
             data = set()
             for f in models.EveLocation._meta.get_fields():
                 if f.auto_created and not f.concrete:
-                    print(f)
                     data.update(
                         set(
                             f.related_model.objects.all().values_list(

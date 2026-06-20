@@ -611,7 +611,6 @@ class Skillfilter(FilterBase):
     def audit_filter(self, users):
         output = defaultdict(lambda: {"message": "No Data", "check": False})
         accounts = providers.skills.get_and_cache_users(users)
-        print(accounts)
 
         skill_lists = list(self.required_skill_lists.all())
         req_one = list(self.single_req_skill_lists.all())
