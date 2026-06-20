@@ -8,7 +8,6 @@ from django.utils import timezone
 # AA Example App
 from corptools.models import CharacterWalletJournalEntry
 from corptools.tasks.housekeeping import (
-    clear_all_etags,
     clear_all_skill_caches,
     run_housekeeping,
     update_wallet_currency,
@@ -50,32 +49,6 @@ class TestClearAllSkillCaches(TestCase):
 
         mock_client.delete.assert_not_called()
         self.assertEqual(result, "Deleted 0 skill cache keys")
-
-
-class TestClearAllEtags(TestCase):
-    @patch("django_redis.get_redis_connection")
-    def test_deletes_matching_etag_keys_and_returns_count(self, mock_get_conn):
-        mock_client = MagicMock()
-        mock_client.keys.return_value = [b"etag-abc"]
-        mock_client.delete.return_value = 1
-        mock_get_conn.return_value = mock_client
-
-        result = clear_all_etags()
-
-        mock_client.keys.assert_called_once_with(":?:etag-*")
-        mock_client.delete.assert_called_once_with(b"etag-abc")
-        self.assertEqual(result, "Deleted 1 etag keys")
-
-    @patch("django_redis.get_redis_connection")
-    def test_no_etag_keys_skips_delete_and_reports_zero(self, mock_get_conn):
-        mock_client = MagicMock()
-        mock_client.keys.return_value = []
-        mock_get_conn.return_value = mock_client
-
-        result = clear_all_etags()
-
-        mock_client.delete.assert_not_called()
-        self.assertEqual(result, "Deleted 0 etag keys")
 
 
 def _make_journal_entry(ca, entry_id, reason):
