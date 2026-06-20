@@ -39,6 +39,8 @@ urlpatterns = [
     path('admin/', views.admin, name='admin'),
     path('admin_add_pyfa_xml/', views.admin_add_pyfa_xml,
          name='admin_add_pyfa_xml'),
+    path('admin_add_fitting/', views.admin_add_fitting,
+         name='admin_add_fitting'),
     path('admin_create_tasks/', views.admin_create_tasks,
          name='admin_create_tasks'),
     path('run_tasks/', views.admin_run_tasks, name='run_tasks'),

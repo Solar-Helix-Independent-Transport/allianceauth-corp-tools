@@ -192,6 +192,16 @@ def add_corp_section(request, *args, **kwargs):
 @login_required
 @permission_required('corptools.admin')
 def admin(request):
+    # Django
+    from django.apps import apps
+    fittings_installed = apps.is_installed('fittings')
+    available_fittings = []
+    if fittings_installed:
+        # Third Party
+        from fittings.models import Fitting
+        available_fittings = list(Fitting.objects.select_related(
+            'ship_type').order_by('ship_type__name', 'name'))
+
     names = EveName.objects.all().count()
     location = EveLocation.objects.all().count()
     bridges = MapJumpBridge.objects.all().count()
@@ -220,6 +230,8 @@ def admin(request):
         "ct_config": CorptoolsConfiguration.get_solo(),
         "app_settings": app_settings,
         "etag_clear_groups": ETAG_CLEAR_GROUPS,
+        "fittings_installed": fittings_installed,
+        "available_fittings": available_fittings,
     }
 
     return render(request, 'corptools/admin.html', context=context)
@@ -355,6 +367,87 @@ def admin_add_pyfa_xml(request):
         messages.error(
             request, "File Upload Failed! What are you doing your not meant to be here?")
 
+    return redirect('corptools:admin')
+
+
+@login_required
+@permission_required('corptools.admin')
+def admin_add_fitting(request):
+    if request.method != 'POST':
+        messages.error(request, "Invalid request method.")
+        return redirect('corptools:admin')
+
+    try:
+        # Third Party
+        from eve_sde.models import ItemType, TypeDogma
+        from fittings.models import Fitting, FittingItem
+    except (ImportError, RuntimeError):
+        messages.error(request, "Fittings module is not installed.")
+        return redirect('corptools:admin')
+
+    fitting_id = request.POST.get('fitting_id', '').strip()
+    name = request.POST.get('name', '').strip()
+
+    if not fitting_id or not name:
+        messages.error(request, "Fitting and name are required.")
+        return redirect('corptools:admin')
+
+    try:
+        fitting = Fitting.objects.get(id=int(fitting_id))
+    except (Fitting.DoesNotExist, ValueError):
+        messages.error(request, "Fitting not found.")
+        return redirect('corptools:admin')
+
+    _skill_ids = [182, 183, 184, 1285, 1289, 1290]
+    _level_ids = [277, 278, 279, 1286, 1287, 1288]
+
+    item_type_ids = list(FittingItem.objects.filter(
+        fit=fitting).values_list("type_id", flat=True))
+    type_dogma = TypeDogma.objects.filter(
+        item_type_id__in=item_type_ids + [fitting.ship_type_type_id],
+        dogma_attribute_id__in=_skill_ids + _level_ids
+    )
+
+    required = {}
+    for t in type_dogma:
+        if t.item_type_id not in required:
+            required[t.item_type_id] = {
+                i: {"skill": 0, "level": 0} for i in range(6)}
+        a = t.dogma_attribute_id
+        v = int(t.value)
+        if a in _skill_ids:
+            required[t.item_type_id][_skill_ids.index(a)]["skill"] = v
+        elif a in _level_ids:
+            idx = _level_ids.index(a)
+            if required[t.item_type_id][idx]["level"] < v:
+                required[t.item_type_id][idx]["level"] = v
+
+    skill_max_levels = {}
+    for item_skills in required.values():
+        for s in item_skills.values():
+            if s["skill"]:
+                sid = s["skill"]
+                if sid not in skill_max_levels or s["level"] > skill_max_levels[sid]:
+                    skill_max_levels[sid] = s["level"]
+
+    skills = {
+        t.name: skill_max_levels[t.id]
+        for t in ItemType.objects.filter(id__in=list(skill_max_levels.keys()))
+    }
+
+    sl, created = SkillList.objects.update_or_create(
+        name=name,
+        defaults={"skill_list": json.dumps(skills)}
+    )
+    messages.success(
+        request,
+        "{}: {} ({} skills from {})".format(
+            "Created" if created else "Updated",
+            name,
+            len(skills),
+            fitting.name,
+        )
+    )
     return redirect('corptools:admin')
 
 

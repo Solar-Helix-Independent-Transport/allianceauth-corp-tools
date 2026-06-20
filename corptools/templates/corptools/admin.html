@@ -478,6 +478,33 @@
             <input type="submit" class="btn w-100 btn-primary">
         </div>
     </form>
+    {% if fittings_installed %}
+    <form class="card m-2 flex-grow-1" method="post" action="{% url 'corptools:admin_add_fitting' %}">
+        <div class="card-body">
+            <h5 class="card-title text-center">
+                {% translate "Import Fitting as Skill List" %}
+            </h5>
+            <hr>
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="fitting_id">{% translate "Fitting" %}</label>
+                <select class="form-select" name="fitting_id" id="fitting_id">
+                    {% for fitting in available_fittings %}
+                    <option value="{{ fitting.id }}">{{ fitting.ship_type.name }} — {{ fitting.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label for="fitting_name">{% translate "Skill List Name" %}</label>
+                <input type="text" class="form-control" name="name" id="fitting_name" placeholder="{% translate "Enter name" %}">
+                <div class="form-text">{% translate "This will show as the name of the Skill List" %}.</div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <input type="submit" class="btn w-100 btn-primary" value="{% translate "Import Fitting" %}">
+        </div>
+    </form>
+    {% endif %}
 </div>
 {% endblock content %}
 
