@@ -136,16 +136,17 @@ class SkillListCache():
                 for skill, level in d_list.items():
                     level = int(level)
                     trained_skill = skill_tables[char]["skills"].get(skill, {})
-                    skill_tables[char]["doctrines"][d_name]["_meta"]["total_sp"] += all_skill_sp[d_name][skill]
+                    skill_sp = all_skill_sp[d_name].get(skill, 0)
+                    skill_tables[char]["doctrines"][d_name]["_meta"]["total_sp"] += skill_sp
                     if level > trained_skill.get('active_level', 0):
                         skill_tables[char]["doctrines"][d_name][skill] = level
                         if trained_skill.get('trained_level', 0) == trained_skill.get('active_level', 0):
                             skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += trained_skill.get(
                                 'sp_total', 0)
                         if trained_skill.get('active_level', 0) < trained_skill.get('trained_level', 0):
-                            skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += all_skill_sp[d_name][skill]
+                            skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += skill_sp
                     else:
-                        skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += all_skill_sp[d_name][skill]
+                        skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += skill_sp
 
         # Join them all and ship it.
         return skill_tables
