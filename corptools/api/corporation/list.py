@@ -31,7 +31,7 @@ class ListApiEndpoints:
                 request.user
             ).filter(
                 corporation__corporation_id__gte=2000000
-            )
+            ).select_related('corporation', 'corporation__alliance')
 
             if (request.user.has_perm("corptools.holding_corp_wallets")
                 or request.user.has_perm("corptools.holding_corp_assets")

@@ -12,6 +12,18 @@ admin.site.register(models.CharacterAudit)
 admin.site.register(models.CorporationAudit)
 
 
+@admin.register(models.EveLocation)
+class EveLocationAdmin(admin.ModelAdmin):
+    search_fields = ['location_name']
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+        return queryset.filter(managed=False), use_distinct
+
+    def get_model_perms(self, request):
+        return {}
+
+
 @admin.register(models.CorptoolsConfiguration)
 class ConfigAdmin(SingletonModelAdmin):
     filter_horizontal = ["holding_corps"]
@@ -371,46 +383,19 @@ class LoginAdmin(admin.ModelAdmin):
                     'no_data_pass', 'main_corp_only']
 
 
-class HomeStationFilterAdmin(admin.ModelAdmin):
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
-        if db_field.name == "evelocation":
-            data = set()
-            for f in models.EveLocation._meta.get_fields():
-                if f.auto_created and not f.concrete:
-                    data.update(
-                        set(
-                            f.related_model.objects.all().values_list(
-                                f.field.attname, flat=True).distinct()
-                        )
-                    )
-            kwargs["queryset"] = models.EveLocation.objects.filter(
-                location_id__in=list(data),
-                managed=False
-            )
-        return super().formfield_for_manytomany(db_field, request, **kwargs)
+class EveLocationAutocompleteMixin:
+    autocomplete_fields = ["evelocation"]
 
-    filter_horizontal = ["evelocation"]
+    class Media:
+        css = {"all": ("corptools/admin/admin.css",)}
 
 
-class JumpCloneFilterAdmin(admin.ModelAdmin):
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
-        if db_field.name == "evelocation":
-            data = set()
-            for f in models.EveLocation._meta.get_fields():
-                if f.auto_created and not f.concrete:
-                    data.update(
-                        set(
-                            f.related_model.objects.all().values_list(
-                                f.field.attname, flat=True).distinct()
-                        )
-                    )
-            kwargs["queryset"] = models.EveLocation.objects.filter(
-                location_id__in=list(data),
-                managed=False
-            )
-        return super().formfield_for_manytomany(db_field, request, **kwargs)
+class HomeStationFilterAdmin(EveLocationAutocompleteMixin, admin.ModelAdmin):
+    pass
 
-    filter_horizontal = ["evelocation"]
+
+class JumpCloneFilterAdmin(EveLocationAutocompleteMixin, admin.ModelAdmin):
+    pass
 
 
 if apps.is_installed('securegroups'):
