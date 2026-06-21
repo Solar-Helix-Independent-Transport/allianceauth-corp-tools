@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, call, patch
 
 # Third Party
 from aiopenapi3.errors import RequestError
+from celery import shared_task
 from celery.exceptions import Retry
 from celery_once import AlreadyQueued
 from httpx import RequestError as httpx_RequestError
@@ -35,9 +36,21 @@ from corptools.tasks.utils import (
 
 def _mock_task(retries=0):
     task = MagicMock()
-    task.retries = retries
+    task.request.retries = retries
     task.retry.side_effect = Retry()
     return task
+
+
+@shared_task(bind=True, name="corptools.tests.integrity_error_task")
+@esi_error_retry
+def _integrity_error_task(self):
+    raise IntegrityError("fk constraint")
+
+
+@shared_task(bind=True, name="corptools.tests.integrity_error_task_force_refresh")
+@esi_error_retry
+def _integrity_error_task_with_force_refresh(self, force_refresh=False):
+    raise IntegrityError("fk constraint")
 
 
 class TestCacheFlagHelpers(TestCase):
@@ -411,3 +424,30 @@ class TestRateLimitedTask(TestCase):
             pass
 
         self.assertEqual(named_task.__name__, "named_task")
+
+
+class TestEsiErrorRetryIntegrityErrorRealTask(TestCase):
+    """
+    Regression tests using a real bound Celery task so self.request.retries
+    is a genuine Celery attribute. The old bug accessed self.retries, which
+    doesn't exist on real tasks and raises AttributeError.
+    """
+
+    @patch("corptools.tasks.utils.check_for_sde_updates")
+    def test_integrity_error_retries_then_raises(self, mock_sde):
+        # In eager mode retry() re-runs the task immediately with retries incremented.
+        # Our guard stops at retries==3, so the task runs 4 times total and the
+        # final IntegrityError propagates as the task result.
+        result = _integrity_error_task.apply()
+        self.assertTrue(result.failed())
+        self.assertIsInstance(result.result, IntegrityError)
+        self.assertEqual(mock_sde.apply_async.call_count, 4)
+
+    @patch("corptools.tasks.utils.check_for_sde_updates")
+    def test_integrity_error_passes_force_refresh_on_retry(self, mock_sde):
+        result = _integrity_error_task_with_force_refresh.apply()
+        self.assertTrue(result.failed())
+        self.assertIsInstance(result.result, IntegrityError)
+        # Every retry call should have included force_refresh=True in kwargs.
+        for c in mock_sde.apply_async.call_args_list:
+            self.assertEqual(c, call(priority=1))
