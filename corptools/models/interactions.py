@@ -1,16 +1,21 @@
+# Standard Library
 from typing import TYPE_CHECKING
 
+# Third Party
 from model_utils import Choices
 
+# Django
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+# AA Example App
 from corptools.task_helpers import sanitize_notification_type
 
 from .audits import CharacterAudit, CorporationAudit
 from .eve_models import EveName
 
 if TYPE_CHECKING:
+    # Alliance Auth
     from esi.stubs import (
         CharactersCharacterIdContactsGetItem,
         CharactersCharacterIdContactsLabelsGetItem,
@@ -40,7 +45,8 @@ class Notification(models.Model):
     class Meta:
         indexes = (
             models.Index(fields=['timestamp']),
-            models.Index(fields=['notification_type'])
+            models.Index(fields=['notification_type']),
+            models.Index(fields=['character_id', 'timestamp']),
         )
 
     @classmethod

@@ -22,6 +22,11 @@ class CharacterMiningLedger(models.Model):
     system = models.ForeignKey(SolarSystem, on_delete=models.CASCADE)
     quantity = models.IntegerField()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['character_id', 'date']),
+        ]
+
     @staticmethod
     def create_primary_key(character_id, mining_record: "CharactersCharacterIdMiningGetItem"):
         """
