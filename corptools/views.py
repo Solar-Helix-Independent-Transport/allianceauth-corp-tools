@@ -1,8 +1,10 @@
 # Standard Library
 import json
 import xml.etree.ElementTree as ET
-from datetime import timedelta
+from datetime import datetime, timedelta
+from datetime import timezone as dt_timezone
 from math import ceil
+from pathlib import Path
 
 # Third Party
 from celery.schedules import crontab
@@ -12,6 +14,7 @@ from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.http import FileResponse, Http404
 from django.shortcuts import redirect, render
 from django.template import TemplateDoesNotExist
 from django.urls import reverse
@@ -734,3 +737,93 @@ def metenox_levels(request):
         'structures': dashboards.DashboardApiEndpoints.get_dashboard_drills_levels(request),
     }
     return render(request, 'corptools/dashboards/metenox_dash.html', context=context)
+
+
+def _wallet_export_root() -> Path:
+    # Django
+    from django.conf import settings
+    return Path(settings.MEDIA_ROOT) / "wallet_exports"
+
+
+@login_required
+def wallet_export_list(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    if request.method == "POST":
+        if "run_fixtures" in request.POST:
+            from .tasks.housekeeping import export_old_wallet_fixtures
+            export_old_wallet_fixtures.apply_async(priority=6)
+            messages.info(request, "Wallet fixture export task queued.")
+        elif "run_purge" in request.POST:
+            from .tasks.housekeeping import purge_old_wallet_data
+            purge_old_wallet_data.apply_async(priority=6)
+            messages.warning(request, "Wallet purge task queued.")
+        return redirect("corptools:wallet_export_list")
+
+    export_root = _wallet_export_root()
+    fixture_sections = {}
+    for entity_type in ("characters", "corporations"):
+        fixture_root = export_root / "fixtures" / entity_type
+        entities = []
+        if fixture_root.exists():
+            for entity_dir in sorted(fixture_root.iterdir()):
+                if not entity_dir.is_dir():
+                    continue
+                chunk_files = sorted(
+                    (e for e in entity_dir.iterdir()
+                     if e.suffix == ".json" and e.name != "watermark.json"),
+                    reverse=True,
+                )
+                if not chunk_files:
+                    continue
+                total_size = sum(e.stat().st_size for e in chunk_files)
+                entities.append({
+                    "entity_name": entity_dir.name,
+                    "chunk_count": len(chunk_files),
+                    "total_size": total_size,
+                    "chunks": [
+                        {
+                            "filename": e.name,
+                            "size": e.stat().st_size,
+                            "modified": datetime.fromtimestamp(
+                                e.stat().st_mtime, tz=dt_timezone.utc),
+                            "entity_path": entity_dir.name,
+                        }
+                        for e in chunk_files
+                    ],
+                })
+        fixture_sections[entity_type] = entities
+
+    from .models.audits import CorptoolsConfiguration
+    from .task_helpers.housekeeping_tasks import WALLET_NPC_TYPES
+    config = CorptoolsConfiguration.get_solo()
+
+    return render(request, "corptools/wallet_export_list.html", {
+        "fixture_sections": fixture_sections,
+        "retention_days": config.wallet_journal_retention_days,
+        "npc_type_count": len(WALLET_NPC_TYPES),
+    })
+
+
+@login_required
+def wallet_fixture_download(request, entity_type, entity_path, filename):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    if entity_type not in ("characters", "corporations"):
+        raise Http404
+
+    export_root = _wallet_export_root()
+    target = (export_root / "fixtures" / entity_type /
+              entity_path / filename).resolve()
+
+    try:
+        target.relative_to(export_root.resolve())
+    except ValueError:
+        raise Http404
+
+    if not target.exists() or not target.is_file():
+        raise Http404
+
+    return FileResponse(open(target, "rb"), as_attachment=True, filename=filename)

@@ -44,6 +44,12 @@ urlpatterns = [
     path('admin_create_tasks/', views.admin_create_tasks,
          name='admin_create_tasks'),
     path('run_tasks/', views.admin_run_tasks, name='run_tasks'),
+    path('wallet-export/', views.wallet_export_list, name='wallet_export_list'),
+    path(
+        'wallet-export/download/<str:entity_type>/<str:entity_path>/<str:filename>',
+        views.wallet_fixture_download,
+        name='wallet_fixture_download',
+    ),
     path('char/add/', views.add_char, name='add_char'),
     path('corp/', include([
         # path('r_legacy/', views.react_corp, name='corp_legacy_react'),
