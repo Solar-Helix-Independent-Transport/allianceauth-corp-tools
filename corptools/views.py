@@ -80,6 +80,7 @@ CORP_REQUIRED_SCOPES = [
 
     # Assets
     'esi-assets.read_corporation_assets.v1',
+    'esi-corporations.read_blueprints.v1',
 
     # All...
     'esi-search.search_structures.v1',

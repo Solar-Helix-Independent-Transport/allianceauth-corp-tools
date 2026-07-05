@@ -140,6 +140,11 @@ class CorptoolsConfiguration(SingletonModel):
         blank=True,
         help_text="Temporarily disable the ESI pulls for Character industry Job Data"
     )
+    disable_update_blueprints = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Blueprint ME/TE/Runs Data"
+    )
 
     class Meta:
         permissions = (

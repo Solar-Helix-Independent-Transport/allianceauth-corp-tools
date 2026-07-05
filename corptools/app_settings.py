@@ -164,6 +164,7 @@ def get_character_scopes():
         _scopes += [
             # Assets
             'esi-assets.read_assets.v1',
+            'esi-characters.read_blueprints.v1',
         ]
 
     if CT_CHAR_SKILLS_MODULE:
@@ -341,6 +342,7 @@ _corp_scopes_wallets = [
 # assets
 _corp_scopes_assets = [
     'esi-assets.read_corporation_assets.v1',
+    'esi-corporations.read_blueprints.v1',
 ]
 
 _corp_scopes_contracts = [
