@@ -46,6 +46,11 @@ urlpatterns = [
     path('run_tasks/', views.admin_run_tasks, name='run_tasks'),
     path('wallet-export/', views.wallet_export_list, name='wallet_export_list'),
     path(
+        'wallet-export/data/<str:entity_type>/',
+        views.wallet_fixture_data,
+        name='wallet_fixture_data',
+    ),
+    path(
         'wallet-export/download/<str:entity_type>/<str:entity_path>/<str:filename>',
         views.wallet_fixture_download,
         name='wallet_fixture_download',

@@ -57,6 +57,24 @@
                 Purges the same {{ count }} NPC ref_types tracked for export.
                 {% endblocktranslate %}
             </p>
+            <p class="card-text text-center">
+                <span class="badge bg-danger fs-6">
+                    {% blocktranslate with count=total_purge_count %}{{ count }} entries eligible now{% endblocktranslate %}
+                </span>
+                <br>
+                <span class="small text-muted">
+                    {% blocktranslate with chars=char_purge_count corps=corp_purge_count total=total_purge_count %}Purgable {{ chars }} character + {{ corps }} corporation = {{ total }} total{% endblocktranslate %}
+                </span>
+                <br>
+                <span class="small text-muted">
+                    {% blocktranslate with chars=char_total_count corps=corp_total_count total=total_all_count %}Stored {{ chars }} character + {{ corps }} corporation = {{ total }} total{% endblocktranslate %}
+                </span>
+                <br>
+                <span class="small text-muted">
+                    {% widthratio total_purge_count total_all_count 100 %}%
+                    {% translate "of stored entries are eligible for purge" %}
+                </span>
+            </p>
             <div class="mt-auto">
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" id="purgeConfirm">
@@ -78,8 +96,8 @@
 </div>
 
 {# Per-entity fixture listing #}
-{% for entity_type, entities in fixture_sections.items %}
-{% if entities %}
+{% for entity_type, present in has_fixtures.items %}
+{% if present %}
 <div class="card mb-3">
     <div class="card-header">
         <h5 class="mb-0">
@@ -87,58 +105,24 @@
             {% translate "Fixtures" %}
         </h5>
     </div>
-    <div class="card-body p-0">
-        <div class="accordion" id="accordion_{{ entity_type }}">
-            {% for entity in entities %}
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapse_{{ entity_type }}_{{ forloop.counter }}">
-                        {{ entity.entity_name }}
-                        <span class="badge bg-secondary ms-2">{{ entity.chunk_count }} chunk{{ entity.chunk_count|pluralize }}</span>
-                        <span class="badge bg-light text-dark ms-1">{{ entity.total_size|filesizeformat }}</span>
-                    </button>
-                </h2>
-                <div id="collapse_{{ entity_type }}_{{ forloop.counter }}"
-                     class="accordion-collapse collapse">
-                    <div class="accordion-body p-0">
-                        <table class="table table-sm table-striped mb-0">
-                            <thead>
-                                <tr>
-                                    <th>{% translate "File" %}</th>
-                                    <th>{% translate "Size" %}</th>
-                                    <th>{% translate "Exported" %}</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for chunk in entity.chunks %}
-                                <tr>
-                                    <td class="font-monospace small">{{ chunk.filename }}</td>
-                                    <td>{{ chunk.size|filesizeformat }}</td>
-                                    <td>{{ chunk.modified|date:"Y-m-d H:i" }}</td>
-                                    <td>
-                                        <a href="{% url 'corptools:wallet_fixture_download' entity_type chunk.entity_path chunk.filename %}"
-                                           class="btn btn-sm btn-outline-secondary">
-                                            {% translate "Download" %}
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+    <div class="card-body">
+        <table id="fixturesTable_{{ entity_type }}" class="table table-sm table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>{% translate "Entity" %}</th>
+                    <th>{% translate "File" %}</th>
+                    <th>{% translate "Size" %}</th>
+                    <th>{% translate "Exported" %}</th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
     </div>
 </div>
 {% endif %}
 {% endfor %}
 
-{% if not fixture_sections.characters and not fixture_sections.corporations %}
+{% if not has_fixtures.characters and not has_fixtures.corporations %}
 <div class="card mb-3">
     <div class="card-body text-muted text-center">
         {% translate "No fixture files have been exported yet. Queue the export above to generate them." %}
@@ -191,4 +175,46 @@
 })();
 </script>
 
-{% endblock %}
+{% endblock content %}
+
+{% block extra_css %}
+    {% include "bundles/datatables-2-css-bs5.html" %}
+{% endblock extra_css %}
+
+{% block extra_javascript %}
+    {% include "bundles/datatables-2-js-bs5.html" %}
+    <script>
+        $(document).ready(() => {
+            {% for entity_type, present in has_fixtures.items %}
+            {% if present %}
+            new DataTable('#fixturesTable_{{ entity_type }}', {
+                serverSide: true,
+                ajax: {
+                    url: '{% url "corptools:wallet_fixture_data" entity_type %}',
+                    type: 'GET',
+                },
+                order: [[0, 'asc'], [3, 'desc']],
+                columnDefs: [
+                    { targets: 0, visible: false },
+                    { targets: -1, orderable: false, searchable: false },
+                ],
+                pageLength: 25,
+                drawCallback: function () {
+                    const api = this.api();
+                    const rows = api.rows({ page: 'current' }).nodes();
+                    let lastGroup = null;
+                    api.column(0, { page: 'current' }).data().each((group, i) => {
+                        if (lastGroup !== group) {
+                            $(rows).eq(i).before(
+                                '<tr class="table-secondary fw-bold"><td colspan="4">' + group + '</td></tr>'
+                            );
+                            lastGroup = group;
+                        }
+                    });
+                },
+            });
+            {% endif %}
+            {% endfor %}
+        });
+    </script>
+{% endblock extra_javascript %}
