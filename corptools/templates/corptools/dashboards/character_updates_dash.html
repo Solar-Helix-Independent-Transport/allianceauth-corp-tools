@@ -57,7 +57,8 @@
             const dt = new DataTable('#table-char-updates', {
                 language: {
                     url: '{{ DT_LANG_PATH }}',
-                    processing: `{% include "framework/datatables/process-indicator.html" %}`
+                    processing: `{% include "framework/datatables/process-indicator.html" %}`,
+
                 },
                 layout: {
                     topStart: 'pageLength',
@@ -79,7 +80,10 @@
                         );
                         return {...data, ...filters};
                     },
-                    error: (xhr, error) => console.error('Error fetching data:', xhr, error)
+                    error: (xhr, error) => console.error('Error fetching data:', xhr, error),
+// not merged into allianceauth yet
+//                    type: 'POST',
+//                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
                 },
                 columnDefs: [
                     {
