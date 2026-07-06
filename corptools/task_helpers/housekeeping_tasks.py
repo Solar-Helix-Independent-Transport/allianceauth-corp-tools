@@ -81,7 +81,6 @@ WALLET_NPC_TYPES = [
     "jump_clone_installation_fee",
     "lp_store",
     "manufacturing",
-    "market_escrow",
     "market_fine_paid",
     "market_security_tax",
     "milestone_reward_payment",
