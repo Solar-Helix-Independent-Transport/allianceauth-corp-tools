@@ -63,7 +63,7 @@ export const IconStatusDiv = ({
 }: IconStatusCardProps) => {
   const inner = (
     <div
-      className={`d-flex m-1 ${text ? "pt-2" : ""} flex-column align-items-center`}
+      className={`d-flex m-1 ${text || isLoading ? "pt-2" : ""} flex-column align-items-center`}
       style={{ minWidth: "64px" }}
     >
       <div
