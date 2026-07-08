@@ -58,6 +58,11 @@ class Asset(models.Model):
 class CorpAsset(Asset):
     corporation = models.ForeignKey(CorporationAudit, on_delete=models.CASCADE)
 
+    class Meta:
+        indexes = Asset.Meta.indexes + [
+            models.Index(fields=['corporation_id', 'location_id']),
+        ]
+
     def __str__(self):
         return '{2} {0}x{1} ({3} / {4})'.format(self.type_id, self.quantity, self.corporation,
                                                 self.location_id, self.location_type)

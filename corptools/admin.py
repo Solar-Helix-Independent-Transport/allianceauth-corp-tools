@@ -5,6 +5,7 @@ from solo.admin import SingletonModelAdmin
 from django.apps import apps
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 
 from . import app_settings, models
 
@@ -12,9 +13,36 @@ admin.site.register(models.CharacterAudit)
 admin.site.register(models.CorporationAudit)
 
 
+class AutocompleteMediaMixin:
+    class Media:
+        css = {"all": ("corptools/admin/admin.css",)}
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        field = super().formfield_for_manytomany(db_field, request, **kwargs)
+        if db_field.name in getattr(self, "autocomplete_fields", []):
+            field.help_text = _(
+                "Search by name. Supports multiple selections.")
+            field.widget.can_add_related = False
+            field.widget.can_change_related = False
+            field.widget.can_delete_related = False
+        return field
+
+
+@admin.register(models.EveLocation)
+class EveLocationAdmin(admin.ModelAdmin):
+    search_fields = ['location_name']
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+        return queryset.filter(managed=False), use_distinct
+
+    def get_model_perms(self, request):
+        return {}
+
+
 @admin.register(models.CorptoolsConfiguration)
-class ConfigAdmin(SingletonModelAdmin):
-    filter_horizontal = ["holding_corps"]
+class ConfigAdmin(AutocompleteMediaMixin, SingletonModelAdmin):
+    autocomplete_fields = ["holding_corps"]
 
 
 # @admin.register(models.MapSystem)
@@ -148,7 +176,7 @@ class TitleAdmin(admin.ModelAdmin):
         return {}
 
 
-class assetFilterAdmin(admin.ModelAdmin):
+class assetFilterAdmin(AutocompleteMediaMixin, admin.ModelAdmin):
     list_display = ['__str__', '_types', '_groups', '_cats',
                     '_systems', '_constellations', '_regions']
 
@@ -235,19 +263,15 @@ class assetFilterAdmin(admin.ModelAdmin):
             10
         )
 
-    filter_horizontal = ["types",
-                         "groups",
-                         "categories",
-                         "systems",
-                         "constellations",
-                         "regions"]
+    autocomplete_fields = ["types", "groups",
+                           "categories", "systems", "constellations", "regions"]
 
 
-class CurrentShipFilterAdmin(admin.ModelAdmin):
+class CurrentShipFilterAdmin(AutocompleteMediaMixin, admin.ModelAdmin):
     list_display = ['__str__', '_types', '_groups',
                     '_systems', '_constellations', '_regions']
-    filter_horizontal = ["types", "groups",
-                         "systems", "constellations", "regions"]
+    autocomplete_fields = ["types", "groups",
+                           "systems", "constellations", "regions"]
 
     def _list_2_html_w_tooltips(self, my_items: list, max_items: int) -> str:
         """converts list of strings into HTML with cutoff and tooltip"""
@@ -354,10 +378,8 @@ class CharacterAgeFilterAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'min_age', "reversed_logic"]
 
 
-class rolesFilterAdmin(admin.ModelAdmin):
-    filter_horizontal = ["corps_filter",
-                         "alliances_filter"]
-
+class rolesFilterAdmin(AutocompleteMediaMixin, admin.ModelAdmin):
+    autocomplete_fields = ["corps_filter", "alliances_filter"]
     list_display = ['__str__', 'has_director', 'has_accountant',
                     'has_station_manager', 'has_personnel_manager']
 
@@ -371,46 +393,12 @@ class LoginAdmin(admin.ModelAdmin):
                     'no_data_pass', 'main_corp_only']
 
 
-class HomeStationFilterAdmin(admin.ModelAdmin):
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
-        if db_field.name == "evelocation":
-            data = set()
-            for f in models.EveLocation._meta.get_fields():
-                if f.auto_created and not f.concrete:
-                    data.update(
-                        set(
-                            f.related_model.objects.all().values_list(
-                                f.field.attname, flat=True).distinct()
-                        )
-                    )
-            kwargs["queryset"] = models.EveLocation.objects.filter(
-                location_id__in=list(data),
-                managed=False
-            )
-        return super().formfield_for_manytomany(db_field, request, **kwargs)
-
-    filter_horizontal = ["evelocation"]
+class HomeStationFilterAdmin(AutocompleteMediaMixin, admin.ModelAdmin):
+    autocomplete_fields = ["evelocation"]
 
 
-class JumpCloneFilterAdmin(admin.ModelAdmin):
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
-        if db_field.name == "evelocation":
-            data = set()
-            for f in models.EveLocation._meta.get_fields():
-                if f.auto_created and not f.concrete:
-                    data.update(
-                        set(
-                            f.related_model.objects.all().values_list(
-                                f.field.attname, flat=True).distinct()
-                        )
-                    )
-            kwargs["queryset"] = models.EveLocation.objects.filter(
-                location_id__in=list(data),
-                managed=False
-            )
-        return super().formfield_for_manytomany(db_field, request, **kwargs)
-
-    filter_horizontal = ["evelocation"]
+class JumpCloneFilterAdmin(AutocompleteMediaMixin, admin.ModelAdmin):
+    autocomplete_fields = ["evelocation"]
 
 
 if apps.is_installed('securegroups'):

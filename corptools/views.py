@@ -1,8 +1,10 @@
 # Standard Library
 import json
 import xml.etree.ElementTree as ET
-from datetime import timedelta
+from datetime import datetime, timedelta
+from datetime import timezone as dt_timezone
 from math import ceil
+from pathlib import Path
 
 # Third Party
 from celery.schedules import crontab
@@ -12,11 +14,14 @@ from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.template import TemplateDoesNotExist
+from django.template.defaultfilters import filesizeformat
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
@@ -33,8 +38,10 @@ from .api.helpers import format_hours_as_duration
 from .forms import UploadForm
 from .models import (
     CharacterAudit,
+    CharacterWalletJournalEntry,
     CorpAsset,
     CorporationAudit,
+    CorporationWalletJournalEntry,
     CorptoolsConfiguration,
     EveLocation,
     EveName,
@@ -735,3 +742,161 @@ def metenox_levels(request):
         'structures': dashboards.DashboardApiEndpoints.get_dashboard_drills_levels(request),
     }
     return render(request, 'corptools/dashboards/metenox_dash.html', context=context)
+
+
+def _wallet_export_root() -> Path:
+    # Django
+    from django.conf import settings
+    return Path(settings.MEDIA_ROOT) / "wallet_exports"
+
+
+def _list_wallet_fixture_rows(entity_type: str) -> list:
+    fixture_root = _wallet_export_root() / "fixtures" / entity_type
+    rows = []
+    if fixture_root.exists():
+        for entity_dir in fixture_root.iterdir():
+            if not entity_dir.is_dir():
+                continue
+            for f in entity_dir.iterdir():
+                if f.suffix != ".json" or f.name == "watermark.json":
+                    continue
+                rows.append({
+                    "entity_name": entity_dir.name,
+                    "filename": f.name,
+                    "size": f.stat().st_size,
+                    "modified": datetime.fromtimestamp(
+                        f.stat().st_mtime, tz=dt_timezone.utc),
+                    "entity_path": entity_dir.name,
+                })
+    return rows
+
+
+@login_required
+def wallet_export_list(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    if request.method == "POST":
+        if "run_fixtures" in request.POST:
+            from .tasks.housekeeping import export_old_wallet_fixtures
+            export_old_wallet_fixtures.apply_async(priority=6)
+            messages.info(request, "Wallet fixture export task queued.")
+        elif "run_purge" in request.POST:
+            from .tasks.housekeeping import purge_old_wallet_data
+            purge_old_wallet_data.apply_async(priority=6)
+            messages.warning(request, "Wallet purge task queued.")
+        return redirect("corptools:wallet_export_list")
+
+    has_fixtures = {
+        entity_type: bool(_list_wallet_fixture_rows(entity_type))
+        for entity_type in ("characters", "corporations")
+    }
+
+    from .models.audits import CorptoolsConfiguration
+    from .task_helpers.housekeeping_tasks import WALLET_NPC_TYPES
+    config = CorptoolsConfiguration.get_solo()
+    cutoff = timezone.now() - timedelta(days=config.wallet_journal_retention_days)
+
+    char_purge_count = CharacterWalletJournalEntry.objects.filter(
+        ref_type__in=WALLET_NPC_TYPES, date__lt=cutoff).count()
+    corp_purge_count = CorporationWalletJournalEntry.objects.filter(
+        ref_type__in=WALLET_NPC_TYPES, date__lt=cutoff).count()
+    char_total_count = CharacterWalletJournalEntry.objects.all().count()
+    corp_total_count = CorporationWalletJournalEntry.objects.all().count()
+
+    return render(request, "corptools/wallet_export_list.html", {
+        "has_fixtures": has_fixtures,
+        "retention_days": config.wallet_journal_retention_days,
+        "npc_type_count": len(WALLET_NPC_TYPES),
+        "char_purge_count": char_purge_count,
+        "corp_purge_count": corp_purge_count,
+        "char_total_count": char_total_count,
+        "corp_total_count": corp_total_count,
+        "total_all_count": char_total_count + corp_total_count,
+        "total_purge_count": char_purge_count + corp_purge_count
+    }
+    )
+
+
+@login_required
+def wallet_fixture_data(request, entity_type):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    if entity_type not in ("characters", "corporations"):
+        raise Http404
+
+    draw = int(request.GET.get("draw", 1))
+    start = int(request.GET.get("start", 0))
+    length = int(request.GET.get("length", 25))
+    search_value = request.GET.get("search[value]", "").strip().lower()
+    order_column = int(request.GET.get("order[0][column]", 0))
+    order_dir = request.GET.get("order[0][dir]", "asc")
+
+    sort_fields = ["entity_name", "filename", "size", "modified"]
+    sort_field = sort_fields[order_column] if order_column < len(
+        sort_fields) else "entity_name"
+
+    rows = _list_wallet_fixture_rows(entity_type)
+    records_total = len(rows)
+
+    if search_value:
+        rows = [
+            r for r in rows
+            if search_value in r["entity_name"].lower()
+            or search_value in r["filename"].lower()
+        ]
+    records_filtered = len(rows)
+
+    rows.sort(key=lambda r: r[sort_field], reverse=(order_dir == "desc"))
+
+    if length > 0:
+        rows = rows[start:start + length]
+
+    data = []
+    for r in rows:
+        download_url = reverse(
+            "corptools:wallet_fixture_download",
+            args=[entity_type, r["entity_path"], r["filename"]],
+        )
+        download_html = format_html(
+            '<a href="{}" class="btn btn-sm btn-outline-secondary">{}</a>',
+            download_url, _("Download"),
+        )
+        data.append([
+            r["entity_name"],
+            r["filename"],
+            filesizeformat(r["size"]),
+            r["modified"].strftime("%Y-%m-%d %H:%M"),
+            download_html,
+        ])
+
+    return JsonResponse({
+        "draw": draw,
+        "recordsTotal": records_total,
+        "recordsFiltered": records_filtered,
+        "data": data,
+    })
+
+
+@login_required
+def wallet_fixture_download(request, entity_type, entity_path, filename):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    if entity_type not in ("characters", "corporations"):
+        raise Http404
+
+    export_root = _wallet_export_root()
+    target = (export_root / "fixtures" / entity_type /
+              entity_path / filename).resolve()
+
+    try:
+        target.relative_to(export_root.resolve())
+    except ValueError:
+        raise Http404
+
+    if not target.exists() or not target.is_file():
+        raise Http404
+
+    return FileResponse(open(target, "rb"), as_attachment=True, filename=filename)
