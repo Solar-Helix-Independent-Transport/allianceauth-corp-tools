@@ -38,10 +38,8 @@ from .api.helpers import format_hours_as_duration
 from .forms import UploadForm
 from .models import (
     CharacterAudit,
-    CharacterWalletJournalEntry,
     CorpAsset,
     CorporationAudit,
-    CorporationWalletJournalEntry,
     CorptoolsConfiguration,
     EveLocation,
     EveName,
@@ -795,20 +793,11 @@ def wallet_export_list(request):
     from .models.audits import CorptoolsConfiguration
     from .task_helpers.housekeeping_tasks import WALLET_NPC_TYPES
     config = CorptoolsConfiguration.get_solo()
-    cutoff = timezone.now() - timedelta(days=config.wallet_journal_retention_days)
-
-    char_purge_count = CharacterWalletJournalEntry.objects.filter(
-        ref_type__in=WALLET_NPC_TYPES, date__lt=cutoff).count()
-    corp_purge_count = CorporationWalletJournalEntry.objects.filter(
-        ref_type__in=WALLET_NPC_TYPES, date__lt=cutoff).count()
 
     return render(request, "corptools/wallet_export_list.html", {
         "has_fixtures": has_fixtures,
         "retention_days": config.wallet_journal_retention_days,
         "npc_type_count": len(WALLET_NPC_TYPES),
-        "char_purge_count": char_purge_count,
-        "corp_purge_count": corp_purge_count,
-        "total_purge_count": char_purge_count + corp_purge_count
     }
     )
 

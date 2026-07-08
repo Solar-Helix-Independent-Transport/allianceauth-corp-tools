@@ -57,14 +57,8 @@
                 Purges the same {{ count }} NPC ref_types tracked for export.
                 {% endblocktranslate %}
             </p>
-            <p class="card-text text-center">
-                <span class="badge bg-danger fs-6">
-                    {% blocktranslate with count=total_purge_count %}{{ count }} entries eligible now{% endblocktranslate %}
-                </span>
-                <br>
-                <span class="small text-muted">
-                    {% blocktranslate with chars=char_purge_count corps=corp_purge_count total=total_purge_count %}Purgable {{ chars }} character + {{ corps }} corporation = {{ total }} total{% endblocktranslate %}
-                </span>
+            <p class="card-text small text-muted text-center">
+                {% translate "Run `python manage.py ct_wallet_stats` on the server to see current entry counts." %}
             </p>
             <div class="mt-auto">
                 <div class="form-check mb-2">
