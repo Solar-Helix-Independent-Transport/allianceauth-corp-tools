@@ -42,6 +42,11 @@ class Asset(models.Model):
     # extra's
     name = models.CharField(max_length=255, null=True, default=None)
 
+    # blueprint attributes (from the blueprints endpoint, matched by item_id)
+    material_efficiency = models.SmallIntegerField(null=True, default=None)
+    time_efficiency = models.SmallIntegerField(null=True, default=None)
+    runs = models.IntegerField(null=True, default=None)
+
     class Meta:
         abstract = True
         indexes = [

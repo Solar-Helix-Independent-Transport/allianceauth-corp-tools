@@ -140,6 +140,7 @@ esi_openapi = OpenAPI(
         "GetCharactersCharacterIdAssets",
         "PostCharactersCharacterIdAssetsNames",
         "PostCharactersCharacterIdAssetsLocations",
+        "GetCharactersCharacterIdBlueprints",
         # Character Location
         "GetCharactersCharacterIdShip",
         "GetCharactersCharacterIdLocation",
@@ -151,6 +152,7 @@ esi_openapi = OpenAPI(
         "GetCharactersCharacterIdContactsLabels",
         # Corporate Assets
         "GetCorporationsCorporationIdAssets",
+        "GetCorporationsCorporationIdBlueprints",
         "PostCorporationsCorporationIdAssetsNames",
         "PostCorporationsCorporationIdAssetsLocations",
         # Character Skills
