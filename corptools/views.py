@@ -801,8 +801,6 @@ def wallet_export_list(request):
         ref_type__in=WALLET_NPC_TYPES, date__lt=cutoff).count()
     corp_purge_count = CorporationWalletJournalEntry.objects.filter(
         ref_type__in=WALLET_NPC_TYPES, date__lt=cutoff).count()
-    char_total_count = CharacterWalletJournalEntry.objects.all().count()
-    corp_total_count = CorporationWalletJournalEntry.objects.all().count()
 
     return render(request, "corptools/wallet_export_list.html", {
         "has_fixtures": has_fixtures,
@@ -810,9 +808,6 @@ def wallet_export_list(request):
         "npc_type_count": len(WALLET_NPC_TYPES),
         "char_purge_count": char_purge_count,
         "corp_purge_count": corp_purge_count,
-        "char_total_count": char_total_count,
-        "corp_total_count": corp_total_count,
-        "total_all_count": char_total_count + corp_total_count,
         "total_purge_count": char_purge_count + corp_purge_count
     }
     )

@@ -65,15 +65,6 @@
                 <span class="small text-muted">
                     {% blocktranslate with chars=char_purge_count corps=corp_purge_count total=total_purge_count %}Purgable {{ chars }} character + {{ corps }} corporation = {{ total }} total{% endblocktranslate %}
                 </span>
-                <br>
-                <span class="small text-muted">
-                    {% blocktranslate with chars=char_total_count corps=corp_total_count total=total_all_count %}Stored {{ chars }} character + {{ corps }} corporation = {{ total }} total{% endblocktranslate %}
-                </span>
-                <br>
-                <span class="small text-muted">
-                    {% widthratio total_purge_count total_all_count 100 %}%
-                    {% translate "of stored entries are eligible for purge" %}
-                </span>
             </p>
             <div class="mt-auto">
                 <div class="form-check mb-2">
