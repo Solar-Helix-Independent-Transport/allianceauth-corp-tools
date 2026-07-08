@@ -42,6 +42,7 @@ from ..models import (
     Contract,
     ContractItem,
     CorporationHistory,
+    CorptoolsConfiguration,
     EveLocation,
     EveName,
     Implant,
@@ -468,6 +469,11 @@ def update_character_assets(character_id, force_refresh=False):
             update_den_locations(character_id)
         except Exception as e:
             logger.error(e)
+        try:
+            # Enrich blueprint assets with ME/TE/Runs!
+            update_character_blueprints(character_id, force_refresh=force_refresh)
+        except Exception as e:
+            logger.error(e)
 
     except HTTPNotModified as e:
         _, _, tb = sys.exc_info()
@@ -527,6 +533,60 @@ def update_character_assets_names(character_id):
             if asset.item_id in id_list:
                 asset.name = id_list.get(asset.item_id)
                 asset.save()
+
+
+def update_character_blueprints(character_id, force_refresh=False):
+    """
+        Uses GetCharactersCharacterIdBlueprints to enrich stored assets with the
+        blueprint ME/TE/Runs, matched by item_id. The /assets/ endpoint does not
+        carry these, so they are pulled here and written onto the asset rows.
+    """
+    if CorptoolsConfiguration.get_solo().disable_update_blueprints:
+        return "Disabled"
+
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id
+    )
+
+    logger.debug(
+        f"Updating Blueprints for: {audit_char.character.character_name}")
+
+    req_scopes = ['esi-characters.read_blueprints.v1']
+
+    token = get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+
+    blueprints = providers.esi_openapi.client.Character.GetCharactersCharacterIdBlueprints(
+        character_id=character_id,
+        token=token
+    ).results(
+        force_refresh=force_refresh,
+        # the asset rows are recreated on every asset pull, so an unchanged
+        # blueprint list must still be applied to the fresh rows.
+        use_etag=False,
+        store_cache=False
+    )
+
+    bp_map = {b.item_id: b for b in blueprints}
+
+    updates = []
+    for id_chunk in providers.esi_openapi.chunk_ids(list(bp_map.keys())):
+        for asset in CharacterAsset.objects.filter(
+            character=audit_char, item_id__in=id_chunk
+        ):
+            bp = bp_map[asset.item_id]
+            asset.material_efficiency = bp.material_efficiency
+            asset.time_efficiency = bp.time_efficiency
+            asset.runs = bp.runs
+            updates.append(asset)
+
+    CharacterAsset.objects.bulk_update(
+        updates,
+        ["material_efficiency", "time_efficiency", "runs"],
+        batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
+    )
 
 
 def update_den_locations(character_id, force_refresh=False):

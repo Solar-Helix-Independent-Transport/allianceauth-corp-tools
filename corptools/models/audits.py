@@ -48,6 +48,23 @@ class CorptoolsConfiguration(SingletonModel):
         help_text="Days to look back in aggregated views, like the mining ledger graphs."
     )
 
+    wallet_journal_retention_days = models.IntegerField(
+        default=365,
+        help_text=(
+            "Days to retain NPC-only wallet journal entries (e.g. insurance, manufacturing fees). "
+            "Player interaction entries are never purged."
+        )
+    )
+
+    notification_retention_days = models.IntegerField(
+        default=90,
+        help_text=(
+            "Days to retain purgeable notification types (NPC, war, structure, sovereignty). "
+            "Corp membership, player bounties, kill rights, and similar player interaction "
+            "notifications are never purged."
+        )
+    )
+
     disable_verification_assets = models.BooleanField(
         default=False,
         help_text="Allow ESI to provide data that does not match the ESI Assets Spec"
@@ -139,6 +156,11 @@ class CorptoolsConfiguration(SingletonModel):
         default=False,
         blank=True,
         help_text="Temporarily disable the ESI pulls for Character industry Job Data"
+    )
+    disable_update_blueprints = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Blueprint ME/TE/Runs Data"
     )
 
     class Meta:

@@ -262,13 +262,49 @@ def corp_starbase_update(corp_id, force_refresh=True):  # Set true as we have ba
             f"CT: No Tokens for Starbases for {_corporation.corporation.corporation_name}")
         return f"CT: No Tokens for Starbases for {_corporation.corporation.corporation_name}"
 
-    starbases = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdStarbases(
-        corporation_id=_corporation.corporation.corporation_id,
-        token=_token
-    ).results(
-        force_refresh=force_refresh,
-        store_cache=False
-    )
+    try:
+        starbases = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdStarbases(
+            corporation_id=_corporation.corporation.corporation_id,
+            token=_token
+        ).results(
+            force_refresh=force_refresh,
+            store_cache=False
+        )
+    except HTTPNotModified:
+        # List unchanged — state/membership data is current, but fuel quantities
+        # are only in the detail endpoint so we still need to refresh those.
+        for sb in Starbase.objects.filter(corporation=_corporation):
+            try:
+                detail = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdStarbasesStarbaseId(
+                    corporation_id=_corporation.corporation.corporation_id,
+                    starbase_id=sb.starbase_id,
+                    system_id=sb.system_id,
+                    token=_token
+                ).result(
+                    force_refresh=force_refresh,
+                    store_cache=False
+                )
+            except HTTPNotModified:
+                continue
+            sb.allow_alliance_members = detail.allow_alliance_members
+            sb.allow_corporation_members = detail.allow_corporation_members
+            sb.anchor = detail.anchor
+            sb.attack_if_at_war = detail.attack_if_at_war
+            sb.attack_if_other_security_status_dropping = detail.attack_if_other_security_status_dropping
+            sb.attack_security_status_threshold = detail.attack_security_status_threshold
+            sb.attack_standing_threshold = detail.attack_standing_threshold
+            sb.fuel_bay_take = detail.fuel_bay_take
+            sb.fuel_bay_view = detail.fuel_bay_view
+            sb.offline = detail.offline
+            sb.online = detail.online
+            sb.unanchor = detail.unanchor
+            sb.use_alliance_standings = detail.use_alliance_standings
+            sb.fuels = [
+                {"type_id": f.type_id, "quantity": f.quantity}
+                for f in (detail.fuels or [])
+            ]
+            sb.save()
+        return f"CT: Completed Starbases for {_corporation.corporation.corporation_name}"
 
     if not len(starbases):
         # Remove them all!

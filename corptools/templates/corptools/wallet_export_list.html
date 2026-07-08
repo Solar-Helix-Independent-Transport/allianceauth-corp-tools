@@ -1,0 +1,220 @@
+{% extends 'allianceauth/base-bs5.html' %}
+{% load i18n %}
+{% block page_title %}{% translate "Wallet Archive Export" %}{% endblock %}
+
+{% block header_nav_collapse_left %}
+    {% include 'corptools/top_menu.html' %}
+{% endblock %}
+
+{% block content %}
+{% translate "Wallet Archive Export" as page_title %}
+{% include "framework/header/page-header.html" with title=page_title %}
+
+<div class="row g-3 mb-3">
+
+    <div class="col-12 col-md-6 col-xl-4">
+    {# Export trigger card #}
+    <form action="{% url 'corptools:wallet_export_list' %}" method="post" class="card h-100">
+        {% csrf_token %}
+        <div class="card-body d-flex flex-column">
+            <h5 class="card-title text-center">{% translate "Export Fixtures" %}</h5>
+            <hr>
+            <p class="card-text small text-muted">
+                {% blocktranslate with days=retention_days %}
+                Exports all NPC wallet journal entries older than {{ days }} days to
+                Django fixture files (one chunk per run, watermarked to avoid re-exporting).
+                {% endblocktranslate %}
+            </p>
+            <p class="card-text small text-muted">
+                {% blocktranslate with count=npc_type_count %}
+                {{ count }} NPC ref_types are tracked for export and purge.
+                {% endblocktranslate %}
+            </p>
+            <div class="mt-auto">
+                <button type="submit" name="run_fixtures" class="btn btn-primary w-100">
+                    {% translate "Queue Fixture Export" %}
+                </button>
+            </div>
+        </div>
+    </form>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-4">
+    {# Purge trigger card #}
+    <form action="{% url 'corptools:wallet_export_list' %}" method="post" class="card h-100">
+        {% csrf_token %}
+        <div class="card-body d-flex flex-column">
+            <h5 class="card-title text-center">{% translate "Purge NPC Wallet Data" %}</h5>
+            <hr>
+            <p class="card-text small text-muted">
+                {% blocktranslate with days=retention_days %}
+                Deletes all NPC wallet journal entries older than {{ days }} days from the database.
+                Run the fixture export first to archive data before purging.
+                {% endblocktranslate %}
+            </p>
+            <p class="card-text small text-muted">
+                {% blocktranslate with count=npc_type_count %}
+                Purges the same {{ count }} NPC ref_types tracked for export.
+                {% endblocktranslate %}
+            </p>
+            <p class="card-text text-center">
+                <span class="badge bg-danger fs-6">
+                    {% blocktranslate with count=total_purge_count %}{{ count }} entries eligible now{% endblocktranslate %}
+                </span>
+                <br>
+                <span class="small text-muted">
+                    {% blocktranslate with chars=char_purge_count corps=corp_purge_count total=total_purge_count %}Purgable {{ chars }} character + {{ corps }} corporation = {{ total }} total{% endblocktranslate %}
+                </span>
+                <br>
+                <span class="small text-muted">
+                    {% blocktranslate with chars=char_total_count corps=corp_total_count total=total_all_count %}Stored {{ chars }} character + {{ corps }} corporation = {{ total }} total{% endblocktranslate %}
+                </span>
+                <br>
+                <span class="small text-muted">
+                    {% widthratio total_purge_count total_all_count 100 %}%
+                    {% translate "of stored entries are eligible for purge" %}
+                </span>
+            </p>
+            <div class="mt-auto">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="purgeConfirm">
+                    <label class="form-check-label small" for="purgeConfirm">
+                        {% translate "I understand this permanently deletes wallet data" %}
+                    </label>
+                </div>
+                <div class="text-center mb-2" id="purgeCountdown" style="display:none;">
+                    <span class="badge bg-warning text-dark" id="purgeCountdownBadge"></span>
+                </div>
+                <button type="submit" name="run_purge" id="purgeBtn" class="btn btn-danger w-100" disabled>
+                    {% translate "Queue Purge" %}
+                </button>
+            </div>
+        </div>
+    </form>
+    </div>
+
+</div>
+
+{# Per-entity fixture listing #}
+{% for entity_type, present in has_fixtures.items %}
+{% if present %}
+<div class="card mb-3">
+    <div class="card-header">
+        <h5 class="mb-0">
+            {% if entity_type == "characters" %}{% translate "Character" %}{% else %}{% translate "Corporation" %}{% endif %}
+            {% translate "Fixtures" %}
+        </h5>
+    </div>
+    <div class="card-body">
+        <table id="fixturesTable_{{ entity_type }}" class="table table-sm table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>{% translate "Entity" %}</th>
+                    <th>{% translate "File" %}</th>
+                    <th>{% translate "Size" %}</th>
+                    <th>{% translate "Exported" %}</th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
+{% if not has_fixtures.characters and not has_fixtures.corporations %}
+<div class="card mb-3">
+    <div class="card-body text-muted text-center">
+        {% translate "No fixture files have been exported yet. Queue the export above to generate them." %}
+    </div>
+</div>
+{% endif %}
+
+<script>
+(function () {
+    const checkbox = document.getElementById('purgeConfirm');
+    const btn = document.getElementById('purgeBtn');
+    const countdown = document.getElementById('purgeCountdown');
+    const badge = document.getElementById('purgeCountdownBadge');
+    const TIMEOUT = 10;
+    let timer = null;
+    let remaining = 0;
+
+    function reset() {
+        clearInterval(timer);
+        timer = null;
+        btn.disabled = true;
+        countdown.style.display = 'none';
+        badge.textContent = '';
+        checkbox.checked = false;
+    }
+
+    function tick() {
+        remaining -= 1;
+        badge.textContent = 'Expires in ' + remaining + 's';
+        if (remaining <= 0) {
+            reset();
+        }
+    }
+
+    checkbox.addEventListener('change', function () {
+        if (this.checked) {
+            remaining = TIMEOUT;
+            btn.disabled = false;
+            badge.textContent = 'Expires in ' + remaining + 's';
+            countdown.style.display = 'block';
+            timer = setInterval(tick, 1000);
+        } else {
+            reset();
+        }
+    });
+
+    btn.closest('form').addEventListener('submit', function () {
+        clearInterval(timer);
+    });
+})();
+</script>
+
+{% endblock content %}
+
+{% block extra_css %}
+    {% include "bundles/datatables-2-css-bs5.html" %}
+{% endblock extra_css %}
+
+{% block extra_javascript %}
+    {% include "bundles/datatables-2-js-bs5.html" %}
+    <script>
+        $(document).ready(() => {
+            {% for entity_type, present in has_fixtures.items %}
+            {% if present %}
+            new DataTable('#fixturesTable_{{ entity_type }}', {
+                serverSide: true,
+                ajax: {
+                    url: '{% url "corptools:wallet_fixture_data" entity_type %}',
+                    type: 'GET',
+                },
+                order: [[0, 'asc'], [3, 'desc']],
+                columnDefs: [
+                    { targets: 0, visible: false },
+                    { targets: -1, orderable: false, searchable: false },
+                ],
+                pageLength: 25,
+                drawCallback: function () {
+                    const api = this.api();
+                    const rows = api.rows({ page: 'current' }).nodes();
+                    let lastGroup = null;
+                    api.column(0, { page: 'current' }).data().each((group, i) => {
+                        if (lastGroup !== group) {
+                            $(rows).eq(i).before(
+                                '<tr class="table-secondary fw-bold"><td colspan="4">' + group + '</td></tr>'
+                            );
+                            lastGroup = group;
+                        }
+                    });
+                },
+            });
+            {% endif %}
+            {% endfor %}
+        });
+    </script>
+{% endblock extra_javascript %}

@@ -3,11 +3,19 @@ from celery import shared_task
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
+from allianceauth.services.tasks import QueueOnce
 from esi.openapi_clients import EsiOperation
 
 from ..models import CharacterAudit, CharacterWalletJournalEntry, CorporationAudit
 from ..providers import esi_openapi
-from ..task_helpers.housekeeping_tasks import remove_old_notifications
+from ..task_helpers.housekeeping_tasks import (
+    purge_npc_wallet_entries,
+    remove_old_notifications,
+)
+from ..task_helpers.wallet_export import (
+    export_character_wallet_fixtures,
+    export_corporation_wallet_fixtures,
+)
 
 logger = get_extension_logger(__name__)
 
@@ -207,3 +215,45 @@ def update_wallet_currency(pk):
         reason = reason.replace(" @ $", " @ ")
         m.reason = reason + " ISK"
         m.save()
+
+
+@shared_task(name="corptools.tasks.export_old_wallet_fixtures")
+def export_old_wallet_fixtures():
+    char_ids = list(CharacterAudit.objects.values_list(
+        "character__character_id", flat=True))
+    for char_id in char_ids:
+        export_character_wallet_fixtures_task.apply_async(
+            args=[char_id], priority=7)
+
+    corp_ids = list(CorporationAudit.objects.values_list(
+        "corporation__corporation_id", flat=True))
+    for corp_id in corp_ids:
+        export_corporation_wallet_fixtures_task.apply_async(
+            args=[corp_id], priority=7)
+
+    return f"Dispatched {len(char_ids)} character and {len(corp_ids)} corporation wallet fixture export tasks"
+
+
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    once={"graceful": True, "keys": ["character_id"]},
+    name="corptools.tasks.export_character_wallet_fixtures",
+)
+def export_character_wallet_fixtures_task(self, character_id):
+    return export_character_wallet_fixtures(character_id)
+
+
+@shared_task(
+    bind=True,
+    base=QueueOnce,
+    once={"graceful": True, "keys": ["corporation_id"]},
+    name="corptools.tasks.export_corporation_wallet_fixtures",
+)
+def export_corporation_wallet_fixtures_task(self, corporation_id):
+    return export_corporation_wallet_fixtures(corporation_id)
+
+
+@shared_task(name="corptools.tasks.purge_old_wallet_data")
+def purge_old_wallet_data():
+    return purge_npc_wallet_entries()

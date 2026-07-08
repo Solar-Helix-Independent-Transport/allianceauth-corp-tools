@@ -22,6 +22,7 @@ from corptools.models import (
     BridgeOzoneLevel,
     CorpAsset,
     CorporationAudit,
+    CorptoolsConfiguration,
     EveLocation,
     Structure,
 )
@@ -117,6 +118,10 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
         corp_update_asset_names(corp_id)
     except Exception as e:
         logger.error(e)
+    try:
+        update_corporation_blueprints(corp_id, force_refresh=force_refresh)
+    except Exception as e:
+        logger.error(e)
 
     que = []
     que.append(fetch_coordiantes.si(corp_id, force_refresh=force_refresh))
@@ -126,6 +131,60 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
     chain(que).apply_async(priority=7)
 
     return f"Finished assets for: {audit_corp.corporation}"
+
+
+def update_corporation_blueprints(corp_id, force_refresh: bool = False):
+    """
+        Uses GetCorporationsCorporationIdBlueprints to enrich stored corp assets
+        with the blueprint ME/TE/Runs, matched by item_id. Requires the Director
+        role and the read_blueprints corp scope.
+    """
+    if CorptoolsConfiguration.get_solo().disable_update_blueprints:
+        return "Disabled"
+
+    audit_corp = CorporationAudit.objects.get(
+        corporation__corporation_id=corp_id)
+    logger.debug("Updating Blueprints for: {}".format(
+        audit_corp.corporation))
+
+    req_scopes = ['esi-corporations.read_blueprints.v1',
+                  'esi-characters.read_corporation_roles.v1']
+    req_roles = ['Director']
+
+    token = get_corp_token(corp_id, req_scopes, req_roles)
+
+    if not token:
+        return "No Tokens"
+
+    blueprints = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdBlueprints(
+        corporation_id=corp_id,
+        token=token
+    ).results(
+        force_refresh=force_refresh,
+        # the asset rows are recreated on every asset pull, so an unchanged
+        # blueprint list must still be applied to the fresh rows.
+        use_etag=False,
+        store_cache=False
+    )
+
+    bp_map = {b.item_id: b for b in blueprints}
+
+    updates = []
+    for id_chunk in providers.esi_openapi.chunk_ids(list(bp_map.keys())):
+        for asset in CorpAsset.objects.filter(
+            corporation=audit_corp, item_id__in=id_chunk
+        ):
+            bp = bp_map[asset.item_id]
+            asset.material_efficiency = bp.material_efficiency
+            asset.time_efficiency = bp.time_efficiency
+            asset.runs = bp.runs
+            updates.append(asset)
+
+    CorpAsset.objects.bulk_update(
+        updates,
+        ["material_efficiency", "time_efficiency", "runs"],
+        batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
+    )
 
 
 @shared_task(bind=True)
