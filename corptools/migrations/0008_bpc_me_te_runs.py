@@ -1,10 +1,11 @@
+# Django
 from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("corptools", "0005_sovereigntyhub_sovereigntyhubreagent_and_more"),
+        ("corptools", "0007_corptoolsconfiguration_notification_retention_days_and_more"),
     ]
 
     operations = [
