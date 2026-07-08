@@ -35,6 +35,10 @@ def _mock_providers(mock_providers, blueprints, tag="Character",
 class TestCharacterBlueprintEnrichment(CorptoolsTestCase):
     def setUp(self):
         super().setUp()
+        # CorptoolsConfiguration is a django-solo singleton cached outside the
+        # DB transaction, so a previous test's config.save() can otherwise
+        # leak into this test.
+        CorptoolsConfiguration.clear_cache()
         self.audit, _ = CharacterAudit.objects.get_or_create(
             character=self.char1)
         self.asset = CharacterAsset.objects.create(
@@ -88,6 +92,7 @@ class TestCharacterBlueprintEnrichment(CorptoolsTestCase):
 class TestCorporationBlueprintEnrichment(CorptoolsTestCase):
     def setUp(self):
         super().setUp()
+        CorptoolsConfiguration.clear_cache()
         self.asset = CorpAsset.objects.create(
             corporation=self.cp1,
             type_id=999,
