@@ -80,9 +80,14 @@ class SovereigntyDashboard(MenuItemHook):
         # (corptools.view_characteraudit) - this is the public, read-only
         # view, not gated behind the corp-manager perms Corporation Audit
         # requires.
-        if request.user.has_perm("corptools.view_characteraudit"):
-            return MenuItemHook.render(self, request)
-        return ''
+        if not request.user.has_perm("corptools.view_characteraudit"):
+            return ''
+        # The dashboard shows every tracked hub regardless of viewer - if
+        # there are none at all yet, the link would just lead to an empty
+        # page, so don't show it.
+        if not models.SovereigntyHub.objects.exists():
+            return ''
+        return MenuItemHook.render(self, request)
 
 
 @hooks.register('menu_item_hook')
