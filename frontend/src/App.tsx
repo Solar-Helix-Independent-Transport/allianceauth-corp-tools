@@ -45,7 +45,10 @@ import CorporationStatus from "./Pages/Corp/Status";
 import CorporationStarbases from "./Pages/Corp/Starbases";
 import CorporationMiningLedger from "./Pages/Corp/MiningLedger";
 import CorporationSovereigntyHubs from "./Pages/Corp/SovereigntyHubs";
+import CorporationSovereigntyMap from "./Pages/Corp/SovereigntyMap";
 import Dens from "./Pages/Corp/Dens";
+import DashAudit from "./Pages/Dash/Audit";
+import DashSovereigntyMap from "./Pages/Dash/SovereigntyMap";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -143,7 +146,21 @@ function App() {
                 <Route path="bridges" element={<Bridges />} />
                 <Route path="dens" element={<Dens />} />
                 <Route path="sovhubs" element={<CorporationSovereigntyHubs />} />
+                <Route path="sovmap" element={<CorporationSovereigntyMap />} />
                 {/* <Route path="fuel" element={<Bridges />} /> */}
+                <Route
+                  path="*"
+                  element={
+                    <ErrorLoader
+                      title="Error 404"
+                      message="This is not the path you are looking for! Page not found."
+                    />
+                  }
+                />
+              </Route>
+              <Route path="audit/r/dash/" element={<DashAudit />}>
+                <Route index element={<Navigate to="sovmap" replace />} />
+                <Route path="sovmap" element={<DashSovereigntyMap />} />
                 <Route
                   path="*"
                   element={

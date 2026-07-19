@@ -188,6 +188,8 @@ def update_character_location(character_id, force_refresh=False):
             if online_data.logins:
                 audit_char.total_logins = online_data.logins
 
+            audit_char.set_update_time("login")
+
             logger.debug(
                 f"CT_TIME: {time.perf_counter() - _st} update_character_location_last_online {character_id}"
             )
@@ -196,6 +198,7 @@ def update_character_location(character_id, force_refresh=False):
         logger.info(
             f"CT: No New online data for: {audit_char.character.character_name}"
         )
+        audit_char.set_update_time("login")
 
     audit_char.set_update_time("location")
     audit_char.save()
@@ -471,7 +474,8 @@ def update_character_assets(character_id, force_refresh=False):
             logger.error(e)
         try:
             # Enrich blueprint assets with ME/TE/Runs!
-            update_character_blueprints(character_id, force_refresh=force_refresh)
+            update_character_blueprints(
+                character_id, force_refresh=force_refresh)
         except Exception as e:
             logger.error(e)
 

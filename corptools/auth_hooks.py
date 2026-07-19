@@ -1,3 +1,4 @@
+# Alliance Auth
 from allianceauth import hooks
 from allianceauth.services.hooks import MenuItemHook, UrlHook
 
@@ -65,6 +66,25 @@ class CorporationAudit(MenuItemHook):
         return ''
 
 
+class SovereigntyDashboard(MenuItemHook):
+    def __init__(self):
+
+        MenuItemHook.__init__(self,
+                              "Sovereignty Dashboard",
+                              'far fa-flag fa-fw',
+                              'corptools:dash_react',
+                              navactive=['corptools:dash_react'])
+
+    def render(self, request):
+        # Deliberately the same low bar as the dashboard API itself
+        # (corptools.view_characteraudit) - this is the public, read-only
+        # view, not gated behind the corp-manager perms Corporation Audit
+        # requires.
+        if request.user.has_perm("corptools.view_characteraudit"):
+            return MenuItemHook.render(self, request)
+        return ''
+
+
 @hooks.register('menu_item_hook')
 def register_menu():
     return MemberAudit()
@@ -73,6 +93,11 @@ def register_menu():
 @hooks.register('menu_item_hook')
 def register_corp():
     return CorporationAudit()
+
+
+@hooks.register('menu_item_hook')
+def register_sov_dashboard():
+    return SovereigntyDashboard()
 
 
 @hooks.register('url_hook')

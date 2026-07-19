@@ -113,6 +113,18 @@ export async function loadSovHubs() {
   return api.data;
 }
 
+export async function loadSovHubMap() {
+  const api = await axios.get(`/audit/api/corp/sovhubs/map`);
+  console.log(`get sovhubs map in api`);
+  return api.data;
+}
+
+export async function loadPublicSovHubMap() {
+  const api = await axios.get(`/audit/api/dash/sovmap`);
+  console.log(`get public sovhubs map in api`);
+  return api.data;
+}
+
 export async function loadSov() {
   const api = await axios.get(`/audit/api/dashboard/sov`);
   console.log(`get sov in api`);

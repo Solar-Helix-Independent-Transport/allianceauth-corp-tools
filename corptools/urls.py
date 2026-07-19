@@ -24,6 +24,11 @@ urlpatterns = [
         views.react_corp_beta,
         name='corp_react'
     ),
+    re_path(
+        'r/dash',
+        views.react_dash,
+        name='dash_react'
+    ),
     # path(
     #     'r_legacy/',
     #     views.react_menu,

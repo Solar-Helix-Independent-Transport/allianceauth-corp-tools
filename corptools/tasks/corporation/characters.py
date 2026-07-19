@@ -38,21 +38,22 @@ def update_character_logins_from_corp(corp_id, full_update=False):
         store_cache=False
     )
 
+    now = timezone.now().isoformat()
+    updated_chars = []
     for c in tracking:
         try:
             ca = CharacterAudit.objects.get(
                 character__character_id=c.character_id)
             ca.last_known_login = c.logon_date
             ca.last_known_logoff = c.logoff_date
-            ca.save()
+            ca.update_timestamps["login"] = now
+            updated_chars.append(ca)
         except CharacterAudit.DoesNotExist:
             pass
 
-    all_chars = list(CharacterAudit.objects.filter(
-        character__corporation_id=corp_id))
-    now = timezone.now().isoformat()
-    for ca in all_chars:
-        ca.update_timestamps["login"] = now
-    CharacterAudit.objects.bulk_update(all_chars, ["update_timestamps"])
+    CharacterAudit.objects.bulk_update(
+        updated_chars,
+        ["last_known_login", "last_known_logoff", "update_timestamps"]
+    )
 
     return f"Finished Logins for: {audit_corp.corporation}"

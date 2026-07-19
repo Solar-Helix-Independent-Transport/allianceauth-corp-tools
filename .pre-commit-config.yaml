@@ -86,6 +86,9 @@ repos:
             allianceauth\/static\/allianceauth\/css\/themes\/bootstrap-locals.less|
             \.po|
             \.mo|
+            \.tsx|
+            \.ts|
+            \.json|
             swagger\.json
           )
   - repo: https://github.com/hhatto/autopep8

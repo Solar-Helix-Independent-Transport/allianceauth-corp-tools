@@ -481,6 +481,14 @@ def react_corp_beta(request):
 
 
 @login_required
+def react_dash(request):
+    # Just the SPA shell, same as react_corp_beta - the actual permission
+    # gate (a low, broadly-held bar, not the corp-manager perms corp/ uses)
+    # is enforced by the dashboard API endpoints themselves.
+    return render(request, 'corptools/base_bs5.html', context={"version": __version__, "app_name": "corptools/bs5", "page_title": "Dashboard"})
+
+
+@login_required
 def react_main(request, character_id):
     try:
         return render(request, 'corptools/base_bs5.html', context={"version": __version__, "app_name": "corptools/bs5", "page_title": "Audit"})
