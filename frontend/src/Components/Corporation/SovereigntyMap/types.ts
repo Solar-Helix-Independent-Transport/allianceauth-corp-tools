@@ -31,6 +31,7 @@ export type SovMapResponse = {
   regions: SovMapRegion[];
   systems: SovMapSystem[];
   edges: SovMapEdge[];
+  jump_bridges: SovMapEdge[];
   hubs: SovHub[];
 };
 

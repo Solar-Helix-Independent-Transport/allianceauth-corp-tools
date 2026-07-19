@@ -18,6 +18,22 @@ const Swatch = ({ color, label }: { color: string; label: string }) => (
   </span>
 );
 
+const LineSwatch = ({ color, label }: { color: string; label: string }) => (
+  <span className="d-inline-flex align-items-center me-3 text-nowrap small">
+    <svg width={16} height={10} style={{ marginRight: 4 }}>
+      <line x1={0} y1={5} x2={16} y2={5} stroke={color} strokeWidth={2} strokeDasharray="4 3" />
+    </svg>
+    {label}
+  </span>
+);
+
+// Jump bridges are drawn regardless of mode (like the background stargate
+// lines), so their legend entry doesn't belong to either mode-specific list.
+const JumpBridgeSwatch = () => {
+  const { t } = useTranslation();
+  return <LineSwatch color={BOOTSTRAP_HEX.primary} label={t("Jump Bridge")} />;
+};
+
 const Legend = ({ mode }: { mode: SovMapMode }) => {
   const { t } = useTranslation();
 
@@ -29,6 +45,7 @@ const Legend = ({ mode }: { mode: SovMapMode }) => {
         <Swatch color={BOOTSTRAP_HEX.warning} label={t("Offline")} />
         <Swatch color={BOOTSTRAP_HEX.danger} label={t("Low")} />
         <Swatch color={secColor(0.5)} label={t("Non-hub system")} />
+        <JumpBridgeSwatch />
       </div>
     );
   }
@@ -39,6 +56,7 @@ const Legend = ({ mode }: { mode: SovMapMode }) => {
       <Swatch color={BOOTSTRAP_HEX.primary} label={t("Export")} />
       <Swatch color={BOOTSTRAP_HEX.secondary} label={t("Transit / none")} />
       <Swatch color={secColor(0.5)} label={t("Uninvolved system")} />
+      <JumpBridgeSwatch />
     </div>
   );
 };

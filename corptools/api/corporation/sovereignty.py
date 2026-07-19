@@ -93,6 +93,53 @@ def _transport_system_ids(hubs) -> set:
     return transport_system_ids
 
 
+ANSIBLEX_JUMP_GATE_TYPE_ID = 35841
+
+
+def _get_jump_bridge_structures(structures_qs):
+    return structures_qs.filter(
+        type_id=ANSIBLEX_JUMP_GATE_TYPE_ID
+    ).select_related('system_name')
+
+
+def _jump_bridge_edges(structures) -> set:
+    # Same naming convention get_dashboard_gates (dashboards.py) parses: each
+    # end of a bridge is its own Structure, named "<this system> » <other
+    # system> - <bridge name>". The structure's own system_name gives us the
+    # "this system" side reliably; the "other system" side is only ever a
+    # name, so it needs a bulk lookup, and a link is declared once from each
+    # end (two Structure rows), so the result needs deduping too.
+    parsed = []
+    other_names = set()
+    for s in structures:
+        if not s.system_name_id or not s.name:
+            continue
+        parts = s.name.split(" » ")
+        if len(parts) < 2:
+            continue
+        other_name = parts[1].split(" - ")[0].strip()
+        if not other_name:
+            continue
+        parsed.append((s.system_name_id, other_name))
+        other_names.add(other_name)
+
+    if not parsed:
+        return set()
+
+    name_to_id = {
+        sys_.name: sys_.id
+        for sys_ in SolarSystem.objects.filter(name__in=other_names)
+    }
+
+    edges = set()
+    for from_id, other_name in parsed:
+        to_id = name_to_id.get(other_name)
+        if to_id is None or to_id == from_id:
+            continue
+        edges.add(tuple(sorted((from_id, to_id))))
+    return edges
+
+
 def _serialize_hub(h, system_names: dict) -> dict:
     reagents = []
     for r in h.reagents.all():
@@ -218,7 +265,12 @@ def _get_all_hubs():
     ).prefetch_related('upgrades__type_name')
 
 
-def _build_sov_map_payload(hubs, serialize_hub, transport_system_ids=frozenset()) -> dict:
+def _build_sov_map_payload(
+    hubs,
+    serialize_hub,
+    transport_system_ids=frozenset(),
+    jump_bridge_edges=frozenset(),
+) -> dict:
     region_ids = {
         h.solar_system_name.constellation.region_id
         for h in hubs
@@ -237,7 +289,13 @@ def _build_sov_map_payload(hubs, serialize_hub, transport_system_ids=frozenset()
     ).values_list('solar_system_id', 'destination_id')
     edges = {tuple(sorted(pair)) for pair in edge_rows if pair[0] != pair[1]}
 
-    external_ids = transport_system_ids - base_system_ids
+    # Jump bridges routinely connect a hub region to somewhere far outside
+    # any tracked sov region, so their endpoints need the same "pull in as
+    # an external system" treatment as workforce-transport systems do.
+    jump_bridge_system_ids = {
+        sid for pair in jump_bridge_edges for sid in pair}
+    external_ids = (transport_system_ids |
+                    jump_bridge_system_ids) - base_system_ids
     external_systems = list(
         SolarSystem.objects.filter(id__in=external_ids)
         .select_related('constellation')
@@ -283,6 +341,7 @@ def _build_sov_map_payload(hubs, serialize_hub, transport_system_ids=frozenset()
         "regions": regions_out,
         "systems": systems_out,
         "edges": [{"source": a, "target": b} for a, b in edges],
+        "jump_bridges": [{"source": a, "target": b} for a, b in jump_bridge_edges],
         "hubs": [serialize_hub(h) for h in hubs],
     }
 
@@ -331,11 +390,16 @@ class SovereigntyApiEndpoints:
                 s.id: s.name
                 for s in SolarSystem.objects.filter(id__in=transport_system_ids)
             }
+            jump_bridge_edges = _jump_bridge_edges(
+                _get_jump_bridge_structures(
+                    models.Structure.get_visible(request.user))
+            )
 
             return _build_sov_map_payload(
                 hubs,
                 lambda h: _serialize_hub(h, system_names),
                 transport_system_ids,
+                jump_bridge_edges,
             )
 
         @api.get(
@@ -350,8 +414,10 @@ class SovereigntyApiEndpoints:
                 return 403, "Permission Denied!"
 
             hubs = list(_get_all_hubs())
+            # Same low-sensitivity treatment as the sov hubs themselves -
+            # unscoped, alliance-wide, not filtered to the viewer's own corp.
+            jump_bridge_edges = _jump_bridge_edges(
+                _get_jump_bridge_structures(models.Structure.objects.all())
+            )
 
-            # No workforce_transport in the public payload, so there's
-            # nothing to plot outside the sov regions themselves - no
-            # external/transport systems to resolve here, unlike get_sov_map.
-            return _build_sov_map_payload(hubs, _serialize_hub_public)
+            return _build_sov_map_payload(hubs, _serialize_hub_public, jump_bridge_edges=jump_bridge_edges)

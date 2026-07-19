@@ -13,6 +13,7 @@ import "@xyflow/react/dist/style.css";
 import { SystemNode } from "./SystemNode";
 import { FloatingEdge } from "./FloatingEdge";
 import StargateEdgesLayer from "./StargateEdgesLayer";
+import JumpBridgeEdgesLayer from "./JumpBridgeEdgesLayer";
 import RegionLabelsLayer, { LABEL_FONT_SIZE } from "./RegionLabelsLayer";
 import RegionLabelNode from "./RegionLabelNode";
 import { useFillHeight } from "./useFillHeight";
@@ -213,6 +214,11 @@ const SovMapCanvas = ({
           ReactFlowProvider that wraps this whole component. */}
       <RegionLabelsLayer regions={data.regions} systems={data.systems} coordMode={coordMode} />
       <StargateEdgesLayer systems={data.systems} edges={data.edges} coordMode={coordMode} />
+      <JumpBridgeEdgesLayer
+        systems={data.systems}
+        edges={data.jump_bridges}
+        coordMode={coordMode}
+      />
       <ReactFlow
         nodes={allNodes}
         edges={edges}
