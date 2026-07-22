@@ -124,6 +124,20 @@ class CharacterClones(Schema):
     last_clone_jump: Optional[datetime] = None
 
 
+class CharacterMercenaryDen(Schema):
+    character: Character
+    den_id: int
+    planet: EveName
+    type: EveName
+    state: str
+    development_amount: int
+    development_level: str
+    anarchy_amount: int
+    anarchy_level: str
+    infomorph_amount: int
+    reinforcement_end: Optional[datetime] = None
+
+
 class Skill(Schema):
     group: str
     skill: str

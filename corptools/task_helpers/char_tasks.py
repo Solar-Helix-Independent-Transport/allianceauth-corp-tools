@@ -33,6 +33,7 @@ from ..models import (
     CharacterIndustryJob,
     CharacterLocation,
     CharacterMarketOrder,
+    CharacterMercenaryDen,
     CharacterMiningLedger,
     CharacterRoles,
     CharacterTitle,
@@ -1172,6 +1173,79 @@ def update_character_clones(character_id, force_refresh=False):
     audit_char.is_active()
 
     return f"CT: Finished clones for: {audit_char.character.character_name}"
+
+
+def update_character_mercenary_dens(character_id, force_refresh=False):
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+    logger.debug("Updating Mercenary Dens for: {}".format(
+        audit_char.character.character_name))
+
+    req_scopes = ['esi-structures.read_character.v1']
+
+    token = get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+
+    try:
+        den_listing = providers.esi_openapi.client.Structures.GetCharactersStructuresMercenaryDensListing(
+            character_id=character_id,
+            token=token
+        ).result(
+            store_cache=False
+        )
+
+        den_ids = [den.id for den in (den_listing.mercenary_dens or [])]
+
+        CharacterMercenaryDen.objects.filter(
+            character=audit_char
+        ).exclude(
+            den_id__in=den_ids
+        ).delete()
+
+        for den_id in den_ids:
+            den = providers.esi_openapi.client.Structures.GetCharactersStructuresMercenaryDensDetail(
+                character_id=character_id,
+                mercenary_den_id=den_id,
+                token=token
+            ).result(
+                store_cache=False
+            )
+
+            reinforcement_end = None
+            if den.reinforcement_timer:
+                reinforcement_end = den.reinforcement_timer.end
+
+            CharacterMercenaryDen.objects.update_or_create(
+                character=audit_char,
+                den_id=den.id,
+                defaults={
+                    'planet_id': den.skyhook.planet_id,
+                    'planet_name_id': den.skyhook.planet_id,
+                    'type_id': den.type_id,
+                    'type_name_id': den.type_id,
+                    'state': den.state.lower(),
+                    'development_amount': den.evolution.development.amount,
+                    'development_level': den.evolution.development.level.lower(),
+                    'anarchy_amount': den.evolution.anarchy.amount,
+                    'anarchy_level': den.evolution.anarchy.level.lower(),
+                    'infomorph_amount': den.infomorphs.amount,
+                    'reinforcement_end': reinforcement_end,
+                    'skyhook_id': den.skyhook.id,
+                    'skyhook_planet_id': den.skyhook.planet_id,
+                    'skyhook_corporation_id': den.skyhook.corporation_id,
+                }
+            )
+    except HTTPNotModified:
+        logger.info(
+            f"CT: No New Mercenary Den data for: {audit_char.character.character_name}"
+        )
+
+    audit_char.set_update_time("mercenary_dens")
+    audit_char.save()
+
+    return f"CT: Finished mercenary dens for: {audit_char.character.character_name}"
 
 
 def update_character_loyaltypoints(character_id, force_refresh=False):

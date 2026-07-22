@@ -279,6 +279,9 @@ def get_character_update_attributes():
     if CT_CHAR_CLONES_MODULE:
         _attribs += [("Clones", 'clones')]
 
+    if CT_CHAR_STRUCTURES_MODULE:
+        _attribs += [("Mercenary Dens", 'mercenary_dens')]
+
     if CT_CHAR_MAIL_MODULE:
         _attribs += [("Mail", 'mails')]
 

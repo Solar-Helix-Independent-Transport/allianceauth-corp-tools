@@ -29,7 +29,7 @@ from allianceauth.eveonline.models import EveAllianceInfo, EveCorporationInfo
 
 from .. import app_settings, providers
 from .assets import CharacterAsset
-from .audits import CharacterLocation, EveLocation
+from .audits import CharacterLocation, EveLocation, check_date
 from .clones import Clone, JumpClone
 from .interactions import CharacterTitle, CorporationHistory
 from .skills import SkillList, SkillTotals
@@ -118,6 +118,60 @@ class FullyLoadedFilter(FilterBase):
                         "message": "All Characters Loaded", "check": not logic}
                     continue
             output[u.id] = {"message": "", "check": logic}
+        return output
+
+
+class UpdateSectionFilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Character Update Section(s) Loaded"
+        verbose_name_plural = verbose_name
+
+    sections = models.JSONField(default=list)
+    reversed_logic = models.BooleanField(
+        default=False,
+        help_text="If set all members WITHOUT the selected sections loaded will pass the test.")
+
+    def process_filter(self, user: User):
+        try:
+            return self.audit_filter([user])[user.id]['check']
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False
+
+    def audit_filter(self, users):
+        logic = self.reversed_logic
+        time_ref = timezone.now() - datetime.timedelta(days=app_settings.CT_CHAR_MAX_INACTIVE_DAYS)
+
+        co = CharacterOwnership.objects.filter(user__in=users).select_related(
+            'user', 'character__characteraudit')
+
+        chars = {}  # user_id -> [failing character names]
+        seen = set()
+        for c in co:
+            seen.add(c.user_id)
+            chars.setdefault(c.user_id, [])
+            try:
+                audit = c.character.characteraudit
+            except ObjectDoesNotExist:
+                chars[c.user_id].append(c.character.character_name)
+                continue
+            for key in self.sections:
+                if not check_date(audit.get_update_time(key), time_ref):
+                    chars[c.user_id].append(c.character.character_name)
+                    break
+
+        output = defaultdict(lambda: {"message": "", "check": logic})
+        for u in users:
+            if u.id not in seen:
+                output[u.id] = {"message": "No Characters", "check": logic}
+                continue
+            failing = chars[u.id]
+            if failing:
+                output[u.id] = {
+                    "message": ", ".join(sorted(set(failing))), "check": logic}
+            else:
+                output[u.id] = {
+                    "message": "All Sections Loaded", "check": not logic}
         return output
 
 
@@ -313,6 +367,12 @@ class AssetsFilter(FilterBase):
         help_text="Limit filter to specific regions"
     )
 
+    location_flags = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Limit filter to assets held under specific location flags (e.g. AutoFit for anchored/deployed structures)."
+    )
+
     reversed_logic = models.BooleanField(
         default=False,
         help_text="Negate the value of the filter, i.e. check for absence of assets"
@@ -341,7 +401,7 @@ class AssetsFilter(FilterBase):
             output.append(models.Q(type_name__group__category__in=categories))
 
         if len(output) == 0:
-            return False
+            return CharacterAsset.objects.none()
 
         query = output.pop()
         for _q in output:
@@ -370,6 +430,11 @@ class AssetsFilter(FilterBase):
             for _q in output:
                 query |= _q
             character_count = character_count.filter(query)
+
+        if self.location_flags:
+            character_count = character_count.filter(
+                location_flag__in=self.location_flags)
+
         return character_count
 
     def process_filter(self, user: User):
@@ -467,7 +532,7 @@ class CurrentShipFilter(FilterBase):
             output.append(models.Q(current_ship__group__in=groups))
 
         if len(output) == 0:
-            return False
+            return CharacterLocation.objects.none()
 
         query = output.pop()
         for _q in output:
@@ -615,7 +680,7 @@ class Skillfilter(FilterBase):
         skill_lists = list(self.required_skill_lists.all())
         req_one = list(self.single_req_skill_lists.all())
         if not skill_lists and not req_one:
-            return False
+            return output
 
         for uid, u in accounts.items():
             message = []
@@ -706,6 +771,8 @@ class Rolefilter(FilterBase):
                 _q = models.Q(
                     character__characteraudit__characterroles__personnel_manager=True)
                 queries.append(_q)
+            if not queries:
+                return False
             query = queries.pop()
             for q in queries:
                 query |= q
@@ -746,11 +813,16 @@ class Rolefilter(FilterBase):
             _q = models.Q(
                 character__characteraudit__characterroles__personnel_manager=True)
             queries.append(_q)
-        query = queries.pop()
-        for q in queries:
-            query |= q
 
-        co = co.filter(query).select_related('user', 'character')
+        if queries:
+            query = queries.pop()
+            for q in queries:
+                query |= q
+            co = co.filter(query)
+        else:
+            co = co.none()
+
+        co = co.select_related('user', 'character')
 
         chars = {}
         for c in co:
@@ -898,24 +970,16 @@ class HomeStationFilter(FilterBase):
         character_list = CharacterOwnership.objects.filter(user__in=users)
         evelocation = list(self.evelocation.all())
 
+        if not evelocation:
+            return Clone.objects.none()
+
         character_count = Clone.objects.filter(
             character__character__in=character_list.values_list('character'))
 
-        output = []
-
-        if evelocation:
-            output.append(models.Q(location_name__in=evelocation))
-            output.append(
-                models.Q(
-                    location_id__in=[el.location_id for el in evelocation]
-                )
-            )
-
-        if len(output) > 0:
-            query = output.pop()
-            for _q in output:
-                query |= _q
-            character_count = character_count.filter(query)
+        query = models.Q(location_name__in=evelocation) | models.Q(
+            location_id__in=[el.location_id for el in evelocation]
+        )
+        character_count = character_count.filter(query)
         return character_count
 
     def process_filter(self, user: User):
@@ -980,24 +1044,16 @@ class JumpCloneFilter(FilterBase):
         character_list = CharacterOwnership.objects.filter(user__in=users)
         evelocation = list(self.evelocation.all())
 
+        if not evelocation:
+            return JumpClone.objects.none()
+
         character_count = JumpClone.objects.filter(
             character__character__in=character_list.values_list('character'))
 
-        output = []
-
-        if evelocation:
-            output.append(models.Q(location_name__in=evelocation))
-            output.append(
-                models.Q(
-                    location_id__in=[el.location_id for el in evelocation]
-                )
-            )
-
-        if len(output) > 0:
-            query = output.pop()
-            for _q in output:
-                query |= _q
-            character_count = character_count.filter(query)
+        query = models.Q(location_name__in=evelocation) | models.Q(
+            location_id__in=[el.location_id for el in evelocation]
+        )
+        character_count = character_count.filter(query)
         return character_count
 
     def process_filter(self, user: User):

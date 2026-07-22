@@ -35,6 +35,10 @@ export async function getCharacterClones(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/clones", characterID);
 }
 
+export async function getCharacterMercenaryDens(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/mercenarydens", characterID);
+}
+
 export async function getCharacterRoles(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/roles", characterID);
 }

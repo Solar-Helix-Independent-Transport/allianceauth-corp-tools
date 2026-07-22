@@ -157,6 +157,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/account/{character_id}/mercenarydens": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Mercenary Dens */
+    get: operations["corptools_api_character_structures_get_character_mercenary_dens"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/account/{character_id}/wallet": {
     parameters: {
       query?: never;
@@ -1463,6 +1480,28 @@ export interface components {
       /** Last Clone Jump */
       last_clone_jump?: string | null;
     };
+    /** CharacterMercenaryDen */
+    CharacterMercenaryDen: {
+      character: components["schemas"]["Character"];
+      /** Den Id */
+      den_id: number;
+      planet: components["schemas"]["EveName"];
+      type: components["schemas"]["EveName"];
+      /** State */
+      state: string;
+      /** Development Amount */
+      development_amount: number;
+      /** Development Level */
+      development_level: string;
+      /** Anarchy Amount */
+      anarchy_amount: number;
+      /** Anarchy Level */
+      anarchy_level: string;
+      /** Infomorph Amount */
+      infomorph_amount: number;
+      /** Reinforcement End */
+      reinforcement_end?: string | null;
+    };
     /** Input */
     Input: {
       /**
@@ -2178,6 +2217,37 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["CharacterClones"][];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_structures_get_character_mercenary_dens: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CharacterMercenaryDen"][];
         };
       };
       /** @description Forbidden */

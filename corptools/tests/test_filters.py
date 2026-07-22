@@ -1,6 +1,7 @@
 # flake8: noqa
 # Standard Library
 from datetime import timedelta
+from unittest.mock import patch
 
 # Third Party
 from eve_sde import models as sde_models
@@ -681,6 +682,144 @@ class TestSecGroupBotFilters(TestCase):
         self.assertTrue(tests[9]["check"])
         self.assertTrue(tests[10]["check"])
 
+    def test_update_section_single_section(self):
+        _filter = ct_models.UpdateSectionFilter.objects.create(
+            name="Skills Loaded",
+            description="Something to tell user",
+            sections=["skills"],
+        )
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k in users:
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        # Same split as FullyLoadedFilter: users 8/9/10 have an alt that's
+        # either missing the timestamp entirely or has no audit at all.
+        self.assertTrue(tests[1])
+        self.assertTrue(tests[2])
+        self.assertTrue(tests[3])
+        self.assertTrue(tests[4])
+        self.assertTrue(tests[5])
+        self.assertTrue(tests[6])
+        self.assertTrue(tests[7])
+        self.assertFalse(tests[8])
+        self.assertFalse(tests[9])
+        self.assertFalse(tests[10])
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=list(users)))
+        self.assertTrue(tests[1]["check"])
+        self.assertFalse(tests[8]["check"])
+        self.assertFalse(tests[9]["check"])
+        self.assertFalse(tests[10]["check"])
+
+    def test_update_section_single_section_reverse(self):
+        _filter = ct_models.UpdateSectionFilter.objects.create(
+            name="Skills Loaded",
+            description="Something to tell user",
+            sections=["skills"],
+            reversed_logic=True,
+        )
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k in users:
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        self.assertFalse(tests[1])
+        self.assertFalse(tests[7])
+        self.assertTrue(tests[8])
+        self.assertTrue(tests[9])
+        self.assertTrue(tests[10])
+
+    def test_update_section_empty_sections_is_noop(self):
+        _filter = ct_models.UpdateSectionFilter.objects.create(
+            name="No Sections Picked",
+            description="Something to tell user",
+            sections=[],
+        )
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k in users:
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        # User 8's alt still has an audit row (just empty timestamps), so an
+        # empty section list is a no-op pass for them. Users 9/10's alts
+        # have no audit row at all, which still fails regardless of sections.
+        self.assertTrue(tests[1])
+        self.assertTrue(tests[8])
+        self.assertFalse(tests[9])
+        self.assertFalse(tests[10])
+
+    def test_update_section_requires_all_selected_sections(self):
+        user1 = User.objects.get(id=1)
+        main_audit = ct_models.CharacterAudit.objects.get(
+            character=user1.profile.main_character)
+        main_audit.update_timestamps["clones"] = (
+            timezone.now() - timedelta(days=99)).isoformat()
+        main_audit.save()
+
+        single_section = ct_models.UpdateSectionFilter.objects.create(
+            name="Assets Only",
+            description="Something to tell user",
+            sections=["assets"],
+        )
+        self.assertTrue(single_section.process_filter(user1))
+
+        both_sections = ct_models.UpdateSectionFilter.objects.create(
+            name="Assets and Clones",
+            description="Something to tell user",
+            sections=["assets", "clones"],
+        )
+        self.assertFalse(both_sections.process_filter(user1))
+
+    def test_update_section_ignores_active_ignore_flags(self):
+        user = AuthUtils.create_user("IgnoreFlagUser")
+        main_char = AuthUtils.add_main_character_2(
+            user, "Ignore Flag Main", 9001, corp_id=1,
+            corp_name='Test Corp 1', corp_ticker='TST1')
+        CharacterOwnership.objects.create(
+            user=user, character=main_char, owner_hash="ignoreflagmain")
+        ct_models.CharacterAudit.objects.create(
+            character=main_char,
+            update_timestamps={
+                "assets": timezone.now().isoformat(),
+                "clones": timezone.now().isoformat(),
+                "pub_data": timezone.now().isoformat(),
+                "wallet": timezone.now().isoformat(),
+                "orders": timezone.now().isoformat(),
+                "notif": timezone.now().isoformat(),
+                "roles": timezone.now().isoformat(),
+                # Deliberately stale - this is the section under test.
+                "skills": (timezone.now() - timedelta(days=30)).isoformat(),
+                "skill_que": (timezone.now() - timedelta(days=30)).isoformat(),
+            },
+        )
+
+        fully_loaded = ct_models.FullyLoadedFilter.objects.create(
+            name="Fully Loaded", description="test")
+        section_filter = ct_models.UpdateSectionFilter.objects.create(
+            name="Skills Section", description="test", sections=["skills"])
+
+        # By default (CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE=False) both see the
+        # stale skills timestamp and fail.
+        self.assertFalse(fully_loaded.process_filter(user))
+        self.assertFalse(section_filter.process_filter(user))
+
+        # With the ignore-flag on, is_active()/FullyLoadedFilter stop caring
+        # about skills entirely - but UpdateSectionFilter checks the raw
+        # timestamp directly and isn't affected by the flag.
+        with patch("corptools.app_settings.CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE", True):
+            self.assertTrue(fully_loaded.process_filter(user))
+            self.assertFalse(section_filter.process_filter(user))
+
     def test_user_assets_no_loc(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
                                                         description="Something to tell user")
@@ -731,6 +870,42 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[8])
         self.assertTrue(tests[9])
         self.assertTrue(tests[10])
+
+    def test_user_assets_location_flag(self):
+        a1 = sde_models.ItemType.objects.get(id=10)
+        l1 = ct_models.EveLocation.objects.get(location_id=1)
+        user2_audit = ct_models.CharacterAudit.objects.get(
+            character=User.objects.get(id=2).profile.main_character)
+
+        ct_models.CharacterAsset.objects.create(
+            item_id=99999,
+            location_flag="AutoFit",
+            location_id=0,
+            quantity=1,
+            singleton=True,
+            location_type="test",
+            type_id=10,
+            type_name=a1,
+            location_name=l1,
+            character=user2_audit,
+            blueprint_copy=False,
+        )
+
+        _filter = ct_models.AssetsFilter.objects.create(
+            name="Deployed Assets",
+            description="Something to tell user",
+            location_flags=["AutoFit"],
+        )
+        _filter.types.add(a1)
+
+        # Only User 2's new AutoFit asset matches. The fixture's existing
+        # assets for users 1/3/6/8 (see test_user_assets_no_loc) are
+        # flagged "test" and are correctly excluded by location_flags.
+        self.assertTrue(_filter.process_filter(User.objects.get(id=2)))
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        self.assertFalse(_filter.process_filter(User.objects.get(id=3)))
+        self.assertFalse(_filter.process_filter(User.objects.get(id=6)))
+        self.assertFalse(_filter.process_filter(User.objects.get(id=8)))
 
     def test_user_assets_no_loc_cat(self):
         _filter = ct_models.AssetsFilter.objects.create(name="Assets Test",
@@ -2080,3 +2255,168 @@ class TestSecGroupBotFilters(TestCase):
         tests = _filter.audit_filter(User.objects.filter(id__in=[11]))
 
         self.assertFalse(tests[11]["check"])
+
+    def test_user_home_station(self):
+        l1 = ct_models.EveLocation.objects.get(location_id=1)
+        user1_audit = ct_models.CharacterAudit.objects.get(
+            character=User.objects.get(id=1).profile.main_character)
+        ct_models.Clone.objects.create(
+            character=user1_audit,
+            location_id=1,
+            location_name=l1,
+            location_type="station",
+        )
+
+        _filter = ct_models.HomeStationFilter.objects.create(
+            name="Home Station Test", description="Something to tell user")
+        _filter.evelocation.add(l1)
+
+        self.assertTrue(_filter.process_filter(User.objects.get(id=1)))
+        self.assertFalse(_filter.process_filter(User.objects.get(id=2)))
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1, 2]))
+        self.assertTrue(tests[1]["check"])
+        self.assertFalse(tests[2]["check"])
+
+    def test_user_home_station_unconfigured(self):
+        # Regression: an unconfigured filter (no evelocation picked) must
+        # fail closed, not match every account that merely has a clone.
+        l1 = ct_models.EveLocation.objects.get(location_id=1)
+        user1_audit = ct_models.CharacterAudit.objects.get(
+            character=User.objects.get(id=1).profile.main_character)
+        ct_models.Clone.objects.create(
+            character=user1_audit,
+            location_id=1,
+            location_name=l1,
+            location_type="station",
+        )
+
+        _filter = ct_models.HomeStationFilter.objects.create(
+            name="Unconfigured", description="Something to tell user")
+
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1]))
+        self.assertFalse(tests[1]["check"])
+
+    def test_user_jump_clone(self):
+        l1 = ct_models.EveLocation.objects.get(location_id=1)
+        user1_audit = ct_models.CharacterAudit.objects.get(
+            character=User.objects.get(id=1).profile.main_character)
+        ct_models.JumpClone.objects.create(
+            character=user1_audit,
+            jump_clone_id=1,
+            location_id=1,
+            location_name=l1,
+            location_type="station",
+        )
+
+        _filter = ct_models.JumpCloneFilter.objects.create(
+            name="Jump Clone Test", description="Something to tell user")
+        _filter.evelocation.add(l1)
+
+        self.assertTrue(_filter.process_filter(User.objects.get(id=1)))
+        self.assertFalse(_filter.process_filter(User.objects.get(id=2)))
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1, 2]))
+        self.assertTrue(tests[1]["check"])
+        self.assertFalse(tests[2]["check"])
+
+    def test_user_jump_clone_unconfigured(self):
+        # Regression: same fail-closed requirement as HomeStationFilter.
+        l1 = ct_models.EveLocation.objects.get(location_id=1)
+        user1_audit = ct_models.CharacterAudit.objects.get(
+            character=User.objects.get(id=1).profile.main_character)
+        ct_models.JumpClone.objects.create(
+            character=user1_audit,
+            jump_clone_id=1,
+            location_id=1,
+            location_name=l1,
+            location_type="station",
+        )
+
+        _filter = ct_models.JumpCloneFilter.objects.create(
+            name="Unconfigured", description="Something to tell user")
+
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1]))
+        self.assertFalse(tests[1]["check"])
+
+    def test_user_highest_sp(self):
+        user1_audit = ct_models.CharacterAudit.objects.get(
+            character=User.objects.get(id=1).profile.main_character)
+        user2_audit = ct_models.CharacterAudit.objects.get(
+            character=User.objects.get(id=2).profile.main_character)
+        ct_models.SkillTotals.objects.create(
+            character=user1_audit, total_sp=6_000_000_000, unallocated_sp=0)
+        ct_models.SkillTotals.objects.create(
+            character=user2_audit, total_sp=1_000_000_000, unallocated_sp=0)
+
+        _filter = ct_models.HighestSPFilter.objects.create(
+            name="5B SP", description="Something to tell user", sp_cutoff=5_000_000_000)
+
+        self.assertTrue(_filter.process_filter(User.objects.get(id=1)))
+        self.assertFalse(_filter.process_filter(User.objects.get(id=2)))
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1, 2]))
+        self.assertTrue(tests[1]["check"])
+        self.assertFalse(tests[2]["check"])
+
+    def test_user_highest_sp_swap_logic(self):
+        user1_audit = ct_models.CharacterAudit.objects.get(
+            character=User.objects.get(id=1).profile.main_character)
+        ct_models.SkillTotals.objects.create(
+            character=user1_audit, total_sp=6_000_000_000, unallocated_sp=0)
+
+        _filter = ct_models.HighestSPFilter.objects.create(
+            name="Under 5B SP",
+            description="Something to tell user",
+            sp_cutoff=5_000_000_000,
+            swap_logic=True,
+        )
+
+        # swap_logic inverts pass/fail: at/above cutoff now fails.
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        # No SkillTotals row at all -> treated as 0 SP -> passes under swap_logic.
+        self.assertTrue(_filter.process_filter(User.objects.get(id=2)))
+
+    def test_rolefilter_no_roles_selected(self):
+        # Regression: previously crashed with IndexError (queries.pop() on
+        # an empty list) instead of failing closed like every other filter
+        # does when left unconfigured.
+        _filter = ct_models.Rolefilter.objects.create(
+            name="Unconfigured", description="Something to tell user")
+
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1]))
+        self.assertFalse(tests[1]["check"])
+
+    def test_assets_filter_unconfigured(self):
+        # Regression: previously audit_filter crashed with AttributeError
+        # ('bool' object has no attribute 'values') because filter_query()
+        # returned a bare False instead of an empty queryset.
+        _filter = ct_models.AssetsFilter.objects.create(
+            name="Unconfigured", description="Something to tell user")
+
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1]))
+        self.assertFalse(tests[1]["check"])
+
+    def test_current_ship_filter_unconfigured(self):
+        # Regression: same bare-False/AttributeError bug as AssetsFilter.
+        _filter = ct_models.CurrentShipFilter.objects.create(
+            name="Unconfigured", description="Something to tell user")
+
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1]))
+        self.assertFalse(tests[1]["check"])
+
+    def test_skill_filter_unconfigured(self):
+        # Regression: audit_filter() returned a bare False instead of the
+        # expected {user_id: {...}} dict when no skill lists were picked,
+        # which crashes any caller that indexes the result.
+        _filter = ct_models.Skillfilter.objects.create(
+            name="Unconfigured", description="Something to tell user")
+
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1]))
+        self.assertFalse(tests[1]["check"])

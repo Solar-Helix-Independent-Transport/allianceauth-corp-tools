@@ -9,7 +9,7 @@ from model_utils import Choices
 from django.db import models
 from django.utils import timezone
 
-from .audits import CorporationAudit, CorptoolsConfiguration
+from .audits import CharacterAudit, CorporationAudit, CorptoolsConfiguration
 
 
 class BridgeOzoneLevel(models.Model):
@@ -263,3 +263,43 @@ class Starbase(models.Model):
             corps_vis = corps_vis | corps_holding
         # update_time_filter = timezone.now() - datetime.timedelta(days=7)
         return cls.objects.filter(corporation__in=corps_vis)
+
+
+class CharacterMercenaryDen(models.Model):
+    character = models.ForeignKey(
+        CharacterAudit, on_delete=models.CASCADE, related_name='ct_mercenary_den')
+
+    den_id = models.BigIntegerField()
+
+    planet_id = models.IntegerField()
+    planet_name = models.ForeignKey(
+        Planet, on_delete=models.SET_NULL, null=True, default=None)
+
+    type_id = models.IntegerField()
+    type_name = models.ForeignKey(
+        ItemType, on_delete=models.SET_NULL, null=True, default=None)
+
+    _state_enum = Choices('unspecified', 'running', 'paused', 'disabled')
+    state = models.CharField(max_length=11, choices=_state_enum)
+
+    _level_enum = Choices(
+        'unspecified', 'level0', 'level1', 'level2', 'level3', 'level4')
+    development_amount = models.IntegerField(default=0)
+    development_level = models.CharField(max_length=11, choices=_level_enum)
+    anarchy_amount = models.IntegerField(default=0)
+    anarchy_level = models.CharField(max_length=11, choices=_level_enum)
+
+    infomorph_amount = models.IntegerField(default=0)
+
+    reinforcement_end = models.DateTimeField(null=True, default=None)
+
+    skyhook_id = models.BigIntegerField(null=True, default=None)
+    skyhook_planet_id = models.IntegerField(null=True, default=None)
+    skyhook_corporation_id = models.IntegerField(null=True, default=None)
+
+    class Meta:
+        unique_together = ['character', 'den_id']
+
+    @classmethod
+    def get_visible(cls, user):
+        return cls.objects.filter(character__in=CharacterAudit.objects.visible_to(user))

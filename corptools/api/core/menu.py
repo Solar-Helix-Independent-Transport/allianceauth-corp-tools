@@ -1,7 +1,10 @@
+# Standard Library
 from typing import List
 
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.utils.translation import gettext as _
 
 from ... import app_settings
@@ -113,6 +116,12 @@ class MenuApiEndpoints:
                 _char["links"].append({
                     "name": _("Clones"),
                     "link": "account/clones"
+                })
+
+            if app_settings.CT_CHAR_STRUCTURES_MODULE:
+                _char["links"].append({
+                    "name": _("Mercenary Dens"),
+                    "link": "account/mercenarydens"
                 })
 
             if app_settings.CT_CHAR_ROLES_MODULE:

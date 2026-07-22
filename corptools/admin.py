@@ -2,12 +2,14 @@
 from solo.admin import SingletonModelAdmin
 
 # Django
+from django import forms
 from django.apps import apps
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from . import app_settings, models
+from .constants.assets import LOCATION_FLAG_CHOICES
 
 admin.site.register(models.CharacterAudit)
 admin.site.register(models.CorporationAudit)
@@ -176,9 +178,22 @@ class TitleAdmin(admin.ModelAdmin):
         return {}
 
 
+class AssetsFilterForm(forms.ModelForm):
+    location_flags = forms.MultipleChoiceField(
+        choices=[(flag, flag) for flag in LOCATION_FLAG_CHOICES],
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    class Meta:
+        model = models.AssetsFilter
+        fields = "__all__"
+
+
 class assetFilterAdmin(AutocompleteMediaMixin, admin.ModelAdmin):
+    form = AssetsFilterForm
     list_display = ['__str__', '_types', '_groups', '_cats',
-                    '_systems', '_constellations', '_regions']
+                    '_systems', '_constellations', '_regions', '_flags']
 
     def _list_2_html_w_tooltips(self, my_items: list, max_items: int) -> str:
         """converts list of strings into HTML with cutoff and tooltip"""
@@ -260,6 +275,15 @@ class assetFilterAdmin(AutocompleteMediaMixin, admin.ModelAdmin):
 
         return self._list_2_html_w_tooltips(
             my_regions,
+            10
+        )
+
+    @admin.display(
+        description='location flags'
+    )
+    def _flags(self, obj):
+        return self._list_2_html_w_tooltips(
+            sorted(obj.location_flags),
             10
         )
 
@@ -401,8 +425,27 @@ class JumpCloneFilterAdmin(AutocompleteMediaMixin, admin.ModelAdmin):
     autocomplete_fields = ["evelocation"]
 
 
+class UpdateSectionFilterForm(forms.ModelForm):
+    sections = forms.MultipleChoiceField(
+        choices=[(key, label)
+                 for label, key in app_settings.get_character_update_attributes()],
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    class Meta:
+        model = models.UpdateSectionFilter
+        fields = "__all__"
+
+
+class UpdateSectionFilterAdmin(admin.ModelAdmin):
+    form = UpdateSectionFilterForm
+    list_display = ['__str__', 'sections', 'reversed_logic']
+
+
 if apps.is_installed('securegroups'):
     admin.site.register(models.FullyLoadedFilter)
+    admin.site.register(models.UpdateSectionFilter, UpdateSectionFilterAdmin)
     admin.site.register(models.TimeInCorpFilter, TimeInCorpFilterAdmin)
     admin.site.register(models.CharacterAgeFilter, CharacterAgeFilterAdmin)
     if app_settings.CT_CHAR_ASSETS_MODULE:

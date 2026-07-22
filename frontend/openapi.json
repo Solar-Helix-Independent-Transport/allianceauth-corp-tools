@@ -331,6 +331,42 @@
         "security": [{ "SessionAuth": [] }]
       }
     },
+    "/audit/api/account/{character_id}/mercenarydens": {
+      "get": {
+        "operationId": "corptools_api_character_structures_get_character_mercenary_dens",
+        "summary": "Get Character Mercenary Dens",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterMercenaryDen" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
     "/audit/api/account/{character_id}/wallet": {
       "get": {
         "operationId": "corptools_api_character_finances_get_character_wallet",
@@ -2747,6 +2783,38 @@
         },
         "required": ["character"],
         "title": "CharacterClones",
+        "type": "object"
+      },
+      "CharacterMercenaryDen": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "den_id": { "title": "Den Id", "type": "integer" },
+          "planet": { "$ref": "#/components/schemas/EveName" },
+          "type": { "$ref": "#/components/schemas/EveName" },
+          "state": { "title": "State", "type": "string" },
+          "development_amount": { "title": "Development Amount", "type": "integer" },
+          "development_level": { "title": "Development Level", "type": "string" },
+          "anarchy_amount": { "title": "Anarchy Amount", "type": "integer" },
+          "anarchy_level": { "title": "Anarchy Level", "type": "string" },
+          "infomorph_amount": { "title": "Infomorph Amount", "type": "integer" },
+          "reinforcement_end": {
+            "anyOf": [{ "format": "date-time", "type": "string" }, { "type": "null" }],
+            "title": "Reinforcement End"
+          }
+        },
+        "required": [
+          "character",
+          "den_id",
+          "planet",
+          "type",
+          "state",
+          "development_amount",
+          "development_level",
+          "anarchy_amount",
+          "anarchy_level",
+          "infomorph_amount"
+        ],
+        "title": "CharacterMercenaryDen",
         "type": "object"
       },
       "Input": {

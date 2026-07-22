@@ -117,6 +117,7 @@ def filters():
         models.AssetsFilter,
         models.LastLoginfilter,
         models.FullyLoadedFilter,
+        models.UpdateSectionFilter,
         models.Skillfilter,
         models.TimeInCorpFilter,
         models.CharacterAgeFilter,
