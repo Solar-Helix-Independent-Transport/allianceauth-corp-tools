@@ -21,6 +21,8 @@ from esi.models import Token
 # AA Example App
 from corptools.app_settings import CT_DB_BULK_CREATE_BATCH_SIZE
 from corptools.task_helpers.update_tasks import (
+    SOLAR_SYSTEM_ID_MAX,
+    SOLAR_SYSTEM_ID_MIN,
     fetch_location_name,
 )
 
@@ -596,8 +598,8 @@ def update_character_blueprints(character_id, force_refresh=False):
 
 
 def update_den_locations(character_id, force_refresh=False):
-    max_location_id = 35000000
-    min_location_id = 30000000
+    max_location_id = SOLAR_SYSTEM_ID_MAX
+    min_location_id = SOLAR_SYSTEM_ID_MIN
 
     parents = CharacterAsset.objects.filter(
         character__character__character_id=character_id,
@@ -646,8 +648,8 @@ def update_asset_locations(character_id, force_refresh=False):
     ]
 
     # These must be in space
-    max_location_id = 35000000
-    min_location_id = 30000000
+    max_location_id = SOLAR_SYSTEM_ID_MAX
+    min_location_id = SOLAR_SYSTEM_ID_MIN
 
     assets = CharacterAsset.objects.filter(
         character=audit_char,
@@ -668,7 +670,7 @@ def update_asset_locations(character_id, force_refresh=False):
     locations = []
 
     for ids in chunks(assets, 900):
-        locations = providers.esi_openapi.client.Assets.PostCharactersCharacterIdAssetsLocations(
+        locations += providers.esi_openapi.client.Assets.PostCharactersCharacterIdAssetsLocations(
             character_id=audit_char.character.character_id,
             body=list(ids.values_list("item_id", flat=True)),
             token=_token

@@ -17,6 +17,11 @@ from corptools.models import EveLocation
 
 logger = get_extension_logger(__name__)
 
+# Solar system IDs fall in this range; used to tell "in space" location_ids
+# apart from stations/structures.
+SOLAR_SYSTEM_ID_MIN = 30000000
+SOLAR_SYSTEM_ID_MAX = 33000000
+
 
 def set_error_count_flag():
     return cache.set("esi_errors_timeout", 1, 60)
@@ -49,7 +54,7 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
         # ASSET SAFETY
         return EveLocation(location_id=location_id,
                            location_name="Asset Safety")
-    elif 30000000 < location_id < 33000000:  # Solar System
+    elif SOLAR_SYSTEM_ID_MIN < location_id < SOLAR_SYSTEM_ID_MAX:  # Solar System
         system = SolarSystem.objects.filter(id=location_id)
         if not system.exists():
             logger.error("Unknown System, Have you populated the map?")

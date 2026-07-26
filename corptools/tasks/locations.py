@@ -93,15 +93,18 @@ def location_set(location_id, character_id):
     data = location_get(location_id)
     if data.get('date') is not False:
         if data.get('date') > date:
-            data.get('characters').append(character_id)
-            cache.set(cache_tag, json.dumps(
-                data, cls=DjangoJSONEncoder), CACHE_TIMEOUT)
-            return True
+            if character_id not in data.get('characters'):
+                data.get('characters').append(character_id)
+                cache.set(cache_tag, json.dumps(
+                    data, cls=DjangoJSONEncoder), CACHE_TIMEOUT)
+                return True
+            return False
         else:
             data['date'] = timezone.now().strftime(TZ_STRING)
             data['characters'] = [character_id]
             cache.set(cache_tag, json.dumps(
                 data, cls=DjangoJSONEncoder), CACHE_TIMEOUT)
+            return True
 
     if character_id not in data.get('characters'):
         data.get('characters').append(character_id)
@@ -121,7 +124,8 @@ def location_set(location_id, character_id):
 )
 @esi_error_retry
 def update_citadel_names(self):
-    citadels = EveLocation.objects.filter(location_id__gte=64000000)
+    citadels = EveLocation.objects.filter(
+        location_id__gte=64000000, managed=False)
     for c in citadels:
         update_location.apply_async(
             args=[c.location_id],
