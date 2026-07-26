@@ -1,16 +1,16 @@
 import { useMemo } from "react";
 import { useViewport } from "@xyflow/react";
 import { resolveSystemPosition } from "./layout";
-import type { SovMapCoordMode, SovMapEdge, SovMapSystem } from "./types";
+import type { BaseMapEdge, BaseMapSystem, MapCoordMode } from "./types";
 
 const StargateEdgesLayer = ({
   systems,
   edges,
   coordMode,
 }: {
-  systems: SovMapSystem[];
-  edges: SovMapEdge[];
-  coordMode: SovMapCoordMode;
+  systems: BaseMapSystem[];
+  edges: BaseMapEdge[];
+  coordMode: MapCoordMode;
 }) => {
   const { x, y, zoom } = useViewport();
 

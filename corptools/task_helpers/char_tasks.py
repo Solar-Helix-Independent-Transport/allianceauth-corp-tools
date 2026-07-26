@@ -2070,6 +2070,11 @@ def update_character_titles(character_id, force_refresh=False):
     if not token:
         return False
 
+    # Titles are stored on CharacterRoles, but that row is only otherwise
+    # created by the separate roles update task - which may not have run yet
+    # (or ever, e.g. if roles are disabled) for this character.
+    role_model, _ = CharacterRoles.objects.get_or_create(character=audit_char)
+
     try:
         titles = providers.esi_openapi.client.Character.GetCharactersCharacterIdTitles(
             character_id=character_id,
@@ -2093,13 +2098,13 @@ def update_character_titles(character_id, force_refresh=False):
             )
 
             title_models.append(_title_item.pk)
-            audit_char.characterroles.titles.add(_title_item)
+            role_model.titles.add(_title_item)
 
         if len(title_models) > 0:
-            rem_tits = audit_char.characterroles.titles.all().exclude(pk__in=title_models)
-            audit_char.characterroles.titles.remove(*rem_tits)
+            rem_tits = role_model.titles.all().exclude(pk__in=title_models)
+            role_model.titles.remove(*rem_tits)
         else:
-            audit_char.characterroles.titles.clear()
+            role_model.titles.clear()
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_titles {character_id}"

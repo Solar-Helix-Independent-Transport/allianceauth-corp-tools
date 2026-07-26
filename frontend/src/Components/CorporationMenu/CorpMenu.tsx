@@ -82,6 +82,10 @@ const CorpMenu = () => {
           name: t("Character Mining Ledger"),
           link: `mining`,
         },
+        {
+          name: t("Activity Map"),
+          link: `activitymap`,
+        },
       ],
     },
   ];

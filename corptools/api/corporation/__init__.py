@@ -1,3 +1,4 @@
+from .activity_map import CorpActivityMapApiEndpoints
 from .assets import AssetsApiEndpoints
 from .at_a_glance import CorpGlanceApiEndpoints
 from .dashboards import DashboardApiEndpoints
@@ -10,6 +11,7 @@ from .structures import StructureApiEndpoints
 
 
 def setup(api):
+    CorpActivityMapApiEndpoints(api)
     AssetsApiEndpoints(api)
     FinancesApiEndpoints(api)
     ListApiEndpoints(api)

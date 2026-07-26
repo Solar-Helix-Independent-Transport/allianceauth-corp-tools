@@ -1,4 +1,5 @@
 import AccountList from "./Pages/Char/AccountList";
+import CharacterActivityMap from "./Pages/Char/ActivityMap";
 import CharacterAssetGroups from "./Pages/Char/AssetsGroups";
 import CharacterAssets from "./Pages/Char/AssetsList";
 import CharacterAudit from "./Pages/Char/Audit";
@@ -39,6 +40,7 @@ import CharacterWalletActivity from "./Pages/Char/WalletActivity";
 import CharacterMiningLedger from "./Pages/Char/MiningLedger";
 import { ErrorLoader } from "./Components/Loaders/loaders";
 import Bridges from "./Pages/Corp/Bridges";
+import CorporationActivityMap from "./Pages/Corp/ActivityMap";
 import CorporationAssetGroups from "./Pages/Corp/AssetsGroups";
 import CorporationAssets from "./Pages/Corp/AssetsList";
 import CorporationWallets from "./Pages/Corp/Wallet";
@@ -99,6 +101,7 @@ function App() {
                 <Route path="account/status" element={<CharacterStatus />} />
                 <Route path="account/assets" element={<CharacterAssetGroups />} />
                 <Route path="account/listassets" element={<CharacterAssets />} />
+                <Route path="account/activitymap" element={<CharacterActivityMap />} />
                 <Route path="account/pubdata" element={<CharacterPubData />} />
                 <Route path="account/clones" element={<CharacterClones />} />
                 <Route path="account/mercenarydens" element={<CharacterMercenaryDens />} />
@@ -148,6 +151,7 @@ function App() {
                 <Route path="wallets" element={<CorporationWallets />} />
                 <Route path="assetgroup" element={<CorporationAssetGroups />} />
                 <Route path="assetlist" element={<CorporationAssets />} />
+                <Route path="activitymap" element={<CorporationActivityMap />} />
                 <Route path="pocos" element={<CorporationPocos />} />
                 <Route path="starbases" element={<CorporationStarbases />} />
                 <Route path="bridges" element={<Bridges />} />

@@ -1,35 +1,19 @@
+import type { BaseMapEdge, BaseMapRegion, BaseMapSystem, MapCoordMode } from "../../SpaceMap/types";
 import { AnarchyDenAlert, SovHub, Upgrade, WorkforceTransport } from "../sovereigntyShared";
 
 export type { AnarchyDenAlert };
 
-export type SovMapSystem = {
-  id: number;
-  name: string;
-  region_id: number | null;
-  constellation_id: number | null;
-  x_2d: number | null;
-  y_2d: number | null;
-  x_real: number | null;
-  y_real: number | null;
-  security_status: number | null;
-  security_class: string | null;
+export type SovMapSystem = BaseMapSystem & {
   is_hub: boolean;
-  external: boolean;
   anarchy_alert: boolean;
   anarchy_dens: AnarchyDenAlert[];
 };
 
-export type SovMapCoordMode = "2d" | "real";
+export type SovMapCoordMode = MapCoordMode;
 
-export type SovMapEdge = {
-  source: number;
-  target: number;
-};
+export type SovMapEdge = BaseMapEdge;
 
-export type SovMapRegion = {
-  id: number;
-  name: string;
-};
+export type SovMapRegion = BaseMapRegion;
 
 export type SovMapResponse = {
   regions: SovMapRegion[];

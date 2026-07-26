@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { DotVisual } from "../../SpaceMap/DotNode";
 import { upgradeStateBg, type WorkforceTransport } from "../sovereigntyShared";
 import { BOOTSTRAP_HEX } from "./layout";
 import type { SystemNodeData } from "./types";
@@ -205,44 +206,6 @@ const SystemCard = ({ data, selected }: { data: SystemNodeData; selected?: boole
   </div>
 );
 
-const SystemDot = ({ data }: { data: SystemNodeData }) => {
-  const size = data.radius * 2;
-  return (
-    // No content-visibility here: it implies paint containment, which clips
-    // the label below at the edge of this tiny box - exactly the bug that
-    // made non-hub system names disappear.
-    <div style={{ position: "relative", width: size, height: size }}>
-      <div
-        title={data.system.name}
-        style={{
-          width: size,
-          height: size,
-          borderRadius: "50%",
-          background: data.color,
-          border: "1px solid var(--bs-border-color)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: size + 1,
-          left: "50%",
-          transform: "translateX(-50%)",
-          whiteSpace: "nowrap",
-          fontSize: 9,
-          lineHeight: 1.2,
-          color: "var(--bs-body-color)",
-          textShadow:
-            "0 0 2px var(--bs-body-bg), 0 0 3px var(--bs-body-bg), 0 0 4px var(--bs-body-bg)",
-          pointerEvents: "none",
-        }}
-      >
-        {data.system.name}
-      </div>
-    </div>
-  );
-};
-
 const SystemNodeImpl = ({ data, selected }: NodeProps & { data: SystemNodeData }) => {
   return (
     <>
@@ -251,7 +214,7 @@ const SystemNodeImpl = ({ data, selected }: NodeProps & { data: SystemNodeData }
       {data.system.is_hub ? (
         <SystemCard data={data} selected={selected} />
       ) : (
-        <SystemDot data={data} />
+        <DotVisual radius={data.radius} color={data.color} name={data.system.name} />
       )}
     </>
   );

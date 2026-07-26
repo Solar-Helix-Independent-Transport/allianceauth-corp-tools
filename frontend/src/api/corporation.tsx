@@ -37,6 +37,33 @@ export async function loadCorpGlanceAssetData(corporation_id: number) {
   return api.data;
 }
 
+export async function loadCorporationActivityMapAssets(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/assets`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapAssetsShips(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/assets/ships`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapAssetsCapitals(corporation_id: number) {
+  const api = await axios.get(
+    `/audit/api/corporation/${corporation_id}/activitymap/assets/capitals`,
+  );
+  return api.data;
+}
+
+export async function loadCorporationActivityMapMining(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/mining`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapRatting(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/ratting`);
+  return api.data;
+}
+
 export async function loadCorpGlanceStatusData(corporation_id: number) {
   const api = await axios.get(`/audit/api/corporation/${corporation_id}/character/status`);
   console.log(`get glance/assets in api ${corporation_id}`);

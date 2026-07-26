@@ -8,7 +8,7 @@ import type { InternalNode } from "@xyflow/react";
 function getNodeIntersection(intersectionNode: InternalNode, targetNode: InternalNode) {
   // Before a node's first ResizeObserver pass (e.g. the very first frame
   // after mount, or right after a mode switch recreates nodes - see
-  // SovMapCanvas), `measured` is undefined and this would otherwise divide
+  // SpaceMapCanvas), `measured` is undefined and this would otherwise divide
   // by zero, producing NaN coordinates and a briefly broken/invisible edge.
   const w = Math.max((intersectionNode.measured.width ?? 0) / 2, 0.5);
   const h = Math.max((intersectionNode.measured.height ?? 0) / 2, 0.5);

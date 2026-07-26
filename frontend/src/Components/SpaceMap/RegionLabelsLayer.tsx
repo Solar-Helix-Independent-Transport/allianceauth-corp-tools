@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useViewport } from "@xyflow/react";
 import { computeRegionCentroids } from "./layout";
-import type { SovMapCoordMode, SovMapRegion, SovMapSystem } from "./types";
+import type { BaseMapRegion, BaseMapSystem, MapCoordMode } from "./types";
 
 // Large, dim watermark-style text centered on each region's system centroid -
 // purely a background label, so it sits behind the stargate lines and every
@@ -15,9 +15,9 @@ const RegionLabelsLayer = ({
   systems,
   coordMode,
 }: {
-  regions: SovMapRegion[];
-  systems: SovMapSystem[];
-  coordMode: SovMapCoordMode;
+  regions: BaseMapRegion[];
+  systems: BaseMapSystem[];
+  coordMode: MapCoordMode;
 }) => {
   const { x, y, zoom } = useViewport();
 

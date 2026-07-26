@@ -1,3 +1,4 @@
+from .activity_map import ActivityMapApiEndpoints
 from .assets import AssetsApiEndpoints
 from .at_a_glance import GlanceApiEndpoints
 from .clones import CloneApiEndpoints
@@ -14,6 +15,7 @@ from .structures import MercenaryDenApiEndpoints, MercenaryTacticalOperationApiE
 
 
 def setup(api):
+    ActivityMapApiEndpoints(api)
     AssetsApiEndpoints(api)
     IndustryApiEndpoints(api)
     CloneApiEndpoints(api)

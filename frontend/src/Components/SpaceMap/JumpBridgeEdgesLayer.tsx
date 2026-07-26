@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useViewport } from "@xyflow/react";
 import { BOOTSTRAP_HEX, resolveSystemPosition } from "./layout";
-import type { SovMapCoordMode, SovMapEdge, SovMapSystem } from "./types";
+import type { BaseMapEdge, BaseMapSystem, MapCoordMode } from "./types";
 
 // Text size in flow-space units, same coordinate space the line/system
 // positions live in - roughly matches the on-canvas size of a hub card's
@@ -13,7 +13,7 @@ const LABEL_OFFSET_Y = -10;
 // top of it purely for hit-testing (see pointerEvents: "stroke" below).
 const HIT_AREA_WIDTH = 14;
 
-const edgeKey = (e: SovMapEdge) => `${e.source}-${e.target}`;
+const edgeKey = (e: BaseMapEdge) => `${e.source}-${e.target}`;
 
 // Same always-on background layer pattern as StargateEdgesLayer, painted
 // after it (so jump bridges - a much smaller, more notable set of
@@ -23,9 +23,9 @@ const JumpBridgeEdgesLayer = ({
   edges,
   coordMode,
 }: {
-  systems: SovMapSystem[];
-  edges: SovMapEdge[];
-  coordMode: SovMapCoordMode;
+  systems: BaseMapSystem[];
+  edges: BaseMapEdge[];
+  coordMode: MapCoordMode;
 }) => {
   const { x, y, zoom } = useViewport();
   const [selectedKey, setSelectedKey] = useState<string | null>(null);

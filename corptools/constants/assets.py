@@ -1,3 +1,13 @@
+# eve_sde ItemCategory id for the "Ship" category.
+SHIP_CATEGORY_ID = 6
+
+# Group ids for hull classes considered "capital ships" - the union of the
+# lists already used by the asset-groups endpoints (api/character/assets.py
+# and api/corporation/assets.py) to bucket "Capital Ships": Titan, Carrier,
+# Supercarrier, Force Auxiliary, Dreadnought, Jump Freighter, Freighter,
+# Capital Industrial Ship, Lancer Dreadnought.
+CAPITAL_SHIP_GROUP_IDS = [30, 547, 659, 1538, 485, 902, 513, 883, 77283]
+
 # The full `location_flag` enum from the ESI character/corporation assets
 # endpoints (GetCharactersCharacterIdAssets / GetCorporationsCorporationIdAssets).
 # Used to power the Smart Filter admin's location-flag picker.

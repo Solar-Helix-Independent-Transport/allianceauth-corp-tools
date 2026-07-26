@@ -23,6 +23,32 @@ export async function getCharacterContacts(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/contacts", characterID);
 }
 
+export async function getCharacterActivityMapAssets(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/activitymap/assets", characterID);
+}
+
+export async function getCharacterActivityMapAssetsShips(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/activitymap/assets/ships",
+    characterID,
+  );
+}
+
+export async function getCharacterActivityMapAssetsCapitals(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/activitymap/assets/capitals",
+    characterID,
+  );
+}
+
+export async function getCharacterActivityMapRatting(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/activitymap/ratting", characterID);
+}
+
+export async function getCharacterActivityMapMining(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/activitymap/mining", characterID);
+}
+
 export async function getCharacterLP(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/loyalty", characterID);
 }

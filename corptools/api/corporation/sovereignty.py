@@ -3,7 +3,7 @@ import logging
 from typing import List
 
 # Third Party
-from eve_sde.models import Region, SolarSystem, Stargate
+from eve_sde.models import SolarSystem
 from ninja import NinjaAPI
 
 # Alliance Auth
@@ -11,6 +11,7 @@ from allianceauth.services.hooks import get_extension_logger
 
 # AA Example App
 from corptools import models
+from corptools.api.spacemap import build_base_map_payload
 
 logger = get_extension_logger(__name__)
 
@@ -232,27 +233,6 @@ def _serialize_hub_public(h) -> dict:
     }
 
 
-def _normalize_positions(systems, x_attr: str, y_attr: str, target_span: float = 20000.0) -> dict:
-    xs = [getattr(s, x_attr) for s in systems if getattr(
-        s, x_attr) is not None and getattr(s, y_attr) is not None]
-    ys = [getattr(s, y_attr) for s in systems if getattr(
-        s, x_attr) is not None and getattr(s, y_attr) is not None]
-    if not xs:
-        return {}
-    min_x, max_x = min(xs), max(xs)
-    min_y, max_y = min(ys), max(ys)
-    span = max(max_x - min_x, max_y - min_y) or 1.0
-    scale = target_span / span
-    result = {}
-    for s in systems:
-        x_val = getattr(s, x_attr)
-        y_val = getattr(s, y_attr)
-        if x_val is None or y_val is None:
-            continue
-        result[s.id] = ((x_val - min_x) * scale, (max_y - y_val) * scale)
-    return result
-
-
 # Mercenary den "anarchy" reduces the workforce available to a sovereignty
 # hub in the same solar system, so a den running hot enough is a threat to
 # that hub regardless of who anchored it - anything at or above this is
@@ -314,47 +294,17 @@ def _build_sov_map_payload(
     jump_bridge_edges=frozenset(),
     include_den_detail=True,
 ) -> dict:
-    region_ids = {
-        h.solar_system_name.constellation.region_id
-        for h in hubs
-        if h.solar_system_name and h.solar_system_name.constellation
-    }
-
-    base_systems = list(
-        SolarSystem.objects.filter(constellation__region_id__in=region_ids)
-        .select_related('constellation')
-    )
-    base_system_ids = {s.id for s in base_systems}
-
-    edge_rows = Stargate.objects.filter(
-        solar_system_id__in=base_system_ids,
-        destination_id__in=base_system_ids,
-    ).values_list('solar_system_id', 'destination_id')
-    edges = {tuple(sorted(pair)) for pair in edge_rows if pair[0] != pair[1]}
+    hub_system_ids = {h.solar_system_id for h in hubs}
 
     # Jump bridges routinely connect a hub region to somewhere far outside
     # any tracked sov region, so their endpoints need the same "pull in as
     # an external system" treatment as workforce-transport systems do.
     jump_bridge_system_ids = {
         sid for pair in jump_bridge_edges for sid in pair}
-    external_ids = (transport_system_ids |
-                    jump_bridge_system_ids) - base_system_ids
-    external_systems = list(
-        SolarSystem.objects.filter(id__in=external_ids)
-        .select_related('constellation')
-    ) if external_ids else []
+    extra_system_ids = transport_system_ids | jump_bridge_system_ids
 
-    all_systems = base_systems + external_systems
-    # Two independent layouts: the SDE's precomputed position2D (a
-    # manually laid-out, non-spatially-accurate map projection) and
-    # the real universe coordinates (X/Z - EVE's galaxy is arranged
-    # flat on that plane, Y being the vertical axis). Both are sent
-    # so the frontend can toggle between them instantly, with no
-    # extra round trip.
-    positions_2d = _normalize_positions(all_systems, 'x_2d', 'y_2d')
-    positions_real = _normalize_positions(all_systems, 'x', 'z')
-
-    hub_system_ids = {h.solar_system_id for h in hubs}
+    payload = build_base_map_payload(
+        hub_system_ids, extra_system_ids=extra_system_ids)
 
     # Anarchy only disrupts the sov hub sharing its system, so only hub
     # systems need to be checked. The public/dashboard view shouldn't reveal
@@ -365,40 +315,16 @@ def _build_sov_map_payload(
             hub_system_ids) if include_den_detail else {}
     )
 
-    systems_out = []
-    for s in all_systems:
-        p2d = positions_2d.get(s.id)
-        preal = positions_real.get(s.id)
-        if p2d is None and preal is None:
-            continue
-        anarchy_dens = anarchy_by_system.get(s.id, [])
-        systems_out.append({
-            "id": s.id,
-            "name": s.name,
-            "region_id": s.constellation.region_id if s.constellation else None,
-            "constellation_id": s.constellation_id,
-            "x_2d": p2d[0] if p2d else None,
-            "y_2d": p2d[1] if p2d else None,
-            "x_real": preal[0] if preal else None,
-            "y_real": preal[1] if preal else None,
-            "security_status": s.security_status,
-            "security_class": s.security_class,
-            "is_hub": s.id in hub_system_ids,
-            "external": s.id not in base_system_ids,
-            "anarchy_alert": len(anarchy_dens) > 0,
-            "anarchy_dens": anarchy_dens,
-        })
+    for s in payload["systems"]:
+        anarchy_dens = anarchy_by_system.get(s["id"], [])
+        s["is_hub"] = s["id"] in hub_system_ids
+        s["anarchy_alert"] = len(anarchy_dens) > 0
+        s["anarchy_dens"] = anarchy_dens
 
-    regions_out = list(Region.objects.filter(
-        id__in=region_ids).values('id', 'name'))
-
-    return {
-        "regions": regions_out,
-        "systems": systems_out,
-        "edges": [{"source": a, "target": b} for a, b in edges],
-        "jump_bridges": [{"source": a, "target": b} for a, b in jump_bridge_edges],
-        "hubs": [serialize_hub(h) for h in hubs],
-    }
+    payload["jump_bridges"] = [{"source": a, "target": b}
+                               for a, b in jump_bridge_edges]
+    payload["hubs"] = [serialize_hub(h) for h in hubs]
+    return payload
 
 
 class SovereigntyApiEndpoints:

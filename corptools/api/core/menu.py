@@ -105,6 +105,10 @@ class MenuApiEndpoints:
                     "name": _("Asset List"),
                     "link": "account/listassets"
                 })
+                _inter["links"].append({
+                    "name": _("Activity Map"),
+                    "link": "account/activitymap"
+                })
 
             if app_settings.CT_CHAR_MINING_MODULE:
                 _industry["links"].append({
