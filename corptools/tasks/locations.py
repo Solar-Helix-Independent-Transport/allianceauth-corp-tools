@@ -26,7 +26,7 @@ from ..models import (
     EveLocation,
     JumpClone,
 )
-from ..task_helpers.update_tasks import fetch_location_name
+from ..task_helpers.update_tasks import LocationUnresolvable, fetch_location_name
 from .utils import (
     esi_error_retry,
     get_error_count_flag,
@@ -42,78 +42,84 @@ logger = get_extension_logger(__name__)
 # Bulk Updates
 
 
-def build_location_cache_tag(location_id):
+# Location cooloff/retry tracking.
+#
+# There are two distinct pieces of state, both cached per location_id:
+#  - which characters have already been (unsuccessfully) tried for this
+#    location within the last COOLOFF_DAYS, so we don't hammer the same
+#    token repeatedly
+#  - whether the location as a whole has no untried characters left, so we
+#    can skip it entirely until the cooloff window passes
+COOLOFF_DAYS = 7
+# A structure that 404s is gone for good, not just temporarily inaccessible -
+# cool it off much longer than a normal "no docking access" failure.
+UNRESOLVABLE_COOLOFF_DAYS = 30
+# cache entry TTL, longer than the freshness window itself
+CACHE_TIMEOUT = 60 * 60 * 24 * 30
+
+
+def _location_state_cache_tag(location_id):
     return f"loc_id_{location_id}"
 
 
-def build_location_cooloff_cache_tag(location_id):
+def _location_cooloff_cache_tag(location_id):
     return f"cooldown_loc_id_{location_id}"
 
 
+def _get_location_state(location_id):
+    """Returns {"<character_id>": "<iso tried_at>"} for a location_id."""
+    cache_tag = _location_state_cache_tag(location_id)
+    raw = cache.get(cache_tag)
+    if raw is None:
+        return {}
+    return json.loads(raw)
+
+
+def _save_location_state(location_id, state):
+    cache.set(
+        _location_state_cache_tag(location_id),
+        json.dumps(state, cls=DjangoJSONEncoder),
+        CACHE_TIMEOUT
+    )
+
+
+def is_character_on_cooloff(location_id, character_id):
+    """Has this character already been tried (and failed) for this location recently?"""
+    expires_at = _get_location_state(location_id).get(str(character_id))
+    if not expires_at:
+        return False
+    expires_at = datetime.datetime.strptime(
+        expires_at, TZ_STRING).replace(tzinfo=tz.utc)
+    return expires_at > timezone.now()
+
+
+def set_character_cooloff(location_id, character_id, days=COOLOFF_DAYS):
+    """Record that this character was just tried (and failed) for this location."""
+    state = _get_location_state(location_id)
+    state[str(character_id)] = (
+        timezone.now() + datetime.timedelta(days=days)
+    ).strftime(TZ_STRING)
+    _save_location_state(location_id, state)
+
+
+def untried_characters(location_id, character_ids):
+    """Filters character_ids down to those not currently on cooloff for this location."""
+    return {
+        c_id for c_id in character_ids
+        if not is_character_on_cooloff(location_id, c_id)
+    }
+
+
 def get_location_cooloff(location_id):
-    return cache.get(build_location_cooloff_cache_tag(location_id), False)
+    return cache.get(_location_cooloff_cache_tag(location_id), False)
 
 
 def set_location_cooloff(location_id):
-    # timeout for 7 days
-    return cache.set(build_location_cooloff_cache_tag(location_id), True, (60 * 60 * 24 * 7))
-
-
-def build_location_char_cooloff_cache_tag(location_id, char_id):
-    return f"cooldown_loc_id_{location_id}_char_id_{char_id}"
-
-
-def get_location_char_cooloff(location_id, char_id):
-    return cache.get(build_location_char_cooloff_cache_tag(location_id, char_id), False)
-
-
-def set_location_char_cooloff(location_id, char_id):
-    # timeout for 7 days
-    return cache.set(build_location_char_cooloff_cache_tag(location_id, char_id), True, (60 * 60 * 24 * 7))
-
-
-def location_get(location_id):
-    cache_tag = build_location_cache_tag(location_id)
-    data = json.loads(cache.get(cache_tag, '{"date":false, "characters":[]}'))
-    if data.get('date') is not False:
-        try:
-            data['date'] = datetime.datetime.strptime(
-                data.get('date'), TZ_STRING).replace(tzinfo=tz.utc)
-        except Exception:
-            data['date'] = datetime.datetime.min.replace(tzinfo=tz.utc)
-    return data
-
-
-CACHE_TIMEOUT = 60*60*24*30
-
-
-def location_set(location_id, character_id):
-    cache_tag = build_location_cache_tag(location_id)
-    date = timezone.now() - datetime.timedelta(days=7)
-    data = location_get(location_id)
-    if data.get('date') is not False:
-        if data.get('date') > date:
-            if character_id not in data.get('characters'):
-                data.get('characters').append(character_id)
-                cache.set(cache_tag, json.dumps(
-                    data, cls=DjangoJSONEncoder), CACHE_TIMEOUT)
-                return True
-            return False
-        else:
-            data['date'] = timezone.now().strftime(TZ_STRING)
-            data['characters'] = [character_id]
-            cache.set(cache_tag, json.dumps(
-                data, cls=DjangoJSONEncoder), CACHE_TIMEOUT)
-            return True
-
-    if character_id not in data.get('characters'):
-        data.get('characters').append(character_id)
-        data['date'] = timezone.now().strftime(TZ_STRING)
-        cache.set(cache_tag, json.dumps(
-            data, cls=DjangoJSONEncoder), CACHE_TIMEOUT)
-        return True
-
-    return False
+    return cache.set(
+        _location_cooloff_cache_tag(location_id),
+        True,
+        (60 * 60 * 24 * COOLOFF_DAYS)
+    )
 
 
 @shared_task(
@@ -135,10 +141,6 @@ def update_citadel_names(self):
 
 
 def get_character_lists(location_id):
-    cached_data = location_get(location_id)
-
-    date = timezone.now() - datetime.timedelta(days=7)
-
     asset = CharacterAsset.objects.filter(
         location_id=location_id).select_related('character__character')
     clone = Clone.objects.filter(
@@ -148,18 +150,6 @@ def get_character_lists(location_id):
     marketorder = CharacterMarketOrder.objects.filter(
         location_id=location_id).select_related('character__character')
 
-    if cached_data.get('date') is not False:
-        if cached_data.get('date') > date:
-            asset = asset.exclude(
-                character__character__character_id__in=cached_data.get('characters'))
-            clone = clone.exclude(
-                character__character__character_id__in=cached_data.get('characters'))
-            jumpclone = jumpclone.exclude(
-                character__character__character_id__in=cached_data.get('characters'))
-            marketorder = marketorder.exclude(
-                character__character__character_id__in=cached_data.get('characters'))
-
-    # location_flag = None
     char_ids = []
 
     if asset.exists():
@@ -173,7 +163,7 @@ def get_character_lists(location_id):
         char_ids += list(marketorder.values_list(
             'character__character__character_id', flat=True))
 
-    return set(char_ids)
+    return untried_characters(location_id, set(char_ids))
 
 
 def update_missing_locations(location_id):
@@ -248,7 +238,11 @@ def update_location(self, location_id, character_ids=None, force_citadel=False):
         # self.retry(countdown=300)
 
     if location_id < 64000000:
-        location = fetch_location_name(location_id, None, 0, update=True)
+        try:
+            location = fetch_location_name(location_id, None, 0, update=True)
+        except LocationUnresolvable:
+            set_location_cooloff(location_id)
+            return f"CT LOCATIONS: Location_id: {location_id} unresolvable, cooling off"
         if location is not None:
             location.save()
             return update_missing_locations(location_id)
@@ -263,16 +257,19 @@ def update_location(self, location_id, character_ids=None, force_citadel=False):
         return f"CT LOCATIONS: No more Characters for Location_id: {location_id} cooling off for a while"
 
     for c_id in char_ids:
-        if not get_location_char_cooloff(location_id, c_id):
+        try:
             location = fetch_location_name(location_id, None, c_id)
-            if location is not None:
-                location.save()
-                return update_missing_locations(location_id)
-            else:
-                set_location_char_cooloff(location_id, c_id)
-                location_set(location_id, c_id)
-                if get_error_count_flag():
-                    self.retry(countdown=300)
+        except LocationUnresolvable:
+            set_character_cooloff(
+                location_id, c_id, days=UNRESOLVABLE_COOLOFF_DAYS)
+            continue
+        if location is not None:
+            location.save()
+            return update_missing_locations(location_id)
+        else:
+            set_character_cooloff(location_id, c_id)
+            if get_error_count_flag():
+                self.retry(countdown=300)
 
     set_location_cooloff(location_id)
     return f"CT LOCATIONS: No more Characters for Location_id: {location_id} cooling off for a while"

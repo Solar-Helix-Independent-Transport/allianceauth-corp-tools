@@ -27,6 +27,42 @@ def set_error_count_flag():
     return cache.set("esi_errors_timeout", 1, 60)
 
 
+class LocationUnresolvable(Exception):
+    """Raised when a location_id will never resolve (e.g. a destroyed structure),
+    so the caller can apply a longer cooloff than a merely-denied-access failure."""
+
+
+def _handle_esi_client_error(e, location_id):
+    """Decide how to react to an HTTPClientError hit while resolving location_id.
+
+    - 420/429 (ESI globally error-limited): this isn't about this location or
+      character at all, so re-raise and let the calling task's esi_error_retry
+      decorator pause and retry the whole task.
+    - 404 (object no longer exists, e.g. a destroyed structure): raise
+      LocationUnresolvable so the caller can cool it off for longer than a
+      normal "no access right now" failure.
+    - anything else (typically 403 - no docking access): log and return,
+      treated by the caller as a normal per-character resolution failure.
+    """
+    if int(e.headers.get('x-esi-error-limit-remain', 0)) < 50:
+        set_error_count_flag()
+
+    if e.status_code in (420, 429):
+        raise e
+
+    logger.debug(
+        "Failed to get location:{}, Error:{}, Errors Remaining:{}, Time Remaining: {}".format(
+            location_id,
+            e,
+            e.headers.get('x-esi-error-limit-remain'),
+            e.headers.get('x-esi-error-limit-reset')
+        )
+    )
+
+    if e.status_code == 404:
+        raise LocationUnresolvable(location_id) from e
+
+
 def fetch_location_name(location_id, location_flag, character_id, update=False):
     """Takes a location_id and character_id and returns a location model for items in a station/structure or in space"""
 
@@ -66,9 +102,13 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
                            location_name=system.name,
                            system=system)
     elif 60000000 < location_id < 64000000:  # Station ID
-        station = providers.esi_openapi.client.Universe.GetUniverseStationsStationId(
-            station_id=location_id
-        ).result()
+        try:
+            station = providers.esi_openapi.client.Universe.GetUniverseStationsStationId(
+                station_id=location_id
+            ).result()
+        except HTTPClientError as e:
+            _handle_esi_client_error(e, location_id)
+            return None
         system = SolarSystem.objects.filter(id=station.system_id)
         if not system.exists():
             logger.error("Unknown System, Have you populated the map?")
@@ -93,17 +133,8 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
                 structure_id=location_id,
                 token=token
             ).result(use_etag=False)
-        except HTTPClientError as e:  # no access
-            if int(e.headers.get('x-esi-error-limit-remain', 0)) < 50:
-                set_error_count_flag()
-            logger.debug(
-                "Failed to get location:{}, Error:{}, Errors Remaining:{}, Time Remaining: {}".format(
-                    location_id,
-                    e,
-                    e.headers.get('x-esi-error-limit-remain'),
-                    e.headers.get('x-esi-error-limit-reset')
-                )
-            )
+        except HTTPClientError as e:
+            _handle_esi_client_error(e, location_id)
             return None
         system = SolarSystem.objects.filter(
             id=structure.solar_system_id
