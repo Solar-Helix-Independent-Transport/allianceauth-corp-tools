@@ -155,6 +155,39 @@ class TestGetOldestQs(CorptoolsTestCase):
             pks = [ca.pk for ca in result]
             self.assertLess(pks.index(self.ca1.pk), pks.index(self.ca2.pk))
 
+    def test_mercenary_dens_excluded_from_average_by_default(self):
+        # Default ignore flags are True, so a stale mercenary_dens timestamp
+        # shouldn't affect ordering at all - only the genuinely stale 'wallet'
+        # key (on ca2) should push a character earlier.
+        old = (timezone.now() - datetime.timedelta(days=5)).isoformat()
+        recent = (timezone.now() - datetime.timedelta(hours=1)).isoformat()
+        self.ca1.update_timestamps = {"wallet": recent, "mercenary_dens": old}
+        self.ca1.save()
+        self.ca2.update_timestamps = {"wallet": old}
+        self.ca2.save()
+
+        result = CharacterAudit.get_oldest_qs()
+        pks = [ca.pk for ca in result]
+        self.assertLess(pks.index(self.ca2.pk), pks.index(self.ca1.pk))
+
+    def test_mercenary_dens_included_in_average_when_flag_disabled(self):
+        with patch(
+            "corptools.models.audits.app_settings.CT_CHAR_ACTIVE_IGNORE_MERCENARY_DENS_MODULE",
+            False,
+        ):
+            old = (timezone.now() - datetime.timedelta(days=5)).isoformat()
+            recent = (timezone.now() - datetime.timedelta(hours=1)).isoformat()
+            self.ca1.update_timestamps = {
+                "wallet": recent, "mercenary_dens": old}
+            self.ca1.save()
+            self.ca2.update_timestamps = {
+                "wallet": recent, "mercenary_dens": recent}
+            self.ca2.save()
+
+            result = CharacterAudit.get_oldest_qs()
+            pks = [ca.pk for ca in result]
+            self.assertLess(pks.index(self.ca1.pk), pks.index(self.ca2.pk))
+
     def test_mixed_timestamps_average_determines_order(self):
         # ca1: one old, one recent → avg is middling
         # ca2: both recent → avg is very recent

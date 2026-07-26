@@ -1,5 +1,6 @@
 # Standard Library
 import datetime
+from unittest.mock import patch
 
 # Django
 from django.test import TestCase
@@ -81,6 +82,56 @@ class TestCharacterAuditTimestamps(CorptoolsTestCase):
         self.ca1.is_active()
         self.ca1.refresh_from_db()
         self.assertFalse(self.ca1.active)
+
+    def test_is_active_ignores_stale_mercenary_dens_by_default(self):
+        now_iso = timezone.now().isoformat()
+        stale_iso = (timezone.now() - datetime.timedelta(days=200)).isoformat()
+        self.ca1.update_timestamps = {
+            'pub_data': now_iso, 'assets': now_iso, 'clones': now_iso,
+            'skills': now_iso, 'skill_que': now_iso, 'wallet': now_iso,
+            'orders': now_iso, 'notif': now_iso, 'roles': now_iso,
+            'mails': now_iso, 'loyaltypoints': now_iso, 'mining': now_iso,
+            'mercenary_dens': stale_iso,
+            'mercenary_tactical_operations': stale_iso,
+        }
+        self.ca1.save()
+        self.assertTrue(self.ca1.is_active())
+
+    def test_is_active_checks_mercenary_dens_when_flag_disabled(self):
+        now_iso = timezone.now().isoformat()
+        stale_iso = (timezone.now() - datetime.timedelta(days=200)).isoformat()
+        self.ca1.update_timestamps = {
+            'pub_data': now_iso, 'assets': now_iso, 'clones': now_iso,
+            'skills': now_iso, 'skill_que': now_iso, 'wallet': now_iso,
+            'orders': now_iso, 'notif': now_iso, 'roles': now_iso,
+            'mails': now_iso, 'loyaltypoints': now_iso, 'mining': now_iso,
+            'mercenary_dens': stale_iso,
+            'mercenary_tactical_operations': now_iso,
+        }
+        self.ca1.save()
+        with patch(
+            "corptools.models.audits.app_settings.CT_CHAR_ACTIVE_IGNORE_MERCENARY_DENS_MODULE",
+            False,
+        ):
+            self.assertFalse(self.ca1.is_active())
+
+    def test_is_active_checks_mercenary_tactical_operations_when_flag_disabled(self):
+        now_iso = timezone.now().isoformat()
+        stale_iso = (timezone.now() - datetime.timedelta(days=200)).isoformat()
+        self.ca1.update_timestamps = {
+            'pub_data': now_iso, 'assets': now_iso, 'clones': now_iso,
+            'skills': now_iso, 'skill_que': now_iso, 'wallet': now_iso,
+            'orders': now_iso, 'notif': now_iso, 'roles': now_iso,
+            'mails': now_iso, 'loyaltypoints': now_iso, 'mining': now_iso,
+            'mercenary_dens': now_iso,
+            'mercenary_tactical_operations': stale_iso,
+        }
+        self.ca1.save()
+        with patch(
+            "corptools.models.audits.app_settings.CT_CHAR_ACTIVE_IGNORE_MERCENARY_TACTICAL_OPERATIONS_MODULE",
+            False,
+        ):
+            self.assertFalse(self.ca1.is_active())
 
 
 class TestCorptoolsConfigurationClassMethods(TestCase):

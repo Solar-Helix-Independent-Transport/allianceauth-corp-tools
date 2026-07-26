@@ -83,6 +83,12 @@ CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE = getattr(
 CT_CHAR_ACTIVE_IGNORE_MINING_MODULE = getattr(
     settings, 'CT_CHAR_ACTIVE_IGNORE_MINING_MODULE', True)
 
+# New scopes so existing tokens will fail until re-auth - ignore by default.
+CT_CHAR_ACTIVE_IGNORE_MERCENARY_DENS_MODULE = getattr(
+    settings, 'CT_CHAR_ACTIVE_IGNORE_MERCENARY_DENS_MODULE', True)
+CT_CHAR_ACTIVE_IGNORE_MERCENARY_TACTICAL_OPERATIONS_MODULE = getattr(
+    settings, 'CT_CHAR_ACTIVE_IGNORE_MERCENARY_TACTICAL_OPERATIONS_MODULE', True)
+
 
 def get_character_scopes():
     _scopes = [

@@ -298,6 +298,12 @@ class CharacterAudit(models.Model):
             if app_settings.CT_CHAR_MINING_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE and not ct_conf.disable_update_mining:
                 is_active = is_active and check_date(
                     self.get_update_time('mining'), time_ref)
+            if app_settings.CT_CHAR_STRUCTURES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MERCENARY_DENS_MODULE and not ct_conf.disable_update_mercenary_dens:
+                is_active = is_active and check_date(
+                    self.get_update_time('mercenary_dens'), time_ref)
+            if app_settings.CT_CHAR_STRUCTURES_MODULE and not app_settings.CT_CHAR_ACTIVE_IGNORE_MERCENARY_TACTICAL_OPERATIONS_MODULE and not ct_conf.disable_update_mercenary_tactical_operations:
+                is_active = is_active and check_date(
+                    self.get_update_time('mercenary_tactical_operations'), time_ref)
 
             if self.active != is_active:
                 self.active = is_active
@@ -352,6 +358,15 @@ class CharacterAudit(models.Model):
             app_settings.CT_CHAR_ACTIVE_IGNORE_MINING_MODULE or ct_conf.disable_update_mining
         ):
             keys.append('mining')
+        if app_settings.CT_CHAR_STRUCTURES_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_MERCENARY_DENS_MODULE or ct_conf.disable_update_mercenary_dens
+        ):
+            keys.append('mercenary_dens')
+        if app_settings.CT_CHAR_STRUCTURES_MODULE and not (
+            app_settings.CT_CHAR_ACTIVE_IGNORE_MERCENARY_TACTICAL_OPERATIONS_MODULE
+            or ct_conf.disable_update_mercenary_tactical_operations
+        ):
+            keys.append('mercenary_tactical_operations')
 
         time_ref_epoch = time_ref.timestamp()
 
