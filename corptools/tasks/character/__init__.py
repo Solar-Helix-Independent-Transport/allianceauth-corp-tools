@@ -19,7 +19,7 @@ from esi.models import Token
 from ... import app_settings
 from ...models import CharacterAudit, CorptoolsConfiguration
 from ..locations import update_all_locations
-from ..utils import enqueue_next_task
+from ..utils import _needs_update, enqueue_next_task
 from .assets import update_char_assets
 from .clones import update_char_clones
 from .misc import (
@@ -44,6 +44,8 @@ from .social import (
 from .structures import (
     update_char_mercenary_dens,
     update_char_mercenary_tactical_operations,
+    update_mercenary_dens_for_den_holders,
+    update_mercenary_tactical_operations_for_den_holders,
 )
 from .wallet import (  # noqa: F401
     update_char_contract_items,
@@ -56,11 +58,6 @@ from .wallet import (  # noqa: F401
 )
 
 logger = get_extension_logger(__name__)
-
-
-def _needs_update(last_update, skip_date, force_refresh, min_date):
-    """Return True if a character update field is stale or a force refresh was requested."""
-    return (last_update or min_date) <= skip_date or force_refresh
 
 
 @shared_task(name="corptools.tasks.update_all_characters")
@@ -85,6 +82,12 @@ def update_subset_of_characters(self, subset=48, min_runs=15, force=False):
             kwargs={"force_refresh": force}
         )
     process_corp_histories.apply_async(priority=6)
+    update_mercenary_dens_for_den_holders.apply_async(
+        priority=6, kwargs={"force_refresh": force}
+    )
+    update_mercenary_tactical_operations_for_den_holders.apply_async(
+        priority=6, kwargs={"force_refresh": force}
+    )
     return f"Queued {len(characters)} Character Updates"
 
 

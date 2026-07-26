@@ -97,23 +97,67 @@ const WorkforceLine = ({
   );
 };
 
+const AnarchyAlertBadge = ({ dens }: { dens: SystemNodeData["system"]["anarchy_dens"] }) => {
+  if (!dens || dens.length === 0) return null;
+  const title = dens
+    .map((d) => `${d.character_name} - ${d.type_name} (${d.anarchy_amount}% anarchy)`)
+    .join("\n");
+  return (
+    <div
+      title={`Mercenary den anarchy is disrupting this hub's workforce:\n${title}`}
+      style={{
+        position: "absolute",
+        top: -8,
+        right: -8,
+        background: BOOTSTRAP_HEX.danger,
+        color: "#fff",
+        borderRadius: "50%",
+        width: 18,
+        height: 18,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 11,
+        fontWeight: 700,
+        boxShadow: "0 0 0 2px var(--bs-body-bg)",
+        cursor: "help",
+      }}
+    >
+      !
+    </div>
+  );
+};
+
+// A big, unmissable glow layered under the normal card shadow - so a hub
+// under den-anarchy pressure stands out on the map itself, not just via the
+// small corner badge (which is easy to miss when zoomed out or scanning
+// dozens of hubs at once).
+const ANARCHY_GLOW = `0 0 18px 6px ${BOOTSTRAP_HEX.danger}, 0 0 34px 14px color-mix(in srgb, ${BOOTSTRAP_HEX.danger} 55%, transparent)`;
+
 const SystemCard = ({ data, selected }: { data: SystemNodeData; selected?: boolean }) => (
   <div
     style={{
+      position: "relative",
       minWidth: 130,
       maxWidth: 230,
       background: "color-mix(in srgb, var(--bs-tertiary-bg) 70%, transparent)",
-      border: `2px solid ${data.color}`,
+      border: `2px solid ${data.system.anarchy_alert ? BOOTSTRAP_HEX.danger : data.color}`,
       borderRadius: 6,
-      boxShadow: selected
-        ? `0 0 0 2px var(--bs-emphasis-color), 0 4px 14px rgba(0,0,0,0.75)`
-        : "0 2px 6px rgba(0,0,0,0.55)",
+      boxShadow: [
+        data.system.anarchy_alert ? ANARCHY_GLOW : null,
+        selected
+          ? `0 0 0 2px var(--bs-emphasis-color), 0 4px 14px rgba(0,0,0,0.75)`
+          : "0 2px 6px rgba(0,0,0,0.55)",
+      ]
+        .filter(Boolean)
+        .join(", "),
       padding: "5px 8px",
       fontSize: 11,
       color: "var(--bs-body-color)",
       cursor: "pointer",
     }}
   >
+    <AnarchyAlertBadge dens={data.system.anarchy_dens} />
     <div
       style={{
         fontWeight: 600,

@@ -140,7 +140,7 @@ def _jump_bridge_edges(structures) -> set:
     return edges
 
 
-def _serialize_hub(h, system_names: dict) -> dict:
+def _serialize_hub(h, system_names: dict, anarchy_dens=None) -> dict:
     reagents = []
     for r in h.reagents.all():
         reagents.append({
@@ -185,6 +185,7 @@ def _serialize_hub(h, system_names: dict) -> dict:
         "reagents": reagents,
         "upgrades": upgrades,
         "workforce_transport": _parse_workforce_transport(h.workforce_transport, system_names),
+        "anarchy_dens": anarchy_dens or [],
     }
 
 
@@ -219,7 +220,15 @@ def _serialize_hub_public(h) -> dict:
         "location": location,
         "constellation": constellation,
         "region": region,
+        "power_allocated": None,
+        "power_available": None,
+        "workforce_allocated": None,
+        "workforce_available": None,
+        "reagent_last_updated": None,
+        "reagents": [],
         "upgrades": upgrades,
+        "workforce_transport": None,
+        "anarchy_dens": [],
     }
 
 
@@ -242,6 +251,39 @@ def _normalize_positions(systems, x_attr: str, y_attr: str, target_span: float =
             continue
         result[s.id] = ((x_val - min_x) * scale, (max_y - y_val) * scale)
     return result
+
+
+# Mercenary den "anarchy" reduces the workforce available to a sovereignty
+# hub in the same solar system, so a den running hot enough is a threat to
+# that hub regardless of who anchored it - anything at or above this is
+# flagged on the map.
+ANARCHY_ALERT_THRESHOLD_PCT = 40
+
+
+def _high_anarchy_dens_by_system(system_ids) -> dict:
+    """solar_system_id -> list of high-anarchy den alerts anchored in that system."""
+    if not system_ids:
+        return {}
+
+    dens = models.CharacterMercenaryDen.objects.filter(
+        anarchy_amount__gt=ANARCHY_ALERT_THRESHOLD_PCT,
+        planet_name__solar_system_id__in=system_ids,
+    ).select_related(
+        'planet_name__solar_system',
+        'character__character',
+        'type_name',
+    )
+
+    by_system = {}
+    for den in dens:
+        by_system.setdefault(den.planet_name.solar_system_id, []).append({
+            "den_id": den.den_id,
+            "anarchy_amount": den.anarchy_amount,
+            "character_name": den.character.character.character_name,
+            "type_name": den.type_name.name if den.type_name else "Unknown",
+            "planet_name": den.planet_name.name if den.planet_name else f"Planet ID {den.planet_id}",
+        })
+    return by_system
 
 
 def _get_visible_hubs(user):
@@ -270,6 +312,7 @@ def _build_sov_map_payload(
     serialize_hub,
     transport_system_ids=frozenset(),
     jump_bridge_edges=frozenset(),
+    include_den_detail=True,
 ) -> dict:
     region_ids = {
         h.solar_system_name.constellation.region_id
@@ -313,12 +356,22 @@ def _build_sov_map_payload(
 
     hub_system_ids = {h.solar_system_id for h in hubs}
 
+    # Anarchy only disrupts the sov hub sharing its system, so only hub
+    # systems need to be checked. The public/dashboard view shouldn't reveal
+    # any den info at all - not even that an alert exists - so skip the
+    # lookup entirely there rather than just withholding the den list.
+    anarchy_by_system = (
+        _high_anarchy_dens_by_system(
+            hub_system_ids) if include_den_detail else {}
+    )
+
     systems_out = []
     for s in all_systems:
         p2d = positions_2d.get(s.id)
         preal = positions_real.get(s.id)
         if p2d is None and preal is None:
             continue
+        anarchy_dens = anarchy_by_system.get(s.id, [])
         systems_out.append({
             "id": s.id,
             "name": s.name,
@@ -332,6 +385,8 @@ def _build_sov_map_payload(
             "security_class": s.security_class,
             "is_hub": s.id in hub_system_ids,
             "external": s.id not in base_system_ids,
+            "anarchy_alert": len(anarchy_dens) > 0,
+            "anarchy_dens": anarchy_dens,
         })
 
     regions_out = list(Region.objects.filter(
@@ -369,8 +424,17 @@ class SovereigntyApiEndpoints:
                 s.id: s.name
                 for s in SolarSystem.objects.filter(id__in=transport_system_ids)
             }
+            anarchy_by_system = _high_anarchy_dens_by_system(
+                {h.solar_system_id for h in hubs}
+            )
 
-            return [_serialize_hub(h, system_names) for h in hubs]
+            return [
+                _serialize_hub(
+                    h, system_names, anarchy_by_system.get(
+                        h.solar_system_id, [])
+                )
+                for h in hubs
+            ]
 
         @api.get(
             "corp/sovhubs/map",
@@ -420,4 +484,9 @@ class SovereigntyApiEndpoints:
                 _get_jump_bridge_structures(models.Structure.objects.all())
             )
 
-            return _build_sov_map_payload(hubs, _serialize_hub_public, jump_bridge_edges=jump_bridge_edges)
+            return _build_sov_map_payload(
+                hubs,
+                _serialize_hub_public,
+                jump_bridge_edges=jump_bridge_edges,
+                include_den_detail=False,
+            )

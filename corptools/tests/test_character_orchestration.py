@@ -10,7 +10,11 @@ from django.utils import timezone
 from esi.errors import TokenExpiredError
 
 # AA Example App
-from corptools.models import CharacterAudit, CorptoolsConfiguration
+from corptools.models import (
+    CharacterAudit,
+    CharacterMercenaryDen,
+    CorptoolsConfiguration,
+)
 from corptools.tasks.character import (
     _needs_update,
     check_account,
@@ -18,6 +22,8 @@ from corptools.tasks.character import (
     re_que_corp_histories,
     update_all_characters,
     update_character,
+    update_mercenary_dens_for_den_holders,
+    update_mercenary_tactical_operations_for_den_holders,
     update_subset_of_characters,
 )
 
@@ -172,24 +178,224 @@ class TestGetOldestQs(CorptoolsTestCase):
 
 
 class TestUpdateSubsetOfCharacters(CorptoolsTestCase):
+    @patch("corptools.tasks.character.update_mercenary_tactical_operations_for_den_holders")
+    @patch("corptools.tasks.character.update_mercenary_dens_for_den_holders")
     @patch("corptools.tasks.character.process_corp_histories")
     @patch("corptools.tasks.character.update_character")
-    def test_enqueues_characters_and_triggers_corp_history(self, mock_task, mock_corps):
+    def test_enqueues_characters_and_triggers_corp_history(self, mock_task, mock_corps, mock_merc_dens, mock_merc_ops):
         result = update_subset_of_characters()
         self.assertGreater(mock_task.apply_async.call_count, 0)
         mock_corps.apply_async.assert_called_once_with(priority=6)
         self.assertIn("Queued", result)
 
+    @patch("corptools.tasks.character.update_mercenary_tactical_operations_for_den_holders")
+    @patch("corptools.tasks.character.update_mercenary_dens_for_den_holders")
+    @patch("corptools.tasks.character.process_corp_histories")
+    @patch("corptools.tasks.character.update_character")
+    def test_triggers_out_of_band_mercenary_tactical_operations_update(
+        self, mock_task, mock_corps, mock_merc_dens, mock_merc_ops
+    ):
+        update_subset_of_characters(force=True)
+        mock_merc_ops.apply_async.assert_called_once_with(
+            priority=6, kwargs={"force_refresh": True}
+        )
+
+    @patch("corptools.tasks.character.update_mercenary_tactical_operations_for_den_holders")
+    @patch("corptools.tasks.character.update_mercenary_dens_for_den_holders")
+    @patch("corptools.tasks.character.process_corp_histories")
+    @patch("corptools.tasks.character.update_character")
+    def test_triggers_out_of_band_mercenary_den_update(
+        self, mock_task, mock_corps, mock_merc_dens, mock_merc_ops
+    ):
+        update_subset_of_characters(force=True)
+        mock_merc_dens.apply_async.assert_called_once_with(
+            priority=6, kwargs={"force_refresh": True}
+        )
+
+    @patch("corptools.tasks.character.update_mercenary_tactical_operations_for_den_holders")
+    @patch("corptools.tasks.character.update_mercenary_dens_for_den_holders")
     @patch("corptools.tasks.character.process_corp_histories")
     @patch("corptools.tasks.character.update_character")
     @patch("corptools.tasks.character.CharacterAudit.get_oldest_qs")
     @patch("corptools.tasks.character.CharacterAudit.objects")
-    def test_slice_is_integer_when_count_exceeds_min_runs(self, mock_objects, mock_qs, mock_task, mock_corps):
+    def test_slice_is_integer_when_count_exceeds_min_runs(
+        self, mock_objects, mock_qs, mock_task, mock_corps, mock_merc_dens, mock_merc_ops
+    ):
         mock_objects.all.return_value.count.return_value = 1000
         mock_qs.return_value.__getitem__ = MagicMock(return_value=[])
         update_subset_of_characters(subset=48, min_runs=15)
         slice_arg = mock_qs.return_value.__getitem__.call_args[0][0]
         self.assertIsInstance(slice_arg.stop, int)
+
+
+class TestUpdateMercenaryTacticalOperationsForDenHolders(CorptoolsTestCase):
+    @patch("corptools.tasks.character.structures.update_char_mercenary_tactical_operations")
+    def test_only_den_holders_are_queued(self, mock_task):
+        CharacterMercenaryDen.objects.create(
+            character=self.ca1,
+            den_id=1,
+            planet_id=1,
+            type_id=1,
+            state='running',
+            development_level='level0',
+            anarchy_level='level0',
+        )
+        CharacterMercenaryDen.objects.create(
+            character=self.ca3,
+            den_id=2,
+            planet_id=2,
+            type_id=1,
+            state='running',
+            development_level='level0',
+            anarchy_level='level0',
+        )
+
+        result = update_mercenary_tactical_operations_for_den_holders()
+
+        queued_ids = {
+            call.kwargs["args"][0] for call in mock_task.apply_async.call_args_list
+        }
+        self.assertEqual(
+            queued_ids, {self.char1.character_id, self.char3.character_id})
+        self.assertIn("Queued 2", result)
+
+    @patch("corptools.tasks.character.structures.update_char_mercenary_tactical_operations")
+    def test_character_with_multiple_dens_is_only_queued_once(self, mock_task):
+        CharacterMercenaryDen.objects.create(
+            character=self.ca1,
+            den_id=1,
+            planet_id=1,
+            type_id=1,
+            state='running',
+            development_level='level0',
+            anarchy_level='level0',
+        )
+        CharacterMercenaryDen.objects.create(
+            character=self.ca1,
+            den_id=2,
+            planet_id=2,
+            type_id=1,
+            state='running',
+            development_level='level0',
+            anarchy_level='level0',
+        )
+
+        update_mercenary_tactical_operations_for_den_holders()
+
+        self.assertEqual(mock_task.apply_async.call_count, 1)
+
+    @patch("corptools.tasks.character.structures.update_char_mercenary_tactical_operations")
+    def test_no_den_holders_queues_nothing(self, mock_task):
+        result = update_mercenary_tactical_operations_for_den_holders()
+        mock_task.apply_async.assert_not_called()
+        self.assertIn("Queued 0", result)
+
+    @patch("corptools.tasks.character.structures.update_char_mercenary_tactical_operations")
+    def test_disabled_via_config_queues_nothing(self, mock_task):
+        self.addCleanup(CorptoolsConfiguration.clear_cache)
+        CharacterMercenaryDen.objects.create(
+            character=self.ca1,
+            den_id=1,
+            planet_id=1,
+            type_id=1,
+            state='running',
+            development_level='level0',
+            anarchy_level='level0',
+        )
+        config = CorptoolsConfiguration.get_solo()
+        config.disable_update_mercenary_tactical_operations = True
+        config.save()
+
+        result = update_mercenary_tactical_operations_for_den_holders()
+
+        mock_task.apply_async.assert_not_called()
+        self.assertEqual(result, "Disabled")
+
+
+class TestUpdateMercenaryDensForDenHolders(CorptoolsTestCase):
+    def _add_den(self, character, den_id):
+        CharacterMercenaryDen.objects.create(
+            character=character,
+            den_id=den_id,
+            planet_id=den_id,
+            type_id=1,
+            state='running',
+            development_level='level0',
+            anarchy_level='level0',
+        )
+
+    @patch("corptools.tasks.character.structures.update_char_mercenary_dens")
+    def test_never_updated_den_holder_is_queued(self, mock_task):
+        self._add_den(self.ca1, 1)
+
+        result = update_mercenary_dens_for_den_holders()
+
+        mock_task.apply_async.assert_called_once_with(
+            args=[self.char1.character_id], kwargs={"force_refresh": False}
+        )
+        self.assertIn("Queued 1", result)
+
+    @patch("corptools.tasks.character.structures.update_char_mercenary_dens")
+    def test_recently_updated_den_holder_is_skipped(self, mock_task):
+        self._add_den(self.ca1, 1)
+        self.ca1.update_timestamps["mercenary_dens"] = (
+            timezone.now() - datetime.timedelta(minutes=30)
+        ).isoformat()
+        self.ca1.save()
+
+        result = update_mercenary_dens_for_den_holders()
+
+        mock_task.apply_async.assert_not_called()
+        self.assertIn("Queued 0", result)
+
+    @patch("corptools.tasks.character.structures.update_char_mercenary_dens")
+    def test_stale_den_holder_is_queued(self, mock_task):
+        self._add_den(self.ca1, 1)
+        self.ca1.update_timestamps["mercenary_dens"] = (
+            timezone.now() - datetime.timedelta(hours=2)
+        ).isoformat()
+        self.ca1.save()
+
+        result = update_mercenary_dens_for_den_holders()
+
+        mock_task.apply_async.assert_called_once_with(
+            args=[self.char1.character_id], kwargs={"force_refresh": False}
+        )
+        self.assertIn("Queued 1", result)
+
+    @patch("corptools.tasks.character.structures.update_char_mercenary_dens")
+    def test_force_refresh_bypasses_staleness_check(self, mock_task):
+        self._add_den(self.ca1, 1)
+        self.ca1.update_timestamps["mercenary_dens"] = (
+            timezone.now() - datetime.timedelta(minutes=30)
+        ).isoformat()
+        self.ca1.save()
+
+        result = update_mercenary_dens_for_den_holders(force_refresh=True)
+
+        mock_task.apply_async.assert_called_once_with(
+            args=[self.char1.character_id], kwargs={"force_refresh": True}
+        )
+        self.assertIn("Queued 1", result)
+
+    @patch("corptools.tasks.character.structures.update_char_mercenary_dens")
+    def test_no_den_holders_queues_nothing(self, mock_task):
+        result = update_mercenary_dens_for_den_holders()
+        mock_task.apply_async.assert_not_called()
+        self.assertIn("Queued 0", result)
+
+    @patch("corptools.tasks.character.structures.update_char_mercenary_dens")
+    def test_disabled_via_config_queues_nothing(self, mock_task):
+        self.addCleanup(CorptoolsConfiguration.clear_cache)
+        self._add_den(self.ca1, 1)
+        config = CorptoolsConfiguration.get_solo()
+        config.disable_update_mercenary_dens = True
+        config.save()
+
+        result = update_mercenary_dens_for_den_holders()
+
+        mock_task.apply_async.assert_not_called()
+        self.assertEqual(result, "Disabled")
 
 
 class TestReQueCorpHistories(TestCase):

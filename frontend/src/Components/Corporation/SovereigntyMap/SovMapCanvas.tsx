@@ -11,6 +11,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { SystemNode } from "./SystemNode";
+import SystemDetailPanel from "./SystemDetailPanel";
 import { FloatingEdge } from "./FloatingEdge";
 import StargateEdgesLayer from "./StargateEdgesLayer";
 import JumpBridgeEdgesLayer from "./JumpBridgeEdgesLayer";
@@ -49,6 +50,11 @@ const SovMapCanvas = ({
   coordMode: SovMapCoordMode;
 }) => {
   const hubsById = useMemo(() => buildHubsById(data.hubs), [data.hubs]);
+
+  const regionNameByRegionId = useMemo(
+    () => new Map(data.regions.map((r) => [r.id, r.name])),
+    [data.regions],
+  );
 
   const baseNodes = useMemo(() => buildBaseNodes(data, coordMode), [data, coordMode]);
 
@@ -175,6 +181,11 @@ const SovMapCanvas = ({
     [regionNameById],
   );
 
+  const selectedSystem = useMemo(
+    () => data.systems.find((s) => String(s.id) === selectedNodeId) ?? null,
+    [data.systems, selectedNodeId],
+  );
+
   const { ref, height } = useFillHeight<HTMLDivElement>();
 
   // Switching coordinate systems moves every node to a completely different
@@ -251,6 +262,18 @@ const SovMapCanvas = ({
           }}
         />
       </ReactFlow>
+      {selectedSystem && (
+        <SystemDetailPanel
+          system={selectedSystem}
+          hub={hubsById.get(selectedSystem.id) ?? null}
+          regionName={
+            selectedSystem.region_id != null
+              ? regionNameByRegionId.get(selectedSystem.region_id)
+              : undefined
+          }
+          onClose={() => setSelectedNodeId(null)}
+        />
+      )}
     </div>
   );
 };

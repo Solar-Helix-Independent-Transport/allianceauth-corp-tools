@@ -34,6 +34,34 @@ const JumpBridgeSwatch = () => {
   return <LineSwatch color={BOOTSTRAP_HEX.primary} label={t("Jump Bridge")} />;
 };
 
+// Same reasoning as JumpBridgeSwatch - the anarchy alert badge can appear on
+// a hub regardless of which mode (upgrades/flow) is active.
+const AnarchyAlertSwatch = () => {
+  const { t } = useTranslation();
+  return (
+    <span className="d-inline-flex align-items-center me-3 text-nowrap small">
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 14,
+          height: 14,
+          borderRadius: "50%",
+          background: BOOTSTRAP_HEX.danger,
+          color: "#fff",
+          fontSize: 10,
+          fontWeight: 700,
+          marginRight: 4,
+        }}
+      >
+        !
+      </span>
+      {t("Mercenary den anarchy > 40%")}
+    </span>
+  );
+};
+
 const Legend = ({ mode }: { mode: SovMapMode }) => {
   const { t } = useTranslation();
 
@@ -46,6 +74,7 @@ const Legend = ({ mode }: { mode: SovMapMode }) => {
         <Swatch color={BOOTSTRAP_HEX.danger} label={t("Low")} />
         <Swatch color={secColor(0.5)} label={t("Non-hub system")} />
         <JumpBridgeSwatch />
+        <AnarchyAlertSwatch />
       </div>
     );
   }
@@ -57,6 +86,7 @@ const Legend = ({ mode }: { mode: SovMapMode }) => {
       <Swatch color={BOOTSTRAP_HEX.secondary} label={t("Transit / none")} />
       <Swatch color={secColor(0.5)} label={t("Uninvolved system")} />
       <JumpBridgeSwatch />
+      <AnarchyAlertSwatch />
     </div>
   );
 };

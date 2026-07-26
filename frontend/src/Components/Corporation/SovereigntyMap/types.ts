@@ -1,4 +1,6 @@
-import { SovHub, Upgrade, WorkforceTransport } from "../sovereigntyShared";
+import { AnarchyDenAlert, SovHub, Upgrade, WorkforceTransport } from "../sovereigntyShared";
+
+export type { AnarchyDenAlert };
 
 export type SovMapSystem = {
   id: number;
@@ -13,6 +15,8 @@ export type SovMapSystem = {
   security_class: string | null;
   is_hub: boolean;
   external: boolean;
+  anarchy_alert: boolean;
+  anarchy_dens: AnarchyDenAlert[];
 };
 
 export type SovMapCoordMode = "2d" | "real";

@@ -35,6 +35,14 @@ export type WorkforceTransport = {
   state_destination: TransportSystem | null;
 } | null;
 
+export type AnarchyDenAlert = {
+  den_id: number;
+  anarchy_amount: number;
+  character_name: string;
+  type_name: string;
+  planet_name: string;
+};
+
 export type SovHub = {
   hub_id: number;
   owner: Corporation;
@@ -48,6 +56,7 @@ export type SovHub = {
   reagent_last_updated: string | null;
   reagents: Reagent[];
   upgrades: Upgrade[];
+  anarchy_dens: AnarchyDenAlert[];
   workforce_transport: WorkforceTransport;
 };
 

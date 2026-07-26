@@ -20,6 +20,7 @@ const SovereigntyHubsTable = ({ data, isFetching }: { data: any; isFetching: boo
   const [hideAllOnline, setHideAllOnline] = useState(false);
   const [hideNoFuel, setHideNoFuel] = useState(false);
   const [showTransportMismatch, setShowTransportMismatch] = useState(false);
+  const [showBadDensOnly, setShowBadDensOnly] = useState(false);
 
   const filteredData = data
     .filter(
@@ -27,7 +28,8 @@ const SovereigntyHubsTable = ({ data, isFetching }: { data: any; isFetching: boo
         !hideAllOnline || h.upgrades.some((u) => u.power_state.toLowerCase() !== "online"),
     )
     .filter((h: SovHub) => !hideNoFuel || h.reagents.some((r) => r.burning_per_hour > 0))
-    .filter((h: SovHub) => !showTransportMismatch || transportMismatch(h.workforce_transport));
+    .filter((h: SovHub) => !showTransportMismatch || transportMismatch(h.workforce_transport))
+    .filter((h: SovHub) => !showBadDensOnly || (h.anarchy_dens?.length ?? 0) > 0);
 
   const columnHelper = createColumnHelper<SovHub>();
 
@@ -121,6 +123,48 @@ const SovereigntyHubsTable = ({ data, isFetching }: { data: any; isFetching: boo
         },
       },
     ),
+    columnHelper.accessor((row) => row.anarchy_dens?.length ?? 0, {
+      id: "anarchy_dens",
+      header: t("Bad Dens"),
+      enableColumnFilter: false,
+      cell: (cell) => {
+        const dens = cell.row.original.anarchy_dens ?? [];
+        if (dens.length === 0) return <></>;
+        return (
+          <div
+            style={{
+              maxWidth: "260px",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "2px",
+            }}
+          >
+            {dens.map((d, i) => (
+              <OverlayTrigger
+                key={i}
+                trigger={["hover"]}
+                placement="top"
+                overlay={
+                  <Tooltip
+                    id={`anarchy-den-${cell.row.original.hub_id}-${i}`}
+                    style={{ position: "fixed" }}
+                  >
+                    <div className="text-start">
+                      <div>{d.character_name}</div>
+                      <div>{d.planet_name}</div>
+                    </div>
+                  </Tooltip>
+                }
+              >
+                <Badge bg="danger">
+                  {d.type_name} · {d.anarchy_amount}%
+                </Badge>
+              </OverlayTrigger>
+            ))}
+          </div>
+        );
+      },
+    }),
     columnHelper.accessor((row) => row.workforce_transport?.mode ?? null, {
       id: "workforce_transport",
       header: t("Workforce Transport"),
@@ -290,6 +334,13 @@ const SovereigntyHubsTable = ({ data, isFetching }: { data: any; isFetching: boo
   return (
     <>
       <div className="d-flex justify-content-end gap-3 mb-2">
+        <Form.Check
+          type="switch"
+          id="bad-dens-only"
+          label={t("Bad dens only")}
+          checked={showBadDensOnly}
+          onChange={(e) => setShowBadDensOnly(e.target.checked)}
+        />
         <Form.Check
           type="switch"
           id="transport-mismatch"

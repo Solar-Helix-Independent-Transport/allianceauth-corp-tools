@@ -39,6 +39,11 @@ from corptools.tasks.rate_limiting import (
 logger = get_extension_logger(__name__)
 
 
+def _needs_update(last_update, skip_date, force_refresh, min_date):
+    """Return True if a character update field is stale or a force refresh was requested."""
+    return (last_update or min_date) <= skip_date or force_refresh
+
+
 def enqueue_next_task(chain, delay=1):
     """
         Queue next task, and attach the rest of the chain to it.
