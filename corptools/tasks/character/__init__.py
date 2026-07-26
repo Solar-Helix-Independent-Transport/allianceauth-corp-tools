@@ -41,7 +41,10 @@ from .social import (
     update_char_mail,
     update_char_notifications,
 )
-from .structures import update_char_mercenary_dens
+from .structures import (
+    update_char_mercenary_dens,
+    update_char_mercenary_tactical_operations,
+)
 from .wallet import (  # noqa: F401
     update_char_contract_items,
     update_char_contracts,
@@ -195,6 +198,12 @@ def update_character(self, char_id, force_refresh=False, now=False):
     if app_settings.CT_CHAR_STRUCTURES_MODULE and not ct_conf.disable_update_mercenary_dens:
         if _needs_update(character.get_update_time("mercenary_dens"), skip_date, force_refresh, min_date):
             que.append(update_char_mercenary_dens.si(
+                character.character.character_id, force_refresh=force_refresh
+            ))
+
+    if app_settings.CT_CHAR_STRUCTURES_MODULE and not ct_conf.disable_update_mercenary_tactical_operations:
+        if _needs_update(character.get_update_time("mercenary_tactical_operations"), skip_date, force_refresh, min_date):
+            que.append(update_char_mercenary_tactical_operations.si(
                 character.character.character_id, force_refresh=force_refresh
             ))
 

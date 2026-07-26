@@ -222,6 +222,8 @@ esi_openapi = OpenAPI(
         "GetCharactersStructuresMercenaryDensListing",
         "GetCharactersStructuresMercenaryDensDetail",
         "GetCharactersAccessListsListing",
-        "GetCharactersAccessListsDetail"
+        "GetCharactersAccessListsDetail",
+        "GetCharactersMercenaryTacticalOperationsListing",
+        "GetCharactersMercenaryTacticalOperationsDetail",
     ]
 )

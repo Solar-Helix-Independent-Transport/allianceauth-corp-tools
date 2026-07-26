@@ -167,6 +167,11 @@ class CorptoolsConfiguration(SingletonModel):
         blank=True,
         help_text="Temporarily disable the ESI pulls for Character Mercenary Den Data"
     )
+    disable_update_mercenary_tactical_operations = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="Temporarily disable the ESI pulls for Character Mercenary Tactical Operations Data"
+    )
 
     class Meta:
         permissions = (

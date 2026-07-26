@@ -57,3 +57,40 @@ class MercenaryDenApiEndpoints:
                 })
 
             return output
+
+
+class MercenaryTacticalOperationApiEndpoints:
+
+    tags = ["Account"]
+
+    def __init__(self, api: NinjaAPI):
+
+        @api.get(
+            "account/{character_id}/mercenarytacticaloperations",
+            response={
+                200: List[schema.CharacterMercenaryTacticalOperation], 403: str},
+            tags=self.tags
+        )
+        def get_character_mercenary_tactical_operations(request, character_id: int):
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
+
+            operations = models.CharacterMercenaryTacticalOperation.objects.filter(
+                character__character__in=characters
+            ).select_related(
+                'character__character',
+            )
+
+            output = []
+            for o in operations:
+                output.append({
+                    "character": o.character.character,
+                    "operation_id": str(o.operation_id),
+                    "mercenary_den_id": o.mercenary_den_id,
+                    "dungeon_type_id": o.dungeon_type_id,
+                    "state": o.state,
+                    "expires": o.expires,
+                })
+
+            return output

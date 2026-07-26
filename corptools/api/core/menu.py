@@ -123,6 +123,10 @@ class MenuApiEndpoints:
                     "name": _("Mercenary Dens"),
                     "link": "account/mercenarydens"
                 })
+                _char["links"].append({
+                    "name": _("Mercenary Tactical Operations"),
+                    "link": "account/mercenarytacticaloperations"
+                })
 
             if app_settings.CT_CHAR_ROLES_MODULE:
                 _char["links"].append({

@@ -367,6 +367,42 @@
         "security": [{ "SessionAuth": [] }]
       }
     },
+    "/audit/api/account/{character_id}/mercenarytacticaloperations": {
+      "get": {
+        "operationId": "corptools_api_character_structures_get_character_mercenary_tactical_operations",
+        "summary": "Get Character Mercenary Tactical Operations",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": { "title": "Character Id", "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "$ref": "#/components/schemas/CharacterMercenaryTacticalOperation" },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": { "schema": { "title": "Response", "type": "string" } }
+            }
+          }
+        },
+        "tags": ["Account"],
+        "security": [{ "SessionAuth": [] }]
+      }
+    },
     "/audit/api/account/{character_id}/wallet": {
       "get": {
         "operationId": "corptools_api_character_finances_get_character_wallet",
@@ -2815,6 +2851,22 @@
           "infomorph_amount"
         ],
         "title": "CharacterMercenaryDen",
+        "type": "object"
+      },
+      "CharacterMercenaryTacticalOperation": {
+        "properties": {
+          "character": { "$ref": "#/components/schemas/Character" },
+          "operation_id": { "title": "Operation Id", "type": "string" },
+          "mercenary_den_id": { "title": "Mercenary Den Id", "type": "integer" },
+          "dungeon_type_id": { "title": "Dungeon Type Id", "type": "integer" },
+          "state": { "title": "State", "type": "string" },
+          "expires": {
+            "anyOf": [{ "format": "date-time", "type": "string" }, { "type": "null" }],
+            "title": "Expires"
+          }
+        },
+        "required": ["character", "operation_id", "mercenary_den_id", "dungeon_type_id", "state"],
+        "title": "CharacterMercenaryTacticalOperation",
         "type": "object"
       },
       "Input": {

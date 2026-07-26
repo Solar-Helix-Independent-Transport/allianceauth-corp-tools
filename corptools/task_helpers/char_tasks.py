@@ -34,6 +34,7 @@ from ..models import (
     CharacterLocation,
     CharacterMarketOrder,
     CharacterMercenaryDen,
+    CharacterMercenaryTacticalOperation,
     CharacterMiningLedger,
     CharacterRoles,
     CharacterTitle,
@@ -1079,19 +1080,38 @@ def update_character_clones(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
 
+    # The active clone's implants can change (e.g. plugging in a new implant)
+    # independently of the jump clone listing (locations, home station), and this
+    # call never 304s (use_etag=False), so it's fetched and applied on its own
+    # rather than inside the jump-clone try block below.
+    active_clone = providers.esi_openapi.client.Clones.GetCharactersCharacterIdImplants(
+        character_id=character_id,
+        token=token
+    ).result(
+        use_etag=False,
+        store_cache=False
+    )
+
+    active_jumpclone, _ = JumpClone.objects.update_or_create(
+        character=audit_char,
+        jump_clone_id=0,
+        defaults={"name": "Active Clone"}
+    )
+
+    Implant.objects.filter(clone=active_jumpclone).delete()
+    Implant.objects.bulk_create(
+        [
+            Implant(clone=active_jumpclone, type_name_id=implant)
+            for implant in active_clone
+        ],
+        batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
+    )
+
     try:
         jump_clones = providers.esi_openapi.client.Clones.GetCharactersCharacterIdClones(
             character_id=character_id,
             token=token
         ).result(
-            store_cache=False
-        )
-
-        active_clone = providers.esi_openapi.client.Clones.GetCharactersCharacterIdImplants(
-            character_id=character_id,
-            token=token
-        ).result(
-            use_etag=False,
             store_cache=False
         )
 
@@ -1117,10 +1137,12 @@ def update_character_clones(character_id, force_refresh=False):
             }
         )
 
-        JumpClone.objects.filter(character=audit_char).delete()  # remove all
+        # remove all but the active clone row, which is managed separately above
+        JumpClone.objects.filter(
+            character=audit_char
+        ).exclude(jump_clone_id=0).delete()
 
         implants = []
-        type_ids = []
 
         for clone in jump_clones.jump_clones:
             _jumpclone = JumpClone(
@@ -1136,30 +1158,12 @@ def update_character_clones(character_id, force_refresh=False):
             _jumpclone.save()
 
             for implant in clone.implants:
-                if implant not in type_ids:
-                    type_ids.append(implant)
                 implants.append(
                     Implant(
                         clone=_jumpclone,
                         type_name_id=implant
                     )
                 )
-
-        _jumpclone = JumpClone.objects.create(
-            character=audit_char,
-            jump_clone_id=0,
-            name="Active Clone"
-        )
-
-        for implant in active_clone:
-            if implant not in type_ids:
-                type_ids.append(implant)
-            implants.append(
-                Implant(
-                    clone=_jumpclone,
-                    type_name_id=implant,
-                )
-            )
 
         Implant.objects.bulk_create(
             implants, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
@@ -1203,8 +1207,19 @@ def update_character_mercenary_dens(character_id, force_refresh=False):
         ).exclude(
             den_id__in=den_ids
         ).delete()
+    except HTTPNotModified:
+        logger.info(
+            f"CT: Mercenary Den listing unchanged for: {audit_char.character.character_name}, "
+            "refreshing details for known dens"
+        )
+        den_ids = list(
+            CharacterMercenaryDen.objects.filter(
+                character=audit_char
+            ).values_list('den_id', flat=True)
+        )
 
-        for den_id in den_ids:
+    for den_id in den_ids:
+        try:
             den = providers.esi_openapi.client.Structures.GetCharactersStructuresMercenaryDensDetail(
                 character_id=character_id,
                 mercenary_den_id=den_id,
@@ -1212,40 +1227,113 @@ def update_character_mercenary_dens(character_id, force_refresh=False):
             ).result(
                 store_cache=False
             )
-
-            reinforcement_end = None
-            if den.reinforcement_timer:
-                reinforcement_end = den.reinforcement_timer.end
-
-            CharacterMercenaryDen.objects.update_or_create(
-                character=audit_char,
-                den_id=den.id,
-                defaults={
-                    'planet_id': den.skyhook.planet_id,
-                    'planet_name_id': den.skyhook.planet_id,
-                    'type_id': den.type_id,
-                    'type_name_id': den.type_id,
-                    'state': den.state.lower(),
-                    'development_amount': den.evolution.development.amount,
-                    'development_level': den.evolution.development.level.lower(),
-                    'anarchy_amount': den.evolution.anarchy.amount,
-                    'anarchy_level': den.evolution.anarchy.level.lower(),
-                    'infomorph_amount': den.infomorphs.amount,
-                    'reinforcement_end': reinforcement_end,
-                    'skyhook_id': den.skyhook.id,
-                    'skyhook_planet_id': den.skyhook.planet_id,
-                    'skyhook_corporation_id': den.skyhook.corporation_id,
-                }
+        except HTTPNotModified:
+            logger.info(
+                f"CT: No new Mercenary Den detail data for {den_id} on: {audit_char.character.character_name}"
             )
-    except HTTPNotModified:
-        logger.info(
-            f"CT: No New Mercenary Den data for: {audit_char.character.character_name}"
+            continue
+
+        reinforcement_end = None
+        if den.reinforcement_timer:
+            reinforcement_end = den.reinforcement_timer.end
+
+        CharacterMercenaryDen.objects.update_or_create(
+            character=audit_char,
+            den_id=den.id,
+            defaults={
+                'planet_id': den.skyhook.planet_id,
+                'planet_name_id': den.skyhook.planet_id,
+                'type_id': den.type_id,
+                'type_name_id': den.type_id,
+                'state': den.state.lower(),
+                'development_amount': den.evolution.development.amount,
+                'development_level': den.evolution.development.level.lower(),
+                'anarchy_amount': den.evolution.anarchy.amount,
+                'anarchy_level': den.evolution.anarchy.level.lower(),
+                'infomorph_amount': den.infomorphs.amount,
+                'reinforcement_end': reinforcement_end,
+                'skyhook_id': den.skyhook.id,
+                'skyhook_planet_id': den.skyhook.planet_id,
+                'skyhook_corporation_id': den.skyhook.corporation_id,
+            }
         )
 
     audit_char.set_update_time("mercenary_dens")
     audit_char.save()
 
     return f"CT: Finished mercenary dens for: {audit_char.character.character_name}"
+
+
+def update_character_mercenary_tactical_operations(character_id, force_refresh=False):
+    audit_char = CharacterAudit.objects.get(
+        character__character_id=character_id)
+    logger.debug("Updating Mercenary Tactical Operations for: {}".format(
+        audit_char.character.character_name))
+
+    req_scopes = ['esi-activities.read_character.v1']
+
+    token = get_token(character_id, req_scopes)
+
+    if not token:
+        return "No Tokens"
+
+    try:
+        op_listing = providers.esi_openapi.client.Activities.GetCharactersMercenaryTacticalOperationsListing(
+            character_id=character_id,
+            token=token
+        ).result(
+            store_cache=False
+        )
+
+        op_ids = [op.id for op in (op_listing.operations or [])]
+
+        CharacterMercenaryTacticalOperation.objects.filter(
+            character=audit_char
+        ).exclude(
+            operation_id__in=op_ids
+        ).delete()
+    except HTTPNotModified:
+        logger.info(
+            f"CT: Mercenary Tactical Operation listing unchanged for: {audit_char.character.character_name}, "
+            "refreshing details for known operations"
+        )
+        op_ids = list(
+            CharacterMercenaryTacticalOperation.objects.filter(
+                character=audit_char
+            ).values_list('operation_id', flat=True)
+        )
+
+    for op_id in op_ids:
+        try:
+            operation = providers.esi_openapi.client.Activities.GetCharactersMercenaryTacticalOperationsDetail(
+                character_id=character_id,
+                operation_id=op_id,
+                token=token
+            ).result(
+                store_cache=False
+            )
+        except HTTPNotModified:
+            logger.info(
+                f"CT: No new Mercenary Tactical Operation detail data for {op_id} "
+                f"on: {audit_char.character.character_name}"
+            )
+            continue
+
+        CharacterMercenaryTacticalOperation.objects.update_or_create(
+            character=audit_char,
+            operation_id=operation.id,
+            defaults={
+                'mercenary_den_id': operation.mercenary_den_id,
+                'dungeon_type_id': operation.dungeon_type_id,
+                'state': operation.state.lower(),
+                'expires': operation.expires,
+            }
+        )
+
+    audit_char.set_update_time("mercenary_tactical_operations")
+    audit_char.save()
+
+    return f"CT: Finished mercenary tactical operations for: {audit_char.character.character_name}"
 
 
 def update_character_loyaltypoints(character_id, force_refresh=False):

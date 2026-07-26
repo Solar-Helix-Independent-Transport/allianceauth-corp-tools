@@ -311,6 +311,7 @@ class TestUpdateCharacter(CorptoolsTestCase):
         config.disable_update_loyaltypoints = True
         config.disable_update_indy = True
         config.disable_update_mercenary_dens = True
+        config.disable_update_mercenary_tactical_operations = True
         config.save()
 
         update_character(self.char1.character_id)

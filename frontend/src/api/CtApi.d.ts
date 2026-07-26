@@ -174,6 +174,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/account/{character_id}/mercenarytacticaloperations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Mercenary Tactical Operations */
+    get: operations["corptools_api_character_structures_get_character_mercenary_tactical_operations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/account/{character_id}/wallet": {
     parameters: {
       query?: never;
@@ -1502,6 +1519,20 @@ export interface components {
       /** Reinforcement End */
       reinforcement_end?: string | null;
     };
+    /** CharacterMercenaryTacticalOperation */
+    CharacterMercenaryTacticalOperation: {
+      character: components["schemas"]["Character"];
+      /** Operation Id */
+      operation_id: string;
+      /** Mercenary Den Id */
+      mercenary_den_id: number;
+      /** Dungeon Type Id */
+      dungeon_type_id: number;
+      /** State */
+      state: string;
+      /** Expires */
+      expires?: string | null;
+    };
     /** Input */
     Input: {
       /**
@@ -2248,6 +2279,37 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["CharacterMercenaryDen"][];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_structures_get_character_mercenary_tactical_operations: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CharacterMercenaryTacticalOperation"][];
         };
       };
       /** @description Forbidden */

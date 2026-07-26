@@ -222,6 +222,7 @@ def get_character_scopes():
     if CT_CHAR_STRUCTURES_MODULE:
         _scopes += [
             'esi-structures.read_character.v1',
+            'esi-activities.read_character.v1',
         ]
 
     if CT_CHAR_ACL_MODULE:
@@ -280,7 +281,10 @@ def get_character_update_attributes():
         _attribs += [("Clones", 'clones')]
 
     if CT_CHAR_STRUCTURES_MODULE:
-        _attribs += [("Mercenary Dens", 'mercenary_dens')]
+        _attribs += [
+            ("Mercenary Dens", 'mercenary_dens'),
+            ("Mercenary Tactical Operations", 'mercenary_tactical_operations'),
+        ]
 
     if CT_CHAR_MAIL_MODULE:
         _attribs += [("Mail", 'mails')]

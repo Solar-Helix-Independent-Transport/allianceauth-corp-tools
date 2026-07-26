@@ -1,5 +1,6 @@
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
+from esi.exceptions import HTTPNotModified
 
 # AA Example App
 from corptools.models import CorporationAudit
@@ -28,13 +29,25 @@ def corp_sovereignty_hub_update(corp_id, force_refresh=False):
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
 
-    hub_listing = providers.esi_openapi.client.Structures.GetCorporationsStructuresSovereigntyHubsListing(
-        corporation_id=_corporation.corporation.corporation_id,
-        token=token
-    ).result(
-        force_refresh=force_refresh,
-        store_cache=False
-    )
+    try:
+        hub_listing = providers.esi_openapi.client.Structures.GetCorporationsStructuresSovereigntyHubsListing(
+            corporation_id=_corporation.corporation.corporation_id,
+            token=token
+        ).result(
+            force_refresh=force_refresh,
+            store_cache=False
+        )
+    except HTTPNotModified:
+        # Listing unchanged — resources/vulnerability windows etc are only in the
+        # detail endpoint so we still need to refresh those for known hubs.
+        logger.info(
+            f"CT: Sovereignty hub listing unchanged for corp {corp_id}, refreshing details for known hubs"
+        )
+        return list(
+            SovereigntyHub.objects.filter(
+                corporation=_corporation
+            ).values_list('hub_id', flat=True)
+        )
 
     if hub_listing.sovereignty_hubs is None:
         logger.info(f"CT: No sovereignty hubs found for corp {corp_id}")

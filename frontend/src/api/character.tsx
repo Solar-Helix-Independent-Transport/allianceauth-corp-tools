@@ -39,6 +39,13 @@ export async function getCharacterMercenaryDens(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/mercenarydens", characterID);
 }
 
+export async function getCharacterMercenaryTacticalOperations(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/mercenarytacticaloperations",
+    characterID,
+  );
+}
+
 export async function getCharacterRoles(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/roles", characterID);
 }

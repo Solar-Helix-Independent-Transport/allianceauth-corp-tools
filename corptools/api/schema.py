@@ -138,6 +138,15 @@ class CharacterMercenaryDen(Schema):
     reinforcement_end: Optional[datetime] = None
 
 
+class CharacterMercenaryTacticalOperation(Schema):
+    character: Character
+    operation_id: str
+    mercenary_den_id: int
+    dungeon_type_id: int
+    state: str
+    expires: Optional[datetime] = None
+
+
 class Skill(Schema):
     group: str
     skill: str

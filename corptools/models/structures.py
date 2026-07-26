@@ -303,3 +303,27 @@ class CharacterMercenaryDen(models.Model):
     @classmethod
     def get_visible(cls, user):
         return cls.objects.filter(character__in=CharacterAudit.objects.visible_to(user))
+
+
+class CharacterMercenaryTacticalOperation(models.Model):
+    character = models.ForeignKey(
+        CharacterAudit, on_delete=models.CASCADE, related_name='ct_mercenary_tactical_operation')
+
+    operation_id = models.UUIDField()
+
+    mercenary_den_id = models.BigIntegerField()
+
+    dungeon_type_id = models.BigIntegerField()
+
+    _state_enum = Choices(
+        'unspecified', 'available', 'started', 'completed', 'expired', 'removed')
+    state = models.CharField(max_length=11, choices=_state_enum)
+
+    expires = models.DateTimeField(null=True, default=None)
+
+    class Meta:
+        unique_together = ['character', 'operation_id']
+
+    @classmethod
+    def get_visible(cls, user):
+        return cls.objects.filter(character__in=CharacterAudit.objects.visible_to(user))

@@ -10,6 +10,7 @@ import CharacterFitCheck from "./Pages/Char/FitCheck";
 import CharacterLP from "./Pages/Char/LoyaltyPoints";
 import CharacterMail from "./Pages/Char/Mail";
 import CharacterMercenaryDens from "./Pages/Char/MercenaryDens";
+import CharacterMercenaryTacticalOperations from "./Pages/Char/MercenaryTacticalOperations";
 import Market from "./Pages/Char/Market";
 import CharacterNotifications from "./Pages/Char/Notifications";
 import CharacterOverview from "./Pages/Char/Overview";
@@ -101,6 +102,10 @@ function App() {
                 <Route path="account/pubdata" element={<CharacterPubData />} />
                 <Route path="account/clones" element={<CharacterClones />} />
                 <Route path="account/mercenarydens" element={<CharacterMercenaryDens />} />
+                <Route
+                  path="account/mercenarytacticaloperations"
+                  element={<CharacterMercenaryTacticalOperations />}
+                />
                 <Route path="account/roles" element={<CharacterRoles />} />
                 <Route path="account/wallet" element={<CharacterWallet />} />
                 <Route path="account/mail" element={<CharacterMail />} />

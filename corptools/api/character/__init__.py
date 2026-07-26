@@ -10,7 +10,7 @@ from .refresh import RefreshApiEndpoints
 from .roles import RolesApiEndpoints
 from .skills import SkillApiEndpoints
 from .status import StatusApiEndpoints
-from .structures import MercenaryDenApiEndpoints
+from .structures import MercenaryDenApiEndpoints, MercenaryTacticalOperationApiEndpoints
 
 
 def setup(api):
@@ -27,3 +27,4 @@ def setup(api):
     RefreshApiEndpoints(api)
     GlanceApiEndpoints(api)
     MercenaryDenApiEndpoints(api)
+    MercenaryTacticalOperationApiEndpoints(api)
