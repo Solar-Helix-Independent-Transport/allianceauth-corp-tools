@@ -1,50 +1,50 @@
 {
-  "_@app-libs-CAtmmd_F.js": {
-    "file": "assets/@app-libs-CAtmmd_F.js",
+  "_@app-libs-DD2iX_M9.js": {
+    "file": "assets/@app-libs-DD2iX_M9.js",
     "name": "@app-libs",
     "imports": [
-      "_@bootstrap-libs-DvjsKh0Z.js"
+      "_@bootstrap-libs-W4kPWZT6.js"
     ]
   },
-  "_@bootstrap-libs-DvjsKh0Z.js": {
-    "file": "assets/@bootstrap-libs-DvjsKh0Z.js",
+  "_@bootstrap-libs-W4kPWZT6.js": {
+    "file": "assets/@bootstrap-libs-W4kPWZT6.js",
     "name": "@bootstrap-libs"
   },
-  "_@lang-libs-BJ1V_g_X.js": {
-    "file": "assets/@lang-libs-BJ1V_g_X.js",
+  "_@lang-libs-DrASj5EJ.js": {
+    "file": "assets/@lang-libs-DrASj5EJ.js",
     "name": "@lang-libs",
     "imports": [
-      "_@bootstrap-libs-DvjsKh0Z.js"
+      "_@bootstrap-libs-W4kPWZT6.js"
     ],
     "dynamicImports": [
-      "_browser-ponyfill-oTz-9tnT.js"
+      "_browser-ponyfill-B-_ROx1x.js"
     ]
   },
-  "_@react-libs-Cf0JMtvX.js": {
-    "file": "assets/@react-libs-Cf0JMtvX.js",
+  "_@react-libs-DaOXjxX9.js": {
+    "file": "assets/@react-libs-DaOXjxX9.js",
     "name": "@react-libs",
     "imports": [
-      "_@bootstrap-libs-DvjsKh0Z.js"
+      "_@bootstrap-libs-W4kPWZT6.js"
     ]
   },
-  "_browser-ponyfill-oTz-9tnT.js": {
-    "file": "assets/browser-ponyfill-oTz-9tnT.js",
+  "_browser-ponyfill-B-_ROx1x.js": {
+    "file": "assets/browser-ponyfill-B-_ROx1x.js",
     "name": "browser-ponyfill",
     "isDynamicEntry": true,
     "imports": [
-      "_@bootstrap-libs-DvjsKh0Z.js"
+      "_@bootstrap-libs-W4kPWZT6.js"
     ]
   },
   "index.html": {
-    "file": "assets/index-DY187xy0.js",
+    "file": "assets/index-CyEy8dDb.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
     "imports": [
-      "_@bootstrap-libs-DvjsKh0Z.js",
-      "_@react-libs-Cf0JMtvX.js",
-      "_@app-libs-CAtmmd_F.js",
-      "_@lang-libs-BJ1V_g_X.js"
+      "_@bootstrap-libs-W4kPWZT6.js",
+      "_@react-libs-DaOXjxX9.js",
+      "_@app-libs-DD2iX_M9.js",
+      "_@lang-libs-DrASj5EJ.js"
     ],
     "css": [
       "static/corptools/bs5/static/css/index-CZODPYNv.css"
