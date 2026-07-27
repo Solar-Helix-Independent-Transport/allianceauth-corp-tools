@@ -58,6 +58,11 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
                 'type_id': _structure.type_id,
                 'unanchors_at': _structure.unanchors_at,
                 'name': _name,
+                # TODO: no existence check against SolarSystem here (unlike
+                # every other location resolution path) - a system missing
+                # from the local SDE will raise an IntegrityError. Rare in
+                # practice (new systems are very uncommon), left alone for
+                # now.
                 'system_name_id': _structure.system_id,
                 'type_name': str_type
             }

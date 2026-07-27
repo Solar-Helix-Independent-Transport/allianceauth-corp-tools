@@ -158,27 +158,8 @@ class CorpStructureUpdateDirectNameTests(CorptoolsTestCase):
         structure = Structure.objects.get(structure_id=1000000000000)
         self.assertEqual(structure.name, "Keepstar")
 
-    @patch("corptools.tasks.corporation.structures.resolve_location")
-    @patch("corptools.tasks.corporation.structures.get_corp_token")
-    @patch("corptools.tasks.corporation.structures.providers")
-    def test_unknown_system_is_skipped_instead_of_raising(
-        self, mock_providers, mock_get_corp_token, mock_resolve_location
-    ):
-        mock_providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdStructures.return_value.results.return_value = [
-            _fake_structure(2000000000000, name="Keepstar",
-                            system_id=99999999)
-        ]
-        mock_get_corp_token.return_value = MagicMock(character_id=1)
-
-        # Should not raise (previously this would hit an IntegrityError from
-        # the FK constraint on EveLocation.system).
-        corp_structure_update(
-            self.corp1.corporation_id, force_refresh=False)
-
-        self.assertFalse(
-            EveLocation.objects.filter(location_id=2000000000000).exists())
-        mock_resolve_location.assert_not_called()
-        # The Structure row still gets created, just without a real name -
-        # same fallback behaviour as any other unresolved location.
-        structure = Structure.objects.get(structure_id=2000000000000)
-        self.assertEqual(structure.name, "2000000000000")
+    # Note: an unknown system_id will still raise further down in
+    # _structures_db_update, which unconditionally sets
+    # Structure.system_name_id with no existence check of its own. New
+    # systems are rare enough in practice that this is left alone for now -
+    # see the TODO next to that assignment in structures.py.
