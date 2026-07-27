@@ -152,3 +152,5 @@ corptools/static/corptools/static/*
 corptools/static/i18n*
 
 frontend/build
+coverage-summary.md
+test-summary.md

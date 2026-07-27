@@ -42,11 +42,13 @@ jobs:
       - name: Run Tests
         run: make test
 
-      - name: Add coverage summary
+      - name: Add test summary
         if: ${{ !env.ACT }}
         run: |
-          echo "### Coverage (Python ${{ matrix.python-version }})" >> "$GITHUB_STEP_SUMMARY"
-          cat coverage-summary.md >> "$GITHUB_STEP_SUMMARY"
+          echo "### Test Report (Python ${{ matrix.python-version }})" >> "$GITHUB_STEP_SUMMARY"
+          cat test-summary.md >> "$GITHUB_STEP_SUMMARY"
+          # echo "### Coverage (Python ${{ matrix.python-version }})" >> "$GITHUB_STEP_SUMMARY"
+          # cat coverage-summary.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload test coverage
         if: ${{ !env.ACT }}

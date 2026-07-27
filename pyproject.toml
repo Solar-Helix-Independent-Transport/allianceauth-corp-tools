@@ -50,6 +50,9 @@ dependencies = [
 ]
 optional-dependencies.test = [
     "allianceauth-securegroups",
+    "pytest",
+    "pytest-django",
+    "pytest-md-report",
 ]
 urls.Homepage = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools"
 urls.Source = "https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools"
@@ -84,6 +87,10 @@ exclude = [ ".git", "*migrations*", ".tox", "dist", "htmlcov" ]
 max-line-length = 119
 select = [ "C", "E", "F", "W", "B", "B950" ]
 ignore = [ 'E203', 'E231', 'E501', 'W503', 'W291', 'W293' ]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.test_settingsAA4"
+testpaths = [ "corptools" ]
 
 [tool.djlint]
 max_attribute_length = 119
