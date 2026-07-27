@@ -18,6 +18,7 @@ import {
   type MiniMapNodeProps,
   type Node,
   type NodeTypes,
+  type Viewport,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import RegionLabelNode from "./RegionLabelNode";
@@ -54,6 +55,12 @@ export type SpaceMapCanvasProps<
   flowEdges?: Edge[];
   nodeTypes: NodeTypes;
   renderDetailPanel?: (system: TSystem, onClose: () => void) => ReactNode;
+  // Restores a previously-saved pan/zoom instead of auto-fitting on mount -
+  // callers that want that persisted (e.g. to a URL query string) own the
+  // storage; this component only needs the resulting value back out.
+  // Omitting these preserves the original always-fitView behaviour.
+  initialViewport?: Viewport;
+  onViewportChange?: (viewport: Viewport) => void;
 };
 
 // The shared, feature-agnostic space map shell: normalized system positions,
@@ -72,6 +79,8 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
   flowEdges,
   nodeTypes: nodeTypesProp,
   renderDetailPanel,
+  initialViewport,
+  onViewportChange,
 }: SpaceMapCanvasProps<TSystem, TNodeData>) => {
   const nodeTypes = useMemo(
     () => ({ regionLabel: RegionLabelNode, ...nodeTypesProp }),
@@ -199,7 +208,16 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
   // layout, so the previous pan/zoom no longer frames anything meaningful -
   // re-fit whenever the coordinate mode changes (but not on every data
   // refresh/mode toggle, which would otherwise fight the user's own panning).
+  // The one exception is the very first run: if the caller handed us a
+  // restored viewport (e.g. from a URL query string), that's an explicit
+  // request to land somewhere specific instead of auto-fitting - honour it
+  // once, then fall back to the normal re-fit-on-mode-change behaviour.
+  const skippedInitialFit = useRef(false);
   useEffect(() => {
+    if (!skippedInitialFit.current) {
+      skippedInitialFit.current = true;
+      if (initialViewport) return;
+    }
     fitView();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coordMode]);
@@ -241,13 +259,17 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
         nodeTypes={nodeTypes}
         edgeTypes={BASE_EDGE_TYPES}
         nodeOrigin={[0.5, 0.5]}
-        fitView
+        // defaultViewport is ignored by xyflow whenever fitView is set, so
+        // these are mutually exclusive: restore the saved spot if we have
+        // one, otherwise fall back to the original auto-fit.
+        {...(initialViewport ? { defaultViewport: initialViewport } : { fitView: true })}
         nodesDraggable={false}
         nodesConnectable={false}
         edgesFocusable={false}
         elevateNodesOnSelect
         onNodeClick={(_, node) => setSelectedNodeId(node.id)}
         onPaneClick={() => setSelectedNodeId(null)}
+        onMoveEnd={onViewportChange ? (_, viewport) => onViewportChange(viewport) : undefined}
         minZoom={0.02}
         maxZoom={4}
         proOptions={{ hideAttribution: true }}

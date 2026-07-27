@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type { Viewport } from "@xyflow/react";
 import SpaceMapCanvas from "../SpaceMap/SpaceMapCanvas";
 import type { MapCoordMode } from "../SpaceMap/types";
 import { ActivityDotNode } from "./ActivityDotNode";
@@ -12,10 +13,14 @@ const ActivityMapCanvas = ({
   data,
   coordMode,
   dataSource,
+  initialViewport,
+  onViewportChange,
 }: {
   data: ActivityMapResponse;
   coordMode: MapCoordMode;
   dataSource: ActivityMapDataSource;
+  initialViewport?: Viewport;
+  onViewportChange?: (viewport: Viewport) => void;
 }) => {
   const nodes = useMemo(() => buildActivityNodes(data, coordMode), [data, coordMode]);
 
@@ -32,6 +37,8 @@ const ActivityMapCanvas = ({
       coordMode={coordMode}
       nodes={nodes}
       nodeTypes={nodeTypes}
+      initialViewport={initialViewport}
+      onViewportChange={onViewportChange}
       renderDetailPanel={(system, onClose) => {
         const v = valuesBySystem.get(system.id);
         return (

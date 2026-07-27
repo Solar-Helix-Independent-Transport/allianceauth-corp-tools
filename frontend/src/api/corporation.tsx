@@ -54,6 +54,117 @@ export async function loadCorporationActivityMapAssetsCapitals(corporation_id: n
   return api.data;
 }
 
+export async function loadCorporationActivityMapAssetsMembers(corporation_id: number) {
+  const api = await axios.get(
+    `/audit/api/corporation/${corporation_id}/activitymap/assets/members`,
+  );
+  return api.data;
+}
+
+export async function loadCorporationActivityMapAssetsMembersShips(corporation_id: number) {
+  const api = await axios.get(
+    `/audit/api/corporation/${corporation_id}/activitymap/assets/members/ships`,
+  );
+  return api.data;
+}
+
+export async function loadCorporationActivityMapAssetsMembersCapitals(corporation_id: number) {
+  const api = await axios.get(
+    `/audit/api/corporation/${corporation_id}/activitymap/assets/members/capitals`,
+  );
+  return api.data;
+}
+
+export async function loadCorporationActivityMapStructures(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/structures`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapStarbases(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/starbases`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapPocos(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/pocos`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapPocosRevenue(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/pocos/revenue`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapOrders(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/orders`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapOrdersMembers(corporation_id: number) {
+  const api = await axios.get(
+    `/audit/api/corporation/${corporation_id}/activitymap/orders/members`,
+  );
+  return api.data;
+}
+
+export async function loadCorporationActivityMapContracts(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/contracts`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapContractsSales(corporation_id: number) {
+  const api = await axios.get(
+    `/audit/api/corporation/${corporation_id}/activitymap/contracts/sales`,
+  );
+  return api.data;
+}
+
+export async function loadCorporationActivityMapContractsLogistics(corporation_id: number) {
+  const api = await axios.get(
+    `/audit/api/corporation/${corporation_id}/activitymap/contracts/logistics`,
+  );
+  return api.data;
+}
+
+export async function loadCorporationActivityMapIndustry(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/industry`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapPi(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/pi`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapLocation(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/location`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapClonesHome(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/clones/home`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapClonesJump(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/clones/jump`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapMercenaryDens(corporation_id: number) {
+  const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/mercenarydens`);
+  return api.data;
+}
+
+export async function loadCorporationActivityMapMercenaryTacticalOperations(
+  corporation_id: number,
+) {
+  const api = await axios.get(
+    `/audit/api/corporation/${corporation_id}/activitymap/mercenarytacticaloperations`,
+  );
+  return api.data;
+}
+
 export async function loadCorporationActivityMapMining(corporation_id: number) {
   const api = await axios.get(`/audit/api/corporation/${corporation_id}/activitymap/mining`);
   return api.data;

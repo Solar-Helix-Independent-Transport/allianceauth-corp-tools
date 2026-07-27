@@ -41,8 +41,79 @@ export async function getCharacterActivityMapAssetsCapitals(characterID: number)
   );
 }
 
+export async function getCharacterActivityMapContracts(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/activitymap/contracts",
+    characterID,
+  );
+}
+
+export async function getCharacterActivityMapContractsSales(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/activitymap/contracts/sales",
+    characterID,
+  );
+}
+
+export async function getCharacterActivityMapContractsLogistics(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/activitymap/contracts/logistics",
+    characterID,
+  );
+}
+
+export async function getCharacterActivityMapIndustry(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/activitymap/industry",
+    characterID,
+  );
+}
+
 export async function getCharacterActivityMapRatting(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/activitymap/ratting", characterID);
+}
+
+export async function getCharacterActivityMapPi(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/activitymap/pi", characterID);
+}
+
+export async function getCharacterActivityMapOrders(characterID: number) {
+  return getCharacterEndpoint("/audit/api/account/{character_id}/activitymap/orders", characterID);
+}
+
+export async function getCharacterActivityMapMercenaryDens(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/activitymap/mercenarydens",
+    characterID,
+  );
+}
+
+export async function getCharacterActivityMapMercenaryTacticalOperations(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/activitymap/mercenarytacticaloperations",
+    characterID,
+  );
+}
+
+export async function getCharacterActivityMapLocation(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/activitymap/location",
+    characterID,
+  );
+}
+
+export async function getCharacterActivityMapClonesHome(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/activitymap/clones/home",
+    characterID,
+  );
+}
+
+export async function getCharacterActivityMapClonesJump(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/activitymap/clones/jump",
+    characterID,
+  );
 }
 
 export async function getCharacterActivityMapMining(characterID: number) {
