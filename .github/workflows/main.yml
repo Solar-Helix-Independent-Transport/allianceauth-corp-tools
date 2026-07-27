@@ -18,7 +18,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  test:
+  python-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -36,12 +36,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - run: npm install -g @yarnpkg/cli
-
       - name: install dependencies
         run: make dev
 
@@ -56,6 +50,42 @@ jobs:
           name: Python${{ matrix.python-version }} Test Coverage
           # A file, directory or wildcard pattern that describes what to upload
           path: htmlcov/
+
+  js-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: npm install -g @yarnpkg/cli
+
+      - name: install dependencies
+        run: cd frontend && yarn install --frozen-lockfile
+
+      - name: Run JS Tests
+        run: cd frontend && yarn test
+
+  build:
+    needs: [python-test, js-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: npm install -g @yarnpkg/cli
+
+      - name: install dependencies
+        run: make dev
 
       - name: Build JS
         run: make buildjs
