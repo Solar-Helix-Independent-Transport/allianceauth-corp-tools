@@ -23,8 +23,7 @@ from corptools.app_settings import CT_DB_BULK_CREATE_BATCH_SIZE
 from corptools.task_helpers.update_tasks import (
     SOLAR_SYSTEM_ID_MAX,
     SOLAR_SYSTEM_ID_MIN,
-    LocationUnresolvable,
-    fetch_location_name,
+    resolve_location,
 )
 
 from .. import providers
@@ -122,10 +121,7 @@ def update_character_location(character_id, force_refresh=False):
         else:
             loc_id = location.solar_system_id
 
-        try:
-            _loc = fetch_location_name(loc_id, "solar_system", character_id)
-        except LocationUnresolvable:
-            _loc = None
+        _loc = resolve_location(loc_id, character_id)
 
         if _loc:
             _loc.save()

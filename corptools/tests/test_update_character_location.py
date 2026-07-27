@@ -7,7 +7,10 @@ from esi.exceptions import HTTPNotModified
 # AA Example App
 from corptools.models import CharacterAudit, CharacterLocation, EveLocation
 from corptools.task_helpers.char_tasks import update_character_location
-from corptools.task_helpers.update_tasks import LocationUnresolvable
+from corptools.task_helpers.update_tasks import (
+    is_character_on_cooloff,
+    set_character_cooloff,
+)
 
 from . import CorptoolsTestCase
 
@@ -16,14 +19,12 @@ def _not_modified():
     return HTTPNotModified(304, {})
 
 
-class UpdateCharacterLocationUnresolvableTests(CorptoolsTestCase):
-    """fetch_location_name can now raise LocationUnresolvable for a 404 (e.g.
-    a destroyed structure the character happens to be sitting in). Before
-    this fix, update_character_location didn't catch it, so an already
-    error-handled case (esi_error_retry does not know about this exception)
-    would blow up the whole per-character task instead of just recording an
-    unknown current location - same as the existing "no docking access"
-    (403 -> None) case already does."""
+class UpdateCharacterLocationTests(CorptoolsTestCase):
+    """update_character_location resolves the character's current location
+    through resolve_location, which owns all the cooloff/retry bookkeeping
+    (including the 404 -> LocationUnresolvable case) - so this function
+    itself just needs to treat "couldn't resolve it" (None) as
+    current_location=None, the same as it always did for a plain 403."""
 
     def setUp(self):
         super().setUp()
@@ -37,31 +38,32 @@ class UpdateCharacterLocationUnresolvableTests(CorptoolsTestCase):
         mock_providers.esi_openapi.client.Location.GetCharactersCharacterIdShip.return_value.result.side_effect = _not_modified()
         mock_providers.esi_openapi.client.Location.GetCharactersCharacterIdOnline.return_value.result.side_effect = _not_modified()
 
-    @patch("corptools.task_helpers.char_tasks.fetch_location_name")
+    @patch("corptools.task_helpers.char_tasks.resolve_location")
     @patch("corptools.task_helpers.char_tasks.providers")
     @patch("corptools.task_helpers.char_tasks.get_token")
     def test_unresolvable_current_location_does_not_raise(
-        self, mock_get_token, mock_providers, mock_fetch
+        self, mock_get_token, mock_providers, mock_resolve_location
     ):
         mock_get_token.return_value = MagicMock()
         self._mock_out_ship_and_online_lookups(mock_providers)
         esi_location = MagicMock(structure_id=1000000000000,
                                  station_id=None, solar_system_id=None)
         mock_providers.esi_openapi.char_location.return_value = esi_location
-        mock_fetch.side_effect = LocationUnresolvable(1000000000000)
+        mock_resolve_location.return_value = None
 
-        # Should not raise.
+        # Should not raise, regardless of *why* resolve_location came back
+        # empty (cooled off, denied access, structure gone, ...).
         update_character_location(self.char1.character_id)
 
         current = CharacterLocation.objects.get(
             character__character=self.char1)
         self.assertIsNone(current.current_location)
 
-    @patch("corptools.task_helpers.char_tasks.fetch_location_name")
+    @patch("corptools.task_helpers.char_tasks.resolve_location")
     @patch("corptools.task_helpers.char_tasks.providers")
     @patch("corptools.task_helpers.char_tasks.get_token")
     def test_resolvable_current_location_is_still_saved(
-        self, mock_get_token, mock_providers, mock_fetch
+        self, mock_get_token, mock_providers, mock_resolve_location
     ):
         mock_get_token.return_value = MagicMock()
         self._mock_out_ship_and_online_lookups(mock_providers)
@@ -71,10 +73,34 @@ class UpdateCharacterLocationUnresolvableTests(CorptoolsTestCase):
 
         resolved = EveLocation(location_id=60003760,
                                location_name="Jita IV - Moon 4")
-        mock_fetch.return_value = resolved
+        mock_resolve_location.return_value = resolved
 
         update_character_location(self.char1.character_id)
 
         current = CharacterLocation.objects.get(
             character__character=self.char1)
         self.assertEqual(current.current_location_id, 60003760)
+
+    @patch("corptools.task_helpers.char_tasks.providers")
+    @patch("corptools.task_helpers.char_tasks.get_token")
+    def test_character_stuck_somewhere_inaccessible_stops_hitting_esi(
+        self, mock_get_token, mock_providers
+    ):
+        # Before resolve_location, this call path had *no* backoff at all -
+        # a character sitting in a structure they can't access would hit
+        # ESI's structure endpoint every single audit cycle, forever. Now
+        # that it goes through resolve_location, an already-cooled-off
+        # character/location pair should short-circuit before ever touching
+        # ESI's structure endpoint.
+        mock_get_token.return_value = MagicMock()
+        self._mock_out_ship_and_online_lookups(mock_providers)
+        esi_location = MagicMock(structure_id=1000000000000,
+                                 station_id=None, solar_system_id=None)
+        mock_providers.esi_openapi.char_location.return_value = esi_location
+        set_character_cooloff(1000000000000, self.char1.character_id)
+
+        update_character_location(self.char1.character_id)
+
+        mock_providers.esi_openapi.client.Universe.GetUniverseStructuresStructureId.assert_not_called()
+        self.assertTrue(
+            is_character_on_cooloff(1000000000000, self.char1.character_id))

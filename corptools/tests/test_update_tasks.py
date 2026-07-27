@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 from eve_sde import models as sde_models
 
 # Django
+from django.core.cache import cache
 from django.test import TestCase
 
 # Alliance Auth
@@ -13,9 +14,15 @@ from esi.exceptions import HTTPClientError
 # AA Example App
 from corptools.models import EveLocation
 from corptools.task_helpers.update_tasks import (
+    COOLOFF_DAYS,
+    UNRESOLVABLE_COOLOFF_DAYS,
     LocationUnresolvable,
     _handle_esi_client_error,
     fetch_location_name,
+    is_character_on_cooloff,
+    resolve_location,
+    set_character_cooloff,
+    untried_characters,
 )
 
 
@@ -231,3 +238,126 @@ class FetchLocationNameTests(TestCase):
 
         self.assertEqual(location.location_id, 1000000000000)
         self.assertEqual(location.location_name, "New Name")
+
+
+class CharacterCooloffTests(TestCase):
+    """A single per-location cache entry tracks which characters have
+    already been (unsuccessfully) tried. This is the shared state
+    resolve_location uses across all of its callers."""
+
+    def setUp(self):
+        cache.clear()
+
+    def test_character_not_on_cooloff_when_never_tried(self):
+        self.assertFalse(is_character_on_cooloff(1000000000000, 1))
+
+    def test_character_on_cooloff_after_being_set(self):
+        set_character_cooloff(1000000000000, 1)
+        self.assertTrue(is_character_on_cooloff(1000000000000, 1))
+
+    def test_cooloff_does_not_affect_other_characters(self):
+        set_character_cooloff(1000000000000, 1)
+        self.assertFalse(is_character_on_cooloff(1000000000000, 2))
+
+    def test_cooloff_does_not_affect_other_locations(self):
+        set_character_cooloff(1000000000000, 1)
+        self.assertFalse(is_character_on_cooloff(2000000000000, 1))
+
+    def test_custom_duration_is_respected(self):
+        # A cooloff set for -1 days is already in the past, so it should read
+        # back as expired immediately - proves `days` actually drives expiry
+        # rather than always using COOLOFF_DAYS.
+        set_character_cooloff(1000000000000, 1, days=-1)
+        self.assertFalse(is_character_on_cooloff(1000000000000, 1))
+
+    def test_unresolvable_cooloff_outlasts_default_cooloff(self):
+        set_character_cooloff(
+            1000000000000, 1, days=UNRESOLVABLE_COOLOFF_DAYS)
+        self.assertGreater(UNRESOLVABLE_COOLOFF_DAYS, COOLOFF_DAYS)
+        self.assertTrue(is_character_on_cooloff(1000000000000, 1))
+
+    def test_untried_characters_excludes_those_on_cooloff(self):
+        set_character_cooloff(1000000000000, 1)
+        result = untried_characters(1000000000000, {1, 2, 3})
+        self.assertEqual(result, {2, 3})
+
+    def test_untried_characters_is_untouched_when_nothing_cooled_off(self):
+        result = untried_characters(1000000000000, {1, 2, 3})
+        self.assertEqual(result, {1, 2, 3})
+
+
+class ResolveLocationTests(TestCase):
+    """resolve_location is the single entry point every caller (the
+    update_location task, update_character_location, corp_structure_update)
+    should use instead of fetch_location_name directly - it owns the
+    cooloff bookkeeping so none of them have to reimplement it."""
+
+    def setUp(self):
+        cache.clear()
+
+    @patch("corptools.task_helpers.update_tasks.fetch_location_name")
+    def test_successful_resolution_is_returned_unchanged(self, mock_fetch):
+        resolved = EveLocation(location_id=1000000000000,
+                               location_name="Test Citadel")
+        mock_fetch.return_value = resolved
+
+        result = resolve_location(1000000000000, 1)
+
+        self.assertIs(result, resolved)
+        self.assertFalse(is_character_on_cooloff(1000000000000, 1))
+
+    @patch("corptools.task_helpers.update_tasks.fetch_location_name")
+    def test_plain_failure_returns_none_and_sets_cooloff(self, mock_fetch):
+        mock_fetch.return_value = None
+
+        result = resolve_location(1000000000000, 1)
+
+        self.assertIsNone(result)
+        self.assertTrue(is_character_on_cooloff(1000000000000, 1))
+
+    @patch("corptools.task_helpers.update_tasks.fetch_location_name")
+    def test_unresolvable_returns_none_instead_of_raising(self, mock_fetch):
+        mock_fetch.side_effect = LocationUnresolvable(1000000000000)
+
+        result = resolve_location(1000000000000, 1)
+
+        self.assertIsNone(result)
+        self.assertTrue(is_character_on_cooloff(1000000000000, 1))
+
+    @patch("corptools.task_helpers.update_tasks.fetch_location_name")
+    def test_unresolvable_cooloff_outlasts_a_plain_failure_cooloff(self, mock_fetch):
+        # A plain (non-raising) failure for character 1 vs an unresolvable
+        # (404) failure for character 2 - the latter should be cooled off
+        # for noticeably longer since it will never resolve.
+        mock_fetch.return_value = None
+        resolve_location(1000000000000, 1)
+
+        mock_fetch.side_effect = LocationUnresolvable(1000000000000)
+        resolve_location(1000000000000, 2)
+
+        # AA Example App
+        from corptools.task_helpers import update_tasks
+        state = update_tasks._get_location_state(1000000000000)
+        # Both are on cooloff right now, but character 2's recorded expiry
+        # is much further in the future than character 1's.
+        self.assertGreater(state["2"], state["1"])
+
+    @patch("corptools.task_helpers.update_tasks.fetch_location_name")
+    def test_already_cooled_off_character_short_circuits_without_calling_esi(self, mock_fetch):
+        set_character_cooloff(1000000000000, 1)
+
+        result = resolve_location(1000000000000, 1)
+
+        self.assertIsNone(result)
+        mock_fetch.assert_not_called()
+
+    @patch("corptools.task_helpers.update_tasks.fetch_location_name")
+    def test_420_propagates_instead_of_being_absorbed(self, mock_fetch):
+        mock_fetch.side_effect = HTTPClientError(420, {}, MagicMock())
+
+        with self.assertRaises(HTTPClientError):
+            resolve_location(1000000000000, 1)
+
+        # Not treated as a per-character failure - a global ESI problem
+        # shouldn't burn this character's cooloff slot.
+        self.assertFalse(is_character_on_cooloff(1000000000000, 1))

@@ -1,14 +1,11 @@
 # Standard Library
 import datetime
-import json
-from datetime import timezone as tz
 
 # Third Party
 from celery import shared_task
 
 # Django
 from django.core.cache import cache
-from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
 # Alliance Auth
@@ -23,10 +20,16 @@ from ..models import (
     Contract,
     CorpAsset,
     CorporateContract,
+    CorporationAudit,
     EveLocation,
     JumpClone,
 )
-from ..task_helpers.update_tasks import LocationUnresolvable, fetch_location_name
+from ..task_helpers.update_tasks import (
+    LocationUnresolvable,
+    fetch_location_name,
+    resolve_location,
+    untried_characters,
+)
 from .utils import (
     esi_error_retry,
     get_error_count_flag,
@@ -34,80 +37,21 @@ from .utils import (
     rate_limited_task,
 )
 
-TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
-
-
 logger = get_extension_logger(__name__)
 
 # Bulk Updates
 
 
-# Location cooloff/retry tracking.
-#
-# There are two distinct pieces of state, both cached per location_id:
-#  - which characters have already been (unsuccessfully) tried for this
-#    location within the last COOLOFF_DAYS, so we don't hammer the same
-#    token repeatedly
-#  - whether the location as a whole has no untried characters left, so we
-#    can skip it entirely until the cooloff window passes
-COOLOFF_DAYS = 7
-# A structure that 404s is gone for good, not just temporarily inaccessible -
-# cool it off much longer than a normal "no docking access" failure.
-UNRESOLVABLE_COOLOFF_DAYS = 30
-# cache entry TTL, longer than the freshness window itself
-CACHE_TIMEOUT = 60 * 60 * 24 * 30
-
-
-def _location_state_cache_tag(location_id):
-    return f"loc_id_{location_id}"
+# Whole-location cooloff: distinct from the per-(location, character)
+# cooloff in task_helpers/update_tasks.py (used by resolve_location). This
+# tracks "no untried characters are left for this location at all", which is
+# only meaningful here where we have a whole candidate list to iterate -
+# resolve_location's single-character callers have no equivalent concept.
+LOCATION_COOLOFF_DAYS = 7
 
 
 def _location_cooloff_cache_tag(location_id):
     return f"cooldown_loc_id_{location_id}"
-
-
-def _get_location_state(location_id):
-    """Returns {"<character_id>": "<iso tried_at>"} for a location_id."""
-    cache_tag = _location_state_cache_tag(location_id)
-    raw = cache.get(cache_tag)
-    if raw is None:
-        return {}
-    return json.loads(raw)
-
-
-def _save_location_state(location_id, state):
-    cache.set(
-        _location_state_cache_tag(location_id),
-        json.dumps(state, cls=DjangoJSONEncoder),
-        CACHE_TIMEOUT
-    )
-
-
-def is_character_on_cooloff(location_id, character_id):
-    """Has this character already been tried (and failed) for this location recently?"""
-    expires_at = _get_location_state(location_id).get(str(character_id))
-    if not expires_at:
-        return False
-    expires_at = datetime.datetime.strptime(
-        expires_at, TZ_STRING).replace(tzinfo=tz.utc)
-    return expires_at > timezone.now()
-
-
-def set_character_cooloff(location_id, character_id, days=COOLOFF_DAYS):
-    """Record that this character was just tried (and failed) for this location."""
-    state = _get_location_state(location_id)
-    state[str(character_id)] = (
-        timezone.now() + datetime.timedelta(days=days)
-    ).strftime(TZ_STRING)
-    _save_location_state(location_id, state)
-
-
-def untried_characters(location_id, character_ids):
-    """Filters character_ids down to those not currently on cooloff for this location."""
-    return {
-        c_id for c_id in character_ids
-        if not is_character_on_cooloff(location_id, c_id)
-    }
 
 
 def get_location_cooloff(location_id):
@@ -118,7 +62,7 @@ def set_location_cooloff(location_id):
     return cache.set(
         _location_cooloff_cache_tag(location_id),
         True,
-        (60 * 60 * 24 * COOLOFF_DAYS)
+        (60 * 60 * 24 * LOCATION_COOLOFF_DAYS)
     )
 
 
@@ -257,19 +201,12 @@ def update_location(self, location_id, character_ids=None, force_citadel=False):
         return f"CT LOCATIONS: No more Characters for Location_id: {location_id} cooling off for a while"
 
     for c_id in char_ids:
-        try:
-            location = fetch_location_name(location_id, None, c_id)
-        except LocationUnresolvable:
-            set_character_cooloff(
-                location_id, c_id, days=UNRESOLVABLE_COOLOFF_DAYS)
-            continue
+        location = resolve_location(location_id, c_id)
         if location is not None:
             location.save()
             return update_missing_locations(location_id)
-        else:
-            set_character_cooloff(location_id, c_id)
-            if get_error_count_flag():
-                self.retry(countdown=300)
+        if get_error_count_flag():
+            self.retry(countdown=300)
 
     set_location_cooloff(location_id)
     return f"CT LOCATIONS: No more Characters for Location_id: {location_id} cooling off for a while"
@@ -281,7 +218,10 @@ def update_location(self, location_id, character_ids=None, force_citadel=False):
     name="corptools.tasks.update_all_locations"
 )
 @no_fail_chain
-def update_all_locations(self, character_filter=None, force_citadels=False, update_all=False, chain=[]):
+def update_all_locations(
+    self, character_filter=None, corp_filter=None, force_citadels=False,
+    update_all=False, chain=[]
+):
     location_flags = [
         'Deliveries',
         'Hangar',
@@ -291,11 +231,28 @@ def update_all_locations(self, character_filter=None, force_citadels=False, upda
     expire = timezone.now() - datetime.timedelta(days=30)  # 1 week refresh
 
     asset_tops = CharacterAsset.objects.all().values_list("item_id", flat=True)
-    char_filter = CharacterAudit.objects.all()
 
-    if character_filter:
-        char_filter = char_filter.filter(
+    # character_filter/corp_filter are independent scopes. A per-character
+    # call (character_filter=[id]) should only touch that character's
+    # locations, not every corp's - and vice versa. Only a bare call with
+    # neither filter set (a full sweep) should touch everything.
+    if character_filter is not None:
+        char_filter = CharacterAudit.objects.filter(
             character__character_id__in=character_filter)
+    elif corp_filter is None:
+        char_filter = CharacterAudit.objects.all()
+    else:
+        char_filter = CharacterAudit.objects.none()
+
+    corp_asset_tops = CorpAsset.objects.all().values_list("item_id", flat=True)
+
+    if corp_filter is not None:
+        corp_audit_filter = CorporationAudit.objects.filter(
+            corporation__corporation_id__in=corp_filter)
+    elif character_filter is None:
+        corp_audit_filter = CorporationAudit.objects.all()
+    else:
+        corp_audit_filter = CorporationAudit.objects.none()
 
     queryset1 = list(
         CharacterAsset.objects.filter(
@@ -364,10 +321,52 @@ def update_all_locations(self, character_filter=None, force_citadels=False, upda
     )
     logger.debug(f"CT LOCATIONS: {character_filter} Contract {queryset8}")
 
+    # Same "only locations actually in use" filtering as the character-asset
+    # queries above (queryset1/queryset5), just scoped to CorpAsset/
+    # CorporateContract instead of doing this inline in corp_update_assets.
+    queryset9 = list(
+        CorpAsset.objects.filter(
+            location_flag__in=location_flags,
+            location_name=None,
+            corporation__in=corp_audit_filter
+        ).exclude(
+            location_id__in=corp_asset_tops
+        ).values_list('location_id', flat=True)
+    )
+
+    queryset10 = list(
+        CorpAsset.objects.filter(
+            location_flag='AssetSafety',
+            location_name=None,
+            corporation__in=corp_audit_filter
+        ).values_list('location_id', flat=True)
+    )
+    logger.debug(
+        f"CT LOCATIONS: {corp_filter} CorpAssets {queryset9 + queryset10}")
+
+    queryset11 = list(
+        CorporateContract.objects.filter(
+            start_location_name=None,
+            start_location_id__isnull=False,
+            corporation__in=corp_audit_filter
+        ).values_list('start_location_id', flat=True)
+    )
+    logger.debug(f"CT LOCATIONS: {corp_filter} CorporateContract {queryset11}")
+
+    queryset12 = list(
+        CorporateContract.objects.filter(
+            end_location_name=None,
+            end_location_id__isnull=False,
+            corporation__in=corp_audit_filter
+        ).values_list('end_location_id', flat=True)
+    )
+    logger.debug(f"CT LOCATIONS: {corp_filter} CorporateContract {queryset12}")
+
     all_locations = set(
         queryset1 + queryset3 + queryset8 +
         queryset4 + queryset5 + queryset6 +
-        queryset7
+        queryset7 + queryset9 + queryset10 +
+        queryset11 + queryset12
     )
     logger.debug(
         f"CT LOCATIONS: {character_filter} all_locations {all_locations}")
@@ -381,7 +380,7 @@ def update_all_locations(self, character_filter=None, force_citadels=False, upda
         )
 
         jump_clones_all = list(
-            Clone.objects.all().values_list(
+            JumpClone.objects.all().values_list(
                 'location_id',
                 flat=True
             )
@@ -394,11 +393,18 @@ def update_all_locations(self, character_filter=None, force_citadels=False, upda
             )
         )
 
+        corp_asset_all = list(
+            CorpAsset.objects.all().values_list(
+                'location_id',
+                flat=True
+            )
+        )
+
         queryset2 = list(
             EveLocation.objects.filter(
                 last_update__lte=expire,
                 location_id__in=set(
-                    clones_all + jump_clones_all + asset_all
+                    clones_all + jump_clones_all + asset_all + corp_asset_all
                 )
             ).values_list('location_id', flat=True)
         )

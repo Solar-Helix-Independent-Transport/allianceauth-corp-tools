@@ -26,9 +26,9 @@ from corptools.models import (
     EveLocation,
     Structure,
 )
-from corptools.task_helpers.update_tasks import fetch_location_name
 
 from ... import providers
+from ..locations import update_all_locations
 from ..utils import chunks
 from .utils import NoTokens, get_corp_token, update_corp_audit
 
@@ -54,8 +54,6 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
     if not token:
         raise NoTokens("Assets")
 
-    failed_locations = []
-
     assets = providers.esi_openapi.client.Assets.GetCorporationsCorporationIdAssets(
         corporation_id=corp_id,
         token=token
@@ -64,8 +62,13 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
         store_cache=False
     )
 
-    location_names = list(
-        EveLocation.objects.all().values_list('location_id', flat=True)
+    # Only look up locations already known - actually resolving anything
+    # missing is handled asynchronously (with cooloff/rate limiting) by
+    # update_all_locations, not inline here.
+    location_names = set(
+        EveLocation.objects.filter(
+            location_id__in={item.location_id for item in assets}
+        ).values_list('location_id', flat=True)
     )
 
     _current_type_ids = []
@@ -79,29 +82,7 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
 
         asset_item = CorpAsset.from_esi_model(audit_corp, item)
 
-        if item.location_id not in location_names:
-            try:
-                if item.location_id not in failed_locations:
-                    """ this is bad
-                        This is causing the 420 issues
-                        TODO Fix this. make it similar/same as the character updates
-                    """
-                    new_name = fetch_location_name(
-                        item.location_id,
-                        item.location_flag,
-                        token.character_id
-                    )
-                    if new_name:
-                        new_name.save()
-                        location_names.append(
-                            item.location_id
-                        )
-                        asset_item.location_name_id = item.location_id
-                    else:
-                        failed_locations.append(item.location_id)
-            except Exception:
-                pass  # TODO
-        else:
+        if item.location_id in location_names:
             asset_item.location_name_id = item.location_id
 
         items.append(asset_item)
@@ -128,6 +109,7 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
     que.append(run_ozone_levels.si(corp_id))
     que.append(build_managed_asset_locations.si(
         corp_id, force_refresh=force_refresh))
+    que.append(update_all_locations.si(corp_filter=[corp_id]))
     chain(que).apply_async(priority=7)
 
     return f"Finished assets for: {audit_corp.corporation}"

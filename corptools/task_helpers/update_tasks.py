@@ -1,3 +1,8 @@
+# Standard Library
+import datetime
+import json
+from datetime import timezone as tz
+
 # Third Party
 from eve_sde.models import (
     SolarSystem,
@@ -5,6 +10,8 @@ from eve_sde.models import (
 
 # Django
 from django.core.cache import cache
+from django.core.serializers.json import DjangoJSONEncoder
+from django.utils import timezone
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
@@ -22,9 +29,67 @@ logger = get_extension_logger(__name__)
 SOLAR_SYSTEM_ID_MIN = 30000000
 SOLAR_SYSTEM_ID_MAX = 33000000
 
+TZ_STRING = "%Y-%m-%dT%H:%M:%SZ"
+
+# Per-(location, character) cooloff tracking: how long to wait before
+# retrying a character/location pair that has already failed to resolve.
+COOLOFF_DAYS = 7
+# A structure that 404s is gone for good, not just temporarily inaccessible -
+# cool it off much longer than a normal "no docking access" failure.
+UNRESOLVABLE_COOLOFF_DAYS = 30
+# cache entry TTL, longer than the freshness window itself
+CACHE_TIMEOUT = 60 * 60 * 24 * 30
+
 
 def set_error_count_flag():
     return cache.set("esi_errors_timeout", 1, 60)
+
+
+def _location_state_cache_tag(location_id):
+    return f"loc_id_{location_id}"
+
+
+def _get_location_state(location_id):
+    """Returns {"<character_id>": "<iso expires_at>"} for a location_id."""
+    raw = cache.get(_location_state_cache_tag(location_id))
+    if raw is None:
+        return {}
+    return json.loads(raw)
+
+
+def _save_location_state(location_id, state):
+    cache.set(
+        _location_state_cache_tag(location_id),
+        json.dumps(state, cls=DjangoJSONEncoder),
+        CACHE_TIMEOUT
+    )
+
+
+def is_character_on_cooloff(location_id, character_id):
+    """Has this character already been tried (and failed) for this location recently?"""
+    expires_at = _get_location_state(location_id).get(str(character_id))
+    if not expires_at:
+        return False
+    expires_at = datetime.datetime.strptime(
+        expires_at, TZ_STRING).replace(tzinfo=tz.utc)
+    return expires_at > timezone.now()
+
+
+def set_character_cooloff(location_id, character_id, days=COOLOFF_DAYS):
+    """Record that this character was just tried (and failed) for this location."""
+    state = _get_location_state(location_id)
+    state[str(character_id)] = (
+        timezone.now() + datetime.timedelta(days=days)
+    ).strftime(TZ_STRING)
+    _save_location_state(location_id, state)
+
+
+def untried_characters(location_id, character_ids):
+    """Filters character_ids down to those not currently on cooloff for this location."""
+    return {
+        c_id for c_id in character_ids
+        if not is_character_on_cooloff(location_id, c_id)
+    }
 
 
 class LocationUnresolvable(Exception):
@@ -150,3 +215,32 @@ def fetch_location_name(location_id, location_flag, character_id, update=False):
             return EveLocation(location_id=location_id,
                                location_name=structure.name,
                                system_id=structure.solar_system_id)
+
+
+def resolve_location(location_id, character_id):
+    """Best-effort location resolution for a specific character's token.
+
+    Wraps fetch_location_name with the cooloff bookkeeping every caller
+    needs: never raises for a per-character/location failure (returns None
+    instead, same as a straightforward "couldn't resolve it" from
+    fetch_location_name), and never retries a character/location pair that
+    already failed recently. HTTPClientError for 420/429 is deliberately
+    left to propagate - that's an ESI-wide problem, not a per-character one,
+    so the calling task's esi_error_retry decorator should handle it instead
+    of this function eating it into a per-character cooloff.
+    """
+    if is_character_on_cooloff(location_id, character_id):
+        return None
+
+    try:
+        location = fetch_location_name(location_id, None, character_id)
+    except LocationUnresolvable:
+        set_character_cooloff(
+            location_id, character_id, days=UNRESOLVABLE_COOLOFF_DAYS)
+        return None
+
+    if location is None:
+        set_character_cooloff(location_id, character_id)
+        return None
+
+    return location

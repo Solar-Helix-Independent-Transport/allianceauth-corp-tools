@@ -24,7 +24,7 @@ from corptools.models import (
     StructureService,
 )
 from corptools.models.eve_models import MapJumpBridge
-from corptools.task_helpers.update_tasks import fetch_location_name
+from corptools.task_helpers.update_tasks import resolve_location
 
 from ... import providers
 from .utils import NoTokens, get_corp_token, update_corp_audit
@@ -182,23 +182,21 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
     for structure in structures:
         name = str(structure.structure_id)
         if structure.name:
-            name = structure.name
-            EveLocation.objects.update_or_create(
-                location_id=structure.structure_id,
-                defaults={
-                    "location_name": structure.name,
-                    "system_id": structure.system_id,
-                }
-            )
-        else:
-            try:
-                structure_info = fetch_location_name(
-                    structure.structure_id,
-                    'solar_system',
-                    token.character_id
+            if SolarSystem.objects.filter(id=structure.system_id).exists():
+                name = structure.name
+                EveLocation.objects.update_or_create(
+                    location_id=structure.structure_id,
+                    defaults={
+                        "location_name": structure.name,
+                        "system_id": structure.system_id,
+                    }
                 )
-            except Exception:
-                structure_info = False
+            else:
+                logger.error(
+                    "Unknown System, Have you populated the map?")
+        else:
+            structure_info = resolve_location(
+                structure.structure_id, token.character_id)
             if structure_info:
                 structure_info.save()
                 name = structure_info.location_name
