@@ -274,4 +274,7 @@ class MenuApiEndpoints:
             if len(_dashboards["links"]):
                 out.append(_dashboards)
 
+            if user.is_superuser:
+                out.append({"name": _("Admin"), "link": "/audit/admin"})
+
             return out

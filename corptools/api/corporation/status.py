@@ -102,8 +102,12 @@ class StatusApiEndpoints:
                 except models.CharacterAudit.DoesNotExist:
                     output["characters"]["bad"] += 1
 
+            # liquid accumulates DecimalField values, so without this cast
+            # it stays a Decimal and gets JSON-serialized as a string
+            # (DjangoJSONEncoder does this to preserve precision) - the
+            # frontend then silently can't format it as a number.
             output["characters"]["liquid"] = helpers.round_or_null(
-                output["characters"]["liquid"]
+                float(output["characters"]["liquid"])
             )
 
             return 200, output

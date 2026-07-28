@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { loadDivisions } from "../../api/corporation";
 import { Badge } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
+import { COMPACT_NUM_FORMAT } from "../Cards/IconStatusCard.helpers";
 
 const CorpDivisions = ({ corporationID }: { corporationID: number }) => {
   const { t } = useTranslation();
@@ -20,7 +21,7 @@ const CorpDivisions = ({ corporationID }: { corporationID: number }) => {
             <h5>
               <Badge className="text-center m-2">
                 {division.division} {division.name == "Unknown" ? "" : division.name}:{" "}
-                {Number(division.balance).toLocaleString()} Isk
+                {Number(division.balance).toLocaleString("en-US", COMPACT_NUM_FORMAT)} Isk
               </Badge>
             </h5>
           );

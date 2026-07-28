@@ -16,6 +16,9 @@ Endpoints that are skipped / excluded:
   - GET /audit/api/extras/test/newapi5   — makes live ESI calls; not for CI
 """
 
+# Standard Library
+from decimal import Decimal
+
 # AA Example App
 from corptools.models.interactions import MailMessage
 
@@ -246,6 +249,21 @@ class TestSmokeCorporationApi(CorptoolsTestCase):
             f"/audit/api/corporation/{self.corp_id}/character/status"
         )
         self.assertEqual(resp.status_code, 200)
+
+    def test_corporation_character_status_liquid_is_numeric_not_string(self):
+        # balance is a DecimalField; without casting to float before the
+        # response is built, DjangoJSONEncoder serializes the accumulated
+        # Decimal as a JSON string, which the frontend can't format as a
+        # number (silently ignores toLocaleString()'s options).
+        self.ca1.balance = Decimal("46046146907.41")
+        self.ca1.save()
+        resp = self.client.get(
+            f"/audit/api/corporation/{self.corp_id}/character/status"
+        )
+        self.assertEqual(resp.status_code, 200)
+        liquid = resp.json()["characters"]["liquid"]
+        self.assertIsInstance(liquid, float)
+        self.assertEqual(liquid, 46046146907.41)
 
     def test_corporation_asset_locations(self):
         resp = self.client.get(

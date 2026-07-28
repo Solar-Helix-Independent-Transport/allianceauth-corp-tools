@@ -27,12 +27,12 @@ describe("CorpDivisions", () => {
 
   it("renders a balance badge per division, omitting the name for 'Unknown'", async () => {
     vi.mocked(loadDivisions).mockResolvedValue([
-      { division: 1, name: "Master Wallet", balance: 1000.5 },
-      { division: 2, name: "Unknown", balance: 50 },
+      { division: 1, name: "Master Wallet", balance: 50 },
+      { division: 2, name: "Unknown", balance: 1234567.89 },
     ]);
     renderDivisions();
 
-    expect(await screen.findByText("1 Master Wallet: 1,000.5 Isk")).toBeInTheDocument();
-    expect(screen.getByText("2 : 50 Isk")).toBeInTheDocument();
+    expect(await screen.findByText("1 Master Wallet: 50 Isk")).toBeInTheDocument();
+    expect(screen.getByText("2 : 1.23M Isk")).toBeInTheDocument();
   });
 });

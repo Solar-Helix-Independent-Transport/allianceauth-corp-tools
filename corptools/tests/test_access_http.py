@@ -216,6 +216,19 @@ class TestCorporationMenuPermissions(CorptoolsTestCase):
             "Activity Map",
         ):
             self.assertIn(expected, names)
+        self.assertNotIn("Admin", names)
+
+    def test_superuser_sees_admin(self):
+        self.user1.is_superuser = True
+        self.user1.save()
+        self.client.force_login(self.user1)
+        resp = self.client.get(self._MENU_URL)
+        self.assertIn("Admin", self._names(resp.json()))
+
+    def test_no_perms_no_admin_link(self):
+        self.client.force_login(self.user1)
+        resp = self.client.get(self._MENU_URL)
+        self.assertNotIn("Admin", self._names(resp.json()))
 
     def test_holding_corp_wallets_only_sees_wallets_and_mining_not_structures_or_assets(self):
         holding_wallets = Permission.objects.get_by_natural_key(
