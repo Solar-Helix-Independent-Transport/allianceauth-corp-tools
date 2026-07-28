@@ -18,13 +18,36 @@ declare module "react-copy-to-clipboard" {
     children?: ReactNode;
   }
 
-  class CopyToClipboard extends React.Component<PropsWithChildren<Props>, {}> {}
+  class CopyToClipboard extends React.Component<PropsWithChildren<Props>, Record<string, never>> {}
   export default CopyToClipboard;
 }
 
 declare module "react-slider" {
   import React from "react";
 
-  class ReactSlider extends React.Component<PropsWithChildren<any>, {}> {}
+  interface ReactSliderProps<T extends number | number[] = number | number[]> {
+    className?: string;
+    thumbClassName?: string;
+    trackClassName?: string;
+    min?: number;
+    max?: number;
+    step?: number;
+    value?: T;
+    defaultValue?: T;
+    pearling?: boolean;
+    minDistance?: number;
+    disabled?: boolean;
+    orientation?: "horizontal" | "vertical";
+    invert?: boolean;
+    ariaLabel?: string | string[];
+    onChange?(value: T, index: number): void;
+    onAfterChange?(value: T, index: number): void;
+    onBeforeChange?(value: T, index: number): void;
+  }
+
+  class ReactSlider<T extends number | number[] = number | number[]> extends React.Component<
+    PropsWithChildren<ReactSliderProps<T>>,
+    Record<string, never>
+  > {}
   export default ReactSlider;
 }

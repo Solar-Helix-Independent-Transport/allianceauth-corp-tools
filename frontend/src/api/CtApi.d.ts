@@ -21,6 +21,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/corp/menu": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Menu */
+    get: operations["corptools_api_core_menu_get_corporation_menu"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/search/system/{search_text}": {
     parameters: {
       query?: never;
@@ -64,6 +81,278 @@ export interface paths {
     };
     /** Get Group Search */
     get: operations["corptools_api_core_search_get_group_search"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/assets": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Assets */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_assets"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/assets/ships": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Assets Ships */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_assets_ships"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/assets/capitals": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Assets Capitals */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_assets_capitals"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/contracts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Contracts */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_contracts"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/contracts/sales": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Contracts Sales */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_contracts_sales"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/contracts/logistics": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Contracts Logistics */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_contracts_logistics"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/industry": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Industry */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_industry"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/location": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Location */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_location"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/clones/home": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Clones Home */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_clones_home"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/clones/jump": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Clones Jump */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_clones_jump"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/orders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Orders */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_orders"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/mercenarydens": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Mercenary Dens */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_mercenary_dens"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/mercenarytacticaloperations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Mercenary Tactical Operations */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_mercenary_tactical_operations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/pi": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Pi */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_pi"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/mining": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Mining */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_mining"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/activitymap/ratting": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Activity Map Ratting */
+    get: operations["corptools_api_character_activity_map_get_character_activity_map_ratting"];
     put?: never;
     post?: never;
     delete?: never;
@@ -149,40 +438,6 @@ export interface paths {
     };
     /** Get Character Clones */
     get: operations["corptools_api_character_clones_get_character_clones"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/audit/api/account/{character_id}/mercenarydens": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Character Mercenary Dens */
-    get: operations["corptools_api_character_structures_get_character_mercenary_dens"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/audit/api/account/{character_id}/mercenarytacticaloperations": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Character Mercenary Tactical Operations */
-    get: operations["corptools_api_character_structures_get_character_mercenary_tactical_operations"];
     put?: never;
     post?: never;
     delete?: never;
@@ -667,6 +922,448 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/account/{character_id}/mercenarydens": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Mercenary Dens */
+    get: operations["corptools_api_character_structures_get_character_mercenary_dens"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/account/{character_id}/mercenarytacticaloperations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Character Mercenary Tactical Operations */
+    get: operations["corptools_api_character_structures_get_character_mercenary_tactical_operations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/assets": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Assets */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_assets"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/assets/ships": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Assets Ships */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_assets_ships"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/assets/capitals": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Assets Capitals */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_assets_capitals"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/assets/members": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Assets Members */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_assets_members"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/assets/members/ships": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Assets Members Ships */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_assets_members_ships"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/assets/members/capitals": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Assets Members Capitals */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_assets_members_capitals"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/structures": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Structures */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_structures"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/starbases": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Starbases */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_starbases"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/pocos": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Pocos */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_pocos"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/pocos/revenue": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Pocos Revenue */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_pocos_revenue"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/orders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Orders */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_orders"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/orders/members": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Orders Members */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_orders_members"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/contracts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Contracts */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_contracts"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/contracts/sales": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Contracts Sales */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_contracts_sales"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/contracts/logistics": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Contracts Logistics */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_contracts_logistics"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/industry": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Industry */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_industry"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/location": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Location */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_location"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/clones/home": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Clones Home */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_clones_home"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/clones/jump": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Clones Jump */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_clones_jump"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/mercenarydens": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Mercenary Dens */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_mercenary_dens"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/mercenarytacticaloperations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Mercenary Tactical Operations */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_mercenary_tactical_operations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/pi": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Pi */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_pi"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/mining": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Mining */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_mining"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corporation/{corporation_id}/activitymap/ratting": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Corporation Activity Map Ratting */
+    get: operations["corptools_api_corporation_activity_map_get_corporation_activity_map_ratting"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/corporation/{corporation_id}/asset/locations": {
     parameters: {
       query?: never;
@@ -1041,6 +1738,57 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/corp/sovhubs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Visible Sovhubs */
+    get: operations["corptools_api_corporation_sovereignty_get_visible_sovhubs"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/corp/sovhubs/map": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Sov Map */
+    get: operations["corptools_api_corporation_sovereignty_get_sov_map"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/audit/api/dash/sovmap": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Sov Map Public */
+    get: operations["corptools_api_corporation_sovereignty_get_sov_map_public"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/corporation/{corporation_id}/glance/assets": {
     parameters: {
       query?: never;
@@ -1257,27 +2005,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/audit/api/extras/test/newapi1": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Test Api Bravadosih
-     * @description Not for real use!
-     *     this is kinda like bravado in use... no type hinting
-     */
-    get: operations["corptools_api_extras_testing_get_test_api_bravadosih"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/audit/api/extras/test/skilltest": {
     parameters: {
       query?: never;
@@ -1291,69 +2018,6 @@ export interface paths {
      *     this is kinda like bravado in use... no type hinting
      */
     get: operations["corptools_api_extras_testing_get_test_api_skilltests"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/audit/api/extras/test/newapi2": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Test Api Openapi
-     * @description Not for real use!
-     *     this has type hinting
-     */
-    get: operations["corptools_api_extras_testing_get_test_api_openapi"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/audit/api/extras/test/newapi3": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Test Api Openapi 3
-     * @description Not for real use!
-     *     this has type hinting
-     */
-    get: operations["corptools_api_extras_testing_get_test_api_openapi_3"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/audit/api/extras/test/newapi4": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Test Api Openapi 4
-     * @description Not for real use!
-     *     this has type hinting
-     */
-    get: operations["corptools_api_extras_testing_get_test_api_openapi_4"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1497,42 +2161,6 @@ export interface components {
       /** Last Clone Jump */
       last_clone_jump?: string | null;
     };
-    /** CharacterMercenaryDen */
-    CharacterMercenaryDen: {
-      character: components["schemas"]["Character"];
-      /** Den Id */
-      den_id: number;
-      planet: components["schemas"]["EveName"];
-      type: components["schemas"]["EveName"];
-      /** State */
-      state: string;
-      /** Development Amount */
-      development_amount: number;
-      /** Development Level */
-      development_level: string;
-      /** Anarchy Amount */
-      anarchy_amount: number;
-      /** Anarchy Level */
-      anarchy_level: string;
-      /** Infomorph Amount */
-      infomorph_amount: number;
-      /** Reinforcement End */
-      reinforcement_end?: string | null;
-    };
-    /** CharacterMercenaryTacticalOperation */
-    CharacterMercenaryTacticalOperation: {
-      character: components["schemas"]["Character"];
-      /** Operation Id */
-      operation_id: string;
-      /** Mercenary Den Id */
-      mercenary_den_id: number;
-      /** Dungeon Type Id */
-      dungeon_type_id: number;
-      /** State */
-      state: string;
-      /** Expires */
-      expires?: string | null;
-    };
     /** Input */
     Input: {
       /**
@@ -1616,6 +2244,39 @@ export interface components {
       total_active: number;
       /** Total Expired */
       total_expired: number;
+    };
+    /** WalletActivityEntry */
+    WalletActivityEntry: {
+      /** Fpn */
+      fpn?: string | null;
+      firstParty: components["schemas"]["WalletActivityParty"];
+      /** Spn */
+      spn?: string | null;
+      secondParty: components["schemas"]["WalletActivityParty"];
+      /** Value */
+      value: number;
+      /** Interactions */
+      interactions: number;
+      /**
+       * Own Account
+       * @default false
+       */
+      own_account: boolean;
+    };
+    /** WalletActivityParty */
+    WalletActivityParty: {
+      /** Cat */
+      cat?: string | null;
+      /** Id */
+      id?: number | null;
+      /** Cid */
+      cid?: number | null;
+      /** Cn */
+      cn?: string | null;
+      /** Aid */
+      aid?: string | null;
+      /** An */
+      an?: number | null;
     };
     /** CharacterContract */
     CharacterContract: {
@@ -1902,6 +2563,259 @@ export interface components {
       /** Message */
       message: string;
     };
+    /** GlanceAssets */
+    GlanceAssets: {
+      /**
+       * Frigate
+       * @default 0
+       */
+      frigate: number;
+      /**
+       * Destroyer
+       * @default 0
+       */
+      destroyer: number;
+      /**
+       * Cruiser
+       * @default 0
+       */
+      cruiser: number;
+      /**
+       * Battlecruiser
+       * @default 0
+       */
+      battlecruiser: number;
+      /**
+       * Battleship
+       * @default 0
+       */
+      battleship: number;
+      /**
+       * Carrier
+       * @default 0
+       */
+      carrier: number;
+      /**
+       * Fax
+       * @default 0
+       */
+      fax: number;
+      /**
+       * Dread
+       * @default 0
+       */
+      dread: number;
+      /**
+       * Supercarrier
+       * @default 0
+       */
+      supercarrier: number;
+      /**
+       * Titan
+       * @default 0
+       */
+      titan: number;
+      /**
+       * Mining
+       * @default 0
+       */
+      mining: number;
+      /**
+       * Hauler
+       * @default 0
+       */
+      hauler: number;
+      /**
+       * Indy Command
+       * @default 0
+       */
+      indy_command: number;
+      /**
+       * Capital Indy
+       * @default 0
+       */
+      capital_indy: number;
+      /**
+       * Injector
+       * @default 0
+       */
+      injector: number;
+      /**
+       * Extractor
+       * @default 0
+       */
+      extractor: number;
+      /**
+       * Citadel
+       * @default 0
+       */
+      citadel: number;
+      /**
+       * Eng Comp
+       * @default 0
+       */
+      eng_comp: number;
+      /**
+       * Refinary
+       * @default 0
+       */
+      refinary: number;
+      /**
+       * Flex
+       * @default 0
+       */
+      flex: number;
+      /**
+       * Merc Den Grp
+       * @default 0
+       */
+      merc_den_grp: number;
+      /**
+       * Merc Den
+       * @default 0
+       */
+      merc_den: number;
+    };
+    /** GlanceActivities */
+    GlanceActivities: {
+      /** Ratting */
+      ratting?: number | null;
+      /** Incursion */
+      incursion?: number | null;
+      /** Pochven */
+      pochven?: number | null;
+      /** Mission */
+      mission?: number | null;
+      /** Market */
+      market?: number | null;
+      /** Industry */
+      industry?: number | null;
+      /** Pi */
+      pi?: number | null;
+      /** Mining Ore */
+      mining_ore?: number | null;
+      /** Mining Moon */
+      mining_moon?: number | null;
+      /** Mining Gas */
+      mining_gas?: number | null;
+      /** Mining Ice */
+      mining_ice?: number | null;
+    };
+    /** GlanceRatting */
+    GlanceRatting: {
+      /** Subcap */
+      subcap?: number | null;
+      /** Capital */
+      capital?: number | null;
+      /** Supers */
+      supers?: number | null;
+      /** Titans */
+      titans?: number | null;
+      /** Officer */
+      officer?: number | null;
+      /** Officer Cruiser */
+      officer_cruiser?: number | null;
+      /** Officer Frigate */
+      officer_frigate?: number | null;
+    };
+    /** GlanceFaction */
+    GlanceFaction: {
+      factions: components["schemas"]["GlanceFactionCounts"];
+      lp: components["schemas"]["GlanceFactionLPSummary"];
+    };
+    /** GlanceFactionCounts */
+    GlanceFactionCounts: {
+      /**
+       * Amarr
+       * @default 0
+       */
+      amarr: number;
+      /**
+       * Caldari
+       * @default 0
+       */
+      caldari: number;
+      /**
+       * Gallente
+       * @default 0
+       */
+      gallente: number;
+      /**
+       * Minmatar
+       * @default 0
+       */
+      minmatar: number;
+      /**
+       * Angel
+       * @default 0
+       */
+      angel: number;
+      /**
+       * Guristas
+       * @default 0
+       */
+      guristas: number;
+    };
+    /** GlanceFactionLP */
+    GlanceFactionLP: {
+      /** Corp Id */
+      corp_id?: number | null;
+      /** Lp */
+      lp?: number | null;
+      /** Corp Name */
+      corp_name?: string | null;
+    };
+    /** GlanceFactionLPSummary */
+    GlanceFactionLPSummary: {
+      /** Total */
+      total?: number | null;
+      /**
+       * Evermark
+       * @default []
+       */
+      evermark: components["schemas"]["GlanceFactionLP"][];
+      /**
+       * Top Five
+       * @default []
+       */
+      top_five: components["schemas"]["GlanceFactionLP"][];
+    };
+    /** CharacterMercenaryDen */
+    CharacterMercenaryDen: {
+      character: components["schemas"]["Character"];
+      /** Den Id */
+      den_id: number;
+      planet: components["schemas"]["EveName"];
+      type: components["schemas"]["EveName"];
+      /** State */
+      state: string;
+      /** Development Amount */
+      development_amount: number;
+      /** Development Level */
+      development_level: string;
+      /** Anarchy Amount */
+      anarchy_amount: number;
+      /** Anarchy Level */
+      anarchy_level: string;
+      /** Infomorph Amount */
+      infomorph_amount: number;
+      /** Reinforcement End */
+      reinforcement_end?: string | null;
+    };
+    /** CharacterMercenaryTacticalOperation */
+    CharacterMercenaryTacticalOperation: {
+      character: components["schemas"]["Character"];
+      /** Operation Id */
+      operation_id: string;
+      /** Mercenary Den Id */
+      mercenary_den_id: number;
+      /** Dungeon Type Id */
+      dungeon_type_id: number;
+      /** State */
+      state: string;
+      /** Expires */
+      expires?: string | null;
+    };
     /** AssetItem */
     AssetItem: {
       /** Id */
@@ -1995,6 +2909,46 @@ export interface components {
       /** State */
       state: string;
     };
+    /** GlanceCorporateAssets */
+    GlanceCorporateAssets: {
+      corporate: components["schemas"]["GlanceAssets"];
+      character: components["schemas"]["GlanceAssets"];
+    };
+    /** GlancePveActivities */
+    GlancePveActivities: {
+      /** Ratting */
+      ratting?: number | null;
+      /** Incursion */
+      incursion?: number | null;
+      /** Pochven */
+      pochven?: number | null;
+      /** Mission */
+      mission?: number | null;
+      /** Market */
+      market?: number | null;
+      /** Industry */
+      industry?: number | null;
+    };
+    /** GlanceIndyActivities */
+    GlanceIndyActivities: {
+      /** Market */
+      market?: number | null;
+      /** Industry */
+      industry?: number | null;
+      /** Pi */
+      pi?: number | null;
+    };
+    /** GlanceMiningActivities */
+    GlanceMiningActivities: {
+      /** Mining Ore */
+      mining_ore?: number | null;
+      /** Mining Moon */
+      mining_moon?: number | null;
+      /** Mining Gas */
+      mining_gas?: number | null;
+      /** Mining Ice */
+      mining_ice?: number | null;
+    };
     /** PingStats */
     PingStats: {
       /** Members */
@@ -2012,6 +2966,26 @@ export interface components {
 export type $defs = Record<string, never>;
 export interface operations {
   corptools_api_core_menu_get_character_menu: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MenuCategory"][];
+        };
+      };
+    };
+  };
+  corptools_api_core_menu_get_corporation_menu: {
     parameters: {
       query?: never;
       header?: never;
@@ -2053,6 +3027,15 @@ export interface operations {
           "application/json": components["schemas"]["EveName"][];
         };
       };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
     };
   };
   corptools_api_core_search_get_location_search: {
@@ -2077,6 +3060,15 @@ export interface operations {
           "application/json": components["schemas"]["EveName"][];
         };
       };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
     };
   };
   corptools_api_core_search_get_group_search: {
@@ -2099,6 +3091,543 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["EveName"][];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_assets: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_assets_ships: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_assets_capitals: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_contracts: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_contracts_sales: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_contracts_logistics: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_industry: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_location: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_clones_home: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_clones_jump: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_orders: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_mercenary_dens: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_mercenary_tactical_operations: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_pi: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_mining: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_activity_map_get_character_activity_map_ratting: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
         };
       };
     };
@@ -2261,68 +3790,6 @@ export interface operations {
       };
     };
   };
-  corptools_api_character_structures_get_character_mercenary_dens: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        character_id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["CharacterMercenaryDen"][];
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": string;
-        };
-      };
-    };
-  };
-  corptools_api_character_structures_get_character_mercenary_tactical_operations: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        character_id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["CharacterMercenaryTacticalOperation"][];
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": string;
-        };
-      };
-    };
-  };
   corptools_api_character_finances_get_character_wallet: {
     parameters: {
       query?: {
@@ -2435,7 +3902,18 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["WalletActivityEntry"][];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
       };
     };
   };
@@ -2968,7 +4446,18 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": unknown[];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
       };
     };
   };
@@ -3100,9 +4589,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["GlanceAssets"];
         };
       };
       /** @description Forbidden */
@@ -3133,9 +4620,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["GlanceActivities"];
         };
       };
       /** @description Forbidden */
@@ -3166,9 +4651,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["GlanceRatting"];
         };
       };
       /** @description Forbidden */
@@ -3188,6 +4671,858 @@ export interface operations {
       header?: never;
       path: {
         character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GlanceFaction"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_structures_get_character_mercenary_dens: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CharacterMercenaryDen"][];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_structures_get_character_mercenary_tactical_operations: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CharacterMercenaryTacticalOperation"][];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_assets: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_assets_ships: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_assets_capitals: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_assets_members: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_assets_members_ships: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_assets_members_capitals: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_structures: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_starbases: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_pocos: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_pocos_revenue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_orders: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_orders_members: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_contracts: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_contracts_sales: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_contracts_logistics: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_industry: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_location: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_clones_home: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_clones_jump: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_mercenary_dens: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_mercenary_tactical_operations: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_pi: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_mining: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_activity_map_get_corporation_activity_map_ratting: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        corporation_id: number;
       };
       cookie?: never;
     };
@@ -3359,7 +5694,18 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": string[];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
       };
     };
   };
@@ -3893,6 +6239,97 @@ export interface operations {
       };
     };
   };
+  corptools_api_corporation_sovereignty_get_visible_sovhubs: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown[];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_sovereignty_get_sov_map: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_corporation_sovereignty_get_sov_map_public: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
   corptools_api_corporation_at_a_glance_get_glance_assets_corp: {
     parameters: {
       query?: never;
@@ -3910,9 +6347,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["GlanceCorporateAssets"];
         };
       };
       /** @description Forbidden */
@@ -3943,9 +6378,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["GlancePveActivities"];
         };
       };
       /** @description Forbidden */
@@ -3976,9 +6409,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["GlanceIndyActivities"];
         };
       };
       /** @description Forbidden */
@@ -4009,9 +6440,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["GlanceMiningActivities"];
         };
       };
       /** @description Forbidden */
@@ -4042,9 +6471,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["GlanceFaction"];
         };
       };
       /** @description Forbidden */
@@ -4375,24 +6802,6 @@ export interface operations {
       };
     };
   };
-  corptools_api_extras_testing_get_test_api_bravadosih: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
   corptools_api_extras_testing_get_test_api_skilltests: {
     parameters: {
       query?: never;
@@ -4407,65 +6816,20 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
       };
-    };
-  };
-  corptools_api_extras_testing_get_test_api_openapi: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
+      /** @description Forbidden */
+      403: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
-      };
-    };
-  };
-  corptools_api_extras_testing_get_test_api_openapi_3: {
-    parameters: {
-      query?: {
-        name?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        content: {
+          "application/json": string;
         };
-        content?: never;
-      };
-    };
-  };
-  corptools_api_extras_testing_get_test_api_openapi_4: {
-    parameters: {
-      query?: {
-        character_id?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
       };
     };
   };
@@ -4483,7 +6847,20 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": {
+            [key: string]: unknown;
+          };
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
       };
     };
   };

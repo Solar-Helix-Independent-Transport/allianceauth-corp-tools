@@ -1,5 +1,5 @@
 import "./MiningLedger.css";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import ReactSlider from "react-slider";
 import { MiningTotalsGraph } from "../../Components/Graphs/MiningTotalsGraph";
 import { MiningGraph } from "../../Components/Graphs/MiningGraph";
@@ -9,42 +9,74 @@ import BaseTable from "../Tables/BaseTable/BaseTable";
 import { useTranslation } from "react-i18next";
 import { TypeIcon, CharacterPortrait } from "../EveImages/EveImages";
 import { Card, Form } from "react-bootstrap";
+import { MiningGraphDatum, MiningTotalsDatum } from "./MiningGraphTypes";
 
-function apiDataToObject(input: any, dataKey = "volume") {
-  return input.map((d: any) => {
-    const o: any = { id: d.date };
+interface MiningLedgerOre {
+  id: number;
+  name: string;
+  group: string;
+  volume: number;
+  value: number;
+}
+
+interface MiningLedgerEntry {
+  date: string;
+  value: number;
+  volume: number;
+  characters: { id: number; name: string }[];
+  systems: { name: string }[];
+  ores: MiningLedgerOre[];
+}
+
+export interface MiningLedgerData {
+  data: MiningLedgerEntry[];
+  all_groups: string[];
+  all_ores: string[];
+}
+
+function apiDataToObject(
+  input: MiningLedgerEntry[],
+  dataKey: "volume" | "value" = "volume",
+): MiningGraphDatum[] {
+  return input.map((d) => {
+    const o: MiningGraphDatum = { id: d.date };
     for (let i = 0; i < d.ores.length; ++i) o[d.ores[i]["name"]] = d.ores[i][dataKey];
     return o;
   });
 }
 
-function apiDataToTotals(group_list: any, ore_list: any, input: any, dataKey = "volume") {
-  const out = Object.fromEntries(
-    group_list.map((x: any) => [x, Object.fromEntries(ore_list.map((x: any) => [x, 0]))]),
+function apiDataToTotals(
+  group_list: string[],
+  ore_list: string[],
+  input: MiningLedgerEntry[],
+  dataKey: "volume" | "value" = "volume",
+): MiningTotalsDatum[] {
+  const out: Record<string, Record<string, number>> = Object.fromEntries(
+    group_list.map((x) => [x, Object.fromEntries(ore_list.map((x) => [x, 0]))]),
   );
-  input.forEach((d: any) => {
+  input.forEach((d) => {
     for (let i = 0; i < d.ores.length; ++i)
       out[d.ores[i]["group"]][d.ores[i]["name"]] += Math.floor(Number(d.ores[i][dataKey]));
   });
 
   return Object.entries(out).map((elem) => {
-    const row: any = { name: elem[0] };
+    const row: MiningTotalsDatum = { name: elem[0] };
     Object.entries(elem[1]).forEach(([k, v]) => (row[k] = v));
     return row;
   });
 }
 
-const LedgerGraph = ({ data }: any) => {
+const LedgerGraph = ({ data }: { data: MiningLedgerData }) => {
   const { t } = useTranslation();
   const [mode, setMode] = useState(false);
   const [slice, setSlice] = useState([0, data.data.length - 1]);
 
-  const inSlice = (_: any, index: number) => slice[0] <= index && index <= slice[1];
+  const inSlice = (_: MiningLedgerEntry, index: number) => slice[0] <= index && index <= slice[1];
 
   const graphData = apiDataToObject(data.data.filter(inSlice), mode ? "value" : "volume");
 
   const tableData = data.data.filter(
-    (e: any, index: number) => inSlice(e, index) && e.characters.length > 0,
+    (e: MiningLedgerEntry, index: number) => inSlice(e, index) && e.characters.length > 0,
   );
 
   const totalData = apiDataToTotals(
@@ -54,7 +86,7 @@ const LedgerGraph = ({ data }: any) => {
     mode ? "value" : "volume",
   );
 
-  const columnHelper = createColumnHelper<any>();
+  const columnHelper = createColumnHelper<MiningLedgerEntry>();
 
   const columns = [
     columnHelper.accessor("date", {
@@ -79,7 +111,7 @@ const LedgerGraph = ({ data }: any) => {
       enableSorting: false,
       enableColumnFilter: false,
       cell: (cell) =>
-        cell.getValue()?.map((d: any) => (
+        cell.getValue()?.map((d) => (
           <div key={d.id}>
             <CharacterPortrait className="me-2" character_id={d.id} size={32} />
             {d.name}
@@ -90,7 +122,7 @@ const LedgerGraph = ({ data }: any) => {
       header: t("Systems"),
       enableSorting: false,
       enableColumnFilter: false,
-      cell: (cell) => cell.getValue()?.map((d: any) => <div key={d.name}>{d.name}</div>),
+      cell: (cell) => cell.getValue()?.map((d) => <div key={d.name}>{d.name}</div>),
     }),
     columnHelper.accessor("ores", {
       header: () => <span className="ms-auto">{t("Detail")}</span>,
@@ -106,7 +138,7 @@ const LedgerGraph = ({ data }: any) => {
             </tr>
           </thead>
           <tbody>
-            {cell.getValue()?.map((d: any) => (
+            {cell.getValue()?.map((d) => (
               <tr key={d.id}>
                 <td style={{ width: "60%" }}>
                   <TypeIcon type_id={d.id} size={32} />
@@ -144,7 +176,7 @@ const LedgerGraph = ({ data }: any) => {
           id="custom-switch"
           label={t("Show As Value")}
           className="ms-auto"
-          onChange={(event: any) => setMode(event.target.checked)}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => setMode(event.target.checked)}
           defaultChecked={mode}
         />
       </div>
@@ -152,7 +184,6 @@ const LedgerGraph = ({ data }: any) => {
         <div style={{ height: "250px", margin: "5px", background: "#646464" }}>
           <MiningTotalsGraph
             data={totalData}
-            groups={data.all_groups}
             ores={data.all_ores}
             dataType={mode ? "Value" : "Volume"}
           />
@@ -171,13 +202,12 @@ const LedgerGraph = ({ data }: any) => {
                 className="slider"
                 thumbClassName="thumb"
                 trackClassName="track"
-                // @ts-ignore:
                 defaultValue={[0, data.data.length - 1]}
                 pearling
                 minDistance={3}
                 min={0}
                 max={data.data.length - 1}
-                onChange={(value: any) => setSlice(value)}
+                onChange={(value: number[]) => setSlice(value)}
               />
             </div>
           </div>

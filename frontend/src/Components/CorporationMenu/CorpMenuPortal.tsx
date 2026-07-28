@@ -1,13 +1,7 @@
-import CorpMenu from "./CorpMenu";
-import ReactDOM from "react-dom";
-
-const menuRoot = document.getElementById("nav-left");
+import { CorpMenuAsync } from "./CorpMenuAsync";
 
 const CorpMenuPortal = () => {
-  if (!menuRoot) {
-    return <></>;
-  }
-  return ReactDOM.createPortal(<CorpMenu />, menuRoot);
+  return <CorpMenuAsync />;
 };
 
 export { CorpMenuPortal };

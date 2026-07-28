@@ -3,11 +3,11 @@ import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
 import { getCharacterContracts } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 const CharacterContracts = () => {
   const { t } = useTranslation();
@@ -67,7 +67,7 @@ const CharacterContracts = () => {
     }),
   ];
 
-  const data_out = data?.filter((row: any) => {
+  const data_out = data?.filter((row) => {
     if (showAll) {
       return true;
     } else {
@@ -82,7 +82,7 @@ const CharacterContracts = () => {
         id="custom-switch"
         label={t("Show Own Account Activity")}
         className="float-end"
-        onChange={(event: any) => {
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
           setShowAll(event.target.checked);
         }}
         defaultChecked={showAll}

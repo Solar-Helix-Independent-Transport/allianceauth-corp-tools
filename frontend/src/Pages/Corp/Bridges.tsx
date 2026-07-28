@@ -1,4 +1,5 @@
 import { loadBridges } from "../../api/corporation";
+import { BridgePair } from "../../Components/Corporation/BridgeTypes";
 import { useQuery } from "@tanstack/react-query";
 import { PanelLoader } from "../../Components/Loaders/loaders";
 import { Card } from "react-bootstrap";
@@ -10,7 +11,7 @@ const Bridges = () => {
     queryKey: ["bridges"],
     queryFn: () => loadBridges(),
     refetchOnWindowFocus: false,
-    initialData: { characters: [], main: undefined, headers: [] },
+    initialData: [] as BridgePair[],
   });
 
   return data.length > 0 ? (
@@ -21,14 +22,14 @@ const Bridges = () => {
         <hr className="col-xs-12" />
 
         {data
-          .sort((a: any, b: any) => {
-            let levels_a = [];
-            let levels_b = [];
+          .sort((a, b) => {
+            const levels_a = [];
+            const levels_b = [];
 
-            a.start.known && levels_a.push(a.start.ozone);
-            a.end.known && levels_a.push(a.end.ozone);
-            b.start.known && levels_b.push(b.start.ozone);
-            b.end.known && levels_b.push(b.end.ozone);
+            if (a.start.known) levels_a.push(a.start.ozone);
+            if (a.end.known) levels_a.push(a.end.ozone);
+            if (b.start.known) levels_b.push(b.start.ozone);
+            if (b.end.known) levels_b.push(b.end.ozone);
 
             if (Math.min(...levels_a) > Math.min(...levels_b)) {
               return 1;
@@ -38,7 +39,7 @@ const Bridges = () => {
               return 0;
             }
           })
-          .map((bridgePair: any) => {
+          .map((bridgePair) => {
             return <BridgeLink start={bridgePair.start} end={bridgePair.end} />;
           })}
       </Card.Body>

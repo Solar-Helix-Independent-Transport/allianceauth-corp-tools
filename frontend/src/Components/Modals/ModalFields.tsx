@@ -1,4 +1,18 @@
-export function StrToFields({ strValue, text, valuePre = "", valuePost = "", children }: any) {
+import { ReactNode } from "react";
+
+export function StrToFields({
+  strValue,
+  text,
+  valuePre = "",
+  valuePost = "",
+  children,
+}: {
+  strValue?: string | number | null;
+  text: string;
+  valuePre?: string;
+  valuePost?: string;
+  children?: ReactNode;
+}) {
   return strValue || children ? (
     <tr className="m-0">
       <td className="m-0">
@@ -18,7 +32,17 @@ export function StrToFields({ strValue, text, valuePre = "", valuePost = "", chi
   );
 }
 
-export function DateToFields({ dateStrValue, text, valuePre = "", valuePost = "" }: any) {
+export function DateToFields({
+  dateStrValue,
+  text,
+  valuePre = "",
+  valuePost = "",
+}: {
+  dateStrValue?: string | null;
+  text: string;
+  valuePre?: string;
+  valuePost?: string;
+}) {
   return dateStrValue ? (
     <StrToFields
       strValue={new Date(dateStrValue).toLocaleString()}
@@ -31,7 +55,17 @@ export function DateToFields({ dateStrValue, text, valuePre = "", valuePost = ""
   );
 }
 
-export function IntToFields({ intValue, text, valuePre = "", valuePost = "" }: any) {
+export function IntToFields({
+  intValue,
+  text,
+  valuePre = "",
+  valuePost = "",
+}: {
+  intValue: number;
+  text: string;
+  valuePre?: string;
+  valuePost?: string;
+}) {
   return intValue !== 0 ? (
     <StrToFields
       strValue={intValue.toLocaleString()}
@@ -44,8 +78,18 @@ export function IntToFields({ intValue, text, valuePre = "", valuePost = "" }: a
   );
 }
 
-export function StrIntToFields({ strValue, text, valuePre = "", valuePost = "" }: any) {
-  let intValue = parseInt(strValue);
+export function StrIntToFields({
+  strValue,
+  text,
+  valuePre = "",
+  valuePost = "",
+}: {
+  strValue?: string | number | null;
+  text: string;
+  valuePre?: string;
+  valuePost?: string;
+}) {
+  const intValue = parseInt(String(strValue ?? ""));
   return strValue ? (
     <IntToFields intValue={intValue} text={text} valuePre={valuePre} valuePost={valuePost} />
   ) : (

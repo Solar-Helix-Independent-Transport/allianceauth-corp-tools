@@ -6,7 +6,7 @@ import { loadAssetList } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import CharacterAssetModal from "../../Components/Modals/CharacterAssetContents";
 import { SecurityStatusBadge } from "../../Components/SecurityStatusBadge";
 

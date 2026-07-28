@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { IconStatusDiv, statusProps } from "./IconStatusCard";
+import { IconStatusDiv } from "./IconStatusCard";
+import { statusProps } from "./IconStatusCard.helpers";
 
 describe("statusProps", () => {
   it("marks a truthy value as success, formatted with String() by default", () => {

@@ -106,6 +106,19 @@ describe("buildActivityNodes", () => {
     expect(nodes[1].data.radius).toBe(140);
   });
 
+  it("gives bigger dots a lower zIndex, so they paint behind smaller ones", () => {
+    const systems = [makeSystem({ id: 1 }), makeSystem({ id: 2 })];
+    const response = makeResponse(systems, [
+      { system_id: 1, value: 100, count: 0, quantity: 0 },
+      { system_id: 2, value: 25, count: 0, quantity: 0 },
+    ]);
+
+    const nodes = buildActivityNodes(response, "2d");
+
+    expect(nodes[0].data.radius).toBeGreaterThan(nodes[1].data.radius);
+    expect(nodes[0].zIndex).toBeLessThan(nodes[1].zIndex as number);
+  });
+
   it("carries the system object through onto node data", () => {
     const systems = [makeSystem({ id: 42, name: "Jita" })];
     const response = makeResponse(systems, []);

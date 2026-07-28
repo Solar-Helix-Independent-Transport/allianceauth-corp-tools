@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CorporationLogo, TypeIcon } from "../EveImages/EveImages";
 import BaseTable from "../Tables/BaseTable/BaseTable";
-import { NameObjectArrayFilterFn } from "../Tables/BaseTable/BaseTableFilter";
+import { NameObjectArrayFilterFn } from "../Tables/BaseTable/NameObjectArrayFilterFn";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Badge, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { SovHub, modeBg, transportMismatch, upgradeStateBg } from "./sovereigntyShared";
@@ -15,7 +15,7 @@ const formatHours = (hours: number) => {
   return `${d}d ${h}h`;
 };
 
-const SovereigntyHubsTable = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
+const SovereigntyHubsTable = ({ data, isFetching }: { data: SovHub[]; isFetching: boolean }) => {
   const { t } = useTranslation();
   const [hideAllOnline, setHideAllOnline] = useState(false);
   const [hideNoFuel, setHideNoFuel] = useState(false);

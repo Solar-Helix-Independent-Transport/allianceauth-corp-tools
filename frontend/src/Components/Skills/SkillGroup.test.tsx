@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 import { SkillGroup } from "./SkillGroup";
 
 const skills = [
-  { skill: "Zoology", level: 1, active: 1, sp: 100 },
-  { skill: "Astrometrics", level: 2, active: 2, sp: 200 },
+  { group: "Science", skill: "Zoology", level: 1, active: 1, sp: 100 },
+  { group: "Science", skill: "Astrometrics", level: 2, active: 2, sp: 200 },
 ];
 
 describe("SkillGroup", () => {

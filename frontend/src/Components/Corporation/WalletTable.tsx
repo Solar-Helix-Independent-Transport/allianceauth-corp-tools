@@ -3,6 +3,7 @@ import TableWrapper from "../Tables/BaseTable/TableWrapper";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { loadWallet } from "../../api/corporation";
+import { components } from "../../api/CtApi";
 
 const CorporationWalletTable = ({
   corporationID,
@@ -19,10 +20,10 @@ const CorporationWalletTable = ({
     queryKey: ["wallet", corporationID, refTypes, page],
     queryFn: () => loadWallet(Number(corporationID), refTypes, page),
     refetchOnWindowFocus: false,
-    initialData: { characters: [], main: undefined, headers: [] },
+    initialData: [] as components["schemas"]["CorporationWalletEvent"][],
   });
 
-  const columnHelper = createColumnHelper<any>();
+  const columnHelper = createColumnHelper<components["schemas"]["CorporationWalletEvent"]>();
 
   const columns = [
     columnHelper.accessor("date", {

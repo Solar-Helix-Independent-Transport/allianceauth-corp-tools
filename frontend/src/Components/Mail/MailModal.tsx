@@ -1,15 +1,24 @@
 import { useTranslation } from "react-i18next";
 import { getMailBody } from "../../api/character";
 import { DateToFields, StrToFields } from "../Modals/ModalFields";
+import { MailListItem } from "./MailTypes";
 import { Badge, Button, Modal } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
 
-function MailModal({ msg_data, shown, setShown }: any) {
+function MailModal({
+  msg_data,
+  shown,
+  setShown,
+}: {
+  msg_data: MailListItem | null;
+  shown: boolean;
+  setShown: (show: boolean) => void;
+}) {
   const { t } = useTranslation();
 
   const { isFetching, error, data } = useQuery({
     queryKey: ["mailBody", msg_data?.character_id, msg_data?.mail_id],
-    queryFn: () => getMailBody(msg_data?.character_id, msg_data?.mail_id),
+    queryFn: () => getMailBody(msg_data?.character_id ?? 0, msg_data?.mail_id ?? 0),
     refetchOnWindowFocus: false,
   });
 
@@ -29,20 +38,18 @@ function MailModal({ msg_data, shown, setShown }: any) {
           <StrToFields strValue={msg_data?.from} text={"From:"} />
           <StrToFields text={"Labels:"}>
             <span style={{ overflowWrap: "anywhere" }}>
-              {msg_data?.labels.map((name: any) => (
-                <Badge style={{ marginLeft: "5px" }}>{name}</Badge>
-              ))}
+              {msg_data?.labels.map((name) => <Badge style={{ marginLeft: "5px" }}>{name}</Badge>)}
             </span>
           </StrToFields>
           <StrToFields text={"Recipients:"}>
-            {msg_data?.recipients.length > 2 && (
+            {(msg_data?.recipients.length ?? 0) > 2 && (
               <p>
                 {msg_data?.recipients.length} {t("Recipients")}
               </p>
             )}
 
             <span style={{ overflowWrap: "anywhere" }}>
-              {msg_data?.recipients.map((name: any) => (
+              {msg_data?.recipients.map((name) => (
                 <Badge style={{ marginLeft: "5px" }}>{name}</Badge>
               ))}
             </span>

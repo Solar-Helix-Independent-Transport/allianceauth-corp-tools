@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it } from "vitest";
-import CharMenu from "./CharMenu";
+import CharMenu, { CharCategoryProps, CharMenuItemProps } from "./CharMenu";
 
-const renderMenu = (data: any) =>
+const renderMenu = (data: Array<CharCategoryProps | CharMenuItemProps>) =>
   render(
     <MemoryRouter initialEntries={["/audit/r/42/account/overview"]}>
       <Routes>
@@ -35,5 +35,15 @@ describe("CharMenu", () => {
     renderMenu([{ name: "Docs", link: "/static/docs.html" }]);
 
     expect(screen.getByRole("link", { name: "Docs" })).toHaveAttribute("href", "/static/docs.html");
+  });
+
+  it("renders a plain link, not an empty dropdown, when the API sends links: null (e.g. Admin)", () => {
+    // MenuCategory always serializes a `links` key (pydantic doesn't drop
+    // None fields), so a plain entry like the "Admin" item still arrives as
+    // { name, link, links: null } rather than omitting `links` entirely.
+    renderMenu([{ name: "Admin", link: "/audit/admin", links: null as unknown as undefined }]);
+
+    expect(screen.getByRole("link", { name: "Admin" })).toHaveAttribute("href", "/audit/admin");
+    expect(screen.queryByRole("button", { name: "Admin" })).not.toBeInTheDocument();
   });
 });

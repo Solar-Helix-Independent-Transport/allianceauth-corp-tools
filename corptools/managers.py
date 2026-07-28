@@ -466,6 +466,15 @@ class AuditCorporationQuerySet(models.QuerySet):
                     )
                 )
 
+            if user.has_perm('corptools.state_corp_manager'):
+                queries.append(
+                    models.Q(
+                        corporation__corporation_id__in=EveCharacter.objects.filter(
+                            character_ownership__user__profile__state=user.profile.state
+                        ).values_list("corporation_id", flat=True)
+                    )
+                )
+
             logger.debug('%s queries for user %s visible chracters.' %
                          (len(queries), user))
             # filter based on queries

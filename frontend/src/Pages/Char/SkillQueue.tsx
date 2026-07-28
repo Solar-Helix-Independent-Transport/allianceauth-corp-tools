@@ -2,11 +2,11 @@ import { PortraitCard } from "../../Components/Cards/PortraitCard";
 import { ErrorLoader, PanelLoader } from "../../Components/Loaders/loaders";
 import { SkillLevelBlock } from "../../Components/Skills/SkillLevelBlock";
 import { getCharacterSkillQueues } from "../../api/character";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { Form, FormGroup, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import ReactTimeAgo from "react-time-ago";
 
 const CharacterSkillQueues = () => {
@@ -24,21 +24,21 @@ const CharacterSkillQueues = () => {
 
   if (isLoading) return <PanelLoader />;
 
-  if (error) return <ErrorLoader />;
+  if (error || !data) return <ErrorLoader />;
 
-  const handleActive = (e: any) => {
+  const handleActive = (e: ChangeEvent<HTMLInputElement>) => {
     setActive(e.currentTarget.checked);
   };
 
-  const handlePaused = (e: any) => {
+  const handlePaused = (e: ChangeEvent<HTMLInputElement>) => {
     setPaused(e.currentTarget.checked);
   };
 
-  const handleEmpty = (e: any) => {
+  const handleEmpty = (e: ChangeEvent<HTMLInputElement>) => {
     setEmpty(e.currentTarget.checked);
   };
 
-  let filtered_data = data.filter((char: any) => {
+  const filtered_data = data.filter((char) => {
     let active = false;
     let paused = false;
     let empty = false;
@@ -85,9 +85,9 @@ const CharacterSkillQueues = () => {
       </FormGroup>
 
       <div className="d-flex justify-content-around align-items-center flex-row flex-wrap">
-        {filtered_data?.map((char: any) => {
-          let char_status = char.queue.length ? { border: "success" } : { border: "warning" };
-          if (char.queue.length > 0 && !char.queue[0].end) {
+        {filtered_data?.map((char) => {
+          let char_status = char.queue?.length ? { border: "success" } : { border: "warning" };
+          if (char.queue?.length && !char.queue[0].end) {
             char_status = { border: "info" };
           }
 
@@ -120,7 +120,7 @@ const CharacterSkillQueues = () => {
                   >
                     <Table striped>
                       <tbody>
-                        {char.queue?.map((s: any) => {
+                        {char.queue?.map((s) => {
                           return (
                             <tr key={`${char.character.character_name}${s.skill}${s.end_level}`}>
                               <td className="no-margin">
@@ -128,8 +128,8 @@ const CharacterSkillQueues = () => {
                                   <p className="m-0">{s.skill}</p>
                                   <SkillLevelBlock
                                     level={s.end_level}
-                                    trained={s.current_level}
-                                    active={s.current_level}
+                                    trained={s.current_level ?? undefined}
+                                    active={s.current_level ?? undefined}
                                   />
                                 </div>
                                 <div className="d-flex justify-content-between">

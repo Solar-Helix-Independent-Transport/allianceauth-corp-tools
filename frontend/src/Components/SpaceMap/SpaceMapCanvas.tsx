@@ -125,6 +125,11 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
       string,
       { source: Node<TNodeData>; selected: boolean; result: Node<TNodeData> }
     >();
+    // Reading/writing selectionStampCache.current here is intentional: this
+    // memo IS the cache's synchronization point (see the comment above) - an
+    // effect-based update would only apply after this render has already
+    // committed with wrong/stale stamped nodes, defeating the whole point.
+    // eslint-disable-next-line react-hooks/refs
     const result = nodesProp.map((n) => {
       const isSelected = n.id === selectedNodeId;
       const cached = cache.get(n.id);
@@ -141,6 +146,7 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
       nextCache.set(n.id, { source: n, selected: isSelected, result: stamped });
       return stamped;
     });
+    // eslint-disable-next-line react-hooks/refs
     selectionStampCache.current = nextCache;
     return result;
   }, [nodesProp, selectedNodeId, getInternalNode]);

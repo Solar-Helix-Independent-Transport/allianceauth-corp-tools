@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { CorporationLogo, TypeIcon } from "../EveImages/EveImages";
 import { TimeTill } from "../Helpers/TimeTill";
 import BaseTable from "../Tables/BaseTable/BaseTable";
-import { NameObjectArrayFilterFn } from "../Tables/BaseTable/BaseTableFilter";
+import { NameObjectArrayFilterFn } from "../Tables/BaseTable/NameObjectArrayFilterFn";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Badge, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FittingModal } from "../Modals/FittingModal";
@@ -20,7 +20,12 @@ type BaseItemType = {
   cat?: string;
 };
 
-type StructureType = {
+type ServiceType = {
+  name: string;
+  state: string;
+};
+
+export type StructureType = {
   id: number;
   owner: Corporation;
   type: BaseItemType;
@@ -30,7 +35,7 @@ type StructureType = {
   name: string;
   state: string;
   fuel_expiry: string;
-  services: BaseItemType[];
+  services: ServiceType[];
 };
 
 const showTooltip = (toolTipText: string | undefined) => {
@@ -43,7 +48,7 @@ const showTooltip = (toolTipText: string | undefined) => {
   );
 };
 
-const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
+const StructuresTable = ({ data, isFetching }: { data: StructureType[]; isFetching: boolean }) => {
   const { t } = useTranslation();
   const [structure, setStructure] = useState({ id: 0, name: "" });
   const [showModal, setShowModal] = useState(false);
@@ -155,7 +160,7 @@ const StructuresTable = ({ data, isFetching }: { data: any; isFetching: boolean 
               flexDirection: "row",
             }}
           >
-            {props.getValue().map((service: any) => {
+            {props.getValue().map((service) => {
               return (
                 <Badge bg={service.state === "online" ? "primary" : "danger"}>{service.name}</Badge>
               );

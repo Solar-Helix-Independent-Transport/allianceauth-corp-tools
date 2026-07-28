@@ -1,12 +1,20 @@
 import { DoctrineCheck } from "../../Components/Skills/DoctrineCheck";
+import { DoctrineSkillList, DoctrineSkillReqs } from "../../Components/Skills/DoctrineTypes";
 import { getFitCheck } from "../../api/character";
 import { ChangeEvent, useState } from "react";
 import { Form } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { PanelLoader } from "../../Components/Loaders/loaders";
+
+// getFitCheck's OpenAPI schema is under-specified (loose object), so the
+// response is asserted to the shape this page actually consumes.
+interface FitCheckResponse {
+  skills?: { n: string; l: number }[];
+  chars: Record<string, { doctrines?: { fit?: DoctrineSkillReqs }; skills: DoctrineSkillList }>;
+}
 
 const CharacterFitCheck = () => {
   const { t } = useTranslation();
@@ -16,14 +24,14 @@ const CharacterFitCheck = () => {
   const { data, refetch, isFetching, isFetched } = useQuery({
     queryKey: ["getFitCheck", fit, characterID],
     queryFn: () => {
-      let out = getFitCheck(fit, characterID ? Number(characterID) : 0);
-      return out;
+      const out = getFitCheck(fit, characterID ? Number(characterID) : 0);
+      return out as unknown as Promise<FitCheckResponse>;
     },
     refetchOnWindowFocus: false,
     enabled: false,
   });
 
-  function fitUpdate(event: ChangeEvent | any) {
+  function fitUpdate(event: ChangeEvent<HTMLTextAreaElement>) {
     setFit(event.target?.value);
   }
 
@@ -130,7 +138,7 @@ const CharacterFitCheck = () => {
                     <th className="text-end">Level</th>
                   </thead>
                   <tbody>
-                    {data.skills?.map((sk: any) => {
+                    {data?.skills?.map((sk) => {
                       return (
                         <>
                           <tr>
@@ -147,8 +155,9 @@ const CharacterFitCheck = () => {
             <div className="card m-1">
               <h5 className="card-header">Character Checks</h5>
               <div className="d-flex justify-content-center align-items-center flex-wrap">
-                {Object.entries(data?.chars).map((name: any) => {
-                  let reqs = name[1].doctrines?.fit ? name[1].doctrines?.fit : [];
+                {Object.entries(data?.chars ?? {}).map((name) => {
+                  const reqs = name[1].doctrines?.fit;
+                  if (!reqs) return <></>;
                   return (
                     <>
                       <DoctrineCheck name={name[0]} skill_reqs={reqs} skill_list={name[1].skills} />

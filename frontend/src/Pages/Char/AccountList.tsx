@@ -5,7 +5,7 @@ import { getCharacterList } from "../../api/character";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 const AccountList = () => {
   const { t } = useTranslation();
@@ -17,7 +17,7 @@ const AccountList = () => {
   });
   const columnHelper = createColumnHelper<components["schemas"]["AccountStatus"]>();
 
-  const columns: ColumnDef<components["schemas"]["AccountStatus"], any>[] = [
+  const columns: ColumnDef<components["schemas"]["AccountStatus"], unknown>[] = [
     columnHelper.accessor("main.character_name", {
       header: t("Character"),
       cell: (cell) => (

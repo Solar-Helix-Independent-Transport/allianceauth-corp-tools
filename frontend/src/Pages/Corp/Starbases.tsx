@@ -7,6 +7,7 @@ import { TimeTill } from "../../Components/Helpers/TimeTill";
 import { useState } from "react";
 import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import StarbaseModal from "../../Components/Modals/StarbaseModal";
+import { Starbase } from "../../Components/Modals/StarbaseTypes";
 import BaseTable from "../../Components/Tables/BaseTable/BaseTable";
 
 const showTooltip = (toolTipText: string | undefined) => {
@@ -21,7 +22,7 @@ const showTooltip = (toolTipText: string | undefined) => {
 
 const CorporationStarbases = () => {
   const { t } = useTranslation();
-  const [starbase, setSarbase] = useState({} as any);
+  const [starbase, setSarbase] = useState<Starbase | Record<string, never>>({});
   const [showModal, setShowModal] = useState(true);
 
   const { data, isFetching } = useQuery({
@@ -30,7 +31,7 @@ const CorporationStarbases = () => {
     refetchOnWindowFocus: false,
   });
 
-  const columnHelper = createColumnHelper<any>();
+  const columnHelper = createColumnHelper<Starbase>();
 
   const columns = [
     columnHelper.accessor("region.name", {
@@ -109,7 +110,7 @@ const CorporationStarbases = () => {
             <span>{cell.getValue()}</span>
             {cell.getValue() == "online" && (
               <>
-                <TimeTill date={cell.row.original.onlined_since} />
+                <TimeTill date={cell.row.original.onlined_since ?? ""} />
               </>
             )}
           </div>
@@ -120,8 +121,8 @@ const CorporationStarbases = () => {
   return (
     <>
       <BaseTable {...{ isFetching, data, columns }} />
-      {starbase.starbase_id && (
-        <StarbaseModal starbase={starbase} {...{ showModal, setShowModal }} />
+      {"starbase_id" in starbase && (
+        <StarbaseModal starbase={starbase as Starbase} {...{ showModal, setShowModal }} />
       )}
     </>
   );

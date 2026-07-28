@@ -1,18 +1,33 @@
 import axios from "axios";
+import { Starbase, StarbaseFit } from "../Components/Modals/StarbaseTypes";
+import { BridgePair } from "../Components/Corporation/BridgeTypes";
+import { StructureType } from "../Components/Corporation/Structures";
+import { Den } from "../Components/Corporation/DenTypes";
+import { Poco } from "../Components/Corporation/PocoTypes";
+import { components } from "./CtApi";
 
 // import Cookies from "js-cookie";
 
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 
-export async function loadStatus() {
+export interface CorpUpdateStatus {
+  update: string | null;
+  change: string | null;
+}
+
+export interface CorpStatus {
+  corporation: { corporation_id: number; corporation_name: string };
+  last_updates: Record<string, CorpUpdateStatus>;
+}
+
+export async function loadStatus(): Promise<{ corps: CorpStatus[]; headers: string[] }> {
   const api = await axios.get(`/audit/api/corp/list`);
-  console.log(`got corp status in api`);
   const headers = Array.from(
-    new Set(
-      api.data.reduce((p: any, c: any) => {
+    new Set<string>(
+      api.data.reduce((p: string[], c: CorpStatus) => {
         try {
           return p.concat(Object.keys(c.last_updates));
-        } catch (err) {
+        } catch {
           return p;
         }
       }, []),
@@ -31,9 +46,10 @@ export async function postCorporationRefresh() {
   return 1;
 }
 
-export async function loadCorpGlanceAssetData(corporation_id: number) {
+export async function loadCorpGlanceAssetData(
+  corporation_id: number,
+): Promise<components["schemas"]["GlanceCorporateAssets"]> {
   const api = await axios.get(`/audit/api/corporation/${corporation_id}/glance/assets`);
-  console.log(`get glance/assets in api ${corporation_id}`);
   return api.data;
 }
 
@@ -177,115 +193,111 @@ export async function loadCorporationActivityMapRatting(corporation_id: number) 
 
 export async function loadCorpGlanceStatusData(corporation_id: number) {
   const api = await axios.get(`/audit/api/corporation/${corporation_id}/character/status`);
-  console.log(`get glance/assets in api ${corporation_id}`);
   return api.data;
 }
 
-export async function loadCorpGlanceActivityDataPVE(corporation_id: number) {
+export async function loadCorpGlanceActivityDataPVE(
+  corporation_id: number,
+): Promise<components["schemas"]["GlancePveActivities"]> {
   const api = await axios.get(`/audit/api/corporation/${corporation_id}/glance/activities/pve`);
-  console.log(`get glance/activities in api ${corporation_id}`);
   return api.data;
 }
-export async function loadCorpGlanceActivityDataEco(corporation_id: number) {
+export async function loadCorpGlanceActivityDataEco(
+  corporation_id: number,
+): Promise<components["schemas"]["GlanceIndyActivities"]> {
   const api = await axios.get(`/audit/api/corporation/${corporation_id}/glance/activities/indy`);
-  console.log(`get glance/activities in api ${corporation_id}`);
   return api.data;
 }
-export async function loadCorpGlanceActivityDataMining(corporation_id: number) {
+export async function loadCorpGlanceActivityDataMining(
+  corporation_id: number,
+): Promise<components["schemas"]["GlanceMiningActivities"]> {
   const api = await axios.get(`/audit/api/corporation/${corporation_id}/glance/activities/mining`);
-  console.log(`get glance/activities in api ${corporation_id}`);
   return api.data;
 }
 
-export async function loadCorpGlanceFactionData(corporation_id: number) {
+export async function loadCorpGlanceFactionData(
+  corporation_id: number,
+): Promise<components["schemas"]["GlanceFaction"]> {
   const api = await axios.get(`/audit/api/corporation/${corporation_id}/glance/faction`);
-  console.log(`get glance/faction in api ${corporation_id}`);
   return api.data;
 }
 
-export async function loadAllStructures() {
+export async function loadAllStructures(): Promise<StructureType[]> {
   const api = await axios.get(`/audit/api/corp/structures`);
-  console.log(`get structures in api`);
   return api.data;
 }
 
 export async function loadStructureFit(structureId: number) {
   const api = await axios.get(`/audit/api/corp/structures/${structureId}`);
-  console.log(`get structures in api`);
   return api.data;
 }
 
-export async function LoadAllStarbases() {
+export async function LoadAllStarbases(): Promise<Starbase[]> {
   const api = await axios.get(`/audit/api/corp/starbases`);
-  console.log(`get starbases in api`);
   return api.data;
 }
 
-export async function loadStarbaseFit(starbaseID: number) {
+export async function loadStarbaseFit(starbaseID: number): Promise<StarbaseFit> {
   const api = await axios.get(`/audit/api/corp/starbase/${starbaseID}`);
-  console.log(`get starbase ${starbaseID} fit in api`);
   return api.data;
 }
 
-export async function loadAllPocos() {
+export async function loadAllPocos(): Promise<Poco[]> {
   const api = await axios.get(`/audit/api/corp/pocos`);
-  console.log(`get pocos in api`);
   return api.data;
 }
 
-export async function loadBridges() {
+export async function loadBridges(): Promise<BridgePair[]> {
   const api = await axios.get(`/audit/api/dashboard/gates`);
-  console.log(`get bridges in api`);
   return api.data;
 }
 
-export async function loadDens() {
+export async function loadDens(): Promise<Den[]> {
   const api = await axios.get(`/audit/api/dashboard/dens`);
-  console.log(`get dens in api`);
   return api.data;
 }
 
 export async function loadSovHubs() {
   const api = await axios.get(`/audit/api/corp/sovhubs`);
-  console.log(`get sovhubs in api`);
   return api.data;
 }
 
 export async function loadSovHubMap() {
   const api = await axios.get(`/audit/api/corp/sovhubs/map`);
-  console.log(`get sovhubs map in api`);
   return api.data;
 }
 
 export async function loadPublicSovHubMap() {
   const api = await axios.get(`/audit/api/dash/sovmap`);
-  console.log(`get public sovhubs map in api`);
   return api.data;
 }
 
 export async function loadSov() {
   const api = await axios.get(`/audit/api/dashboard/sov`);
-  console.log(`get sov in api`);
   return api.data;
 }
 
-export async function loadAssetLocations(corporation_id: number) {
+export async function loadAssetLocations(
+  corporation_id: number,
+): Promise<{ value: number; label: string }[]> {
   const api = await axios.get(`/audit/api/corporation/${corporation_id}/asset/locations`);
-  console.log(`get asset locations in api ${corporation_id}`);
   return api.data;
 }
 
-export async function loadAssetGroups(corporation_id: number, location_id: number) {
+export async function loadAssetGroups(
+  corporation_id: number,
+  location_id: number,
+): Promise<components["schemas"]["CharacterAssetGroups"][]> {
   const api = await axios.get(
     `/audit/api/corporation/${corporation_id}/asset/${location_id}/groups`,
   );
-  console.log(`get asset groups in api ${corporation_id} ${location_id}`);
   return api.data;
 }
 
-export async function loadAssetContents(item_id: number) {
+export async function loadAssetContents(
+  item_id: number,
+): Promise<components["schemas"]["AssetItem"][]> {
   const api = await axios.get(`/audit/api/corporation/asset/${item_id}/contents`);
-  console.log(`get asset contents in api ${item_id}`);
   return api.data;
 }
 
@@ -297,32 +309,37 @@ export async function loadAssetList(
   const api = await axios.get(
     `/audit/api/corporation/${corporation_id}/asset/${location_id}/list?new_asset_tree=${new_type}`,
   );
-  console.log(`get asset list in api ${corporation_id} ${location_id}`);
   return api.data;
 }
 
-export async function loadWallet(corporation_id: number, refType = "", page = 1) {
+export async function loadWallet(
+  corporation_id: number,
+  refType = "",
+  page = 1,
+): Promise<components["schemas"]["CorporationWalletEvent"][]> {
   const api = await axios.get(`/audit/api/corporation/${corporation_id}/wallet`, {
     params: { type_refs: refType, page: page },
   });
-  console.log(`get wallet in api ${corporation_id}`);
   return api.data;
 }
 
-export async function loadDivisions(corporation_id: number) {
+export interface CorpDivision {
+  division: number;
+  name: string;
+  balance: number;
+}
+
+export async function loadDivisions(corporation_id: number): Promise<CorpDivision[]> {
   const api = await axios.get(`/audit/api/corporation/${corporation_id}/divisions`);
-  console.log(`get divisions in api ${corporation_id}`);
   return api.data;
 }
 
-export async function loadRefTypes() {
+export async function loadRefTypes(): Promise<string[]> {
   const api = await axios.get(`/audit/api/corporation/wallettypes`);
-  console.log(`get wallet types in api`);
   return api.data;
 }
 
-export async function LoadAgregatedMining(corporationId: Number) {
+export async function LoadAgregatedMining(corporationId: number) {
   const api = await axios.get(`/audit/api/corporation/${corporationId}/mining`);
-  console.log(`get mining in api`);
   return api.data;
 }

@@ -36,8 +36,10 @@ def _has_activity_map_perms(user) -> bool:
         | user.has_perm('corptools.alliance_corp_manager')
         | user.has_perm('corptools.state_corp_manager')
         | user.has_perm('corptools.global_corp_manager')
+        | user.has_perm('corptools.show_if_director')
         | user.has_perm('corptools.holding_corp_assets')
         | user.has_perm('corptools.holding_corp_wallets')
+        | user.has_perm('corptools.holding_corp_structures')
     )
 
 

@@ -4,10 +4,27 @@ import ErrorBoundary from "../Helpers/ErrorBoundary";
 import TableWrapper from "../Tables/BaseTable/TableWrapper";
 import { createColumnHelper } from "@tanstack/react-table";
 import { TypeIcon } from "../EveImages/EveImages";
+import { components } from "../../api/CtApi";
 
-function AssetContentsTable({ data, header = "", isFetching }: any) {
+// Shared shape for both character and corporation asset content items -
+// they're structurally identical for what this table displays (character
+// asset items additionally carry a `character` field this table ignores).
+export type AssetContentItem = Pick<
+  components["schemas"]["CharacterAssetItem"],
+  "id" | "item" | "quantity" | "location"
+>;
+
+function AssetContentsTable({
+  data,
+  header = "",
+  isFetching,
+}: {
+  data?: AssetContentItem[];
+  header?: string;
+  isFetching: boolean;
+}) {
   const { t } = useTranslation();
-  const columnHelper = createColumnHelper<any>();
+  const columnHelper = createColumnHelper<AssetContentItem>();
 
   const columns = [
     columnHelper.accessor("item.name", {
@@ -42,7 +59,7 @@ function AssetContentsTable({ data, header = "", isFetching }: any) {
 
   return (
     <ErrorBoundary>
-      {data?.length > 0 && (
+      {(data?.length ?? 0) > 0 && (
         <>
           <h6 className={styles.strikeOut}>{header}</h6>
           <TableWrapper {...{ data, columns }} isFetching={isFetching} />

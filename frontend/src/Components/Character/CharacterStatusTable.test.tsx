@@ -1,9 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 import CharacterStatusTable from "./CharacterStatusTable";
+import { components } from "../../api/CtApi";
 
-const renderTable = (data: unknown) =>
+const renderTable = (data: { characters: components["schemas"]["CharacterStatus"][] }) =>
   render(
     <MemoryRouter>
       <CharacterStatusTable data={data} isFetching={false} />
@@ -17,6 +18,8 @@ describe("CharacterStatusTable", () => {
         {
           character: {
             character_name: "Test Character",
+            character_id: 1,
+            corporation_id: 2,
             corporation_name: "Test Corp",
             alliance_name: "Test Alliance",
           },
@@ -42,7 +45,12 @@ describe("CharacterStatusTable", () => {
     renderTable({
       characters: [
         {
-          character: { character_name: "Test Character" },
+          character: {
+            character_name: "Test Character",
+            character_id: 1,
+            corporation_id: 2,
+            corporation_name: "Test Corp",
+          },
           total_logins: 1,
           active: false,
           last_updates: { assets: "2024-01-01T00:00:00Z", wallet: null },

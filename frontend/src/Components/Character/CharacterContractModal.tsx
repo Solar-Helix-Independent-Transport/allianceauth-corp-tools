@@ -2,8 +2,17 @@ import { DateToFields, StrIntToFields, StrToFields } from "../Modals/ModalFields
 import CharacterContractModalTable from "./CharacterContractModalTable";
 import { Button, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
+import { components } from "../../api/CtApi";
 
-function CharacterContractModal({ data, shown, setShown }: any) {
+function CharacterContractModal({
+  data,
+  shown,
+  setShown,
+}: {
+  data: components["schemas"]["CharacterContract"] | null;
+  shown: boolean;
+  setShown: (show: boolean) => void;
+}) {
   const { t } = useTranslation();
   return (
     <Modal
@@ -24,7 +33,7 @@ function CharacterContractModal({ data, shown, setShown }: any) {
             strValue={data?.acceptor === data?.assignee ? null : data?.acceptor}
             text={"Acceptor:"}
           />
-          <StrToFields strValue={data?.availability} text={t("Availability")} />
+          <StrToFields strValue={data?.availbility} text={t("Availability")} />
           <StrToFields strValue={data?.status} text={t("Status")} />
           {data?.start_location ? (
             <StrToFields strValue={data?.start_location.name} text={t("Start Location")} />
@@ -50,11 +59,11 @@ function CharacterContractModal({ data, shown, setShown }: any) {
         </table>
 
         <CharacterContractModalTable
-          data={data?.items?.filter((item: any) => item.is_included)}
+          data={data?.items?.filter((item) => item.is_included)}
           header={t("Items Received")}
         />
         <CharacterContractModalTable
-          data={data?.items?.filter((item: any) => !item.is_included)}
+          data={data?.items?.filter((item) => !item.is_included)}
           header={t("Items Wanted")}
         />
       </Modal.Body>

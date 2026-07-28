@@ -7,7 +7,7 @@ import CharSkillGroups from "../../Components/Skills/CharacterSkills";
 import { getCharacterSkills } from "../../api/character";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { SkillsRadarGraph } from "../../Components/Graphs/SkillGroups";
 
 const CharacterSkills = () => {
@@ -26,36 +26,36 @@ const CharacterSkills = () => {
 
   if (isLoading) return <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />;
 
-  if (error) return <ErrorLoader />;
+  if (error || !data) return <ErrorLoader />;
 
   if (char_id === "0") {
-    setCharacter(data[0].character.character_id);
+    setCharacter(String(data[0].character.character_id));
     return <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />;
   } else {
     const char_data = data.filter(
-      (obj: any) => obj.character.character_id === Number(char_id ? char_id : 0),
+      (obj) => obj.character.character_id === Number(char_id ? char_id : 0),
     );
 
     let skill_data = char_data?.[0]?.skills;
 
     if (group_filter !== "" && group_filter !== "All") {
-      skill_data = skill_data?.filter((o: any) =>
+      skill_data = skill_data?.filter((o) =>
         o.group.toLowerCase().includes(group_filter.toLowerCase()),
       );
     }
 
     if (level_filter >= 0) {
-      skill_data = skill_data?.filter((o: any) => o.level === level_filter);
+      skill_data = skill_data?.filter((o) => o.level === level_filter);
     }
 
     if (skill_filter !== "") {
-      skill_data = skill_data?.filter((o: any) =>
+      skill_data = skill_data?.filter((o) =>
         o.skill.toLowerCase().includes(skill_filter.toLowerCase()),
       );
     }
-    const charOptions = data.map((char: any) => {
+    const charOptions = data.map((char) => {
       return {
-        value: char.character.character_id,
+        value: String(char.character.character_id),
         label: char.character.character_name,
       };
     });
@@ -91,14 +91,14 @@ const CharacterSkills = () => {
       },
     ];
 
-    const groupOptions = new Set();
+    const groupOptions = new Set<string>();
 
-    char_data?.[0]?.skills?.forEach((skill: any) => {
+    char_data?.[0]?.skills?.forEach((skill) => {
       groupOptions.add(skill.group);
     });
 
     const groups = [{ value: "All", label: "All" }].concat(
-      [...groupOptions.values()].sort().map((grp: any) => {
+      [...groupOptions.values()].sort().map((grp) => {
         return {
           value: grp,
           label: grp,
@@ -130,7 +130,7 @@ const CharacterSkills = () => {
           <SkillsRadarGraph characterID={Number(char_id)} />
         </div>
 
-        <CharSkillGroups data={skill_data} />
+        <CharSkillGroups data={skill_data ?? []} />
       </ErrorBoundary>
     );
   }

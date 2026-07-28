@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { IconStatusDiv, COMPACT_NUM_FORMAT } from "../../Components/Cards/IconStatusCard";
+import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
+import { COMPACT_NUM_FORMAT } from "../../Components/Cards/IconStatusCard.helpers";
 import { loadCorpGlanceStatusData } from "../../api/corporation";
 import Isk from "../../assets/isk_128.png";
 import Omega from "../../assets/omega_128.png";

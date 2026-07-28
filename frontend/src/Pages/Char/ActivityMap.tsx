@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import ActivityMap from "../../Components/ActivityMap/ActivityMap";
 import { CHARACTER_ACTIVITY_MAP_DATA_SOURCES } from "../../Components/Character/ActivityMap/dataSources";
 

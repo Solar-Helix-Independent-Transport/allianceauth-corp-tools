@@ -1,29 +1,23 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { useQueryState } from "nuqs";
-import CorpSelect from "../../Components/Corporation/CorporationSelect";
 import RefTypeSelect from "../../Components/Corporation/RefTypeSelect";
 import CorporationWalletTable from "../../Components/Corporation/WalletTable";
 import { CorpLoader } from "../../Components/Loaders/loaders";
 import CorpDivisions from "../../Components/Corporation/Divisions";
+import CorporationFilterBar from "../../Components/Corporation/CorporationFilterBar";
+import { useCorporationId } from "../../Components/Corporation/useCorporationId";
 
 const CorporationWallets = () => {
   const { t } = useTranslation();
-  const [cidStr] = useQueryState("cid");
-  const corporationID = Number(cidStr) || 0;
+  const corporationID = useCorporationId();
   const [refTypes, setRefs] = useState("");
   return (
     <>
-      <div className="m-3 d-flex align-items-center my-1">
-        <h6 className="me-1">{t("Corporation Filter")}</h6>
-        <div className="flex-grow-1">
-          <CorpSelect />
-        </div>
-      </div>
+      <CorporationFilterBar />
       <div className="m-3 d-flex align-items-center my-1">
         <h6 className="me-1">{t("Ref Type Filter")}</h6>
         <div className="flex-grow-1">
-          <RefTypeSelect setFilter={setRefs} preFill={refTypes} />
+          <RefTypeSelect setFilter={setRefs} />
         </div>
       </div>
       <div className="d-flex flex-column align-items-center my-1">

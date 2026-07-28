@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { loadDens } from "../../api/corporation";
+import { Den } from "../../Components/Corporation/DenTypes";
 import { CharacterPortrait, CorporationLogo } from "../../Components/EveImages/EveImages";
 import BaseTable from "../../Components/Tables/BaseTable/BaseTable";
 
@@ -14,7 +15,7 @@ const Dens = () => {
     refetchOnWindowFocus: false,
   });
 
-  const columnHelper = createColumnHelper<any>();
+  const columnHelper = createColumnHelper<Den>();
 
   const columns = [
     columnHelper.accessor("location.region.name", {
@@ -29,7 +30,7 @@ const Dens = () => {
       header: t("Constellation"),
       cell: (cell) => (
         <a
-          href={`https://evemaps.dotlan.net/map/${cell.row.original.region?.name.replace(
+          href={`https://evemaps.dotlan.net/map/${cell.row.original.location.region.name.replace(
             " ",
             "_",
           )}/${cell.getValue().replace(" ", "_")}`}

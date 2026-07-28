@@ -5,7 +5,7 @@ import { getCharacterClones } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Button, Modal, Table } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import React from "react";
 
@@ -13,7 +13,9 @@ const CharacterClones = () => {
   const { t } = useTranslation();
   const { characterID } = useParams();
   const [openModal, setOpenModal] = React.useState(false);
-  const [modalData, setModalData] = React.useState(null as any);
+  const [modalData, setModalData] = React.useState<components["schemas"]["CharacterClone"] | null>(
+    null,
+  );
 
   const { data, isFetching } = useQuery({
     queryKey: ["clones", characterID],
@@ -116,7 +118,7 @@ const CharacterClones = () => {
             <div>
               <Table striped style={{ marginBottom: 0 }}>
                 <tbody>
-                  {modalData?.implants.map((imp: any) => {
+                  {modalData?.implants?.map((imp) => {
                     return (
                       <tr key={imp.name}>
                         <td className="text-end">

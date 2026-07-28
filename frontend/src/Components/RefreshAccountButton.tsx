@@ -2,7 +2,7 @@ import { postAccountRefresh } from "../api/character";
 import styles from "./RefreshAccountButton.module.css";
 import Button from "react-bootstrap/Button";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 export const RefreshCharButton = () => {
   const { characterID } = useParams();

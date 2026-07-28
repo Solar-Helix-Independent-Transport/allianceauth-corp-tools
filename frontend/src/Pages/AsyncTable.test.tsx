@@ -4,28 +4,25 @@ import { describe, expect, it, vi } from "vitest";
 import type { BaseTableProps } from "../Components/Tables/BaseTable/BaseTable";
 import AsyncTable from "./AsyncTable";
 
-let lastProps: BaseTableProps | null = null;
+type Row = { a: number };
+
+let lastProps: BaseTableProps<Row> | null = null;
 
 vi.mock("../Components/Tables/BaseTable/BaseTable", () => ({
-  default: (props: BaseTableProps) => {
+  default: (props: BaseTableProps<Row>) => {
     lastProps = props;
     return <div data-testid="base-table" />;
   },
 }));
 
-const renderAsyncTable = (apiEndpoint: (params: any) => Promise<any>) => {
+const renderAsyncTable = (apiEndpoint: (params: unknown[]) => Promise<Row[]>) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={queryClient}>
       <AsyncTable
         apiQueryKey="things"
         apiParams={[1, 2]}
-        // AsyncTableProps types this as `(params: any) => Array<any>`, but
-        // it's only ever called as `() => apiEndpoint(apiParams)` and handed
-        // straight to react-query's queryFn, which awaits whatever comes
-        // back - the declared return type doesn't match what's actually
-        // supported (a promise), so a cast is needed here.
-        apiEndpoint={apiEndpoint as unknown as (params: any) => any[]}
+        apiEndpoint={apiEndpoint}
         columnDefinition={[{ accessorKey: "a", header: "A" }]}
       />
     </QueryClientProvider>,

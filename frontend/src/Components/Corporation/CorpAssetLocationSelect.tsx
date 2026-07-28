@@ -1,52 +1,55 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import Select from "react-select";
+import Select, { StylesConfig } from "react-select";
 import { loadAssetLocations } from "../../api/corporation";
+import { bootstrapSelectStyles } from "../Helpers/reactSelectTheme";
 
-const colourStyles = {
-  option: (styles: any) => {
-    return {
-      ...styles,
-      color: "black",
-    };
-  },
-  menu: (base: any) => ({ ...base, zIndex: 9999 }),
-  menuList: (base: any) => ({ ...base, zIndex: 9999 }),
-  menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
-};
+interface LocationOption {
+  value: number;
+  label: string;
+}
+
+const colourStyles = bootstrapSelectStyles as StylesConfig<LocationOption>;
 
 const CorporationAssetLocationSelect = ({
   corporationID,
   setLocation,
 }: {
   corporationID: number;
-  setLocation: any;
+  setLocation: (value: number) => void;
 }) => {
   const { isLoading, data } = useQuery({
     queryKey: ["corp_asset_loc", corporationID],
     queryFn: () => loadAssetLocations(corporationID),
   });
 
-  const [selected, setSelected] = useState<any>(null);
+  const [selected, setSelected] = useState<LocationOption | null>(null);
+  // Auto-select the first location whenever a new location list arrives -
+  // this is React's documented "adjust state when a prop changes" pattern
+  // (calling setState during render, guarded by comparing against the
+  // previous render's data), not a side effect, so it doesn't need
+  // useEffect: https://react.dev/learn/you-might-not-need-an-effect
+  const [prevData, setPrevData] = useState(data);
+  if (data !== prevData) {
+    setPrevData(data);
+    setSelected(data?.length ? data[0] : null);
+  }
 
+  // Notifying the parent is a side effect (updating an external system),
+  // so it belongs in an effect - unlike the local `selected` adjustment
+  // above.
   useEffect(() => {
-    if (data?.length) {
-      setSelected(data[0]);
-      setLocation(data[0].value);
-    }
-  }, [data]);
+    if (selected) setLocation(selected.value);
+  }, [selected, setLocation]);
 
   return (
-    <Select
+    <Select<LocationOption>
       isLoading={isLoading}
       styles={colourStyles}
       options={data}
       value={selected}
       isDisabled={!corporationID}
-      onChange={(e: any) => {
-        setSelected(e);
-        setLocation(e.value);
-      }}
+      onChange={(e) => setSelected(e)}
     />
   );
 };

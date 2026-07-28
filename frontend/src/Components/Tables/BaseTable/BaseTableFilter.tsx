@@ -1,5 +1,5 @@
 import Styles from "./BaseTableFilter.module.css";
-import { Column, Table as ReactTable, Row } from "@tanstack/react-table";
+import { Column, Table as ReactTable } from "@tanstack/react-table";
 import { Button, Dropdown, Form, OverlayTrigger, Popover } from "react-bootstrap";
 
 const isHTML = RegExp.prototype.test.bind(/(<([^>]+)>)/i);
@@ -8,13 +8,8 @@ const isDate = (str: string) => {
   const dateCheck = Date.parse(str);
   return !isNaN(dateCheck);
 };
-export const NameObjectArrayFilterFn = (row: Row<any>, columnId: string, filterValue: any) => {
-  const data: any = row.getValue(columnId);
-  const _svrs = data.reduce((o: string, r: any) => (o += `|${r.name}`), "");
-  return _svrs.toLowerCase().includes(filterValue.toLowerCase());
-};
 
-export const NumberFilter = ({ column }: { column: Column<any, any> }) => {
+export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
   const columnFilterValue = column.getFilterValue();
   const fromToNumber = columnFilterValue as [string, string];
 
@@ -111,7 +106,7 @@ export const NumberFilter = ({ column }: { column: Column<any, any> }) => {
   );
 };
 
-export const BoolFilter = ({ column }: { column: Column<any, any> }) => {
+export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
   const passFail = column.getFilterValue();
 
   const popoverBool = (
@@ -194,7 +189,7 @@ export const BoolFilter = ({ column }: { column: Column<any, any> }) => {
   );
 };
 
-export const TextFilter = ({ column }: { column: Column<any, any> }) => {
+export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
   return (
     <form
       onReset={() => {
@@ -244,14 +239,14 @@ export const TextFilter = ({ column }: { column: Column<any, any> }) => {
 // function setSearchItems(allItems: any) {
 //   return allItems;
 // }
-export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
+export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
   const sortedUniqueValues = Array.from(column.getFacetedUniqueValues().keys()).sort();
   const currentFilterValue = column.getFilterValue() as string;
   const isObjectorHTML =
     isHTML(sortedUniqueValues?.[0]) || typeof sortedUniqueValues?.[0] === "object";
 
-  const selectOptions = sortedUniqueValues.reduce(
-    (previousValue: Array<any>, currentValue: any) => {
+  const selectOptions = (sortedUniqueValues as string[]).reduce(
+    (previousValue: { value: string; label: string }[], currentValue) => {
       if (typeof currentValue != "undefined") {
         if (!isObjectorHTML) {
           if (
@@ -277,7 +272,7 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
           <Dropdown.Menu className={Styles.dropDown}>
             <>
               {selectOptions.length > 0 ? (
-                selectOptions.map((item: any) => {
+                selectOptions.map((item) => {
                   if (item?.value) {
                     // const gaps = item?.value.split(" ").length;
                     // const cammelCase =
@@ -353,8 +348,14 @@ export const SelectFilter = ({ column }: { column: Column<any, any> }) => {
   );
 };
 
-export const Filter = ({ column, table }: { column: Column<any, any>; table: ReactTable<any> }) => {
-  const firstValue: any = table.getPreFilteredRowModel().flatRows[0]?.getValue(column.id);
+export const Filter = <TData,>({
+  column,
+  table,
+}: {
+  column: Column<TData, unknown>;
+  table: ReactTable<TData>;
+}) => {
+  const firstValue: unknown = table.getPreFilteredRowModel().flatRows[0]?.getValue(column.id);
   if (typeof firstValue === "number") {
     return <NumberFilter {...{ column }} />;
   } else if (typeof firstValue === "boolean") {
@@ -362,7 +363,7 @@ export const Filter = ({ column, table }: { column: Column<any, any>; table: Rea
   } else if (typeof firstValue === "object") {
     return <TextFilter {...{ column }} />;
   } else {
-    if (isDate(firstValue)) {
+    if (isDate(String(firstValue))) {
       // TODO maybe add a date range selecterer for now nothing.
       return <></>;
     } else {

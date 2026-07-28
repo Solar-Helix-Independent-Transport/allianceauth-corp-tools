@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { IconStatusDiv, statusProps } from "../../Components/Cards/IconStatusCard";
+import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
+import { statusProps } from "../../Components/Cards/IconStatusCard.helpers";
 import { loadGlanceAssetData } from "../../api/character";
 import { loadCorpGlanceAssetData } from "../../api/corporation";
 import Battlecruiser from "../../assets/battleCruiser_32.png";
@@ -21,9 +22,16 @@ import Titan from "../../assets/titan_32.png";
 import styles from "./AtAGlance.module.css";
 import Card from "react-bootstrap/Card";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
+import { components } from "../../api/CtApi";
 
-export const Assets = ({ data, isLoading }: any) => {
+export const Assets = ({
+  data,
+  isLoading,
+}: {
+  data?: components["schemas"]["GlanceAssets"];
+  isLoading: boolean;
+}) => {
   const { t } = useTranslation();
 
   return (

@@ -12,15 +12,26 @@ describe("CharacterPubDataPanels", () => {
     const data = {
       characters: [
         {
-          active: true,
-          character: { character_id: 1, character_name: "Test Character", corporation_id: 2 },
+          character: {
+            character_id: 1,
+            character_name: "Test Character",
+            corporation_id: 2,
+            corporation_name: "Test Corp",
+          },
           history: [
-            { start: "2020-01-01T00:00:00Z", corporation: { corporation_name: "Old Corp" } },
+            {
+              start: "2020-01-01T00:00:00Z",
+              corporation: { corporation_id: 5, corporation_name: "Old Corp" },
+            },
           ],
         },
         {
-          active: false,
-          character: { character_id: 3, character_name: "Other Character", corporation_id: 4 },
+          character: {
+            character_id: 3,
+            character_name: "Other Character",
+            corporation_id: 4,
+            corporation_name: "Other Corp",
+          },
           history: [],
         },
       ],
@@ -33,17 +44,16 @@ describe("CharacterPubDataPanels", () => {
     expect(screen.getByText("Old Corp")).toBeInTheDocument();
   });
 
-  it("borders inactive characters differently from active ones", () => {
+  it("always borders panels as 'warning' - CharacterHistory has no active field to vary on", () => {
     const data = {
       characters: [
         {
-          active: true,
-          character: { character_id: 1, character_name: "Active Guy", corporation_id: 2 },
-          history: [],
-        },
-        {
-          active: false,
-          character: { character_id: 3, character_name: "Inactive Guy", corporation_id: 4 },
+          character: {
+            character_id: 1,
+            character_name: "Some Guy",
+            corporation_id: 2,
+            corporation_name: "Some Corp",
+          },
           history: [],
         },
       ],
@@ -51,7 +61,7 @@ describe("CharacterPubDataPanels", () => {
 
     const { container } = render(<CharacterPubDataPanels isFetching={false} data={data} />);
 
-    expect(container.querySelector(".border-success")).toBeInTheDocument();
     expect(container.querySelector(".border-warning")).toBeInTheDocument();
+    expect(container.querySelector(".border-success")).not.toBeInTheDocument();
   });
 });

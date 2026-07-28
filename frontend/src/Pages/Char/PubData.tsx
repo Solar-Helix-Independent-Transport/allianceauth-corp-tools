@@ -1,7 +1,7 @@
 import CharacterPubDataPanels from "../../Components/Character/CharacterPubDataPanels";
 import { loadPubData } from "../../api/character";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 const CharacterPubData = () => {
   const { characterID } = useParams();

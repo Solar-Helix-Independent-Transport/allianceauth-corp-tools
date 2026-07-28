@@ -7,8 +7,17 @@ import { loadStarbaseFit } from "../../api/corporation";
 import { TypeIcon } from "../EveImages/EveImages";
 import styles from "../../Pages/Glance/AtAGlance.module.css";
 import StarbaseModalFuelTable from "./StarbaseModalFuelTable";
+import { Starbase } from "./StarbaseTypes";
 
-function StarbaseModal({ starbase, showModal, setShowModal }: any) {
+function StarbaseModal({
+  starbase,
+  showModal,
+  setShowModal,
+}: {
+  starbase: Starbase;
+  showModal: boolean;
+  setShowModal: (show: boolean) => void;
+}) {
   const { t } = useTranslation();
   const { data, isFetching } = useQuery({
     queryKey: ["starbase", starbase.starbase_id],

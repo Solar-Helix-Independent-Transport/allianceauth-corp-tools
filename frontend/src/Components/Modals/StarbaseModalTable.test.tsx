@@ -1,9 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 import StarbaseModalTable from "./StarbaseModalTable";
+import { StarbaseSpaceItem } from "./StarbaseTypes";
 
-const renderTable = (data: unknown[], isFetching = false, header?: string) =>
+const renderTable = (data: StarbaseSpaceItem[], isFetching = false, header?: string) =>
   render(
     <MemoryRouter>
       <StarbaseModalTable data={data} header={header} isFetching={isFetching} />

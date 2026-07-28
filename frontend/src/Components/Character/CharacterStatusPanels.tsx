@@ -3,15 +3,24 @@ import React from "react";
 import { Badge, Button, ButtonGroup, Card, Modal, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import TimeAgo from "react-timeago";
+import { components } from "../../api/CtApi";
 
-const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
+const CharacterStatusPanels = ({
+  data,
+  isFetching,
+}: {
+  data: { characters: components["schemas"]["CharacterStatus"][]; headers: string[] };
+  isFetching: boolean;
+}) => {
   const { t } = useTranslation();
 
   const [openModal, setOpenModal] = React.useState(false);
-  const [modalData, setModalData] = React.useState(null as any);
+  const [modalData, setModalData] = React.useState<components["schemas"]["CharacterStatus"] | null>(
+    null,
+  );
   return (
     <div className="d-flex justify-content-around align-items-center flex-row flex-wrap">
-      {data?.characters.map((char: any) => {
+      {data?.characters.map((char) => {
         const char_status = char.active ? "success" : "warning";
         return (
           <PortraitCard
@@ -177,14 +186,14 @@ const CharacterStatusPanels = ({ data, isFetching }: { data: any; isFetching: bo
                   </tr>
                 </thead>
                 <tbody>
-                  {data?.headers.map((h: any) => {
+                  {data?.headers.map((h) => {
                     return (
                       <tr key={h}>
                         <td>{h}</td>
                         <td className="text-end">
                           {modalData?.last_updates ? (
                             modalData?.last_updates[h] ? (
-                              <TimeAgo date={modalData?.last_updates[h]} />
+                              <TimeAgo date={modalData?.last_updates[h] as string} />
                             ) : (
                               t("Never")
                             )

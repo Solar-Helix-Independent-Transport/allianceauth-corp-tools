@@ -1,9 +1,6 @@
 import { useTranslation } from "react-i18next";
-import {
-  IconStatusDiv,
-  statusProps,
-  COMPACT_NUM_FORMAT,
-} from "../../Components/Cards/IconStatusCard";
+import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
+import { statusProps, COMPACT_NUM_FORMAT } from "../../Components/Cards/IconStatusCard.helpers";
 import { loadGlanceActivityData } from "../../api/character";
 import {
   loadCorpGlanceActivityDataEco,
@@ -24,13 +21,18 @@ import Triglavian from "../../assets/triglavian_128.png";
 import styles from "./AtAGlance.module.css";
 import Card from "react-bootstrap/Card";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
+import { components } from "../../api/CtApi";
 
-const fmtISKPlus = (v: any) => `+${Number(v).toLocaleString("en-US", COMPACT_NUM_FORMAT)} ISK`;
-const fmtISK = (v: any) => `${Number(v).toLocaleString("en-US", COMPACT_NUM_FORMAT)} ISK`;
-const fmtM3 = (v: any) => `${Number(v).toLocaleString("en-US", COMPACT_NUM_FORMAT)} m3`;
+const fmtISKPlus = (v: number | string) =>
+  `+${Number(v).toLocaleString("en-US", COMPACT_NUM_FORMAT)} ISK`;
+const fmtISK = (v: number | string) =>
+  `${Number(v).toLocaleString("en-US", COMPACT_NUM_FORMAT)} ISK`;
+const fmtM3 = (v: number | string) => `${Number(v).toLocaleString("en-US", COMPACT_NUM_FORMAT)} m3`;
 
-const ActivitiesPVE = ({ data, isLoading }: any) => {
+type GlanceActivityData = Partial<components["schemas"]["GlanceActivities"]>;
+
+const ActivitiesPVE = ({ data, isLoading }: { data?: GlanceActivityData; isLoading: boolean }) => {
   const { t } = useTranslation();
   return (
     <Card className="m-2">
@@ -63,7 +65,7 @@ const ActivitiesPVE = ({ data, isLoading }: any) => {
   );
 };
 
-const ActivitiesEco = ({ data, isLoading }: any) => {
+const ActivitiesEco = ({ data, isLoading }: { data?: GlanceActivityData; isLoading: boolean }) => {
   const { t } = useTranslation();
   return (
     <Card className="m-2">
@@ -93,7 +95,13 @@ const ActivitiesEco = ({ data, isLoading }: any) => {
   );
 };
 
-const ActivitiesMining = ({ data, isLoading }: any) => {
+const ActivitiesMining = ({
+  data,
+  isLoading,
+}: {
+  data?: GlanceActivityData;
+  isLoading: boolean;
+}) => {
   const { t } = useTranslation();
   return (
     <Card className="m-2">

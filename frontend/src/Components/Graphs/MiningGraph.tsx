@@ -2,6 +2,7 @@
 // yarn add @nivo/bar
 import { abbreviateNumber, getCSSVariable } from "./GraphHelpers";
 import { ResponsiveBarCanvas } from "@nivo/bar";
+import { MiningGraphDatum } from "./MiningGraphTypes";
 
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 and
@@ -9,20 +10,26 @@ import { ResponsiveBarCanvas } from "@nivo/bar";
 // website examples showcase many properties,
 // you'll often use just a few of them.
 
-function tickGen(a: any, n: any) {
+function tickGen<T>(a: T[], n: number): T[] {
   // pick n elements from a, distibuted evenly
   if (a.length <= n) {
     return a;
   }
-  var p = Math.round(a.length / n);
+  const p = Math.round(a.length / n);
 
-  return a.slice(Math.round(p / 2), p * n + Math.round(p / 2)).filter(function (_: any, i: any) {
-    return 0 === i % p;
-  });
+  return a.slice(Math.round(p / 2), p * n + Math.round(p / 2)).filter((_, i) => 0 === i % p);
 }
 
-export const MiningGraph = ({ data, keys, dataType = "Volume" }: any) => {
-  const ticks = tickGen(data, 10).map((e: any) => {
+export const MiningGraph = ({
+  data,
+  keys,
+  dataType = "Volume",
+}: {
+  data: MiningGraphDatum[];
+  keys: string[];
+  dataType?: string;
+}) => {
+  const ticks = tickGen(data, 10).map((e) => {
     return e.id;
   });
   const bg = getCSSVariable("--bs-body-bg");
@@ -38,12 +45,9 @@ export const MiningGraph = ({ data, keys, dataType = "Volume" }: any) => {
       margin={{ top: 10, right: 0, bottom: 50, left: 80 }}
       pixelRatio={2}
       innerPadding={0}
-      minValue="auto"
-      maxValue="auto"
       groupMode="stacked"
       layout="vertical"
-      reverse={false}
-      valueScale={{ type: "linear" }}
+      valueScale={{ type: "linear", min: "auto", max: "auto", reverse: false }}
       indexScale={{ type: "band", round: true }}
       colors={{ scheme: "spectral" }}
       colorBy="id"

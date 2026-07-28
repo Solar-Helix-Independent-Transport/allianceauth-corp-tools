@@ -4,10 +4,12 @@ import { describe, expect, it, vi } from "vitest";
 import type { BaseTableProps } from "./BaseTable";
 import AsyncTableWrapper from "./AsyncTableWrapper";
 
-let lastProps: BaseTableProps | null = null;
+type Row = { a: number };
+
+let lastProps: BaseTableProps<Row> | null = null;
 
 vi.mock("./BaseTable", () => ({
-  default: (props: BaseTableProps) => {
+  default: (props: BaseTableProps<Row>) => {
     lastProps = props;
     return <div data-testid="base-table" />;
   },
@@ -15,7 +17,7 @@ vi.mock("./BaseTable", () => ({
 
 const columns = [{ accessorKey: "a", header: "A" }];
 
-const renderWrapper = (queryFn: () => Promise<unknown>) => {
+const renderWrapper = (queryFn: () => Promise<Row[]>) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={queryClient}>
@@ -26,7 +28,7 @@ const renderWrapper = (queryFn: () => Promise<unknown>) => {
 
 describe("AsyncTableWrapper", () => {
   it("passes isFetching=true and no data to BaseTable while the query is in flight", async () => {
-    renderWrapper(() => new Promise(() => {}));
+    renderWrapper(() => new Promise<Row[]>(() => {}));
 
     await screen.findByTestId("base-table");
     expect(lastProps?.isFetching).toBe(true);

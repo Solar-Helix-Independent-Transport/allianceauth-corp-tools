@@ -1,29 +1,35 @@
-import Select from "react-select";
+import Select, { StylesConfig } from "react-select";
+import { bootstrapSelectStyles } from "./reactSelectTheme";
+
+export interface SelectFilterOption<T> {
+  value: T;
+  label: string;
+}
 
 const colourStyles = {
-  option: (styles: any) => {
-    return {
-      ...styles,
-      color: "black",
-    };
-  },
-  container: (base: any) => ({ ...base, zIndex: 0 }),
-  menu: (base: any) => ({ ...base, zIndex: 9999 }),
-  menuList: (base: any) => ({ ...base, zIndex: 9999 }),
-  menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
-};
+  ...bootstrapSelectStyles,
+  container: (base) => ({ ...base, zIndex: 0 }),
+} as StylesConfig<SelectFilterOption<unknown>>;
 
-export const SelectFilter = ({ setFilter, options, labelText }: any) => {
+export const SelectFilter = <T,>({
+  setFilter,
+  options,
+  labelText,
+}: {
+  setFilter: (value: T) => void;
+  options: SelectFilterOption<T>[];
+  labelText: string;
+}) => {
   return (
     <div className="flex-grow-1 flex-even d-flex text-nowrap">
       <div className="my-auto mx-2">
         <h6>{labelText}</h6>
       </div>
-      <Select
+      <Select<SelectFilterOption<T>, false>
         className="m-1 flex-grow-1"
-        styles={colourStyles}
+        styles={colourStyles as StylesConfig<SelectFilterOption<T>>}
         options={options}
-        onChange={(e) => setFilter(e.value)}
+        onChange={(e) => e && setFilter(e.value)}
         defaultValue={options[0]}
         menuPortalTarget={document.body}
         menuPosition="fixed"

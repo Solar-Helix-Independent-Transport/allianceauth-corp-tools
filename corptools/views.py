@@ -12,7 +12,7 @@ from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 # Django
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import redirect, render
@@ -196,7 +196,7 @@ def add_corp_section(request, *args, **kwargs):
 
 
 @login_required
-@permission_required('corptools.admin')
+@user_passes_test(lambda u: u.is_superuser)
 def admin(request):
     # Django
     from django.apps import apps
@@ -244,7 +244,7 @@ def admin(request):
 
 
 @login_required
-@permission_required('corptools.admin')
+@user_passes_test(lambda u: u.is_superuser)
 def admin_run_tasks(request):
     if request.method == 'POST':
         if request.POST.get('run_update_all'):
@@ -284,7 +284,7 @@ def admin_run_tasks(request):
 
 
 @login_required
-@permission_required('corptools.admin')
+@user_passes_test(lambda u: u.is_superuser)
 def admin_create_tasks(request):
 
     schedule_a = CrontabSchedule.from_schedule(
@@ -335,7 +335,7 @@ def admin_create_tasks(request):
 
 
 @login_required
-@permission_required('corptools.admin')
+@user_passes_test(lambda u: u.is_superuser)
 def admin_add_pyfa_xml(request):
     if request.method == 'POST':
         form = UploadForm(request.POST, request.FILES)
@@ -377,7 +377,7 @@ def admin_add_pyfa_xml(request):
 
 
 @login_required
-@permission_required('corptools.admin')
+@user_passes_test(lambda u: u.is_superuser)
 def admin_add_fitting(request):
     if request.method != 'POST':
         messages.error(request, "Invalid request method.")
@@ -458,7 +458,7 @@ def admin_add_fitting(request):
 
 
 @login_required
-@permission_required('corptools.admin')
+@user_passes_test(lambda u: u.is_superuser)
 def skill_list_editor(request):
     pass
 
@@ -537,7 +537,7 @@ def _get_char_update_ts_columns():
 
 
 @method_decorator(login_required, name='dispatch')
-@method_decorator(permission_required('corptools.admin'), name='dispatch')
+@method_decorator(user_passes_test(lambda u: u.is_superuser), name='dispatch')
 class CharacterUpdateDashData(DataTablesView):
     model = CharacterAudit
 
@@ -581,7 +581,7 @@ class CharacterUpdateDashData(DataTablesView):
 
 
 @login_required
-@permission_required('corptools.admin')
+@user_passes_test(lambda u: u.is_superuser)
 def character_update_dashboard(request):
     headers = [display for _, display in _get_char_update_ts_columns()]
     return render(request, 'corptools/dashboards/character_updates_dash.html', {'headers': headers})
@@ -593,6 +593,7 @@ def fuel_levels(request):
             or request.user.has_perm('corptools.alliance_corp_manager')
             or request.user.has_perm('corptools.state_corp_manager')
             or request.user.has_perm('corptools.global_corp_manager')
+            or request.user.has_perm('corptools.show_if_director')
             or request.user.has_perm('corptools.holding_corp_structures')):
         raise PermissionDenied("No perms to view")
 
@@ -741,6 +742,7 @@ def metenox_levels(request):
             or request.user.has_perm('corptools.alliance_corp_manager')
             or request.user.has_perm('corptools.state_corp_manager')
             or request.user.has_perm('corptools.global_corp_manager')
+            or request.user.has_perm('corptools.show_if_director')
             or request.user.has_perm('corptools.holding_corp_structures')):
         raise PermissionDenied("No perms to view")
 

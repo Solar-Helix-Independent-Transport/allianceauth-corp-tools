@@ -3,10 +3,12 @@ import { describe, expect, it, vi } from "vitest";
 import type { BaseTableProps } from "./BaseTable";
 import TableWrapper from "./TableWrapper";
 
-let lastProps: BaseTableProps | null = null;
+type Row = { a: number };
+
+let lastProps: BaseTableProps<Row> | null = null;
 
 vi.mock("../../Tables/BaseTable/BaseTable", () => ({
-  default: (props: BaseTableProps) => {
+  default: (props: BaseTableProps<Row>) => {
     lastProps = props;
     return <div data-testid="base-table" />;
   },

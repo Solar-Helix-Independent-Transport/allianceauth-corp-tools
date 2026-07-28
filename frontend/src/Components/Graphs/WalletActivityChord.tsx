@@ -1,14 +1,19 @@
 import { ResponsiveChord } from "@nivo/chord";
 import { getCSSVariable } from "./GraphHelpers";
-import { COMPACT_NUM_FORMAT } from "../Cards/IconStatusCard";
+import { COMPACT_NUM_FORMAT } from "../Cards/IconStatusCard.helpers";
+import { components } from "../../api/CtApi";
 
 const MAX_ENTITIES = 12;
 
-function buildChordData(rows: any[]) {
+type WalletActivityRow = components["schemas"]["WalletActivityEntry"];
+
+function buildChordData(rows: WalletActivityRow[]) {
   const totals: Record<string, number> = {};
   rows.forEach((row) => {
-    totals[row.fpn] = (totals[row.fpn] || 0) + Math.abs(row.value);
-    totals[row.spn] = (totals[row.spn] || 0) + Math.abs(row.value);
+    const fpn = row.fpn ?? "";
+    const spn = row.spn ?? "";
+    totals[fpn] = (totals[fpn] || 0) + Math.abs(row.value);
+    totals[spn] = (totals[spn] || 0) + Math.abs(row.value);
   });
 
   const keys = Object.entries(totals)
@@ -20,8 +25,8 @@ function buildChordData(rows: any[]) {
   const data = keys.map(() => keys.map(() => 0));
 
   rows.forEach((row) => {
-    const fi = idx[row.fpn];
-    const si = idx[row.spn];
+    const fi = idx[row.fpn ?? ""];
+    const si = idx[row.spn ?? ""];
     if (fi !== undefined && si !== undefined && fi !== si) {
       data[fi][si] += Math.abs(row.value);
     }
@@ -30,7 +35,7 @@ function buildChordData(rows: any[]) {
   return { keys, data };
 }
 
-const WalletActivityChord = ({ data: rows }: { data: any[] }) => {
+const WalletActivityChord = ({ data: rows }: { data: WalletActivityRow[] }) => {
   const bg = getCSSVariable("--bs-body-bg");
   const txt = getCSSVariable("--bs-body-color");
   const bdr = getCSSVariable("--bs-light-border-subtle");

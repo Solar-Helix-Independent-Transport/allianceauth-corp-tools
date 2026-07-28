@@ -1,15 +1,12 @@
-import { useTranslation } from "react-i18next";
 import { LoadAgregatedMining } from "../../api/corporation";
 import { useQuery } from "@tanstack/react-query";
 import LedgerGraph from "../../Components/Graphs/LedgerGraph";
 import { PanelLoader } from "../../Components/Loaders/loaders";
-import { useQueryState } from "nuqs";
-import CorpSelect from "../../Components/Corporation/CorporationSelect";
+import CorporationFilterBar from "../../Components/Corporation/CorporationFilterBar";
+import { useCorporationId } from "../../Components/Corporation/useCorporationId";
 
 const CorporationMiningLedger = () => {
-  const { t } = useTranslation();
-  const [cidStr] = useQueryState("cid");
-  const corporationID = Number(cidStr) || 0;
+  const corporationID = useCorporationId();
 
   const { data } = useQuery({
     queryKey: ["mining-ledger-corp", corporationID],
@@ -19,12 +16,7 @@ const CorporationMiningLedger = () => {
 
   return (
     <>
-      <div className="m-3 d-flex align-items-center my-1">
-        <h6 className="me-1">{t("Corporation Filter")}</h6>
-        <div className="flex-grow-1">
-          <CorpSelect />
-        </div>
-      </div>
+      <CorporationFilterBar />
 
       {data ? <LedgerGraph {...{ data }} /> : <PanelLoader />}
     </>

@@ -4,6 +4,10 @@ HTTP-level permission enforcement tests.
 Classes:
   TestCharacterApiHttpPermissions  — character API (resolve_character path)
   TestCorpApiHttpPermissions       — corporation API (corp-manager perm check)
+  TestCorpMiningLedgerPermissions  — corp mining ledger (corp-manager perms
+                                     plus holding_corp_wallets)
+  TestCorporationMenuPermissions   — corp/menu reflects the caller's actual
+                                     per-domain access rather than a fixed list
   TestWalletActivityPermissions    — character wallet/activity (needs BOTH
                                      corp-manager AND character access)
   TestViewPermissions              — Django views with @permission_required /
@@ -144,6 +148,194 @@ class TestCorpApiHttpPermissions(CorptoolsTestCase):
 
 
 # ---------------------------------------------------------------------------
+# mining ledger — same corp-manager gate as its siblings, plus
+# holding_corp_wallets (it reports ISK value, so it's grouped with the
+# wallet-tier holding perm rather than holding_corp_structures/assets)
+# ---------------------------------------------------------------------------
+
+class TestCorpMiningLedgerPermissions(CorptoolsTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.holding_wallets = Permission.objects.get_by_natural_key(
+            'holding_corp_wallets', 'corptools', 'corptoolsconfiguration')
+        self._url = f"/audit/api/corporation/{self.corp1.corporation_id}/mining"
+
+    def test_no_perms_returns_403(self):
+        self.client.force_login(self.user1)
+        resp = self.client.get(self._url)
+        self.assertEqual(resp.status_code, 403)
+
+    def test_own_corp_manager_returns_200(self):
+        self.user1.user_permissions.add(self.own_corp_manager)
+        self.client.force_login(self.user1)
+        resp = self.client.get(self._url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_holding_corp_wallets_returns_200(self):
+        self.user1.user_permissions.add(self.holding_wallets)
+        self.client.force_login(self.user1)
+        resp = self.client.get(self._url)
+        self.assertEqual(resp.status_code, 200)
+
+
+# ---------------------------------------------------------------------------
+# corp/menu — reflects the caller's actual per-domain access
+# ---------------------------------------------------------------------------
+
+class TestCorporationMenuPermissions(CorptoolsTestCase):
+
+    _MENU_URL = "/audit/api/corp/menu"
+
+    @staticmethod
+    def _names(menu):
+        # top-level entries and every nested link name, flattened
+        out = set()
+        for cat in menu:
+            out.add(cat["name"])
+            for link in cat.get("links") or []:
+                out.add(link["name"])
+        return out
+
+    def test_no_perms_returns_no_categories(self):
+        self.client.force_login(self.user1)
+        resp = self.client.get(self._MENU_URL)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), [])
+
+    def test_own_corp_manager_sees_everything(self):
+        self.user1.user_permissions.add(self.own_corp_manager)
+        self.client.force_login(self.user1)
+        resp = self.client.get(self._MENU_URL)
+        names = self._names(resp.json())
+        for expected in (
+            "Overview", "Structures", "Pocos", "Starbases",
+            "Sovereignty Hubs", "Sovereignty Map", "Wallets",
+            "Assets", "Asset Overview", "Asset List", "Dashboards",
+            "Fuel", "Metenox", "Bridges", "Character Mining Ledger",
+            "Activity Map",
+        ):
+            self.assertIn(expected, names)
+
+    def test_holding_corp_wallets_only_sees_wallets_and_mining_not_structures_or_assets(self):
+        holding_wallets = Permission.objects.get_by_natural_key(
+            'holding_corp_wallets', 'corptools', 'corptoolsconfiguration')
+        self.user1.user_permissions.add(holding_wallets)
+        self.client.force_login(self.user1)
+        resp = self.client.get(self._MENU_URL)
+        names = self._names(resp.json())
+
+        self.assertIn("Wallets", names)
+        self.assertIn("Character Mining Ledger", names)
+        self.assertIn("Activity Map", names)
+        # Dashboards still shows since Mining Ledger/Activity Map live in it.
+        self.assertIn("Dashboards", names)
+
+        self.assertNotIn("Overview", names)
+        self.assertNotIn("Structures", names)
+        self.assertNotIn("Assets", names)
+        self.assertNotIn("Fuel", names)
+        self.assertNotIn("Bridges", names)
+
+    def test_holding_corp_structures_only_sees_structures_dashboards_not_wallets_or_assets(self):
+        holding_structures = Permission.objects.get_by_natural_key(
+            'holding_corp_structures', 'corptools', 'corptoolsconfiguration')
+        self.user1.user_permissions.add(holding_structures)
+        self.client.force_login(self.user1)
+        resp = self.client.get(self._MENU_URL)
+        names = self._names(resp.json())
+
+        self.assertIn("Overview", names)
+        self.assertIn("Structures", names)
+        self.assertIn("Dashboards", names)
+        self.assertIn("Fuel", names)
+        self.assertIn("Bridges", names)
+        self.assertIn("Activity Map", names)
+
+        self.assertNotIn("Wallets", names)
+        self.assertNotIn("Character Mining Ledger", names)
+        self.assertNotIn("Assets", names)
+
+
+# ---------------------------------------------------------------------------
+# show_if_director — was wired into visible_to() and the nav menus, but every
+# individual corp/* endpoint's own hand-rolled perm gate omitted it. Fixed
+# across structures.py, finances.py, assets.py, dashboards.py, mining.py,
+# activity_map.py, sovereignty.py, character/finances.py, and views.py.
+# ---------------------------------------------------------------------------
+
+class TestShowIfDirectorAcrossEndpoints(CorptoolsTestCase):
+    """
+    user3 owns char7 (corp4) and char7 is flagged as a director there
+    (see CorptoolsTestCase.setUp). show_if_director alone should now be
+    enough to pass every one of these gates.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user3.user_permissions.add(self.director_manager)
+        self.client.force_login(self.user3)
+
+    def test_structures(self):
+        resp = self.client.get("/audit/api/corp/structures")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_pocos(self):
+        resp = self.client.get("/audit/api/corp/pocos")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_starbases(self):
+        resp = self.client.get("/audit/api/corp/starbases")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_wallettypes(self):
+        resp = self.client.get("/audit/api/corporation/wallettypes")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_wallet(self):
+        resp = self.client.get(
+            f"/audit/api/corporation/{self.corp4.corporation_id}/wallet")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_asset_locations(self):
+        resp = self.client.get(
+            f"/audit/api/corporation/{self.corp4.corporation_id}/asset/locations")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_mining(self):
+        resp = self.client.get(
+            f"/audit/api/corporation/{self.corp4.corporation_id}/mining")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_sovhubs(self):
+        resp = self.client.get("/audit/api/corp/sovhubs")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_dashboard_gates(self):
+        resp = self.client.get("/audit/api/dashboard/gates")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_dashboard_dens(self):
+        resp = self.client.get("/audit/api/dashboard/dens")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_activity_map_assets(self):
+        resp = self.client.get(
+            f"/audit/api/corporation/{self.corp4.corporation_id}/activitymap/assets")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_character_wallet_activity(self):
+        # Requires BOTH the corp-tier check (now satisfied by
+        # show_if_director) AND resolve_character's own-character check.
+        view_module = Permission.objects.get_by_natural_key(
+            'view_characteraudit', 'corptools', 'characteraudit')
+        self.user3.user_permissions.add(view_module)
+        resp = self.client.get(
+            f"/audit/api/account/{self.char7.character_id}/wallet/activity")
+        self.assertEqual(resp.status_code, 200)
+
+
+# ---------------------------------------------------------------------------
 # wallet/activity — requires BOTH corp-manager AND character access
 # ---------------------------------------------------------------------------
 
@@ -188,30 +380,32 @@ class TestWalletActivityPermissions(CorptoolsTestCase):
 
 
 # ---------------------------------------------------------------------------
-# Django views — @permission_required and inline PermissionDenied
+# Django views — @user_passes_test(is_superuser) and inline PermissionDenied
 # ---------------------------------------------------------------------------
 
 class TestViewPermissions(CorptoolsTestCase):
     """
     Verifies the two enforcement mechanisms used in views.py:
 
-    1. @permission_required('corptools.admin') — redirects (302) when the
-       requesting user lacks the permission.
+    1. @user_passes_test(lambda u: u.is_superuser) — redirects (302) when
+       the requesting user isn't a superuser. Previously this was
+       @permission_required('corptools.admin'), but that permission was
+       never defined anywhere, so it was a de facto (accidental)
+       superuser-only gate; this makes the actual, intended check explicit.
 
     2. Inline ``raise PermissionDenied`` in fuel_levels() / metenox_levels()
        — returns 403 when no corp-manager perm is present.
     """
 
     # ------------------------------------------------------------------
-    # @permission_required('corptools.admin') views
+    # @user_passes_test(lambda u: u.is_superuser) views
     # ------------------------------------------------------------------
 
     def test_admin_view_unauthenticated_redirects(self):
         resp = self.client.get("/audit/admin/")
         self.assertEqual(resp.status_code, 302)
 
-    def test_admin_view_no_perm_redirects(self):
-        # The 'corptools.admin' perm is not granted to any user in tests.
+    def test_admin_view_non_superuser_redirects(self):
         self.client.force_login(self.user1)
         resp = self.client.get("/audit/admin/")
         self.assertEqual(resp.status_code, 302)
@@ -238,6 +432,12 @@ class TestViewPermissions(CorptoolsTestCase):
         resp = self.client.get("/audit/corp/dashboard/fuel")
         self.assertEqual(resp.status_code, 200)
 
+    def test_fuel_levels_show_if_director_returns_200(self):
+        self.user3.user_permissions.add(self.director_manager)
+        self.client.force_login(self.user3)
+        resp = self.client.get("/audit/corp/dashboard/fuel")
+        self.assertEqual(resp.status_code, 200)
+
     # ------------------------------------------------------------------
     # metenox_levels — inline PermissionDenied
     # ------------------------------------------------------------------
@@ -250,5 +450,11 @@ class TestViewPermissions(CorptoolsTestCase):
     def test_metenox_levels_own_corp_manager_returns_200(self):
         self.user1.user_permissions.add(self.own_corp_manager)
         self.client.force_login(self.user1)
+        resp = self.client.get("/audit/corp/dashboard/metenox")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_metenox_levels_show_if_director_returns_200(self):
+        self.user3.user_permissions.add(self.director_manager)
+        self.client.force_login(self.user3)
         resp = self.client.get("/audit/corp/dashboard/metenox")
         self.assertEqual(resp.status_code, 200)

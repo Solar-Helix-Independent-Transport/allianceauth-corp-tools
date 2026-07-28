@@ -182,3 +182,96 @@ class MenuApiEndpoints:
                 out.append(admin)
 
             return out
+
+        @api.get(
+            "corp/menu",
+            response=List[schema.MenuCategory],
+            tags=self.tags
+        )
+        def get_corporation_menu(request):
+            user = request.user
+
+            # Same manager-tier set every corp/* endpoint's permission gate
+            # checks (own/alliance/state/global_corp_manager, show_if_director
+            # via CorporationAudit.objects.visible_to()).
+            manager_tier = (
+                user.has_perm("corptools.own_corp_manager")
+                or user.has_perm("corptools.alliance_corp_manager")
+                or user.has_perm("corptools.state_corp_manager")
+                or user.has_perm("corptools.global_corp_manager")
+                or user.has_perm("corptools.show_if_director")
+            )
+            has_structures = manager_tier or user.has_perm(
+                "corptools.holding_corp_structures")
+            has_wallets = manager_tier or user.has_perm(
+                "corptools.holding_corp_wallets")
+            has_assets = manager_tier or user.has_perm(
+                "corptools.holding_corp_assets")
+            # Activity map aggregates structure/asset/wallet data, so any one
+            # of the three domain perms is enough to see it.
+            has_activity_map = has_structures or has_wallets or has_assets
+
+            _structures = {
+                "name": _("Structures"),
+                "links": []
+            }
+            if has_structures:
+                _structures["links"].append(
+                    {"name": _("Structures"), "link": "structures"})
+                _structures["links"].append(
+                    {"name": _("Pocos"), "link": "pocos"})
+                _structures["links"].append(
+                    {"name": _("Starbases"), "link": "starbases"})
+                _structures["links"].append(
+                    {"name": _("Sovereignty Hubs"), "link": "sovhubs"})
+                _structures["links"].append(
+                    {"name": _("Sovereignty Map"), "link": "sovmap"})
+
+            _assets = {
+                "name": _("Assets"),
+                "links": []
+            }
+            if has_assets:
+                _assets["links"].append(
+                    {"name": _("Asset Overview"), "link": "assetgroup"})
+                _assets["links"].append(
+                    {"name": _("Asset List"), "link": "assetlist"})
+
+            _dashboards = {
+                "name": _("Dashboards"),
+                "links": []
+            }
+            if has_structures:
+                _dashboards["links"].append(
+                    {"name": _("Fuel"), "link": "/audit/corp/dashboard/fuel"})
+                _dashboards["links"].append(
+                    {"name": _("Metenox"), "link": "/audit/corp/dashboard/metenox"})
+                _dashboards["links"].append(
+                    {"name": _("Bridges"), "link": "bridges"})
+            if has_wallets:
+                _dashboards["links"].append(
+                    {"name": _("Character Mining Ledger"), "link": "mining"})
+            if has_activity_map:
+                _dashboards["links"].append(
+                    {"name": _("Activity Map"), "link": "activitymap"})
+
+            out = []
+
+            # Mirrors at_a_glance.check_permisions: manager-tier or
+            # holding_corp_structures.
+            if manager_tier or user.has_perm("corptools.holding_corp_structures"):
+                out.append({"name": _("Overview"), "link": "glance"})
+
+            if len(_structures["links"]):
+                out.append(_structures)
+
+            if has_wallets:
+                out.append({"name": _("Wallets"), "link": "wallets"})
+
+            if len(_assets["links"]):
+                out.append(_assets)
+
+            if len(_dashboards["links"]):
+                out.append(_dashboards)
+
+            return out

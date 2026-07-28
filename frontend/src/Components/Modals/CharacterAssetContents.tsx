@@ -4,11 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { TypeIcon } from "../EveImages/EveImages";
 import React from "react";
 import { loadAssetContents } from "../../api/character";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import AssetContentsTable from "./AssetContentsTable";
+import { components } from "../../api/CtApi";
 // import { AssetFittingModal } from "./FittingModal";
 
-function CharacterAssetModal({ item }: any) {
+function CharacterAssetModal({ item }: { item: components["schemas"]["CharacterAssetItem"] }) {
   // type is asset from api
   const { t } = useTranslation();
   const { characterID } = useParams();

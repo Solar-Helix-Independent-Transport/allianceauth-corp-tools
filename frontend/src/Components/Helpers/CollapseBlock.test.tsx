@@ -21,6 +21,10 @@ describe("CollapseBlock", () => {
     // transition completes, which happens on a real timer even in jsdom.
     await waitFor(() => expect(container.querySelector(".collapse.show")).toBeInTheDocument());
     expect(screen.getByText("hidden content")).toBeInTheDocument();
+    // Collapse's transitionend fallback timer isn't cancelled by the real
+    // event firing, just left to fire (as a no-op) a few ms later - give it
+    // a moment so it doesn't fire after this file's jsdom is torn down.
+    await new Promise((resolve) => setTimeout(resolve, 20));
   });
 
   it("collapses again on a second click", async () => {
@@ -41,5 +45,6 @@ describe("CollapseBlock", () => {
     // its own fallback timer per transition, and leaving one in flight past
     // the end of the test leaks a timeout into whichever test runs next.
     await waitFor(() => expect(container.querySelector(".collapse.show")).not.toBeInTheDocument());
+    await new Promise((resolve) => setTimeout(resolve, 20));
   });
 });

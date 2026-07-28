@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Card, Form, Alert } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 const CharacterStatus = () => {
   const { t } = useTranslation();
@@ -21,7 +21,7 @@ const CharacterStatus = () => {
 
   const filteredData = {
     ...data,
-    characters: issuesOnly ? data.characters.filter((c: any) => !c.active) : data.characters,
+    characters: issuesOnly ? data.characters.filter((c) => !c.active) : data.characters,
   };
 
   return (

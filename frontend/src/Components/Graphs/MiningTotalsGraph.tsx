@@ -2,6 +2,7 @@
 // yarn add @nivo/bar
 import { abbreviateNumber, getCSSVariable } from "./GraphHelpers";
 import { ResponsiveBarCanvas } from "@nivo/bar";
+import { MiningTotalsDatum } from "./MiningGraphTypes";
 
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 and
@@ -9,7 +10,15 @@ import { ResponsiveBarCanvas } from "@nivo/bar";
 // website examples showcase many properties,
 // you'll often use just a few of them.
 
-export const MiningTotalsGraph = ({ data, ores, dataType }: any) => {
+export const MiningTotalsGraph = ({
+  data,
+  ores,
+  dataType,
+}: {
+  data: MiningTotalsDatum[];
+  ores: string[];
+  dataType: string;
+}) => {
   const bg = getCSSVariable("--bs-body-bg");
   const txt = getCSSVariable("--bs-body-color");
   const bdr = getCSSVariable("--bs-light-border-subtle");
@@ -23,12 +32,9 @@ export const MiningTotalsGraph = ({ data, ores, dataType }: any) => {
       margin={{ top: 10, right: 0, bottom: 50, left: 80 }}
       pixelRatio={2}
       innerPadding={0}
-      minValue="auto"
-      maxValue="auto"
       groupMode="stacked"
       layout="vertical"
-      reverse={false}
-      valueScale={{ type: "linear" }}
+      valueScale={{ type: "linear", min: "auto", max: "auto", reverse: false }}
       indexScale={{ type: "band", round: true }}
       colors={{ scheme: "spectral" }}
       colorBy="id"

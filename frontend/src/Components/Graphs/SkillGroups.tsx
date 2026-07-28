@@ -3,30 +3,32 @@ import { useQuery } from "@tanstack/react-query";
 import { getCharacterSkillGraph } from "../../api/character";
 import { getCSSVariable } from "./GraphHelpers";
 
+// getCharacterSkillGraph's OpenAPI schema is under-specified (loose
+// object), so the response is asserted to the shape this component
+// actually consumes:
+// { data: [{ group: "Gunnery", "Name 1": 500, ... }, ...], characters: ["Name 1", ...] }
+type SkillGraphResponse = {
+  data: Record<string, unknown>[];
+  characters: string[];
+};
+
 export const SkillsRadarGraph = ({ characterID }: { characterID: number }) => {
   const { isLoading, error, data } = useQuery({
     queryKey: ["skillgraph", characterID ? Number(characterID) : 0],
-    queryFn: () => getCharacterSkillGraph(characterID ? Number(characterID) : 0),
+    queryFn: () =>
+      getCharacterSkillGraph(
+        characterID ? Number(characterID) : 0,
+      ) as unknown as Promise<SkillGraphResponse>,
     refetchOnWindowFocus: false,
   });
   const bg = getCSSVariable("--bs-body-bg");
   const txt = getCSSVariable("--bs-body-color");
   const bdr = getCSSVariable("--bs-light-border-subtle");
 
-  // data looks like
-  // [
-  //   { group: "Gunnery", "Name 1": 500, "Name 2": 0, "Name 3": 1000000, ... },
-  //   { group: "Ship Control", "Name 1": 500000, "Name 2": 50000000, "Name 3": 1000000, ... },
-  //   ...
-  // ]
-  // Keys looks likt
-  // ["Name 1", "Name 2", "Name 3", ...]
-
   if (isLoading) return <div>Loading...</div>;
 
-  if (error) return <div>Error loading data</div>;
+  if (error || !data) return <div>Error loading data</div>;
 
-  // const data = data
   return (
     <ResponsiveRadar
       colors={{ scheme: "category10" }}

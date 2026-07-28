@@ -6,7 +6,7 @@ from math import ceil
 from typing import List
 
 # Third Party
-from eve_sde.models import TypeDogma
+from eve_sde.models import ItemType, TypeDogma
 from ninja import NinjaAPI
 
 # Django
@@ -14,8 +14,6 @@ from django.db.models import F
 from django.db.models.functions import Power, Sqrt
 from django.http import HttpResponse
 from django.utils import timezone
-
-from eve_sde.models import ItemType
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
@@ -44,6 +42,7 @@ class StructureApiEndpoints:
                 | request.user.has_perm('corptools.alliance_corp_manager')
                 | request.user.has_perm('corptools.state_corp_manager')
                 | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.show_if_director')
                 | request.user.has_perm('corptools.holding_corp_structures')
             )
 
@@ -92,6 +91,7 @@ class StructureApiEndpoints:
                     or request.user.has_perm('corptools.alliance_corp_manager')
                     or request.user.has_perm('corptools.state_corp_manager')
                     or request.user.has_perm('corptools.global_corp_manager')
+                    or request.user.has_perm('corptools.show_if_director')
                     or request.user.has_perm('corptools.holding_corp_structures')):
                 logging.error(
                     f"Permission Denied for {request.user} to view Fuel!")
@@ -239,7 +239,8 @@ class StructureApiEndpoints:
                             0
                         ),
                         "gas_90day": max(
-                            (current_metenox_gas_hourly * 90 * 24) - current_metenox_gas,
+                            (current_metenox_gas_hourly * 90 * 24) -
+                            current_metenox_gas,
                             0
                         ),
                     }
@@ -263,6 +264,7 @@ class StructureApiEndpoints:
                 | request.user.has_perm('corptools.alliance_corp_manager')
                 | request.user.has_perm('corptools.state_corp_manager')
                 | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.show_if_director')
                 | request.user.has_perm('corptools.holding_corp_structures')
             )
             structure = models.Structure.get_visible(request.user).filter(
@@ -340,6 +342,7 @@ class StructureApiEndpoints:
                 | request.user.has_perm('corptools.alliance_corp_manager')
                 | request.user.has_perm('corptools.state_corp_manager')
                 | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.show_if_director')
                 | request.user.has_perm('corptools.holding_corp_structures')
             )
 
@@ -414,6 +417,7 @@ class StructureApiEndpoints:
                 | request.user.has_perm('corptools.alliance_corp_manager')
                 | request.user.has_perm('corptools.state_corp_manager')
                 | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.show_if_director')
                 | request.user.has_perm('corptools.holding_corp_structures')
             )
 
@@ -489,6 +493,7 @@ class StructureApiEndpoints:
                 | request.user.has_perm('corptools.alliance_corp_manager')
                 | request.user.has_perm('corptools.state_corp_manager')
                 | request.user.has_perm('corptools.global_corp_manager')
+                | request.user.has_perm('corptools.show_if_director')
                 | request.user.has_perm('corptools.holding_corp_structures')
             )
 

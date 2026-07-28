@@ -2,7 +2,7 @@ import { CharHeader } from "../../Components/Character/CharacterHeader";
 import { CharMenuAsync } from "../../Components/CharacterMenu/CharacterMenuAsync";
 import { CharMenuRight } from "../../Components/CharacterMenu/CharacterMenuRight";
 import { Col } from "react-bootstrap";
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 import ErrorBoundary from "../../Components/Helpers/ErrorBoundary";
 
 const CharacterAudit = () => {

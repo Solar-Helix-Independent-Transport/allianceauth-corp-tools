@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
-import { loadStatus } from "../../api/corporation";
+import { CorpStatus, loadStatus } from "../../api/corporation";
 import { CorporationLogo } from "../../Components/EveImages/EveImages";
 import ReactTimeAgo from "react-time-ago";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -16,9 +16,9 @@ const CorporationStatus = () => {
     refetchOnWindowFocus: false,
   });
 
-  const columnHelper = createColumnHelper<any>();
+  const columnHelper = createColumnHelper<CorpStatus>();
 
-  let columns: ColumnDef<any, any>[] = [
+  let columns: ColumnDef<CorpStatus, unknown>[] = [
     columnHelper.accessor("corporation.corporation_name", {
       header: t("Corporation"),
       cell: (cell) => (
@@ -33,7 +33,7 @@ const CorporationStatus = () => {
     }),
   ];
 
-  const dataColumns = data?.headers?.map((ob: any) => {
+  const dataColumns = data?.headers?.map((ob) => {
     return columnHelper.accessor((row) => row.last_updates?.[ob]?.update ?? null, {
       id: `${ob}`,
       header: ob,

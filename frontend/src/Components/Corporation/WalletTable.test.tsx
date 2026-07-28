@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { loadWallet } from "../../api/corporation";
 import CorporationWalletTable from "./WalletTable";
@@ -13,11 +13,12 @@ describe("CorporationWalletTable", () => {
   it("fetches the wallet with the given corporationID/refTypes and renders it as a table", async () => {
     vi.mocked(loadWallet).mockResolvedValue([
       {
+        id: 1,
         date: "2024-01-01",
         ref_type: "bounty_prizes",
-        division: 1,
-        first_party: { name: "NPC" },
-        second_party: { name: "Test Character" },
+        division: "1",
+        first_party: { id: 1, name: "NPC" },
+        second_party: { id: 2, name: "Test Character" },
         amount: 1000000,
         balance: 5000000,
         reason: "",

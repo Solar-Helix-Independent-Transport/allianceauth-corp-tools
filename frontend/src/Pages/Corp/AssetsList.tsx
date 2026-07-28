@@ -2,30 +2,30 @@ import { useTranslation } from "react-i18next";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
-import { useQueryState } from "nuqs";
 import { useQuery } from "@tanstack/react-query";
 import CorporationAssetLocationSelect from "../../Components/Corporation/CorpAssetLocationSelect";
-import CorpSelect from "../../Components/Corporation/CorporationSelect";
+import CorporationFilterBar from "../../Components/Corporation/CorporationFilterBar";
+import { useCorporationId } from "../../Components/Corporation/useCorporationId";
 import { loadAssetList } from "../../api/corporation";
 import { CorpLoader, PanelLoader } from "../../Components/Loaders/loaders";
 import CorporationAssetModal from "../../Components/Modals/CorporationAssetContents";
 import { SecurityStatusBadge } from "../../Components/SecurityStatusBadge";
+import { components } from "../../api/CtApi";
 
 const CorporationAssets = () => {
   const { t } = useTranslation();
 
-  const [cidStr] = useQueryState("cid");
-  const corporationID = Number(cidStr) || 0;
+  const corporationID = useCorporationId();
   const [locationID, setLocation] = useState<number>(0);
 
   const { data, isFetching } = useQuery({
     queryKey: ["corpassetList", corporationID, locationID],
     queryFn: () => loadAssetList(Number(corporationID), locationID, true),
     refetchOnWindowFocus: false,
-    initialData: { characters: [], main: undefined, headers: [] },
+    initialData: [] as components["schemas"]["AssetItem"][],
   });
 
-  const columnHelper = createColumnHelper<any>();
+  const columnHelper = createColumnHelper<components["schemas"]["AssetItem"]>();
 
   const columns = [
     columnHelper.accessor("item.name", {
@@ -57,12 +57,7 @@ const CorporationAssets = () => {
 
   return (
     <>
-      <div className="m-3 d-flex align-items-center my-1">
-        <h6 className="me-1">{t("Corporation Filter")}</h6>
-        <div className="flex-grow-1">
-          <CorpSelect />
-        </div>
-      </div>
+      <CorporationFilterBar />
       <div className="m-3 d-flex align-items-center">
         <h6 className="me-1">{t("Location Filter")}</h6>
         <div className="flex-grow-1">

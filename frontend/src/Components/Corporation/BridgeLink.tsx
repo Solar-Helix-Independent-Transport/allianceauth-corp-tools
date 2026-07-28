@@ -1,7 +1,8 @@
 import styles from "./BridgeLink.module.css";
+import { BridgeGate } from "./BridgeTypes";
 import { Badge, OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 
-function MyTooltip({ message }: any) {
+function MyTooltip({ message }: { message: string }) {
   return (
     <Tooltip style={{ position: "fixed" }} id="tooltip">
       {message}
@@ -9,7 +10,7 @@ function MyTooltip({ message }: any) {
   );
 }
 
-export const BridgeLink = ({ start, end }: any) => {
+export const BridgeLink = ({ start, end }: { start: BridgeGate; end: BridgeGate }) => {
   return (
     <div className="bridge-div d-flex col-xs-12 my-3">
       {start.system_name ? (
@@ -52,7 +53,7 @@ export const BridgeLink = ({ start, end }: any) => {
             end.known && start.known
               ? end.active && start.active
                 ? true
-                : end.active || start.activefalse
+                : end.active
                   ? true
                   : false
               : true
@@ -61,7 +62,7 @@ export const BridgeLink = ({ start, end }: any) => {
             end.known && start.known
               ? end.active && start.active
                 ? "success"
-                : end.active || start.activefalse
+                : end.active
                   ? "warning"
                   : "danger"
               : "warning"

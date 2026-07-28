@@ -1,25 +1,21 @@
 import { loadAssetLocations } from "../../api/character";
 import { useQuery } from "@tanstack/react-query";
-import Select from "react-select";
+import Select, { StylesConfig } from "react-select";
+import { bootstrapSelectStyles } from "../Helpers/reactSelectTheme";
 
-const colourStyles = {
-  option: (styles: any) => {
-    return {
-      ...styles,
-      color: "black",
-    };
-  },
-  menu: (base: any) => ({ ...base, zIndex: 9999 }),
-  menuList: (base: any) => ({ ...base, zIndex: 9999 }),
-  menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
-};
+interface LocationOption {
+  value: number;
+  label: string;
+}
+
+const colourStyles = bootstrapSelectStyles as StylesConfig<LocationOption>;
 
 const CharacterAssetLocationSelect = ({
   characterID,
   setLocation,
 }: {
   characterID: number;
-  setLocation: any;
+  setLocation: (value: number) => void;
 }) => {
   const { isLoading, data } = useQuery({
     queryKey: ["asset_loc", characterID],
@@ -28,11 +24,11 @@ const CharacterAssetLocationSelect = ({
   });
 
   return (
-    <Select
+    <Select<LocationOption>
       isLoading={isLoading}
       styles={colourStyles}
       options={data}
-      onChange={(e: any) => setLocation(e.value)}
+      onChange={(e) => e && setLocation(e.value)}
     />
   );
 };

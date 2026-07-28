@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
-import AssetContentsTable from "./AssetContentsTable";
+import AssetContentsTable, { AssetContentItem } from "./AssetContentsTable";
 
-const renderTable = (data: unknown[], isFetching = false, header?: string) =>
+const renderTable = (data: AssetContentItem[], isFetching = false, header?: string) =>
   render(
     <MemoryRouter>
       <AssetContentsTable data={data} header={header} isFetching={isFetching} />
@@ -13,7 +13,14 @@ const renderTable = (data: unknown[], isFetching = false, header?: string) =>
 describe("AssetContentsTable", () => {
   it("renders the header and a row per item with a formatted quantity and its location", () => {
     renderTable(
-      [{ item: { id: 34, name: "Tritanium" }, quantity: 25000, location: { name: "Cargo Hold" } }],
+      [
+        {
+          id: 1,
+          item: { id: 34, name: "Tritanium" },
+          quantity: 25000,
+          location: { id: 60003760, name: "Cargo Hold" },
+        },
+      ],
       false,
       "Contents",
     );

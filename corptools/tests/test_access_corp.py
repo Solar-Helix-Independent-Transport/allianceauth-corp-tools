@@ -1,3 +1,6 @@
+# Alliance Auth
+from allianceauth.authentication.models import State
+
 from ..models import CorporationAudit
 from ..models.interactions import CharacterRoles
 from . import CorptoolsTestCase
@@ -181,3 +184,15 @@ class TestCorptoolsCorpAccessPerms(CorptoolsTestCase):
         self.assertNotIn(self.cp2, cs)
         self.assertNotIn(self.cp3, cs)
         self.assertIn(self.cp4, cs)
+
+    def test_state_perms_u1(self):
+        m = State.objects.get(name="Member")
+        m.member_characters.add(self.char1)
+        m.member_characters.add(self.char3)
+        self.user1.user_permissions.add(self.state_corp_manager)
+        self.user1.refresh_from_db()
+        cs = CorporationAudit.objects.visible_to(self.user1)
+        self.assertIn(self.cp1, cs)      # own char1 is a Member
+        self.assertIn(self.cp2, cs)      # char3 (user2) is a Member
+        self.assertNotIn(self.cp3, cs)
+        self.assertNotIn(self.cp4, cs)

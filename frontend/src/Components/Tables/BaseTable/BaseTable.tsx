@@ -1,7 +1,8 @@
-import { Fragment } from "react";
+import { Fragment, MouseEvent } from "react";
 import tableStyles from "./BaseTable.module.css";
 import Filter from "./BaseTableFilter";
 import {
+  Cell,
   ColumnDef,
   Header,
   HeaderGroup,
@@ -28,7 +29,7 @@ import {
   Table,
   Tooltip,
 } from "react-bootstrap";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 
 function MyTooltip(message: string) {
   return (
@@ -38,21 +39,21 @@ function MyTooltip(message: string) {
   );
 }
 
-const isNumber = (cell: any) => typeof cell.getValue() === "number";
+const isNumber = <TData,>(cell: Cell<TData, unknown>) => typeof cell.getValue() === "number";
 
-const exportToCSV = (table: ReactTable<any>, exportFileName: string) => {
+const exportToCSV = <TData,>(table: ReactTable<TData>, exportFileName: string) => {
   const { rows } = table.getFilteredRowModel();
 
-  const headerRows = table.getHeaderGroups().map((headerGroup: HeaderGroup<any>) =>
-    headerGroup.headers.map((header: Header<any, any>) => {
+  const headerRows = table.getHeaderGroups().map((headerGroup: HeaderGroup<TData>) =>
+    headerGroup.headers.map((header: Header<TData, unknown>) => {
       if (typeof header.column.columnDef.header === "function") {
-        return (header.column.columnDef as any).accessorKey;
+        return (header.column.columnDef as { accessorKey?: string }).accessorKey;
       }
       return header.column.columnDef.header;
     }),
   );
 
-  const csvData = rows.map((row: any) => row.getVisibleCells().map((cell: any) => cell.getValue()));
+  const csvData = rows.map((row) => row.getVisibleCells().map((cell) => cell.getValue()));
 
   const csv = stringify([...headerRows, ...csvData]);
   const blob = new Blob([csv], { type: "text/csv;charset=utf8;" });
@@ -66,18 +67,18 @@ const exportToCSV = (table: ReactTable<any>, exportFileName: string) => {
   document.body.removeChild(link);
 };
 
-export interface BaseTableProps {
+export interface BaseTableProps<TData> {
   isFetching?: boolean;
   debugTable?: boolean;
   striped?: boolean;
   hover?: boolean;
-  data?: any;
-  columns: ColumnDef<any, any>[];
+  data?: TData[];
+  columns: ColumnDef<TData, unknown>[];
   initialState?: InitialTableState;
   exportFileName?: string;
 }
 
-const BaseTable = ({
+const BaseTable = <TData,>({
   isFetching = false,
   debugTable = false,
   data = [],
@@ -86,9 +87,12 @@ const BaseTable = ({
   hover = false,
   initialState = undefined,
   exportFileName = undefined,
-}: BaseTableProps) => {
+}: BaseTableProps<TData>) => {
   const location = useLocation();
 
+  // TanStack Table's useReactTable() returns functions the compiler can't
+  // safely memoize; this is inherent to the library, not fixable here.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
@@ -115,10 +119,10 @@ const BaseTable = ({
     <>
       <Table {...{ striped, hover }}>
         <thead>
-          {table.getHeaderGroups().map((headerGroup: HeaderGroup<any>) => (
+          {table.getHeaderGroups().map((headerGroup: HeaderGroup<TData>) => (
             <Fragment key={headerGroup.id}>
               <tr>
-                {headerGroup.headers.map((header: Header<any, any>) => (
+                {headerGroup.headers.map((header: Header<TData, unknown>) => (
                   <th key={header.id} colSpan={header.colSpan}>
                     {header.isPlaceholder ? null : (
                       <div
@@ -257,8 +261,8 @@ const BaseTable = ({
                   id={`${_pageSize}`}
                   key={_pageSize}
                   eventKey={_pageSize}
-                  onClick={(eventKey: any) => {
-                    table.setPageSize(Number(eventKey.target.id));
+                  onClick={(event: MouseEvent<HTMLElement>) => {
+                    table.setPageSize(Number((event.target as HTMLElement).id));
                   }}
                 >
                   {_pageSize === 1000000 ? "Show All" : `Show ${_pageSize}`}

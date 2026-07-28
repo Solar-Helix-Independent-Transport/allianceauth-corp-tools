@@ -3,11 +3,11 @@ import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
 import { getCharacterContacts } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { Badge, Button, ButtonGroup, Card, Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 const CharacterContacts = () => {
   const { t } = useTranslation();
@@ -116,7 +116,7 @@ const CharacterContacts = () => {
     }),
   ];
 
-  const data_filtered = data?.filter((row: any) => {
+  const data_filtered = data?.filter((row) => {
     if (!showNPC) {
       return row.contact.id > 4000000;
     } else {
@@ -132,7 +132,7 @@ const CharacterContacts = () => {
             type="switch"
             id="custom-switch"
             label="Show NPC Contacts"
-            onChange={(event: any) => {
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
               setShowNPC(event.target.checked);
             }}
             defaultChecked={showNPC}

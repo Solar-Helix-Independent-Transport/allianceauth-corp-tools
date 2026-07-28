@@ -1,6 +1,5 @@
 import Nav from "react-bootstrap/Nav";
-import { useTranslation } from "react-i18next";
-import { MenuDropdown, MenuItem } from "./MenuParts";
+import { MenuDropdown, MenuItem } from "../Menu/MenuParts";
 
 export interface MenuItemProps {
   name: string;
@@ -13,102 +12,36 @@ export interface CategoryProps {
   link?: string;
 }
 
-const CorpMenu = () => {
-  const { t } = useTranslation();
+export interface CorpMenuProps extends Partial<HTMLElement> {
+  isLoading: boolean;
+  data: Array<CategoryProps | MenuItemProps>;
+  error: boolean;
+}
 
-  const menuLinks: Array<CategoryProps> = [
-    {
-      name: t("Overview"),
-      link: `glance`,
-    },
-    {
-      name: t("Structures"),
-      links: [
-        {
-          name: t("Structures"),
-          link: `structures`,
-        },
-        {
-          name: t("Pocos"),
-          link: `pocos`,
-        },
-        {
-          name: t("Starbases"),
-          link: `starbases`,
-        },
-        {
-          name: t("Sovereignty Hubs"),
-          link: `sovhubs`,
-        },
-        {
-          name: t("Sovereignty Map"),
-          link: `sovmap`,
-        },
-      ],
-    },
-    {
-      name: t("Wallets"),
-      link: `wallets`,
-    },
-    {
-      name: t("Assets"),
-      links: [
-        {
-          name: t("Asset Overview"),
-          link: `assetgroup`,
-        },
-        {
-          name: t("Asset List"),
-          link: `assetlist`,
-        },
-      ],
-    },
-    {
-      name: t("Dashboards"),
-      links: [
-        {
-          name: t("Fuel"),
-          link: `/audit/corp/dashboard/fuel`,
-        },
-        {
-          name: t("Metenox"),
-          link: `/audit/corp/dashboard/metenox`,
-        },
-        {
-          name: t("Bridges"),
-          link: `bridges`,
-        },
-        {
-          name: t("Character Mining Ledger"),
-          link: `mining`,
-        },
-        {
-          name: t("Activity Map"),
-          link: `activitymap`,
-        },
-      ],
-    },
-  ];
+const BASEURL = "/audit/r/corp/";
+const toPath = (link: string) => `${BASEURL}${link}`;
 
+const CorpMenu = ({ data }: CorpMenuProps) => {
   return (
     <>
-      {menuLinks.map((cat) => {
-        return cat.links ? (
-          <MenuDropdown {...{ cat }} />
-        ) : (
-          <>
-            {cat?.link?.startsWith("/") ? (
-              <Nav.Item as="li">
-                <Nav.Link id={cat.name} key={cat.name} href={cat.link}>
-                  <>{cat.name}</>
-                </Nav.Link>
-              </Nav.Item>
-            ) : (
-              <MenuItem link={cat} />
-            )}
-          </>
-        );
-      })}
+      {data &&
+        data.map((cat) => {
+          return "links" in cat && cat.links ? (
+            <MenuDropdown {...{ cat, toPath }} />
+          ) : (
+            <>
+              {cat?.link?.startsWith("/") ? (
+                <Nav.Item as="li">
+                  <Nav.Link id={cat.name} key={cat.name} href={cat.link}>
+                    <>{cat.name}</>
+                  </Nav.Link>
+                </Nav.Item>
+              ) : (
+                <MenuItem link={cat} {...{ toPath }} />
+              )}
+            </>
+          );
+        })}
     </>
   );
 };

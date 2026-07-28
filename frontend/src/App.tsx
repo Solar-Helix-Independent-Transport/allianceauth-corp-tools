@@ -29,8 +29,8 @@ import en from "javascript-time-ago/locale/en";
 import React from "react";
 import { Card } from "react-bootstrap";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import { NuqsAdapter } from "nuqs/adapters/react-router";
+import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router";
+import { NuqsAdapter } from "nuqs/adapters/react-router/v8";
 
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";

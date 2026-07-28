@@ -32,8 +32,8 @@ describe("BridgeLink", () => {
   });
 
   it("shows an 'Unknown' start gate and a question mark when the end system isn't known", () => {
-    const start = { system_name: "", known: false };
-    const end = { known: false };
+    const start = { system_name: "", known: false, active: false, ozone: 0, expires: 0 };
+    const end = { known: false, active: false, ozone: 0, expires: 0 };
 
     const { container } = render(<BridgeLink start={start} end={end} />);
 
@@ -50,7 +50,7 @@ describe("BridgeLink", () => {
       expires: 1,
       known: true,
     };
-    const end = { known: false };
+    const end = { known: false, active: false, ozone: 0, expires: 0 };
 
     const { container } = render(<BridgeLink start={start} end={end} />);
 

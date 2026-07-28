@@ -1,18 +1,17 @@
 import { useState } from "react";
-import { useQueryState } from "nuqs";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { AssetGroups } from "../../Components/AssetGroups";
 import CorporationAssetLocationSelect from "../../Components/Corporation/CorpAssetLocationSelect";
 import { CorpLoader, PanelLoader } from "../../Components/Loaders/loaders";
-import CorpSelect from "../../Components/Corporation/CorporationSelect";
+import CorporationFilterBar from "../../Components/Corporation/CorporationFilterBar";
+import { useCorporationId } from "../../Components/Corporation/useCorporationId";
 import { loadAssetGroups } from "../../api/corporation";
 
 const CorporationAssetGroups = () => {
   const { t } = useTranslation();
 
-  const [cidStr] = useQueryState("cid");
-  const corporationID = Number(cidStr) || 0;
+  const corporationID = useCorporationId();
   const [locationID, setLocation] = useState<number>(0);
 
   const { data, isFetching } = useQuery({
@@ -23,12 +22,7 @@ const CorporationAssetGroups = () => {
 
   return (
     <>
-      <div className="m-3 d-flex align-items-center">
-        <h6 className="me-1">{t("Corporation Filter")}</h6>
-        <div className="flex-grow-1">
-          <CorpSelect />
-        </div>
-      </div>
+      <CorporationFilterBar />
       <div className="m-3 d-flex align-items-center">
         <h6 className="me-1">{t("Location Filter")}</h6>
         <div className="flex-grow-1">

@@ -53,6 +53,11 @@ export const buildActivityNodes = (
       selectable: true,
       initialWidth: radius * 2,
       initialHeight: radius * 2,
+      // Inverse of radius, so the biggest dots (which would otherwise
+      // blanket smaller ones sharing a system) paint at the back and small
+      // dots stay clickable on top. xyflow's z-index model (via node.zIndex,
+      // see @xyflow/system's calculateZ) accepts negatives fine.
+      zIndex: -radius,
       data: {
         system: s,
         color,

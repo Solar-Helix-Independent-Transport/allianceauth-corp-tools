@@ -5,7 +5,7 @@ import { components } from "../../api/CtApi";
 import { getCharacterNotifications } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 const CharacterNotifications = () => {
   const { t } = useTranslation();

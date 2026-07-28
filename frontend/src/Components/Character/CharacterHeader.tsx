@@ -12,9 +12,10 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
+import { useEffect } from "react";
 
-function MyTooltip({ message }: { message: String }) {
+function MyTooltip({ message }: { message: string }) {
   return (
     <Tooltip id="character_tooltip" style={{ position: "fixed" }}>
       {message}
@@ -36,13 +37,15 @@ const CharHeader = () => {
     refetchOnWindowFocus: false,
   });
 
-  const bad_chars = data?.characters
-    ?.filter((char: any) => !char.active)
-    .map((char: any) => char.character.character_name);
+  const bad_chars =
+    data?.characters?.filter((char) => !char.active).map((char) => char.character.character_name) ??
+    [];
 
-  if (data?.main) {
-    document.title = `${data.main.character_name} - Audit`;
-  }
+  useEffect(() => {
+    if (data?.main) {
+      document.title = `${data.main.character_name} - Audit`;
+    }
+  }, [data?.main]);
 
   return (
     <Card>

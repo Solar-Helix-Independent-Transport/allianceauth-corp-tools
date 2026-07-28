@@ -1,16 +1,22 @@
 import { components } from "../../api/CtApi";
 import BaseTable from "../Tables/BaseTable/BaseTable";
-import { createColumnHelper } from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import TimeAgo from "react-timeago";
 
-const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boolean }) => {
+const CharacterStatusTable = ({
+  data,
+  isFetching,
+}: {
+  data: { characters: components["schemas"]["CharacterStatus"][] };
+  isFetching: boolean;
+}) => {
   const { t } = useTranslation();
 
   const columnHelper = createColumnHelper<components["schemas"]["CharacterStatus"]>();
 
-  let columns = [
+  const columns: ColumnDef<components["schemas"]["CharacterStatus"], unknown>[] = [
     columnHelper.accessor("character.character_name", {
       header: t("Character"),
     }),
@@ -23,14 +29,14 @@ const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boo
     columnHelper.accessor("last_login", {
       header: t("Last Login"),
       cell: (cell) => {
-        let date = cell.getValue();
+        const date = cell.getValue();
         return date ? <TimeAgo date={date} /> : t("Never");
       },
     }),
     columnHelper.accessor("last_logoff", {
       header: t("Last Logoff"),
       cell: (cell) => {
-        let date = cell.getValue();
+        const date = cell.getValue();
         return date ? <TimeAgo date={date} /> : t("Never");
       },
     }),
@@ -75,7 +81,7 @@ const CharacterStatusTable = ({ data, isFetching }: { data: any; isFetching: boo
           cell: (cell) => {
             return cell.getValue() ? <TimeAgo date={cell.getValue() as string} /> : t("Never");
           },
-        }) as any,
+        }),
       );
     });
   }

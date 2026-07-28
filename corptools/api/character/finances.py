@@ -200,7 +200,8 @@ class FinancesApiEndpoints:
             if not (request.user.has_perm("corptools.global_corp_manager")
                     or request.user.has_perm("corptools.state_corp_manager")
                     or request.user.has_perm("corptools.alliance_corp_manager")
-                    or request.user.has_perm("corptools.own_corp_manager")):
+                    or request.user.has_perm("corptools.own_corp_manager")
+                    or request.user.has_perm("corptools.show_if_director")):
                 return 403, _("Permission Denied")
 
             err, main, characters = resolve_character(request, character_id)

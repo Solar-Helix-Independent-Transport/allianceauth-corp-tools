@@ -1,15 +1,15 @@
 import BaseTable from "./BaseTable";
 import { ColumnDef } from "@tanstack/react-table";
-import { useQuery } from "@tanstack/react-query";
+import { QueryKey, useQuery } from "@tanstack/react-query";
 
-const AsyncTableWrapper = ({
+const AsyncTableWrapper = <TData,>({
   queryFn,
   queryKey,
   columns,
 }: {
-  queryFn: any;
-  queryKey: any;
-  columns: ColumnDef<any, any>[];
+  queryFn: () => Promise<TData[]>;
+  queryKey: QueryKey;
+  columns: ColumnDef<TData, unknown>[];
 }) => {
   const { data, isFetching } = useQuery({
     queryKey: queryKey,

@@ -1,8 +1,1 @@
-export const colourStyles = {
-  option: (styles: any) => {
-    return {
-      ...styles,
-      color: "black",
-    };
-  },
-};
+export { bootstrapSelectStyles as colourStyles } from "../../Helpers/reactSelectTheme";

@@ -1,6 +1,12 @@
 import { Form, FormControl } from "react-bootstrap";
 
-export const TextFilter = ({ setFilterText, labelText }: any) => {
+export const TextFilter = ({
+  setFilterText,
+  labelText,
+}: {
+  setFilterText: (value: string) => void;
+  labelText: string;
+}) => {
   return (
     <div className="flex-grow-1 flex-even d-flex text-nowrap">
       <div className="my-auto mx-2">

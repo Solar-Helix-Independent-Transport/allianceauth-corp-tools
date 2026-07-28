@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { useReactTable, getCoreRowModel, type ColumnDef } from "@tanstack/react-table";
-import Filter, { NameObjectArrayFilterFn } from "./BaseTableFilter";
+import { useReactTable, getCoreRowModel, type ColumnDef, type Row } from "@tanstack/react-table";
+import Filter from "./BaseTableFilter";
+import { NameObjectArrayFilterFn } from "./NameObjectArrayFilterFn";
 
 // Filter picks its input type by inspecting the *first row's* value for a
 // column, so a minimal one/two-row table per case is enough to drive it
@@ -14,7 +15,10 @@ const FilterHarness = ({
   data: Record<string, unknown>[];
   accessorKey: string;
 }) => {
-  const columns: ColumnDef<any, any>[] = [{ accessorKey, header: accessorKey }];
+  const columns: ColumnDef<Record<string, unknown>, unknown>[] = [
+    { accessorKey, header: accessorKey },
+  ];
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });
   const column = table.getColumn(accessorKey)!;
   return <Filter column={column} table={table} />;
@@ -51,7 +55,9 @@ describe("Filter", () => {
 
 describe("NameObjectArrayFilterFn", () => {
   it("matches case-insensitively against any object's name in the array", () => {
-    const row = { getValue: () => [{ name: "Alpha Corp" }, { name: "Beta Alliance" }] } as any;
+    const row = {
+      getValue: () => [{ name: "Alpha Corp" }, { name: "Beta Alliance" }],
+    } as unknown as Row<unknown>;
     expect(NameObjectArrayFilterFn(row, "col", "beta")).toBe(true);
     expect(NameObjectArrayFilterFn(row, "col", "gamma")).toBe(false);
   });

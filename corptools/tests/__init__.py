@@ -1,12 +1,17 @@
+# Django
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 
+# Alliance Auth
 from allianceauth.authentication.models import CharacterOwnership
 from allianceauth.eveonline.models import (
-    EveAllianceInfo, EveCharacter, EveCorporationInfo,
+    EveAllianceInfo,
+    EveCharacter,
+    EveCorporationInfo,
 )
 from allianceauth.tests.auth_utils import AuthUtils
 
+# AA Example App
 from corptools.models import CharacterAudit, CharacterRoles, CorporationAudit
 
 
@@ -133,6 +138,8 @@ class CorptoolsTestCase(TestCase):
             'global_corp_manager', 'corptools', 'corporationaudit')
         cls.director_manager = Permission.objects.get_by_natural_key(
             'show_if_director', 'corptools', 'corporationaudit')
+        cls.state_corp_manager = Permission.objects.get_by_natural_key(
+            'state_corp_manager', 'corptools', 'corporationaudit')
 
         cls.view_corp_permission = Permission.objects.get_by_natural_key(
             'corp_hr', 'corptools', 'characteraudit')

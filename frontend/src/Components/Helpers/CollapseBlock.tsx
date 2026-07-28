@@ -1,9 +1,9 @@
-import React, { JSXElementConstructor, ReactElement, useState } from "react";
+import React, { ReactElement, useState } from "react";
 import { Collapse } from "react-bootstrap";
 import { Row } from "react-bootstrap";
 
 export declare interface CollapseBlockProps {
-  children: ReactElement<any, string | JSXElementConstructor<any>>; // best, accepts everything React can render
+  children: ReactElement; // best, accepts everything React can render
   style?: React.CSSProperties; // to pass through style props
   heading: string;
   className?: string;

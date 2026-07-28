@@ -1,14 +1,14 @@
 import BaseTable from "../../Tables/BaseTable/BaseTable";
 import { ColumnDef } from "@tanstack/react-table";
 
-const TableWrapper = ({
+const TableWrapper = <TData,>({
   data,
   isFetching,
   columns,
 }: {
-  data: any;
+  data?: TData[];
   isFetching: boolean;
-  columns: ColumnDef<any, any>[];
+  columns: ColumnDef<TData, unknown>[];
 }) => {
   return <BaseTable {...{ isFetching, columns, data }} />;
 };

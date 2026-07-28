@@ -1,30 +1,25 @@
 import CorpAddToken from "./CorpAddToken";
 import styles from "./CorpMenu.module.css";
-import React from "react";
 import { Nav } from "react-bootstrap";
 import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useIsFetching } from "@tanstack/react-query";
-import { MenuItem } from "./MenuParts";
+import { MenuItem } from "../Menu/MenuParts";
+
+const BASEURL = "/audit/r/corp/";
+const toPath = (link: string) => `${BASEURL}${link}`;
 
 const menuRoot = document.getElementById("nav-right");
+// Clear the server-rendered placeholder content once, before React ever
+// portals into it - this only needs to happen once per page load, not on
+// every render, so it lives at module scope rather than in an effect.
+menuRoot?.replaceChildren();
 
 const CorpMenuRight = () => {
   const { t } = useTranslation();
 
   const isLoading = useIsFetching();
-  const [innerHtmlEmptied, setInnerHtmlEmptied] = React.useState(false);
 
-  React.useEffect(() => {
-    if (!innerHtmlEmptied) {
-      if (menuRoot) {
-        menuRoot.innerHTML = "";
-        setInnerHtmlEmptied(true);
-      }
-    }
-  }, [innerHtmlEmptied]);
-
-  if (!innerHtmlEmptied) return null;
   if (!menuRoot) {
     return <></>;
   }
@@ -45,6 +40,7 @@ const CorpMenuRight = () => {
           link: `corporations`,
           name: t("Corporations"),
         }}
+        {...{ toPath }}
       />
       {/* <Nav.Link as={Link} to={`audit/r/0`} key="corporation_list">
         <i className="fa-solid fa-users"></i>

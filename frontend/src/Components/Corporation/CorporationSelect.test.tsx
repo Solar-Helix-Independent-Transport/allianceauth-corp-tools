@@ -21,7 +21,7 @@ const renderSelect = (searchParams = "", onUrlUpdate?: OnUrlUpdateFunction) => {
 };
 
 const makeStatus = (corps: { corporation_id: number; corporation_name: string }[]) => ({
-  corps: corps.map((corporation) => ({ corporation })),
+  corps: corps.map((corporation) => ({ corporation, last_updates: {} })),
   headers: [],
 });
 

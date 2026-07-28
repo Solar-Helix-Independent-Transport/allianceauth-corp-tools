@@ -371,6 +371,27 @@ class CorpActivityMapTestCase(CorptoolsTestCase):
             resp = self.client.get(url.format(cid=self.corp1.corporation_id))
             self.assertEqual(resp.status_code, 200)
 
+    def test_holding_corp_structures_returns_200_for_every_endpoint(self):
+        # Every sibling structure/starbase/poco endpoint under corp/*
+        # accepts holding_corp_structures; the activity map's shared gate
+        # serves the same structure/starbase/poco data and should too.
+        holding_structures = Permission.objects.get_by_natural_key(
+            'holding_corp_structures', 'corptools', 'corptoolsconfiguration')
+        self.user1.user_permissions.add(holding_structures)
+        self.client.force_login(self.user1)
+        for url in (
+            _ASSETS_URL, _SHIPS_URL, _CAPITALS_URL, _MEMBER_ASSETS_URL,
+            _MEMBER_SHIPS_URL, _MEMBER_CAPITALS_URL, _STRUCTURES_URL,
+            _STARBASES_URL, _POCOS_URL, _POCOS_REVENUE_URL,
+            _ORDERS_URL, _ORDERS_MEMBERS_URL, _CONTRACTS_URL,
+            _CONTRACTS_SALES_URL, _CONTRACTS_LOGISTICS_URL, _INDUSTRY_URL,
+            _LOCATION_URL, _CLONES_HOME_URL, _CLONES_JUMP_URL,
+            _MERCENARY_DENS_URL, _MERCENARY_TACOPS_URL, _PI_URL,
+            _MINING_URL, _RATTING_URL,
+        ):
+            resp = self.client.get(url.format(cid=self.corp1.corporation_id))
+            self.assertEqual(resp.status_code, 200)
+
     # ------------------------------------------------------------------
     # assets
     # ------------------------------------------------------------------

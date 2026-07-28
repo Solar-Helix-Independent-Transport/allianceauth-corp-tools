@@ -22,6 +22,7 @@ def _has_sov_perms(user) -> bool:
         | user.has_perm('corptools.alliance_corp_manager')
         | user.has_perm('corptools.state_corp_manager')
         | user.has_perm('corptools.global_corp_manager')
+        | user.has_perm('corptools.show_if_director')
         | user.has_perm('corptools.holding_corp_structures')
     )
 

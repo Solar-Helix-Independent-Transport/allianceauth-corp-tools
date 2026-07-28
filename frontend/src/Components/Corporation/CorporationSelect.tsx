@@ -1,15 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import Select from "react-select";
+import Select, { StylesConfig } from "react-select";
 import { loadStatus } from "../../api/corporation";
 import { useQueryState } from "nuqs";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { bootstrapSelectStyles } from "../Helpers/reactSelectTheme";
 
-const colourStyles = {
-  option: (styles: any) => ({ ...styles, color: "black" }),
-  menu: (base: any) => ({ ...base, zIndex: 9999 }),
-  menuList: (base: any) => ({ ...base, zIndex: 9999 }),
-  menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
-};
+interface CorpOption {
+  value: number;
+  label: string;
+}
+
+const colourStyles = bootstrapSelectStyles as StylesConfig<CorpOption>;
 
 const CorpSelect = () => {
   const { isLoading, data } = useQuery({
@@ -18,23 +19,27 @@ const CorpSelect = () => {
   });
   const [cidStr, setCid] = useQueryState("cid");
 
-  const options: { value: number; label: string }[] = isLoading
-    ? []
-    : (data?.corps.map((corp: any) => ({
-        value: corp.corporation.corporation_id,
-        label: corp.corporation.corporation_name,
-      })) ?? []);
+  const options: CorpOption[] = useMemo(
+    () =>
+      isLoading
+        ? []
+        : (data?.corps.map((corp) => ({
+            value: corp.corporation.corporation_id,
+            label: corp.corporation.corporation_name,
+          })) ?? []),
+    [isLoading, data],
+  );
 
   const value = options.find((o) => o.value === Number(cidStr)) ?? null;
 
   useEffect(() => {
-    if (!isLoading && data?.corps.length === 1) {
+    if (!isLoading && options.length === 1) {
       setCid(String(options[0].value));
     }
-  }, [data]);
+  }, [isLoading, options, setCid]);
 
   return (
-    <Select
+    <Select<CorpOption>
       isLoading={isLoading}
       value={value}
       styles={colourStyles}

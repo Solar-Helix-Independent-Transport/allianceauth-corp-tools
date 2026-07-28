@@ -5,7 +5,13 @@ import ErrorBoundary from "../Helpers/ErrorBoundary";
 import TableWrapper from "../Tables/BaseTable/TableWrapper";
 import { createColumnHelper } from "@tanstack/react-table";
 
-function CharacterContractModalTable({ data, header = "" }: any) {
+function CharacterContractModalTable({
+  data,
+  header = "",
+}: {
+  data?: components["schemas"]["ContractItems"][];
+  header?: string;
+}) {
   const { t } = useTranslation();
   const columnHelper = createColumnHelper<components["schemas"]["ContractItems"]>();
 
@@ -20,7 +26,7 @@ function CharacterContractModalTable({ data, header = "" }: any) {
 
   return (
     <ErrorBoundary>
-      {data.length > 0 && (
+      {(data?.length ?? 0) > 0 && (
         <>
           <h6 className={styles.strikeOut}>{header}</h6>
           <TableWrapper {...{ data, columns }} isFetching={false} />

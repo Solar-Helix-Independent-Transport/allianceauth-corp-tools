@@ -1,12 +1,12 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ColumnDef } from "@tanstack/react-table";
-import BaseTable from "./BaseTable";
+import BaseTable, { BaseTableProps } from "./BaseTable";
 
 type Row = { name: string; count: number };
 
-const columns: ColumnDef<Row, any>[] = [
+const columns: ColumnDef<Row, unknown>[] = [
   { accessorKey: "name", header: "Name" },
   { accessorKey: "count", header: "Count" },
 ];
@@ -16,7 +16,7 @@ const rows: Row[] = Array.from({ length: 20 }, (_, i) => ({
   count: i,
 }));
 
-const renderTable = (props: Partial<React.ComponentProps<typeof BaseTable>> = {}) =>
+const renderTable = (props: Partial<BaseTableProps<Row>> = {}) =>
   render(
     <MemoryRouter>
       <BaseTable columns={columns} data={rows} {...props} />

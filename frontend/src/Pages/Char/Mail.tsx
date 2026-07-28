@@ -2,27 +2,28 @@ import ErrorBoundary from "../../Components/Helpers/ErrorBoundary";
 import CharMailModal from "../../Components/Mail/MailModal";
 import BaseTable from "../../Components/Tables/BaseTable/BaseTable";
 import { loadMail } from "../../api/character";
+import { MailListItem } from "../../Components/Mail/MailTypes";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
 import { Badge, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 const CharacterMail = () => {
   const { t } = useTranslation();
-  let { characterID } = useParams();
+  const { characterID } = useParams();
   const [showModal, setModal] = useState(false);
-  const [modalData, setData] = useState(null);
+  const [modalData, setData] = useState<MailListItem | null>(null);
 
   const { isFetching, data } = useQuery({
     queryKey: ["mail", characterID],
     queryFn: () => loadMail(Number(characterID)),
-    initialData: [],
+    initialData: [] as MailListItem[],
     refetchOnWindowFocus: false,
   });
 
-  const columnHelper = createColumnHelper<any>();
+  const columnHelper = createColumnHelper<MailListItem>();
 
   const columns = [
     columnHelper.accessor("character", {
@@ -35,7 +36,7 @@ const CharacterMail = () => {
       header: t("Labels"),
       cell: (cell) => (
         <p>
-          {cell.getValue().map((name: any) => (
+          {cell.getValue().map((name) => (
             <Badge style={{ marginLeft: "5px" }}>{name}</Badge>
           ))}
         </p>
@@ -52,7 +53,7 @@ const CharacterMail = () => {
           </p>
         ) : (
           <p>
-            {cell.getValue().map((name: any) => (
+            {cell.getValue().map((name) => (
               <Badge style={{ marginLeft: "5px" }} bg="info">
                 {name}
               </Badge>

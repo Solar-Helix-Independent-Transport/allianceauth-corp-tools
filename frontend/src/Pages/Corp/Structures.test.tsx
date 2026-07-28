@@ -26,18 +26,31 @@ const renderPage = () => {
 };
 
 describe("Structures (Corp page)", () => {
-  it("passes the {characters: [], main: undefined, headers: []} initialData before the query resolves", async () => {
+  it("passes an empty array as initialData before the query resolves", async () => {
     vi.mocked(loadAllStructures).mockReturnValue(new Promise(() => {}));
 
     renderPage();
 
     await screen.findByTestId("structures-table");
-    expect(lastProps?.data).toEqual({ characters: [], main: undefined, headers: [] });
+    expect(lastProps?.data).toEqual([]);
     expect(lastProps?.isFetching).toBe(true);
   });
 
-  it("passes the resolved structures data through once loadAllStructures settles", async () => {
-    const resolved = { characters: [{ id: 1 }], main: 1, headers: ["Name"] };
+  it("passes the resolved structures array through once loadAllStructures settles", async () => {
+    const resolved = [
+      {
+        id: 1,
+        owner: { corporation_id: 1, corporation_name: "Test Corp", alliance_name: "" },
+        type: { id: 1, name: "Astrahus" },
+        location: { id: 1, name: "Jita IV - Moon 4" },
+        constellation: { id: 1, name: "Kimotoro" },
+        region: { id: 1, name: "The Forge" },
+        name: "My Citadel",
+        state: "online",
+        fuel_expiry: "2024-01-01T00:00:00Z",
+        services: [],
+      },
+    ];
     vi.mocked(loadAllStructures).mockResolvedValue(resolved);
 
     renderPage();

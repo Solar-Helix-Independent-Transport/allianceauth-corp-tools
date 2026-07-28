@@ -27,8 +27,8 @@ describe("CorpDivisions", () => {
 
   it("renders a balance badge per division, omitting the name for 'Unknown'", async () => {
     vi.mocked(loadDivisions).mockResolvedValue([
-      { division: 1, name: "Master Wallet", balance: "1000.5" },
-      { division: 2, name: "Unknown", balance: "50" },
+      { division: 1, name: "Master Wallet", balance: 1000.5 },
+      { division: 2, name: "Unknown", balance: 50 },
     ]);
     renderDivisions();
 

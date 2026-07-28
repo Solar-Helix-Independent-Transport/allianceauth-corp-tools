@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { IconStatusDiv, COMPACT_NUM_FORMAT } from "../../Components/Cards/IconStatusCard";
+import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
+import { COMPACT_NUM_FORMAT } from "../../Components/Cards/IconStatusCard.helpers";
 import { loadCharacterStatus } from "../../api/character";
 // import Asteroid from "../../../assets/asteroid_64.png";
 // import NPC from "../../../assets/npcbattleship_32.png";
@@ -9,7 +10,7 @@ import Skills from "../../assets/skillInjector_64.png";
 import Unknowns from "../../assets/unknown_64.png";
 import styles from "./AtAGlance.module.css";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 export const CharacterGlancesAccount = () => {
   const { t } = useTranslation();
@@ -21,23 +22,17 @@ export const CharacterGlancesAccount = () => {
     refetchOnWindowFocus: false,
   });
 
-  const isk = data?.characters?.reduce((p: number, c: any) => {
-    try {
-      return p + c.isk;
-    } catch (err) {
-      return p;
-    }
-  }, 0);
+  const isk =
+    data?.characters?.reduce((p: number, c) => {
+      return p + (c.isk ?? 0);
+    }, 0) ?? 0;
 
-  const sp = data?.characters?.reduce((p: number, c: any) => {
-    try {
-      return p + c.sp;
-    } catch (err) {
-      return p;
-    }
-  }, 0);
+  const sp =
+    data?.characters?.reduce((p: number, c) => {
+      return p + (c.sp ?? 0);
+    }, 0) ?? 0;
 
-  const bad_chars = data?.characters?.filter((char: any) => !char.active).length;
+  const bad_chars = data?.characters?.filter((char) => !char.active).length ?? 0;
 
   const total_chars = data?.characters?.length;
 

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { getCharacterRoles } from "../../api/character";
 import CharacterRoles from "./Roles";
@@ -26,14 +26,19 @@ describe("CharacterRoles", () => {
   it("fetches roles for the characterID route param and renders them in the table", async () => {
     vi.mocked(getCharacterRoles).mockResolvedValue([
       {
-        character: { character_name: "Test Character", corporation_name: "Test Corp" },
+        character: {
+          character_name: "Test Character",
+          character_id: 42,
+          corporation_id: 1,
+          corporation_name: "Test Corp",
+        },
         director: true,
         station_manager: false,
         personnel_manager: false,
         accountant: false,
-        titles: [{ name: "CEO" }],
+        titles: [{ id: 1, name: "CEO" }],
       },
-    ] as any);
+    ]);
 
     renderPage();
 

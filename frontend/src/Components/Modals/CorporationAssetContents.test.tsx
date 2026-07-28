@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { loadAssetContents } from "../../api/corporation";
 import CorporationAssetModal from "./CorporationAssetContents";
@@ -9,7 +9,7 @@ vi.mock("../../api/corporation", () => ({
   loadAssetContents: vi.fn(),
 }));
 
-const item = { id: 55, item: { id: 34, name: "Tritanium" } };
+const item = { id: 55, item: { id: 34, name: "Tritanium" }, quantity: 1 };
 
 const renderModal = () => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -30,7 +30,7 @@ describe("CorporationAssetModal", () => {
 
   it("fetches and shows the asset's contents once opened", async () => {
     vi.mocked(loadAssetContents).mockResolvedValue([
-      { item: { id: 1, name: "Widget" }, quantity: 3, location: { name: "Hold" } },
+      { id: 2, item: { id: 1, name: "Widget" }, quantity: 3, location: { id: 1, name: "Hold" } },
     ]);
 
     renderModal();

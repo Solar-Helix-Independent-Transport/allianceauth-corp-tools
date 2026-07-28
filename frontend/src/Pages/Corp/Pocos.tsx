@@ -3,6 +3,7 @@ import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { loadAllPocos } from "../../api/corporation";
+import { Poco } from "../../Components/Corporation/PocoTypes";
 import { CorporationLogo } from "../../Components/EveImages/EveImages";
 
 const CorporationPocos = () => {
@@ -14,7 +15,7 @@ const CorporationPocos = () => {
     refetchOnWindowFocus: false,
   });
 
-  const columnHelper = createColumnHelper<any>();
+  const columnHelper = createColumnHelper<Poco>();
 
   const columns = [
     columnHelper.accessor("location.region", {

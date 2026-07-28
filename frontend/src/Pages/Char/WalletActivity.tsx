@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { loadWalletActivity } from "../../api/character";
+import { components } from "../../api/CtApi";
 import { createColumnHelper } from "@tanstack/react-table";
+import { ChangeEvent, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useParams } from "react-router";
 import { Form } from "react-bootstrap";
 import WalletActivityChord from "../../Components/Graphs/WalletActivityChord";
 
@@ -18,7 +19,7 @@ const CharacterWalletActivity = () => {
     queryFn: () => loadWalletActivity(Number(characterID)),
     refetchOnWindowFocus: false,
   });
-  const columnHelper = createColumnHelper<any>();
+  const columnHelper = createColumnHelper<components["schemas"]["WalletActivityEntry"]>();
 
   const columns = [
     columnHelper.accessor("fpn", {
@@ -59,7 +60,7 @@ const CharacterWalletActivity = () => {
     }),
   ];
 
-  const data_out = data?.filter((row: any) => {
+  const data_out = data?.filter((row) => {
     if (showAll) {
       return true;
     } else {
@@ -73,7 +74,7 @@ const CharacterWalletActivity = () => {
           type="switch"
           id="custom-switch"
           label={t("Show Own Account Activity")}
-          onChange={(event: any) => setShowAll(event.target.checked)}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => setShowAll(event.target.checked)}
           defaultChecked={showAll}
         />
       </div>

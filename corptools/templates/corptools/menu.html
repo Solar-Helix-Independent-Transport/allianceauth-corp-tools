@@ -21,7 +21,7 @@
 
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    {% if perms.corptools.admin %}
+                    {% if user.is_superuser %}
                         <li>
                             <a class="" href="{% url 'corptools:admin' %}">{% translate "DB Admin" %}</a>
                         </li>

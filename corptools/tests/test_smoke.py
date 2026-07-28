@@ -379,6 +379,10 @@ class TestSmokeCoreApi(CorptoolsTestCase):
         resp = self.client.get("/audit/api/account/menu")
         self.assertEqual(resp.status_code, 200)
 
+    def test_corp_menu(self):
+        resp = self.client.get("/audit/api/corp/menu")
+        self.assertEqual(resp.status_code, 200)
+
     def test_search_system(self):
         resp = self.client.get("/audit/api/search/system/test")
         self.assertEqual(resp.status_code, 200)

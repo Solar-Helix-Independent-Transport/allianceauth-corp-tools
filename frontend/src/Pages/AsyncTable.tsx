@@ -1,14 +1,20 @@
 import BaseTable from "../Components/Tables/BaseTable/BaseTable";
+import { ColumnDef } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 
-interface AsyncTableProps {
-  apiParams: Array<any>;
+interface AsyncTableProps<TData> {
+  apiParams: unknown[];
   apiQueryKey: string;
-  apiEndpoint: (params: any) => Array<any>;
-  columnDefinition: any;
+  apiEndpoint: (params: unknown[]) => Promise<TData[]>;
+  columnDefinition: ColumnDef<TData, unknown>[];
 }
 
-const AsyncTable = ({ apiQueryKey, apiParams, apiEndpoint, columnDefinition }: AsyncTableProps) => {
+const AsyncTable = <TData,>({
+  apiQueryKey,
+  apiParams,
+  apiEndpoint,
+  columnDefinition,
+}: AsyncTableProps<TData>) => {
   const { data, isFetching } = useQuery({
     queryKey: [apiQueryKey, ...apiParams],
     queryFn: () => apiEndpoint(apiParams),

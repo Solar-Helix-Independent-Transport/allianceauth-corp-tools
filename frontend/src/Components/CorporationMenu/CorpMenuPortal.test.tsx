@@ -1,4 +1,5 @@
 import { render } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it } from "vitest";
 import { CorpMenuPortal } from "./CorpMenuPortal";
 
@@ -8,7 +9,12 @@ import { CorpMenuPortal } from "./CorpMenuPortal";
 // this only ever exercises the "nothing to portal into" branch.
 describe("CorpMenuPortal", () => {
   it("renders nothing when there is no #nav-left element to portal into", () => {
-    const { container } = render(<CorpMenuPortal />);
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <CorpMenuPortal />
+      </QueryClientProvider>,
+    );
     expect(container).toBeEmptyDOMElement();
   });
 });

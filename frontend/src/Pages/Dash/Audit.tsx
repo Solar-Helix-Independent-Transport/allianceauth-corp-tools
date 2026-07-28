@@ -1,5 +1,5 @@
 import { Col } from "react-bootstrap";
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 import ErrorBoundary from "../../Components/Helpers/ErrorBoundary";
 
 // Deliberately no CorpMenuPortal/CorpMenuRight here (unlike Pages/Corp/Audit)

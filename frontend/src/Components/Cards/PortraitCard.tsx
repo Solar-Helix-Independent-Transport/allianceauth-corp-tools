@@ -1,4 +1,4 @@
-import { CharacterAllegiancePortrait } from "../EveImages/EveImages";
+import { CharacterAllegiancePortrait, PortraitProps } from "../EveImages/EveImages";
 import styles from "./PortraitCard.module.css";
 import React from "react";
 import { Card } from "react-bootstrap";
@@ -13,7 +13,7 @@ export declare interface PortraitCardProps {
   isFetching?: boolean;
   headerIcon?: string;
   roundedImages?: string;
-  character: any; //todo type from api?
+  character: PortraitProps["character"] & { character_name: string };
   portaitSize?: number;
 }
 

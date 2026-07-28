@@ -15,7 +15,7 @@ const CorpDivisions = ({ corporationID }: { corporationID: number }) => {
   return (
     <div className="d-flex flex-wrap">
       {data.length > 0 ? (
-        data.map((division: any) => {
+        data.map((division) => {
           return (
             <h5>
               <Badge className="text-center m-2">

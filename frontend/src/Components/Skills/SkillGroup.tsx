@@ -2,7 +2,15 @@ import { useTranslation } from "react-i18next";
 import { SkillBlock } from "./SkillBlock";
 import { Accordion } from "react-bootstrap";
 
-export const SkillGroup = ({ group, skills }: { group: string; skills: Array<any> }) => {
+export interface Skill {
+  skill: string;
+  group: string;
+  level: number;
+  active: number;
+  sp: number;
+}
+
+export const SkillGroup = ({ group, skills }: { group: string; skills: Skill[] }) => {
   const { t } = useTranslation();
 
   return (
@@ -21,7 +29,7 @@ export const SkillGroup = ({ group, skills }: { group: string; skills: Array<any
       </Accordion.Header>
       <Accordion.Body className="d-flex flex-wrap ">
         {skills
-          .sort(function (a: any, b: any) {
+          .sort(function (a, b) {
             const nameA = a.skill.toLowerCase(),
               nameB = b.skill.toLowerCase();
             if (nameA < nameB)

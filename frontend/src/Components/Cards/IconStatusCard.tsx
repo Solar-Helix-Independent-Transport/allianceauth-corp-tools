@@ -30,28 +30,6 @@ type IconStatusCardProps = {
   toolTipText?: string;
 };
 
-export const COMPACT_NUM_FORMAT: Intl.NumberFormatOptions = {
-  maximumFractionDigits: 2,
-  notation: "compact",
-  compactDisplay: "short",
-};
-
-export function statusProps(
-  value: any,
-  isLoading: boolean,
-  emptyVariant = "secondary",
-  format?: (v: any) => string,
-) {
-  const active = Boolean(value);
-  const variant = active ? "success" : isLoading ? undefined : emptyVariant;
-  return {
-    isLoading,
-    text: (active ? (format ? format(value) : String(value)) : "-") as string,
-    textVariant: variant as IconStatusCardProps["textVariant"],
-    cardVariant: variant as IconStatusCardProps["cardVariant"],
-  };
-}
-
 export const IconStatusDiv = ({
   iconSrc,
   text,

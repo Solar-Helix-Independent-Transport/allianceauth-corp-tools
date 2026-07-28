@@ -2,16 +2,25 @@ import { useTranslation } from "react-i18next";
 import { PortraitCard } from "../Cards/PortraitCard";
 import { PanelLoader } from "../Loaders/loaders";
 import { Table } from "react-bootstrap";
+import { components } from "../../api/CtApi";
 
-const CharacterPubDataPanels = ({ isFetching, data }: { isFetching: boolean; data: any }) => {
+const CharacterPubDataPanels = ({
+  isFetching,
+  data,
+}: {
+  isFetching: boolean;
+  data?: { characters: components["schemas"]["CharacterHistory"][] };
+}) => {
   const { t } = useTranslation();
 
   if (!data) return <PanelLoader />;
 
   return (
     <div className="d-flex justify-content-around align-items-center flex-row flex-wrap">
-      {data?.characters.map((char: any) => {
-        const char_status = char.active ? "success" : "warning";
+      {data?.characters.map((char) => {
+        // CharacterHistory has no "active" field - this panel always used
+        // the "warning" border color regardless of character status.
+        const char_status = "warning";
         return (
           <PortraitCard
             border={char_status}
@@ -36,7 +45,7 @@ const CharacterPubDataPanels = ({ isFetching, data }: { isFetching: boolean; dat
                 >
                   <Table striped>
                     <tbody>
-                      {char.history?.map((h: any) => {
+                      {char.history?.map((h) => {
                         return (
                           <tr key={h.start}>
                             <td>{h.corporation.corporation_name}</td>

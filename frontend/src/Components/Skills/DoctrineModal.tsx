@@ -4,8 +4,21 @@ import { SkillBlockKey } from "./SkillBlockKey";
 // import "./doctrine.css";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { DoctrineSkillList } from "./DoctrineTypes";
 
-export const DoctrineModal = ({ show, setShow, name, skill_reqs, skill_list }: any) => {
+export const DoctrineModal = ({
+  show,
+  setShow,
+  name,
+  skill_reqs,
+  skill_list,
+}: {
+  show: boolean;
+  setShow: (show: boolean) => void;
+  name: string;
+  skill_reqs: Record<string, number>;
+  skill_list: DoctrineSkillList;
+}) => {
   const { t } = useTranslation();
 
   const toggleLevel = () => {

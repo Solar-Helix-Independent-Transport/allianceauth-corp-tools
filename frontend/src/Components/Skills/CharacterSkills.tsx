@@ -1,18 +1,18 @@
 import ErrorBoundary from "../Helpers/ErrorBoundary";
 import { PanelLoader } from "../Loaders/loaders";
-import { SkillGroup } from "./SkillGroup";
+import { Skill, SkillGroup } from "./SkillGroup";
 import Accordion from "react-bootstrap/Accordion";
 
-const CharSkillGroups = ({ data }: any) => {
-  const groupByKey = (list: any, key: any) =>
-    list?.reduce(
-      (hash: any, obj: any) => ({
-        ...hash,
-        [obj[key]]: (hash[obj[key]] || []).concat(obj),
-      }),
-      {},
-    );
+const groupByKey = (list: Skill[], key: "group") =>
+  list?.reduce<Record<string, Skill[]>>(
+    (hash, obj) => ({
+      ...hash,
+      [obj[key]]: (hash[obj[key]] || []).concat(obj),
+    }),
+    {},
+  );
 
+const CharSkillGroups = ({ data }: { data: Skill[] }) => {
   const skills_data = groupByKey(data, "group");
 
   if (Object.entries(skills_data).length === 0) {
@@ -22,7 +22,7 @@ const CharSkillGroups = ({ data }: any) => {
     <ErrorBoundary>
       <Accordion defaultActiveKey={[]} alwaysOpen>
         {Object.entries(skills_data)
-          .sort(function (a: any, b: any) {
+          .sort(function (a, b) {
             const nameA = a[0].toLowerCase(),
               nameB = b[0].toLowerCase();
             if (nameA < nameB)
@@ -31,7 +31,7 @@ const CharSkillGroups = ({ data }: any) => {
             if (nameA > nameB) return 1;
             return 0; //default return value (no sorting)
           })
-          .map((entry: any) => (
+          .map((entry) => (
             <SkillGroup group={entry[0]} skills={entry[1]} />
           ))}
       </Accordion>

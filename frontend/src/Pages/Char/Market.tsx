@@ -4,7 +4,7 @@ import { components } from "../../api/CtApi";
 import { getCharacterMarket } from "../../api/character";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 const CharacterMarket = () => {
   const { t } = useTranslation();

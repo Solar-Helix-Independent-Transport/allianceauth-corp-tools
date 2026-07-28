@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it } from "vitest";
-import CorpMenu from "./CorpMenu";
+import CorpMenu, { CategoryProps, MenuItemProps } from "./CorpMenu";
 
-const renderMenu = () =>
+const renderMenu = (data: Array<CategoryProps | MenuItemProps>) =>
   render(
     <MemoryRouter initialEntries={["/audit/r/corp/glance"]}>
       <Routes>
@@ -11,7 +11,7 @@ const renderMenu = () =>
           path="/audit/r/corp/*"
           element={
             <ul>
-              <CorpMenu />
+              <CorpMenu data={data} isLoading={false} error={false} />
             </ul>
           }
         />
@@ -21,7 +21,7 @@ const renderMenu = () =>
 
 describe("CorpMenu", () => {
   it("renders a plain link for a top-level entry with no sub-links", () => {
-    renderMenu();
+    renderMenu([{ name: "Overview", link: "glance" }]);
     expect(screen.getByRole("link", { name: "Overview" })).toHaveAttribute(
       "href",
       "/audit/r/corp/glance",
@@ -29,7 +29,15 @@ describe("CorpMenu", () => {
   });
 
   it("renders a dropdown for a category with sub-links", () => {
-    renderMenu();
+    renderMenu([
+      {
+        name: "Structures",
+        links: [
+          { name: "Pocos", link: "pocos" },
+          { name: "Sovereignty Hubs", link: "sovhubs" },
+        ],
+      },
+    ]);
 
     fireEvent.click(screen.getByRole("button", { name: "Structures" }));
     expect(screen.getByRole("link", { name: "Pocos" })).toBeInTheDocument();
@@ -37,12 +45,22 @@ describe("CorpMenu", () => {
   });
 
   it("renders an absolute href (not a router link) for dashboard entries starting with '/'", () => {
-    renderMenu();
+    renderMenu([
+      {
+        name: "Dashboards",
+        links: [{ name: "Fuel", link: "/audit/corp/dashboard/fuel" }],
+      },
+    ]);
 
     fireEvent.click(screen.getByRole("button", { name: "Dashboards" }));
     expect(screen.getByRole("link", { name: "Fuel" })).toHaveAttribute(
       "href",
       "/audit/corp/dashboard/fuel",
     );
+  });
+
+  it("renders nothing extra for an empty menu", () => {
+    const { container } = renderMenu([]);
+    expect(container.querySelectorAll("li").length).toBe(0);
   });
 });

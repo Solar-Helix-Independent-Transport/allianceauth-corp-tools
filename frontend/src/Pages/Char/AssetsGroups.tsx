@@ -4,7 +4,7 @@ import { getAssetGroups } from "../../api/character";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { AssetGroups } from "../../Components/AssetGroups";
 
 const CharacterAssetGroups = () => {

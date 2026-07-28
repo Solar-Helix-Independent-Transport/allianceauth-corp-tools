@@ -5,9 +5,10 @@ import { TypeIcon } from "../EveImages/EveImages";
 import React from "react";
 import { loadAssetContents } from "../../api/corporation";
 import AssetContentsTable from "./AssetContentsTable";
+import { components } from "../../api/CtApi";
 // import { AssetFittingModal } from "./FittingModal";
 
-function CorporationAssetModal({ item }: any) {
+function CorporationAssetModal({ item }: { item: components["schemas"]["AssetItem"] }) {
   // type is asset from api
   const { t } = useTranslation();
   const [show, setShow] = React.useState(false);

@@ -4,10 +4,19 @@ import ErrorBoundary from "../Helpers/ErrorBoundary";
 import TableWrapper from "../Tables/BaseTable/TableWrapper";
 import { createColumnHelper } from "@tanstack/react-table";
 import { TypeIcon } from "../EveImages/EveImages";
+import { StarbaseSpaceItem } from "./StarbaseTypes";
 
-function StarbaseModalTable({ data, header = "", isFetching }: any) {
+function StarbaseModalTable({
+  data,
+  header = "",
+  isFetching,
+}: {
+  data?: StarbaseSpaceItem[];
+  header?: string;
+  isFetching: boolean;
+}) {
   const { t } = useTranslation();
-  const columnHelper = createColumnHelper<any>();
+  const columnHelper = createColumnHelper<StarbaseSpaceItem>();
 
   const columns = [
     columnHelper.accessor("type.name", {
@@ -42,7 +51,7 @@ function StarbaseModalTable({ data, header = "", isFetching }: any) {
 
   return (
     <ErrorBoundary>
-      {data?.length > 0 && (
+      {(data?.length ?? 0) > 0 && (
         <>
           <h6 className={styles.strikeOut}>{header}</h6>
           <TableWrapper {...{ data, columns }} isFetching={isFetching} />

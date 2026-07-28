@@ -4,10 +4,19 @@ import ErrorBoundary from "../Helpers/ErrorBoundary";
 import TableWrapper from "../Tables/BaseTable/TableWrapper";
 import { createColumnHelper } from "@tanstack/react-table";
 import { TypeIcon } from "../EveImages/EveImages";
+import { StarbaseFuelItem } from "./StarbaseTypes";
 
-function StarbaseModalFuelTable({ data, header = "", isFetching }: any) {
+function StarbaseModalFuelTable({
+  data,
+  header = "",
+  isFetching,
+}: {
+  data?: StarbaseFuelItem[];
+  header?: string;
+  isFetching: boolean;
+}) {
   const { t } = useTranslation();
-  const columnHelper = createColumnHelper<any>();
+  const columnHelper = createColumnHelper<StarbaseFuelItem>();
 
   const columns = [
     columnHelper.accessor("name", {
@@ -33,7 +42,7 @@ function StarbaseModalFuelTable({ data, header = "", isFetching }: any) {
 
   return (
     <ErrorBoundary>
-      {data?.length > 0 && (
+      {(data?.length ?? 0) > 0 && (
         <>
           <h6 className={styles.strikeOut}>{header}</h6>
           <TableWrapper {...{ data, columns }} isFetching={isFetching} />

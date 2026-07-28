@@ -7,7 +7,7 @@ const Structures = () => {
     queryKey: ["structures"],
     queryFn: () => loadAllStructures(),
     refetchOnWindowFocus: false,
-    initialData: { characters: [], main: undefined, headers: [] },
+    initialData: [],
   });
 
   return (
