@@ -8,6 +8,7 @@ import CorporationFilterBar from "../../Components/Corporation/CorporationFilter
 import { useCorporationId } from "../../Components/Corporation/useCorporationId";
 import { loadAssetList } from "../../api/corporation";
 import { CorpLoader, PanelLoader } from "../../Components/Loaders/loaders";
+import LabeledSelect from "../../Components/Helpers/LabeledSelect";
 import CorporationAssetModal from "../../Components/Modals/CorporationAssetContents";
 import { SecurityStatusBadge } from "../../Components/SecurityStatusBadge";
 import { components } from "../../api/CtApi";
@@ -58,15 +59,12 @@ const CorporationAssets = () => {
   return (
     <>
       <CorporationFilterBar />
-      <div className="m-3 d-flex align-items-center">
-        <h6 className="me-1">{t("Location Filter")}</h6>
-        <div className="flex-grow-1">
-          <CorporationAssetLocationSelect
-            corporationID={corporationID ? Number(corporationID) : 0}
-            {...{ setLocation }}
-          />
-        </div>
-      </div>
+      <LabeledSelect label={t("Location Filter")}>
+        <CorporationAssetLocationSelect
+          corporationID={corporationID ? Number(corporationID) : 0}
+          {...{ setLocation }}
+        />
+      </LabeledSelect>
       {isFetching ? (
         <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />
       ) : corporationID > 0 ? (

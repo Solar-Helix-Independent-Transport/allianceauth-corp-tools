@@ -12,6 +12,12 @@ export interface MenuCategory {
   links?: MenuLinkItem[];
 }
 
+export interface MenuProps {
+  isLoading: boolean;
+  data: Array<MenuCategory | MenuLinkItem>;
+  error: boolean;
+}
+
 // Char-scoped menus route via `/audit/r/:characterID/...`, corp-scoped menus
 // via the fixed `/audit/r/corp/...`; toPath is how each caller supplies that
 // difference without MenuParts needing to know which scope it's in.

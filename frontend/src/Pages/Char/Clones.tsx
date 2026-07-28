@@ -64,9 +64,7 @@ const CharacterClones = () => {
                           <div className="d-flex justify-content-end align-items-center">
                             {d.implants?.length ? (
                               d.implants.map((imp) => {
-                                return (
-                                  <TypeIcon textContent={imp.name} type_id={imp.id} size={32} />
-                                );
+                                return <TypeIcon type_id={imp.id} size={32} />;
                               })
                             ) : (
                               <>
@@ -122,7 +120,7 @@ const CharacterClones = () => {
                     return (
                       <tr key={imp.name}>
                         <td className="text-end">
-                          <TypeIcon textContent={imp.name} type_id={imp.id} size={32} />
+                          <TypeIcon type_id={imp.id} size={32} />
                         </td>
                         <td className="text-start">{imp.name}</td>
                       </tr>

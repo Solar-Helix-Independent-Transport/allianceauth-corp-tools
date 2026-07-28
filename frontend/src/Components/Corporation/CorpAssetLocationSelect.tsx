@@ -2,14 +2,9 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Select, { StylesConfig } from "react-select";
 import { loadAssetLocations } from "../../api/corporation";
-import { bootstrapSelectStyles } from "../Helpers/reactSelectTheme";
+import { bootstrapSelectStyles, SelectOption } from "../Helpers/reactSelectTheme";
 
-interface LocationOption {
-  value: number;
-  label: string;
-}
-
-const colourStyles = bootstrapSelectStyles as StylesConfig<LocationOption>;
+const colourStyles = bootstrapSelectStyles as StylesConfig<SelectOption>;
 
 const CorporationAssetLocationSelect = ({
   corporationID,
@@ -23,7 +18,7 @@ const CorporationAssetLocationSelect = ({
     queryFn: () => loadAssetLocations(corporationID),
   });
 
-  const [selected, setSelected] = useState<LocationOption | null>(null);
+  const [selected, setSelected] = useState<SelectOption | null>(null);
   // Auto-select the first location whenever a new location list arrives -
   // this is React's documented "adjust state when a prop changes" pattern
   // (calling setState during render, guarded by comparing against the
@@ -39,11 +34,11 @@ const CorporationAssetLocationSelect = ({
   // so it belongs in an effect - unlike the local `selected` adjustment
   // above.
   useEffect(() => {
-    if (selected) setLocation(selected.value);
+    if (selected) setLocation(Number(selected.value));
   }, [selected, setLocation]);
 
   return (
-    <Select<LocationOption>
+    <Select<SelectOption>
       isLoading={isLoading}
       styles={colourStyles}
       options={data}

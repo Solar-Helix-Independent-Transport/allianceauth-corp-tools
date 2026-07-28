@@ -57,21 +57,11 @@ const CharHeader = () => {
           size={64}
         />
         <h4 className="m-1 mx-3">{data?.main?.character_name}</h4>
-        <CorporationLogo
-          style={style}
-          className="m-1 mx-3"
-          corporation_id={data?.main?.corporation_id}
-          size={32}
-        />
+        <CorporationLogo style={style} corporation_id={data?.main?.corporation_id} size={32} />
         <h5 className="m-1 mx-3">{data?.main?.corporation_name}</h5>
         {data?.main?.alliance_id && (
           <>
-            <AllianceLogo
-              style={style}
-              className="m-1 mx-3"
-              alliance_id={data?.main?.alliance_id}
-              size={32}
-            />
+            <AllianceLogo style={style} alliance_id={data?.main?.alliance_id} size={32} />
             <h5 className="m-1 mx-3">{data?.main?.alliance_name}</h5>
           </>
         )}

@@ -1,26 +1,9 @@
 import { Nav } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
-import { MenuDropdown, MenuItem } from "../Menu/MenuParts";
+import { MenuDropdown, MenuItem, MenuProps } from "../Menu/MenuParts";
 
-export interface CharMenuItemProps {
-  name: string;
-  link?: string;
-}
-
-export interface CharCategoryProps {
-  name: string;
-  link?: string;
-  links?: Array<CharMenuItemProps>;
-}
-
-export interface CharMenuProps extends Partial<HTMLElement> {
-  isLoading: boolean;
-  data: Array<CharCategoryProps | CharMenuItemProps>;
-  error: boolean;
-}
-
-const CharMenu = ({ data }: CharMenuProps) => {
+const CharMenu = ({ data }: MenuProps) => {
   const { t } = useTranslation();
   const { characterID } = useParams();
   const toPath = (link: string) => `/audit/r/${characterID}/${link}`;

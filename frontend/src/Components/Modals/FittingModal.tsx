@@ -98,7 +98,7 @@ interface FitData {
   [key: string]: FitItem | FitItem[] | undefined;
 }
 
-interface StructureFitData {
+export interface StructureFitData {
   fit: FitData;
   high?: number;
   med?: number;

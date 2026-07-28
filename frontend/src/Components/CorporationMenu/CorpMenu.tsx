@@ -1,27 +1,10 @@
 import Nav from "react-bootstrap/Nav";
-import { MenuDropdown, MenuItem } from "../Menu/MenuParts";
-
-export interface MenuItemProps {
-  name: string;
-  link?: string;
-}
-
-export interface CategoryProps {
-  name: string;
-  links?: Array<MenuItemProps>;
-  link?: string;
-}
-
-export interface CorpMenuProps extends Partial<HTMLElement> {
-  isLoading: boolean;
-  data: Array<CategoryProps | MenuItemProps>;
-  error: boolean;
-}
+import { MenuDropdown, MenuItem, MenuProps } from "../Menu/MenuParts";
 
 const BASEURL = "/audit/r/corp/";
 const toPath = (link: string) => `${BASEURL}${link}`;
 
-const CorpMenu = ({ data }: CorpMenuProps) => {
+const CorpMenu = ({ data }: MenuProps) => {
   return (
     <>
       {data &&

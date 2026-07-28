@@ -1,9 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it } from "vitest";
-import CharMenu, { CharCategoryProps, CharMenuItemProps } from "./CharMenu";
+import { MenuCategory, MenuLinkItem } from "../Menu/MenuParts";
+import CharMenu from "./CharMenu";
 
-const renderMenu = (data: Array<CharCategoryProps | CharMenuItemProps>) =>
+const renderMenu = (data: Array<MenuCategory | MenuLinkItem>) =>
   render(
     <MemoryRouter initialEntries={["/audit/r/42/account/overview"]}>
       <Routes>

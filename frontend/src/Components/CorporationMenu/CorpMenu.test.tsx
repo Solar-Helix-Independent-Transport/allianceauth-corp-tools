@@ -1,9 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it } from "vitest";
-import CorpMenu, { CategoryProps, MenuItemProps } from "./CorpMenu";
+import { MenuCategory, MenuLinkItem } from "../Menu/MenuParts";
+import CorpMenu from "./CorpMenu";
 
-const renderMenu = (data: Array<CategoryProps | MenuItemProps>) =>
+const renderMenu = (data: Array<MenuCategory | MenuLinkItem>) =>
   render(
     <MemoryRouter initialEntries={["/audit/r/corp/glance"]}>
       <Routes>

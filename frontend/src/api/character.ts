@@ -1,16 +1,11 @@
-import { getCatApi } from "./Api";
-import type { components, paths } from "./CtApi";
+import { getCatApi, GetEndpoint } from "./Api";
+import type { components } from "./CtApi";
 import axios from "axios";
 import Cookies from "js-cookie";
-import type { PathsWithMethod } from "openapi-typescript-helpers";
 import type { ActivityMapResponse } from "../Components/ActivityMap/types";
 import type { MailBody, MailListItem } from "../Components/Mail/MailTypes";
 
-axios.defaults.xsrfHeaderName = "X-CSRFToken";
-
-export type CharacterGetEndpoint = PathsWithMethod<paths, "get">;
-
-export async function getCharacterEndpoint<Endpoint extends CharacterGetEndpoint>(
+export async function getCharacterEndpoint<Endpoint extends GetEndpoint>(
   endpoint: Endpoint,
   characterID: number,
 ) {
@@ -40,7 +35,7 @@ export async function getCharacterContacts(characterID: number) {
 // object rather than the real shape), so the response is cast to the
 // shape the map component actually consumes.
 async function getCharacterActivityMapEndpoint(
-  endpoint: CharacterGetEndpoint,
+  endpoint: GetEndpoint,
   characterID: number,
 ): Promise<ActivityMapResponse> {
   return getCharacterEndpoint(endpoint, characterID) as unknown as Promise<ActivityMapResponse>;
@@ -346,7 +341,7 @@ export async function loadAssetContents(
 
 export async function loadAssetLocations(
   character_id: number,
-): Promise<{ value: number; label: string }[]> {
+): Promise<components["schemas"]["ValueLabel"][]> {
   const api = await axios.get(`/audit/api/account/${character_id}/asset/locations`);
   return api.data;
 }

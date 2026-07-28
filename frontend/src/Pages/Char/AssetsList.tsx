@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import CharacterAssetModal from "../../Components/Modals/CharacterAssetContents";
 import { SecurityStatusBadge } from "../../Components/SecurityStatusBadge";
+import LabeledSelect from "../../Components/Helpers/LabeledSelect";
 
 const CharacterAssets = () => {
   const { t } = useTranslation();
@@ -61,15 +62,12 @@ const CharacterAssets = () => {
   ];
   return (
     <>
-      <div className="m-3 d-flex align-items-center">
-        <h5 className="me-1">{t("Location Filter")}</h5>
-        <div className="flex-grow-1">
-          <CharacterAssetLocationSelect
-            characterID={characterID ? Number(characterID) : 0}
-            {...{ setLocation }}
-          />
-        </div>
-      </div>
+      <LabeledSelect label={t("Location Filter")}>
+        <CharacterAssetLocationSelect
+          characterID={characterID ? Number(characterID) : 0}
+          {...{ setLocation }}
+        />
+      </LabeledSelect>
       <TableWrapper {...{ isFetching, data, columns }} />
     </>
   );

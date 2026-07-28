@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { AssetGroups } from "../../Components/AssetGroups";
+import LabeledSelect from "../../Components/Helpers/LabeledSelect";
 
 const CharacterAssetGroups = () => {
   const { t } = useTranslation();
@@ -22,15 +23,12 @@ const CharacterAssetGroups = () => {
 
   return (
     <>
-      <div className="m-3 d-flex align-items-center">
-        <h5 className="me-1">{t("Location Filter")}</h5>
-        <div className="flex-grow-1">
-          <CharacterAssetLocationSelect
-            characterID={characterID ? Number(characterID) : 0}
-            {...{ setLocation }}
-          />
-        </div>
-      </div>
+      <LabeledSelect label={t("Location Filter")}>
+        <CharacterAssetLocationSelect
+          characterID={characterID ? Number(characterID) : 0}
+          {...{ setLocation }}
+        />
+      </LabeledSelect>
       {isFetching ? (
         <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />
       ) : (

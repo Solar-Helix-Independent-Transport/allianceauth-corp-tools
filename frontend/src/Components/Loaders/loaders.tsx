@@ -1,6 +1,6 @@
 import styles from "./Loader.module.css";
 
-export interface LoaderProps extends Partial<HTMLElement> {
+export interface LoaderProps {
   message?: string;
   title?: string;
 }

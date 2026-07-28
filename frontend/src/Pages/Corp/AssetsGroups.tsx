@@ -7,6 +7,7 @@ import { CorpLoader, PanelLoader } from "../../Components/Loaders/loaders";
 import CorporationFilterBar from "../../Components/Corporation/CorporationFilterBar";
 import { useCorporationId } from "../../Components/Corporation/useCorporationId";
 import { loadAssetGroups } from "../../api/corporation";
+import LabeledSelect from "../../Components/Helpers/LabeledSelect";
 
 const CorporationAssetGroups = () => {
   const { t } = useTranslation();
@@ -23,15 +24,12 @@ const CorporationAssetGroups = () => {
   return (
     <>
       <CorporationFilterBar />
-      <div className="m-3 d-flex align-items-center">
-        <h6 className="me-1">{t("Location Filter")}</h6>
-        <div className="flex-grow-1">
-          <CorporationAssetLocationSelect
-            corporationID={corporationID ? Number(corporationID) : 0}
-            {...{ setLocation }}
-          />
-        </div>
-      </div>
+      <LabeledSelect label={t("Location Filter")}>
+        <CorporationAssetLocationSelect
+          corporationID={corporationID ? Number(corporationID) : 0}
+          {...{ setLocation }}
+        />
+      </LabeledSelect>
       {isFetching ? (
         <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />
       ) : corporationID > 0 ? (

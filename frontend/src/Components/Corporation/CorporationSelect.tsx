@@ -3,14 +3,9 @@ import Select, { StylesConfig } from "react-select";
 import { loadStatus } from "../../api/corporation";
 import { useQueryState } from "nuqs";
 import { useEffect, useMemo } from "react";
-import { bootstrapSelectStyles } from "../Helpers/reactSelectTheme";
+import { bootstrapSelectStyles, SelectOption } from "../Helpers/reactSelectTheme";
 
-interface CorpOption {
-  value: number;
-  label: string;
-}
-
-const colourStyles = bootstrapSelectStyles as StylesConfig<CorpOption>;
+const colourStyles = bootstrapSelectStyles as StylesConfig<SelectOption>;
 
 const CorpSelect = () => {
   const { isLoading, data } = useQuery({
@@ -19,7 +14,7 @@ const CorpSelect = () => {
   });
   const [cidStr, setCid] = useQueryState("cid");
 
-  const options: CorpOption[] = useMemo(
+  const options: SelectOption[] = useMemo(
     () =>
       isLoading
         ? []
@@ -39,7 +34,7 @@ const CorpSelect = () => {
   }, [isLoading, options, setCid]);
 
   return (
-    <Select<CorpOption>
+    <Select<SelectOption>
       isLoading={isLoading}
       value={value}
       styles={colourStyles}

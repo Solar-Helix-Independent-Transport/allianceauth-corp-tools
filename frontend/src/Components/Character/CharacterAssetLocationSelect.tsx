@@ -1,14 +1,9 @@
 import { loadAssetLocations } from "../../api/character";
 import { useQuery } from "@tanstack/react-query";
 import Select, { StylesConfig } from "react-select";
-import { bootstrapSelectStyles } from "../Helpers/reactSelectTheme";
+import { bootstrapSelectStyles, SelectOption } from "../Helpers/reactSelectTheme";
 
-interface LocationOption {
-  value: number;
-  label: string;
-}
-
-const colourStyles = bootstrapSelectStyles as StylesConfig<LocationOption>;
+const colourStyles = bootstrapSelectStyles as StylesConfig<SelectOption>;
 
 const CharacterAssetLocationSelect = ({
   characterID,
@@ -24,11 +19,11 @@ const CharacterAssetLocationSelect = ({
   });
 
   return (
-    <Select<LocationOption>
+    <Select<SelectOption>
       isLoading={isLoading}
       styles={colourStyles}
       options={data}
-      onChange={(e) => e && setLocation(e.value)}
+      onChange={(e) => e && setLocation(Number(e.value))}
     />
   );
 };

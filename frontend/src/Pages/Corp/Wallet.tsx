@@ -6,6 +6,7 @@ import { CorpLoader } from "../../Components/Loaders/loaders";
 import CorpDivisions from "../../Components/Corporation/Divisions";
 import CorporationFilterBar from "../../Components/Corporation/CorporationFilterBar";
 import { useCorporationId } from "../../Components/Corporation/useCorporationId";
+import LabeledSelect from "../../Components/Helpers/LabeledSelect";
 
 const CorporationWallets = () => {
   const { t } = useTranslation();
@@ -14,12 +15,9 @@ const CorporationWallets = () => {
   return (
     <>
       <CorporationFilterBar />
-      <div className="m-3 d-flex align-items-center my-1">
-        <h6 className="me-1">{t("Ref Type Filter")}</h6>
-        <div className="flex-grow-1">
-          <RefTypeSelect setFilter={setRefs} />
-        </div>
-      </div>
+      <LabeledSelect label={t("Ref Type Filter")}>
+        <RefTypeSelect setFilter={setRefs} />
+      </LabeledSelect>
       <div className="d-flex flex-column align-items-center my-1">
         <h5>{t("Division Balances")}</h5>
         <CorpDivisions corporationID={corporationID} />

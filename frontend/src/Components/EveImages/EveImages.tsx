@@ -3,7 +3,7 @@ import { Image } from "react-bootstrap";
 
 type Sizes = 32 | 64 | 128 | 256 | 512;
 
-export interface CharacterPortraitProps extends Partial<Element> {
+export interface CharacterPortraitProps {
   character_id?: number | string | undefined;
   size: Sizes;
   height?: number;
@@ -24,7 +24,7 @@ export const CharacterPortrait = (props: CharacterPortraitProps) => {
   );
 };
 
-export interface CorporationLogoProps extends Partial<Element> {
+export interface CorporationLogoProps {
   corporation_id?: number | string | null | undefined;
   size: Sizes;
   height?: number;
@@ -43,7 +43,7 @@ export const CorporationLogo = (props: CorporationLogoProps) => {
   );
 };
 
-export interface AllianceLogoProps extends Partial<Element> {
+export interface AllianceLogoProps {
   alliance_id?: number | string | undefined;
   size: Sizes;
   height?: number;
@@ -62,7 +62,7 @@ export const AllianceLogo = (props: AllianceLogoProps) => {
   );
 };
 
-export interface TypeIconProps extends Partial<Element> {
+export interface TypeIconProps {
   type_id?: number;
   size: Sizes;
   height?: number;
@@ -84,7 +84,7 @@ export const TypeIcon = (props: TypeIconProps) => {
   );
 };
 
-export interface PortraitProps extends Partial<Element> {
+export interface PortraitProps {
   character: {
     character_id: number | string | undefined;
     corporation_id?: number | string | null | undefined;
