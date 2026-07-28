@@ -854,6 +854,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/account/{character_id}/contract/{contract_id}/items/refresh": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Post Contract Items Refresh */
+    post: operations["corptools_api_character_refresh_post_contract_items_refresh"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/account/{character_id}/glance/assets": {
     parameters: {
       query?: never;
@@ -2303,8 +2320,8 @@ export interface components {
       assignee?: string | null;
       /** Issuer */
       issuer?: string | null;
-      /** Issuer Corporation Id */
-      issuer_corporation_id?: string | null;
+      /** Issuer Corporation */
+      issuer_corporation?: string | null;
       /** Days To Complete */
       days_to_complete: number;
       /** Collateral */
@@ -4563,6 +4580,47 @@ export interface operations {
       };
       /** @description Forbidden */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_refresh_post_contract_items_refresh: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+        contract_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Message"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+      /** @description Not Found */
+      404: {
         headers: {
           [name: string]: unknown;
         };

@@ -610,7 +610,7 @@ def update_den_locations(character_id, force_refresh=False):
     )
     for parent in parents:
         distance = Planet.objects.filter(
-            system=parent.location_name.system
+            solar_system=parent.location_name.system
         ).annotate(
             distance=Sqrt(
                 Power(
@@ -2195,11 +2195,14 @@ def update_character_contracts(character_id, force_refresh=False):
                     'date_accepted',
                     'date_completed',
                     'acceptor_id',
+                    'assignee_id',
                     'date_expired',
                     'status',
                     'assignee_name',
                     'acceptor_name',
+                    'issuer_corporation_id',
                     'issuer_corporation_name',
+                    'issuer_id',
                     'issuer_name'
                 ],
                 batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,

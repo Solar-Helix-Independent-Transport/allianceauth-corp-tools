@@ -89,7 +89,12 @@ const CharacterContracts = () => {
       />
 
       <TableWrapper data={data_out} {...{ isFetching, columns }} />
-      <CharacterContractModal data={modalData} shown={showModal} setShown={setModal} />
+      <CharacterContractModal
+        data={modalData}
+        shown={showModal}
+        setShown={setModal}
+        characterID={characterID ? Number(characterID) : 0}
+      />
     </>
   );
 };

@@ -85,3 +85,33 @@ class RefreshApiEndpoints:
                 eve_character_update.apply_async(
                     args=[cid], priority=4)
             return 200, {"message": "Requested Updates!"}
+
+        @api.post(
+            "account/{character_id}/contract/{contract_id}/items/refresh",
+            response={200: schema.Message, 403: str, 404: str},
+            tags=self.tags
+        )
+        def post_contract_items_refresh(request, character_id: int, contract_id: int):
+            if character_id == 0:
+                character_id = request.user.profile.main_character.character_id
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
+
+            if not models.Contract.objects.filter(
+                character__character__in=characters,
+                character__character__character_id=character_id,
+                contract_id=contract_id,
+            ).exists():
+                return 404, "Not Found!"
+
+            cache_key = f"refresh-block-contract-items-{character_id}-{contract_id}"
+            if cache.get(cache_key, False):
+                return 200, {"message": "GO AWAY! Already Requested!"}
+
+            character.update_char_contract_items.apply_async(
+                args=[character_id, contract_id],
+                kwargs={"force_refresh": True},
+                priority=4)
+            cache.set(cache_key, 1, 60*5)
+            return 200, {"message": "Requested Update!"}

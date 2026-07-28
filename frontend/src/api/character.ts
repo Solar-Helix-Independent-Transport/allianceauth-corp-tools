@@ -326,6 +326,18 @@ export async function postAccountRefresh(character_id: number) {
   return api.data;
 }
 
+export async function postContractItemsRefresh(
+  character_id: number,
+  contract_id: number,
+): Promise<components["schemas"]["Message"]> {
+  const api = await axios.post(
+    `/audit/api/account/${character_id}/contract/${contract_id}/items/refresh`,
+    {},
+    { headers: { "X-CSRFToken": Cookies.get("csrftoken") } },
+  );
+  return api.data;
+}
+
 export async function loadAssetList(character_id: number, location_id: number) {
   const api = await axios.get(`/audit/api/account/${character_id}/asset/${location_id}/list`);
   return api.data;

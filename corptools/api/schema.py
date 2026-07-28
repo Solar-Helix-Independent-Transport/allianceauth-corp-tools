@@ -269,7 +269,7 @@ class CharacterContract(Schema):
     assignee: Optional[str] = None
     issuer: Optional[str] = None
 
-    issuer_corporation_id: Optional[str] = None
+    issuer_corporation: Optional[str] = None
 
     days_to_complete: int
     collateral: float

@@ -2560,6 +2560,72 @@
         ]
       }
     },
+    "/audit/api/account/{character_id}/contract/{contract_id}/items/refresh": {
+      "post": {
+        "operationId": "corptools_api_character_refresh_post_contract_items_refresh",
+        "summary": "Post Contract Items Refresh",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "contract_id",
+            "schema": {
+              "title": "Contract Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Characters"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
     "/audit/api/account/{character_id}/glance/assets": {
       "get": {
         "operationId": "corptools_api_character_at_a_glance_get_glance_assets",
@@ -6861,7 +6927,7 @@
             ],
             "title": "Issuer"
           },
-          "issuer_corporation_id": {
+          "issuer_corporation": {
             "anyOf": [
               {
                 "type": "string"
@@ -6870,7 +6936,7 @@
                 "type": "null"
               }
             ],
-            "title": "Issuer Corporation Id"
+            "title": "Issuer Corporation"
           },
           "days_to_complete": {
             "title": "Days To Complete",

@@ -16,6 +16,10 @@ Classes:
 
 # Django
 from django.contrib.auth.models import Permission
+from django.utils import timezone
+
+# AA Example App
+from corptools.models import Contract, EveName
 
 from . import CorptoolsTestCase
 
@@ -390,6 +394,81 @@ class TestWalletActivityPermissions(CorptoolsTestCase):
         self.client.force_login(self.user1)
         resp = self.client.get(self._url)
         self.assertEqual(resp.status_code, 200)
+
+
+# ---------------------------------------------------------------------------
+# contract items repull — same resolve_character gate as other account
+# endpoints, plus a 404 for a contract that isn't the caller's own
+# ---------------------------------------------------------------------------
+
+class TestContractItemsRefreshPermissions(CorptoolsTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.view_module = Permission.objects.get_by_natural_key(
+            'view_characteraudit', 'corptools', 'characteraudit')
+
+        eve_name, _ = EveName.objects.get_or_create(
+            eve_id=1, defaults={"name": "Someone", "category": "character"})
+        self.contract = Contract.objects.create(
+            id=Contract.build_pk(self.ca1.id, 999),
+            character=self.ca1,
+            contract_id=999,
+            acceptor_id=0, acceptor_name=eve_name,
+            assignee_id=0, assignee_name=eve_name,
+            issuer_id=1, issuer_name=eve_name,
+            issuer_corporation_id=1, issuer_corporation_name=eve_name,
+            days_to_complete=0,
+            for_corporation=False,
+            date_expired=timezone.now(),
+            date_issued=timezone.now(),
+            status="outstanding",
+            contract_type="item_exchange",
+            availability="private",
+            title="",
+        )
+        self._url = (
+            f"/audit/api/account/{self.char1.character_id}"
+            f"/contract/{self.contract.contract_id}/items/refresh"
+        )
+
+    def test_unauthenticated_redirects_to_login(self):
+        resp = self.client.post(self._url)
+        self.assertEqual(resp.status_code, 302)
+
+    def test_no_perms_returns_403(self):
+        self.client.force_login(self.user1)
+        resp = self.client.post(self._url)
+        self.assertEqual(resp.status_code, 403)
+
+    def test_wrong_contract_id_returns_404(self):
+        self.user1.user_permissions.add(self.view_module)
+        self.client.force_login(self.user1)
+        resp = self.client.post(
+            f"/audit/api/account/{self.char1.character_id}/contract/123456/items/refresh")
+        self.assertEqual(resp.status_code, 404)
+
+    def test_other_users_character_returns_403(self):
+        # user2 can't view char1 at all, so resolve_character rejects this
+        # before the contract lookup is ever reached.
+        self.user2.user_permissions.add(self.view_module)
+        self.client.force_login(self.user2)
+        resp = self.client.post(self._url)
+        self.assertEqual(resp.status_code, 403)
+
+    def test_own_contract_returns_200(self):
+        self.user1.user_permissions.add(self.view_module)
+        self.client.force_login(self.user1)
+        resp = self.client.post(self._url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_second_request_is_rate_limited(self):
+        self.user1.user_permissions.add(self.view_module)
+        self.client.force_login(self.user1)
+        self.client.post(self._url)
+        resp = self.client.post(self._url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("GO AWAY", resp.json()["message"])
 
 
 # ---------------------------------------------------------------------------

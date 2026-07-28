@@ -3,17 +3,26 @@ import CharacterContractModalTable from "./CharacterContractModalTable";
 import { Button, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { components } from "../../api/CtApi";
+import { postContractItemsRefresh } from "../../api/character";
+import { useMutation } from "@tanstack/react-query";
 
 function CharacterContractModal({
   data,
   shown,
   setShown,
+  characterID,
 }: {
   data: components["schemas"]["CharacterContract"] | null;
   shown: boolean;
   setShown: (show: boolean) => void;
+  characterID: number;
 }) {
   const { t } = useTranslation();
+
+  const { mutate: repullItems, isPending } = useMutation({
+    mutationFn: (contractId: number) => postContractItemsRefresh(characterID, contractId),
+  });
+
   return (
     <Modal
       show={shown}
@@ -57,6 +66,18 @@ function CharacterContractModal({
           <StrIntToFields strValue={data?.days_to_complete} text={t("Days to Complete")} />
           <StrToFields strValue={data?.title} text={t("Description")} />
         </table>
+
+        <div className="d-flex justify-content-end mb-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={isPending || !data?.contract}
+            onClick={() => data?.contract && repullItems(data.contract)}
+          >
+            <i className={`fa-solid fa-arrows-rotate me-1 ${isPending ? "fa-spin" : ""}`}></i>
+            {t("Repull Items")}
+          </Button>
+        </div>
 
         <CharacterContractModalTable
           data={data?.items?.filter((item) => item.is_included)}

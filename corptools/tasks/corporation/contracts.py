@@ -88,11 +88,14 @@ def corp_contract_update(corp_id, force_refresh=False):
                 'date_accepted',
                 'date_completed',
                 'acceptor_id',
+                'assignee_id',
                 'date_expired',
                 'status',
                 'assignee_name',
                 'acceptor_name',
+                'issuer_corporation_id',
                 'issuer_corporation_name',
+                'issuer_id',
                 'issuer_name'
             ]
         )
