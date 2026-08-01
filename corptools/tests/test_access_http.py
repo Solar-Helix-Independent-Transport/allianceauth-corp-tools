@@ -19,7 +19,7 @@ from django.contrib.auth.models import Permission
 from django.utils import timezone
 
 # AA Example App
-from corptools.models import Contract, EveName
+from corptools.models import Contract, CorporateContract, EveName
 
 from . import CorptoolsTestCase
 
@@ -464,6 +464,77 @@ class TestContractItemsRefreshPermissions(CorptoolsTestCase):
 
     def test_second_request_is_rate_limited(self):
         self.user1.user_permissions.add(self.view_module)
+        self.client.force_login(self.user1)
+        self.client.post(self._url)
+        resp = self.client.post(self._url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("GO AWAY", resp.json()["message"])
+
+
+# ---------------------------------------------------------------------------
+# corp contract items repull — same corp-manager gate (visible_to()) as
+# corp/list and corporation/refresh, plus a 404 for an unknown contract
+# ---------------------------------------------------------------------------
+
+class TestCorporationContractItemsRefreshPermissions(CorptoolsTestCase):
+
+    def setUp(self):
+        super().setUp()
+        eve_name, _ = EveName.objects.get_or_create(
+            eve_id=1, defaults={"name": "Someone", "category": "character"})
+        self.contract = CorporateContract.objects.create(
+            id=CorporateContract.build_pk(self.cp1.id, 999),
+            corporation=self.cp1,
+            contract_id=999,
+            acceptor_id=0, acceptor_name=eve_name,
+            assignee_id=0, assignee_name=eve_name,
+            issuer_id=1, issuer_name=eve_name,
+            issuer_corporation_id=1, issuer_corporation_name=eve_name,
+            days_to_complete=0,
+            for_corporation=True,
+            date_expired=timezone.now(),
+            date_issued=timezone.now(),
+            status="outstanding",
+            contract_type="item_exchange",
+            availability="private",
+            title="",
+        )
+        self._url = (
+            f"/audit/api/corporation/{self.corp1.corporation_id}"
+            f"/contract/{self.contract.contract_id}/items/refresh"
+        )
+
+    def test_unauthenticated_redirects_to_login(self):
+        resp = self.client.post(self._url)
+        self.assertEqual(resp.status_code, 302)
+
+    def test_no_perms_returns_403(self):
+        self.client.force_login(self.user1)
+        resp = self.client.post(self._url)
+        self.assertEqual(resp.status_code, 403)
+
+    def test_wrong_contract_id_returns_404(self):
+        self.user1.user_permissions.add(self.own_corp_manager)
+        self.client.force_login(self.user1)
+        resp = self.client.post(
+            f"/audit/api/corporation/{self.corp1.corporation_id}/contract/123456/items/refresh")
+        self.assertEqual(resp.status_code, 404)
+
+    def test_other_corp_manager_cannot_see_own_corp_returns_403(self):
+        # user2 manages corp2, not corp1.
+        self.user2.user_permissions.add(self.own_corp_manager)
+        self.client.force_login(self.user2)
+        resp = self.client.post(self._url)
+        self.assertEqual(resp.status_code, 403)
+
+    def test_own_corp_manager_returns_200(self):
+        self.user1.user_permissions.add(self.own_corp_manager)
+        self.client.force_login(self.user1)
+        resp = self.client.post(self._url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_second_request_is_rate_limited(self):
+        self.user1.user_permissions.add(self.own_corp_manager)
         self.client.force_login(self.user1)
         self.client.post(self._url)
         resp = self.client.post(self._url)

@@ -105,6 +105,30 @@ class TestUpdateCorporateContractItems(TestCase):
         self.assertIn("42", result)
         self.assertIn("NOT FOUND", result)
 
+    @patch("corptools.tasks.utils.rate_limiter")
+    @patch("corptools.tasks.corporation.corp_contract_item_fetch")
+    def test_rate_limit_bucket_is_shared_per_corp_not_per_contract(
+        self, mock_helper, mock_limiter
+    ):
+        # Without keys=["corp_id"], task_bucket_slug_key() had nothing to
+        # restrict_to and fell back to just the bare task name - meaning
+        # every corp AND every contract on the whole install shared one
+        # global 600/15m budget, so one corp's big backfill could starve
+        # every other corp's contract-item syncs.
+        mock_limiter.check_bucket.return_value = None
+        mock_helper.return_value = "items done"
+
+        update_corporate_contract_items(123, 42)
+        update_corporate_contract_items(123, 99)
+        update_corporate_contract_items(456, 42)
+
+        slugs = [
+            call.args[0].slug for call in mock_limiter.check_bucket.call_args_list]
+        # same corp, different contract -> same bucket
+        self.assertEqual(slugs[0], slugs[1])
+        # different corp -> different bucket
+        self.assertNotEqual(slugs[0], slugs[2])
+
 
 class TestUpdateCorpContracts(CorptoolsTestCase):
     @patch("corptools.tasks.corporation.Chain")
@@ -119,6 +143,22 @@ class TestUpdateCorpContracts(CorptoolsTestCase):
         mock_contracts.assert_called_once_with(123, force_refresh=False)
         mock_chain_instance.apply_async.assert_called_once_with(priority=8)
         self.assertIn("123", result)
+
+    @patch("corptools.tasks.corporation.Chain")
+    @patch("corptools.tasks.corporation.corp_contract_update")
+    def test_force_refresh_is_propagated_to_item_chain(self, mock_contracts, mock_chain_cls):
+        # force_refresh used to be dropped here, so forcing a contract
+        # refresh never force-refreshed the resulting contracts' items -
+        # unlike the character-side equivalent, which does propagate it.
+        mock_contracts.return_value = (None, [101, 102])
+        mock_chain_cls.return_value = MagicMock()
+
+        update_corp_contracts(123, force_refresh=True)
+
+        signatures = mock_chain_cls.call_args[0][0]
+        self.assertEqual(len(signatures), 2)
+        for sig in signatures:
+            self.assertTrue(sig.kwargs.get("force_refresh"))
 
     @patch("corptools.tasks.corporation.Chain")
     @patch("corptools.tasks.corporation.corp_contract_update")

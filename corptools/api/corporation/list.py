@@ -5,7 +5,9 @@ from typing import List
 from ninja import NinjaAPI
 
 # Django
+from django.core.cache import cache
 from django.db.models import Q
+from django.utils.translation import gettext as _
 
 # Alliance Auth
 from esi.models import Token
@@ -13,7 +15,7 @@ from esi.models import Token
 # AA Example App
 from corptools import app_settings, models
 from corptools.api import schema
-from corptools.tasks import update_corp
+from corptools.tasks import update_corp, update_corporate_contract_items
 
 
 class ListApiEndpoints:
@@ -173,3 +175,35 @@ class ListApiEndpoints:
                 },
                 priority=4)
             return 200, {"message": "Requested Updates!"}
+
+        @api.post(
+            "corporation/{corporation_id}/contract/{contract_id}/items/refresh",
+            response={200: schema.Message, 403: str, 404: str},
+            tags=self.tags
+        )
+        def post_corporation_contract_items_refresh(request, corporation_id: int, contract_id: int):
+            corp = models.CorporationAudit.objects.visible_to(
+                request.user
+            ).filter(
+                corporation__corporation_id=corporation_id
+            )
+
+            if not corp.exists():
+                return 403, _("Permission Denied")
+
+            if not models.CorporateContract.objects.filter(
+                corporation__corporation__corporation_id=corporation_id,
+                contract_id=contract_id,
+            ).exists():
+                return 404, _("Not Found")
+
+            cache_key = f"refresh-block-corp-contract-items-{corporation_id}-{contract_id}"
+            if cache.get(cache_key, False):
+                return 200, {"message": "GO AWAY! Already Requested!"}
+
+            update_corporate_contract_items.apply_async(
+                args=[corporation_id, contract_id],
+                kwargs={"force_refresh": True},
+                priority=4)
+            cache.set(cache_key, 1, 60*5)
+            return 200, {"message": "Requested Update!"}

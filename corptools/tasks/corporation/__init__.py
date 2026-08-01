@@ -93,9 +93,10 @@ def update_corp_starbases(self, corp_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True, "keys": ["corp_id", "contract_id"]},
     name="corptools.tasks.update_corp_contract_items"
 )
-@rate_limited_task("600/15m")
+@rate_limited_task("600/15m", keys=["corp_id"])
 @esi_error_retry
 def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=False):
     try:
@@ -132,7 +133,8 @@ def update_corp_contracts(self, corp_id, force_refresh=False, chain=[]):
             _chain.append(
                 update_corporate_contract_items.si(
                     corp_id,
-                    id
+                    id,
+                    force_refresh=force_refresh
                 )
             )
         Chain(_chain).apply_async(priority=8)

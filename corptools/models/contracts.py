@@ -118,6 +118,11 @@ class Contract(models.Model):
 
     @staticmethod
     def build_pk(char, cont):
+        # KNOWN ISSUE: naive concatenation with no separator between two
+        # integers is collision-prone - e.g. char=1, cont=23 and char=12,
+        # cont=3 both produce "123". A collision would make bulk_create
+        # (ignore_conflicts=True) silently drop a real contract for a
+        # different character.
         return f"{char}{cont}"
 
     class Meta:
@@ -262,6 +267,12 @@ class CorporateContract(models.Model):
 
     @staticmethod
     def build_pk(corp, cont):
+        # KNOWN ISSUE: same collision risk as Contract.build_pk above - see
+        # that comment. unique_together below is the real uniqueness
+        # constraint; this hand-rolled string PK is redundant and a
+        # collision would silently drop a real contract via
+        # bulk_create(ignore_conflicts=True). Left alone for now since
+        # fixing it properly requires a migration.
         return f"{corp}{cont}"
 
     class Meta:
