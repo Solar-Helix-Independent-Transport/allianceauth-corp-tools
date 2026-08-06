@@ -86,7 +86,7 @@ class DashboardApiEndpoints:
                     output[to_sys]["end"] = {
                         "system_name": s.system_name.name,
                         "system_id": s.system_name_id,
-                        "ozone": levels.get(s.structure_id),
+                        "ozone": levels.get(s.structure_id) or 0,
                         "known": True,
                         "active": active,
                         "expires": days,
@@ -97,7 +97,7 @@ class DashboardApiEndpoints:
                     output[from_sys]["start"] = {
                         "system_name": s.system_name.name,
                         "system_id": s.system_name_id,
-                        "ozone": levels.get(s.structure_id),
+                        "ozone": levels.get(s.structure_id) or 0,
                         "known": True,
                         "active": active,
                         "expires": days,
