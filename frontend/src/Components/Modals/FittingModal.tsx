@@ -36,6 +36,8 @@ import { useQuery } from "@tanstack/react-query";
 import { loadStructureFit } from "../../api/corporation";
 import { PanelLoader } from "../Loaders/loaders";
 import { useTranslation } from "react-i18next";
+import CopyToClipboard from "react-copy-to-clipboard";
+import { useState } from "react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -112,7 +114,7 @@ export interface StructureFitData {
 interface ShipInfo {
   id?: number;
   name: string;
-  type?: { id: number };
+  type?: { id: number; name?: string };
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -366,6 +368,47 @@ const FittingModalCircle = ({
 
 // ── Exported modals ───────────────────────────────────────────────────────────
 
+// ── EFT fit builder ───────────────────────────────────────────────────────────
+const SLOT_PREFIXES = ["HiSlot", "MedSlot", "LoSlot", "RigSlot", "ServiceSlot"] as const;
+const SLOT_FALLBACKS: Record<string, number> = { HiSlot: 8, MedSlot: 8, LoSlot: 8, RigSlot: 3, ServiceSlot: 6 };
+const SLOT_DATA_KEY: Record<string, "high" | "med" | "low" | "rig" | "service"> = {
+  HiSlot: "high",
+  MedSlot: "med",
+  LoSlot: "low",
+  RigSlot: "rig",
+  ServiceSlot: "service",
+};
+
+const buildEftFit = (ship: ShipInfo, data: StructureFitData): string => {
+  const shipTypeName = ship.type?.name ?? ship.name ?? "Structure";
+  const fitName = ship.name || shipTypeName;
+  const lines: string[] = [`[${shipTypeName}, ${fitName}]`];
+
+  for (const prefix of SLOT_PREFIXES) {
+    const count = data[SLOT_DATA_KEY[prefix]] ?? SLOT_FALLBACKS[prefix];
+    for (let i = 0; i < count; i++) {
+      const item = data.fit[`${prefix}${i}`] as FitItem | undefined;
+      if (item) lines.push(item.name);
+    }
+  }
+
+  const fighterCount = data.fighter ?? 0;
+  for (let i = 0; i < fighterCount; i++) {
+    const item = data.fit[`FighterTube${i}`] as FitItem | undefined;
+    if (item) lines.push(item.name);
+  }
+
+  const fighterBay = data.fit.FighterBay ?? [];
+  if (fighterBay.length > 0) {
+    lines.push("");
+    for (const item of fighterBay) {
+      lines.push(item.qty && item.qty > 1 ? `${item.name} x${item.qty}` : item.name);
+    }
+  }
+
+  return lines.join("\n");
+};
+
 export const FittingModal = ({
   ship,
   showModal,
@@ -418,7 +461,7 @@ export const AssetFittingModal = ({
 
   const ship: ShipInfo = {
     name: asset.item.name,
-    type: { id: asset.item.id },
+    type: { id: asset.item.id, name: asset.item.name },
   };
 
   return <FittingModalBase {...{ ship, data, showModal, setShowModal }} isFetching={false} />;
@@ -438,11 +481,30 @@ export const FittingModalBase = ({
   isFetching: boolean;
 }) => {
   const { t } = useTranslation();
+  const [copied, setCopied] = useState(false);
 
   return (
     <Modal size="xl" show={showModal} onHide={() => setShowModal(false)}>
       <Modal.Header>
         <Modal.Title>{ship?.name}</Modal.Title>
+        {data && (
+          <CopyToClipboard
+            text={buildEftFit(ship, data)}
+            onCopy={() => {
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+          >
+            <button
+              type="button"
+              className="btn btn-sm btn-secondary ms-auto"
+              title={t("Copy fit to clipboard for evepraisal")}
+            >
+              <i className="fa-solid fa-copy me-1"></i>
+              {copied ? t("Copied!") : t("Copy Fit")}
+            </button>
+          </CopyToClipboard>
+        )}
       </Modal.Header>
       {isFetching || !data ? (
         <PanelLoader title={t("Loading Fit")} message={t("Please Wait")} />
