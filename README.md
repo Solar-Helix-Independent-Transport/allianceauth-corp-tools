@@ -123,22 +123,22 @@ All permissions are filtered by main character, if a person has neutral alts loa
 
 | Perm                | Admin Site | Perm                                                                         | Description                                            |
 | ------------------- | ---------- | ---------------------------------------------------------------------------- | ------------------------------------------------------ |
-| view_characteraudit | nill       | Can view character audit.                                                    | Generic Access perm to show the Member Audit Menu item |
-| global_hr           | nill       | Can access other character's data for characters in any corp/alliance/state. | Superuser level access                                 |
-| alliance_hr         | nill       | Can access other character's data for own alliance.                          | Alliance only level access                             |
-| corp_hr             | nill       | Can access other character's data for own corp.                              | Own Corp restricted level access                       |
+| view_characteraudit | nil        | Can view character audit.                                                    | Generic Access perm to show the Member Audit Menu item |
+| global_hr           | nil        | Can access other character's data for characters in any corp/alliance/state. | Superuser level access                                 |
+| alliance_hr         | nil        | Can access other character's data for own alliance.                          | Alliance only level access                             |
+| corp_hr             | nil        | Can access other character's data for own corp.                              | Own Corp restricted level access                       |
 
 ### Corporate
 
 | Perm                    | Admin Site | Perm                                                                         | Description                                                        |
 | ----------------------- | ---------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| global_corp_manager     | nill       | Can access other character's data for characters in any corp/alliance/state. | Superuser level access                                             |
-| alliance_corp_manager   | nill       | Can access other character's data for own alliance.                          | Alliance only level access                                         |
-| own_corp_manager        | nill       | Can access other character's data for own corp.                              | Own Corp restricted level access                                   |
-| show_if_director        | nill       | Can access all corporations's where character is a director.                 | Can access corporation audit where user has one director character |
-| holding_corp_structures | nill       | Can access configured holding corp structure data.                           | Holding Corp Structure data access                                 |
-| holding_corp_wallets    | nill       | Can access configured holding corp wallet data.                              | Holding Corp Structure data access                                 |
-| holding_corp_assets     | nill       | Can access configured holding corp asset data.                               | Holding Corp Structure data access                                 |
+| global_corp_manager     | nil        | Can access other character's data for characters in any corp/alliance/state. | Superuser level access                                             |
+| alliance_corp_manager   | nil        | Can access other character's data for own alliance.                          | Alliance only level access                                         |
+| own_corp_manager        | nil        | Can access other character's data for own corp.                              | Own Corp restricted level access                                   |
+| show_if_director        | nil        | Can access all corporations's where character is a director.                 | Can access corporation audit where user has one director character |
+| holding_corp_structures | nil        | Can access configured holding corp structure data.                           | Holding Corp Structure data access                                 |
+| holding_corp_wallets    | nil        | Can access configured holding corp wallet data.                              | Holding Corp Structure data access                                 |
+| holding_corp_assets     | nil        | Can access configured holding corp asset data.                               | Holding Corp Structure data access                                 |
 
 Note: Configure the "Holding Corps" in the `Corptools Configuration` Admin Model. via the auth admin interface.
 
@@ -173,10 +173,10 @@ To assist with auth related tasks we request `publicData` on top of the configur
 | Wallets/Markets/Contracts | `CT_CHAR_WALLET_MODULE` (`True`)         | `CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE` (`False`)        | Character Wallets, Contracts and Trading/Orders | 'esi-markets.read_character_orders.v1', 'esi-wallet.read_character_wallet.v1', 'esi-contracts.read_character_contracts.v1' | Fully Enabled                         |
 | Skills                    | `CT_CHAR_SKILLS_MODULE` (`True`)         | `CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE` (`False`)        | Character Skills/Queues and Doctrine Tools      | 'esi-skills.read_skillqueue.v1','esi-skills.read_skills.v1'                                                                | Fully Enabled with Sec Group Filters  |
 | Clones                    | `CT_CHAR_CLONES_MODULE` (`True`)         | `CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE` (`False`)        | Character Medical and Jump Clone Module         | 'esi-clones.read_implants.v1', 'esi-clones.read_clones.v1'                                                                 | Fully Enabled with a Sec Group Filter |
-| Fleet                     | `CT_CHAR_FLEET_MODULE` (`True`)          | nill                                                   | Character Fleet Tools                           | 'esi-fleets.read_fleet.v1', 'esi-fleets.write_fleet.v1`                                                                    | Future Version                        |
+| Fleet                     | `CT_CHAR_FLEET_MODULE` (`True`)          | nil                                                    | Character Fleet Tools                           | 'esi-fleets.read_fleet.v1', 'esi-fleets.write_fleet.v1`                                                                    | Future Version                        |
 | Mail                      | `CT_CHAR_MAIL_MODULE` (`False`)          | `CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE` (`False`)          | Character Mail Views                            | 'esi-mail.read_mail.v1`                                                                                                    | Fully Enabled                         |
 | Helpers                   | `CT_CHAR_HELPER_MODULE` (`False`)        | `CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE` (`False`)        | Character Helpers                               | 'esi-ui.open_window.v1','esi-ui.write_waypoint.v1'                                                                         | Future Versions                       |
-| Opportunities             | `CT_CHAR_OPPORTUNITIES` (`False`)        | nill                                                   | Character Opportunities                         | 'esi-characters.read_opportunities.v1'                                                                                     | Future Versions                       |
+| Opportunities             | `CT_CHAR_OPPORTUNITIES` (`False`)        | nil                                                    | Character Opportunities                         | 'esi-characters.read_opportunities.v1'                                                                                     | Future Versions                       |
 | Loyalty Points            | `CT_CHAR_LOYALTYPOINTS_MODULE` (`False`) | `CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE` (`True`)  | Character LP                                    | 'esi-characters.read_loyalty.v1'                                                                                           | Fully Enabled                         |
 
 ### Extra Scopes
