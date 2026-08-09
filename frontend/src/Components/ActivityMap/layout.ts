@@ -6,9 +6,9 @@ import type { ActivityMapResponse, ActivityNodeData } from "./types";
 // Systems with no data still need to be clickable/visible against the full
 // map backdrop, just unobtrusively so - a small fixed dot rather than a
 // zero-size node. (10x the original sizing.)
-const NO_VALUE_RADIUS = 5;
-const MIN_VALUE_RADIUS = 20;
-const MAX_RADIUS = 130;
+export const NO_VALUE_RADIUS = 5;
+export const MIN_VALUE_RADIUS = 15;
+export const MAX_RADIUS = 200;
 
 // Translucent accent color where there's data to show - dots overlapping
 // near a busy system blend into a denser blob, giving the overlay a

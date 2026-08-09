@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { BaseMapSystem } from "../SpaceMap/types";
-import { buildActivityNodes } from "./layout";
+import { buildActivityNodes, MAX_RADIUS, MIN_VALUE_RADIUS, NO_VALUE_RADIUS } from "./layout";
 import type { ActivityMapResponse } from "./types";
 
 const makeSystem = (overrides: Partial<BaseMapSystem> & { id: number }): BaseMapSystem => ({
@@ -61,9 +61,9 @@ describe("buildActivityNodes", () => {
     expect(node.data.value).toBe(0);
     expect(node.data.count).toBe(0);
     expect(node.data.quantity).toBe(0);
-    expect(node.data.radius).toBe(5);
-    expect(node.initialWidth).toBe(10);
-    expect(node.initialHeight).toBe(10);
+    expect(node.data.radius).toBe(NO_VALUE_RADIUS);
+    expect(node.initialWidth).toBe(NO_VALUE_RADIUS * 2);
+    expect(node.initialHeight).toBe(NO_VALUE_RADIUS * 2);
     expect(node.data.color).not.toContain("info");
   });
 
@@ -76,8 +76,8 @@ describe("buildActivityNodes", () => {
 
     const nodes = buildActivityNodes(response, "2d");
 
-    expect(nodes[0].data.radius).toBe(5);
-    expect(nodes[1].data.radius).toBe(5);
+    expect(nodes[0].data.radius).toBe(NO_VALUE_RADIUS);
+    expect(nodes[1].data.radius).toBe(NO_VALUE_RADIUS);
   });
 
   it("scales the highest-value system to MAX_RADIUS and uses the value color", () => {
@@ -86,7 +86,7 @@ describe("buildActivityNodes", () => {
 
     const [node] = buildActivityNodes(response, "2d");
 
-    expect(node.data.radius).toBe(260);
+    expect(node.data.radius).toBe(MAX_RADIUS);
     expect(node.data.value).toBe(100);
     expect(node.data.count).toBe(3);
     expect(node.data.quantity).toBe(7);
@@ -102,8 +102,9 @@ describe("buildActivityNodes", () => {
 
     const nodes = buildActivityNodes(response, "2d");
 
-    // fraction = sqrt(25/100) = 0.5 -> 20 + 0.5 * (260 - 20) = 140
-    expect(nodes[1].data.radius).toBe(140);
+    // fraction = sqrt(25/100) = 0.5
+    const expectedRadius = MIN_VALUE_RADIUS + 0.5 * (MAX_RADIUS - MIN_VALUE_RADIUS);
+    expect(nodes[1].data.radius).toBe(expectedRadius);
   });
 
   it("gives bigger dots a lower zIndex, so they paint behind smaller ones", () => {
