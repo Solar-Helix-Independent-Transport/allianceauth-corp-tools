@@ -131,6 +131,7 @@ const ActivityMap = ({
         <div style={{ position: "relative" }}>
           <ReactFlowProvider>
             <ActivityMapCanvas
+              id={id}
               data={data}
               coordMode={coordMode}
               dataSource={dataSource}

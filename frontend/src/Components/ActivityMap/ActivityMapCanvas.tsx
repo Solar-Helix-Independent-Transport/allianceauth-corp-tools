@@ -10,12 +10,14 @@ import type { ActivityMapDataSource, ActivityMapResponse } from "./types";
 const nodeTypes = { dot: ActivityDotNode };
 
 const ActivityMapCanvas = ({
+  id,
   data,
   coordMode,
   dataSource,
   initialViewport,
   onViewportChange,
 }: {
+  id: number;
   data: ActivityMapResponse;
   coordMode: MapCoordMode;
   dataSource: ActivityMapDataSource;
@@ -29,6 +31,24 @@ const ActivityMapCanvas = ({
     [data.values],
   );
 
+  // Every known-space system renders as a node (see buildActivityNodes) so
+  // the whole map stays clickable, but that means an unrestricted fitView
+  // frames the entire backdrop rather than the handful of systems that
+  // actually have data - restricting the initial fit to just these keeps the
+  // map zoomed to what's actually interesting instead of the whole universe.
+  // Intersected with data.systems because the backdrop excludes wormhole/
+  // abyssal systems entirely (see build_base_map_payload) - a value entry
+  // for one of those has no matching node at all, and handing fitView an id
+  // with zero real matches collapses its bounds to a single degenerate
+  // point, which xyflow resolves as "zoom in as far as possible" rather than
+  // falling back to fitting everything else.
+  const activeNodeIds = useMemo(() => {
+    const systemIds = new Set(data.systems.map((s) => String(s.id)));
+    return data.values
+      .filter((v) => v.value > 0 && systemIds.has(String(v.system_id)))
+      .map((v) => String(v.system_id));
+  }, [data.systems, data.values]);
+
   return (
     <SpaceMapCanvas
       systems={data.systems}
@@ -39,6 +59,8 @@ const ActivityMapCanvas = ({
       nodeTypes={nodeTypes}
       initialViewport={initialViewport}
       onViewportChange={onViewportChange}
+      fitViewKey={id}
+      fitViewNodeIds={activeNodeIds}
       renderDetailPanel={(system, onClose) => {
         const v = valuesBySystem.get(system.id);
         return (

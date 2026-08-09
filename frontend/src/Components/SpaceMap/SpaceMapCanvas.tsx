@@ -61,6 +61,24 @@ export type SpaceMapCanvasProps<
   // Omitting these preserves the original always-fitView behaviour.
   initialViewport?: Viewport;
   onViewportChange?: (viewport: Viewport) => void;
+  // Identifies "which map" is being shown - e.g. the character/corporation
+  // id an activity map is scoped to. A saved pan/zoom only frames the node
+  // set it was captured against; if the caller switches to a different
+  // scope (a different corp, or "all corporations") while keeping the same
+  // coordMode, the node set's extent can change completely while the old
+  // viewport - restored via initialViewport, or just left over from before -
+  // stays put, framing the wrong region and clipping/overflowing the new
+  // nodes. Changing this key re-fits, the same way a coordMode change does;
+  // leave it undefined for callers with only one map/scope (e.g. sovmap).
+  fitViewKey?: string | number;
+  // Restricts the auto-fit to just these node ids instead of every node -
+  // the activity map always renders the *entire* known-space backdrop (every
+  // system, not just ones with data) so its nodes stay clickable, but fitting
+  // to all of them zooms out to frame the whole universe even when actual
+  // activity is a tiny cluster inside it. Passing just the nodes that have
+  // data keeps the initial view zoomed to what's actually interesting;
+  // omit (or pass an empty list) to fit every node as before.
+  fitViewNodeIds?: string[];
 };
 
 // The shared, feature-agnostic space map shell: normalized system positions,
@@ -81,6 +99,8 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
   renderDetailPanel,
   initialViewport,
   onViewportChange,
+  fitViewKey,
+  fitViewNodeIds,
 }: SpaceMapCanvasProps<TSystem, TNodeData>) => {
   const nodeTypes = useMemo(
     () => ({ regionLabel: RegionLabelNode, ...nodeTypesProp }),
@@ -211,22 +231,55 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
   const { ref, height } = useFillHeight<HTMLDivElement>();
 
   // Switching coordinate systems moves every node to a completely different
-  // layout, so the previous pan/zoom no longer frames anything meaningful -
-  // re-fit whenever the coordinate mode changes (but not on every data
-  // refresh/mode toggle, which would otherwise fight the user's own panning).
-  // The one exception is the very first run: if the caller handed us a
-  // restored viewport (e.g. from a URL query string), that's an explicit
-  // request to land somewhere specific instead of auto-fitting - honour it
-  // once, then fall back to the normal re-fit-on-mode-change behaviour.
+  // layout, and switching fitViewKey (e.g. the corp/character a map is
+  // scoped to) swaps in a differently-sized/positioned node set entirely -
+  // either way the previous pan/zoom no longer frames anything meaningful,
+  // so re-fit when either changes (but not on every data refresh with the
+  // same scope, which would otherwise fight the user's own panning). The one
+  // exception is the very first run: if the caller handed us a restored
+  // viewport (e.g. from a URL query string), that's an explicit request to
+  // land somewhere specific instead of auto-fitting - honour it once, then
+  // fall back to the normal re-fit-on-change behaviour.
   const skippedInitialFit = useRef(false);
   useEffect(() => {
     if (!skippedInitialFit.current) {
       skippedInitialFit.current = true;
       if (initialViewport) return;
     }
-    fitView();
+    // fitView only counts a node toward the fit bounds once xyflow has
+    // measured its rendered size (getFitViewNodes checks node.measured
+    // directly, no initialWidth/initialHeight fallback) - useNodesInitialized
+    // is the documented way to wait for that, but on this map's node count
+    // (thousands of backdrop systems plus one zero-footprint node per region
+    // - see RegionLabelNode) it was observed, live, to never resolve at all,
+    // permanently blocking every fit. So instead: check readiness of just the
+    // handful of nodes this fit actually needs, retry a few animation frames
+    // if they're not measured yet, and fit with whatever's ready once the
+    // budget runs out rather than waiting forever on a signal that may never
+    // come.
+    let cancelled = false;
+    let attempts = 0;
+    const tryFit = () => {
+      if (cancelled) return;
+      const measuredFitIds = fitViewNodeIds?.filter((id) => {
+        const measured = getInternalNode(id)?.measured;
+        return Boolean(measured?.width && measured?.height);
+      });
+      const targetCount = fitViewNodeIds?.length ?? 0;
+      const ready = targetCount === 0 || (measuredFitIds?.length ?? 0) > 0;
+      if (!ready && attempts < 30) {
+        attempts += 1;
+        requestAnimationFrame(tryFit);
+        return;
+      }
+      fitView(measuredFitIds?.length ? { nodes: measuredFitIds.map((id) => ({ id })) } : undefined);
+    };
+    tryFit();
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coordMode]);
+  }, [coordMode, fitViewKey, fitViewNodeIds]);
 
   return (
     // xyflow's own Controls/MiniMap chrome is styled via these CSS custom
@@ -241,6 +294,16 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
           position: "relative",
           width: "100%",
           height,
+          // The stargate/jump-bridge/region-label layers below are drawn as
+          // sibling <svg> overlays with their own overflow:visible (needed
+          // so lines aren't clipped by their own SVG box at every zoom
+          // level) - neither that nor xyflow's own container clips content
+          // to the map's actual footprint, so at low zoom or once panned,
+          // nodes and lines bleed out past this box into whatever page
+          // chrome sits above/around it. This is the one place that clips
+          // the whole assembly - ReactFlow, MiniMap/Controls, and all three
+          // overlay layers alike - back down to the intended area.
+          overflow: "hidden",
           "--xy-controls-button-background-color": "var(--bs-tertiary-bg)",
           "--xy-controls-button-background-color-hover": "var(--bs-secondary-bg)",
           "--xy-controls-button-color": "var(--bs-body-color)",
@@ -265,10 +328,14 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
         nodeTypes={nodeTypes}
         edgeTypes={BASE_EDGE_TYPES}
         nodeOrigin={[0.5, 0.5]}
-        // defaultViewport is ignored by xyflow whenever fitView is set, so
-        // these are mutually exclusive: restore the saved spot if we have
-        // one, otherwise fall back to the original auto-fit.
-        {...(initialViewport ? { defaultViewport: initialViewport } : { fitView: true })}
+        // Deliberately not using the declarative fitView prop here: it fits
+        // *every* node with no way to pass fitViewNodeIds, so on first mount
+        // it would race the effect below (both wait on nodesInitialized) and
+        // could win, clobbering our restricted fit with an unrestricted one
+        // that frames the whole backdrop instead of just the active systems.
+        // The effect handles the initial fit too, so this only needs to
+        // restore a saved viewport when we have one.
+        {...(initialViewport ? { defaultViewport: initialViewport } : {})}
         nodesDraggable={false}
         nodesConnectable={false}
         edgesFocusable={false}
