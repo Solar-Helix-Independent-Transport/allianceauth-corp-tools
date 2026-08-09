@@ -1746,6 +1746,21 @@ def update_character_mail_body(character_id, mail_message, force_refresh=False):
     return mail_message
 
 
+def _mail_sender_is_mailing_list(msg):
+    """A mail's `from` id can itself be a mailing list rather than a
+    character/corp/alliance, and ESI 404s ("Ensure all IDs are valid before
+    resolving.") if you try to resolve a mailing-list id as a name (#257).
+    ESI's mail schema has no from_type to check directly, but a
+    mailing-list sender's id reliably also shows up as a mailing_list-type
+    recipient on that same message, so that's used as the signal instead.
+    """
+    sender_id = getattr(msg, "from")
+    return any(
+        recip.recipient_type == "mailing_list" and recip.recipient_id == sender_id
+        for recip in msg.recipients
+    )
+
+
 def update_character_mail_headers(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
@@ -1826,7 +1841,7 @@ def update_character_mail_headers(character_id, force_refresh=False):
 
         names_to_create = set()
         for msg in mail:
-            if getattr(msg, "from") not in _current_eve_ids:
+            if getattr(msg, "from") not in _current_eve_ids and not _mail_sender_is_mailing_list(msg):
                 names_to_create.add(getattr(msg, "from"))
 
             for recip in msg.recipients:
@@ -1854,7 +1869,10 @@ def update_character_mail_headers(character_id, force_refresh=False):
                        str(msg.mail_id))
 
             if not already_known:
-                if getattr(msg, "from") not in _current_eve_ids:
+                if (
+                    getattr(msg, "from") not in _current_eve_ids
+                    and not _mail_sender_is_mailing_list(msg)
+                ):
                     if getattr(msg, "from") not in failed_ids:
                         try:
                             EveName.objects.get_or_create_from_esi(

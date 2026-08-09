@@ -1,10 +1,12 @@
 # Standard Library
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 # Django
 from django.test import TestCase
 
 # AA Example App
+from corptools.task_helpers.char_tasks import _mail_sender_is_mailing_list
 from corptools.tasks.character.assets import update_char_assets
 from corptools.tasks.character.clones import update_char_clones
 from corptools.tasks.character.misc import (
@@ -26,6 +28,46 @@ from corptools.tasks.character.social import (
     update_char_mail,
     update_char_notifications,
 )
+
+
+class TestMailSenderIsMailingList(TestCase):
+    """Regression tests for #257: ESI 404s ("Ensure all IDs are valid
+    before resolving.") when a mail's `from` id is itself a mailing list
+    rather than a character/corp/alliance. ESI's mail schema has no
+    from_type to check directly, so _mail_sender_is_mailing_list infers it
+    from the sender's id also appearing as a mailing_list-type recipient on
+    the same message."""
+
+    def test_true_when_sender_id_matches_a_mailing_list_recipient(self):
+        # The exact payload shape reported in #257.
+        msg = SimpleNamespace(**{
+            "from": 145093383,
+            "recipients": [
+                SimpleNamespace(recipient_id=145093383,
+                                recipient_type="mailing_list"),
+            ],
+        })
+        self.assertTrue(_mail_sender_is_mailing_list(msg))
+
+    def test_false_for_an_ordinary_character_sender(self):
+        msg = SimpleNamespace(**{
+            "from": 90000001,
+            "recipients": [
+                SimpleNamespace(recipient_id=90000002,
+                                recipient_type="character"),
+            ],
+        })
+        self.assertFalse(_mail_sender_is_mailing_list(msg))
+
+    def test_false_when_sender_id_only_coincidentally_matches_a_non_mailing_list_recipient(self):
+        msg = SimpleNamespace(**{
+            "from": 145093383,
+            "recipients": [
+                SimpleNamespace(recipient_id=145093383,
+                                recipient_type="character"),
+            ],
+        })
+        self.assertFalse(_mail_sender_is_mailing_list(msg))
 
 
 class TestCharacterSocialTasks(TestCase):
