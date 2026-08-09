@@ -249,9 +249,10 @@ def update_character(self, char_id, force_refresh=False, now=False):
         ))
 
     if app_settings.CT_CHAR_MAIL_MODULE and not ct_conf.disable_update_mails:
-        que.append(update_char_mail.si(
-            character.character.character_id, force_refresh=force_refresh
-        ))
+        if _needs_update(character.get_update_time("mails"), skip_date, force_refresh, min_date):
+            que.append(update_char_mail.si(
+                character.character.character_id, force_refresh=force_refresh
+            ))
 
     if app_settings.CT_CHAR_LOYALTYPOINTS_MODULE and not ct_conf.disable_update_loyaltypoints:
         que.append(update_char_loyaltypoints.si(
