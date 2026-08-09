@@ -14,8 +14,8 @@
       "_@app-libs-DIJV9c2g.js"
     ]
   },
-  "_@lang-libs-Cl5hnNIJ.js": {
-    "file": "assets/@lang-libs-Cl5hnNIJ.js",
+  "_@lang-libs-l1_7Iw72.js": {
+    "file": "assets/@lang-libs-l1_7Iw72.js",
     "name": "@lang-libs",
     "imports": [
       "_rolldown-runtime-QTnfLwEv.js",
@@ -36,7 +36,7 @@
     "name": "rolldown-runtime"
   },
   "index.html": {
-    "file": "assets/index-BvqTneDz.js",
+    "file": "assets/index-w8vzaYpr.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
@@ -44,8 +44,8 @@
       "_rolldown-runtime-QTnfLwEv.js",
       "_@app-libs-DIJV9c2g.js",
       "_@bootstrap-libs-DrlPb3NK.js",
-      "_@react-libs-Dhmt5BkD.js",
-      "_@lang-libs-Cl5hnNIJ.js"
+      "_@lang-libs-l1_7Iw72.js",
+      "_@react-libs-Dhmt5BkD.js"
     ],
     "css": [
       "static/corptools/bs5/static/css/index-DXnj7DNF.css"
