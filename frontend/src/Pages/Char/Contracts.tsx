@@ -36,8 +36,11 @@ const CharacterContracts = () => {
     columnHelper.accessor("status", {
       header: t("Status"),
     }),
+    columnHelper.accessor("issuer", {
+      header: t("From"),
+    }),
     columnHelper.accessor("assignee", {
-      header: t("Assignee"),
+      header: t("To"),
     }),
     columnHelper.accessor("acceptor", {
       header: t("Acceptor"),
