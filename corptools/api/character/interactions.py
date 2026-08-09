@@ -134,12 +134,19 @@ class InteractionApiEndpoints:
 
             if not msg.body:
                 try:
-                    msg = update_character_mail_body(
+                    updated_msg = update_character_mail_body(
                         character_id=character_id, mail_message=msg)
-                    msg.save()
+                    # update_character_mail_body returns False (not the
+                    # MailMessage) when the character has no valid ESI token
+                    # to fetch the body with - keep the original msg in that
+                    # case rather than clobbering it with the falsy result.
+                    if updated_msg:
+                        msg = updated_msg
+                        msg.save()
                 except Exception:
                     logger.error("failed to fetch mail")
-            return 200, {"body": msg.body.replace("size=", "_size_=").replace("color=", "_color_=")}
+            body = msg.body or ""
+            return 200, {"body": body.replace("size=", "_size_=").replace("color=", "_color_=")}
 
         @api.get(
             "account/{character_id}/notifications",

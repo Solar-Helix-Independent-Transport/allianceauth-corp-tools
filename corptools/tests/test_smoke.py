@@ -193,6 +193,24 @@ class TestSmokeCharacterApi(CorptoolsTestCase):
             f"/audit/api/account/{self.cid}/mail/{self.mail.mail_id}")
         self.assertEqual(resp.status_code, 200)
 
+    def test_mail_detail_with_no_body_and_no_esi_token(self):
+        # Regression test for #272: fetching a mail whose body hasn't been
+        # pulled yet, for a character with no usable ESI token (the fixture
+        # here has none), used to crash with AttributeError: 'bool' object
+        # has no attribute 'body' - update_character_mail_body returns False
+        # rather than the MailMessage when there's no token, and that False
+        # was clobbering the local `msg` before it got used again.
+        empty_mail = MailMessage.objects.create(
+            id_key=99998,
+            character=self.ca1,
+            mail_id=2,
+            body=None,
+        )
+        resp = self.client.get(
+            f"/audit/api/account/{self.cid}/mail/{empty_mail.mail_id}")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json()["body"], "")
+
     def test_notifications(self):
         resp = self.client.get(f"/audit/api/account/{self.cid}/notifications")
         self.assertEqual(resp.status_code, 200)
