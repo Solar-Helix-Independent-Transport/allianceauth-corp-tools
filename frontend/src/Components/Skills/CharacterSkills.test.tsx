@@ -14,6 +14,17 @@ describe("CharSkillGroups", () => {
     expect(screen.getByText("Nothing Found")).toBeInTheDocument();
   });
 
+  it("doesn't crash when data is undefined at runtime, even though the type says it can't be (#196)", () => {
+    // The only current caller (Pages/Char/Skills.tsx) guards with
+    // `skill_data ?? []`, but that's the caller's contract, not this
+    // component's - a real API response for a character with no skill data
+    // yet (e.g. a main with no ESI token added) can still hand this
+    // undefined at runtime regardless of what TypeScript assumes. Casting
+    // around the type here to reproduce that.
+    render(<CharSkillGroups data={undefined as unknown as typeof data} />);
+    expect(screen.getByText("Nothing Found")).toBeInTheDocument();
+  });
+
   it("groups skills by their 'group' field and renders one accordion item per group", () => {
     render(<CharSkillGroups data={data} />);
 
