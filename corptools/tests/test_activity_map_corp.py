@@ -1112,3 +1112,85 @@ class CorpActivityMapTestCase(CorptoolsTestCase):
         values_by_system = {v["system_id"]: v for v in data["values"]}
         self.assertEqual(values_by_system[self.system1.id]["value"], 3000000)
         self.assertEqual(values_by_system[self.system1.id]["count"], 2)
+
+    # ------------------------------------------------------------------
+    # corporation_id == 0 - "all corporations visible to the user", scoped
+    # by the same visible_to()/get_visible() permission logic as the corp
+    # list endpoint, not literally every corp in the database.
+    # ------------------------------------------------------------------
+
+    def test_assets_endpoint_zero_id_aggregates_all_visible_corps(self):
+        self._create_corp_asset(self.cp1, self.loc1,
+                                item_id=1, type_id=1, quantity=5)
+        self._create_corp_asset(self.cp2, self.loc2,
+                                item_id=2, type_id=1, quantity=9)
+
+        # own_corp_manager only makes corp1 visible - corp2's assets must
+        # stay excluded even when asking for "all corps".
+        self.user1.user_permissions.add(self.own_corp_manager)
+        self.client.force_login(self.user1)
+        resp = self.client.get(_ASSETS_URL.format(cid=0))
+
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        values_by_system = {v["system_id"]: v for v in data["values"]}
+        self.assertEqual(set(values_by_system), {self.system1.id})
+        self.assertEqual(values_by_system[self.system1.id]["quantity"], 5)
+
+    def test_assets_endpoint_zero_id_includes_every_corp_for_global_manager(self):
+        self._create_corp_asset(self.cp1, self.loc1,
+                                item_id=1, type_id=1, quantity=5)
+        self._create_corp_asset(self.cp2, self.loc2,
+                                item_id=2, type_id=1, quantity=9)
+
+        self.user1.user_permissions.add(self.global_corp_manager)
+        self.client.force_login(self.user1)
+        resp = self.client.get(_ASSETS_URL.format(cid=0))
+
+        data = resp.json()
+        values_by_system = {v["system_id"]: v for v in data["values"]}
+        self.assertEqual(set(values_by_system), {
+                         self.system1.id, self.system2.id})
+        self.assertEqual(values_by_system[self.system2.id]["quantity"], 9)
+
+    def test_member_assets_endpoint_zero_id_aggregates_all_visible_corps(self):
+        self._create_character_asset(
+            self.ca1, self.loc1, item_id=1, type_id=1, quantity=5)
+        self._create_character_asset(
+            self.ca3, self.loc2, item_id=2, type_id=1, quantity=9)
+
+        self.user1.user_permissions.add(self.own_corp_manager)
+        self.client.force_login(self.user1)
+        resp = self.client.get(_MEMBER_ASSETS_URL.format(cid=0))
+
+        data = resp.json()
+        system_ids_with_values = {v["system_id"] for v in data["values"]}
+        self.assertNotIn(self.system2.id, system_ids_with_values)
+
+    def test_orders_endpoint_zero_id_aggregates_all_visible_corps(self):
+        division1 = self._create_corp_wallet_division(self.cp1)
+        division2 = self._create_corp_wallet_division(self.cp2)
+        self._create_corp_order(division1, self.loc1, order_id=1)
+        self._create_corp_order(division2, self.loc2, order_id=2)
+
+        self.user1.user_permissions.add(self.own_corp_manager)
+        self.client.force_login(self.user1)
+        resp = self.client.get(_ORDERS_URL.format(cid=0))
+
+        data = resp.json()
+        system_ids_with_values = {v["system_id"] for v in data["values"]}
+        self.assertNotIn(self.system2.id, system_ids_with_values)
+
+    def test_contracts_endpoint_zero_id_aggregates_all_visible_corps(self):
+        self._create_corp_contract(
+            self.cp1, contract_id=1, start_location=self.loc1)
+        self._create_corp_contract(
+            self.cp2, contract_id=2, start_location=self.loc2)
+
+        self.user1.user_permissions.add(self.own_corp_manager)
+        self.client.force_login(self.user1)
+        resp = self.client.get(_CONTRACTS_URL.format(cid=0))
+
+        data = resp.json()
+        system_ids_with_values = {v["system_id"] for v in data["values"]}
+        self.assertNotIn(self.system2.id, system_ids_with_values)

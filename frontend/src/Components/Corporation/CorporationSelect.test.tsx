@@ -9,12 +9,16 @@ vi.mock("../../api/corporation", () => ({
   loadStatus: vi.fn(),
 }));
 
-const renderSelect = (searchParams = "", onUrlUpdate?: OnUrlUpdateFunction) => {
+const renderSelect = (
+  searchParams = "",
+  onUrlUpdate?: OnUrlUpdateFunction,
+  includeAllOption = false,
+) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={queryClient}>
       <NuqsTestingAdapter hasMemory searchParams={searchParams} onUrlUpdate={onUrlUpdate}>
-        <CorpSelect />
+        <CorpSelect includeAllOption={includeAllOption} />
       </NuqsTestingAdapter>
     </QueryClientProvider>,
   );
@@ -65,5 +69,28 @@ describe("CorpSelect", () => {
 
     await screen.findByText("Select...");
     expect(onUrlUpdate).not.toHaveBeenCalled();
+  });
+
+  it("defaults to the All Corporations option when includeAllOption is set", async () => {
+    vi.mocked(loadStatus).mockResolvedValue(
+      makeStatus([
+        { corporation_id: 1, corporation_name: "Alpha Corp" },
+        { corporation_id: 2, corporation_name: "Beta Corp" },
+      ]),
+    );
+
+    renderSelect("", undefined, true);
+
+    expect(await screen.findByText("All Corporations")).toBeInTheDocument();
+  });
+
+  it("does not add an All Corporations option when includeAllOption is unset", async () => {
+    vi.mocked(loadStatus).mockResolvedValue(
+      makeStatus([{ corporation_id: 1, corporation_name: "Alpha Corp" }]),
+    );
+
+    renderSelect("", undefined, false);
+
+    await waitFor(() => expect(screen.queryByText("All Corporations")).not.toBeInTheDocument());
   });
 });

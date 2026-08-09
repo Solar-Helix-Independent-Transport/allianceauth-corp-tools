@@ -1845,53 +1845,54 @@ def update_character_mail_headers(character_id, force_refresh=False):
         failed_ids = set()
         stop = False
         for msg in mail:
-            if msg.mail_id in mail_id_set:
-                if not force_refresh:
-                    stop = True
-                    break
-                continue
+            already_known = msg.mail_id in mail_id_set
+            if already_known and not force_refresh:
+                stop = True
+                break
 
             id_k = int(str(audit_char.character.character_id) +
                        str(msg.mail_id))
-            if getattr(msg, "from") not in _current_eve_ids:
-                if getattr(msg, "from") not in failed_ids:
-                    try:
-                        EveName.objects.get_or_create_from_esi(
-                            getattr(msg, "from")
-                        )
-                        _current_eve_ids.add(getattr(msg, "from"))
-                    except Exception as e:
-                        logger.error(
-                            f"Error creating eve name for mail header: {e} {vars(msg)}")
-                        failed_ids.add(getattr(msg, "from"))
 
-            msg_obj = MailMessage(
-                character=audit_char,
-                id_key=id_k,
-                mail_id=msg.mail_id,
-                from_id=getattr(msg, "from"),
-                is_read=msg.is_read,
-                timestamp=msg.timestamp,
-                subject=msg.subject,
-                body=None
-            )
+            if not already_known:
+                if getattr(msg, "from") not in _current_eve_ids:
+                    if getattr(msg, "from") not in failed_ids:
+                        try:
+                            EveName.objects.get_or_create_from_esi(
+                                getattr(msg, "from")
+                            )
+                            _current_eve_ids.add(getattr(msg, "from"))
+                        except Exception as e:
+                            logger.error(
+                                f"Error creating eve name for mail header: {e} {vars(msg)}")
+                            failed_ids.add(getattr(msg, "from"))
 
-            from_name_id = getattr(msg, "from")
-            if from_name_id in _current_eve_ids:
-                msg_obj.from_name_id = getattr(msg, "from")
+                msg_obj = MailMessage(
+                    character=audit_char,
+                    id_key=id_k,
+                    mail_id=msg.mail_id,
+                    from_id=getattr(msg, "from"),
+                    is_read=msg.is_read,
+                    timestamp=msg.timestamp,
+                    subject=msg.subject,
+                    body=None
+                )
 
-            messages.append(msg_obj)
+                from_name_id = getattr(msg, "from")
+                if from_name_id in _current_eve_ids:
+                    msg_obj.from_name_id = getattr(msg, "from")
+
+                messages.append(msg_obj)
 
             if msg.labels:
-                m_l_map[msg.mail_id] = msg.labels
+                m_l_map[id_k] = msg.labels
 
-            m_r_map[msg.mail_id] = [
+            m_r_map[id_k] = [
                 (r.recipient_id, r.recipient_type)
                 for r in msg.recipients
             ]
             last_id = msg.mail_id
 
-        msgs = MailMessage.objects.bulk_create(
+        MailMessage.objects.bulk_create(
             messages,
             batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
             ignore_conflicts=True
@@ -1899,42 +1900,40 @@ def update_character_mail_headers(character_id, force_refresh=False):
 
         LabelThroughModel = MailMessage.labels.through
         lms = []
-        for _msg in msgs:
-            if _msg.mail_id in m_l_map:
-                for label in m_l_map[_msg.mail_id]:
-                    if label in label_pk_map:
-                        lms.append(LabelThroughModel(
-                            mailmessage_id=_msg.id_key,
-                            maillabel_id=label_pk_map[label]
-                        ))
+        for id_k, msg_labels in m_l_map.items():
+            for label in msg_labels:
+                if label in label_pk_map:
+                    lms.append(LabelThroughModel(
+                        mailmessage_id=id_k,
+                        maillabel_id=label_pk_map[label]
+                    ))
 
         LabelThroughModel.objects.bulk_create(
             lms, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         RecipThroughModel = MailMessage.recipients.through
         rms = []
-        for _msg in msgs:
-            if _msg.mail_id in m_r_map:
-                for recip, r_type in m_r_map[_msg.mail_id]:
-                    recip_name = None
-                    if r_type != "mailing_list":
-                        if recip not in _current_eve_ids:
-                            EveName.objects.get_or_create_from_esi(recip)
-                            _current_eve_ids.add(recip)
-                        recip_name = recip
-                    if recip not in _current_mail_rec or force_refresh:
-                        MailRecipient.objects.update_or_create(
-                            recipient_id=recip,
-                            defaults={
-                                "recipient_name_id": recip_name,
-                                "recipient_type": r_type
-                            }
-                        )
-                        if not force_refresh:
-                            _current_mail_rec.add(recip)
+        for id_k, recipients in m_r_map.items():
+            for recip, r_type in recipients:
+                recip_name = None
+                if r_type != "mailing_list":
+                    if recip not in _current_eve_ids:
+                        EveName.objects.get_or_create_from_esi(recip)
+                        _current_eve_ids.add(recip)
+                    recip_name = recip
+                if recip not in _current_mail_rec or force_refresh:
+                    MailRecipient.objects.update_or_create(
+                        recipient_id=recip,
+                        defaults={
+                            "recipient_name_id": recip_name,
+                            "recipient_type": r_type
+                        }
+                    )
+                    if not force_refresh:
+                        _current_mail_rec.add(recip)
 
-                    rms.append(RecipThroughModel(
-                        mailmessage_id=_msg.id_key, mailrecipient_id=recip))
+                rms.append(RecipThroughModel(
+                    mailmessage_id=id_k, mailrecipient_id=recip))
 
         RecipThroughModel.objects.bulk_create(
             rms, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)

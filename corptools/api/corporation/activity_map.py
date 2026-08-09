@@ -4,6 +4,9 @@ from ninja import NinjaAPI
 # Django
 from django.db.models import Q
 
+# Alliance Auth
+from allianceauth.eveonline.models import EveCharacter
+
 # AA Example App
 from corptools import models
 from corptools.api.activity_map_shared import (
@@ -43,6 +46,29 @@ def _has_activity_map_perms(user) -> bool:
     )
 
 
+def _get_characters(request, corporation_id: int):
+    """corporation_id == 0 means "every corp the user can see"."""
+    if corporation_id:
+        return get_corporation_characters(request, corporation_id)
+    return EveCharacter.objects.filter(
+        character_id__in=models.CharacterAudit.objects.visible_eve_characters(
+            request.user
+        ).values_list("character_id", flat=True)
+    )
+
+
+def _visible_corporation_ids(user):
+    return models.CorporationAudit.objects.visible_to(user).values_list(
+        "corporation__corporation_id", flat=True)
+
+
+def _corporation_scope_q(corporation_id: int, user) -> Q:
+    """corporation_id == 0 means "every corp the user can see"."""
+    if corporation_id:
+        return Q(corporation__corporation__corporation_id=corporation_id)
+    return Q(corporation__corporation__corporation_id__in=_visible_corporation_ids(user))
+
+
 class CorpActivityMapApiEndpoints:
 
     tags = ["ActivityMap"]
@@ -57,8 +83,10 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            asset_qs = models.CorpAsset.get_visible(request.user).filter(
-                corporation__corporation__corporation_id=corporation_id)
+            asset_qs = models.CorpAsset.get_visible(request.user)
+            if corporation_id:
+                asset_qs = asset_qs.filter(
+                    corporation__corporation__corporation_id=corporation_id)
             return build_asset_map_payload(asset_qs)
 
         @api.get(
@@ -70,8 +98,10 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            asset_qs = models.CorpAsset.get_visible(request.user).filter(
-                corporation__corporation__corporation_id=corporation_id)
+            asset_qs = models.CorpAsset.get_visible(request.user)
+            if corporation_id:
+                asset_qs = asset_qs.filter(
+                    corporation__corporation__corporation_id=corporation_id)
             return build_asset_map_payload(
                 asset_qs,
                 Q(type_name__group__category_id=SHIP_CATEGORY_ID),
@@ -86,8 +116,10 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            asset_qs = models.CorpAsset.get_visible(request.user).filter(
-                corporation__corporation__corporation_id=corporation_id)
+            asset_qs = models.CorpAsset.get_visible(request.user)
+            if corporation_id:
+                asset_qs = asset_qs.filter(
+                    corporation__corporation__corporation_id=corporation_id)
             return build_asset_map_payload(
                 asset_qs,
                 Q(type_name__group_id__in=CAPITAL_SHIP_GROUP_IDS),
@@ -102,7 +134,7 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            characters = get_corporation_characters(request, corporation_id)
+            characters = _get_characters(request, corporation_id)
             asset_qs = models.CharacterAsset.objects.filter(
                 character__character__in=characters)
             return build_asset_map_payload(asset_qs)
@@ -116,7 +148,7 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            characters = get_corporation_characters(request, corporation_id)
+            characters = _get_characters(request, corporation_id)
             asset_qs = models.CharacterAsset.objects.filter(
                 character__character__in=characters)
             return build_asset_map_payload(
@@ -133,7 +165,7 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            characters = get_corporation_characters(request, corporation_id)
+            characters = _get_characters(request, corporation_id)
             asset_qs = models.CharacterAsset.objects.filter(
                 character__character__in=characters)
             return build_asset_map_payload(
@@ -150,8 +182,10 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            structure_qs = models.Structure.get_visible(request.user).filter(
-                corporation__corporation__corporation_id=corporation_id)
+            structure_qs = models.Structure.get_visible(request.user)
+            if corporation_id:
+                structure_qs = structure_qs.filter(
+                    corporation__corporation__corporation_id=corporation_id)
             return build_structure_map_payload(structure_qs)
 
         @api.get(
@@ -163,8 +197,10 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            starbase_qs = models.Starbase.get_visible(request.user).filter(
-                corporation__corporation__corporation_id=corporation_id)
+            starbase_qs = models.Starbase.get_visible(request.user)
+            if corporation_id:
+                starbase_qs = starbase_qs.filter(
+                    corporation__corporation__corporation_id=corporation_id)
             return build_starbase_map_payload(starbase_qs)
 
         @api.get(
@@ -176,8 +212,10 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            poco_qs = models.Poco.get_visible(request.user).filter(
-                corporation__corporation__corporation_id=corporation_id)
+            poco_qs = models.Poco.get_visible(request.user)
+            if corporation_id:
+                poco_qs = poco_qs.filter(
+                    corporation__corporation__corporation_id=corporation_id)
             return build_poco_map_payload(poco_qs)
 
         @api.get(
@@ -189,8 +227,11 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            wallet_qs = models.CorporationWalletJournalEntry.get_visible(request.user).filter(
-                division__corporation__corporation__corporation_id=corporation_id)
+            wallet_qs = models.CorporationWalletJournalEntry.get_visible(
+                request.user)
+            if corporation_id:
+                wallet_qs = wallet_qs.filter(
+                    division__corporation__corporation__corporation_id=corporation_id)
             return build_poco_revenue_map_payload(wallet_qs)
 
         @api.get(
@@ -202,8 +243,12 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            order_qs = models.CorporationMarketOrder.objects.filter(
-                wallet_division__corporation__corporation__corporation_id=corporation_id)
+            if corporation_id:
+                order_qs = models.CorporationMarketOrder.objects.filter(
+                    wallet_division__corporation__corporation__corporation_id=corporation_id)
+            else:
+                order_qs = models.CorporationMarketOrder.objects.filter(
+                    wallet_division__corporation__corporation__corporation_id__in=_visible_corporation_ids(request.user))
             return build_market_order_map_payload(order_qs)
 
         @api.get(
@@ -215,7 +260,7 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            characters = get_corporation_characters(request, corporation_id)
+            characters = _get_characters(request, corporation_id)
             order_qs = models.CharacterMarketOrder.objects.filter(
                 character__character__in=characters)
             return build_market_order_map_payload(order_qs)
@@ -230,7 +275,7 @@ class CorpActivityMapApiEndpoints:
                 return 403, "Permission Denied!"
 
             contract_qs = models.CorporateContract.objects.filter(
-                corporation__corporation__corporation_id=corporation_id)
+                _corporation_scope_q(corporation_id, request.user))
             return build_contract_map_payload(contract_qs)
 
         @api.get(
@@ -243,7 +288,7 @@ class CorpActivityMapApiEndpoints:
                 return 403, "Permission Denied!"
 
             contract_qs = models.CorporateContract.objects.filter(
-                corporation__corporation__corporation_id=corporation_id)
+                _corporation_scope_q(corporation_id, request.user))
             return build_contract_map_payload(
                 contract_qs,
                 Q(contract_type__in=SALES_CONTRACT_TYPES),
@@ -259,7 +304,7 @@ class CorpActivityMapApiEndpoints:
                 return 403, "Permission Denied!"
 
             contract_qs = models.CorporateContract.objects.filter(
-                corporation__corporation__corporation_id=corporation_id)
+                _corporation_scope_q(corporation_id, request.user))
             return build_contract_map_payload(
                 contract_qs,
                 Q(contract_type__in=LOGISTICS_CONTRACT_TYPES),
@@ -275,7 +320,7 @@ class CorpActivityMapApiEndpoints:
                 return 403, "Permission Denied!"
 
             job_qs = models.CorporationIndustryJob.objects.filter(
-                corporation__corporation__corporation_id=corporation_id)
+                _corporation_scope_q(corporation_id, request.user))
             return build_industry_map_payload(job_qs)
 
         @api.get(
@@ -287,7 +332,7 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            characters = get_corporation_characters(request, corporation_id)
+            characters = _get_characters(request, corporation_id)
             return build_current_location_map_payload(characters)
 
         @api.get(
@@ -299,7 +344,7 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            characters = get_corporation_characters(request, corporation_id)
+            characters = _get_characters(request, corporation_id)
             return build_home_clone_map_payload(characters)
 
         @api.get(
@@ -311,7 +356,7 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            characters = get_corporation_characters(request, corporation_id)
+            characters = _get_characters(request, corporation_id)
             return build_jump_clone_map_payload(characters)
 
         @api.get(
@@ -323,7 +368,7 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            characters = get_corporation_characters(request, corporation_id)
+            characters = _get_characters(request, corporation_id)
             den_qs = models.CharacterMercenaryDen.objects.filter(
                 character__character__in=characters)
             return build_mercenary_den_map_payload(den_qs)
@@ -337,7 +382,7 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            characters = get_corporation_characters(request, corporation_id)
+            characters = _get_characters(request, corporation_id)
             return build_mercenary_tactical_operation_map_payload(characters)
 
         @api.get(
@@ -349,7 +394,7 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            characters = get_corporation_characters(request, corporation_id)
+            characters = _get_characters(request, corporation_id)
             return build_pi_activity_map_payload(characters)
 
         @api.get(
@@ -361,7 +406,7 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            characters = get_corporation_characters(request, corporation_id)
+            characters = _get_characters(request, corporation_id)
             return build_mining_map_payload(characters)
 
         @api.get(
@@ -373,5 +418,5 @@ class CorpActivityMapApiEndpoints:
             if not _has_activity_map_perms(request.user):
                 return 403, "Permission Denied!"
 
-            characters = get_corporation_characters(request, corporation_id)
+            characters = _get_characters(request, corporation_id)
             return build_ratting_map_payload(characters)
