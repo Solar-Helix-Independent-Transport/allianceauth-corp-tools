@@ -8,7 +8,7 @@ import type { ActivityMapResponse, ActivityNodeData } from "./types";
 // zero-size node. (10x the original sizing.)
 const NO_VALUE_RADIUS = 5;
 const MIN_VALUE_RADIUS = 20;
-const MAX_RADIUS = 260;
+const MAX_RADIUS = 130;
 
 // Translucent accent color where there's data to show - dots overlapping
 // near a busy system blend into a denser blob, giving the overlay a
