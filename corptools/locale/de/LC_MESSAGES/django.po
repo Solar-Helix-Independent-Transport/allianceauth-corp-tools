@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Peter Pfeufer, 2025
+# Peter Pfeufer, 2026
 # 
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-18 17:22+0800\n"
 "PO-Revision-Date: 2024-05-27 04:09+0000\n"
-"Last-Translator: Peter Pfeufer, 2025\n"
+"Last-Translator: Peter Pfeufer, 2026\n"
 "Language-Team: German (https://app.transifex.com/alliance-auth/teams/107430/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -252,7 +252,7 @@ msgstr ""
 
 #: corptools/templates/corptools/admin.html:3
 msgid "Corptools Admin"
-msgstr ""
+msgstr "Corptools Admin"
 
 #: corptools/templates/corptools/admin.html:10
 msgid "Corptools Configuration Info"
@@ -320,7 +320,7 @@ msgstr ""
 
 #: corptools/templates/corptools/admin.html:74
 msgid "Module"
-msgstr ""
+msgstr "Modul"
 
 #: corptools/templates/corptools/admin.html:75
 msgid "Enabled"
@@ -358,7 +358,7 @@ msgstr "Kontakte"
 
 #: corptools/templates/corptools/admin.html:238
 msgid "Mining"
-msgstr ""
+msgstr "Mining"
 
 #: corptools/templates/corptools/admin.html:262
 msgid "Wallets/Markets/Contracts"
@@ -512,7 +512,7 @@ msgstr "Kontoüberprüfung"
 
 #: corptools/templates/corptools/menu.html:26
 msgid "DB Admin"
-msgstr ""
+msgstr "DB Admin"
 
 #: corptools/templates/corptools/menu.html:32
 msgid "Corporations"
