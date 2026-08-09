@@ -594,6 +594,20 @@ class TestUpdateCharacter(CorptoolsTestCase):
         self.assertTrue(any("mail" in n for n in task_names))
 
     @patch("corptools.tasks.character.enqueue_next_task")
+    def test_recently_updated_mail_is_skipped(self, mock_enqueue):
+        # Regression test for #245: mail used to be queued on every cycle
+        # unconditionally, unlike wallet/mining/orders/etc which all respect
+        # a staleness check - meaning mail was polled far more often than
+        # necessary, contributing to ESI's mail-route rate limiting.
+        self.ca1.set_update_time("mails")
+        self.ca1.save()
+        with patch("corptools.app_settings.CT_CHAR_MAIL_MODULE", True):
+            update_character(self.char1.character_id)
+        queue = mock_enqueue.call_args[0][0]
+        task_names = [str(t) for t in queue]
+        self.assertFalse(any("mail" in n for n in task_names))
+
+    @patch("corptools.tasks.character.enqueue_next_task")
     def test_character_without_ownership_skips_skill_cache(self, mock_enqueue):
         # char8 has ca8 but no CharacterOwnership → ObjectDoesNotExist is caught
         update_character(self.char8.character_id)

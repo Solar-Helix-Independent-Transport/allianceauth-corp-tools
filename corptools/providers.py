@@ -158,6 +158,8 @@ esi_openapi = OpenAPI(
         # Character Skills
         "GetCharactersCharacterIdSkills",
         "GetCharactersCharacterIdSkillqueue",
+        "GetCharactersSkills",  # testing
+        "GetCharactersSkillqueue",  # testing
         # Character Indy
         "GetCharactersCharacterIdIndustryJobs",
         "GetCharactersCharacterIdMining",

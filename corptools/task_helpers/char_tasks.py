@@ -276,6 +276,10 @@ def update_character_skill_list(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
     try:
+        _sf = providers.esi_openapi.client.Skills
+        _fn = _sf.GetCharactersCharacterIdSkills if hasattr(
+            _sf, "GetCharactersCharacterIdSkills") else _sf.GetCharactersSkills
+
         skills = providers.esi_openapi.client.Skills.GetCharactersCharacterIdSkills(
             character_id=character_id,
             token=token
@@ -291,7 +295,7 @@ def update_character_skill_list(character_id, force_refresh=False):
         SkillTotals.objects.update_or_create(
             character=audit_char,
             defaults={
-                'total_sp': skills.total_sp,
+                'total_sp': skills.total_sp if hasattr(skills, "total_sp") else skills.total_sp_used,
                 'unallocated_sp': skills.unallocated_sp if skills.unallocated_sp else 0
             }
         )
@@ -347,7 +351,10 @@ def update_character_skill_queue(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
     try:
-        queue = providers.esi_openapi.client.Skills.GetCharactersCharacterIdSkillqueue(
+        _sf = providers.esi_openapi.client.Skills
+        _fn = _sf.GetCharactersCharacterIdSkillqueue if hasattr(
+            _sf, "GetCharactersCharacterIdSkillqueue") else _sf.GetCharactersSkillqueue
+        queue = _fn(
             character_id=character_id,
             token=token
         ).result(
