@@ -154,3 +154,4 @@ corptools/static/i18n*
 frontend/build
 coverage-summary.md
 test-summary.md
+feature-requests.md
