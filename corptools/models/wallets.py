@@ -74,6 +74,16 @@ class CorporationWalletJournalEntry(WalletJournalEntry):
     second_party_name = models.ForeignKey(
         EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='corp_second_party')
 
+    class Meta:
+        indexes = (
+            models.Index(fields=['date']),
+            models.Index(fields=['entry_id']),
+            models.Index(fields=['ref_type']),
+            models.Index(fields=['division', 'date']),
+            models.Index(fields=['division', 'ref_type']),
+            models.Index(fields=['ref_type', 'context_id_type', 'date']),
+        )
+
     def __str__(self):
         return "{} '{}' {}: {}isk".format(
             self.first_party_name.name,
@@ -119,6 +129,16 @@ class CharacterWalletJournalEntry(WalletJournalEntry):
         EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_first_party')
     second_party_name = models.ForeignKey(
         EveName, on_delete=models.SET_NULL, null=True, default=None, related_name='char_second_party')
+
+    class Meta:
+        indexes = (
+            models.Index(fields=['date']),
+            models.Index(fields=['entry_id']),
+            models.Index(fields=['ref_type']),
+            models.Index(fields=['character', 'date']),
+            models.Index(fields=['character', 'ref_type', 'date']),
+            models.Index(fields=['ref_type', 'context_id_type', 'date']),
+        )
 
     @classmethod
     def from_esi_model(cls, character: CharacterAudit, esi_model: "CharactersCharacterIdWalletJournalGetItem"):
