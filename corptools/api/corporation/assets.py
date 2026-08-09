@@ -53,8 +53,15 @@ class AssetsApiEndpoints:
             ).order_by('location_name')
             if top_level_only:
                 asset_locs = asset_locs.filter(managed=False)
-            asset_locations = [{"label": "Everywhere", "value": 0},
-                               {"label": "AssetSafety", "value": 2004}, ]
+            # Asset Safety (location_id 2004) isn't hardcoded here - unlike
+            # ordinary stations/structures, it's populated through the same
+            # normal location-resolution path (see fetch_location_name in
+            # task_helpers/update_tasks.py) whenever the corp actually has
+            # assets sitting there, so it already appears via the loop below
+            # like any other location. A hardcoded entry used to sit here
+            # too, which duplicated it as a second, differently-spelled
+            # "AssetSafety" option once the real one existed (#291).
+            asset_locations = [{"label": "Everywhere", "value": 0}]
             for loc in asset_locs:
                 asset_locations.append({
                     "label": loc.location_name,

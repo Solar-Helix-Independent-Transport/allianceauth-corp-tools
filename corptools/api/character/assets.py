@@ -38,8 +38,15 @@ class AssetsApiEndpoints:
             asset_locs = models.EveLocation.objects.filter(
                 location_id__in=asset_locs).order_by('location_name')
 
-            asset_locations = [{"label": _("Everywhere"), "value": 0},
-                               {"label": _("AssetSafety"), "value": 2004}, ]
+            # Asset Safety (location_id 2004) isn't hardcoded here - unlike
+            # ordinary stations/structures, it's populated through the same
+            # normal location-resolution path (see fetch_location_name in
+            # task_helpers/update_tasks.py) whenever a character actually
+            # has assets sitting there, so it already appears via the loop
+            # below like any other location. A hardcoded entry used to sit
+            # here too, which duplicated it as a second, differently-spelled
+            # "AssetSafety" option once the real one existed (#291).
+            asset_locations = [{"label": _("Everywhere"), "value": 0}]
 
             for loc in asset_locs:
                 name = loc.location_name
