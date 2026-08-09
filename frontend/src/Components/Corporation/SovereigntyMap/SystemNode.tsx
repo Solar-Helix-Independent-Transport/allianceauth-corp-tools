@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { DotVisual } from "../../SpaceMap/DotNode";
 import { upgradeStateBg, type WorkforceTransport } from "../sovereigntyShared";
@@ -31,15 +32,16 @@ const DIRECTION_ICON: Record<string, string> = {
 const formatAmount = (n: number | null | undefined) => (n != null ? n.toLocaleString() : null);
 
 const TransportSummary = ({ transport }: { transport: WorkforceTransport }) => {
+  const { t } = useTranslation();
   if (!transport || !transport.mode) {
-    return <span style={{ opacity: 0.6 }}>No transport</span>;
+    return <span style={{ opacity: 0.6 }}>{t("No transport")}</span>;
   }
 
   if (transport.mode === "import") {
     return (
       <div>
         <span style={{ marginRight: 4 }}>{DIRECTION_ICON.import}</span>
-        Import
+        {t("Import")}
         {transport.state_sources.length > 0 && (
           <div style={{ opacity: 0.85, fontSize: 10 }}>
             {transport.state_sources.map((s, i) => (
@@ -64,7 +66,7 @@ const TransportSummary = ({ transport }: { transport: WorkforceTransport }) => {
     return (
       <div>
         <span style={{ marginRight: 4 }}>{DIRECTION_ICON.export}</span>
-        Export
+        {t("Export")}
         {transport.state_destination && (
           <div style={{ opacity: 0.85, fontSize: 10 }}>
             {transport.state_destination.system_name}
@@ -78,7 +80,7 @@ const TransportSummary = ({ transport }: { transport: WorkforceTransport }) => {
   return (
     <div>
       <span style={{ marginRight: 4 }}>{DIRECTION_ICON.transit}</span>
-      Transit
+      {t("Transit")}
     </div>
   );
 };
@@ -90,22 +92,35 @@ const WorkforceLine = ({
   allocated: number | null;
   available: number | null;
 }) => {
+  const { t } = useTranslation();
   if (allocated == null || available == null) return null;
   return (
     <div style={{ opacity: 0.85, fontSize: 10, marginTop: 3 }}>
-      {formatAmount(allocated)} / {formatAmount(available)} workforce
+      {t("{{allocated}} / {{available}} workforce", {
+        allocated: formatAmount(allocated),
+        available: formatAmount(available),
+      })}
     </div>
   );
 };
 
 const AnarchyAlertBadge = ({ dens }: { dens: SystemNodeData["system"]["anarchy_dens"] }) => {
+  const { t } = useTranslation();
   if (!dens || dens.length === 0) return null;
-  const title = dens
-    .map((d) => `${d.character_name} - ${d.type_name} (${d.anarchy_amount}% anarchy)`)
+  const denList = dens
+    .map((d) =>
+      t("{{character}} - {{type}} ({{amount}}% anarchy)", {
+        character: d.character_name,
+        type: d.type_name,
+        amount: d.anarchy_amount,
+      }),
+    )
     .join("\n");
   return (
     <div
-      title={`Mercenary den anarchy is disrupting this hub's workforce:\n${title}`}
+      title={t("Mercenary den anarchy is disrupting this hub's workforce:\n{{denList}}", {
+        denList,
+      })}
       style={{
         position: "absolute",
         top: -8,
@@ -135,76 +150,79 @@ const AnarchyAlertBadge = ({ dens }: { dens: SystemNodeData["system"]["anarchy_d
 // dozens of hubs at once).
 const ANARCHY_GLOW = `0 0 18px 6px ${BOOTSTRAP_HEX.danger}, 0 0 34px 14px color-mix(in srgb, ${BOOTSTRAP_HEX.danger} 55%, transparent)`;
 
-const SystemCard = ({ data, selected }: { data: SystemNodeData; selected?: boolean }) => (
-  <div
-    style={{
-      position: "relative",
-      minWidth: 130,
-      maxWidth: 230,
-      background: "color-mix(in srgb, var(--bs-tertiary-bg) 70%, transparent)",
-      border: `2px solid ${data.system.anarchy_alert ? BOOTSTRAP_HEX.danger : data.color}`,
-      borderRadius: 6,
-      boxShadow: [
-        data.system.anarchy_alert ? ANARCHY_GLOW : null,
-        selected
-          ? `0 0 0 2px var(--bs-emphasis-color), 0 4px 14px rgba(0,0,0,0.75)`
-          : "0 2px 6px rgba(0,0,0,0.55)",
-      ]
-        .filter(Boolean)
-        .join(", "),
-      padding: "5px 8px",
-      fontSize: 11,
-      color: "var(--bs-body-color)",
-      cursor: "pointer",
-    }}
-  >
-    <AnarchyAlertBadge dens={data.system.anarchy_dens} />
+const SystemCard = ({ data, selected }: { data: SystemNodeData; selected?: boolean }) => {
+  const { t } = useTranslation();
+  return (
     <div
       style={{
-        fontWeight: 600,
-        fontSize: 12,
-        marginBottom: 4,
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
+        position: "relative",
+        minWidth: 130,
+        maxWidth: 230,
+        background: "color-mix(in srgb, var(--bs-tertiary-bg) 70%, transparent)",
+        border: `2px solid ${data.system.anarchy_alert ? BOOTSTRAP_HEX.danger : data.color}`,
+        borderRadius: 6,
+        boxShadow: [
+          data.system.anarchy_alert ? ANARCHY_GLOW : null,
+          selected
+            ? `0 0 0 2px var(--bs-emphasis-color), 0 4px 14px rgba(0,0,0,0.75)`
+            : "0 2px 6px rgba(0,0,0,0.55)",
+        ]
+          .filter(Boolean)
+          .join(", "),
+        padding: "5px 8px",
+        fontSize: 11,
+        color: "var(--bs-body-color)",
+        cursor: "pointer",
       }}
-      title={data.ownerName ? `${data.system.name} (${data.ownerName})` : data.system.name}
     >
-      {data.system.name}
-    </div>
+      <AnarchyAlertBadge dens={data.system.anarchy_dens} />
+      <div
+        style={{
+          fontWeight: 600,
+          fontSize: 12,
+          marginBottom: 4,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+        title={data.ownerName ? `${data.system.name} (${data.ownerName})` : data.system.name}
+      >
+        {data.system.name}
+      </div>
 
-    {data.mode === "upgrades" ? (
-      data.hubUpgrades && data.hubUpgrades.length > 0 ? (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-          {data.hubUpgrades.map((u, i) => (
-            <span
-              key={i}
-              title={u.power_state}
-              style={{
-                background: BOOTSTRAP_HEX[upgradeStateBg(u.power_state)],
-                color: "#fff",
-                borderRadius: 3,
-                padding: "1px 4px",
-                fontSize: 10,
-                whiteSpace: "nowrap",
-              }}
-            >
-              {u.name}
-            </span>
-          ))}
-        </div>
-      ) : data.hasUpgradeSearch ? null : (
-        <span style={{ opacity: 0.6 }}>No upgrades</span>
-      )
-    ) : (
-      <TransportSummary transport={data.transport ?? null} />
-    )}
-    <WorkforceLine
-      allocated={data.workforceAllocated ?? null}
-      available={data.workforceAvailable ?? null}
-    />
-  </div>
-);
+      {data.mode === "upgrades" ? (
+        data.hubUpgrades && data.hubUpgrades.length > 0 ? (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
+            {data.hubUpgrades.map((u, i) => (
+              <span
+                key={i}
+                title={u.power_state}
+                style={{
+                  background: BOOTSTRAP_HEX[upgradeStateBg(u.power_state)],
+                  color: "#fff",
+                  borderRadius: 3,
+                  padding: "1px 4px",
+                  fontSize: 10,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {u.name}
+              </span>
+            ))}
+          </div>
+        ) : data.hasUpgradeSearch ? null : (
+          <span style={{ opacity: 0.6 }}>{t("No upgrades")}</span>
+        )
+      ) : (
+        <TransportSummary transport={data.transport ?? null} />
+      )}
+      <WorkforceLine
+        allocated={data.workforceAllocated ?? null}
+        available={data.workforceAvailable ?? null}
+      />
+    </div>
+  );
+};
 
 const SystemNodeImpl = ({ data, selected }: NodeProps & { data: SystemNodeData }) => {
   return (

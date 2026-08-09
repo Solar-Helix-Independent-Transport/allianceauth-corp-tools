@@ -35,13 +35,13 @@ function MailModal({
       </Modal.Header>
       <Modal.Body>
         <div className="container-fluid">
-          <StrToFields strValue={msg_data?.from} text={"From:"} />
-          <StrToFields text={"Labels:"}>
+          <StrToFields strValue={msg_data?.from} text={t("From:")} />
+          <StrToFields text={t("Labels:")}>
             <span style={{ overflowWrap: "anywhere" }}>
               {msg_data?.labels.map((name) => <Badge style={{ marginLeft: "5px" }}>{name}</Badge>)}
             </span>
           </StrToFields>
-          <StrToFields text={"Recipients:"}>
+          <StrToFields text={t("Recipients:")}>
             {(msg_data?.recipients.length ?? 0) > 2 && (
               <p>
                 {msg_data?.recipients.length} {t("Recipients")}
@@ -54,12 +54,12 @@ function MailModal({
               ))}
             </span>
           </StrToFields>
-          <DateToFields dateStrValue={msg_data?.timestamp} text={"Timestamp:"} />
-          <StrToFields strValue={msg_data?.subject} text={"Subject:"} />
+          <DateToFields dateStrValue={msg_data?.timestamp} text={t("Timestamp:")} />
+          <StrToFields strValue={msg_data?.subject} text={t("Subject:")} />
         </div>
         <hr />
         {error && <p>{t("Error from API")}</p>}
-        {isFetching && <p>Loading From API...</p>}
+        {isFetching && <p>{t("Loading From API...")}</p>}
         {data && <p dangerouslySetInnerHTML={{ __html: `${data?.body}` }}></p>}
       </Modal.Body>
       <Modal.Footer>

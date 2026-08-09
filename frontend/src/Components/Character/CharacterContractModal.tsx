@@ -32,15 +32,15 @@ function CharacterContractModal({
       }}
     >
       <Modal.Header closeButton>
-        <Modal.Title>Contract Detail</Modal.Title>
+        <Modal.Title>{t("Contract Detail")}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <table className="table">
-          <StrToFields strValue={data?.issuer} text={"From:"} />
-          <StrToFields strValue={data?.assignee} text={"To:"} />
+          <StrToFields strValue={data?.issuer} text={t("From:")} />
+          <StrToFields strValue={data?.assignee} text={t("To:")} />
           <StrToFields
             strValue={data?.acceptor === data?.assignee ? null : data?.acceptor}
-            text={"Acceptor:"}
+            text={t("Acceptor:")}
           />
           <StrToFields strValue={data?.availbility} text={t("Availability")} />
           <StrToFields strValue={data?.status} text={t("Status")} />
@@ -57,7 +57,7 @@ function CharacterContractModal({
           <DateToFields dateStrValue={data?.date_issued} text={t("Issued")} />
           <DateToFields dateStrValue={data?.date_accepted} text={t("Accepted")} />
           <DateToFields dateStrValue={data?.date_completed} text={t("Completed")} />
-          <DateToFields dateStrValue={data?.date_expired} text={"Expiry"} />
+          <DateToFields dateStrValue={data?.date_expired} text={t("Expiry")} />
           <StrIntToFields strValue={data?.price} text={t("Price")} valuePre={"$"} />
           <StrIntToFields strValue={data?.collateral} text={t("Collateral")} valuePre={"$"} />
           <StrIntToFields strValue={data?.reward} text={t("Reward")} valuePre={"$"} />

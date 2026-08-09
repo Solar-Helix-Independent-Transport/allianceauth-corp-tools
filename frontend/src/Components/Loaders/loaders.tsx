@@ -9,7 +9,15 @@ export const LdsLoader = ({ className = "" }: { className?: string }) => {
   return <div className={className + " " + styles.ldsDualRing}></div>;
 };
 
-export const PanelLoader = (props: LoaderProps = { title: "Loading..." }) => {
+// The LoaderProps default (`= {}`) only matters if one of these is ever
+// called as a plain function with zero arguments - JSX always passes an
+// object (even `{}` for `<PanelLoader />`), so title/message fall through to
+// simply not rendering rather than to a hardcoded English default. That
+// means there's no dead-code string to translate here; every real piece of
+// visible text comes from whatever the caller passes in, so translation
+// coverage is a caller responsibility (see e.g. Pages/Corp/Bridges.tsx,
+// Components/Skills/CharacterSkills.tsx).
+export const PanelLoader = (props: LoaderProps = {}) => {
   return (
     <div className={styles.flexContainer}>
       <div className="text-center">
@@ -21,7 +29,7 @@ export const PanelLoader = (props: LoaderProps = { title: "Loading..." }) => {
   );
 };
 
-export const ErrorLoader = (props: LoaderProps = { title: "Error Loading Component" }) => {
+export const ErrorLoader = (props: LoaderProps = {}) => {
   return (
     <div className={styles.flexContainer}>
       <div className="text-center">
@@ -46,7 +54,7 @@ export const ErrorLoader = (props: LoaderProps = { title: "Error Loading Compone
   );
 };
 
-export const CorpLoader = (props: LoaderProps = { title: "Select Corporation" }) => {
+export const CorpLoader = (props: LoaderProps = {}) => {
   return (
     <div className={styles.flexContainer}>
       <div className="text-center">

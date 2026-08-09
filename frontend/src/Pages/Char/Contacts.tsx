@@ -30,7 +30,7 @@ const CharacterContacts = () => {
       cell: (cell) => {
         return (
           <div className="text-nowrap">
-            {cell.getValue()} {cell.row.original.contact.id <= 4000000 && <Badge>NPC</Badge>}
+            {cell.getValue()} {cell.row.original.contact.id <= 4000000 && <Badge>{t("NPC")}</Badge>}
           </div>
         );
       },
@@ -48,13 +48,13 @@ const CharacterContacts = () => {
       },
     }),
     columnHelper.accessor("standing", {
-      header: "Standing",
+      header: t("Standing"),
     }),
     columnHelper.accessor("contact.cat", {
-      header: "Type",
+      header: t("Type"),
     }),
     columnHelper.accessor("contact", {
-      header: "Links",
+      header: t("Links"),
       enableSorting: false,
       enableColumnFilter: false,
       cell: (cell) => {
@@ -131,7 +131,7 @@ const CharacterContacts = () => {
           <Form.Check // prettier-ignore
             type="switch"
             id="custom-switch"
-            label="Show NPC Contacts"
+            label={t("Show NPC Contacts")}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               setShowNPC(event.target.checked);
             }}

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import styles from "./BridgeLink.module.css";
 import { BridgeGate } from "./BridgeTypes";
 import { Badge, OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
@@ -11,6 +12,7 @@ function MyTooltip({ message }: { message: string }) {
 }
 
 export const BridgeLink = ({ start, end }: { start: BridgeGate; end: BridgeGate }) => {
+  const { t } = useTranslation();
   return (
     <div className="bridge-div d-flex col-xs-12 my-3">
       {start.system_name ? (
@@ -26,14 +28,17 @@ export const BridgeLink = ({ start, end }: { start: BridgeGate; end: BridgeGate 
           <div className="d-flex justify-content-evenly align-content-center flex-column">
             <Badge bg={start.ozone > 2500000 ? "info" : "danger"}>
               {" "}
-              Ozone: {start.ozone.toLocaleString()}
+              {t("Ozone: {{ozone}}", { ozone: start.ozone.toLocaleString() })}
             </Badge>
-            <Badge bg={start.expires > 13 ? "info" : "danger"}> Fuel: {start.expires} days</Badge>
+            <Badge bg={start.expires > 13 ? "info" : "danger"}>
+              {" "}
+              {t("Fuel: {{days}} days", { days: start.expires })}
+            </Badge>
           </div>
           {start.active ? (
             <></>
           ) : (
-            <OverlayTrigger placement="top" overlay={MyTooltip({ message: "Gate Offline!" })}>
+            <OverlayTrigger placement="top" overlay={MyTooltip({ message: t("Gate Offline!") })}>
               <i className="far fa-times-circle"></i>
             </OverlayTrigger>
           )}
@@ -41,7 +46,7 @@ export const BridgeLink = ({ start, end }: { start: BridgeGate; end: BridgeGate 
       ) : (
         <>
           <div className={`${styles.start} ${styles.gateInactive}`}>
-            <h4>Unknown</h4>
+            <h4>{t("Unknown")}</h4>
           </div>
           <i className="flex-child far fa-question-circle"></i>
         </>
@@ -76,10 +81,10 @@ export const BridgeLink = ({ start, end }: { start: BridgeGate; end: BridgeGate 
             <>
               <div className="d-flex justify-content-evenly align-content-center flex-column">
                 <Badge className="flex-child" bg={end.ozone > 2500000 ? "info" : "danger"}>
-                  Ozone: {end.ozone.toLocaleString()}
+                  {t("Ozone: {{ozone}}", { ozone: end.ozone.toLocaleString() })}
                 </Badge>
                 <Badge className="flex-child" bg={end.expires > 13 ? "info" : "danger"}>
-                  Fuel: {end.expires} Days
+                  {t("Fuel: {{days}} days", { days: end.expires })}
                 </Badge>
               </div>
               <div
@@ -90,7 +95,7 @@ export const BridgeLink = ({ start, end }: { start: BridgeGate; end: BridgeGate 
               </div>
             </>
           ) : (
-            <OverlayTrigger placement="top" overlay={MyTooltip({ message: "Gate Offline!" })}>
+            <OverlayTrigger placement="top" overlay={MyTooltip({ message: t("Gate Offline!") })}>
               <i className="far fa-times-circle"></i>
             </OverlayTrigger>
           )}
@@ -100,7 +105,7 @@ export const BridgeLink = ({ start, end }: { start: BridgeGate; end: BridgeGate 
           <OverlayTrigger
             placement="top"
             overlay={MyTooltip({
-              message: "Gate not found in the Audit Module!",
+              message: t("Gate not found in the Audit Module!"),
             })}
           >
             <i className="align-self-center far fa-question-circle"></i>
@@ -110,7 +115,7 @@ export const BridgeLink = ({ start, end }: { start: BridgeGate; end: BridgeGate 
             style={{ justifyContent: "center" }}
             className={`d-flex flex-column ${styles.end} ${styles.gateInactive}`}
           >
-            <h4>Unknown</h4>
+            <h4>{t("Unknown")}</h4>
           </div>
         </>
       )}

@@ -28,7 +28,7 @@ describe("BridgeLink", () => {
     expect(screen.getByText("Ozone: 3,000,000")).toBeInTheDocument();
     expect(screen.getByText("Ozone: 1,000,000")).toBeInTheDocument();
     expect(screen.getByText("Fuel: 20 days")).toBeInTheDocument();
-    expect(screen.getByText("Fuel: 5 Days")).toBeInTheDocument();
+    expect(screen.getByText("Fuel: 5 days")).toBeInTheDocument();
   });
 
   it("shows an 'Unknown' start gate and a question mark when the end system isn't known", () => {

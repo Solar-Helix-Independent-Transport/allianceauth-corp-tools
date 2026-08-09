@@ -34,7 +34,7 @@ const CharacterDoctrine = () => {
           <tr className="row align-items-center">
             <td className="col align-items-center text-end">
               <DoctrineCheck
-                name="Passed"
+                name={t("Passed")}
                 skill_reqs={{
                   _meta: {
                     total_sp: 100,
@@ -78,7 +78,7 @@ const CharacterDoctrine = () => {
           <tr className="row align-items-center">
             <td className="col align-items-center text-end">
               <DoctrineCheck
-                name="Failed"
+                name={t("Failed")}
                 skill_reqs={{
                   _meta: {
                     total_sp: 100,
@@ -114,7 +114,7 @@ const CharacterDoctrine = () => {
           defaultChecked={hideFailures}
         />
         <div className="d-flex flex-row text-nowrap" style={{ minWidth: "400px" }}>
-          <Form.Label className="me-2">Percentage Complete Filter</Form.Label>
+          <Form.Label className="me-2">{t("Percentage Complete Filter")}</Form.Label>
           <Form.Range
             min={0}
             max={100}

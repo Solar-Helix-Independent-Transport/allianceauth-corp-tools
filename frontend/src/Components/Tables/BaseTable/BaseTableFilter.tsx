@@ -1,6 +1,7 @@
 import Styles from "./BaseTableFilter.module.css";
 import { Column, Table as ReactTable } from "@tanstack/react-table";
 import { Button, Dropdown, Form, OverlayTrigger, Popover } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 const isHTML = RegExp.prototype.test.bind(/(<([^>]+)>)/i);
 
@@ -10,6 +11,7 @@ const isDate = (str: string) => {
 };
 
 export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
+  const { t } = useTranslation();
   const columnFilterValue = column.getFilterValue();
   const fromToNumber = columnFilterValue as [string, string];
 
@@ -22,17 +24,17 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
           onChange={(e) =>
             column.setFilterValue((old: [number, number]) => [e.target.value, old?.[1]])
           }
-          placeholder={`Min`}
+          placeholder={t("Min")}
           className="form-control"
         />
-        <p className="text-center">to</p>
+        <p className="text-center">{t("to")}</p>
         <input
           type="number"
           value={fromToNumber?.[1] ?? ""}
           onChange={(e) =>
             column.setFilterValue((old: [number, number]) => [old?.[0], e.target.value])
           }
-          placeholder={`Max`}
+          placeholder={t("Max")}
           className="form-control"
         />
         <Button
@@ -41,7 +43,7 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
           className="w-100 mt-2"
           onClick={() => document.body.click()}
         >
-          Close
+          {t("Close")}
         </Button>
       </div>
     </Popover>
@@ -60,14 +62,14 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
             className={Styles.searchInput}
             readOnly={true}
             type="text"
-            placeholder="Set Range"
+            placeholder={t("Set Range")}
             value={
               typeof fromToNumber?.[0] != "undefined" || typeof fromToNumber?.[1] != "undefined"
                 ? `${
                     typeof fromToNumber?.[0] === "undefined" || fromToNumber?.[0] === ""
                       ? "-∞"
                       : fromToNumber?.[0].toLocaleString()
-                  }${" to "}${
+                  }${` ${t("to")} `}${
                     typeof fromToNumber?.[1] === "undefined" || fromToNumber?.[1] === ""
                       ? "∞"
                       : fromToNumber?.[1].toLocaleString()
@@ -107,13 +109,14 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
 };
 
 export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
+  const { t } = useTranslation();
   const passFail = column.getFilterValue();
 
   const popoverBool = (
     <Popover id="popover-positioned-top">
       <div className={`${Styles.radioWrapper} p-2`}>
         <Form.Check
-          label="True"
+          label={t("True")}
           name="group1"
           type="radio"
           id="radio-true"
@@ -122,7 +125,7 @@ export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> 
           }}
         />
         <Form.Check
-          label="False"
+          label={t("False")}
           name="group1"
           type="radio"
           id="radio-false"
@@ -136,7 +139,7 @@ export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> 
           className="w-100"
           onClick={() => document.body.click()}
         >
-          Close
+          {t("Close")}
         </Button>
       </div>
     </Popover>
@@ -155,8 +158,8 @@ export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> 
             className={Styles.searchInput}
             readOnly={true}
             type="text"
-            placeholder="Filter"
-            value={typeof passFail === "undefined" ? undefined : passFail ? "True" : "False"}
+            placeholder={t("Filter")}
+            value={typeof passFail === "undefined" ? undefined : passFail ? t("True") : t("False")}
           />
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -190,6 +193,7 @@ export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> 
 };
 
 export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
+  const { t } = useTranslation();
   return (
     <form
       onReset={() => {
@@ -200,7 +204,7 @@ export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> 
         <Form.Control
           className={Styles.searchInput}
           type="text"
-          placeholder="Search"
+          placeholder={t("Search")}
           onChange={(event) => {
             column.setFilterValue(event.target.value ? event.target.value : "");
           }}
@@ -240,6 +244,7 @@ export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> 
 //   return allItems;
 // }
 export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
+  const { t } = useTranslation();
   const sortedUniqueValues = Array.from(column.getFacetedUniqueValues().keys()).sort();
   const currentFilterValue = column.getFilterValue() as string;
   const isObjectorHTML =
@@ -293,7 +298,7 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
                   }
                 })
               ) : (
-                <Dropdown.Item disabled>Start typing to search.</Dropdown.Item>
+                <Dropdown.Item disabled>{t("Start typing to search.")}</Dropdown.Item>
               )}
             </>
           </Dropdown.Menu>
@@ -310,7 +315,7 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
           <Form.Control
             className={Styles.searchInput}
             type="text"
-            placeholder="Search"
+            placeholder={t("Search")}
             value={typeof currentFilterValue === "undefined" ? undefined : currentFilterValue}
             onChange={(event) => {
               column.setFilterValue(event.target.value ? event.target.value : "");

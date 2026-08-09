@@ -1,5 +1,6 @@
 // install (please try to align the version of installed @nivo packages)
 // yarn add @nivo/bar
+import { useTranslation } from "react-i18next";
 import { abbreviateNumber, getCSSVariable } from "./GraphHelpers";
 import { ResponsiveBarCanvas } from "@nivo/bar";
 import { MiningGraphDatum } from "./MiningGraphTypes";
@@ -29,6 +30,7 @@ export const MiningGraph = ({
   keys: string[];
   dataType?: string;
 }) => {
+  const { t } = useTranslation();
   const ticks = tickGen(data, 10).map((e) => {
     return e.id;
   });
@@ -64,7 +66,7 @@ export const MiningGraph = ({
         tickSize: 5,
         tickPadding: 3,
         tickValues: ticks,
-        legend: "Date",
+        legend: t("Date"),
         legendPosition: "middle",
         legendOffset: 35,
       }}
@@ -73,7 +75,7 @@ export const MiningGraph = ({
         tickPadding: 5,
         tickRotation: 0,
         format: (tick) => `${abbreviateNumber(tick)}`,
-        legend: `Daily ${dataType}`,
+        legend: t("Daily {{dataType}}", { dataType }),
         legendPosition: "middle",
         legendOffset: -70,
       }}

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { loadBridges } from "../../api/corporation";
 import { BridgePair } from "../../Components/Corporation/BridgeTypes";
 import { useQuery } from "@tanstack/react-query";
@@ -7,6 +8,7 @@ import { BridgeLink } from "../../Components/Corporation/BridgeLink";
 import { BridgeHeader } from "../../Components/Corporation/BridgeHeader";
 
 const Bridges = () => {
+  const { t } = useTranslation();
   const { data, isFetching } = useQuery({
     queryKey: ["bridges"],
     queryFn: () => loadBridges(),
@@ -47,7 +49,7 @@ const Bridges = () => {
   ) : isFetching ? (
     <PanelLoader />
   ) : (
-    <PanelLoader message="No Bridges Found" />
+    <PanelLoader message={t("No Bridges Found")} />
   );
 };
 

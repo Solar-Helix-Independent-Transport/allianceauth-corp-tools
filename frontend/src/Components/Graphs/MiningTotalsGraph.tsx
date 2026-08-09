@@ -1,5 +1,6 @@
 // install (please try to align the version of installed @nivo packages)
 // yarn add @nivo/bar
+import { useTranslation } from "react-i18next";
 import { abbreviateNumber, getCSSVariable } from "./GraphHelpers";
 import { ResponsiveBarCanvas } from "@nivo/bar";
 import { MiningTotalsDatum } from "./MiningGraphTypes";
@@ -19,6 +20,7 @@ export const MiningTotalsGraph = ({
   ores: string[];
   dataType: string;
 }) => {
+  const { t } = useTranslation();
   const bg = getCSSVariable("--bs-body-bg");
   const txt = getCSSVariable("--bs-body-color");
   const bdr = getCSSVariable("--bs-light-border-subtle");
@@ -49,7 +51,7 @@ export const MiningTotalsGraph = ({
         // background: "#222",
         tickSize: 5,
         tickPadding: 3,
-        legend: "Ore",
+        legend: t("Ore"),
         legendPosition: "middle",
         legendOffset: 35,
       }}
@@ -58,7 +60,7 @@ export const MiningTotalsGraph = ({
         tickPadding: 5,
         tickRotation: 0,
         format: (tick) => `${abbreviateNumber(tick)}`,
-        legend: `Total ${dataType}`,
+        legend: t("Total {{dataType}}", { dataType }),
         legendPosition: "middle",
         legendOffset: -70,
       }}

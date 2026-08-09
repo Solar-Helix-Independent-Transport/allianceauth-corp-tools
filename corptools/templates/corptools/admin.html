@@ -456,7 +456,7 @@
                 {% csrf_token %}
                 <div class="form-group mb-3">
                     <label for="name">{% translate "Skill List Description" %}</label>
-                    <input type="text" class="form-control" name="name" placeholder="Enter Description">
+                    <input type="text" class="form-control" name="name" placeholder="{% translate "Enter Description" %}">
                     <div id="nameHelp" class="form-text">{% translate "This will show as the name of the Skill List" %}.</div>
                 </div>
 

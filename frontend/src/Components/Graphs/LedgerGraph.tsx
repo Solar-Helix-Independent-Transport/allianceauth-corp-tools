@@ -185,14 +185,18 @@ const LedgerGraph = ({ data }: { data: MiningLedgerData }) => {
           <MiningTotalsGraph
             data={totalData}
             ores={data.all_ores}
-            dataType={mode ? "Value" : "Volume"}
+            dataType={mode ? t("Value") : t("Volume")}
           />
         </div>
         <div style={{ height: "300px", margin: "5px", background: "#646464" }}>
-          <MiningGraph data={graphData} keys={data.all_ores} dataType={mode ? "Value" : "Volume"} />
+          <MiningGraph
+            data={graphData}
+            keys={data.all_ores}
+            dataType={mode ? t("Value") : t("Volume")}
+          />
         </div>
         <div style={{ display: "flex", margin: "7px" }}>
-          <p style={{ margin: "5px", marginTop: "auto", marginBottom: "auto" }}>Zoom:</p>
+          <p style={{ margin: "5px", marginTop: "auto", marginBottom: "auto" }}>{t("Zoom:")}</p>
           <div style={{ position: "relative", flexGrow: 1, height: "50px" }}>
             <div style={{ position: "absolute", inset: 0 }}>
               <MiningGraphBrush data={apiDataToObject(data.data)} keys={data.all_ores} />

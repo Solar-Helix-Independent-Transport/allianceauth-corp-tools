@@ -47,12 +47,12 @@ function StarbaseModal({
           <DateToFields dateStrValue={starbase?.reinforced_until} text={t("Reinforced Till")} />
           <DateToFields dateStrValue={starbase?.unanchor_at} text={t("Unanchoring AT")} />
           <StrToFields strValue={starbase?.moon?.name} text={t("Moon")} />
-          <StrToFields strValue={starbase?.anchor} text={"Anchoring Permissions:"} />
-          <StrToFields strValue={starbase?.online} text={"Onlining Permissions:"} />
-          <StrToFields strValue={starbase?.offline} text={"Offlining Permissions:"} />
-          <StrToFields strValue={starbase?.unanchor} text={"UnAnchoring Permissions:"} />
-          <StrToFields strValue={starbase?.fuel_bay_take} text={"Fuel Take Permissions:"} />
-          <StrToFields strValue={starbase?.fuel_bay_view} text={"Fuel View Permissions:"} />
+          <StrToFields strValue={starbase?.anchor} text={t("Anchoring Permissions:")} />
+          <StrToFields strValue={starbase?.online} text={t("Onlining Permissions:")} />
+          <StrToFields strValue={starbase?.offline} text={t("Offlining Permissions:")} />
+          <StrToFields strValue={starbase?.unanchor} text={t("UnAnchoring Permissions:")} />
+          <StrToFields strValue={starbase?.fuel_bay_take} text={t("Fuel Take Permissions:")} />
+          <StrToFields strValue={starbase?.fuel_bay_view} text={t("Fuel View Permissions:")} />
         </table>
 
         <StarbaseModalFuelTable data={data?.fuel} isFetching={isFetching} header={t("Fuel Bays")} />

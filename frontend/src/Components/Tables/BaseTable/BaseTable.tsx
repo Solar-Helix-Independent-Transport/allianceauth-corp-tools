@@ -1,4 +1,5 @@
 import { Fragment, MouseEvent } from "react";
+import { useTranslation } from "react-i18next";
 import tableStyles from "./BaseTable.module.css";
 import Filter from "./BaseTableFilter";
 import {
@@ -89,6 +90,7 @@ const BaseTable = <TData,>({
   exportFileName = undefined,
 }: BaseTableProps<TData>) => {
   const location = useLocation();
+  const { t } = useTranslation();
 
   // TanStack Table's useReactTable() returns functions the compiler can't
   // safely memoize; this is inherent to the library, not fixable here.
@@ -189,7 +191,7 @@ const BaseTable = <TData,>({
             <OverlayTrigger
               placement="bottom"
               trigger={["hover", "focus"]}
-              overlay={MyTooltip("Refreshing Data")}
+              overlay={MyTooltip(t("Refreshing Data"))}
             >
               <Button variant="info">
                 <i className={`${tableStyles.refreshAnimate} fas fa-sync`}></i>
@@ -199,7 +201,7 @@ const BaseTable = <TData,>({
             <OverlayTrigger
               placement="bottom"
               trigger={["hover", "focus"]}
-              overlay={MyTooltip("Data Loaded: " + new Date().toLocaleString())}
+              overlay={MyTooltip(t("Data Loaded: {{date}}", { date: new Date().toLocaleString() }))}
             >
               <Button variant="info">
                 <i className="far fa-check-circle"></i>
@@ -207,7 +209,7 @@ const BaseTable = <TData,>({
             </OverlayTrigger>
           )}
           <Button active variant="primary" onClick={() => exportToCSV(table, fileName)}>
-            Export Table to CSV
+            {t("Export Table to CSV")}
           </Button>
         </ButtonGroup>
 
@@ -245,14 +247,14 @@ const BaseTable = <TData,>({
 
           <ButtonGroup style={{ zIndex: 0 }} className="ms-1">
             <Button active variant="success">
-              Page Size:
+              {t("Page Size:")}
             </Button>
             <SplitButton
               id="pageSizeDropdown"
               variant="success"
               title={
                 table.getState().pagination.pageSize === 1000000
-                  ? "All"
+                  ? t("All")
                   : table.getState().pagination.pageSize
               }
             >
@@ -265,7 +267,9 @@ const BaseTable = <TData,>({
                     table.setPageSize(Number((event.target as HTMLElement).id));
                   }}
                 >
-                  {_pageSize === 1000000 ? "Show All" : `Show ${_pageSize}`}
+                  {_pageSize === 1000000
+                    ? t("Show All")
+                    : t("Show {{pageSize}}", { pageSize: _pageSize })}
                 </Dropdown.Item>
               ))}
             </SplitButton>
@@ -275,7 +279,7 @@ const BaseTable = <TData,>({
 
       {debugTable && (
         <div className="col-xs-12">
-          <div>{table.getRowModel().rows.length} Rows</div>
+          <div>{t("{{count}} Rows", { count: table.getRowModel().rows.length })}</div>
           <pre>{JSON.stringify(table.getState(), null, 2)}</pre>
         </div>
       )}

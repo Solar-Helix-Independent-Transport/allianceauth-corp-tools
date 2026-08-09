@@ -1,7 +1,8 @@
 import { ErrorLoader } from "../Loaders/loaders";
 import React, { Component, ErrorInfo } from "react";
+import { WithTranslation, withTranslation } from "react-i18next";
 
-interface Props {
+interface Props extends WithTranslation {
   children: React.ReactNode;
 }
 
@@ -34,14 +35,18 @@ class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      const { t } = this.props;
       return (
         <>
           <ErrorLoader title={this.state.title} message={this.state.message} />
           <p className="text-center">
-            You should not be seeing this message, please report this error to your Admininstrators.
+            {t(
+              "You should not be seeing this message, please report this error to your Admininstrators.",
+            )}
             <br />
-            Should they need help they can find help in the Corp Tools Channel on the{" "}
-            <a href="https://discord.gg/fjnHAmk">Alliance Auth Discord</a> or create an issue on{" "}
+            {t("Should they need help they can find help in the Corp Tools Channel on the")}{" "}
+            <a href="https://discord.gg/fjnHAmk">{t("Alliance Auth Discord")}</a>{" "}
+            {t("or create an issue on")}{" "}
             <a href="https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools">
               GitHub
             </a>
@@ -60,4 +65,4 @@ class ErrorBoundary extends Component<Props, State> {
   }
 }
 
-export default ErrorBoundary;
+export default withTranslation()(ErrorBoundary);

@@ -9,29 +9,29 @@
 
 {% block content %}
 {% if structures %}
-<h2 class="text-center">Metenox Stats</h2>
+<h2 class="text-center">{% translate "Metenox Stats" %}</h2>
 <hr>
 <div id="chart_info" class="mx-auto">
   <div class="text-center">
-    <h4 class="text-center">Filtered Stats</h4>
-    <p>Structures Matching Filter <span id="total_str" class="badge bg-primary"></span></p>
-    <p>Total Value in Drills <span id="total_value" class="badge bg-primary"></span></p>
-    <p>Filtered System Count <span id="total_system" class="badge bg-primary"></span></p>
-    <p>Filtered Constellation Count <span id="total_const" class="badge bg-primary"></span></p>
-    <p>Filtered Region Count <span id="total_region" class="badge bg-primary"></span></p>
+    <h4 class="text-center">{% translate "Filtered Stats" %}</h4>
+    <p>{% translate "Structures Matching Filter" %} <span id="total_str" class="badge bg-primary"></span></p>
+    <p>{% translate "Total Value in Drills" %} <span id="total_value" class="badge bg-primary"></span></p>
+    <p>{% translate "Filtered System Count" %} <span id="total_system" class="badge bg-primary"></span></p>
+    <p>{% translate "Filtered Constellation Count" %} <span id="total_const" class="badge bg-primary"></span></p>
+    <p>{% translate "Filtered Region Count" %} <span id="total_region" class="badge bg-primary"></span></p>
   </div>
 </div>
 <hr>
   <table id="table-structs" class="table table-responsive">
     <thead>
       <tr>
-        <th>Structure</th>
-        <th>Owner</th>
-        <th>System</th>
-        <th>Constellation</th>
-        <th>Region</th>
-        <th>Value</th>
-        <th>Contents</th>
+        <th>{% translate "Structure" %}</th>
+        <th>{% translate "Owner" %}</th>
+        <th>{% translate "System" %}</th>
+        <th>{% translate "Constellation" %}</th>
+        <th>{% translate "Region" %}</th>
+        <th>{% translate "Value" %}</th>
+        <th>{% translate "Contents" %}</th>
       </tr>
     </thead>
     <tbody>
@@ -50,9 +50,9 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Type</th>
-                        <th>Qty</th>
-                        <th>Value</th>
+                        <th>{% translate "Type" %}</th>
+                        <th>{% translate "Qty" %}</th>
+                        <th>{% translate "Value" %}</th>
                     </tr>
                 </thead>
                 <tbody>

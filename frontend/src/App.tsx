@@ -33,7 +33,7 @@ import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router";
 import { NuqsAdapter } from "nuqs/adapters/react-router/v8";
 
 import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
+import { initReactI18next, useTranslation } from "react-i18next";
 import Backend from "i18next-http-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
 import CharacterWalletActivity from "./Pages/Char/WalletActivity";
@@ -89,6 +89,7 @@ i18n
   });
 
 function App() {
+  const { t } = useTranslation();
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -127,7 +128,9 @@ function App() {
                   path="account/standings"
                   element={
                     <Card>
-                      <Card.Body className="text-center">This is account/standings.</Card.Body>
+                      <Card.Body className="text-center">
+                        {t("This is account/standings.")}
+                      </Card.Body>
                     </Card>
                   }
                 />
@@ -136,8 +139,8 @@ function App() {
                   path="*"
                   element={
                     <ErrorLoader
-                      title="Error 404"
-                      message="This is not the path you are looking for! Page not found."
+                      title={t("Error 404")}
+                      message={t("This is not the path you are looking for! Page not found.")}
                     />
                   }
                 />
@@ -163,8 +166,8 @@ function App() {
                   path="*"
                   element={
                     <ErrorLoader
-                      title="Error 404"
-                      message="This is not the path you are looking for! Page not found."
+                      title={t("Error 404")}
+                      message={t("This is not the path you are looking for! Page not found.")}
                     />
                   }
                 />
@@ -176,8 +179,8 @@ function App() {
                   path="*"
                   element={
                     <ErrorLoader
-                      title="Error 404"
-                      message="This is not the path you are looking for! Page not found."
+                      title={t("Error 404")}
+                      message={t("This is not the path you are looking for! Page not found.")}
                     />
                   }
                 />

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import ErrorBoundary from "../Helpers/ErrorBoundary";
 import { PanelLoader } from "../Loaders/loaders";
 import { Skill, SkillGroup } from "./SkillGroup";
@@ -13,10 +14,11 @@ const groupByKey = (list: Skill[], key: "group") =>
   );
 
 const CharSkillGroups = ({ data }: { data: Skill[] }) => {
+  const { t } = useTranslation();
   const skills_data = groupByKey(data, "group");
 
   if (Object.entries(skills_data).length === 0) {
-    return <PanelLoader title="Nothing Found" />;
+    return <PanelLoader title={t("Nothing Found")} />;
   }
   return (
     <ErrorBoundary>

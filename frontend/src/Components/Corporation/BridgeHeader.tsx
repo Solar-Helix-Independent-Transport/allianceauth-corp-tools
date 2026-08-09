@@ -1,7 +1,9 @@
+import { useTranslation } from "react-i18next";
 import { Badge } from "react-bootstrap";
 import styles from "./BridgeLink.module.css";
 
 export const BridgeHeader = () => {
+  const { t } = useTranslation();
   return (
     <div style={{ justifyContent: "center" }} className="d-flex align-items-center">
       <p
@@ -11,7 +13,7 @@ export const BridgeHeader = () => {
           borderBottom: "3px dotted",
         }}
       >
-        Gate Online
+        {t("Gate Online")}
       </p>
       <p
         className={styles.gateInactive}
@@ -20,7 +22,7 @@ export const BridgeHeader = () => {
           borderBottom: "3px dotted",
         }}
       >
-        Gate Offline
+        {t("Gate Offline")}
       </p>{" "}
       <p
         className={styles.gateUnknown}
@@ -29,7 +31,7 @@ export const BridgeHeader = () => {
           borderBottom: "3px dotted",
         }}
       >
-        Gate Unknown
+        {t("Gate Unknown")}
       </p>
       <Badge
         bg="info"
@@ -37,7 +39,7 @@ export const BridgeHeader = () => {
           margin: "15px",
         }}
       >
-        Lo/Fuel Level Ok
+        {t("Lo/Fuel Level Ok")}
       </Badge>
       <Badge
         bg="danger"
@@ -45,7 +47,7 @@ export const BridgeHeader = () => {
           margin: "15px",
         }}
       >
-        Lo/Fuel Level Low
+        {t("Lo/Fuel Level Low")}
       </Badge>
     </div>
   );
