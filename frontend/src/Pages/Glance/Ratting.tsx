@@ -1,17 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
 import { statusProps } from "../../Components/Cards/IconStatusCard.helpers";
-import { loadGlanceRattingData } from "../../api/character";
 import Battleship from "../../assets/battleship_32.png";
 import Cruiser from "../../assets/cruiser_32.png";
 import Dreadnought from "../../assets/dreadnought_32.png";
 import Frigate from "../../assets/frigate_32.png";
 import Supercarrier from "../../assets/superCarrier_32.png";
 import Titan from "../../assets/titan_32.png";
-import styles from "./AtAGlance.module.css";
 import Card from "react-bootstrap/Card";
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router";
 import { components } from "../../api/CtApi";
 
 export const Ratting = ({
@@ -75,22 +71,5 @@ export const Ratting = ({
         </div>
       </Card>
     </div>
-  );
-};
-
-export const CharacterGlancesRatting = () => {
-  const { t } = useTranslation();
-  const { characterID } = useParams();
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["glances", "ratting", characterID],
-    queryFn: () => loadGlanceRattingData(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
-  });
-  return (
-    <>
-      <h3 className={`${styles.strikeOut} w-100 text-center mt-3`}>{t("Ratting Activity")}</h3>
-      <Ratting {...{ data, isLoading }} />
-    </>
   );
 };
