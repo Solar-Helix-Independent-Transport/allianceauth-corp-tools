@@ -61,7 +61,7 @@ const CharacterClones = () => {
                       </tr>
                       <tr className="align-items-center">
                         <td colSpan={2} style={{ verticalAlign: "middle" }}>
-                          <div className="d-flex justify-content-end align-items-center">
+                          <div className="d-flex flex-wrap justify-content-end align-items-center">
                             {d.implants?.length ? (
                               d.implants.map((imp) => {
                                 return <TypeIcon type_id={imp.id} size={32} />;
