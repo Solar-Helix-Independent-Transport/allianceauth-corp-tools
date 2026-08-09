@@ -5,11 +5,6 @@ import { useTranslation } from "react-i18next";
 
 const isHTML = RegExp.prototype.test.bind(/(<([^>]+)>)/i);
 
-const isDate = (str: string) => {
-  const dateCheck = Date.parse(str);
-  return !isNaN(dateCheck);
-};
-
 export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
   const { t } = useTranslation();
   const columnFilterValue = column.getFilterValue();
@@ -368,12 +363,16 @@ export const Filter = <TData,>({
   } else if (typeof firstValue === "object") {
     return <TextFilter {...{ column }} />;
   } else {
-    if (isDate(String(firstValue))) {
-      // TODO maybe add a date range selecterer for now nothing.
-      return <></>;
-    } else {
-      return <SelectFilter {...{ column }} />;
-    }
+    // Used to infer a date column here via Date.parse() on the first row's
+    // value and render nothing for it (no date-range filter was ever
+    // implemented) - but Date.parse() is permissive enough to accept plenty
+    // of ordinary text as a valid date (e.g. EVE item names like "Inherent
+    // Implants 'Squire' Power Grid Management EG-602"), which made the
+    // filter vanish for arbitrary text columns depending on browser and
+    // which row happened to load first (#308). Falling through to
+    // SelectFilter for every non-number/boolean/object column, date-like or
+    // not, is strictly better than silently disappearing.
+    return <SelectFilter {...{ column }} />;
   }
 };
 
