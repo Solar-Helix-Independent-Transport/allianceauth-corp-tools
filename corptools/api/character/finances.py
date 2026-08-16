@@ -14,6 +14,7 @@ from corptools import models
 from corptools.api import schema
 from corptools.api.helpers import (
     Paginator,
+    get_ref_type_lookup,
     resolve_character,
 )
 
@@ -47,6 +48,8 @@ class FinancesApiEndpoints:
                     "msg"
                 ).order_by('-date')[:35000]
 
+            ref_type_lookup = get_ref_type_lookup()
+
             output = []
             for w in wallet_journal:
                 own_account = False
@@ -54,6 +57,7 @@ class FinancesApiEndpoints:
                     own_account = True
                 _msg = getattr(w, "msg", None)
                 msg = _msg.message if _msg is not None else w.reason
+                ref_type_entry = ref_type_lookup.get(w.ref_type)
 
                 output.append(
                     {
@@ -71,6 +75,8 @@ class FinancesApiEndpoints:
                             "cat": w.second_party_name.category,
                         },
                         "ref_type": w.ref_type,
+                        "ref_type_name": ref_type_entry.name if ref_type_entry else None,
+                        "ref_type_description": ref_type_entry.description if ref_type_entry else None,
                         "amount": w.amount,
                         "balance": w.balance,
                         "reason": msg,

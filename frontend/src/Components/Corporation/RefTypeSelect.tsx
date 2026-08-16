@@ -1,29 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import Select, { MultiValue, StylesConfig } from "react-select";
 import { loadRefTypes } from "../../api/corporation";
+import { components } from "../../api/CtApi";
 import { useQueryState } from "nuqs";
 import { useEffect } from "react";
 import { bootstrapSelectStyles } from "../Helpers/reactSelectTheme";
 
-interface RefTypeOption {
-  value: string;
-  label: string;
-}
+type RefTypeOption = components["schemas"]["RefTypeOption"];
 
 const colourStyles = bootstrapSelectStyles as StylesConfig<RefTypeOption, true>;
-
-const convertToTitleCase = (str: string) => {
-  if (!str) {
-    return "";
-  }
-  return str.toLowerCase().replace(/\b\w/g, (s) => s.toUpperCase());
-};
 
 const RefTypeSelect = ({ setFilter }: { setFilter: (value: string) => void }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["ref_types", 0],
     queryFn: () => loadRefTypes(),
-    initialData: [] as string[],
+    initialData: [] as RefTypeOption[],
     refetchOnWindowFocus: false,
   });
   const [baseQry, setRefQry] = useQueryState("refs");
@@ -36,22 +27,10 @@ const RefTypeSelect = ({ setFilter }: { setFilter: (value: string) => void }) =>
     setRefQry(values.sort().join(","));
   };
 
-  let options: RefTypeOption[] = [];
-
-  if (!isLoading) {
-    options = data?.map((ref) => {
-      return {
-        value: ref,
-        label: convertToTitleCase(ref.replaceAll("_", " ")),
-      };
-    });
-  }
+  const options: RefTypeOption[] = isLoading ? [] : data;
 
   const defaultValue = baseQry?.split(",").map((ref) => {
-    return {
-      value: ref,
-      label: convertToTitleCase(ref.replaceAll("_", " ")),
-    };
+    return options.find((o) => o.value === ref) ?? { value: ref, label: ref };
   });
 
   useEffect(() => {

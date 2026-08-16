@@ -2,11 +2,13 @@ import { useTranslation } from "react-i18next";
 import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { components } from "../../api/CtApi";
 import { loadWallet } from "../../api/character";
-import { createColumnHelper } from "@tanstack/react-table";
+import { createColumnHelper, type ColumnDef } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { ChangeEvent, useState } from "react";
 import { Form } from "react-bootstrap";
+import RefTypeLabel from "../../Components/Helpers/RefTypeLabel";
+import { getRefTypeLabel } from "../../Components/Helpers/refTypeFormat";
 
 const CharacterWallet = () => {
   const { t } = useTranslation();
@@ -20,17 +22,27 @@ const CharacterWallet = () => {
   });
   const columnHelper = createColumnHelper<components["schemas"]["CharacterWalletEvent"]>();
 
-  const columns = [
+  const columns: ColumnDef<components["schemas"]["CharacterWalletEvent"], unknown>[] = [
     columnHelper.accessor("character.character_name", {
       header: t("Character"),
     }),
     columnHelper.accessor("date", {
       header: t("Date"),
     }),
-    columnHelper.accessor("ref_type", {
+    // accessorFn (not the raw ref_type field) so the column filter's option
+    // list - built from this accessor's own values, see BaseTableFilter's
+    // SelectFilter - facets on the exact same friendly label the cell
+    // renders, including RefTypeLabel's title-cased fallback for ref_types
+    // the SDE doesn't have a name for yet, rather than the raw machine key.
+    columnHelper.accessor((row) => getRefTypeLabel(row.ref_type, row.ref_type_name), {
+      id: "ref_type",
       header: t("Type"),
       cell: (cell) => (
-        <span style={{ textTransform: "capitalize" }}>{cell.getValue().replaceAll("_", " ")}</span>
+        <RefTypeLabel
+          refType={cell.row.original.ref_type}
+          name={cell.row.original.ref_type_name}
+          description={cell.row.original.ref_type_description}
+        />
       ),
     }),
     columnHelper.accessor("first_party.name", {

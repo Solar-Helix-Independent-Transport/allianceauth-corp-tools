@@ -4308,7 +4308,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/RefTypeOption"
                   },
                   "title": "Response",
                   "type": "array"
@@ -6576,6 +6576,28 @@
             "title": "Ref Type",
             "type": "string"
           },
+          "ref_type_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Type Name"
+          },
+          "ref_type_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Type Description"
+          },
           "balance": {
             "title": "Balance",
             "type": "number"
@@ -8362,6 +8384,32 @@
         "title": "AssetItem",
         "type": "object"
       },
+      "RefTypeOption": {
+        "properties": {
+          "value": {
+            "title": "Value",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "required": ["value", "label"],
+        "title": "RefTypeOption",
+        "type": "object"
+      },
       "CorporationWalletEvent": {
         "properties": {
           "division": {
@@ -8386,6 +8434,28 @@
           "ref_type": {
             "title": "Ref Type",
             "type": "string"
+          },
+          "ref_type_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Type Name"
+          },
+          "ref_type_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Type Description"
           },
           "balance": {
             "title": "Balance",

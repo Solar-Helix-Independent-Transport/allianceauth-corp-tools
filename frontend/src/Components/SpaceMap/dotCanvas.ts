@@ -58,6 +58,20 @@ export type DrawDotsOptions = {
   textHaloColor?: string;
 };
 
+// Below this zoom, a glow's on-screen size tracks world space normally
+// (grows/shrinks with pan-zoom like everything else on the canvas) - this is
+// roughly the zoom level a cluster of glows was tuned to read well at.
+// Above it, the glow shrinks the further you zoom in past that instead of
+// continuing to grow, so it doesn't balloon to cover the screen and hide
+// the system layout it's decorating once you're zoomed in close. Anchored
+// at (and continuous with) that same reference zoom, so nothing changes at
+// or below it.
+const GLOW_REFERENCE_ZOOM = 0.35;
+
+// Zoom past which a value dot's core marker swaps to the bigger,
+// heat-colored, value-labeled version - see MapDot.expandedCoreRadius.
+const EXPANDED_CORE_ZOOM_THRESHOLD = 1;
+
 const LABEL_FONT_SIZE = 9;
 const LABEL_OFFSET = 1;
 // Below this on-screen size a label is unreadable anyway, and skipping the
@@ -83,15 +97,80 @@ export const drawDots = (
   const textColor = resolve(options.textColor ?? "var(--bs-body-color)");
   const textHaloColor = resolve(options.textHaloColor ?? "var(--bs-body-bg)");
 
+  // Pass 1: glows, additively blended and flat-filled (d.color already
+  // carries its own translucency - see ActivityMap/layout.ts). Painting
+  // translucent circles on top of each other with normal compositing leaves
+  // every circle's own edge visible as a seam wherever it overlaps the next
+  // one, so a cluster of nearby systems reads as a patch of scalloped petals
+  // instead of one smooth glow. "lighter" sums overlapping alpha instead of
+  // overpainting, so overlap just gets brighter - and being commutative,
+  // draw order no longer matters for glow dots.
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
   for (const d of dots) {
+    if (!d.gradient) continue;
+    const shrink = Math.min(1, (GLOW_REFERENCE_ZOOM / zoom) ** 2);
+    const glowRadius = d.radius * shrink;
     ctx.beginPath();
-    ctx.arc(d.x, d.y, d.radius, 0, Math.PI * 2);
+    ctx.arc(d.x, d.y, glowRadius, 0, Math.PI * 2);
     ctx.fillStyle = resolve(d.color);
     ctx.fill();
-    if (d.bordered !== false) {
-      ctx.lineWidth = 1 / zoom;
-      ctx.strokeStyle = borderColor;
-      ctx.stroke();
+  }
+  ctx.restore();
+
+  // Pass 2: flat (non-glow) dots, plus every dot's fixed-size core marker -
+  // both drawn with normal compositing, after all glows, so they stay crisp
+  // on top regardless of which glow was painted last in pass 1.
+  for (const d of dots) {
+    if (!d.gradient) {
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.radius, 0, Math.PI * 2);
+      ctx.fillStyle = resolve(d.color);
+      ctx.fill();
+      if (d.bordered !== false) {
+        ctx.lineWidth = 1 / zoom;
+        ctx.strokeStyle = borderColor;
+        ctx.stroke();
+      }
+    }
+
+    // Fixed-size marker at the dot's true position - see MapDot.coreRadius.
+    // Zoomed in far enough, a value dot swaps to the bigger expanded
+    // version instead (see MapDot.expandedCoreRadius) - drawn unconditionally
+    // rather than through the `< d.radius` guard below, since it's often
+    // bigger than a lower-value dot's (by-then-shrunk) glow radius.
+    const expanded = zoom >= EXPANDED_CORE_ZOOM_THRESHOLD && d.expandedCoreRadius !== undefined;
+    if (expanded) {
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.expandedCoreRadius!, 0, Math.PI * 2);
+      ctx.fillStyle = resolve(d.expandedCoreColor ?? d.coreColor ?? d.color);
+      ctx.fill();
+      if (d.bordered !== false) {
+        ctx.lineWidth = 1 / zoom;
+        ctx.strokeStyle = borderColor;
+        ctx.stroke();
+      }
+      if (d.valueLabel) {
+        const fontSize = d.expandedCoreRadius! * 0.7;
+        ctx.font = `bold ${fontSize}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.lineWidth = fontSize * 0.2;
+        ctx.strokeStyle = textHaloColor;
+        ctx.fillStyle = textColor;
+        ctx.strokeText(d.valueLabel, d.x, d.y);
+        ctx.fillText(d.valueLabel, d.x, d.y);
+      }
+    } else if (d.coreRadius !== undefined && d.coreRadius < d.radius) {
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.coreRadius, 0, Math.PI * 2);
+      ctx.fillStyle = resolve(d.coreColor ?? d.color);
+      ctx.fill();
+      if (d.bordered !== false) {
+        ctx.lineWidth = 1 / zoom;
+        ctx.strokeStyle = borderColor;
+        ctx.stroke();
+      }
     }
   }
 
@@ -104,7 +183,9 @@ export const drawDots = (
   ctx.strokeStyle = textHaloColor;
   ctx.fillStyle = textColor;
   for (const d of dots) {
-    const ty = d.y + d.radius + LABEL_OFFSET;
+    const expanded = zoom >= EXPANDED_CORE_ZOOM_THRESHOLD && d.expandedCoreRadius !== undefined;
+    const anchorRadius = expanded ? d.expandedCoreRadius! : (d.coreRadius ?? d.radius);
+    const ty = d.y + anchorRadius + LABEL_OFFSET;
     ctx.strokeText(d.name, d.x, ty);
     ctx.fillText(d.name, d.x, ty);
   }

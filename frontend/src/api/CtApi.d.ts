@@ -2222,6 +2222,10 @@ export interface components {
       second_party: components["schemas"]["EveName"];
       /** Ref Type */
       ref_type: string;
+      /** Ref Type Name */
+      ref_type_name?: string | null;
+      /** Ref Type Description */
+      ref_type_description?: string | null;
       /** Balance */
       balance: number;
       /** Amount */
@@ -2864,6 +2868,15 @@ export interface components {
       /** Expand */
       expand?: boolean | null;
     };
+    /** RefTypeOption */
+    RefTypeOption: {
+      /** Value */
+      value: string;
+      /** Label */
+      label: string;
+      /** Description */
+      description?: string | null;
+    };
     /** CorporationWalletEvent */
     CorporationWalletEvent: {
       /** Division */
@@ -2879,6 +2892,10 @@ export interface components {
       second_party: components["schemas"]["EveName"];
       /** Ref Type */
       ref_type: string;
+      /** Ref Type Name */
+      ref_type_name?: string | null;
+      /** Ref Type Description */
+      ref_type_description?: string | null;
       /** Balance */
       balance: number;
       /** Amount */
@@ -5770,7 +5787,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": string[];
+          "application/json": components["schemas"]["RefTypeOption"][];
         };
       };
       /** @description Forbidden */

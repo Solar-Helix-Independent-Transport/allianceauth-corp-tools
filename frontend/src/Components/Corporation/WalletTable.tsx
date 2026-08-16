@@ -1,9 +1,11 @@
 import { useTranslation } from "react-i18next";
 import TableWrapper from "../Tables/BaseTable/TableWrapper";
-import { createColumnHelper } from "@tanstack/react-table";
+import { createColumnHelper, type ColumnDef } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { loadWallet } from "../../api/corporation";
 import { components } from "../../api/CtApi";
+import RefTypeLabel from "../Helpers/RefTypeLabel";
+import { getRefTypeLabel } from "../Helpers/refTypeFormat";
 
 const CorporationWalletTable = ({
   corporationID,
@@ -25,14 +27,24 @@ const CorporationWalletTable = ({
 
   const columnHelper = createColumnHelper<components["schemas"]["CorporationWalletEvent"]>();
 
-  const columns = [
+  const columns: ColumnDef<components["schemas"]["CorporationWalletEvent"], unknown>[] = [
     columnHelper.accessor("date", {
       header: t("Date"),
     }),
-    columnHelper.accessor("ref_type", {
+    // accessorFn (not the raw ref_type field) so the column filter's option
+    // list - built from this accessor's own values, see BaseTableFilter's
+    // SelectFilter - facets on the exact same friendly label the cell
+    // renders, including RefTypeLabel's title-cased fallback for ref_types
+    // the SDE doesn't have a name for yet, rather than the raw machine key.
+    columnHelper.accessor((row) => getRefTypeLabel(row.ref_type, row.ref_type_name), {
+      id: "ref_type",
       header: t("Type"),
       cell: (cell) => (
-        <span style={{ textTransform: "capitalize" }}>{cell.getValue().replaceAll("_", " ")}</span>
+        <RefTypeLabel
+          refType={cell.row.original.ref_type}
+          name={cell.row.original.ref_type_name}
+          description={cell.row.original.ref_type_description}
+        />
       ),
     }),
     columnHelper.accessor("division", {

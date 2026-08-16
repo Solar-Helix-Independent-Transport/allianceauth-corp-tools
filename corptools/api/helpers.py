@@ -153,6 +153,33 @@ def format_hours_as_duration(hours: int) -> str:
     return f"{', '.join(parts[:-1])}, and {parts[-1]}"
 
 
+def get_ref_type_lookup() -> DictStrAny:
+    """Map ESI wallet journal ref_type strings to their SDE display name/description.
+
+    AccountingEntryType.internal_name is the same string ESI uses for
+    ref_type, but the table is keyed by a separate numeric id, so this is a
+    plain dict lookup rather than a queryset join. name/description are
+    modeltranslation fields, so this resolves in the request's active
+    language. Not cached across requests since it would otherwise pin
+    whichever language populated it first.
+
+    AccountingEntryType was only added to django-eveonline-sde recently, so
+    older pinned versions of that dependency won't have it yet - fall back
+    to an empty lookup (raw ref_type strings) rather than 500ing.
+    """
+    try:
+        # Third Party
+        from eve_sde.models import AccountingEntryType
+    except ImportError:
+        return {}
+
+    return {
+        entry.internal_name: entry
+        for entry in AccountingEntryType.objects.all()
+        if entry.internal_name
+    }
+
+
 def wallet_check(characters, types, first_parties=None, minimum_amount=None, look_back=30):
     start_date = timezone.now() - timedelta(days=look_back)
     if isinstance(types, str):

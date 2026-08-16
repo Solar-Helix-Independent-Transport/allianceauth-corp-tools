@@ -1,6 +1,14 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { useReactTable, getCoreRowModel, type ColumnDef, type Row } from "@tanstack/react-table";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
+  type ColumnDef,
+  type Row,
+} from "@tanstack/react-table";
 import Filter from "./BaseTableFilter";
 import { NameObjectArrayFilterFn } from "./NameObjectArrayFilterFn";
 
@@ -11,15 +19,24 @@ import { NameObjectArrayFilterFn } from "./NameObjectArrayFilterFn";
 const FilterHarness = ({
   data,
   accessorKey,
+  meta,
 }: {
   data: Record<string, unknown>[];
   accessorKey: string;
+  meta?: ColumnDef<Record<string, unknown>, unknown>["meta"];
 }) => {
   const columns: ColumnDef<Record<string, unknown>, unknown>[] = [
-    { accessorKey, header: accessorKey },
+    { accessorKey, header: accessorKey, meta },
   ];
   // eslint-disable-next-line react-hooks/incompatible-library
-  const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+  });
   const column = table.getColumn(accessorKey)!;
   return <Filter column={column} table={table} />;
 };
@@ -62,6 +79,39 @@ describe("Filter", () => {
       />,
     );
     expect(screen.getByPlaceholderText("Search")).toBeInTheDocument();
+  });
+});
+
+describe("SelectFilter", () => {
+  it("shows the underscore-replaced label once idle after picking an option, and the raw value while editing", async () => {
+    render(<FilterHarness data={[{ ref_type: "bounty_prizes" }]} accessorKey="ref_type" />);
+    const input = screen.getByPlaceholderText("Search") as HTMLInputElement;
+
+    fireEvent.click(input);
+    fireEvent.click(await screen.findByText("bounty prizes"));
+    expect(input.value).toBe("bounty prizes");
+
+    fireEvent.focus(input);
+    expect(input.value).toBe("bounty_prizes");
+
+    fireEvent.blur(input);
+    expect(input.value).toBe("bounty prizes");
+  });
+
+  it("uses meta.filterOptionLabel for the idle display when provided", async () => {
+    render(
+      <FilterHarness
+        data={[{ ref_type: "bounty_prizes" }]}
+        accessorKey="ref_type"
+        meta={{ filterOptionLabel: (v: string) => (v === "bounty_prizes" ? "Bounty Prizes" : v) }}
+      />,
+    );
+    const input = screen.getByPlaceholderText("Search") as HTMLInputElement;
+
+    fireEvent.click(input);
+    fireEvent.click(await screen.findByText("Bounty Prizes"));
+
+    expect(input.value).toBe("Bounty Prizes");
   });
 });
 

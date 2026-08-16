@@ -9,6 +9,7 @@ import {
 } from "react";
 import {
   Background,
+  ControlButton,
   Controls,
   ReactFlow,
   useReactFlow,
@@ -31,6 +32,16 @@ import { computeFitBounds, computeRegionCentroids } from "./layout";
 import type { BaseMapEdge, BaseMapRegion, BaseMapSystem, MapCoordMode, MapDot } from "./types";
 
 const BASE_EDGE_TYPES: EdgeTypes = { floating: FloatingEdge };
+
+// Same icon as xyflow's own built-in fit-view button (not part of its public
+// export surface, so copied here) - its button is replaced below with one
+// wired to our own bounds computation instead, but should still look
+// identical alongside the zoom in/out buttons it sits next to.
+const FitViewIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 30">
+    <path d="M3.692 4.63c0-.53.4-.938.939-.938h5.215V0H4.708C2.13 0 0 2.054 0 4.63v5.216h3.692V4.631zM27.354 0h-5.2v3.692h5.17c.53 0 .984.4.984.939v5.215H32V4.631A4.624 4.624 0 0027.354 0zm.954 24.83c0 .532-.4.94-.939.94h-5.215v3.768h5.215c2.577 0 4.631-2.13 4.631-4.707v-5.139h-3.692v5.139zm-23.677.94c-.531 0-.939-.4-.939-.94v-5.138H0v5.139c0 2.577 2.13 4.707 4.708 4.707h5.138V25.77H4.631z" />
+  </svg>
+);
 
 // A click within this many *screen* pixels of a dot's edge still counts as
 // hitting it - dots at the smallest radii are only a couple of world units
@@ -88,6 +99,12 @@ export type SpaceMapCanvasProps<
   // actually interesting; omit (or pass an empty list) to fit every
   // dot/node as before.
   fitViewNodeIds?: string[];
+  // Feature-specific chrome overlaid on the map (e.g. the activity map's
+  // color-scale legend) - rendered as a plain absolutely-positioned sibling
+  // inside this component's own position:relative wrapper, same as
+  // MapMiniCanvas/the detail panel below; the caller positions its own
+  // content via its own style.
+  children?: ReactNode;
 };
 
 // The shared, feature-agnostic space map shell: normalized system positions,
@@ -110,6 +127,7 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
   onViewportChange,
   fitViewKey,
   fitViewNodeIds,
+  children,
 }: SpaceMapCanvasProps<TSystem, TNodeData>) => {
   // We don't wire up onNodesChange (there's nothing to drag/connect here), so
   // xyflow never gets to persist its own "select" change back onto our node
@@ -222,6 +240,24 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
     [nodesProp],
   );
 
+  // Computing the bounds ourselves from known dot radii/node position hints
+  // (rather than xyflow's own fitView, which only counts a node once it's
+  // been measured via ResizeObserver) sidesteps a real problem this used to
+  // hit: at this map's node count, useNodesInitialized/getFitViewNodes was
+  // observed, live, to never resolve at all, permanently blocking every fit.
+  // Shared by the auto-fit effect below and the Controls fit-view button -
+  // that button calls xyflow's own fitView() internally too, but that has
+  // nothing to fit to here (every system is a canvas dot, not a real node,
+  // so `nodes` is empty/small), so it silently does nothing on its own; this
+  // is the actual "fit to content" implementation for both call sites.
+  const runFitView = useCallback(() => {
+    const restrictToIds = fitViewNodeIds?.length ? new Set(fitViewNodeIds) : null;
+    const targetDots = restrictToIds ? dots.filter((d) => restrictToIds.has(d.id)) : dots;
+    const targetNodes = restrictToIds ? [] : nodeFitPositions;
+    const bounds = computeFitBounds(targetDots, targetNodes);
+    if (bounds) fitBounds(bounds, { padding: 0.1 });
+  }, [dots, nodeFitPositions, fitViewNodeIds, fitBounds]);
+
   // Switching coordinate systems moves every system to a completely
   // different layout, and switching fitViewKey (e.g. the corp/character a
   // map is scoped to) swaps in a differently-sized/positioned set entirely -
@@ -232,32 +268,21 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
   // viewport (e.g. from a URL query string), that's an explicit request to
   // land somewhere specific instead of auto-fitting - honour it once, then
   // fall back to the normal re-fit-on-change behaviour.
-  //
-  // Computing the bounds ourselves from known dot radii/node position hints
-  // (rather than xyflow's own fitView, which only counts a node once it's
-  // been measured via ResizeObserver) sidesteps a real problem this used to
-  // hit: at this map's node count, useNodesInitialized/getFitViewNodes was
-  // observed, live, to never resolve at all, permanently blocking every fit.
   const skippedInitialFit = useRef(false);
   useEffect(() => {
     if (!skippedInitialFit.current) {
       skippedInitialFit.current = true;
       if (initialViewport) return;
     }
-    const restrictToIds = fitViewNodeIds?.length ? new Set(fitViewNodeIds) : null;
-    const targetDots = restrictToIds ? dots.filter((d) => restrictToIds.has(d.id)) : dots;
-    const targetNodes = restrictToIds ? [] : nodeFitPositions;
-    const bounds = computeFitBounds(targetDots, targetNodes);
-    if (bounds) fitBounds(bounds, { padding: 0.1 });
-    // Deliberately narrow: `dots`/`nodeFitPositions` (and, once the URL has
-    // viewport params, `initialViewport`) get a new reference on essentially
+    runFitView();
+    // Deliberately narrow: `runFitView` gets a new reference on essentially
     // every render of a caller like ActivityMapCanvas (its `nodes` prop is a
     // fresh `[]` literal each time, and `initialViewport` is rebuilt from
-    // URL query state) - including them here would re-fit, and so undo the
-    // user's own pan/zoom, on every render rather than only on an actual
-    // scope/coordMode change. `dots` and node positions are still read
-    // fresh from closure every time this runs; they just don't drive *when*
-    // it runs.
+    // URL query state, both of which flow into runFitView's own deps) -
+    // depending on it here would re-fit, and so undo the user's own pan/
+    // zoom, on every render rather than only on an actual scope/coordMode
+    // change. It's still read fresh from closure every time this runs; it
+    // just doesn't drive *when* it runs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coordMode, fitViewKey, fitViewNodeIds]);
 
@@ -335,7 +360,11 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
         proOptions={{ hideAttribution: true }}
       >
         <Background gap={64} size={1} style={{ opacity: 0.15 }} />
-        <Controls showInteractive={false} />
+        <Controls showFitView={false} showInteractive={false}>
+          <ControlButton onClick={runFitView} title="fit view" aria-label="fit view">
+            <FitViewIcon />
+          </ControlButton>
+        </Controls>
       </ReactFlow>
       <MapMiniCanvas
         dots={dots}
@@ -346,6 +375,7 @@ const SpaceMapCanvas = <TSystem extends BaseMapSystem, TNodeData extends { color
       {selectedSystem &&
         renderDetailPanel &&
         renderDetailPanel(selectedSystem, () => setSelectedNodeId(null))}
+      {children}
     </div>
   );
 };

@@ -1,7 +1,20 @@
+import { useState } from "react";
 import Styles from "./BaseTableFilter.module.css";
 import { Column, Table as ReactTable } from "@tanstack/react-table";
 import { Button, Dropdown, Form, OverlayTrigger, Popover } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
+
+// Lets a column supply a nicer label for its own SelectFilter options than
+// the raw underlying value (e.g. the wallet table's ref_type column, whose
+// raw values are ESI machine keys like "bounty_prizes" - see RefTypeLabel).
+// Falls back to SelectFilter's own value.replaceAll("_", " ") when unset, so
+// every other column's filter is unaffected.
+declare module "@tanstack/react-table" {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- must match the original interface's arity, not just what this augmentation itself uses
+  interface ColumnMeta<TData, TValue> {
+    filterOptionLabel?: (value: string) => string;
+  }
+}
 
 const isHTML = RegExp.prototype.test.bind(/(<([^>]+)>)/i);
 
@@ -240,10 +253,20 @@ export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> 
 // }
 export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
   const { t } = useTranslation();
+  // The box doubles as both "what's currently applied" and "what you're
+  // typing to search/narrow the dropdown" - while idle it should show the
+  // applied value's friendly label (see labelFor below), but while the user
+  // is actively typing it needs to show their literal keystrokes (which get
+  // matched, and applied as the filter itself, against the raw values -
+  // see onChange), not a label for whatever they've typed so far.
+  const [isEditing, setIsEditing] = useState(false);
   const sortedUniqueValues = Array.from(column.getFacetedUniqueValues().keys()).sort();
   const currentFilterValue = column.getFilterValue() as string;
   const isObjectorHTML =
     isHTML(sortedUniqueValues?.[0]) || typeof sortedUniqueValues?.[0] === "object";
+
+  const labelFor =
+    column.columnDef.meta?.filterOptionLabel ?? ((v: string) => v.replaceAll("_", " "));
 
   const selectOptions = (sortedUniqueValues as string[]).reduce(
     (previousValue: { value: string; label: string }[], currentValue) => {
@@ -253,7 +276,7 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
             currentFilterValue === undefined ||
             currentValue?.toLowerCase().includes(currentFilterValue?.toLowerCase())
           ) {
-            previousValue.push({ value: currentValue, label: currentValue });
+            previousValue.push({ value: currentValue, label: labelFor(currentValue) });
           }
         }
       }
@@ -274,9 +297,6 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
               {selectOptions.length > 0 ? (
                 selectOptions.map((item) => {
                   if (item?.value) {
-                    // const gaps = item?.value.split(" ").length;
-                    // const cammelCase =
-                    //   gaps === 0 ? item?.value?.match(/[A-Z][a-z]+/g)?.join(" ") : false;
                     return (
                       <Dropdown.Item
                         className={Styles.capitaliseWords}
@@ -286,8 +306,7 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
                           document.body.click();
                         }}
                       >
-                        {/* {cammelCase ? cammelCase : item.value.replaceAll("_", " ")} */}
-                        {item.value.replaceAll("_", " ")}
+                        {item.label}
                       </Dropdown.Item>
                     );
                   }
@@ -311,7 +330,22 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
             className={Styles.searchInput}
             type="text"
             placeholder={t("Search")}
-            value={typeof currentFilterValue === "undefined" ? undefined : currentFilterValue}
+            value={
+              typeof currentFilterValue === "undefined"
+                ? undefined
+                : isEditing
+                  ? currentFilterValue
+                  : labelFor(currentFilterValue)
+            }
+            onFocus={(event) => {
+              setIsEditing(true);
+              // Selects the label text so the very next keystroke replaces
+              // it outright, rather than being inserted into the middle of
+              // (or appended after) a label that no longer corresponds to
+              // what's about to be typed.
+              event.target.select();
+            }}
+            onBlur={() => setIsEditing(false)}
             onChange={(event) => {
               column.setFilterValue(event.target.value ? event.target.value : "");
             }}

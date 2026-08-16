@@ -5,12 +5,16 @@ from typing import List, Union
 # Third Party
 from ninja import NinjaAPI
 
+# Django
+from django.utils.translation import gettext as _
+
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
 # AA Example App
 from corptools import models
 from corptools.api import schema
+from corptools.api.helpers import get_ref_type_lookup
 
 logger = get_extension_logger(__name__)
 
@@ -22,7 +26,7 @@ class FinancesApiEndpoints:
     def __init__(self, api: NinjaAPI):
         @api.get(
             "corporation/wallettypes",
-            response={200: List[str], 403: str},
+            response={200: List[schema.RefTypeOption], 403: str},
             tags=self.tags
         )
         def get_corporation_wallet_types(request):
@@ -43,7 +47,19 @@ class FinancesApiEndpoints:
             ref_types = models.CorporationWalletJournalEntry.objects.values_list(
                 "ref_type", flat=True).distinct()
 
-            return 200, ["all"] + list(ref_types)
+            ref_type_lookup = get_ref_type_lookup()
+
+            options = [{"value": "all", "label": _(
+                "All"), "description": None}]
+            for ref_type in ref_types:
+                entry = ref_type_lookup.get(ref_type)
+                options.append({
+                    "value": ref_type,
+                    "label": entry.name if entry else ref_type.replace("_", " ").title(),
+                    "description": entry.description if entry else None,
+                })
+
+            return 200, options
 
         @api.get(
             "corporation/{corporation_id}/wallet",
@@ -87,8 +103,11 @@ class FinancesApiEndpoints:
 
             wallet_journal = wallet_journal[start_count:end_count]
 
+            ref_type_lookup = get_ref_type_lookup()
+
             output = []
             for w in wallet_journal:
+                ref_type_entry = ref_type_lookup.get(w.ref_type)
                 output.append(
                     {
                         "division": f"{w.division.division} {w.division.name}",
@@ -105,6 +124,8 @@ class FinancesApiEndpoints:
                             "cat": w.second_party_name.category,
                         },
                         "ref_type": w.ref_type,
+                        "ref_type_name": ref_type_entry.name if ref_type_entry else None,
+                        "ref_type_description": ref_type_entry.description if ref_type_entry else None,
                         "amount": w.amount,
                         "balance": w.balance,
                         "reason": w.reason,

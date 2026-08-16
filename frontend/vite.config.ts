@@ -55,6 +55,8 @@ export default defineConfig({
             id.includes("javascript-time-ago") ||
             id.includes("@nivo/bar") ||
             id.includes("@nivo/core") ||
+            id.includes("@nivo/chord") ||
+            id.includes("@nivo/radar") ||
             id.includes("recharts")
           ) {
             return "@app-libs";

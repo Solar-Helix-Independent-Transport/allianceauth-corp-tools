@@ -35,7 +35,7 @@ describe("CorporationWalletTable", () => {
     );
 
     expect(loadWallet).toHaveBeenCalledWith(7, "bounty_prizes", 1);
-    expect(await screen.findByText("bounty prizes")).toBeInTheDocument();
+    expect(await screen.findByText("Bounty Prizes")).toBeInTheDocument();
     expect(screen.getByText("Test Character")).toBeInTheDocument();
     expect(screen.getByText("1,000,000")).toBeInTheDocument();
   });

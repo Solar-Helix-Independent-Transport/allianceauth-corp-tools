@@ -3,6 +3,7 @@ import type { Node, Viewport } from "@xyflow/react";
 import SpaceMapCanvas from "../SpaceMap/SpaceMapCanvas";
 import type { MapCoordMode } from "../SpaceMap/types";
 import ActivityDetailPanel from "./ActivityDetailPanel";
+import ActivityLegend from "./ActivityLegend";
 import { buildActivityDots } from "./layout";
 import type { ActivityMapDataSource, ActivityMapResponse } from "./types";
 
@@ -37,6 +38,11 @@ const ActivityMapCanvas = ({
 
   const valuesBySystem = useMemo(
     () => new Map(data.values.map((v) => [v.system_id, v])),
+    [data.values],
+  );
+
+  const maxValue = useMemo(
+    () => data.values.reduce((max, v) => Math.max(max, v.value), 0),
     [data.values],
   );
 
@@ -86,7 +92,12 @@ const ActivityMapCanvas = ({
           />
         );
       }}
-    />
+    >
+      <ActivityLegend
+        maxValue={maxValue}
+        title={dataSource.valueLabel ?? dataSource.countLabel ?? dataSource.label}
+      />
+    </SpaceMapCanvas>
   );
 };
 

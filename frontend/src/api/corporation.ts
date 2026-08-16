@@ -409,7 +409,7 @@ export async function loadDivisions(corporation_id: number): Promise<CorpDivisio
   return api.data;
 }
 
-export async function loadRefTypes(): Promise<string[]> {
+export async function loadRefTypes(): Promise<components["schemas"]["RefTypeOption"][]> {
   const api = await axios.get(`/audit/api/corporation/wallettypes`);
   return api.data;
 }

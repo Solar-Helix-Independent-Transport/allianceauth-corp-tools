@@ -222,6 +222,8 @@ class CharacterWalletEvent(Schema):
     first_party: EveName
     second_party: EveName
     ref_type: str
+    ref_type_name: Optional[str] = None
+    ref_type_description: Optional[str] = None
     balance: float
     amount: float
     own_account: Optional[bool] = True
@@ -235,6 +237,12 @@ class LoyaltyPoints(Schema):
     amount: int
 
 
+class RefTypeOption(Schema):
+    value: str
+    label: str
+    description: Optional[str] = None
+
+
 class CorporationWalletEvent(Schema):
     division: str
     id: int
@@ -242,6 +250,8 @@ class CorporationWalletEvent(Schema):
     first_party: EveName
     second_party: EveName
     ref_type: str
+    ref_type_name: Optional[str] = None
+    ref_type_description: Optional[str] = None
     balance: float
     amount: float
     reason: Optional[str] = None
