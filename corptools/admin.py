@@ -193,7 +193,8 @@ class AssetsFilterForm(forms.ModelForm):
 class assetFilterAdmin(AutocompleteMediaMixin, admin.ModelAdmin):
     form = AssetsFilterForm
     list_display = ['__str__', '_types', '_groups', '_cats',
-                    '_systems', '_constellations', '_regions', '_flags']
+                    '_systems', '_constellations', '_regions', '_flags',
+                    'exclude_main_character']
 
     def _list_2_html_w_tooltips(self, my_items: list, max_items: int) -> str:
         """converts list of strings into HTML with cutoff and tooltip"""
@@ -348,7 +349,7 @@ class CurrentShipFilterAdmin(AutocompleteMediaMixin, admin.ModelAdmin):
 
 class skillsFilterAdmin(admin.ModelAdmin):
     list_display = ['__str__', '_required_skill_lists',
-                    '_single_req_skill_lists']
+                    '_single_req_skill_lists', 'exclude_main_character']
     filter_horizontal = ["required_skill_lists",
                          "single_req_skill_lists"]
 

@@ -871,6 +871,28 @@ class TestSecGroupBotFilters(TestCase):
         self.assertTrue(tests[9])
         self.assertTrue(tests[10])
 
+    def test_user_assets_no_loc_exclude_main(self):
+        _filter = ct_models.AssetsFilter.objects.create(
+            name="Assets Test",
+            description="Something to tell user",
+            exclude_main_character=True,
+        )
+        _filter.types.add(sde_models.ItemType.objects.get(id=10))
+
+        # Per test_user_assets_no_loc: users 1/3 only match via their MAIN
+        # character's asset, so excluding mains drops them. Users 6/8 match
+        # via an alt's asset instead, so they're unaffected.
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        self.assertFalse(_filter.process_filter(User.objects.get(id=3)))
+        self.assertTrue(_filter.process_filter(User.objects.get(id=6)))
+        self.assertTrue(_filter.process_filter(User.objects.get(id=8)))
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1, 3, 6, 8]))
+        self.assertFalse(tests[1]["check"])
+        self.assertFalse(tests[3]["check"])
+        self.assertTrue(tests[6]["check"])
+        self.assertTrue(tests[8]["check"])
+
     def test_user_assets_location_flag(self):
         a1 = sde_models.ItemType.objects.get(id=10)
         l1 = ct_models.EveLocation.objects.get(location_id=1)
@@ -1379,6 +1401,69 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[8]['check'])
         self.assertFalse(tests[9]['check'])
         self.assertTrue(tests[10]['check'])
+
+    def test_user_skill_lists_exclude_main_drops_main_only_pass(self):
+        _filter = ct_models.Skillfilter.objects.create(
+            name="Skills Test",
+            description="Something to tell user",
+            exclude_main_character=True,
+        )
+        _filter.required_skill_lists.add(
+            ct_models.SkillList.objects.get(name="Test Skills 1"))
+
+        # Per test_user_skill_lists_omega, users 1 and 10 only pass because
+        # their MAIN character has Skill 1 trained - their alts don't, so
+        # excluding mains drops both.
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        self.assertFalse(_filter.process_filter(User.objects.get(id=10)))
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1, 10]))
+        self.assertFalse(tests[1]['check'])
+        self.assertFalse(tests[10]['check'])
+
+    def test_user_skill_lists_exclude_main_keeps_alt_pass(self):
+        user = AuthUtils.create_user("SkillAltUser")
+        main_char = AuthUtils.add_main_character_2(
+            user, "Skill Alt Main", 9101, corp_id=1,
+            corp_name='Test Corp 1', corp_ticker='TST1')
+        CharacterOwnership.objects.create(
+            user=user, character=main_char, owner_hash="skillaltmain")
+        ct_models.CharacterAudit.objects.create(character=main_char)
+
+        alt_char = EveCharacter.objects.create(
+            character_name="Skill Alt Alt",
+            character_id=9102,
+            corporation_name='Test Corp 1',
+            corporation_id=1,
+            corporation_ticker='TST1')
+        CharacterOwnership.objects.create(
+            user=user, character=alt_char, owner_hash="skillaltalt")
+        alt_audit = ct_models.CharacterAudit.objects.create(character=alt_char)
+
+        sk1 = sde_models.ItemType.objects.get(id=1)
+        ct_models.Skill.objects.create(
+            character=alt_audit,
+            skill_id=sk1.id,
+            skill_name=sk1,
+            active_skill_level=5,
+            trained_skill_level=5,
+            skillpoints_in_skill=500,
+        )
+
+        _filter = ct_models.Skillfilter.objects.create(
+            name="Skills Test",
+            description="Something to tell user",
+            exclude_main_character=True,
+        )
+        _filter.required_skill_lists.add(
+            ct_models.SkillList.objects.get(name="Test Skills 1"))
+
+        # The matching skill lives only on the alt, so it still passes with
+        # mains excluded.
+        self.assertTrue(_filter.process_filter(user))
+
+        tests = _filter.audit_filter(User.objects.filter(id=user.id))
+        self.assertTrue(tests[user.id]['check'])
 
     def test_user_has_roles_director(self):
         _filter = ct_models.Rolefilter.objects.create(name="roles Test",

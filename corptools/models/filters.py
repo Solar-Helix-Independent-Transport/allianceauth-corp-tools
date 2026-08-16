@@ -442,8 +442,18 @@ class AssetsFilter(FilterBase):
         help_text="Negate the value of the filter, i.e. check for absence of assets"
     )
 
+    exclude_main_character = models.BooleanField(
+        default=False,
+        help_text="If set, each user's main character is ignored - only alts are checked."
+    )
+
     def filter_query(self, users):
         character_list = CharacterOwnership.objects.filter(user__in=users)
+        if self.exclude_main_character:
+            character_list = character_list.exclude(
+                character__character_id=models.F(
+                    "user__profile__main_character__character_id")
+            )
         types = list(self.types.all())
         groups = list(self.groups.all())
         categories = list(self.categories.all())
@@ -692,6 +702,11 @@ class Skillfilter(FilterBase):
     single_req_skill_lists = models.ManyToManyField(
         SkillList, blank=True, related_name="single_req")
 
+    exclude_main_character = models.BooleanField(
+        default=False,
+        help_text="If set, each user's main character is ignored - only alts are checked."
+    )
+
     def process_filter(self, user: User):
         try:  # avatar 11567
             skills_list = providers.skills.get_and_cache_user(user.id)
@@ -713,13 +728,22 @@ class Skillfilter(FilterBase):
 
             skill_tables = skills_list.get("skills_list")
 
+            main_id = None
+            if self.exclude_main_character:
+                main_char = getattr(user.profile, "main_character", None)
+                main_id = main_char.character_id if main_char else None
+
             for char in skill_tables:
+                if main_id and skill_tables[char].get("character_id") == main_id:
+                    continue
                 for d_name, d_list in skill_list_base.items():
                     if len(skill_tables[char]["doctrines"][d_name]) == 1:
                         skill_list_base[d_name]['pass'] = True
             if req_one.count() > 0:
                 single_pass = False
                 for char in skill_tables:
+                    if main_id and skill_tables[char].get("character_id") == main_id:
+                        continue
                     for d_name, d_list in skill_list_single.items():
                         if len(skill_tables[char]["doctrines"][d_name]) == 1:
                             single_pass = True
@@ -746,8 +770,16 @@ class Skillfilter(FilterBase):
         if not skill_lists and not req_one:
             return output
 
+        main_ids = {}
+        if self.exclude_main_character:
+            main_ids = dict(
+                User.objects.filter(id__in=accounts.keys()).values_list(
+                    "id", "profile__main_character__character_id")
+            )
+
         for uid, u in accounts.items():
             message = []
+            main_id = main_ids.get(uid)
 
             skill_list_base = {skl.name: {'pass': False}
                                for skl in skill_lists}
@@ -757,6 +789,8 @@ class Skillfilter(FilterBase):
                 skill_tables = u['data'].get("skills_list")
 
                 for char in skill_tables:
+                    if main_id and skill_tables[char].get("character_id") == main_id:
+                        continue
                     for d_name, d_list in skill_list_base.items():
                         if len(skill_tables[char]["doctrines"][d_name]) == 1:
                             skill_list_base[d_name]['pass'] = True
@@ -765,6 +799,8 @@ class Skillfilter(FilterBase):
                 single_pass = False
                 if req_one:
                     for char in skill_tables:
+                        if main_id and skill_tables[char].get("character_id") == main_id:
+                            continue
                         for d_name in skill_list_single:
                             if len(skill_tables[char]["doctrines"][d_name]) == 1:
                                 single_pass = True
