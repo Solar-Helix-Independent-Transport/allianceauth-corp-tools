@@ -4,12 +4,14 @@ import type { Viewport } from "@xyflow/react";
 import type { SpaceMapCanvasProps } from "../SpaceMap/SpaceMapCanvas";
 import type { BaseMapSystem } from "../SpaceMap/types";
 import ActivityMapCanvas from "./ActivityMapCanvas";
-import type { ActivityMapDataSource, ActivityMapResponse, ActivityNodeData } from "./types";
+import type { ActivityMapDataSource, ActivityMapResponse } from "./types";
 
-let lastProps: SpaceMapCanvasProps<BaseMapSystem, ActivityNodeData> | null = null;
+type CanvasNodeData = { color: string };
+
+let lastProps: SpaceMapCanvasProps<BaseMapSystem, CanvasNodeData> | null = null;
 
 vi.mock("../SpaceMap/SpaceMapCanvas", () => ({
-  default: (props: SpaceMapCanvasProps<BaseMapSystem, ActivityNodeData>) => {
+  default: (props: SpaceMapCanvasProps<BaseMapSystem, CanvasNodeData>) => {
     lastProps = props;
     return <div data-testid="space-map-canvas" />;
   },
@@ -45,7 +47,7 @@ const makeData = (): ActivityMapResponse => ({
 });
 
 describe("ActivityMapCanvas", () => {
-  it("passes systems/regions/edges straight through and builds activity nodes from the response", () => {
+  it("passes systems/regions/edges straight through and builds activity dots from the response", () => {
     const data = makeData();
 
     render(<ActivityMapCanvas id={7} data={data} coordMode="2d" dataSource={dataSource} />);
@@ -54,8 +56,11 @@ describe("ActivityMapCanvas", () => {
     expect(lastProps?.systems).toBe(data.systems);
     expect(lastProps?.regions).toBe(data.regions);
     expect(lastProps?.edges).toBe(data.edges);
-    expect(lastProps?.nodes).toHaveLength(2);
-    expect(lastProps?.nodes[0]).toMatchObject({ id: "1", type: "dot" });
+    expect(lastProps?.nodes).toEqual([]);
+    expect(lastProps?.dots).toHaveLength(2);
+    // System 1 has the only positive value, so it gets the biggest radius
+    // and sorts first (see buildActivityDots' biggest-paints-first order).
+    expect(lastProps?.dots[0]).toMatchObject({ id: "1" });
   });
 
   it("forwards id as fitViewKey so switching corp/character scope re-fits instead of keeping a stale viewport", () => {

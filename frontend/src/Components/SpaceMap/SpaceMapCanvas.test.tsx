@@ -3,7 +3,7 @@ import { ReactFlowProvider } from "@xyflow/react";
 import { describe, expect, it, vi } from "vitest";
 import type { Node } from "@xyflow/react";
 import SpaceMapCanvas from "./SpaceMapCanvas";
-import type { BaseMapSystem } from "./types";
+import type { BaseMapSystem, MapDot } from "./types";
 
 type DotData = { color: string };
 
@@ -25,6 +25,8 @@ const DotNodeType = ({ data }: { data: DotData }) => (
   <div data-testid="dot-node" style={{ background: data.color }} />
 );
 
+// A "real" xyflow node - standing in for something like a sov hub card,
+// which (unlike the bulk of systems) needs to be an actual DOM element.
 const makeNodes = (systems: BaseMapSystem[]): Node<DotData>[] =>
   systems.map((s) => ({
     id: String(s.id),
@@ -33,8 +35,18 @@ const makeNodes = (systems: BaseMapSystem[]): Node<DotData>[] =>
     data: { color: "blue" },
   }));
 
+const makeDots = (systems: BaseMapSystem[]): MapDot[] =>
+  systems.map((s) => ({
+    id: String(s.id),
+    x: s.x_2d ?? 0,
+    y: s.y_2d ?? 0,
+    radius: 4,
+    color: "blue",
+    name: s.name,
+  }));
+
 describe("SpaceMapCanvas", () => {
-  it("renders one node per system plus the standard xyflow chrome (controls, minimap, background)", () => {
+  it("draws the bulk system set on a canvas (not as per-system DOM nodes) alongside the standard xyflow chrome", () => {
     const systems = [makeSystem(1, 0, 0), makeSystem(2, 100, 100)];
 
     const { container } = render(
@@ -44,18 +56,19 @@ describe("SpaceMapCanvas", () => {
           regions={[]}
           edges={[]}
           coordMode="2d"
-          nodes={makeNodes(systems)}
+          dots={makeDots(systems)}
+          nodes={[]}
           nodeTypes={{ dot: DotNodeType }}
         />
       </ReactFlowProvider>,
     );
 
-    expect(screen.getAllByTestId("dot-node")).toHaveLength(2);
+    expect(screen.queryAllByTestId("dot-node")).toHaveLength(0);
+    expect(container.querySelectorAll("canvas").length).toBeGreaterThanOrEqual(2);
     expect(container.querySelector(".react-flow__controls")).toBeInTheDocument();
-    expect(container.querySelector(".react-flow__minimap")).toBeInTheDocument();
   });
 
-  it("shows the detail panel for a system after clicking its node, and hides it again on pane click", () => {
+  it("still renders real xyflow nodes passed via `nodes` (e.g. richer cards)", () => {
     const systems = [makeSystem(1, 0, 0)];
 
     render(
@@ -65,6 +78,27 @@ describe("SpaceMapCanvas", () => {
           regions={[]}
           edges={[]}
           coordMode="2d"
+          dots={[]}
+          nodes={makeNodes(systems)}
+          nodeTypes={{ dot: DotNodeType }}
+        />
+      </ReactFlowProvider>,
+    );
+
+    expect(screen.getAllByTestId("dot-node")).toHaveLength(1);
+  });
+
+  it("shows the detail panel for a system after clicking its (real) node, and hides it again on pane click", () => {
+    const systems = [makeSystem(1, 0, 0)];
+
+    render(
+      <ReactFlowProvider>
+        <SpaceMapCanvas
+          systems={systems}
+          regions={[]}
+          edges={[]}
+          coordMode="2d"
+          dots={[]}
           nodes={makeNodes(systems)}
           nodeTypes={{ dot: DotNodeType }}
           renderDetailPanel={(system, onClose) => (
@@ -100,7 +134,8 @@ describe("SpaceMapCanvas", () => {
           regions={[]}
           edges={[]}
           coordMode="2d"
-          nodes={makeNodes(systems)}
+          dots={makeDots(systems)}
+          nodes={[]}
           nodeTypes={{ dot: DotNodeType }}
         />
       </ReactFlowProvider>,
@@ -120,7 +155,8 @@ describe("SpaceMapCanvas", () => {
           regions={[]}
           edges={[]}
           coordMode="2d"
-          nodes={makeNodes(systems)}
+          dots={makeDots(systems)}
+          nodes={[]}
           nodeTypes={{ dot: DotNodeType }}
           initialViewport={{ x: 1, y: 2, zoom: 1 }}
           onViewportChange={onViewportChange}
@@ -131,7 +167,7 @@ describe("SpaceMapCanvas", () => {
     // Smoke-test only: xyflow's pan/zoom gesture handling relies on pointer
     // capture and layout measurements jsdom doesn't provide, so we can't
     // simulate a real drag here. This just confirms an initialViewport
-    // renders without crashing and doesn't error the fitView effect.
+    // renders without crashing and doesn't error the fit-bounds effect.
     expect(document.querySelector(".react-flow__renderer")).toBeInTheDocument();
   });
 });

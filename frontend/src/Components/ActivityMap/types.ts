@@ -20,16 +20,6 @@ export type ActivityMapResponse = {
   values: ActivityMapValue[];
 };
 
-export type ActivityNodeData = {
-  system: ActivityMapSystem;
-  color: string;
-  radius: number;
-  value: number;
-  count: number;
-  quantity: number;
-  [key: string]: unknown;
-};
-
 // One thing the map can show, and how to fetch/label it. `id` is whatever
 // scope the map is fetching for (a character id, a corporation id, ...) -
 // the map itself doesn't care which. Character and corporation pages each

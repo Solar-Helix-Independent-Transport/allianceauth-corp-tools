@@ -1,5 +1,4 @@
-import type { Node } from "@xyflow/react";
-import type { BaseMapRegion, BaseMapSystem, MapCoordMode } from "./types";
+import type { BaseMapRegion, BaseMapSystem, MapCoordMode, MapDot } from "./types";
 
 // A system occasionally lacks one coordinate set (e.g. no position2D on
 // record) - fall back to whichever set it does have rather than dropping it
@@ -44,31 +43,50 @@ export const computeRegionCentroids = (
     .filter((r): r is RegionCentroid => r !== null);
 };
 
-export type RegionLabelNodeData = { regionLabelName: string };
+export type FitBoundsRect = { x: number; y: number; width: number; height: number };
 
-// Real (but invisible - see RegionLabelNode) ReactFlow nodes purely so the
-// MiniMap's nodeComponent callback has something to hook into: the MiniMap
-// has no children/overlay slot of its own, it only ever renders one
-// component per flow node, so smuggling the region labels in as zero-size
-// nodes is the only way to get them onto the minimap at all.
-export const buildRegionLabelNodes = (
-  regions: BaseMapRegion[],
-  systems: BaseMapSystem[],
+// Bounding box (in flow-space, i.e. the same coordinate space positions
+// already live in) around every given dot and node hint - used to fitBounds
+// the view without waiting on xyflow's own node measurement, which doesn't
+// resolve reliably at this map's scale (see the comment on the fit effect in
+// SpaceMapCanvas). Dots carry an exact radius; real nodes only have a
+// pre-measurement size hint, which is close enough for framing purposes.
+export const computeFitBounds = (
+  dots: { x: number; y: number; radius: number }[],
+  nodeHints: { x: number; y: number; halfWidth: number; halfHeight: number }[],
+): FitBoundsRect | null => {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const d of dots) {
+    minX = Math.min(minX, d.x - d.radius);
+    minY = Math.min(minY, d.y - d.radius);
+    maxX = Math.max(maxX, d.x + d.radius);
+    maxY = Math.max(maxY, d.y + d.radius);
+  }
+  for (const n of nodeHints) {
+    minX = Math.min(minX, n.x - n.halfWidth);
+    minY = Math.min(minY, n.y - n.halfHeight);
+    maxX = Math.max(maxX, n.x + n.halfWidth);
+    maxY = Math.max(maxY, n.y + n.halfHeight);
+  }
+  if (!Number.isFinite(minX) || !Number.isFinite(minY)) return null;
+  return { x: minX, y: minY, width: Math.max(1, maxX - minX), height: Math.max(1, maxY - minY) };
+};
+
+// Builds the plain circle+label MapDot every space-map feature's bulk system
+// set boils down to, once the caller has already worked out each system's
+// radius/color/border for its own purposes (security color, activity value,
+// hub-transport highlight, ...).
+export const toMapDot = (
+  system: BaseMapSystem,
   coordMode: MapCoordMode,
-): Node<RegionLabelNodeData>[] =>
-  computeRegionCentroids(regions, systems, coordMode).map((c) => ({
-    id: `region-label-${c.id}`,
-    type: "regionLabel",
-    position: { x: c.x, y: c.y },
-    width: 1,
-    height: 1,
-    draggable: false,
-    selectable: false,
-    connectable: false,
-    focusable: false,
-    style: { pointerEvents: "none" as const },
-    data: { regionLabelName: c.name },
-  }));
+  { radius, color, bordered }: { radius: number; color: string; bordered?: boolean },
+): MapDot => {
+  const pos = resolveSystemPosition(system, coordMode);
+  return { id: String(system.id), x: pos.x, y: pos.y, radius, color, name: system.name, bordered };
+};
 
 // Values, not just names: these feed straight into inline `style`/SVG
 // `fill`/`stroke` props, so using the CSS variables (rather than fixed hex)

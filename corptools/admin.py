@@ -398,6 +398,11 @@ class TimeInCorpFilterAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'days_in_corp', "reversed_logic"]
 
 
+class PVEIskFilterAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'stat',
+                    'isk_threshold', 'look_back_days', 'reversed_logic']
+
+
 class CharacterAgeFilterAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'min_age', "reversed_logic"]
 
@@ -448,6 +453,8 @@ if apps.is_installed('securegroups'):
     admin.site.register(models.UpdateSectionFilter, UpdateSectionFilterAdmin)
     admin.site.register(models.TimeInCorpFilter, TimeInCorpFilterAdmin)
     admin.site.register(models.CharacterAgeFilter, CharacterAgeFilterAdmin)
+    if app_settings.CT_CHAR_WALLET_MODULE:
+        admin.site.register(models.PVEIskFilter, PVEIskFilterAdmin)
     if app_settings.CT_CHAR_ASSETS_MODULE:
         admin.site.register(models.AssetsFilter, assetFilterAdmin)
     if app_settings.CT_CHAR_LOCATIONS_MODULE:

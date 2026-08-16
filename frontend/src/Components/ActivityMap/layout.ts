@@ -1,7 +1,6 @@
-import type { Node } from "@xyflow/react";
-import { BOOTSTRAP_HEX, resolveSystemPosition } from "../SpaceMap/layout";
-import type { MapCoordMode } from "../SpaceMap/types";
-import type { ActivityMapResponse, ActivityNodeData } from "./types";
+import { BOOTSTRAP_HEX, toMapDot } from "../SpaceMap/layout";
+import type { MapCoordMode, MapDot } from "../SpaceMap/types";
+import type { ActivityMapResponse } from "./types";
 
 // Systems with no data still need to be clickable/visible against the full
 // map backdrop, just unobtrusively so - a small fixed dot rather than a
@@ -31,41 +30,23 @@ const radiusForValue = (value: number, maxValue: number): number => {
   return MIN_VALUE_RADIUS + fraction * (MAX_RADIUS - MIN_VALUE_RADIUS);
 };
 
-export const buildActivityNodes = (
+export const buildActivityDots = (
   response: ActivityMapResponse,
   coordMode: MapCoordMode,
-): Node<ActivityNodeData>[] => {
+): MapDot[] => {
   const valuesBySystem = new Map(response.values.map((v) => [v.system_id, v]));
   const maxValue = response.values.reduce((max, v) => Math.max(max, v.value), 0);
 
-  return response.systems.map((s) => {
+  const dots = response.systems.map((s) => {
     const v = valuesBySystem.get(s.id);
     const value = v?.value ?? 0;
     const radius = radiusForValue(value, maxValue);
     const color = value > 0 ? VALUE_COLOR : NO_VALUE_COLOR;
-
-    return {
-      id: String(s.id),
-      type: "dot",
-      position: resolveSystemPosition(s, coordMode),
-      draggable: false,
-      connectable: false,
-      selectable: true,
-      initialWidth: radius * 2,
-      initialHeight: radius * 2,
-      // Inverse of radius, so the biggest dots (which would otherwise
-      // blanket smaller ones sharing a system) paint at the back and small
-      // dots stay clickable on top. xyflow's z-index model (via node.zIndex,
-      // see @xyflow/system's calculateZ) accepts negatives fine.
-      zIndex: -radius,
-      data: {
-        system: s,
-        color,
-        radius,
-        value,
-        count: v?.count ?? 0,
-        quantity: v?.quantity ?? 0,
-      },
-    };
+    return toMapDot(s, coordMode, { radius, color, bordered: false });
   });
+
+  // Biggest first, so the biggest dots (which would otherwise blanket
+  // smaller ones sharing roughly the same spot) paint at the back and small
+  // dots stay visible - and easier to click - on top.
+  return dots.sort((a, b) => b.radius - a.radius);
 };

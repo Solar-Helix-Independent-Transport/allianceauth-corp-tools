@@ -1,11 +1,18 @@
 import { MarkerType, type Edge, type Node } from "@xyflow/react";
-import { BOOTSTRAP_HEX, resolveSystemPosition, secColor } from "../../SpaceMap/layout";
+import { BOOTSTRAP_HEX, resolveSystemPosition, secColor, toMapDot } from "../../SpaceMap/layout";
+import type { MapDot } from "../../SpaceMap/types";
 import { SovHub, Upgrade, modeBg, transportMismatch, upgradeStateBg } from "../sovereigntyShared";
-import { SovMapCoordMode, SovMapMode, SovMapResponse, SystemNodeData } from "./types";
+import { SovMapCoordMode, SovMapMode, SovMapResponse, SovMapSystem, SystemNodeData } from "./types";
 
 export { BOOTSTRAP_HEX, resolveSystemPosition, secColor };
 
 const SEVERITY_ORDER = ["danger", "warning", "info", "secondary", "success"];
+
+const NON_HUB_RADIUS = 4;
+// Non-hub systems involved in a hub's workforce transport chain (mode ===
+// "flow") get called out slightly bigger, same as before this was split out
+// of decorateNodesForMode.
+const TRANSPORT_INVOLVED_RADIUS = 6;
 
 const worstUpgradeColorName = (upgrades: Upgrade[]): string => {
   if (!upgrades || upgrades.length === 0) return "secondary";
@@ -28,38 +35,32 @@ export const filterUpgrades = (upgrades: Upgrade[], search: string): Upgrade[] =
   return upgrades.filter((u) => u.name.toLowerCase().includes(term));
 };
 
-export const buildBaseNodes = (
+// Only hub systems become real xyflow nodes now - they're the ones that
+// need to be actual DOM elements (rich card content, and flow-mode edges,
+// which route via each node's measured xyflow internals). The much larger
+// set of non-hub systems is handled by buildSystemDots instead, drawn
+// straight to canvas - see SystemDotsLayer.
+export const buildHubNodes = (
   data: SovMapResponse,
   coordMode: SovMapCoordMode,
 ): Node<SystemNodeData>[] => {
-  return data.systems.map((s) => {
-    const radius = s.is_hub ? 10 : 4;
-    return {
+  return data.systems
+    .filter((s) => s.is_hub)
+    .map((s) => ({
       id: String(s.id),
       type: "system",
       position: resolveSystemPosition(s, coordMode),
       draggable: false,
       connectable: false,
       selectable: true,
-      // `initialWidth`/`initialHeight` (not `width`/`height` - those force a
-      // fixed inline CSS size onto the real card/dot forever) only ever
-      // serve as a size hint before the node's first real measurement.
-      // We never wire up onNodesChange, so that real measured size never
-      // makes it back onto our own node objects - which means the MiniMap
-      // (fed directly from these objects) would otherwise treat every
-      // system as dimensionless and never render it at all. This keeps
-      // MiniMap sizing in sync with `radius` without touching on-canvas
-      // rendering. See decorateNodesForMode for the mode-based update.
-      initialWidth: radius * 2,
-      initialHeight: radius * 2,
+      initialWidth: 20,
+      initialHeight: 20,
       data: {
         system: s,
         color: secColor(s.security_status),
-        radius,
         mode: "upgrades" as SovMapMode,
       },
-    };
-  });
+    }));
 };
 
 const involvedTransportSystemIds = (hubs: SovHub[]): Set<number> => {
@@ -75,18 +76,15 @@ const involvedTransportSystemIds = (hubs: SovHub[]): Set<number> => {
   return ids;
 };
 
-export const decorateNodesForMode = (
-  baseNodes: Node<SystemNodeData>[],
+export const decorateHubNodesForMode = (
+  hubNodes: Node<SystemNodeData>[],
   hubsById: Map<number, SovHub>,
   mode: SovMapMode,
   upgradeSearch = "",
 ): Node<SystemNodeData>[] => {
-  const involved = mode === "flow" ? involvedTransportSystemIds([...hubsById.values()]) : null;
-
-  return baseNodes.map((n) => {
+  return hubNodes.map((n) => {
     const system = n.data.system;
     let color = secColor(system.security_status);
-    let radius = system.is_hub ? 10 : 4;
     let hubUpgrades: SystemNodeData["hubUpgrades"];
     let transport: SystemNodeData["transport"];
     let ownerName: string | undefined;
@@ -94,41 +92,33 @@ export const decorateNodesForMode = (
     let workforceAllocated: number | null | undefined;
     let workforceAvailable: number | null | undefined;
 
-    if (system.is_hub) {
-      const hub = hubsById.get(system.id);
-      if (hub) {
-        transport = hub.workforce_transport;
-        ownerName = hub.owner?.corporation_name;
-        workforceAllocated = hub.workforce_allocated;
-        workforceAvailable = hub.workforce_available;
-        if (mode === "upgrades") {
-          hasUpgradeSearch = upgradeSearch.trim().length > 0;
-          // A system with no matching upgrades gets the same muted color as
-          // a system with genuinely zero upgrades, but the card itself
-          // distinguishes the two cases (see hasUpgradeSearch): a real "no
-          // upgrades" system says so, a filtered-out-by-search one just
-          // shows its name with no placeholder text.
-          hubUpgrades = filterUpgrades(hub.upgrades, upgradeSearch);
-          color = BOOTSTRAP_HEX[worstUpgradeColorName(hubUpgrades)];
-        } else {
-          hubUpgrades = hub.upgrades;
-          const wtMode = hub.workforce_transport?.mode;
-          color = BOOTSTRAP_HEX[wtMode ? modeBg[wtMode] : "secondary"];
-        }
+    const hub = hubsById.get(system.id);
+    if (hub) {
+      transport = hub.workforce_transport;
+      ownerName = hub.owner?.corporation_name;
+      workforceAllocated = hub.workforce_allocated;
+      workforceAvailable = hub.workforce_available;
+      if (mode === "upgrades") {
+        hasUpgradeSearch = upgradeSearch.trim().length > 0;
+        // A system with no matching upgrades gets the same muted color as a
+        // system with genuinely zero upgrades, but the card itself
+        // distinguishes the two cases (see hasUpgradeSearch): a real "no
+        // upgrades" system says so, a filtered-out-by-search one just shows
+        // its name with no placeholder text.
+        hubUpgrades = filterUpgrades(hub.upgrades, upgradeSearch);
+        color = BOOTSTRAP_HEX[worstUpgradeColorName(hubUpgrades)];
+      } else {
+        hubUpgrades = hub.upgrades;
+        const wtMode = hub.workforce_transport?.mode;
+        color = BOOTSTRAP_HEX[wtMode ? modeBg[wtMode] : "secondary"];
       }
-    } else if (involved?.has(system.id)) {
-      color = BOOTSTRAP_HEX.info;
-      radius = 6;
     }
 
     return {
       ...n,
-      initialWidth: radius * 2,
-      initialHeight: radius * 2,
       data: {
         ...n.data,
         color,
-        radius,
         mode,
         hubUpgrades,
         transport,
@@ -139,6 +129,31 @@ export const decorateNodesForMode = (
       },
     };
   });
+};
+
+// The bulk, non-hub system set, drawn as canvas dots rather than xyflow
+// nodes. Still mode-dependent: in "flow" mode, a non-hub system that's part
+// of some hub's workforce transport chain (a waypoint the goods actually
+// move through) gets called out in the same accent color/larger radius it
+// always has, so the transport picture reads at a glance without needing to
+// click into it.
+export const buildSystemDots = (
+  systems: SovMapSystem[],
+  hubsById: Map<number, SovHub>,
+  mode: SovMapMode,
+  coordMode: SovMapCoordMode,
+): MapDot[] => {
+  const involved = mode === "flow" ? involvedTransportSystemIds([...hubsById.values()]) : null;
+
+  return systems
+    .filter((s) => !s.is_hub)
+    .map((s) => {
+      const isInvolved = involved?.has(s.id) ?? false;
+      return toMapDot(s, coordMode, {
+        radius: isInvolved ? TRANSPORT_INVOLVED_RADIUS : NON_HUB_RADIUS,
+        color: isInvolved ? BOOTSTRAP_HEX.info : secColor(s.security_status),
+      });
+    });
 };
 
 // One color for every flow edge: direction is already unambiguous from the

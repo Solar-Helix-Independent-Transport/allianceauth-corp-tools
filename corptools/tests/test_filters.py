@@ -2420,3 +2420,107 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
         tests = _filter.audit_filter(User.objects.filter(id__in=[1]))
         self.assertFalse(tests[1]["check"])
+
+    def _make_wallet_entry(self, user_id, ref_type, amount, days_ago=1, entry_id=None):
+        audit = ct_models.CharacterAudit.objects.get(
+            character__character_id=user_id)
+        return ct_models.CharacterWalletJournalEntry.objects.create(
+            character=audit,
+            date=timezone.now() - timedelta(days=days_ago),
+            description="test entry",
+            entry_id=entry_id or (user_id * 1000 + days_ago),
+            ref_type=ref_type,
+            amount=amount,
+        )
+
+    def test_pve_isk_filter_ratting_threshold(self):
+        # User 1: two bounty ticks over the per-entry minimum, total passes.
+        self._make_wallet_entry(1, "bounty_prizes", 2_000_000)
+        # User 2: a single tick below the 1m per-entry minimum used by the
+        # "ratting" stat (mirrors glances_ratting_check's gate-rat filter) -
+        # excluded from the sum entirely, so total is 0.
+        self._make_wallet_entry(2, "bounty_prizes", 500_000)
+        # User 3: earns plenty, but the entry falls outside the default
+        # 30 day look_back_days window.
+        self._make_wallet_entry(3, "bounty_prizes", 5_000_000, days_ago=45)
+
+        _filter = ct_models.PVEIskFilter.objects.create(
+            name="Ratting", description="Something to tell user",
+            stat="ratting", isk_threshold=1_500_000,
+        )
+
+        self.assertTrue(_filter.process_filter(User.objects.get(id=1)))
+        self.assertFalse(_filter.process_filter(User.objects.get(id=2)))
+        self.assertFalse(_filter.process_filter(User.objects.get(id=3)))
+        # No wallet data at all.
+        self.assertFalse(_filter.process_filter(User.objects.get(id=4)))
+
+    def test_pve_isk_filter_ratting_threshold_reverse(self):
+        self._make_wallet_entry(1, "bounty_prizes", 2_000_000)
+
+        _filter = ct_models.PVEIskFilter.objects.create(
+            name="Ratting Reverse", description="Something to tell user",
+            stat="ratting", isk_threshold=1_500_000, reversed_logic=True,
+        )
+
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        self.assertTrue(_filter.process_filter(User.objects.get(id=2)))
+
+    def test_pve_isk_filter_look_back_days_boundary(self):
+        self._make_wallet_entry(3, "bounty_prizes", 5_000_000, days_ago=45)
+
+        thirty_day = ct_models.PVEIskFilter.objects.create(
+            name="Ratting 30d", description="Something to tell user",
+            stat="ratting", isk_threshold=1_000_000, look_back_days=30,
+        )
+        sixty_day = ct_models.PVEIskFilter.objects.create(
+            name="Ratting 60d", description="Something to tell user",
+            stat="ratting", isk_threshold=1_000_000, look_back_days=60,
+        )
+
+        self.assertFalse(thirty_day.process_filter(User.objects.get(id=3)))
+        self.assertTrue(sixty_day.process_filter(User.objects.get(id=3)))
+
+    def test_pve_isk_filter_stat_switch(self):
+        # Mission income shouldn't count toward the "ratting" stat, and
+        # vice versa - the two stats must stay independent.
+        self._make_wallet_entry(4, "agent_mission_reward", 3_000_000)
+
+        ratting = ct_models.PVEIskFilter.objects.create(
+            name="Ratting", description="Something to tell user",
+            stat="ratting", isk_threshold=1_000_000,
+        )
+        missions = ct_models.PVEIskFilter.objects.create(
+            name="Missions", description="Something to tell user",
+            stat="missions", isk_threshold=1_000_000,
+        )
+
+        self.assertFalse(ratting.process_filter(User.objects.get(id=4)))
+        self.assertTrue(missions.process_filter(User.objects.get(id=4)))
+
+    def test_pve_isk_filter_audit_filter_message(self):
+        self._make_wallet_entry(1, "bounty_prizes", 2_000_000)
+
+        _filter = ct_models.PVEIskFilter.objects.create(
+            name="Ratting", description="Something to tell user",
+            stat="ratting", isk_threshold=1_500_000,
+        )
+
+        tests = _filter.audit_filter(
+            User.objects.filter(id__in=[1, 2]))
+        self.assertTrue(tests[1]["check"])
+        self.assertEqual(tests[1]["message"], "2,000,000 ISK")
+        self.assertFalse(tests[2]["check"])
+        self.assertEqual(tests[2]["message"], "0 ISK")
+
+    def test_pve_isk_filter_unconfigured(self):
+        # No wallet data at all for this user - should fail closed like
+        # every other filter, not raise.
+        _filter = ct_models.PVEIskFilter.objects.create(
+            name="Unconfigured", description="Something to tell user",
+            stat="ratting", isk_threshold=1_000_000,
+        )
+
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1]))
+        self.assertFalse(tests[1]["check"])

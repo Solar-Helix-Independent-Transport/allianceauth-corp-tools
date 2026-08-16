@@ -29,6 +29,7 @@ from corptools.constants.types import (
     RAT_SUPER_GROUPS,
     RAT_TITAN_GROUPS,
 )
+from corptools.constants.wallet import PVE_GLANCE_STATS
 
 from .. import app_settings, models
 
@@ -261,28 +262,29 @@ def glance_officers_frigate_count(characters):
 
 
 def glance_incursion_check(characters):
-    from_ids = [1000125]
-    types = ["corporate_reward_payout"]
-    return wallet_check(characters, types, first_parties=from_ids).aggregate(total=Sum("amount"))["total"]
+    stat = PVE_GLANCE_STATS["incursion"]
+    return wallet_check(
+        characters, stat["ref_types"], first_parties=stat["first_parties"]
+    ).aggregate(total=Sum("amount"))["total"]
 
 
 def glances_missions_check(characters):
-    types = ["agent_mission_reward", "agent_mission_time_bonus_reward"]
-    return wallet_check(characters, types).aggregate(total=Sum("amount"))["total"]
+    stat = PVE_GLANCE_STATS["missions"]
+    return wallet_check(characters, stat["ref_types"]).aggregate(total=Sum("amount"))["total"]
 
 
 def glances_ratting_check(characters):
-    types = ["bounty_prizes"]
-    min_amount = 1000000
-    # 5 mill ticks should cover gate rats etc. but still show passive ratting
-    return wallet_check(characters, types, minimum_amount=min_amount).aggregate(total=Sum("amount"))["total"]
-    # return wallet_check(characters, types).aggregate(total=Sum("amount"))["total"]
+    stat = PVE_GLANCE_STATS["ratting"]
+    return wallet_check(
+        characters, stat["ref_types"], minimum_amount=stat["minimum_amount"]
+    ).aggregate(total=Sum("amount"))["total"]
 
 
 def glances_pochven_check(characters):
-    from_ids = [1000298]
-    types = ["corporate_reward_payout"]
-    return wallet_check(characters, types, first_parties=from_ids).aggregate(total=Sum("amount"))["total"]
+    stat = PVE_GLANCE_STATS["pochven"]
+    return wallet_check(
+        characters, stat["ref_types"], first_parties=stat["first_parties"]
+    ).aggregate(total=Sum("amount"))["total"]
 
 
 def glances_market_check(characters):

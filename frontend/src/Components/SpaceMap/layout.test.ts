@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   BOOTSTRAP_HEX,
-  buildRegionLabelNodes,
+  computeFitBounds,
   computeRegionCentroids,
   resolveSystemPosition,
   secColor,
   systemById,
+  toMapDot,
 } from "./layout";
 import type { BaseMapRegion, BaseMapSystem } from "./types";
 
@@ -87,27 +88,45 @@ describe("computeRegionCentroids", () => {
   });
 });
 
-describe("buildRegionLabelNodes", () => {
-  it("builds a non-interactive zero-size node per populated region centroid", () => {
-    const regions: BaseMapRegion[] = [{ id: 10, name: "Region A" }];
-    const systems = [makeSystem({ id: 1, region_id: 10, x_2d: 6, y_2d: 8 })];
+describe("toMapDot", () => {
+  it("resolves position for the coord mode and carries through the given radius/color/name", () => {
+    const system = makeSystem({ id: 1, name: "Jita", x_2d: 6, y_2d: 8 });
 
-    const nodes = buildRegionLabelNodes(regions, systems, "2d");
+    const dot = toMapDot(system, "2d", { radius: 5, color: "red" });
 
-    expect(nodes).toEqual([
-      expect.objectContaining({
-        id: "region-label-10",
-        type: "regionLabel",
-        position: { x: 6, y: 8 },
-        width: 1,
-        height: 1,
-        draggable: false,
-        selectable: false,
-        connectable: false,
-        focusable: false,
-        data: { regionLabelName: "Region A" },
-      }),
-    ]);
+    expect(dot).toEqual({
+      id: "1",
+      x: 6,
+      y: 8,
+      radius: 5,
+      color: "red",
+      name: "Jita",
+      bordered: undefined,
+    });
+  });
+});
+
+describe("computeFitBounds", () => {
+  it("returns null when there's nothing to fit", () => {
+    expect(computeFitBounds([], [])).toBeNull();
+  });
+
+  it("bounds a single dot by its radius", () => {
+    expect(computeFitBounds([{ x: 0, y: 0, radius: 5 }], [])).toEqual({
+      x: -5,
+      y: -5,
+      width: 10,
+      height: 10,
+    });
+  });
+
+  it("spans multiple dots and node hints together", () => {
+    const bounds = computeFitBounds(
+      [{ x: -10, y: 0, radius: 2 }],
+      [{ x: 10, y: 5, halfWidth: 3, halfHeight: 4 }],
+    );
+
+    expect(bounds).toEqual({ x: -12, y: -2, width: 25, height: 11 });
   });
 });
 

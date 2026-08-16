@@ -3,7 +3,13 @@ import type { Edge, Node } from "@xyflow/react";
 import SpaceMapCanvas from "../../SpaceMap/SpaceMapCanvas";
 import { SystemNode } from "./SystemNode";
 import SystemDetailPanel from "./SystemDetailPanel";
-import { buildBaseNodes, buildFlowEdges, buildHubsById, decorateNodesForMode } from "./layout";
+import {
+  buildFlowEdges,
+  buildHubNodes,
+  buildHubsById,
+  buildSystemDots,
+  decorateHubNodesForMode,
+} from "./layout";
 import type { SovMapCoordMode, SovMapMode, SovMapResponse, SystemNodeData } from "./types";
 
 const nodeTypes = { system: SystemNode };
@@ -26,11 +32,16 @@ const SovMapCanvas = ({
     [data.regions],
   );
 
-  const baseNodes = useMemo(() => buildBaseNodes(data, coordMode), [data, coordMode]);
+  const baseHubNodes = useMemo(() => buildHubNodes(data, coordMode), [data, coordMode]);
 
   const nodes: Node<SystemNodeData>[] = useMemo(
-    () => decorateNodesForMode(baseNodes, hubsById, mode, upgradeSearch),
-    [baseNodes, hubsById, mode, upgradeSearch],
+    () => decorateHubNodesForMode(baseHubNodes, hubsById, mode, upgradeSearch),
+    [baseHubNodes, hubsById, mode, upgradeSearch],
+  );
+
+  const dots = useMemo(
+    () => buildSystemDots(data.systems, hubsById, mode, coordMode),
+    [data.systems, hubsById, mode, coordMode],
   );
 
   const flowEdges: Edge[] = useMemo(
@@ -45,6 +56,7 @@ const SovMapCanvas = ({
       edges={data.edges}
       jumpBridges={data.jump_bridges}
       coordMode={coordMode}
+      dots={dots}
       nodes={nodes}
       flowEdges={flowEdges}
       nodeTypes={nodeTypes}

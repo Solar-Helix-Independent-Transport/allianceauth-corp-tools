@@ -1,7 +1,6 @@
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
-import { DotVisual } from "../../SpaceMap/DotNode";
 import { upgradeStateBg, type WorkforceTransport } from "../sovereigntyShared";
 import { BOOTSTRAP_HEX } from "./layout";
 import type { SystemNodeData } from "./types";
@@ -224,16 +223,16 @@ const SystemCard = ({ data, selected }: { data: SystemNodeData; selected?: boole
   );
 };
 
+// Only hub systems ever reach this node type now (see buildHubNodes) - the
+// bulk, non-hub system set is drawn as canvas dots instead (see
+// SystemDotsLayer/buildSystemDots), so this only ever needs to render the
+// rich card.
 const SystemNodeImpl = ({ data, selected }: NodeProps & { data: SystemNodeData }) => {
   return (
     <>
       <Handle type="target" position={Position.Top} style={HANDLE_STYLE} />
       <Handle type="source" position={Position.Bottom} style={HANDLE_STYLE} />
-      {data.system.is_hub ? (
-        <SystemCard data={data} selected={selected} />
-      ) : (
-        <DotVisual radius={data.radius} color={data.color} name={data.system.name} />
-      )}
+      <SystemCard data={data} selected={selected} />
     </>
   );
 };

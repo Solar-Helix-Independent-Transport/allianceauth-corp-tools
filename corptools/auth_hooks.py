@@ -121,6 +121,7 @@ def filters():
         models.Skillfilter,
         models.TimeInCorpFilter,
         models.CharacterAgeFilter,
+        models.PVEIskFilter,
         models.Rolefilter,
         models.Titlefilter,
         models.HighestSPFilter,

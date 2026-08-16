@@ -26,3 +26,19 @@ export type BaseMapEdge = {
   source: number;
   target: number;
 };
+
+// One system rendered as a plain circle+label, drawn straight to a <canvas>
+// rather than as a real xyflow node - see SystemDotsLayer. Used for the bulk
+// "many thousands of systems" case where per-system DOM nodes (and their
+// ResizeObservers) are themselves the performance problem; richer per-system
+// content (e.g. sov hub cards) stays on real xyflow nodes instead.
+export type MapDot = {
+  id: string;
+  x: number;
+  y: number;
+  radius: number;
+  color: string;
+  name: string;
+  // Defaults to true, matching DotVisual's old default.
+  bordered?: boolean;
+};

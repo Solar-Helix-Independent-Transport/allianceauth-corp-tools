@@ -1,13 +1,22 @@
 import { useMemo } from "react";
-import type { Viewport } from "@xyflow/react";
+import type { Node, Viewport } from "@xyflow/react";
 import SpaceMapCanvas from "../SpaceMap/SpaceMapCanvas";
 import type { MapCoordMode } from "../SpaceMap/types";
-import { ActivityDotNode } from "./ActivityDotNode";
 import ActivityDetailPanel from "./ActivityDetailPanel";
-import { buildActivityNodes } from "./layout";
+import { buildActivityDots } from "./layout";
 import type { ActivityMapDataSource, ActivityMapResponse } from "./types";
 
-const nodeTypes = { dot: ActivityDotNode };
+// The activity map is 100% canvas dots (see SystemDotsLayer) - every known
+// system in the backdrop, not just ones with data, so there's no real
+// xyflow node type of its own to register here.
+const nodeTypes = {};
+// Module-level (rather than `nodes={[]}` inline below): SpaceMapCanvas's
+// fit-bounds effect reads the current node set from closure rather than
+// depending on it directly (see the comment there), but its `nodes`/
+// `nodePoints` memos still would - a fresh `[]` literal every render would
+// needlessly recompute both on every render for a map that never has any
+// real nodes at all.
+const EMPTY_NODES: Node<{ color: string }>[] = [];
 
 const ActivityMapCanvas = ({
   id,
@@ -24,14 +33,14 @@ const ActivityMapCanvas = ({
   initialViewport?: Viewport;
   onViewportChange?: (viewport: Viewport) => void;
 }) => {
-  const nodes = useMemo(() => buildActivityNodes(data, coordMode), [data, coordMode]);
+  const dots = useMemo(() => buildActivityDots(data, coordMode), [data, coordMode]);
 
   const valuesBySystem = useMemo(
     () => new Map(data.values.map((v) => [v.system_id, v])),
     [data.values],
   );
 
-  // Every known-space system renders as a node (see buildActivityNodes) so
+  // Every known-space system renders as a dot (see buildActivityDots) so
   // the whole map stays clickable, but that means an unrestricted fitView
   // frames the entire backdrop rather than the handful of systems that
   // actually have data - restricting the initial fit to just these keeps the
@@ -55,7 +64,8 @@ const ActivityMapCanvas = ({
       regions={data.regions}
       edges={data.edges}
       coordMode={coordMode}
-      nodes={nodes}
+      dots={dots}
+      nodes={EMPTY_NODES}
       nodeTypes={nodeTypes}
       initialViewport={initialViewport}
       onViewportChange={onViewportChange}

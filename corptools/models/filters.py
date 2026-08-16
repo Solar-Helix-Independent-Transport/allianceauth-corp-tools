@@ -17,7 +17,7 @@ from eve_sde.models import (
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.db.models import F, Max, Min
+from django.db.models import F, Max, Min, Sum
 from django.utils import timezone
 from django.utils.formats import localize
 from django.utils.translation import gettext_lazy as _
@@ -28,11 +28,13 @@ from allianceauth.authentication.models import CharacterOwnership
 from allianceauth.eveonline.models import EveAllianceInfo, EveCorporationInfo
 
 from .. import app_settings, providers
+from ..constants.wallet import PVE_GLANCE_STATS
 from .assets import CharacterAsset
 from .audits import CharacterLocation, EveLocation, check_date
 from .clones import Clone, JumpClone
 from .interactions import CharacterTitle, CorporationHistory
 from .skills import SkillList, SkillTotals
+from .wallets import CharacterWalletJournalEntry
 
 logger = logging.getLogger(__name__)
 
@@ -326,6 +328,68 @@ class TimeInCorpFilter(FilterBase):
                     )
                 )
             output[c] = {"message": msg, "check": check}
+        return output
+
+
+class PVEIskFilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: PvE ISK Earned"
+        verbose_name_plural = verbose_name
+
+    stat = models.CharField(
+        max_length=20,
+        choices=[(key, key.title()) for key in PVE_GLANCE_STATS],
+        default="ratting",
+        help_text="Which glances-page PvE stat to check.",
+    )
+    isk_threshold = models.BigIntegerField(default=0)
+    look_back_days = models.IntegerField(default=30)
+
+    reversed_logic = models.BooleanField(
+        default=False,
+        help_text="If set, members who have earned LESS than the threshold will pass the test."
+    )
+
+    def _totals_queryset(self, character_ids):
+        stat_def = PVE_GLANCE_STATS[self.stat]
+        start_date = timezone.now() - datetime.timedelta(days=self.look_back_days)
+        qry = CharacterWalletJournalEntry.objects.filter(
+            character__character_id__in=character_ids,
+            ref_type__in=stat_def["ref_types"],
+            date__gte=start_date,
+        )
+        if stat_def["first_parties"]:
+            qry = qry.filter(first_party_id__in=stat_def["first_parties"])
+        if stat_def["minimum_amount"]:
+            qry = qry.filter(amount__gte=stat_def["minimum_amount"])
+        return qry
+
+    def process_filter(self, user: User):
+        logic = self.reversed_logic
+        try:
+            character_ids = CharacterOwnership.objects.filter(
+                user=user).values_list("character_id", flat=True)
+            total = self._totals_queryset(character_ids).aggregate(
+                total=Sum("amount"))["total"] or 0
+            return (total >= self.isk_threshold) != logic
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False != logic
+
+    def audit_filter(self, users):
+        character_ids = CharacterOwnership.objects.filter(
+            user__in=users).values_list("character_id", flat=True)
+        totals = self._totals_queryset(character_ids).values(
+            uid=F("character__character__character_ownership__user_id")
+        ).annotate(total=Sum("amount"))
+        by_user = {t["uid"]: t["total"] or 0 for t in totals}
+
+        output = defaultdict(
+            lambda: {"message": "", "check": False != self.reversed_logic})
+        for u in users:
+            total = by_user.get(u.id, 0)
+            check = (total >= self.isk_threshold) != self.reversed_logic
+            output[u.id] = {"message": f"{total:,} ISK", "check": check}
         return output
 
 

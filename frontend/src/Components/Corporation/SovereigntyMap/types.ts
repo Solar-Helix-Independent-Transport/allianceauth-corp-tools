@@ -28,7 +28,6 @@ export type SovMapMode = "upgrades" | "flow";
 export type SystemNodeData = {
   system: SovMapSystem;
   color: string;
-  radius: number;
   mode: SovMapMode;
   ownerName?: string;
   hubUpgrades?: Upgrade[];
