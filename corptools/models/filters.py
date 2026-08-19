@@ -33,6 +33,7 @@ from .assets import CharacterAsset
 from .audits import CharacterLocation, EveLocation, check_date
 from .clones import Clone, JumpClone
 from .interactions import CharacterTitle, CorporationHistory
+from .mining import CharacterMiningLedger
 from .skills import SkillList, SkillTotals
 from .wallets import CharacterWalletJournalEntry
 
@@ -577,6 +578,152 @@ class AssetsFilter(FilterBase):
             else:
                 output[u.id] = {"message": "",
                                 "check": False != self.reversed_logic}
+        return output
+
+
+class MiningFilter(FilterBase):
+    class Meta:
+        verbose_name = "Smart Filter: Mining Yield"
+        verbose_name_plural = verbose_name
+
+    # Pochven/Triglavian region id - eve_sde.models.map.POCHVEN_REGION_ID,
+    # not re-exported from eve_sde.models, so inlined here.
+    _POCHVEN_REGION_ID = 10_000_070
+
+    look_back_days = models.IntegerField(default=30)
+    min_volume = models.FloatField(
+        default=0,
+        help_text="Minimum total m3 mined (quantity x each type's unpackaged volume, across matching "
+        "ore/ice/gas types) in the look-back window."
+    )
+
+    types = models.ManyToManyField(
+        ItemType,
+        blank=True,
+        help_text="Limit to specific ore/ice/gas types. Leave blank for all types."
+    )
+    groups = models.ManyToManyField(
+        ItemGroup,
+        blank=True,
+        help_text="Limit to specific ore/ice/gas groups. Leave blank for all groups."
+    )
+
+    systems = models.ManyToManyField(
+        SolarSystem,
+        blank=True,
+        help_text="Limit filter to specific systems"
+    )
+    constellations = models.ManyToManyField(
+        Constellation,
+        blank=True,
+        help_text="Limit filter to specific constellations"
+    )
+    regions = models.ManyToManyField(
+        Region,
+        blank=True,
+        help_text="Limit filter to specific regions"
+    )
+
+    include_high_sec = models.BooleanField(default=True)
+    include_low_sec = models.BooleanField(default=True)
+    include_null_sec = models.BooleanField(default=True)
+    include_w_space = models.BooleanField(default=True)
+
+    reversed_logic = models.BooleanField(
+        default=False,
+        help_text="If set, members who mined LESS than the threshold will pass the test."
+    )
+
+    def _security_status_query(self):
+        sec_q = models.Q()
+        any_flag = False
+        if self.include_high_sec:
+            sec_q |= models.Q(system__security_status__gte=0.45)
+            any_flag = True
+        if self.include_low_sec:
+            sec_q |= models.Q(
+                system__security_status__gt=0, system__security_status__lt=0.45)
+            any_flag = True
+        if self.include_w_space:
+            sec_q |= models.Q(
+                system_id__gte=31_000_000, system_id__lt=32_000_000)
+            any_flag = True
+        if self.include_null_sec:
+            sec_q |= (
+                models.Q(system__security_status__lte=0)
+                & ~models.Q(system_id__gte=31_000_000, system_id__lt=32_000_000)
+                & ~models.Q(system_id__gte=32_000_000, system_id__lt=33_000_000)
+                & ~models.Q(system__constellation__region_id=self._POCHVEN_REGION_ID)
+            )
+            any_flag = True
+        return sec_q, any_flag
+
+    def _totals_queryset(self, character_ids):
+        start_date = timezone.now() - datetime.timedelta(days=self.look_back_days)
+        qry = CharacterMiningLedger.objects.filter(
+            character__character_id__in=character_ids,
+            date__gte=start_date,
+        )
+
+        types = list(self.types.all())
+        groups = list(self.groups.all())
+        if types or groups:
+            q = models.Q()
+            if types:
+                q |= models.Q(type_name__in=types)
+            if groups:
+                q |= models.Q(type_name__group__in=groups)
+            qry = qry.filter(q)
+
+        systems = list(self.systems.all())
+        constellations = list(self.constellations.all())
+        regions = list(self.regions.all())
+        if systems or constellations or regions:
+            q = models.Q()
+            if systems:
+                q |= models.Q(system__in=systems)
+            if constellations:
+                q |= models.Q(system__constellation__in=constellations)
+            if regions:
+                q |= models.Q(system__constellation__region__in=regions)
+            qry = qry.filter(q)
+
+        sec_q, any_flag = self._security_status_query()
+        if any_flag:
+            qry = qry.filter(sec_q)
+        else:
+            qry = qry.none()
+
+        return qry.annotate(
+            volume_yield=F("quantity") * F("type_name__volume")
+        )
+
+    def process_filter(self, user: User):
+        logic = self.reversed_logic
+        try:
+            character_ids = CharacterOwnership.objects.filter(
+                user=user).values_list("character_id", flat=True)
+            total = self._totals_queryset(character_ids).aggregate(
+                total=Sum("volume_yield"))["total"] or 0
+            return (total >= self.min_volume) != logic
+        except Exception as e:
+            logger.error(e, exc_info=1)
+            return False != logic
+
+    def audit_filter(self, users):
+        character_ids = CharacterOwnership.objects.filter(
+            user__in=users).values_list("character_id", flat=True)
+        totals = self._totals_queryset(character_ids).values(
+            uid=F("character__character__character_ownership__user_id")
+        ).annotate(total=Sum("volume_yield"))
+        by_user = {t["uid"]: t["total"] or 0 for t in totals}
+
+        output = defaultdict(
+            lambda: {"message": "", "check": False != self.reversed_logic})
+        for u in users:
+            total = by_user.get(u.id, 0)
+            check = (total >= self.min_volume) != self.reversed_logic
+            output[u.id] = {"message": f"{total:,.1f} m3", "check": check}
         return output
 
 

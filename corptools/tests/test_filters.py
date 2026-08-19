@@ -2409,6 +2409,204 @@ class TestSecGroupBotFilters(TestCase):
 
         self.assertFalse(tests[11]["check"])
 
+    def _char_audit_for_user(self, user_id):
+        return ct_models.CharacterAudit.objects.get(
+            character=User.objects.get(id=user_id).profile.main_character)
+
+    def test_user_mining_volume(self):
+        ore_group = sde_models.ItemGroup.objects.create(
+            id=500, name="Ore Group")
+        ore_type = sde_models.ItemType.objects.create(
+            id=500, name="Veldspar", published=True, group=ore_group, volume=1.0)
+        system = sde_models.SolarSystem.objects.get(id=1)
+
+        ct_models.CharacterMiningLedger.objects.create(
+            id="m1", character=self._char_audit_for_user(1),
+            date=timezone.now().date(), type_name=ore_type, system=system,
+            quantity=1000,
+        )
+        ct_models.CharacterMiningLedger.objects.create(
+            id="m2", character=self._char_audit_for_user(2),
+            date=timezone.now().date(), type_name=ore_type, system=system,
+            quantity=50,
+        )
+
+        _filter = ct_models.MiningFilter.objects.create(
+            name="Mining >= 500",
+            description="Something to tell user",
+            min_volume=500,
+        )
+
+        self.assertTrue(_filter.process_filter(User.objects.get(id=1)))
+        self.assertFalse(_filter.process_filter(User.objects.get(id=2)))
+        self.assertFalse(_filter.process_filter(
+            User.objects.get(id=3)))  # no mining at all
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=[1, 2, 3]))
+        self.assertTrue(tests[1]["check"])
+        self.assertFalse(tests[2]["check"])
+        self.assertFalse(tests[3]["check"])
+
+    def test_user_mining_volume_reversed(self):
+        ore_group = sde_models.ItemGroup.objects.create(
+            id=501, name="Ore Group")
+        ore_type = sde_models.ItemType.objects.create(
+            id=501, name="Veldspar", published=True, group=ore_group, volume=1.0)
+        system = sde_models.SolarSystem.objects.get(id=1)
+
+        ct_models.CharacterMiningLedger.objects.create(
+            id="m3", character=self._char_audit_for_user(1),
+            date=timezone.now().date(), type_name=ore_type, system=system,
+            quantity=1000,
+        )
+
+        _filter = ct_models.MiningFilter.objects.create(
+            name="Mining < 500",
+            description="Something to tell user",
+            min_volume=500,
+            reversed_logic=True,
+        )
+
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+        self.assertTrue(_filter.process_filter(User.objects.get(id=2)))
+
+    def test_user_mining_look_back_window(self):
+        ore_group = sde_models.ItemGroup.objects.create(
+            id=502, name="Ore Group")
+        ore_type = sde_models.ItemType.objects.create(
+            id=502, name="Veldspar", published=True, group=ore_group, volume=1.0)
+        system = sde_models.SolarSystem.objects.get(id=1)
+
+        # Outside the look-back window - must not count.
+        ct_models.CharacterMiningLedger.objects.create(
+            id="m4", character=self._char_audit_for_user(1),
+            date=(timezone.now() - timedelta(days=45)).date(),
+            type_name=ore_type, system=system, quantity=1000,
+        )
+
+        _filter = ct_models.MiningFilter.objects.create(
+            name="Mining >= 500 in 30d",
+            description="Something to tell user",
+            min_volume=500,
+            look_back_days=30,
+        )
+
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+
+    def test_user_mining_type_and_group_scoping(self):
+        ore_group = sde_models.ItemGroup.objects.create(
+            id=503, name="Ore Group")
+        gas_group = sde_models.ItemGroup.objects.create(
+            id=504, name="Gas Group")
+        ore_type = sde_models.ItemType.objects.create(
+            id=503, name="Veldspar", published=True, group=ore_group, volume=1.0)
+        gas_type = sde_models.ItemType.objects.create(
+            id=504, name="Mykoserocin", published=True, group=gas_group, volume=1.0)
+        system = sde_models.SolarSystem.objects.get(id=1)
+
+        ct_models.CharacterMiningLedger.objects.create(
+            id="m5", character=self._char_audit_for_user(1),
+            date=timezone.now().date(), type_name=gas_type, system=system,
+            quantity=1000,
+        )
+
+        _filter = ct_models.MiningFilter.objects.create(
+            name="Ore only >= 500",
+            description="Something to tell user",
+            min_volume=500,
+        )
+        _filter.groups.add(ore_group)
+
+        # gas doesn't count when scoped to the ore group only
+        self.assertFalse(_filter.process_filter(User.objects.get(id=1)))
+
+        _filter.groups.clear()
+        _filter.groups.add(gas_group)
+        self.assertTrue(_filter.process_filter(User.objects.get(id=1)))
+
+    def test_user_mining_security_status_scoping(self):
+        region = sde_models.Region.objects.create(
+            id=100, name="Sec Test Region")
+        const = sde_models.Constellation.objects.create(
+            id=100, name="Sec Test Const", region=region)
+        hs_system = sde_models.SolarSystem.objects.create(
+            id=100, name="HS System", security_status=0.6, x=1, y=1, z=1,
+            security_class="a", constellation=const,
+        )
+        ns_system = sde_models.SolarSystem.objects.create(
+            id=101, name="NS System", security_status=-0.2, x=1, y=1, z=1,
+            security_class="c", constellation=const,
+        )
+        wh_system = sde_models.SolarSystem.objects.create(
+            id=31_000_001, name="J100001", security_status=-1.0, x=1, y=1, z=1,
+            security_class="", constellation=const,
+        )
+
+        ore_group = sde_models.ItemGroup.objects.create(
+            id=505, name="Ore Group")
+        ore_type = sde_models.ItemType.objects.create(
+            id=505, name="Veldspar", published=True, group=ore_group, volume=1.0)
+
+        user1_audit = self._char_audit_for_user(1)
+        ct_models.CharacterMiningLedger.objects.create(
+            id="m6", character=user1_audit, date=timezone.now().date(),
+            type_name=ore_type, system=hs_system, quantity=1000,
+        )
+        ct_models.CharacterMiningLedger.objects.create(
+            id="m7", character=user1_audit, date=timezone.now().date(),
+            type_name=ore_type, system=ns_system, quantity=1000,
+        )
+        ct_models.CharacterMiningLedger.objects.create(
+            id="m8", character=user1_audit, date=timezone.now().date(),
+            type_name=ore_type, system=wh_system, quantity=1000,
+        )
+
+        # High sec only: null sec + w-space yield doesn't count.
+        hs_only = ct_models.MiningFilter.objects.create(
+            name="HS only >= 1500",
+            description="Something to tell user",
+            min_volume=1500,
+            include_low_sec=False,
+            include_null_sec=False,
+            include_w_space=False,
+        )
+        self.assertFalse(hs_only.process_filter(User.objects.get(id=1)))
+
+        hs_only_low = ct_models.MiningFilter.objects.create(
+            name="HS only >= 500",
+            description="Something to tell user",
+            min_volume=500,
+            include_low_sec=False,
+            include_null_sec=False,
+            include_w_space=False,
+        )
+        self.assertTrue(hs_only_low.process_filter(User.objects.get(id=1)))
+
+        # Null sec only: only the ns_system entry counts.
+        ns_only = ct_models.MiningFilter.objects.create(
+            name="NS only >= 1500",
+            description="Something to tell user",
+            min_volume=1500,
+            include_high_sec=False,
+            include_low_sec=False,
+            include_w_space=False,
+        )
+        self.assertFalse(ns_only.process_filter(User.objects.get(id=1)))
+
+        # Unchecking every sec-status flag must match nothing, not error -
+        # min_volume=1 so a correctly-empty total (0) reads as a fail
+        # rather than trivially passing a >=0 threshold.
+        none_selected = ct_models.MiningFilter.objects.create(
+            name="Nothing selected",
+            description="Something to tell user",
+            min_volume=1,
+            include_high_sec=False,
+            include_low_sec=False,
+            include_null_sec=False,
+            include_w_space=False,
+        )
+        self.assertFalse(none_selected.process_filter(User.objects.get(id=1)))
+
     def test_user_home_station(self):
         l1 = ct_models.EveLocation.objects.get(location_id=1)
         user1_audit = ct_models.CharacterAudit.objects.get(
