@@ -449,6 +449,28 @@ class GlanceMiningActivities(Schema):
     mining_ice: Optional[float] = None
 
 
+class GlanceActivityHeatmapCell(Schema):
+    day: str
+    block: int
+    count: int
+
+
+class GlanceActivityHeatmapMiningDay(Schema):
+    day: str
+    m3: float
+
+
+class GlanceActivityHeatmapRattingDay(Schema):
+    day: str
+    isk: float
+
+
+class GlanceActivityHeatmap(Schema):
+    cells: List[GlanceActivityHeatmapCell]
+    mining: List[GlanceActivityHeatmapMiningDay]
+    ratting: List[GlanceActivityHeatmapRattingDay]
+
+
 class GlanceRatting(Schema):
     subcap: Optional[int] = None
     capital: Optional[int] = None

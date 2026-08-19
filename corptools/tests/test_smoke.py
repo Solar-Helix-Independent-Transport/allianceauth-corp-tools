@@ -174,6 +174,11 @@ class TestSmokeCharacterApi(CorptoolsTestCase):
             f"/audit/api/account/{self.cid}/glance/activities")
         self.assertEqual(resp.status_code, 200)
 
+    def test_glance_activity_heatmap(self):
+        resp = self.client.get(
+            f"/audit/api/account/{self.cid}/glance/activity_heatmap")
+        self.assertEqual(resp.status_code, 200)
+
     def test_glance_ratting(self):
         resp = self.client.get(f"/audit/api/account/{self.cid}/glance/ratting")
         self.assertEqual(resp.status_code, 200)

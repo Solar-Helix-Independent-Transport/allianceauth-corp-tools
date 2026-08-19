@@ -31,8 +31,11 @@ from corptools.api.helpers import (
     glances_pi_check,
     glances_pochven_check,
     glances_ratting_check,
+    mining_activity_by_day,
+    ratting_activity_by_day,
     resolve_character,
     round_or_null,
+    wallet_activity_heatmap,
 )
 
 logger = get_extension_logger(__name__)
@@ -97,6 +100,22 @@ class GlanceApiEndpoints:
                 "officer": glance_officers_count(characters),
                 "officer_cruiser": glance_officers_cruiser_count(characters),
                 "officer_frigate": glance_officers_frigate_count(characters),
+            }
+
+        @api.get(
+            "account/{character_id}/glance/activity_heatmap",
+            response={200: schema.GlanceActivityHeatmap, 403: str},
+            tags=self.tags
+        )
+        def get_glance_activity_heatmap(request, character_id: int):
+            err, main, characters = resolve_character(request, character_id)
+            if err:
+                return err
+
+            return {
+                "cells": wallet_activity_heatmap(characters),
+                "mining": mining_activity_by_day(characters),
+                "ratting": ratting_activity_by_day(characters),
             }
 
         @api.get(

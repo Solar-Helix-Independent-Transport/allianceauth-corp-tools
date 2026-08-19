@@ -1,4 +1,5 @@
 # Standard Library
+from collections import defaultdict
 from datetime import timedelta
 
 # Third Party
@@ -8,7 +9,8 @@ from ninja.types import DictStrAny
 
 # Django
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import F, Q, QuerySet, Sum
+from django.db.models import Count, F, Q, QuerySet, Sum
+from django.db.models.functions import ExtractHour, TruncDate
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -213,6 +215,76 @@ def mining_check(characters, groups, look_back=30):
         type_name__group_id__in=groups,
         date__gte=start_date
     )
+
+
+def wallet_activity_heatmap(characters, look_back=90):
+    """
+    Wallet journal entry counts bucketed by day and 4h block (0-5, i.e.
+    hour // 4), for a calendar-style activity heatmap.
+    """
+    start_date = timezone.now() - timedelta(days=look_back)
+    rows = models.CharacterWalletJournalEntry.objects.filter(
+        character__character__in=characters,
+        date__gte=start_date,
+    ).annotate(
+        day=TruncDate("date"),
+        hour=ExtractHour("date"),
+    ).values("day", "hour").annotate(count=Count("id"))
+
+    buckets = defaultdict(int)
+    for row in rows:
+        block = row["hour"] // 4
+        buckets[(row["day"], block)] += row["count"]
+
+    return [
+        {"day": day.isoformat(), "block": block, "count": count}
+        for (day, block), count in buckets.items()
+    ]
+
+
+def mining_activity_by_day(characters, look_back=90):
+    """
+    Mining ledger volume (m3) totalled per day, for the same heatmap -
+    CharacterMiningLedger.date is date-only (no hour)
+    """
+    start_date = timezone.now() - timedelta(days=look_back)
+    rows = models.CharacterMiningLedger.objects.filter(
+        character__character__in=characters,
+        date__gte=start_date,
+    ).annotate(
+        volume_yield=F("quantity") * F("type_name__volume"),
+    ).values("date").annotate(total=Sum("volume_yield"))
+
+    return [
+        {"day": row["date"].isoformat(), "m3": row["total"] or 0}
+        for row in rows
+    ]
+
+
+def ratting_activity_by_day(characters, look_back=90):
+    """
+    Ratting ISK (bounty_prizes, same definition as the "ratting" glance
+    stat/PVEIskFilter) totalled per day, for the same heatmap.
+    """
+    stat_def = PVE_GLANCE_STATS["ratting"]
+    start_date = timezone.now() - timedelta(days=look_back)
+    qry = models.CharacterWalletJournalEntry.objects.filter(
+        character__character__in=characters,
+        ref_type__in=stat_def["ref_types"],
+        date__gte=start_date,
+    )
+    if stat_def["first_parties"]:
+        qry = qry.filter(first_party_id__in=stat_def["first_parties"])
+    if stat_def["minimum_amount"]:
+        qry = qry.filter(amount__gte=stat_def["minimum_amount"])
+
+    rows = qry.annotate(day=TruncDate("date")).values(
+        "day").annotate(total=Sum("amount"))
+
+    return [
+        {"day": row["day"].isoformat(), "isk": float(row["total"] or 0)}
+        for row in rows
+    ]
 
 
 def bounty_check(characters, groups, look_back=30):

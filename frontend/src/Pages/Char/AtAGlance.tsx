@@ -1,5 +1,5 @@
 import { CharacterGlancesAccount } from "../Glance/Account";
-import { CharacterGlancesActivities } from "../Glance/Activities";
+import { CharacterGlancesActivities, CharacterGlancesActivityHeatmap } from "../Glance/Activities";
 import { CharacterGlancesAssets } from "../Glance/Assets";
 import { CharacterGlancesFactions } from "../Glance/Factions";
 
@@ -9,6 +9,7 @@ const CharacterAtAGlance = () => {
       <CharacterGlancesAccount />
       <CharacterGlancesAssets />
       <CharacterGlancesActivities />
+      <CharacterGlancesActivityHeatmap />
       <CharacterGlancesFactions />
     </div>
   );

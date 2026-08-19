@@ -1,7 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { IconStatusDiv } from "../../Components/Cards/IconStatusCard";
 import { statusProps, COMPACT_NUM_FORMAT } from "../../Components/Cards/IconStatusCard.helpers";
-import { loadGlanceActivityData, loadGlanceRattingData } from "../../api/character";
+import {
+  loadGlanceActivityData,
+  loadGlanceActivityHeatmapData,
+  loadGlanceRattingData,
+} from "../../api/character";
+import ActivityHeatmap from "../../Components/Graphs/ActivityHeatmap";
 import { Ratting } from "./Ratting";
 import {
   loadCorpGlanceActivityDataEco,
@@ -167,6 +172,30 @@ export const CharacterGlancesActivities = () => {
         <ActivitiesMining {...{ data, isLoading }} />
       </div>
     </>
+  );
+};
+
+export const CharacterGlancesActivityHeatmap = () => {
+  const { characterID } = useParams();
+  const { t } = useTranslation();
+
+  const { data } = useQuery({
+    queryKey: ["glances", "activity_heatmap", characterID],
+    queryFn: () => loadGlanceActivityHeatmapData(characterID ? Number(characterID) : 0),
+    refetchOnWindowFocus: false,
+  });
+
+  if (!data || (!data.cells.length && !data.mining.length && !data.ratting.length)) return null;
+
+  return (
+    <Card className="m-2" style={{ maxWidth: "1500px", width: "100%" }}>
+      <Card.Header className="text-center">
+        <Card.Title>{t("Activity Heatmap")}</Card.Title>
+      </Card.Header>
+      <Card.Body>
+        <ActivityHeatmap data={data} />
+      </Card.Body>
+    </Card>
   );
 };
 

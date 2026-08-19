@@ -189,6 +189,13 @@ export async function loadGlanceActivityData(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/glance/activities", characterID);
 }
 
+export async function loadGlanceActivityHeatmapData(characterID: number) {
+  return getCharacterEndpoint(
+    "/audit/api/account/{character_id}/glance/activity_heatmap",
+    characterID,
+  );
+}
+
 export async function loadGlanceFactionData(characterID: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/glance/faction", characterID);
 }

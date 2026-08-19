@@ -1,19 +1,28 @@
 # Standard Library
+from datetime import timedelta
 from unittest import mock
+
+# Third Party
+from eve_sde import models as sde_models
 
 # Django
 from django.contrib.auth.models import Permission
 from django.test import TestCase
+from django.utils import timezone
 
 # AA Example App
+from corptools import models as ct_models
 from corptools.api.helpers import (
     assets_glances,
     format_hours_as_duration,
     get_alts_queryset,
     get_corporation_characters,
+    mining_activity_by_day,
     mining_check,
+    ratting_activity_by_day,
     resolve_character,
     round_or_null,
+    wallet_activity_heatmap,
     wallet_check,
 )
 
@@ -296,6 +305,159 @@ class TestMiningCheck(CorptoolsTestCase):
         characters = [self.char1, self.char2]
         qry = mining_check(characters, [463], look_back=7)
         self.assertEqual(qry.count(), 0)
+
+
+# ---------------------------------------------------------------------------
+# wallet_activity_heatmap
+# ---------------------------------------------------------------------------
+
+class TestWalletActivityHeatmap(CorptoolsTestCase):
+    def _entry(self, entry_id, dt):
+        ct_models.CharacterWalletJournalEntry.objects.create(
+            character=self.ca1,
+            entry_id=entry_id,
+            date=dt,
+            description="",
+            ref_type="bounty_prizes",
+        )
+
+    def test_buckets_by_day_and_4h_block(self):
+        base = timezone.now().replace(minute=0, second=0, microsecond=0)
+        day = base.date().isoformat()
+
+        self._entry(1, base.replace(hour=1))  # block 0
+        self._entry(2, base.replace(hour=1))  # block 0 - combines with above
+        self._entry(3, base.replace(hour=5))  # block 1
+
+        # Outside the default 90 day look-back - must not count.
+        self._entry(4, base - timedelta(days=200))
+
+        result = wallet_activity_heatmap([self.char1])
+        by_key = {(r["day"], r["block"]): r["count"] for r in result}
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(by_key[(day, 0)], 2)
+        self.assertEqual(by_key[(day, 1)], 1)
+
+    def test_no_activity_returns_empty_list(self):
+        self.assertEqual(wallet_activity_heatmap([self.char1]), [])
+
+    def test_only_counts_the_given_characters(self):
+        base = timezone.now().replace(minute=0, second=0, microsecond=0)
+        self._entry(1, base.replace(hour=1))
+        ct_models.CharacterWalletJournalEntry.objects.create(
+            character=self.ca2,
+            entry_id=2,
+            date=base.replace(hour=1),
+            description="",
+            ref_type="bounty_prizes",
+        )
+
+        result = wallet_activity_heatmap([self.char1])
+        self.assertEqual(sum(r["count"] for r in result), 1)
+
+
+# ---------------------------------------------------------------------------
+# mining_activity_by_day
+# ---------------------------------------------------------------------------
+
+class TestMiningActivityByDay(CorptoolsTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        region = sde_models.Region.objects.create(
+            id=900, name="Mining Test Region")
+        const = sde_models.Constellation.objects.create(
+            id=900, name="Mining Test Const", region=region)
+        cls.system = sde_models.SolarSystem.objects.create(
+            id=900, name="Mining Test System", security_status=0.5, x=1, y=1, z=1,
+            security_class="a", constellation=const,
+        )
+        group = sde_models.ItemGroup.objects.create(id=900, name="Ore Group")
+        cls.ore_type = sde_models.ItemType.objects.create(
+            id=900, name="Veldspar", published=True, group=group, volume=10.0)
+
+    def _entry(self, entry_id, day, quantity):
+        ct_models.CharacterMiningLedger.objects.create(
+            id=entry_id,
+            character=self.ca1,
+            date=day,
+            type_name=self.ore_type,
+            system=self.system,
+            quantity=quantity,
+        )
+
+    def test_sums_volume_per_day(self):
+        today = timezone.now().date()
+
+        self._entry("m1", today, 100)
+        self._entry("m2", today, 50)  # combines with above -> 150 units
+
+        result = mining_activity_by_day([self.char1])
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["day"], today.isoformat())
+        self.assertEqual(result[0]["m3"], 1500.0)  # 150 units x 10.0 m3
+
+    def test_outside_look_back_excluded(self):
+        old_day = timezone.now().date() - timedelta(days=200)
+        self._entry("m1", old_day, 100)
+
+        self.assertEqual(mining_activity_by_day([self.char1]), [])
+
+    def test_no_activity_returns_empty_list(self):
+        self.assertEqual(mining_activity_by_day([self.char1]), [])
+
+
+# ---------------------------------------------------------------------------
+# ratting_activity_by_day
+# ---------------------------------------------------------------------------
+
+class TestRattingActivityByDay(CorptoolsTestCase):
+    def _entry(self, entry_id, dt, amount, ref_type="bounty_prizes"):
+        ct_models.CharacterWalletJournalEntry.objects.create(
+            character=self.ca1,
+            entry_id=entry_id,
+            date=dt,
+            description="",
+            ref_type=ref_type,
+            amount=amount,
+        )
+
+    def test_sums_isk_per_day_above_minimum(self):
+        base = timezone.now().replace(minute=0, second=0, microsecond=0)
+        day = base.date().isoformat()
+
+        self._entry(1, base.replace(hour=1), 5_000_000)
+        self._entry(2, base.replace(hour=10), 2_500_000)  # combines with above
+
+        result = ratting_activity_by_day([self.char1])
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["day"], day)
+        self.assertEqual(result[0]["isk"], 7_500_000.0)
+
+    def test_below_minimum_amount_excluded(self):
+        base = timezone.now()
+        # Below PVE_GLANCE_STATS["ratting"]["minimum_amount"] (1,000,000) -
+        # gate-rat ticks etc. shouldn't count as "ratting".
+        self._entry(1, base, 500_000)
+
+        self.assertEqual(ratting_activity_by_day([self.char1]), [])
+
+    def test_wrong_ref_type_excluded(self):
+        base = timezone.now()
+        self._entry(1, base, 5_000_000, ref_type="player_donation")
+
+        self.assertEqual(ratting_activity_by_day([self.char1]), [])
+
+    def test_outside_look_back_excluded(self):
+        old = timezone.now() - timedelta(days=200)
+        self._entry(1, old, 5_000_000)
+
+        self.assertEqual(ratting_activity_by_day([self.char1]), [])
+
+    def test_no_activity_returns_empty_list(self):
+        self.assertEqual(ratting_activity_by_day([self.char1]), [])
 
 
 # ---------------------------------------------------------------------------

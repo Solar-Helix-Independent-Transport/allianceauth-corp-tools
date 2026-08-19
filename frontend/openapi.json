@@ -2764,6 +2764,52 @@
         ]
       }
     },
+    "/audit/api/account/{character_id}/glance/activity_heatmap": {
+      "get": {
+        "operationId": "corptools_api_character_at_a_glance_get_glance_activity_heatmap",
+        "summary": "Get Glance Activity Heatmap",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlanceActivityHeatmap"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Character At a Glance"],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
     "/audit/api/account/{character_id}/glance/faction": {
       "get": {
         "operationId": "corptools_api_character_at_a_glance_get_glance_factions",
@@ -8116,6 +8162,83 @@
           }
         },
         "title": "GlanceRatting",
+        "type": "object"
+      },
+      "GlanceActivityHeatmap": {
+        "properties": {
+          "cells": {
+            "items": {
+              "$ref": "#/components/schemas/GlanceActivityHeatmapCell"
+            },
+            "title": "Cells",
+            "type": "array"
+          },
+          "mining": {
+            "items": {
+              "$ref": "#/components/schemas/GlanceActivityHeatmapMiningDay"
+            },
+            "title": "Mining",
+            "type": "array"
+          },
+          "ratting": {
+            "items": {
+              "$ref": "#/components/schemas/GlanceActivityHeatmapRattingDay"
+            },
+            "title": "Ratting",
+            "type": "array"
+          }
+        },
+        "required": ["cells", "mining", "ratting"],
+        "title": "GlanceActivityHeatmap",
+        "type": "object"
+      },
+      "GlanceActivityHeatmapCell": {
+        "properties": {
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "block": {
+            "title": "Block",
+            "type": "integer"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": ["day", "block", "count"],
+        "title": "GlanceActivityHeatmapCell",
+        "type": "object"
+      },
+      "GlanceActivityHeatmapMiningDay": {
+        "properties": {
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "m3": {
+            "title": "M3",
+            "type": "number"
+          }
+        },
+        "required": ["day", "m3"],
+        "title": "GlanceActivityHeatmapMiningDay",
+        "type": "object"
+      },
+      "GlanceActivityHeatmapRattingDay": {
+        "properties": {
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "isk": {
+            "title": "Isk",
+            "type": "number"
+          }
+        },
+        "required": ["day", "isk"],
+        "title": "GlanceActivityHeatmapRattingDay",
         "type": "object"
       },
       "GlanceFaction": {

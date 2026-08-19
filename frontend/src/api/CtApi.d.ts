@@ -922,6 +922,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/audit/api/account/{character_id}/glance/activity_heatmap": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Glance Activity Heatmap */
+    get: operations["corptools_api_character_at_a_glance_get_glance_activity_heatmap"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/audit/api/account/{character_id}/glance/faction": {
     parameters: {
       query?: never;
@@ -2755,6 +2772,38 @@ export interface components {
       officer_cruiser?: number | null;
       /** Officer Frigate */
       officer_frigate?: number | null;
+    };
+    /** GlanceActivityHeatmap */
+    GlanceActivityHeatmap: {
+      /** Cells */
+      cells: components["schemas"]["GlanceActivityHeatmapCell"][];
+      /** Mining */
+      mining: components["schemas"]["GlanceActivityHeatmapMiningDay"][];
+      /** Ratting */
+      ratting: components["schemas"]["GlanceActivityHeatmapRattingDay"][];
+    };
+    /** GlanceActivityHeatmapCell */
+    GlanceActivityHeatmapCell: {
+      /** Day */
+      day: string;
+      /** Block */
+      block: number;
+      /** Count */
+      count: number;
+    };
+    /** GlanceActivityHeatmapMiningDay */
+    GlanceActivityHeatmapMiningDay: {
+      /** Day */
+      day: string;
+      /** M3 */
+      m3: number;
+    };
+    /** GlanceActivityHeatmapRattingDay */
+    GlanceActivityHeatmapRattingDay: {
+      /** Day */
+      day: string;
+      /** Isk */
+      isk: number;
     };
     /** GlanceFaction */
     GlanceFaction: {
@@ -4744,6 +4793,37 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["GlanceRatting"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+  };
+  corptools_api_character_at_a_glance_get_glance_activity_heatmap: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        character_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GlanceActivityHeatmap"];
         };
       };
       /** @description Forbidden */
