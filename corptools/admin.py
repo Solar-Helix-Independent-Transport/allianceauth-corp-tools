@@ -395,8 +395,9 @@ class skillsFilterAdmin(admin.ModelAdmin):
         )
 
 
-class TimeInCorpFilterAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'days_in_corp', "reversed_logic"]
+class TimeInCorpFilterAdmin(AutocompleteMediaMixin, admin.ModelAdmin):
+    autocomplete_fields = ["corp"]
+    list_display = ['__str__', 'days_in_corp', 'corp', "reversed_logic"]
 
 
 class PVEIskFilterAdmin(admin.ModelAdmin):

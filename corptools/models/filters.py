@@ -232,6 +232,16 @@ class TimeInCorpFilter(FilterBase):
 
     days_in_corp = models.IntegerField(default=30)
 
+    corp = models.ForeignKey(
+        EveCorporationInfo,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        default=None,
+        help_text="If set, checks time in this specific corp's most recent stint instead of the "
+        "main's current corp. Leave blank to check the main's current corp as before."
+    )
+
     reversed_logic = models.BooleanField(
         default=False,
         help_text="If set all members less than the days in corp will pass the test."
@@ -241,14 +251,21 @@ class TimeInCorpFilter(FilterBase):
         logic = self.reversed_logic
         try:
             main_character = user.profile.main_character.characteraudit
-            histories = CorporationHistory.objects.filter(
-                character=main_character
-            ).order_by('-start_date').first()
+
+            if self.corp:
+                histories = CorporationHistory.objects.filter(
+                    character=main_character,
+                    corporation_id=self.corp.corporation_id,
+                ).order_by('-start_date').first()
+            else:
+                histories = CorporationHistory.objects.filter(
+                    character=main_character
+                ).order_by('-start_date').first()
+
+                if main_character.character.corporation_id != histories.corporation_id:
+                    return False  # FAIL if history is no god from CCP.
 
             days = timezone.now() - histories.start_date
-
-            if main_character.character.corporation_id != histories.corporation_id:
-                return False  # FAIL if history is no god from CCP.
 
             if days.days >= self.days_in_corp:
                 return not logic
@@ -260,10 +277,19 @@ class TimeInCorpFilter(FilterBase):
 
     def audit_filter(self, users):
         logic = self.reversed_logic
-        histories = CorporationHistory.objects.filter(
-            character__character_id__in=users.values_list(
-                "profile__main_character", flat=True)
-        ).values(uid=F("character__character__character_ownership__user_id")).annotate(
+        char_ids = users.values_list("profile__main_character", flat=True)
+
+        if self.corp:
+            base_histories = CorporationHistory.objects.filter(
+                character__character_id__in=char_ids,
+                corporation_id=self.corp.corporation_id,
+            )
+        else:
+            base_histories = CorporationHistory.objects.filter(
+                character__character_id__in=char_ids,
+            )
+
+        histories = base_histories.values(uid=F("character__character__character_ownership__user_id")).annotate(
             max_id=Max("record_id"),
         )
         # pull the specific histories
@@ -278,7 +304,7 @@ class TimeInCorpFilter(FilterBase):
 
         chars = defaultdict(lambda: {})
         for c in histories:
-            if c["ccid"] != c["rcid"]:
+            if not self.corp and c["ccid"] != c["rcid"]:
                 continue  # Skip if not main corp.
 
             if c['std']:

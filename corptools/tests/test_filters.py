@@ -2295,6 +2295,74 @@ class TestSecGroupBotFilters(TestCase):
         self.assertFalse(tests[8]["check"])
         self.assertFalse(tests[9]["check"])
 
+    def test_user_time_in_corp_specific_corp_p(self):
+        # All of these characters currently live in corp 1 (per setUpTestData),
+        # so a specific-corp filter targeting corp 2 must go off their most
+        # recent corp-2 stint, not their current corp - including for
+        # users 8/9 whose latest history row is corp 2 (so the default,
+        # unset-corp filter would reject them: it requires the latest
+        # history row to match their live/current corp, which is 1).
+        corp2 = EveCorporationInfo.objects.create(
+            corporation_id=2,
+            corporation_name="Test Corp 2",
+            corporation_ticker="TST2",
+            member_count=10,
+        )
+        _filter = ct_models.TimeInCorpFilter.objects.create(
+            name="Time in Corp 2 > 10d",
+            description="Something to tell user",
+            days_in_corp=10,
+            corp=corp2,
+        )
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = {}
+        for k, u in users.items():
+            tests[k] = _filter.process_filter(User.objects.get(id=k))
+
+        self.assertTrue(tests[1])
+        self.assertTrue(tests[2])
+        self.assertTrue(tests[3])
+        self.assertTrue(tests[4])
+        self.assertFalse(tests[5])  # no corp history at all
+        self.assertTrue(tests[6])
+        self.assertTrue(tests[7])
+        self.assertTrue(tests[8])  # not their current corp - still passes
+        self.assertTrue(tests[9])  # not their current corp - still passes
+
+    def test_user_time_in_corp_specific_corp_a(self):
+        corp2 = EveCorporationInfo.objects.create(
+            corporation_id=2,
+            corporation_name="Test Corp 2",
+            corporation_ticker="TST2",
+            member_count=10,
+        )
+        _filter = ct_models.TimeInCorpFilter.objects.create(
+            name="Time in Corp 2 > 10d",
+            description="Something to tell user",
+            days_in_corp=10,
+            corp=corp2,
+        )
+
+        users = {}
+        for user in ct_models.CharacterAudit.objects.all():
+            users[user.character.character_ownership.user.id] = None
+
+        tests = _filter.audit_filter(User.objects.filter(id__in=users))
+
+        self.assertTrue(tests[1]["check"])
+        self.assertTrue(tests[2]["check"])
+        self.assertTrue(tests[3]["check"])
+        self.assertTrue(tests[4]["check"])
+        self.assertFalse(tests[5]["check"])
+        self.assertTrue(tests[6]["check"])
+        self.assertTrue(tests[7]["check"])
+        self.assertTrue(tests[8]["check"])
+        self.assertTrue(tests[9]["check"])
+
     def test_user_time_in_corp_no_audit_rev(self):
         _filter = ct_models.TimeInCorpFilter.objects.create(
             name="Time in Corp > 20d",
