@@ -98,6 +98,24 @@ describe("SelectFilter", () => {
     expect(input.value).toBe("bounty prizes");
   });
 
+  it("doesn't crash and drops null from the dropdown when some rows have a null value (contract issuer/assignee/acceptor)", async () => {
+    // A column with a null cell in some rows (e.g. CharacterContract.issuer
+    // being null for a contract with no specific counterparty) used to
+    // throw "can't access property 'replaceAll', e is null" while building
+    // the filter dropdown's option labels.
+    render(
+      <FilterHarness
+        data={[{ issuer: "Some Character" }, { issuer: null }]}
+        accessorKey="issuer"
+      />,
+    );
+    const input = screen.getByPlaceholderText("Search") as HTMLInputElement;
+
+    fireEvent.click(input);
+    expect(await screen.findByText("Some Character")).toBeInTheDocument();
+    expect(screen.queryByText("null")).not.toBeInTheDocument();
+  });
+
   it("uses meta.filterOptionLabel for the idle display when provided", async () => {
     render(
       <FilterHarness

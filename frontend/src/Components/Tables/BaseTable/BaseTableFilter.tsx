@@ -260,17 +260,27 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
   // matched, and applied as the filter itself, against the raw values -
   // see onChange), not a label for whatever they've typed so far.
   const [isEditing, setIsEditing] = useState(false);
-  const sortedUniqueValues = Array.from(column.getFacetedUniqueValues().keys()).sort();
+  // Drop null/undefined up front - some columns (e.g. a contract's
+  // issuer/assignee/acceptor) are legitimately null for some rows, and a
+  // stray null here can otherwise trip isObjectorHTML below into treating
+  // every value in the column as an object, hiding the filter entirely.
+  const sortedUniqueValues = Array.from(column.getFacetedUniqueValues().keys())
+    .filter((v) => v !== null && v !== undefined)
+    .sort();
   const currentFilterValue = column.getFilterValue() as string;
   const isObjectorHTML =
     isHTML(sortedUniqueValues?.[0]) || typeof sortedUniqueValues?.[0] === "object";
 
   const labelFor =
-    column.columnDef.meta?.filterOptionLabel ?? ((v: string) => v.replaceAll("_", " "));
+    column.columnDef.meta?.filterOptionLabel ?? ((v: string) => v?.replaceAll("_", " ") ?? v);
 
   const selectOptions = (sortedUniqueValues as string[]).reduce(
     (previousValue: { value: string; label: string }[], currentValue) => {
-      if (typeof currentValue != "undefined") {
+      // Some columns (e.g. a contract's issuer/assignee/acceptor) are
+      // legitimately null for some rows - no reason to offer a "null"
+      // filter option for those, and the fallback labelFor would throw on
+      // it (`.replaceAll` on null) if it somehow got this far.
+      if (currentValue !== undefined && currentValue !== null) {
         if (!isObjectorHTML) {
           if (
             currentFilterValue === undefined ||
