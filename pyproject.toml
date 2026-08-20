@@ -43,7 +43,7 @@ dynamic = [
 dependencies = [
     "allianceauth<6,>=4.6.1",
     "django-esi>=9.6",
-    "django-eveonline-sde>=0.1.2",
+    "django-eveonline-sde>=0.2",
     "django-model-utils",
     "django-ninja<2,>=1.0.1",
     "networkx",
