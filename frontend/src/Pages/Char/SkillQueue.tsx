@@ -130,6 +130,7 @@ const CharacterSkillQueues = () => {
                                     level={s.end_level}
                                     trained={s.current_level ?? undefined}
                                     active={s.current_level ?? undefined}
+                                    queued={s.end_level}
                                   />
                                 </div>
                                 <div className="d-flex justify-content-between">

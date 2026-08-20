@@ -8,6 +8,7 @@ export interface Skill {
   level: number;
   active: number;
   sp: number;
+  queued?: number;
 }
 
 export const SkillGroup = ({ group, skills }: { group: string; skills: Skill[] }) => {
@@ -39,12 +40,17 @@ export const SkillGroup = ({ group, skills }: { group: string; skills: Skill[] }
             return 0; //default return value (no sorting)
           })
           .map((skill) => {
+            const queued = skill.queued ?? 0;
             return (
               <SkillBlock
                 skill={skill.skill}
-                level={skill.level}
+                // The bar's target has to stretch to cover a queued level
+                // past what's currently trained, or there's no room left
+                // for the queued dots to render at all.
+                level={Math.max(skill.level, queued)}
                 active={skill.active}
-                trained={skill.active}
+                trained={skill.level}
+                queued={queued}
                 sp={skill.sp}
               />
             );

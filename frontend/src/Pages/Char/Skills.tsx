@@ -4,7 +4,8 @@ import { SelectFilter } from "../../Components/Helpers/SelectFilter";
 import { TextFilter } from "../../Components/Helpers/TextFilter";
 import { ErrorLoader, PanelLoader } from "../../Components/Loaders/loaders";
 import CharSkillGroups from "../../Components/Skills/CharacterSkills";
-import { getCharacterSkills } from "../../api/character";
+import { SkillBlockKey } from "../../Components/Skills/SkillBlockKey";
+import { getCharacterSkillQueues, getCharacterSkills } from "../../api/character";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
@@ -24,6 +25,12 @@ const CharacterSkills = () => {
     refetchOnWindowFocus: false,
   });
 
+  const { data: queueData } = useQuery({
+    queryKey: ["skills", "queue", characterID],
+    queryFn: () => getCharacterSkillQueues(characterID ? Number(characterID) : 0),
+    refetchOnWindowFocus: false,
+  });
+
   if (isLoading) return <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />;
 
   if (error || !data) return <ErrorLoader />;
@@ -36,7 +43,20 @@ const CharacterSkills = () => {
       (obj) => obj.character.character_id === Number(char_id ? char_id : 0),
     );
 
-    let skill_data = char_data?.[0]?.skills;
+    // Highest queued end_level per skill name, for this character - a skill
+    // can appear multiple times in the queue for successive levels, so only
+    // the furthest one matters for the "queued" state shown on its dots.
+    const queuedLevels: Record<string, number> = {};
+    queueData
+      ?.find((c) => c.character.character_id === Number(char_id ? char_id : 0))
+      ?.queue?.forEach((q) => {
+        queuedLevels[q.skill] = Math.max(queuedLevels[q.skill] ?? 0, q.end_level);
+      });
+
+    let skill_data = char_data?.[0]?.skills?.map((s) => ({
+      ...s,
+      queued: queuedLevels[s.skill] ?? 0,
+    }));
 
     if (group_filter !== "" && group_filter !== "All") {
       skill_data = skill_data?.filter((o) =>
@@ -129,6 +149,7 @@ const CharacterSkills = () => {
         <div className="w-100" style={{ height: "600px" }}>
           <SkillsRadarGraph characterID={Number(char_id)} />
         </div>
+        <SkillBlockKey />
 
         <CharSkillGroups data={skill_data ?? []} />
       </ErrorBoundary>

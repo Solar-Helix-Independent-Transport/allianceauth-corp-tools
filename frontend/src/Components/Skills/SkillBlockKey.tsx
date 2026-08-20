@@ -13,11 +13,15 @@ export const SkillBlockKey = () => {
         </div>
         <div className="m-3">
           <p>{t("Omega Restricted")}</p>
-          <i className="fas fa-circle" style={{ color: "grey" }}></i>
+          <i className="fas fa-circle text-success"></i>
+        </div>
+        <div className="m-3">
+          <p>{t("Skill In Queue")}</p>
+          <i className="fas fa-circle text-warning"></i>
         </div>
         <div className="m-3">
           <p>{t("Missing Level")}</p>
-          <i className="fas fa-circle" style={{ color: "orange" }}></i>
+          <i className="fas fa-circle text-danger"></i>
         </div>
       </div>
     </div>

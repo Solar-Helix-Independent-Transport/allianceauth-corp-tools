@@ -11,7 +11,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { ChangeEvent } from "react";
-import { DoctrineSkillList, DoctrineSkillReqs } from "../../Components/Skills/DoctrineTypes";
+import {
+  DoctrineQueue,
+  DoctrineSkillList,
+  DoctrineSkillReqs,
+} from "../../Components/Skills/DoctrineTypes";
 
 const CharacterDoctrine = () => {
   const { t } = useTranslation();
@@ -87,6 +91,7 @@ const CharacterDoctrine = () => {
                   "Some Skill": 5,
                 }}
                 skill_list={{ "Some Skill": { active_level: 1, trained_level: 1 } }}
+                queue={{ "Some Skill": 2 }}
               />
             </td>
             <td className="col align-items-center">
@@ -174,6 +179,7 @@ const CharacterDoctrine = () => {
                                   name={k}
                                   skill_reqs={v}
                                   skill_list={char.skills as DoctrineSkillList}
+                                  queue={char.queue as DoctrineQueue}
                                 />
                               )
                             );

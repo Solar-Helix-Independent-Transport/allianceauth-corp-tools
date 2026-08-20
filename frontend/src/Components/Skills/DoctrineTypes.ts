@@ -9,3 +9,10 @@ export type DoctrineSkillReqs = {
 export type DoctrineSkillList = {
   [skillName: string]: { active_level: number; trained_level: number };
 };
+
+// Highest skill-queue finish_level per skill name (corptools/api/schema.py
+// CharacterDoctrines.queue) - same under-specified-schema situation as
+// doctrines/skills above.
+export type DoctrineQueue = {
+  [skillName: string]: number;
+};

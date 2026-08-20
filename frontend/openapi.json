@@ -7752,9 +7752,14 @@
             "additionalProperties": true,
             "title": "Skills",
             "type": "object"
+          },
+          "queue": {
+            "additionalProperties": true,
+            "title": "Queue",
+            "type": "object"
           }
         },
-        "required": ["character", "doctrines", "skills"],
+        "required": ["character", "doctrines", "skills", "queue"],
         "title": "CharacterDoctrines",
         "type": "object"
       },

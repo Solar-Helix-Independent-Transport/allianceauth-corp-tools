@@ -6,6 +6,7 @@ export const SkillBlock = ({
   level,
   active = 0,
   trained = 0,
+  queued = 0,
   sp = 0,
   className = "",
 }: {
@@ -13,6 +14,7 @@ export const SkillBlock = ({
   level: number;
   active: number;
   trained: number;
+  queued?: number;
   sp?: number;
   className?: string;
 }) => {
@@ -25,7 +27,7 @@ export const SkillBlock = ({
         ) : (
           <></>
         )}
-        <SkillLevelBlock {...{ level, active, trained }} />
+        <SkillLevelBlock {...{ level, active, trained, queued }} />
       </div>
     </div>
   );

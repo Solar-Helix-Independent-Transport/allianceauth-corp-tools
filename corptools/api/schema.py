@@ -196,6 +196,7 @@ class CharacterDoctrines(Schema):
     character: Character
     doctrines: dict
     skills: dict
+    queue: dict
 
 
 class CharacterNotification(Schema):

@@ -4,7 +4,7 @@ import { SkillBlockKey } from "./SkillBlockKey";
 // import "./doctrine.css";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { DoctrineSkillList } from "./DoctrineTypes";
+import { DoctrineQueue, DoctrineSkillList } from "./DoctrineTypes";
 
 export const DoctrineModal = ({
   show,
@@ -12,12 +12,14 @@ export const DoctrineModal = ({
   name,
   skill_reqs,
   skill_list,
+  queue = {},
 }: {
   show: boolean;
   setShow: (show: boolean) => void;
   name: string;
   skill_reqs: Record<string, number>;
   skill_list: DoctrineSkillList;
+  queue?: DoctrineQueue;
 }) => {
   const { t } = useTranslation();
 
@@ -47,6 +49,7 @@ export const DoctrineModal = ({
                 level={Number(v)}
                 active={active_level}
                 trained={trained_level}
+                queued={queue[k] ?? 0}
                 className="w-100"
               />
             );

@@ -3,16 +3,18 @@ import { DoctrineModal } from "./DoctrineModal";
 import { useState } from "react";
 import { Button, ButtonGroup } from "react-bootstrap";
 import CopyToClipboard from "react-copy-to-clipboard";
-import { DoctrineSkillList, DoctrineSkillReqs } from "./DoctrineTypes";
+import { DoctrineQueue, DoctrineSkillList, DoctrineSkillReqs } from "./DoctrineTypes";
 
 export const DoctrineCheck = ({
   name,
   skill_reqs,
   skill_list,
+  queue = {},
 }: {
   name: string;
   skill_reqs: DoctrineSkillReqs;
   skill_list: DoctrineSkillList;
+  queue?: DoctrineQueue;
 }) => {
   const [show, setShow] = useState(false);
   const { _meta, ..._skill_reqs } = skill_reqs;
@@ -77,7 +79,7 @@ export const DoctrineCheck = ({
           {!completed ? (
             <DoctrineModal
               skill_reqs={_skill_reqs as Record<string, number>}
-              {...{ show, setShow, name, skill_list }}
+              {...{ show, setShow, name, skill_list, queue }}
             />
           ) : (
             <></>

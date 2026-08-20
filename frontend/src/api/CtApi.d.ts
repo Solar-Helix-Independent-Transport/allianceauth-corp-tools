@@ -2586,6 +2586,10 @@ export interface components {
       skills: {
         [key: string]: unknown;
       };
+      /** Queue */
+      queue: {
+        [key: string]: unknown;
+      };
     };
     /** CharacterHistory */
     CharacterHistory: {

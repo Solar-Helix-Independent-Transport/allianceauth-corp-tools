@@ -30,4 +30,37 @@ describe("SkillGroup", () => {
     const skillNames = screen.getAllByText(/Zoology|Astrometrics/).map((el) => el.textContent);
     expect(skillNames).toEqual(["Astrometrics", "Zoology"]);
   });
+
+  it("shows the alpha-restricted gap as bootstrap-success, not danger - level is trained_skill_level, not a doctrine target", () => {
+    // active=3, level(=trained_skill_level)=5 -> 2 levels trained but not
+    // usable on Alpha. That's "Omega Restricted" (success), never "Missing"
+    // (danger) - a plain skill list has no target level to be short of.
+    const restricted = [{ group: "Science", skill: "Zoology", level: 5, active: 3, sp: 100 }];
+
+    const { container } = render(
+      <Accordion>
+        <SkillGroup group="Science" skills={restricted} />
+      </Accordion>,
+    );
+
+    expect(container.querySelectorAll(".fas.fa-circle.text-success")).toHaveLength(2);
+    expect(container.querySelectorAll(".fas.fa-circle.text-danger")).toHaveLength(0);
+  });
+
+  it("shows queued levels beyond what's currently trained as bootstrap-warning, with no danger dots", () => {
+    // trained to level 2, queued up to level 4 - the bar has to stretch
+    // past `level` to fit the queued dots, or there's nowhere for them to go.
+    const queued = [
+      { group: "Science", skill: "Zoology", level: 2, active: 2, sp: 100, queued: 4 },
+    ];
+
+    const { container } = render(
+      <Accordion>
+        <SkillGroup group="Science" skills={queued} />
+      </Accordion>,
+    );
+
+    expect(container.querySelectorAll(".fas.fa-circle.text-warning")).toHaveLength(2);
+    expect(container.querySelectorAll(".fas.fa-circle.text-danger")).toHaveLength(0);
+  });
 });

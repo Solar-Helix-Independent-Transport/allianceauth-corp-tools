@@ -135,7 +135,7 @@ class SkillApiEndpoints:
                     else:
                         d[c] = round(d[c])
                         tot = tot if tot > d[c] else d[c]
-                if tot > 5:
+                if tot > 2:
                     output.append(d)
 
             return {"characters": list(character_names), "data": output}
@@ -267,6 +267,7 @@ class SkillApiEndpoints:
                     "character": c,
                     "doctrines": {},
                     "skills": {},
+                    "queue": {},
                 }
 
             for k, s in skilllists['skills_list'].items():
@@ -275,5 +276,6 @@ class SkillApiEndpoints:
                     if k in visibles:
                         output[s['character_id']]["doctrines"][k] = d
                 output[s['character_id']]["skills"] = s["skills"]
+                output[s['character_id']]["queue"] = s.get("queue", {})
 
             return list(output.values())
