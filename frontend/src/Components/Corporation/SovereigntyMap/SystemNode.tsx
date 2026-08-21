@@ -157,7 +157,7 @@ const SystemCard = ({ data, selected }: { data: SystemNodeData; selected?: boole
         position: "relative",
         minWidth: 130,
         maxWidth: 230,
-        background: "color-mix(in srgb, var(--bs-tertiary-bg) 70%, transparent)",
+        background: "color-mix(in srgb, var(--bs-body-bg) 70%, transparent)",
         border: `2px solid ${data.system.anarchy_alert ? BOOTSTRAP_HEX.danger : data.color}`,
         borderRadius: 6,
         boxShadow: [

@@ -39,7 +39,7 @@ const ActivityDetailPanel = ({
         zIndex: 5,
         minWidth: 220,
         maxWidth: 320,
-        background: "color-mix(in srgb, var(--bs-tertiary-bg) 94%, transparent)",
+        background: "color-mix(in srgb, var(--bs-body-bg) 94%, transparent)",
         border: "1px solid var(--bs-border-color)",
         borderRadius: 6,
         boxShadow: "0 2px 10px rgba(0,0,0,0.45)",
