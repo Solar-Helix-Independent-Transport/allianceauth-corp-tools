@@ -1,4 +1,4 @@
-import { Fragment, MouseEvent } from "react";
+import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import tableStyles from "./BaseTable.module.css";
 import Filter from "./BaseTableFilter";
@@ -24,9 +24,8 @@ import {
   Button,
   ButtonGroup,
   ButtonToolbar,
-  Dropdown,
+  Form,
   OverlayTrigger,
-  SplitButton,
   Table,
   Tooltip,
 } from "react-bootstrap";
@@ -245,35 +244,22 @@ const BaseTable = <TData,>({
             </Button>
           </ButtonGroup>
 
-          <ButtonGroup style={{ zIndex: 0 }} className="ms-1">
-            <Button active variant="success">
-              {t("Page Size:")}
-            </Button>
-            <SplitButton
-              id="pageSizeDropdown"
-              variant="success"
-              title={
-                table.getState().pagination.pageSize === 1000000
-                  ? t("All")
-                  : table.getState().pagination.pageSize
-              }
+          <div className="d-flex align-items-center ms-2">
+            <Form.Label className="m-0 me-2 text-nowrap">{t("Page Size:")}</Form.Label>
+            <Form.Select
+              style={{ width: "auto" }}
+              value={table.getState().pagination.pageSize}
+              onChange={(e) => table.setPageSize(Number(e.target.value))}
             >
               {[15, 30, 60, 100, 1000000].map((_pageSize) => (
-                <Dropdown.Item
-                  id={`${_pageSize}`}
-                  key={_pageSize}
-                  eventKey={_pageSize}
-                  onClick={(event: MouseEvent<HTMLElement>) => {
-                    table.setPageSize(Number((event.target as HTMLElement).id));
-                  }}
-                >
+                <option key={_pageSize} value={_pageSize}>
                   {_pageSize === 1000000
                     ? t("Show All")
                     : t("Show {{pageSize}}", { pageSize: _pageSize })}
-                </Dropdown.Item>
+                </option>
               ))}
-            </SplitButton>
-          </ButtonGroup>
+            </Form.Select>
+          </div>
         </ButtonToolbar>
       </div>
 

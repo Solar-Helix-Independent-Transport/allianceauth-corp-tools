@@ -78,11 +78,8 @@ describe("BaseTable", () => {
   it("changes page size via the dropdown, including the 'Show All' option", () => {
     renderTable();
 
-    // The SplitButton's menu items only mount once the dropdown is opened.
-    fireEvent.click(
-      screen.getByText("Page Size:").nextElementSibling!.querySelector(".dropdown-toggle-split")!,
-    );
-    fireEvent.click(document.getElementById("1000000")!);
+    const pageSizeSelect = screen.getByText("Page Size:").nextElementSibling as HTMLSelectElement;
+    fireEvent.change(pageSizeSelect, { target: { value: "1000000" } });
 
     expect(screen.getAllByRole("row")).toHaveLength(2 + rows.length);
     expect(screen.getByText("1 of 1")).toBeInTheDocument();

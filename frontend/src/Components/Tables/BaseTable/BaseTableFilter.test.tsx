@@ -80,6 +80,17 @@ describe("Filter", () => {
     );
     expect(screen.getByPlaceholderText("Search")).toBeInTheDocument();
   });
+
+  it("clears the text filter when the clear button is clicked", () => {
+    const { container } = render(<FilterHarness data={[{ o: [{ name: "a" }] }]} accessorKey="o" />);
+    const input = screen.getByPlaceholderText("Search") as HTMLInputElement;
+
+    fireEvent.change(input, { target: { value: "abc" } });
+    expect(input.value).toBe("abc");
+
+    fireEvent.click(container.querySelector("button")!);
+    expect(input.value).toBe("");
+  });
 });
 
 describe("SelectFilter", () => {
@@ -130,6 +141,20 @@ describe("SelectFilter", () => {
     fireEvent.click(await screen.findByText("Bounty Prizes"));
 
     expect(input.value).toBe("Bounty Prizes");
+  });
+
+  it("clears the applied filter value when the clear button is clicked", async () => {
+    const { container } = render(
+      <FilterHarness data={[{ ref_type: "bounty_prizes" }]} accessorKey="ref_type" />,
+    );
+    const input = screen.getByPlaceholderText("Search") as HTMLInputElement;
+
+    fireEvent.click(input);
+    fireEvent.click(await screen.findByText("bounty prizes"));
+    expect(input.value).toBe("bounty prizes");
+
+    fireEvent.click(container.querySelector("button")!);
+    expect(input.value).toBe("");
   });
 });
 

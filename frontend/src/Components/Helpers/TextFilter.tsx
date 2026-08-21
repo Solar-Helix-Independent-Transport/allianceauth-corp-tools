@@ -12,16 +12,7 @@ export const TextFilter = ({
       <div className="my-auto mx-2">
         <Form.Label className="m-0 p-0">{labelText}</Form.Label>
       </div>
-      <FormControl
-        className="m-2"
-        type="text"
-        onChange={(e) => setFilterText(e.target.value)}
-        style={{
-          backgroundColor: "var(--bs-body-bg)",
-          color: "var(--bs-body-color)",
-          borderColor: "var(--bs-border-color)",
-        }}
-      />
+      <FormControl className="m-2" type="text" onChange={(e) => setFilterText(e.target.value)} />
     </div>
   );
 };

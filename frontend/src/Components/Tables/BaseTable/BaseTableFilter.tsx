@@ -24,8 +24,8 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
   const fromToNumber = columnFilterValue as [string, string];
 
   const popoverNumber = (
-    <Popover id="popover-positioned-top">
-      <div className="p-3">
+    <Popover id="popover-positioned-top" className={Styles.popover}>
+      <Popover.Body>
         <input
           type="number"
           value={fromToNumber?.[0] ?? ""}
@@ -53,18 +53,13 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
         >
           {t("Close")}
         </Button>
-      </div>
+      </Popover.Body>
     </Popover>
   );
 
   return (
     <OverlayTrigger trigger="click" placement="bottom" rootClose={true} overlay={popoverNumber}>
-      <form
-        className={Styles.searchWrapperFrom}
-        onReset={() => {
-          column.setFilterValue(() => [undefined, undefined]);
-        }}
-      >
+      <form className={Styles.searchWrapperFrom}>
         <div className={Styles.searchWrapper}>
           <Form.Control
             className={Styles.searchInput}
@@ -82,7 +77,7 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
                       ? "∞"
                       : fromToNumber?.[1].toLocaleString()
                   }`
-                : undefined
+                : ""
             }
           />
           <svg
@@ -97,7 +92,13 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
               d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"
             />
           </svg>
-          <button type="reset">
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              column.setFilterValue(() => [undefined, undefined]);
+            }}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -121,8 +122,8 @@ export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> 
   const passFail = column.getFilterValue();
 
   const popoverBool = (
-    <Popover id="popover-positioned-top">
-      <div className={`${Styles.radioWrapper} p-2`}>
+    <Popover id="popover-positioned-top" className={Styles.popover}>
+      <Popover.Body className={Styles.radioWrapper}>
         <Form.Check
           label={t("True")}
           name="group1"
@@ -149,25 +150,20 @@ export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> 
         >
           {t("Close")}
         </Button>
-      </div>
+      </Popover.Body>
     </Popover>
   );
 
   return (
     <OverlayTrigger trigger="click" placement="bottom" rootClose={true} overlay={popoverBool}>
-      <form
-        className={Styles.searchWrapperFrom}
-        onReset={() => {
-          column.setFilterValue(() => undefined);
-        }}
-      >
+      <form className={Styles.searchWrapperFrom}>
         <div className={Styles.searchWrapper}>
           <Form.Control
             className={Styles.searchInput}
             readOnly={true}
             type="text"
             placeholder={t("Filter")}
-            value={typeof passFail === "undefined" ? undefined : passFail ? t("True") : t("False")}
+            value={typeof passFail === "undefined" ? "" : passFail ? t("True") : t("False")}
           />
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -181,7 +177,13 @@ export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> 
               d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"
             />
           </svg>
-          <button type="reset">
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              column.setFilterValue(() => undefined);
+            }}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -203,48 +205,43 @@ export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> 
 export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
   const { t } = useTranslation();
   return (
-    <form
-      onReset={() => {
-        column.setFilterValue(null);
-      }}
-    >
-      <div className={Styles.searchWrapper}>
-        <Form.Control
-          className={Styles.searchInput}
-          type="text"
-          placeholder={t("Search")}
-          onChange={(event) => {
-            column.setFilterValue(event.target.value ? event.target.value : "");
-          }}
-        />
+    <div className={Styles.searchWrapper}>
+      <Form.Control
+        className={Styles.searchInput}
+        type="text"
+        placeholder={t("Search")}
+        value={(column.getFilterValue() as string) ?? ""}
+        onChange={(event) => {
+          column.setFilterValue(event.target.value ? event.target.value : "");
+        }}
+      />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        className={Styles.searchIcon}
+      >
+        <path
+          fill="currentColor"
+          fill-rule="evenodd"
+          d="M15.62 17.03a9 9 0 1 1 1.41-1.41l4.68 4.67a1 1 0 0 1-1.42 1.42l-4.67-4.68ZM17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+      <button type="button" onClick={() => column.setFilterValue("")}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          className={Styles.searchIcon}
+          className={Styles.xIcon}
         >
           <path
             fill="currentColor"
-            fill-rule="evenodd"
-            d="M15.62 17.03a9 9 0 1 1 1.41-1.41l4.68 4.67a1 1 0 0 1-1.42 1.42l-4.67-4.68ZM17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
-            clip-rule="evenodd"
+            d="M17.3 18.7a1 1 0 0 0 1.4-1.4L13.42 12l5.3-5.3a1 1 0 0 0-1.42-1.4L12 10.58l-5.3-5.3a1 1 0 0 0-1.4 1.42L10.58 12l-5.3 5.3a1 1 0 1 0 1.42 1.4L12 13.42l5.3 5.3Z"
           ></path>
         </svg>
-        <button type="reset">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            className={Styles.xIcon}
-          >
-            <path
-              fill="currentColor"
-              d="M17.3 18.7a1 1 0 0 0 1.4-1.4L13.42 12l5.3-5.3a1 1 0 0 0-1.42-1.4L12 10.58l-5.3-5.3a1 1 0 0 0-1.4 1.42L10.58 12l-5.3 5.3a1 1 0 1 0 1.42 1.4L12 13.42l5.3 5.3Z"
-            ></path>
-          </svg>
-        </button>
-      </div>
-    </form>
+      </button>
+    </div>
   );
 };
 
@@ -329,12 +326,7 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
         </Dropdown>
       }
     >
-      <form
-        className={Styles.searchWrapperFrom}
-        onReset={() => {
-          column.setFilterValue(() => undefined);
-        }}
-      >
+      <form className={Styles.searchWrapperFrom}>
         <div className={Styles.searchWrapper}>
           <Form.Control
             className={Styles.searchInput}
@@ -342,7 +334,7 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
             placeholder={t("Search")}
             value={
               typeof currentFilterValue === "undefined"
-                ? undefined
+                ? ""
                 : isEditing
                   ? currentFilterValue
                   : labelFor(currentFilterValue)
@@ -373,7 +365,14 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
               clip-rule="evenodd"
             ></path>
           </svg>
-          <button type="reset">
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              setIsEditing(false);
+              column.setFilterValue(() => undefined);
+            }}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

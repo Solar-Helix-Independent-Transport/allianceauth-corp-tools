@@ -25,16 +25,17 @@
   width: 100%;
 }
 
+/* Deliberately no background/color/border/radius/font-size here - the
+   trigger is a real Bootstrap .form-control (via react-bootstrap's
+   Form.Control), so it inherits those from Bootstrap's own theming instead
+   of a hand-maintained copy that can drift out of sync. This only adds the
+   layout tweaks .form-control doesn't provide on its own: room for the
+   search/clear icon overlay, and the width-grow transition. */
 .searchInput {
-  background-color: var(--bs-body-bg);
-  color: var(--bs-body-color);
-  border: var(--bs-border-width) solid var(--bs-border-color);
   width: 100%;
+  padding-right: 1.75rem;
   transition: width 1s;
   outline: none;
-  border-radius: var(--bs-border-radius);
-  padding: 0.375em;
-  font-size: var(--bs-body-font-size);
 }
 
 .radioWrapper {
@@ -134,4 +135,28 @@
 .dropDown {
   max-height: 250px !important;
   overflow-y: auto;
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border: var(--bs-border-width) solid var(--bs-border-color);
+}
+
+.dropDown :global(.dropdown-item) {
+  color: var(--bs-body-color);
+}
+
+.dropDown :global(.dropdown-item:hover),
+.dropDown :global(.dropdown-item:focus) {
+  background-color: var(--bs-dropdown-link-hover-bg, var(--bs-secondary-bg));
+  color: var(--bs-body-color);
+}
+
+/* Points Bootstrap's own popover variables at the app's body theme instead
+   of redeclaring background/border/arrow colors by hand - Popover's own CSS
+   already reads these tokens, this just repoints them. */
+.popover {
+  --bs-popover-bg: var(--bs-body-bg);
+  --bs-popover-border-color: var(--bs-border-color);
+  --bs-popover-header-bg: var(--bs-body-bg);
+  --bs-popover-header-color: var(--bs-body-color);
+  --bs-popover-body-color: var(--bs-body-color);
 }
