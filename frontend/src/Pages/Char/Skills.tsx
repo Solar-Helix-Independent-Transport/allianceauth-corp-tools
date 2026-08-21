@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import ErrorBoundary from "../../Components/Helpers/ErrorBoundary";
-import { SelectFilter } from "../../Components/Helpers/SelectFilter";
+import { NativeSelectFilter } from "../../Components/Helpers/NativeSelectFilter";
 import { TextFilter } from "../../Components/Helpers/TextFilter";
 import { ErrorLoader, PanelLoader } from "../../Components/Loaders/loaders";
 import CharSkillGroups from "../../Components/Skills/CharacterSkills";
@@ -128,18 +128,22 @@ const CharacterSkills = () => {
 
     return (
       <ErrorBoundary>
-        <SelectFilter
+        <NativeSelectFilter
           setFilter={setCharacter}
           options={charOptions}
           labelText={t("Character Select:")}
         />
         <div className="d-flex justify-content-between mb-3">
-          <SelectFilter
+          <NativeSelectFilter
             setFilter={setLevel}
             options={levelOptions}
             labelText={t("Level Filter:")}
           />
-          <SelectFilter setFilter={setGroup} options={groups} labelText={t("Group Filter:")} />
+          <NativeSelectFilter
+            setFilter={setGroup}
+            options={groups}
+            labelText={t("Group Filter:")}
+          />
           <TextFilter setFilterText={setFilter} labelText={t("Skill Filter:")} />
         </div>
         <h5 className="text-center w-100">{t("Skills Coverage (in percentage)")}</h5>
