@@ -551,6 +551,7 @@ def assets_glances(ship_assets, sp_assets):
     bs_groups = [27, 381, 898, 900]
     indy_groups = [28, 380, 1202]
     indy_command_groups = [941]
+    carrier_groups = [547, 5120]
     dread_groups = [485, 4594]
     cap_indy_groups = [902, 513, 883]
     citadel_groups = [1657,]
@@ -610,7 +611,7 @@ def assets_glances(ship_assets, sp_assets):
             out_groups["capital_indy"] += group["grp_total"]
         elif grp == 30:
             out_groups["titan"] += group["grp_total"]
-        elif grp == 547:
+        elif grp in carrier_groups:
             out_groups["carrier"] += group["grp_total"]
         elif grp == 1538:
             out_groups["fax"] += group["grp_total"]
