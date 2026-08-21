@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Select, { StylesConfig } from "react-select";
 import { useTranslation } from "react-i18next";
 import { loadStatus } from "../../api/corporation";
+import { loadCharacterStatus } from "../../api/character";
 import { useQueryState } from "nuqs";
 import { useEffect, useMemo } from "react";
 import { bootstrapSelectStyles, SelectOption } from "../Helpers/reactSelectTheme";
@@ -18,17 +19,34 @@ const CorpSelect = ({ includeAllOption = false }: { includeAllOption?: boolean }
     queryKey: ["corp-status"],
     queryFn: () => loadStatus(),
   });
+  // Only used to learn the main character's corporation, so this select can
+  // list it first - character_id 0 resolves server-side to the requesting
+  // user's own main character regardless of what page this select is on.
+  const { data: statusData } = useQuery({
+    queryKey: ["status", "0"],
+    queryFn: () => loadCharacterStatus(0),
+    refetchOnWindowFocus: false,
+  });
+  const mainCorporationId = statusData?.main?.corporation_id;
   const [cidStr, setCid] = useQueryState("cid");
 
   const corpOptions: SelectOption[] = useMemo(
     () =>
       isLoading
         ? []
-        : (data?.corps.map((corp) => ({
-            value: corp.corporation.corporation_id,
-            label: corp.corporation.corporation_name,
-          })) ?? []),
-    [isLoading, data],
+        : (data?.corps
+            .map((corp) => ({
+              value: corp.corporation.corporation_id,
+              label: corp.corporation.corporation_name,
+            }))
+            .sort((a, b) => {
+              if (mainCorporationId != null) {
+                if (a.value === mainCorporationId) return -1;
+                if (b.value === mainCorporationId) return 1;
+              }
+              return a.label.localeCompare(b.label);
+            }) ?? []),
+    [isLoading, data, mainCorporationId],
   );
 
   const options: SelectOption[] = useMemo(() => {
