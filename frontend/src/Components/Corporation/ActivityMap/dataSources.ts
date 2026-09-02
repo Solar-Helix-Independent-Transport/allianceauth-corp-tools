@@ -26,6 +26,15 @@ import {
 } from "../../../api/corporation";
 import type { ActivityMapDataSource } from "../../ActivityMap/types";
 
+// Builds the "view in audit" link for the corp asset list, pre-filtered to
+// the clicked system via that table's "System" column filter (see
+// Pages/Corp/AssetsList.tsx). Corp pages carry the selected corp as a `cid`
+// query param rather than a route segment (see useCorporationId), so that
+// has to travel along in the link too. Only the corp-owned asset sources
+// (not the assets_members_* ones) have a matching table to land on.
+const corporationAssetsAuditLink = (corporationID: number, system: { name: string }) =>
+  `/audit/r/corp/assetlist?cid=${corporationID}&system=${encodeURIComponent(system.name)}`;
+
 // Same shape as the character-side registry (Components/Character/
 // ActivityMap/dataSources.ts) - just pointed at the corp-scoped endpoints,
 // which aggregate across every character/asset visible for the whole
@@ -37,6 +46,7 @@ export const CORPORATION_ACTIVITY_MAP_DATA_SOURCES: ActivityMapDataSource[] = [
     load: loadCorporationActivityMapAssets,
     countLabel: "Assets",
     quantityLabel: "Quantity",
+    auditLink: corporationAssetsAuditLink,
   },
   {
     value: "assets_ships",
@@ -44,6 +54,7 @@ export const CORPORATION_ACTIVITY_MAP_DATA_SOURCES: ActivityMapDataSource[] = [
     load: loadCorporationActivityMapAssetsShips,
     countLabel: "Ships",
     quantityLabel: "Quantity",
+    auditLink: corporationAssetsAuditLink,
   },
   {
     value: "assets_capitals",
@@ -51,6 +62,7 @@ export const CORPORATION_ACTIVITY_MAP_DATA_SOURCES: ActivityMapDataSource[] = [
     load: loadCorporationActivityMapAssetsCapitals,
     countLabel: "Capital Ships",
     quantityLabel: "Quantity",
+    auditLink: corporationAssetsAuditLink,
   },
   {
     value: "assets_members",

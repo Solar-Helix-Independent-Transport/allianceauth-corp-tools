@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router";
 import ActivityDetailPanel from "./ActivityDetailPanel";
 import type { ActivityMapSystem } from "./types";
 
@@ -87,6 +88,40 @@ describe("ActivityDetailPanel", () => {
     expect(screen.getByText("45")).toBeInTheDocument();
     expect(screen.getByText("Units")).toBeInTheDocument();
     expect(screen.getByText("6")).toBeInTheDocument();
+  });
+
+  it("omits the audit link when the data source doesn't provide one", () => {
+    render(
+      <ActivityDetailPanel
+        system={makeSystem()}
+        value={0}
+        count={0}
+        quantity={0}
+        onClose={() => {}}
+      />,
+    );
+
+    expect(screen.queryByText("View in Audit")).not.toBeInTheDocument();
+  });
+
+  it("links to the audit page when the data source provides an auditHref", () => {
+    render(
+      <MemoryRouter>
+        <ActivityDetailPanel
+          system={makeSystem()}
+          value={0}
+          count={0}
+          quantity={0}
+          auditHref="/audit/r/123/account/listassets?system=Jita"
+          onClose={() => {}}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("link", { name: /View in Audit/ })).toHaveAttribute(
+      "href",
+      "/audit/r/123/account/listassets?system=Jita",
+    );
   });
 
   it("calls onClose when the close button is clicked", () => {

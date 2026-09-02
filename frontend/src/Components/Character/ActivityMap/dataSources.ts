@@ -18,6 +18,14 @@ import {
 } from "../../../api/character";
 import type { ActivityMapDataSource } from "../../ActivityMap/types";
 
+// Builds the "view in audit" link for the character asset list, pre-filtered
+// to the clicked system via that table's "System" column filter (see
+// Pages/Char/AssetsList.tsx). Shared by all three asset data sources below -
+// they all land on the same table, just pre-filtered server-side to
+// different item sets.
+const characterAssetsAuditLink = (characterID: number, system: { name: string }) =>
+  `/audit/r/${characterID}/account/listassets?system=${encodeURIComponent(system.name)}`;
+
 // One entry per thing the map can show for a character. Adding a new data
 // source later is just another entry here plus its own backend endpoint -
 // the map itself only ever consumes the shared
@@ -29,6 +37,7 @@ export const CHARACTER_ACTIVITY_MAP_DATA_SOURCES: ActivityMapDataSource[] = [
     load: getCharacterActivityMapAssets,
     countLabel: "Assets",
     quantityLabel: "Quantity",
+    auditLink: characterAssetsAuditLink,
   },
   {
     value: "assets_ships",
@@ -36,6 +45,7 @@ export const CHARACTER_ACTIVITY_MAP_DATA_SOURCES: ActivityMapDataSource[] = [
     load: getCharacterActivityMapAssetsShips,
     countLabel: "Ships",
     quantityLabel: "Quantity",
+    auditLink: characterAssetsAuditLink,
   },
   {
     value: "assets_capitals",
@@ -43,6 +53,7 @@ export const CHARACTER_ACTIVITY_MAP_DATA_SOURCES: ActivityMapDataSource[] = [
     load: getCharacterActivityMapAssetsCapitals,
     countLabel: "Capital Ships",
     quantityLabel: "Quantity",
+    auditLink: characterAssetsAuditLink,
   },
   {
     value: "contracts",

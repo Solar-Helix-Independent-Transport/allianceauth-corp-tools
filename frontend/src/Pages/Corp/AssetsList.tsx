@@ -3,6 +3,7 @@ import TableWrapper from "../../Components/Tables/BaseTable/TableWrapper";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useQueryState } from "nuqs";
 import CorporationAssetLocationSelect from "../../Components/Corporation/CorpAssetLocationSelect";
 import CorporationFilterBar from "../../Components/Corporation/CorporationFilterBar";
 import { useCorporationId } from "../../Components/Corporation/useCorporationId";
@@ -18,6 +19,10 @@ const CorporationAssets = () => {
 
   const corporationID = useCorporationId();
   const [locationID, setLocation] = useState<number>(0);
+  // Set when arriving from the activity map's "View in Audit" link (see
+  // Components/Corporation/ActivityMap/dataSources.ts) - read once to seed
+  // the System column's filter below, same as any other deep link.
+  const [systemFilter] = useQueryState("system");
 
   const { data, isFetching } = useQuery({
     queryKey: ["corpassetList", corporationID, locationID],
@@ -54,6 +59,10 @@ const CorporationAssets = () => {
         </div>
       ),
     }),
+    columnHelper.accessor("location.solar_system.system.name", {
+      id: "system",
+      header: t("System"),
+    }),
   ];
 
   return (
@@ -68,7 +77,12 @@ const CorporationAssets = () => {
       {isFetching ? (
         <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />
       ) : corporationID > 0 ? (
-        <TableWrapper {...{ isFetching, data, columns }} />
+        <TableWrapper
+          {...{ isFetching, data, columns }}
+          initialState={
+            systemFilter ? { columnFilters: [{ id: "system", value: systemFilter }] } : undefined
+          }
+        />
       ) : (
         <CorpLoader title={t("Select Corporation")} />
       )}

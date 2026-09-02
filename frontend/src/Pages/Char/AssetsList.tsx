@@ -7,6 +7,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
+import { useQueryState } from "nuqs";
 import CharacterAssetModal from "../../Components/Modals/CharacterAssetContents";
 import { SecurityStatusBadge } from "../../Components/SecurityStatusBadge";
 import LabeledSelect from "../../Components/Helpers/LabeledSelect";
@@ -16,6 +17,10 @@ const CharacterAssets = () => {
   const { characterID } = useParams();
 
   const [location_id, setLocation] = useState<number>(0);
+  // Set when arriving from the activity map's "View in Audit" link
+  // (see Components/Character/ActivityMap/dataSources.ts) - read once to
+  // seed the System column's filter below, same as any other deep link.
+  const [systemFilter] = useQueryState("system");
 
   const { data, isFetching } = useQuery({
     queryKey: ["assetList", characterID, location_id],
@@ -59,6 +64,10 @@ const CharacterAssets = () => {
         </div>
       ),
     }),
+    columnHelper.accessor("location.solar_system.system.name", {
+      id: "system",
+      header: t("System"),
+    }),
   ];
   return (
     <>
@@ -68,7 +77,12 @@ const CharacterAssets = () => {
           {...{ setLocation }}
         />
       </LabeledSelect>
-      <TableWrapper {...{ isFetching, data, columns }} />
+      <TableWrapper
+        {...{ isFetching, data, columns }}
+        initialState={
+          systemFilter ? { columnFilters: [{ id: "system", value: systemFilter }] } : undefined
+        }
+      />
     </>
   );
 };

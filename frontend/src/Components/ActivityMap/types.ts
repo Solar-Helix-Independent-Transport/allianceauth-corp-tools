@@ -39,6 +39,13 @@ export type ActivityMapDataSource = {
   // from `countLabel` (e.g. mining scales by volume, not entry count) - so
   // the panel shows it as its own row instead of duplicating countLabel.
   valueLabel?: string;
+  // Omitted for data sources with no matching audit table (most of them,
+  // for now - see the character/corporation registries). When set, the
+  // detail panel offers a link into that table pre-filtered to the clicked
+  // system via its "System" column, so "there's a pile of assets in Jita"
+  // leads straight to "here's what they are" instead of a second manual
+  // lookup. `id` is the same scope id the map itself was fetched for.
+  auditLink?: (id: number, system: ActivityMapSystem) => string;
 };
 
 export const getActivityMapDataSource = (

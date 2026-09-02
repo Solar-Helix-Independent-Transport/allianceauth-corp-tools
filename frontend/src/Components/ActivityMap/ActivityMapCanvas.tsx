@@ -88,6 +88,7 @@ const ActivityMapCanvas = ({
             valueLabel={dataSource.valueLabel}
             countLabel={dataSource.countLabel}
             quantityLabel={dataSource.quantityLabel}
+            auditHref={dataSource.auditLink?.(id, system)}
             onClose={onClose}
           />
         );

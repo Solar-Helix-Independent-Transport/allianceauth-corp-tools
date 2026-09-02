@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import { secColor } from "../SpaceMap/layout";
 import type { ActivityMapSystem } from "./types";
 
@@ -17,6 +18,7 @@ const ActivityDetailPanel = ({
   valueLabel,
   countLabel,
   quantityLabel,
+  auditHref,
   onClose,
 }: {
   system: ActivityMapSystem;
@@ -26,6 +28,7 @@ const ActivityDetailPanel = ({
   valueLabel?: string;
   countLabel?: string;
   quantityLabel?: string;
+  auditHref?: string;
   onClose: () => void;
 }) => {
   const { t } = useTranslation();
@@ -84,6 +87,14 @@ const ActivityDetailPanel = ({
         {countLabel && <Row label={t(countLabel)} value={count.toLocaleString()} />}
         {quantityLabel && <Row label={t(quantityLabel)} value={quantity.toLocaleString()} />}
       </div>
+
+      {auditHref && (
+        <div style={{ marginTop: 8, textAlign: "right" }}>
+          <Link to={auditHref} target="_blank" rel="noopener noreferrer">
+            {t("View in Audit")} <i className="fas fa-external-link-alt" />
+          </Link>
+        </div>
+      )}
     </div>
   );
 };
