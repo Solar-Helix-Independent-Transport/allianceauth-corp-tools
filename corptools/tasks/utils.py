@@ -12,7 +12,7 @@ from celery import Task, signature
 from celery.exceptions import Retry
 from celery_once import AlreadyQueued
 from eve_sde.tasks import check_for_sde_updates
-from httpx import RequestError as httpx_RequestError
+from httpx2 import RequestError as httpx2_RequestError
 
 # Django
 from django.core.cache import cache
@@ -100,7 +100,7 @@ def esi_error_retry(func):
                     logger.warning(f"Hit ESI error limit! Pausing Tasks! {e}")
                     set_error_flag(60)
                     args[0].retry(countdown=61)
-            elif isinstance(e, (RequestError, httpx_RequestError)):  # Generic Request Errors
+            elif isinstance(e, (RequestError, httpx2_RequestError)):  # Generic Request Errors
                 logger.warning(f"Uncaught RequestError, Retrying... {e}")
                 args[0].retry(countdown=300)
             elif isinstance(e, (OSError)):  # Bravado
