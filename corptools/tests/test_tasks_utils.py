@@ -7,7 +7,7 @@ from aiopenapi3.errors import RequestError
 from celery import shared_task
 from celery.exceptions import Retry
 from celery_once import AlreadyQueued
-from httpx import RequestError as httpx_RequestError
+from httpx2 import RequestError as httpx2_RequestError
 
 # Django
 from django.core.cache import cache
@@ -230,10 +230,10 @@ class TestEsiErrorRetry(TestCase):
             my_func(task)
         task.retry.assert_called_with(countdown=300)
 
-    def test_httpx_request_error_retries_after_300s(self):
+    def test_httpx2_request_error_retries_after_300s(self):
         @esi_error_retry
         def my_func(self):
-            raise httpx_RequestError("connection failed")
+            raise httpx2_RequestError("connection failed")
 
         task = _mock_task()
         with self.assertRaises(Retry):
