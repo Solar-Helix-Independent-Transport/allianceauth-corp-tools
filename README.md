@@ -84,7 +84,7 @@ Please consider helping with [Translations](https://app.transifex.com/alliance-a
 
 ### Docker
 
-1.  add the application to your `conf/requirments.txt` `allianceauth-corptools==2.8.10`
+1.  add the application to your `conf/requirments.txt` `allianceauth-corptools==3.5.1`
 1.  Add `'corptools',` to your `INSTALLED_APPS` in your projects `conf/local.py`
 1.  Build auth, and restart your containers
 1.  enter a container `docker compose exec allianceauth_gunicorn bash` and run migrations, collectstatic, and configure corptools.
