@@ -4,7 +4,7 @@
 
 **CorpTools V3.0.0 and newer are AllianceAuth V5 (Bootstrap 5) and Django ESI V9 (OpenAPI) Compatible**
 
-### Lightweight Toolbox of Bits and bobs for today's Eve Group on the go!
+### Lightweight Toolbox of Bits and bobs for today's EVE Group on the go!
 
 This module is the core of the CorpTools Ecosystem, this includes;
 
@@ -13,10 +13,9 @@ This module is the core of the CorpTools Ecosystem, this includes;
 - [Indy Dash](https://github.com/pvyParts/allianceauth-corp-tools-indy-dash): What Industrial structures have what rigs and where are they.
 - [Pinger](https://github.com/Solar-Helix-Independent-Transport/allianceauth-corp-tools-pinger): High performance pings from the notification endpoint, using the data available from character audit.
 
-Included `Bits and Bobs`:
+Included "Bits and Bobs":
 
-- Modular Character Audit with selectable scopes. ( See Settings section below. )
-
+- Modular Character Audit with selectable scopes. (See Settings section below.)
   - Assets
   - Clones
     - Implants
@@ -37,9 +36,7 @@ Included `Bits and Bobs`:
   - Wallet
     - Activity Analysis
   - At a Glance of all above data across all characters on a members
-
 - Corp Audit
-
   - Wallets
   - Structures
     - Fuel Dashboard
@@ -47,7 +44,6 @@ Included `Bits and Bobs`:
     - Jump Bridge Dashboard
     - Sov Dashboard
   - Assets
-
 - [Sec Group](https://github.com/Solar-Helix-Independent-Transport/allianceauth-secure-groups) Filters
   - Assets
     - Location
@@ -76,31 +72,39 @@ Please consider helping with [Translations](https://app.transifex.com/alliance-a
 
 ### Bare Metal
 
-1.  Install the application `pip install -U allianceauth-corptools`
-1.  Add `'corptools',` to your `INSTALLED_APPS` in your projects `local.py`
-1.  run migrations, collectstatic and restart auth
-1.  run the corp tools setup managemnt command `python manage.py ct_setup`
-1.  Continue with the Common section
+1. Install the application `pip install -U allianceauth-corptools`
+2. Add `'eve_sde',` to your `INSTALLED_APPS` in your projects `local.py`, if not already done so for another application
+3. Add `'corptools',` to your `INSTALLED_APPS` in your projects `local.py`
+4. Run migrations, collectstatic and restart auth:
+   - `python manage.py migrate eve_sde`
+   - `python manage.py esde_load_sde`
+   - `python manage.py migrate corptools`
+   - `python manage.py collectstatic`
+5. Run the corp tools setup managemnt command `python manage.py ct_setup`
+6. Continue with the Common section
 
 ### Docker
 
-1.  add the application to your `conf/requirments.txt` `allianceauth-corptools==3.5.1`
-1.  Add `'corptools',` to your `INSTALLED_APPS` in your projects `conf/local.py`
-1.  Build auth, and restart your containers
-1.  enter a container `docker compose exec allianceauth_gunicorn bash` and run migrations, collectstatic, and configure corptools.
-    - `auth collectstatic`
-    - `auth migrate`
-    - `auth ct_setup`
-1.  Continue with the Common section
+1. add the application to your `conf/requirments.txt` `allianceauth-corptools==3.5.1`
+2. Add `'eve_sde',` to your `INSTALLED_APPS` in your projects `conf/local.py`, if not already done so for another application
+3. Add `'corptools',` to your `INSTALLED_APPS` in your projects `conf/local.py`
+4. Build auth, and restart your containers
+5. enter a container `docker compose exec allianceauth_gunicorn bash` and run migrations, collectstatic, and configure corptools.
+   - `auth migrate eve_sde`
+   - `auth esde_load_sde`
+   - `auth migrate corptools`
+   - `auth collectstatic`
+   - `auth ct_setup`
+6. Continue with the Common section
 
 ### Common
 
-1.  setup your perms as documented below
-1.  add characters and corp tokens as required.
+1. Setup your perms as documented below
+2. Add characters and corp tokens as required.
 
 ## Usage
 
-### adjusting automatic updates
+### Adjusting Automatic Updates
 
 This will show how to setup/modify daily updates.
 
@@ -110,8 +114,8 @@ Currently this is:
 - Corp update run on all corps hourly at minute 30
 
 1. Got Audit Admin `https://your.url/audit/admin/`
-1. Click `Create or Update Periodic Tasks`
-1. you can edit the schedules to work more inline with your group as required in auth admin periodic tasks
+2. Click `Create or Update Periodic Tasks`
+3. you can edit the schedules to work more inline with your group as required in auth admin periodic tasks
 
 ## Permissions
 
@@ -128,7 +132,7 @@ All permissions are filtered by main character, if a person has neutral alts loa
 | alliance_hr         | nill       | Can access other character's data for own alliance.                          | Alliance only level access                             |
 | corp_hr             | nill       | Can access other character's data for own corp.                              | Own Corp restricted level access                       |
 
-### Corporate
+### Corporation
 
 | Perm                    | Admin Site | Perm                                                                         | Description                                                        |
 | ----------------------- | ---------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------ |
@@ -158,35 +162,35 @@ You can also exclude section of hte updates from the "Active" metric, this is ha
 
 To assist with auth related tasks we request `publicData` on top of the configured set.
 
-| Module                    | Enable Setting (Default)                 | Active Setting (Default)                               | Description                                     | Scopes Requested                                                                                                           | Note                                  |
-| ------------------------- | ---------------------------------------- | ------------------------------------------------------ | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| Assets                    | `CT_CHAR_ASSETS_MODULE` (`True`)         | `CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE` (`False`)        | Character Assets                                | 'esi-assets.read_assets.v1'                                                                                                | Fully enabled with a Sec Group Filter |
-| Standings                 | `CT_CHAR_STANDINGS_MODULE` (`True`)      | `CT_CHAR_ACTIVE_IGNORE_STANDINGS_MODULE` (`False`)     | Character NPC Standings                         | 'esi-characters.read_standings.v1'                                                                                         | Fully enabled                         |
-| Killmails                 | `CT_CHAR_KILLMAILS_MODULE` (`True`)      | `CT_CHAR_ACTIVE_IGNORE_KILLMAILS_MODULE` (`False`)     | Character Killmails                             | 'esi-killmails.read_killmails.v1'                                                                                          | Future Version                        |
-| Fittings                  | `CT_CHAR_FITTINGS_MODULE` (`True`)       | `CT_CHAR_ACTIVE_IGNORE_FITTINGS_MODULE` (`False`)      | Character Fittings                              | 'esi-fittings.read_fittings.v1'                                                                                            | Future Version                        |
-| Calendar                  | `CT_CHAR_CALENDAR_MODULE` (`True`)       | `CT_CHAR_ACTIVE_IGNORE_CALENDAR_MODULE` (`False`)      | Character Killmails                             | 'esi-calendar.read_calendar_events.v1'                                                                                     | Future Version                        |
-| Contacts                  | `CT_CHAR_CONTACTS_MODULE` (`True`)       | `CT_CHAR_ACTIVE_IGNORE_CONTACTS_MODULE` (`False`)      | Character Contacts                              | 'esi-characters.read_contacts.v1'                                                                                          | Fully enabled                         |
-| Notifications             | `CT_CHAR_NOTIFICATIONS_MODULE` (`True`)  | `CT_CHAR_ACTIVE_IGNORE_NOTIFICATIONS_MODULE` (`False`) | Character Notifications                         | 'esi-characters.read_notifications.v1'                                                                                     | Fully enabled                         |
-| Roles                     | `CT_CHAR_ROLES_MODULE` (`True`)          | `CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE` (`False`)         | Character Roles and Titles                      | 'esi-characters.read_titles.v1', 'esi-characters.read_corporation_roles.v1'                                                | Fully enabled with a Sec Group Filter |
-| Industry                  | `CT_CHAR_INDUSTRY_MODULE` (`True`)       | `CT_CHAR_ACTIVE_IGNORE_INDUSTRY_MODULE` (`False`)      | Character Indy Jobs                             | 'esi-industry.read_character_jobs.v1'                                                                                      | Fully enabled                         |
-| Mining                    | `CT_CHAR_MINING_MODULE` (`True`)         | `CT_CHAR_ACTIVE_IGNORE_MINING_MODULE` (`False`)        | Character Mining Ledgers                        | 'esi-industry.read_character_mining.v1'                                                                                    | Future Version                        |
-| Wallets/Markets/Contracts | `CT_CHAR_WALLET_MODULE` (`True`)         | `CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE` (`False`)        | Character Wallets, Contracts and Trading/Orders | 'esi-markets.read_character_orders.v1', 'esi-wallet.read_character_wallet.v1', 'esi-contracts.read_character_contracts.v1' | Fully Enabled                         |
-| Skills                    | `CT_CHAR_SKILLS_MODULE` (`True`)         | `CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE` (`False`)        | Character Skills/Queues and Doctrine Tools      | 'esi-skills.read_skillqueue.v1','esi-skills.read_skills.v1'                                                                | Fully Enabled with Sec Group Filters  |
-| Clones                    | `CT_CHAR_CLONES_MODULE` (`True`)         | `CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE` (`False`)        | Character Medical and Jump Clone Module         | 'esi-clones.read_implants.v1', 'esi-clones.read_clones.v1'                                                                 | Fully Enabled with a Sec Group Filter |
-| Fleet                     | `CT_CHAR_FLEET_MODULE` (`True`)          | nill                                                   | Character Fleet Tools                           | 'esi-fleets.read_fleet.v1', 'esi-fleets.write_fleet.v1`                                                                    | Future Version                        |
-| Mail                      | `CT_CHAR_MAIL_MODULE` (`False`)          | `CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE` (`False`)          | Character Mail Views                            | 'esi-mail.read_mail.v1`                                                                                                    | Fully Enabled                         |
-| Helpers                   | `CT_CHAR_HELPER_MODULE` (`True`)        | `CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE` (`False`)        | Character Helpers                               | 'esi-ui.open_window.v1','esi-ui.write_waypoint.v1'                                                                         | Future Versions                       |
-| Opportunities             | `CT_CHAR_OPPORTUNITIES` (`False`)        | nill                                                   | Character Opportunities                         | 'esi-characters.read_opportunities.v1'                                                                                     | Future Versions                       |
-| Loyalty Points            | `CT_CHAR_LOYALTYPOINTS_MODULE` (`True`) | `CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE` (`True`)  | Character LP                                    | 'esi-characters.read_loyalty.v1'                                                                                           | Fully Enabled                         |
-| Location                  | `CT_CHAR_LOCATIONS_MODULE` (`True`)      | `CT_CHAR_ACTIVE_IGNORE_LOCATIONS_MODULE` (`False`) | Character location and current ship | 'esi-location.read_location.v1', 'esi-location.read_online.v1', 'esi-location.read_ship_type.v1', 'esi-characters.read_fatigue.v1' | Fully enabled
-| Access lists              | `CT_CHAR_ACL_MODULE` (`True`)            |  nill                                              | Characters access lists | 'esi-access.read_lists.v1' | Future?
+| Module                    | Enable Setting (Default)                | Active Setting (Default)                               | Description                                     | Scopes Requested                                                                                                                   | Note                                  |
+| ------------------------- | --------------------------------------- | ------------------------------------------------------ | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| Assets                    | `CT_CHAR_ASSETS_MODULE` (`True`)        | `CT_CHAR_ACTIVE_IGNORE_ASSETS_MODULE` (`False`)        | Character Assets                                | 'esi-assets.read_assets.v1'                                                                                                        | Fully enabled with a Sec Group Filter |
+| Standings                 | `CT_CHAR_STANDINGS_MODULE` (`True`)     | `CT_CHAR_ACTIVE_IGNORE_STANDINGS_MODULE` (`False`)     | Character NPC Standings                         | 'esi-characters.read_standings.v1'                                                                                                 | Fully enabled                         |
+| Killmails                 | `CT_CHAR_KILLMAILS_MODULE` (`True`)     | `CT_CHAR_ACTIVE_IGNORE_KILLMAILS_MODULE` (`False`)     | Character Killmails                             | 'esi-killmails.read_killmails.v1'                                                                                                  | Future Version                        |
+| Fittings                  | `CT_CHAR_FITTINGS_MODULE` (`True`)      | `CT_CHAR_ACTIVE_IGNORE_FITTINGS_MODULE` (`False`)      | Character Fittings                              | 'esi-fittings.read_fittings.v1'                                                                                                    | Future Version                        |
+| Calendar                  | `CT_CHAR_CALENDAR_MODULE` (`True`)      | `CT_CHAR_ACTIVE_IGNORE_CALENDAR_MODULE` (`False`)      | Character Killmails                             | 'esi-calendar.read_calendar_events.v1'                                                                                             | Future Version                        |
+| Contacts                  | `CT_CHAR_CONTACTS_MODULE` (`True`)      | `CT_CHAR_ACTIVE_IGNORE_CONTACTS_MODULE` (`False`)      | Character Contacts                              | 'esi-characters.read_contacts.v1'                                                                                                  | Fully enabled                         |
+| Notifications             | `CT_CHAR_NOTIFICATIONS_MODULE` (`True`) | `CT_CHAR_ACTIVE_IGNORE_NOTIFICATIONS_MODULE` (`False`) | Character Notifications                         | 'esi-characters.read_notifications.v1'                                                                                             | Fully enabled                         |
+| Roles                     | `CT_CHAR_ROLES_MODULE` (`True`)         | `CT_CHAR_ACTIVE_IGNORE_ROLES_MODULE` (`False`)         | Character Roles and Titles                      | 'esi-characters.read_titles.v1', 'esi-characters.read_corporation_roles.v1'                                                        | Fully enabled with a Sec Group Filter |
+| Industry                  | `CT_CHAR_INDUSTRY_MODULE` (`True`)      | `CT_CHAR_ACTIVE_IGNORE_INDUSTRY_MODULE` (`False`)      | Character Indy Jobs                             | 'esi-industry.read_character_jobs.v1'                                                                                              | Fully enabled                         |
+| Mining                    | `CT_CHAR_MINING_MODULE` (`True`)        | `CT_CHAR_ACTIVE_IGNORE_MINING_MODULE` (`False`)        | Character Mining Ledgers                        | 'esi-industry.read_character_mining.v1'                                                                                            | Future Version                        |
+| Wallets/Markets/Contracts | `CT_CHAR_WALLET_MODULE` (`True`)        | `CT_CHAR_ACTIVE_IGNORE_WALLET_MODULE` (`False`)        | Character Wallets, Contracts and Trading/Orders | 'esi-markets.read_character_orders.v1', 'esi-wallet.read_character_wallet.v1', 'esi-contracts.read_character_contracts.v1'         | Fully Enabled                         |
+| Skills                    | `CT_CHAR_SKILLS_MODULE` (`True`)        | `CT_CHAR_ACTIVE_IGNORE_SKILLS_MODULE` (`False`)        | Character Skills/Queues and Doctrine Tools      | 'esi-skills.read_skillqueue.v1','esi-skills.read_skills.v1'                                                                        | Fully Enabled with Sec Group Filters  |
+| Clones                    | `CT_CHAR_CLONES_MODULE` (`True`)        | `CT_CHAR_ACTIVE_IGNORE_CLONES_MODULE` (`False`)        | Character Medical and Jump Clone Module         | 'esi-clones.read_implants.v1', 'esi-clones.read_clones.v1'                                                                         | Fully Enabled with a Sec Group Filter |
+| Fleet                     | `CT_CHAR_FLEET_MODULE` (`True`)         | nill                                                   | Character Fleet Tools                           | 'esi-fleets.read_fleet.v1', 'esi-fleets.write_fleet.v1`                                                                            | Future Version                        |
+| Mail                      | `CT_CHAR_MAIL_MODULE` (`False`)         | `CT_CHAR_ACTIVE_IGNORE_MAIL_MODULE` (`False`)          | Character Mail Views                            | 'esi-mail.read_mail.v1`                                                                                                            | Fully Enabled                         |
+| Helpers                   | `CT_CHAR_HELPER_MODULE` (`True`)        | `CT_CHAR_ACTIVE_IGNORE_HELPER_MODULE` (`False`)        | Character Helpers                               | 'esi-ui.open_window.v1','esi-ui.write_waypoint.v1'                                                                                 | Future Version                        |
+| Opportunities             | `CT_CHAR_OPPORTUNITIES` (`False`)       | nill                                                   | Character Opportunities                         | 'esi-characters.read_opportunities.v1'                                                                                             | Future Version                        |
+| Loyalty Points            | `CT_CHAR_LOYALTYPOINTS_MODULE` (`True`) | `CT_CHAR_ACTIVE_IGNORE_LOYALTYPOINTS_MODULE` (`True`)  | Character LP                                    | 'esi-characters.read_loyalty.v1'                                                                                                   | Fully Enabled                         |
+| Location                  | `CT_CHAR_LOCATIONS_MODULE` (`True`)     | `CT_CHAR_ACTIVE_IGNORE_LOCATIONS_MODULE` (`False`)     | Character location and current ship             | 'esi-location.read_location.v1', 'esi-location.read_online.v1', 'esi-location.read_ship_type.v1', 'esi-characters.read_fatigue.v1' | Fully enabled                         |
+| Access lists              | `CT_CHAR_ACL_MODULE` (`True`)           | nill                                                   | Characters access lists                         | 'esi-access.read_lists.v1'                                                                                                         | Future Version                        |
 
 ### Extra Scopes
 
 If `Assets`, `Clones`, `Wallets` or `Minning` are enabled these extra scopes are requested:
 
-- 'esi-universe.read_structures.v1'
-- 'esi-search.search_structures.v1'
+- `esi-universe.read_structures.v1`
+- `esi-search.search_structures.v1`
 
 this is to be able to lookup location names.
 
