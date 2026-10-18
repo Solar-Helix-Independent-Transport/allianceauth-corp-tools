@@ -86,7 +86,7 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
                     if _token:
                         locations = providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsLocations(
                             corporation_id=_corporation.corporation.corporation_id,
-                            item_ids=[_structure.structure_id],
+                            body=[_structure.structure_id],
                             token=_token
                         ).result()
 
@@ -99,7 +99,8 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
                             (str(_structure.system_id))
                         )
 
-                        r = requests.get(url)
+                        r = requests.get(url, timeout=10)
+                        r.raise_for_status()
                         fuzz_result = r.json()
 
                         celestial = StructureCelestial.objects.create(
@@ -108,8 +109,9 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
                         )
                 except ObjectDoesNotExist:
                     celestial = None
-                except Exception:
-                    # logging.exception("Messsage")
+                except Exception as e:
+                    logger.warning(
+                        f"CT: Unable to find nearest celestial for structure {_structure.structure_id}: {e}")
                     celestial = None
             else:
                 celestial = celestial[0]
@@ -444,17 +446,24 @@ def corp_update_pocos(corp_id, full_update=False):
 
     _all_locations = []
 
-    for id_chunk in providers.esi_openapi.chunk_ids(_all_ids):
-        _all_locations += providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsLocations(
-            corporation_id=corp_id,
-            body=id_chunk,
-            token=token_assets
-        ).result()
+    # Positions are only needed to name the pocos, so carry on without them
+    # rather than failing the whole update when there is no assets token.
+    if token_assets:
+        for id_chunk in providers.esi_openapi.chunk_ids(_all_ids):
+            _all_locations += providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsLocations(
+                corporation_id=corp_id,
+                body=id_chunk,
+                token=token_assets
+            ).result()
 
+    _office_to_system = {p.office_id: p.system_id for p in poco_data}
     _office_to_names = {}
 
     for n in _all_locations:
-        nearest = Planet.objects.all(
+        # Asset positions are relative to their own solar system, so only
+        # planets in that same system are comparable.
+        nearest = Planet.objects.filter(
+            solar_system_id=_office_to_system.get(n.item_id)
         ).annotate(
             distance=Sqrt(
                 Power(
@@ -474,10 +483,16 @@ def corp_update_pocos(corp_id, full_update=False):
         _office_to_names[n.item_id] = nearest
 
     for poco in poco_data:
+        # Only overwrite the planet when we found one, so a run without an
+        # assets token doesn't wipe names resolved on an earlier run.
+        planet = _office_to_names.get(poco.office_id)
+        planet_fields = {"name": planet.name,
+                         "planet_id": planet.id} if planet else {}
         Poco.objects.update_or_create(
             office_id=poco.office_id,
             corporation=audit_corp,
             defaults={
+                **planet_fields,
                 "alliance_tax_rate": poco.alliance_tax_rate,
                 "allow_access_with_standings": poco.allow_access_with_standings,
                 "allow_alliance_access": poco.allow_alliance_access,
@@ -492,8 +507,6 @@ def corp_update_pocos(corp_id, full_update=False):
                 "standing_level": poco.standing_level,
                 "system_id": poco.system_id,
                 "system_name_id": poco.system_id,
-                "name": _office_to_names.get(poco.office_id).name,
-                "planet_id": _office_to_names.get(poco.office_id).id,
                 "terrible_standing_tax_rate": poco.terrible_standing_tax_rate
             }
         )

@@ -1,3 +1,6 @@
+# Django
+from django.db import transaction
+
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 from esi.exceptions import HTTPNotModified
@@ -109,33 +112,36 @@ def corp_sovereignty_hub_detail_update(corp_id, hub_id, force_refresh=False):
     if hub_detail.workforce_transport:
         defaults['workforce_transport'] = hub_detail.workforce_transport.model_dump()
 
-    hub_ob, _ = SovereigntyHub.objects.update_or_create(
-        corporation=_corporation,
-        hub_id=hub_detail.id,
-        defaults=defaults
-    )
+    # Hub + reagents + upgrades in one transaction so readers never see a hub
+    # with its reagents/upgrades missing mid-refresh.
+    with transaction.atomic():
+        hub_ob, _ = SovereigntyHub.objects.update_or_create(
+            corporation=_corporation,
+            hub_id=hub_detail.id,
+            defaults=defaults
+        )
 
-    hub_ob.reagents.all().delete()
-    if hub_detail.reagent_bay and hub_detail.reagent_bay.reagents:
-        SovereigntyHubReagent.objects.bulk_create([
-            SovereigntyHubReagent(
-                hub=hub_ob,
-                type_name_id=reagent.type_id,
-                amount=reagent.amount,
-                burning_per_hour=reagent.burning_per_hour,
-            )
-            for reagent in hub_detail.reagent_bay.reagents
-        ])
+        hub_ob.reagents.all().delete()
+        if hub_detail.reagent_bay and hub_detail.reagent_bay.reagents:
+            SovereigntyHubReagent.objects.bulk_create([
+                SovereigntyHubReagent(
+                    hub=hub_ob,
+                    type_name_id=reagent.type_id,
+                    amount=reagent.amount,
+                    burning_per_hour=reagent.burning_per_hour,
+                )
+                for reagent in hub_detail.reagent_bay.reagents
+            ])
 
-    hub_ob.upgrades.all().delete()
-    if hub_detail.upgrades:
-        SovereigntyHubUpgrade.objects.bulk_create([
-            SovereigntyHubUpgrade(
-                hub=hub_ob,
-                type_name_id=upgrade.type_id,
-                power_state=upgrade.power_state,
-            )
-            for upgrade in hub_detail.upgrades
-        ])
+        hub_ob.upgrades.all().delete()
+        if hub_detail.upgrades:
+            SovereigntyHubUpgrade.objects.bulk_create([
+                SovereigntyHubUpgrade(
+                    hub=hub_ob,
+                    type_name_id=upgrade.type_id,
+                    power_state=upgrade.power_state,
+                )
+                for upgrade in hub_detail.upgrades
+            ])
 
     return f"CT: Updated sovereignty hub {hub_id} for {_corporation.corporation.corporation_name}"

@@ -163,3 +163,55 @@ class CorpStructureUpdateDirectNameTests(CorptoolsTestCase):
     # Structure.system_name_id with no existence check of its own. New
     # systems are rare enough in practice that this is left alone for now -
     # see the TODO next to that assignment in structures.py.
+
+
+class CorpStructureUpdateCelestialTests(CorptoolsTestCase):
+    """The nearest-celestial lookup passed `item_ids=` to
+    PostCorporationsCorporationIdAssetsLocations instead of `body=`, so it
+    raised every time and a bare except swallowed it - closest_celestial was
+    never populated and the lookup was retried on every run."""
+
+    def setUp(self):
+        super().setUp()
+        sde_models.ItemType.objects.create(
+            id=34, name="Test Structure Type", published=True)
+
+        region = sde_models.Region.objects.create(id=1, name="Test Region")
+        constellation = sde_models.Constellation.objects.create(
+            id=1, name="Test Constellation", region=region)
+        sde_models.SolarSystem.objects.create(
+            id=30000142, name="Jita", security_status=0.9,
+            x=0, y=0, z=0, security_class="hisec", constellation=constellation,
+        )
+
+    @patch("corptools.tasks.corporation.structures.requests")
+    @patch("corptools.tasks.corporation.structures.get_corp_token")
+    @patch("corptools.tasks.corporation.structures.providers")
+    def test_celestial_lookup_posts_structure_id_as_body(
+        self, mock_providers, mock_get_corp_token, mock_requests
+    ):
+        assets = mock_providers.esi_openapi.client.Assets
+        mock_providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdStructures.return_value.results.return_value = [
+            _fake_structure(1000000000000, name="Keepstar",
+                            system_id=30000142)
+        ]
+        assets.PostCorporationsCorporationIdAssetsLocations.return_value.result.return_value = [
+            MagicMock(position=MagicMock(x=1.0, y=2.0, z=3.0))
+        ]
+        mock_get_corp_token.return_value = MagicMock(character_id=1)
+        mock_requests.get.return_value.json.return_value = {
+            "itemName": "Jita IV - Moon 4"}
+
+        corp_structure_update(
+            self.corp1.corporation_id, force_refresh=False)
+
+        assets.PostCorporationsCorporationIdAssetsLocations.assert_called_once_with(
+            corporation_id=self.corp1.corporation_id,
+            body=[1000000000000],
+            token=mock_get_corp_token.return_value,
+        )
+        self.assertEqual(
+            mock_requests.get.call_args.kwargs.get("timeout"), 10)
+        structure = Structure.objects.get(structure_id=1000000000000)
+        self.assertEqual(
+            structure.closest_celestial.celestial_name, "Jita IV - Moon 4")

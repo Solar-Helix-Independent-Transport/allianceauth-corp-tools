@@ -289,9 +289,7 @@ def update_character_skill_list(character_id, force_refresh=False):
             store_cache=False
         )
 
-        # Delete current SkillList
         _st = time.perf_counter()
-        Skill.objects.filter(character=audit_char).delete()
 
         SkillTotals.objects.update_or_create(
             character=audit_char,
@@ -320,8 +318,13 @@ def update_character_skill_list(character_id, force_refresh=False):
                 trained_skill_level=skill.trained_skill_level
             )
             _create_skills.append(_skill)
-        Skill.objects.bulk_create(
-            _create_skills, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+
+        # Flush + recreate in one transaction so readers (e.g. securegroups
+        # skill filters) never see the character with no skills mid-refresh.
+        with transaction.atomic():
+            Skill.objects.filter(character=audit_char).delete()
+            Skill.objects.bulk_create(
+                _create_skills, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_list {character_id}"
@@ -364,10 +367,6 @@ def update_character_skill_queue(character_id, force_refresh=False):
         )
 
         _st = time.perf_counter()
-        # Delete current SkillList
-        SkillQueue.objects.filter(
-            character=audit_char
-        ).delete()
 
         items = []
         _check_skills = []
@@ -386,8 +385,13 @@ def update_character_skill_queue(character_id, force_refresh=False):
                 training_start_sp=item.training_start_sp
             )
             items.append(queue_item)
-        SkillQueue.objects.bulk_create(
-            items, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+
+        with transaction.atomic():
+            SkillQueue.objects.filter(
+                character=audit_char
+            ).delete()
+            SkillQueue.objects.bulk_create(
+                items, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_queue {character_id}"
@@ -809,8 +813,11 @@ def update_character_industry_jobs(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
     try:
+        # Without include_completed ESI only returns active jobs, so stored
+        # jobs would never be updated to delivered/cancelled.
         jobs = providers.esi_openapi.client.Industry.GetCharactersCharacterIdIndustryJobs(
             character_id=character_id,
+            include_completed=True,
             token=token
         ).result(
             force_refresh=force_refresh,
@@ -1109,20 +1116,21 @@ def update_character_clones(character_id, force_refresh=False):
         store_cache=False
     )
 
-    active_jumpclone, _ = JumpClone.objects.update_or_create(
-        character=audit_char,
-        jump_clone_id=0,
-        defaults={"name": "Active Clone"}
-    )
+    with transaction.atomic():
+        active_jumpclone, _ = JumpClone.objects.update_or_create(
+            character=audit_char,
+            jump_clone_id=0,
+            defaults={"name": "Active Clone"}
+        )
 
-    Implant.objects.filter(clone=active_jumpclone).delete()
-    Implant.objects.bulk_create(
-        [
-            Implant(clone=active_jumpclone, type_name_id=implant)
-            for implant in active_clone
-        ],
-        batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
-    )
+        Implant.objects.filter(clone=active_jumpclone).delete()
+        Implant.objects.bulk_create(
+            [
+                Implant(clone=active_jumpclone, type_name_id=implant)
+                for implant in active_clone
+            ],
+            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
+        )
 
     try:
         jump_clones = providers.esi_openapi.client.Clones.GetCharactersCharacterIdClones(
@@ -1154,36 +1162,37 @@ def update_character_clones(character_id, force_refresh=False):
             }
         )
 
-        # remove all but the active clone row, which is managed separately above
-        JumpClone.objects.filter(
-            character=audit_char
-        ).exclude(jump_clone_id=0).delete()
+        with transaction.atomic():
+            # remove all but the active clone row, which is managed separately above
+            JumpClone.objects.filter(
+                character=audit_char
+            ).exclude(jump_clone_id=0).delete()
 
-        implants = []
+            implants = []
 
-        for clone in jump_clones.jump_clones:
-            _jumpclone = JumpClone(
-                character=audit_char,
-                jump_clone_id=clone.jump_clone_id,
-                location_id=clone.location_id,
-                location_type=clone.location_type,
-                name=clone.name
-            )
-            if clone.location_id in all_locations:
-                _jumpclone.location_name_id = clone.location_id
-
-            _jumpclone.save()
-
-            for implant in clone.implants:
-                implants.append(
-                    Implant(
-                        clone=_jumpclone,
-                        type_name_id=implant
-                    )
+            for clone in jump_clones.jump_clones:
+                _jumpclone = JumpClone(
+                    character=audit_char,
+                    jump_clone_id=clone.jump_clone_id,
+                    location_id=clone.location_id,
+                    location_type=clone.location_type,
+                    name=clone.name
                 )
+                if clone.location_id in all_locations:
+                    _jumpclone.location_name_id = clone.location_id
 
-        Implant.objects.bulk_create(
-            implants, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+                _jumpclone.save()
+
+                for implant in clone.implants:
+                    implants.append(
+                        Implant(
+                            clone=_jumpclone,
+                            type_name_id=implant
+                        )
+                    )
+
+            Implant.objects.bulk_create(
+                implants, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
     except HTTPNotModified:
         logger.info(
             f"CT: No New Clone data for: {audit_char.character.character_name}"
@@ -2019,9 +2028,10 @@ def update_character_contacts(character_id, force_refresh=False):
             _label_item.build_id()
             labels_to_create.append(_label_item)
 
-        CharacterContactLabel.objects.filter(character=audit_char).delete()
-        CharacterContactLabel.objects.bulk_create(
-            labels_to_create, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+        with transaction.atomic():
+            CharacterContactLabel.objects.filter(character=audit_char).delete()
+            CharacterContactLabel.objects.bulk_create(
+                labels_to_create, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} CharacterContactLabel {character_id}"
@@ -2065,12 +2075,13 @@ def update_character_contacts(character_id, force_refresh=False):
                     )
                     _through_to_create.append(_lbl)
 
-        CharacterContact.objects.filter(character=audit_char).delete()
+        with transaction.atomic():
+            CharacterContact.objects.filter(character=audit_char).delete()
 
-        CharacterContact.objects.bulk_create(
-            _contacts_to_create, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
-        ContactLabelThrough.objects.bulk_create(
-            _through_to_create, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+            CharacterContact.objects.bulk_create(
+                _contacts_to_create, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+            ContactLabelThrough.objects.bulk_create(
+                _through_to_create, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_contacts {character_id}"
