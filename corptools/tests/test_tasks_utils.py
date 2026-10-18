@@ -17,7 +17,12 @@ from django.test import TestCase
 from django.utils import timezone
 
 # Alliance Auth
-from esi.exceptions import ESIBucketLimitException, HTTPClientError, HTTPServerError
+from esi.exceptions import (
+    ESIBucketLimitException,
+    ESIErrorLimitException,
+    HTTPClientError,
+    HTTPServerError,
+)
 
 # AA Example App
 from corptools.esi_errors import error_budget_low
@@ -225,6 +230,50 @@ class TestEsiErrorRetry(TestCase):
         with self.assertRaises(Retry):
             my_func(task)
         task.retry.assert_called_with(countdown=30)
+
+    @patch("corptools.tasks.utils.get_error_flag")
+    def test_error_flag_longer_than_a_minute_is_waited_out(self, mock_flag):
+        mock_flag.return_value = timezone.now() + datetime.timedelta(seconds=300)
+
+        @esi_error_retry
+        def my_func(self):
+            return "ok"
+
+        task = _mock_task()
+        with self.assertRaises(Retry):
+            my_func(task)
+        task.retry.assert_called_with(countdown=301)
+
+    def test_esi_error_limit_exception_sets_flag_for_reset_and_retries(self):
+        # django-esi raises ESIErrorLimitException for a real 420, not
+        # HTTPClientError - this used to skip the back-off entirely.
+        cache.clear()
+
+        @esi_error_retry
+        def my_func(self):
+            raise ESIErrorLimitException(reset=120)
+
+        task = _mock_task()
+        with self.assertRaises(Retry):
+            my_func(task)
+        task.retry.assert_called_with(countdown=121)
+        remaining = (get_error_flag() - timezone.now()).total_seconds()
+        self.assertGreater(remaining, 110)
+        # and the location/name tasks see it too
+        self.assertTrue(get_error_count_flag())
+
+    def test_esi_error_limit_exception_without_reset_backs_off_a_minute(self):
+        cache.clear()
+
+        @esi_error_retry
+        def my_func(self):
+            raise ESIErrorLimitException()
+
+        task = _mock_task()
+        with self.assertRaises(Retry):
+            my_func(task)
+        task.retry.assert_called_with(countdown=61)
+        self.assertTrue(get_error_count_flag())
 
     def test_http_420_sets_error_flag_and_retries(self):
         @esi_error_retry

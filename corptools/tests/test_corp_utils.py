@@ -2,10 +2,11 @@
 from unittest.mock import MagicMock, patch
 
 # Django
+from django.core.cache import cache
 from django.test import TestCase
 
 # Alliance Auth
-from esi.exceptions import HTTPError, HTTPNotModified
+from esi.exceptions import HTTPClientError, HTTPError, HTTPNotModified
 
 # AA Example App
 from corptools.models import EveName
@@ -102,89 +103,197 @@ class TestGetEveIds(TestCase):
         self.assertIn(102, result)
 
 
+def _token(pk, character_id):
+    token = MagicMock()
+    token.pk = pk
+    token.character_id = character_id
+    return token
+
+
+ROLES_OP = "corptools.tasks.corporation.utils.providers"
+WALLET_SCOPES = ["esi-wallet.read_corporation_wallets.v1"]
+
+
 class TestGetCorpToken(CorptoolsTestCase):
 
+    def setUp(self):
+        super().setUp()
+        cache.clear()
+
+    def _setup(self, mock_token_cls, mock_providers, tokens, roles_by_char):
+        """roles_by_char: character_id -> list of roles, or an exception to raise."""
+        qs = MagicMock()
+        qs.__iter__.side_effect = lambda: iter(tokens)
+        qs.first.return_value = tokens[0] if tokens else None
+        mock_token_cls.objects.filter.return_value.require_scopes.return_value = qs
+
+        def roles_call(character_id, token):
+            op = MagicMock()
+            result = roles_by_char[character_id]
+            if isinstance(result, Exception):
+                op.result.side_effect = result
+            else:
+                op.result.return_value = MagicMock(roles=result)
+            return op
+
+        roles = mock_providers.esi_openapi.client.Character.GetCharactersCharacterIdRoles
+        roles.side_effect = roles_call
+        return roles
+
     def test_no_characters_in_corp_returns_none(self):
-        result = get_corp_token(
-            99999, ["esi-wallet.read_corporation_wallets.v1"], ["Director"])
+        result = get_corp_token(99999, list(WALLET_SCOPES), ["Director"])
         self.assertIsNone(result)
 
-    def test_roles_scope_appended_when_missing(self):
-        scopes = ["esi-wallet.read_corporation_wallets.v1"]
-        get_corp_token(99999, scopes, ["Director"])
-        self.assertIn("esi-characters.read_corporation_roles.v1", scopes)
+    @patch(ROLES_OP)
+    @patch("corptools.tasks.corporation.utils.Token")
+    def test_roles_scope_required_without_mutating_callers_list(self, mock_token_cls, mock_providers):
+        self._setup(mock_token_cls, mock_providers, [], {})
+        scopes = list(WALLET_SCOPES)
 
-    def test_roles_scope_not_duplicated_when_already_present(self):
-        scopes = [
-            "esi-wallet.read_corporation_wallets.v1",
-            "esi-characters.read_corporation_roles.v1",
-        ]
-        get_corp_token(99999, scopes, ["Director"])
-        self.assertEqual(scopes.count(
-            "esi-characters.read_corporation_roles.v1"), 1)
+        get_corp_token(self.corp1.corporation_id, scopes, ["Director"])
 
-    @patch("corptools.tasks.corporation.utils.providers")
+        self.assertEqual(scopes, WALLET_SCOPES)
+        required = mock_token_cls.objects.filter.return_value.require_scopes.call_args[0][0]
+        self.assertEqual(
+            sorted(required),
+            sorted(WALLET_SCOPES + ["esi-characters.read_corporation_roles.v1"]))
+
+    @patch(ROLES_OP)
     @patch("corptools.tasks.corporation.utils.Token")
     def test_no_roles_required_returns_first_token(self, mock_token_cls, mock_providers):
-        mock_token = MagicMock()
-        mock_token_cls.objects.filter.return_value.require_scopes.return_value = [
-            mock_token]
+        token = _token(1, 101)
+        roles = self._setup(mock_token_cls, mock_providers, [token], {})
 
-        result = get_corp_token(self.corp1.corporation_id, [
-                                "esi-wallet.read_corporation_wallets.v1"], None)
+        result = get_corp_token(self.corp1.corporation_id, WALLET_SCOPES, None)
 
-        self.assertEqual(result, mock_token)
-        mock_providers.esi_openapi.client.Character.GetCharactersCharacterIdRoles.assert_not_called()
+        self.assertEqual(result, token)
+        roles.assert_not_called()
 
-    @patch("corptools.tasks.corporation.utils.providers")
+    @patch(ROLES_OP)
     @patch("corptools.tasks.corporation.utils.Token")
     def test_matching_role_returns_token(self, mock_token_cls, mock_providers):
-        mock_token = MagicMock()
-        mock_token.character_id = 1
-        mock_token_cls.objects.filter.return_value.require_scopes.return_value = [
-            mock_token]
+        token = _token(1, 101)
+        self._setup(mock_token_cls, mock_providers,
+                    [token], {101: ["Accountant"]})
 
-        mock_roles = MagicMock()
-        mock_roles.roles = ["Director", "Accountant"]
-        mock_providers.esi_openapi.client.Character.GetCharactersCharacterIdRoles.return_value.result.return_value = mock_roles
+        result = get_corp_token(self.corp1.corporation_id,
+                                WALLET_SCOPES, ["Accountant"])
 
-        result = get_corp_token(self.corp1.corporation_id, [
-                                "esi-wallet.read_corporation_wallets.v1"], ["Director"])
+        self.assertEqual(result, token)
 
-        self.assertEqual(result, mock_token)
-
-    @patch("corptools.tasks.corporation.utils.providers")
+    @patch(ROLES_OP)
     @patch("corptools.tasks.corporation.utils.Token")
     def test_no_matching_role_returns_none(self, mock_token_cls, mock_providers):
-        mock_token = MagicMock()
-        mock_token.character_id = 1
-        mock_token_cls.objects.filter.return_value.require_scopes.return_value = [
-            mock_token]
+        self._setup(mock_token_cls, mock_providers,
+                    [_token(1, 101)], {101: ["Accountant"]})
 
-        mock_roles = MagicMock()
-        mock_roles.roles = ["Accountant"]
-        mock_providers.esi_openapi.client.Character.GetCharactersCharacterIdRoles.return_value.result.return_value = mock_roles
-
-        result = get_corp_token(self.corp1.corporation_id, [
-                                "esi-wallet.read_corporation_wallets.v1"], ["Director"])
+        result = get_corp_token(self.corp1.corporation_id,
+                                WALLET_SCOPES, ["Factory_Manager"])
 
         self.assertIsNone(result)
 
-    @patch("corptools.tasks.corporation.utils.providers")
+    @patch(ROLES_OP)
+    @patch("corptools.tasks.corporation.utils.Token")
+    def test_director_satisfies_any_role(self, mock_token_cls, mock_providers):
+        # Directors hold every role in game; ESI listing only "Director"
+        # must not stop them qualifying for e.g. industry or sov endpoints.
+        token = _token(1, 101)
+        self._setup(mock_token_cls, mock_providers,
+                    [token], {101: ["Director"]})
+
+        result = get_corp_token(self.corp1.corporation_id,
+                                WALLET_SCOPES, ["Factory_Manager"])
+
+        self.assertEqual(result, token)
+
+    @patch(ROLES_OP)
     @patch("corptools.tasks.corporation.utils.Token")
     def test_token_error_skips_to_next_token(self, mock_token_cls, mock_providers):
         # Alliance Auth
         from esi.errors import TokenError
 
-        bad_token = MagicMock()
-        bad_token.character_id = 1
-        mock_token_cls.objects.filter.return_value.require_scopes.return_value = [
-            bad_token]
+        good = _token(2, 102)
+        self._setup(mock_token_cls, mock_providers, [_token(1, 101), good], {
+            101: TokenError("expired"),
+            102: ["Director"],
+        })
 
-        mock_providers.esi_openapi.client.Character.GetCharactersCharacterIdRoles.return_value.result.side_effect = TokenError(
-            "expired")
+        result = get_corp_token(self.corp1.corporation_id,
+                                WALLET_SCOPES, ["Director"])
 
-        result = get_corp_token(self.corp1.corporation_id, [
-                                "esi-wallet.read_corporation_wallets.v1"], ["Director"])
+        self.assertEqual(result, good)
 
-        self.assertIsNone(result)
+    @patch(ROLES_OP)
+    @patch("corptools.tasks.corporation.utils.Token")
+    def test_http_error_on_one_token_skips_to_next_token(self, mock_token_cls, mock_providers):
+        # Used to abort the whole lookup - and the bad token is always tried
+        # first, so the corp module broke until the token went away.
+        good = _token(2, 102)
+        self._setup(mock_token_cls, mock_providers, [_token(1, 101), good], {
+            101: HTTPClientError(403, {}, MagicMock()),
+            102: ["Director"],
+        })
+
+        result = get_corp_token(self.corp1.corporation_id,
+                                WALLET_SCOPES, ["Director"])
+
+        self.assertEqual(result, good)
+
+    @patch(ROLES_OP)
+    @patch("corptools.tasks.corporation.utils.Token")
+    def test_error_limit_propagates_instead_of_trying_every_token(self, mock_token_cls, mock_providers):
+        roles = self._setup(mock_token_cls, mock_providers, [_token(1, 101), _token(2, 102)], {
+            101: HTTPClientError(429, {}, MagicMock()),
+            102: ["Director"],
+        })
+
+        with self.assertRaises(HTTPClientError):
+            get_corp_token(self.corp1.corporation_id,
+                           WALLET_SCOPES, ["Director"])
+        self.assertEqual(roles.call_count, 1)
+
+    @patch(ROLES_OP)
+    @patch("corptools.tasks.corporation.utils.Token")
+    def test_last_good_token_is_tried_first_next_time(self, mock_token_cls, mock_providers):
+        director = _token(3, 103)
+        roles = self._setup(
+            mock_token_cls, mock_providers,
+            [_token(1, 101), _token(2, 102), director],
+            {101: [], 102: ["Accountant"], 103: ["Director"]},
+        )
+
+        get_corp_token(self.corp1.corporation_id, WALLET_SCOPES, ["Director"])
+        self.assertEqual(roles.call_count, 3)
+
+        roles.reset_mock()
+        result = get_corp_token(self.corp1.corporation_id,
+                                WALLET_SCOPES, ["Director"])
+
+        self.assertEqual(result, director)
+        self.assertEqual(
+            [c.kwargs["character_id"] for c in roles.call_args_list], [103])
+
+    @patch(ROLES_OP)
+    @patch("corptools.tasks.corporation.utils.Token")
+    def test_remembered_token_that_lost_its_role_falls_back_to_scan(self, mock_token_cls, mock_providers):
+        old, new = _token(1, 101), _token(2, 102)
+        roles_by_char = {101: ["Director"], 102: []}
+        self._setup(mock_token_cls, mock_providers, [old, new], roles_by_char)
+        self.assertEqual(
+            get_corp_token(self.corp1.corporation_id, WALLET_SCOPES, ["Director"]), old)
+
+        roles_by_char.update({101: [], 102: ["Director"]})
+        self.assertEqual(
+            get_corp_token(self.corp1.corporation_id, WALLET_SCOPES, ["Director"]), new)
+
+    @patch(ROLES_OP)
+    @patch("corptools.tasks.corporation.utils.Token")
+    def test_remembered_token_is_per_role_set(self, mock_token_cls, mock_providers):
+        accountant, manager = _token(1, 101), _token(2, 102)
+        self._setup(mock_token_cls, mock_providers, [accountant, manager], {
+            101: ["Accountant"], 102: ["Factory_Manager"]})
+
+        self.assertEqual(
+            get_corp_token(self.corp1.corporation_id, WALLET_SCOPES, ["Accountant"]), accountant)
+        self.assertEqual(
+            get_corp_token(self.corp1.corporation_id, WALLET_SCOPES, ["Factory_Manager"]), manager)

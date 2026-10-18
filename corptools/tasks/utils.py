@@ -1,6 +1,7 @@
 # Standard Library
 import functools
 import inspect
+import math
 from functools import wraps
 from random import random
 from time import time
@@ -25,12 +26,14 @@ from django.utils import timezone
 from allianceauth.services.hooks import get_extension_logger
 from esi.exceptions import (
     ESIBucketLimitException,
+    ESIErrorLimitException,
     HTTPClientError,
     HTTPServerError,
 )
 
 # AA Example App
 from corptools.esi_errors import (  # - re-exported
+    ERROR_FLAG_SECONDS,
     clear_error_flag,
     error_flag_active,
     get_error_flag,
@@ -97,9 +100,13 @@ def esi_error_retry(func):
     def wrapper(*args, **kwargs):
         _ret = None
 
-        if get_error_flag() >= timezone.now():
+        flag = get_error_flag()
+        if flag >= timezone.now():
             logger.warning("Hit ESI error limit! will retry tasks!")
-            args[0].retry(countdown=61)
+            # wait out the flag, which may be longer than a minute if ESI
+            # sent a longer reset
+            args[0].retry(
+                countdown=math.ceil((flag - timezone.now()).total_seconds()) + 1)
         else:
             clear_error_flag()
         try:
@@ -108,6 +115,14 @@ def esi_error_retry(func):
             if isinstance(e, (ESIBucketLimitException)):  # OpenAPI
                 logger.warning(f"Hit ESI rate bucket! Pausing Task! {e}")
                 args[0].retry(countdown=e.reset)
+            elif isinstance(e, ESIErrorLimitException):  # OpenAPI 420
+                # django-esi raises this for a 420, not HTTPClientError, so
+                # the status-code branch below never saw a real one.
+                reset = math.ceil(e.reset) if e.reset else ERROR_FLAG_SECONDS
+                logger.warning(
+                    f"Hit ESI error limit! Pausing Tasks for {reset}s! {e}")
+                set_error_flag(reset)
+                args[0].retry(countdown=reset + 1)
             elif isinstance(e, (HTTPClientError, HTTPServerError)):  # OpenAPI
                 code = e.status_code
                 if code in (420, 429):
