@@ -17,7 +17,6 @@ const CharacterWalletActivity = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["wallet-activity", characterID],
     queryFn: () => loadWalletActivity(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
   const columnHelper = createColumnHelper<components["schemas"]["WalletActivityEntry"]>();
 

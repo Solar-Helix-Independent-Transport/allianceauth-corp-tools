@@ -18,7 +18,6 @@ const CharacterAssetGroups = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["assetGroups", characterID, LocationID],
     queryFn: () => getAssetGroups(Number(characterID), Number(LocationID)),
-    refetchOnWindowFocus: false,
   });
 
   return (

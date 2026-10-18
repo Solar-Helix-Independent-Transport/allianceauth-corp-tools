@@ -15,7 +15,6 @@ const CharacterMercenaryDens = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["mercenarydens", characterID],
     queryFn: () => getCharacterMercenaryDens(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
 
   const columnHelper = createColumnHelper<components["schemas"]["CharacterMercenaryDen"]>();

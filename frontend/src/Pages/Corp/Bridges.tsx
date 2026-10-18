@@ -12,7 +12,6 @@ const Bridges = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["bridges"],
     queryFn: () => loadBridges(),
-    refetchOnWindowFocus: false,
     initialData: [] as BridgePair[],
   });
 

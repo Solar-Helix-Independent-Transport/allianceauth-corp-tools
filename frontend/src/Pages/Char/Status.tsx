@@ -15,7 +15,6 @@ const CharacterStatus = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["status", characterID],
     queryFn: () => loadCharacterStatus(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
     initialData: { characters: [], main: undefined, headers: [] },
   });
 

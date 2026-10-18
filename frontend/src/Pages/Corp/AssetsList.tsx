@@ -27,7 +27,6 @@ const CorporationAssets = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["corpassetList", corporationID, locationID],
     queryFn: () => loadAssetList(Number(corporationID), locationID, true),
-    refetchOnWindowFocus: false,
     initialData: [] as components["schemas"]["AssetItem"][],
   });
 

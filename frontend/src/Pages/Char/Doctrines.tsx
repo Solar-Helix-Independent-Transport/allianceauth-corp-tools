@@ -27,7 +27,6 @@ const CharacterDoctrine = () => {
   const { data } = useQuery({
     queryKey: ["doctrines", characterID],
     queryFn: () => getAccountDoctrines(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
 
   return (

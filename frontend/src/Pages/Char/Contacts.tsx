@@ -17,7 +17,6 @@ const CharacterContacts = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["contacts", characterID],
     queryFn: () => getCharacterContacts(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
   const columnHelper = createColumnHelper<components["schemas"]["Contact"]>();
 

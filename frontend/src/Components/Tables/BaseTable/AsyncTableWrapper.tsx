@@ -14,7 +14,6 @@ const AsyncTableWrapper = <TData,>({
   const { data, isFetching } = useQuery({
     queryKey: queryKey,
     queryFn: queryFn,
-    refetchOnWindowFocus: false,
   });
 
   return <BaseTable {...{ isFetching, columns, data }} />;

@@ -26,13 +26,11 @@ const CharacterSkills = () => {
   const { isLoading, error, data } = useQuery({
     queryKey: ["skills", characterID],
     queryFn: () => getCharacterSkills(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
   });
 
   const { data: queueData } = useQuery({
     queryKey: ["skills", "queue", characterID],
     queryFn: () => getCharacterSkillQueues(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
   });
 
   // Shares CharacterHeader's query cache (same key + character_id) rather
@@ -48,7 +46,6 @@ const CharacterSkills = () => {
   } = useQuery({
     queryKey: ["status", characterID],
     queryFn: () => loadCharacterStatus(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
   });
   const mainCharacterId = statusData?.main?.character_id;
 

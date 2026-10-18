@@ -9,7 +9,6 @@ const CharacterPubData = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["pubdata", characterID],
     queryFn: () => loadPubData(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
   });
 
   return (

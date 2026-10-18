@@ -6,7 +6,6 @@ const Structures = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["structures"],
     queryFn: () => loadAllStructures(),
-    refetchOnWindowFocus: false,
     initialData: [],
   });
 

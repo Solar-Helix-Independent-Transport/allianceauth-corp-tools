@@ -13,7 +13,6 @@ const CorporationStatus = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["corp-status"],
     queryFn: () => loadStatus(),
-    refetchOnWindowFocus: false,
   });
 
   const columnHelper = createColumnHelper<CorpStatus>();

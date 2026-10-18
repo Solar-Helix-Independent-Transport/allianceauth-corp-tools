@@ -12,7 +12,6 @@ const CorpMenuAsync = () => {
       const api = await axios.get(`/audit/api/corp/menu`);
       return api.data;
     },
-    refetchOnWindowFocus: false,
   });
   if (!menuRoot) {
     return <></>;

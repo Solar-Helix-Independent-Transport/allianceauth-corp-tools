@@ -22,7 +22,6 @@ function StarbaseModal({
   const { data, isFetching } = useQuery({
     queryKey: ["starbase", starbase.starbase_id],
     queryFn: () => loadStarbaseFit(starbase.starbase_id ? Number(starbase.starbase_id) : 0),
-    refetchOnWindowFocus: false,
   });
   return (
     <Modal

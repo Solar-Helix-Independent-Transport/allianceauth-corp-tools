@@ -11,7 +11,6 @@ const CorporationMiningLedger = () => {
   const { data } = useQuery({
     queryKey: ["mining-ledger-corp", corporationID],
     queryFn: () => LoadAgregatedMining(Number(corporationID)),
-    refetchOnWindowFocus: false,
   });
 
   return (

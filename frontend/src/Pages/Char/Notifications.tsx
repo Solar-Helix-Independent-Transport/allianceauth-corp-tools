@@ -14,7 +14,6 @@ const CharacterNotifications = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["notification", characterID],
     queryFn: () => getCharacterNotifications(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
   const columnHelper = createColumnHelper<components["schemas"]["CharacterNotification"]>();
 

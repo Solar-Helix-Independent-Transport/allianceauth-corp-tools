@@ -19,7 +19,6 @@ function CharacterAssetModal({ item }: { item: components["schemas"]["CharacterA
     queryKey: ["assets", characterID, item.id],
     queryFn: () =>
       loadAssetContents(characterID ? Number(characterID) : 0, item.id ? Number(item.id) : 0),
-    refetchOnWindowFocus: false,
     enabled: show,
   });
 

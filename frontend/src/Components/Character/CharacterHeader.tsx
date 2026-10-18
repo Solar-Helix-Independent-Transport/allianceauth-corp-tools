@@ -34,7 +34,6 @@ const CharHeader = () => {
   const { data } = useQuery({
     queryKey: ["status", characterID],
     queryFn: () => loadCharacterStatus(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
   });
 
   const bad_chars =

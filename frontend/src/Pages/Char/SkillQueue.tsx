@@ -15,7 +15,6 @@ const CharacterSkillQueues = () => {
   const { isLoading, isFetching, error, data } = useQuery({
     queryKey: ["skills", "queue", characterID],
     queryFn: () => getCharacterSkillQueues(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
   });
 
   const [activeFilter, setActive] = useState(true);

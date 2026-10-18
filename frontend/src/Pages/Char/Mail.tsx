@@ -20,7 +20,6 @@ const CharacterMail = () => {
     queryKey: ["mail", characterID],
     queryFn: () => loadMail(Number(characterID)),
     initialData: [] as MailListItem[],
-    refetchOnWindowFocus: false,
   });
 
   const columnHelper = createColumnHelper<MailListItem>();

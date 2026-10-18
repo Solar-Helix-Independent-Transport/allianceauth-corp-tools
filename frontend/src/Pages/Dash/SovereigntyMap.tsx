@@ -6,7 +6,6 @@ const DashSovereigntyMap = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["sovhubmap-public"],
     queryFn: () => loadPublicSovHubMap(),
-    refetchOnWindowFocus: false,
     initialData: null,
   });
 

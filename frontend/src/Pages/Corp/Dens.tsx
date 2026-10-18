@@ -12,7 +12,6 @@ const Dens = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["dens"],
     queryFn: () => loadDens(),
-    refetchOnWindowFocus: false,
   });
 
   const columnHelper = createColumnHelper<Den>();

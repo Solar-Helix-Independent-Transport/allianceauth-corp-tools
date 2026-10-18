@@ -18,7 +18,6 @@ const CorporationAssetGroups = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["assetGroups", corporationID, locationID],
     queryFn: () => loadAssetGroups(Number(corporationID), Number(locationID)),
-    refetchOnWindowFocus: false,
   });
 
   return (

@@ -19,7 +19,6 @@ function MailModal({
   const { isFetching, error, data } = useQuery({
     queryKey: ["mailBody", msg_data?.character_id, msg_data?.mail_id],
     queryFn: () => getMailBody(msg_data?.character_id ?? 0, msg_data?.mail_id ?? 0),
-    refetchOnWindowFocus: false,
   });
 
   return (
@@ -38,7 +37,9 @@ function MailModal({
           <StrToFields strValue={msg_data?.from} text={t("From:")} />
           <StrToFields text={t("Labels:")}>
             <span style={{ overflowWrap: "anywhere" }}>
-              {msg_data?.labels.map((name) => <Badge style={{ marginLeft: "5px" }}>{name}</Badge>)}
+              {msg_data?.labels.map((name) => (
+                <Badge style={{ marginLeft: "5px" }}>{name}</Badge>
+              ))}
             </span>
           </StrToFields>
           <StrToFields text={t("Recipients:")}>

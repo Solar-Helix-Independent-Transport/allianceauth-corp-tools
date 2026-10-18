@@ -370,7 +370,13 @@ const FittingModalCircle = ({
 
 // ── EFT fit builder ───────────────────────────────────────────────────────────
 const SLOT_PREFIXES = ["HiSlot", "MedSlot", "LoSlot", "RigSlot", "ServiceSlot"] as const;
-const SLOT_FALLBACKS: Record<string, number> = { HiSlot: 8, MedSlot: 8, LoSlot: 8, RigSlot: 3, ServiceSlot: 6 };
+const SLOT_FALLBACKS: Record<string, number> = {
+  HiSlot: 8,
+  MedSlot: 8,
+  LoSlot: 8,
+  RigSlot: 3,
+  ServiceSlot: 6,
+};
 const SLOT_DATA_KEY: Record<string, "high" | "med" | "low" | "rig" | "service"> = {
   HiSlot: "high",
   MedSlot: "med",
@@ -421,7 +427,6 @@ export const FittingModal = ({
   const { data, isFetching } = useQuery({
     queryKey: ["glances", "account", ship.id],
     queryFn: () => loadStructureFit(ship.id ? Number(ship.id) : 0),
-    refetchOnWindowFocus: false,
   });
 
   return <FittingModalBase {...{ ship, data, showModal, setShowModal, isFetching }} />;

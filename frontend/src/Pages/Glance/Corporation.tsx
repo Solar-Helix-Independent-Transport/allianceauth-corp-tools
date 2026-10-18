@@ -14,7 +14,6 @@ export const CorporationGlancesInfo = ({ corporationID = 0 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "corporation", "status", corporationID],
     queryFn: () => loadCorpGlanceStatusData(corporationID),
-    refetchOnWindowFocus: false,
   });
 
   return (

@@ -13,7 +13,6 @@ const CharacterMarket = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["market", characterID],
     queryFn: () => getCharacterMarket(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
   const columnHelper = createColumnHelper<components["schemas"]["CharacterOrder"]>();
 

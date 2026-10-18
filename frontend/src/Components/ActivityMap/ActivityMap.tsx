@@ -61,7 +61,6 @@ const ActivityMap = ({
   const { data, isFetching } = useQuery({
     queryKey: [queryKeyPrefix, id, dataSource.value],
     queryFn: () => dataSource.load(id),
-    refetchOnWindowFocus: false,
     placeholderData: keepPreviousData,
   });
 

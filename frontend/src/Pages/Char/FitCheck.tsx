@@ -27,7 +27,6 @@ const CharacterFitCheck = () => {
       const out = getFitCheck(fit, characterID ? Number(characterID) : 0);
       return out as unknown as Promise<FitCheckResponse>;
     },
-    refetchOnWindowFocus: false,
     enabled: false,
     retry: false,
     throwOnError: false, // shown below, so the fit box stays usable

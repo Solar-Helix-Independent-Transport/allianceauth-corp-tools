@@ -12,7 +12,6 @@ const CorporationPocos = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["pocos"],
     queryFn: () => loadAllPocos(),
-    refetchOnWindowFocus: false,
   });
 
   const columnHelper = createColumnHelper<Poco>();

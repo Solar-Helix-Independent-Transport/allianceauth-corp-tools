@@ -15,7 +15,6 @@ const CharacterRoles = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["roles", characterID],
     queryFn: () => getCharacterRoles(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
   const columnHelper = createColumnHelper<components["schemas"]["CharacterRoles"]>();
 

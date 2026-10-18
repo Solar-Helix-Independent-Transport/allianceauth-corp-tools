@@ -18,7 +18,6 @@ const CharacterWallet = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["wallet", characterID],
     queryFn: () => loadWallet(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
   const columnHelper = createColumnHelper<components["schemas"]["CharacterWalletEvent"]>();
 

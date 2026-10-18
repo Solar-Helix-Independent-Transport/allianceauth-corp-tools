@@ -13,7 +13,6 @@ const CharacterLP = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["LP", characterID],
     queryFn: () => getCharacterLP(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
   const columnHelper = createColumnHelper<components["schemas"]["LoyaltyPoints"]>();
 

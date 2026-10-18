@@ -12,7 +12,6 @@ const CharacterMiningLedger = () => {
   const { data } = useQuery({
     queryKey: ["mining-ledger", characterID],
     queryFn: () => loadMining(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
   return data ? <LedgerGraph {...{ data }} /> : <PanelLoader />;
 };

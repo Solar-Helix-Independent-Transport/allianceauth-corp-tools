@@ -114,7 +114,6 @@ export const CharacterGlancesFactions = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "faction", characterID],
     queryFn: () => loadGlanceFactionData(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
   });
   return <Factions {...{ data, isLoading }} />;
 };
@@ -123,7 +122,6 @@ export const CorporationGlancesFactions = ({ corporationID = 0 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "corp", "faction", corporationID],
     queryFn: () => loadCorpGlanceFactionData(corporationID),
-    refetchOnWindowFocus: false,
   });
   return <Factions {...{ data, isLoading }} />;
 };

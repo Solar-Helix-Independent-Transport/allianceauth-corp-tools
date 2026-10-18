@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { AxiosError } from "axios";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { postAccountRefresh } from "../api/character";
 import { RefreshCharButton } from "./RefreshAccountButton";
 
@@ -10,7 +11,7 @@ vi.mock("../api/character", () => ({
 }));
 
 const renderButton = () => {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const queryClient = new QueryClient();
   return render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={["/7"]}>
@@ -23,7 +24,11 @@ const renderButton = () => {
 };
 
 describe("RefreshCharButton", () => {
-  it("does nothing until clicked (the query is disabled by default)", () => {
+  beforeEach(() => {
+    vi.mocked(postAccountRefresh).mockReset();
+  });
+
+  it("does nothing until clicked", () => {
     renderButton();
     expect(postAccountRefresh).not.toHaveBeenCalled();
   });
@@ -35,5 +40,32 @@ describe("RefreshCharButton", () => {
     fireEvent.click(screen.getByRole("button"));
 
     await vi.waitFor(() => expect(postAccountRefresh).toHaveBeenCalledWith(7));
+  });
+
+  it("posts once per click, with no retries when it fails", async () => {
+    vi.mocked(postAccountRefresh).mockRejectedValue(new AxiosError("boom"));
+
+    renderButton();
+    const button = screen.getByRole("button");
+    fireEvent.click(button);
+
+    await vi.waitFor(() => expect(button).toHaveClass("btn-danger"));
+    expect(postAccountRefresh).toHaveBeenCalledTimes(1);
+  });
+
+  it("is disabled and spinning while the refresh is in flight", async () => {
+    vi.mocked(postAccountRefresh).mockReturnValue(new Promise(() => {}));
+
+    renderButton();
+    const button = screen.getByRole("button");
+    fireEvent.click(button);
+
+    await vi.waitFor(() => expect(button).toBeDisabled());
+    expect(button.querySelector("i")?.className).not.toContain("false");
+  });
+
+  it("has no stray class when idle", () => {
+    renderButton();
+    expect(screen.getByRole("button").querySelector("i")?.className).not.toContain("false");
   });
 });

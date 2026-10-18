@@ -12,7 +12,6 @@ const CharMenuAsync = () => {
       const api = await axios.get(`/audit/api/account/menu`);
       return api.data;
     },
-    refetchOnWindowFocus: false,
   });
   if (!menuRoot) {
     return <></>;

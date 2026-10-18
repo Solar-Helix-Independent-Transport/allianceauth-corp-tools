@@ -6,7 +6,6 @@ const CorporationSovereigntyMap = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["sovhubmap"],
     queryFn: () => loadSovHubMap(),
-    refetchOnWindowFocus: false,
     initialData: null,
   });
 

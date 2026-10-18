@@ -25,7 +25,6 @@ const CorpSelect = ({ includeAllOption = false }: { includeAllOption?: boolean }
   const { data: statusData } = useQuery({
     queryKey: ["status", "0"],
     queryFn: () => loadCharacterStatus(0),
-    refetchOnWindowFocus: false,
   });
   const mainCorporationId = statusData?.main?.corporation_id;
   const [cidStr, setCid] = useQueryState("cid");

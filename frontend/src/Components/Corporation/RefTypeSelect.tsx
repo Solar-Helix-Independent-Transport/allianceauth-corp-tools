@@ -15,7 +15,6 @@ const RefTypeSelect = ({ setFilter }: { setFilter: (value: string) => void }) =>
     queryKey: ["ref_types", 0],
     queryFn: () => loadRefTypes(),
     initialData: [] as RefTypeOption[],
-    refetchOnWindowFocus: false,
   });
   const [baseQry, setRefQry] = useQueryState("refs");
 

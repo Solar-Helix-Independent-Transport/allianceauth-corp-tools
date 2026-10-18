@@ -13,7 +13,6 @@ const AccountList = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["list"],
     queryFn: () => getCharacterList(),
-    refetchOnWindowFocus: false,
   });
   const columnHelper = createColumnHelper<components["schemas"]["AccountStatus"]>();
 

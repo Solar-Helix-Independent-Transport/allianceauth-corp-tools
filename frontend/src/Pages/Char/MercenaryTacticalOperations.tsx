@@ -15,7 +15,6 @@ const CharacterMercenaryTacticalOperations = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["mercenarytacticaloperations", characterID],
     queryFn: () => getCharacterMercenaryTacticalOperations(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
 
   const columnHelper =

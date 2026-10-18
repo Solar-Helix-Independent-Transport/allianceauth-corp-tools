@@ -21,7 +21,6 @@ const CorporationWalletTable = ({
   const { data, isFetching } = useQuery({
     queryKey: ["wallet", corporationID, refTypes, page],
     queryFn: () => loadWallet(Number(corporationID), refTypes, page),
-    refetchOnWindowFocus: false,
     initialData: [] as components["schemas"]["CorporationWalletEvent"][],
   });
 

@@ -15,7 +15,6 @@ const CharacterAssetLocationSelect = ({
   const { isLoading, data } = useQuery({
     queryKey: ["asset_loc", characterID],
     queryFn: () => loadAssetLocations(characterID),
-    refetchOnWindowFocus: false,
   });
 
   return (

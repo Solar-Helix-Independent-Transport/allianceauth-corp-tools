@@ -18,7 +18,6 @@ const AsyncTable = <TData,>({
   const { data, isFetching } = useQuery({
     queryKey: [apiQueryKey, ...apiParams],
     queryFn: () => apiEndpoint(apiParams),
-    refetchOnWindowFocus: false,
     initialData: [],
   });
 

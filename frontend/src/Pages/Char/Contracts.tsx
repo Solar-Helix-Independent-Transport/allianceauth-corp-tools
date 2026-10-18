@@ -19,7 +19,6 @@ const CharacterContracts = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["contracts", characterID],
     queryFn: () => getCharacterContracts(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
   const columnHelper = createColumnHelper<components["schemas"]["CharacterContract"]>();
 

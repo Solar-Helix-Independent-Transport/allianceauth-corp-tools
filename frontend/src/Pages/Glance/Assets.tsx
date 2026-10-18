@@ -196,7 +196,6 @@ export const CharacterGlancesAssets = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "assets", characterID],
     queryFn: () => loadGlanceAssetData(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
   });
   return (
     <>
@@ -211,7 +210,6 @@ export const CorporationGlancesAssets = ({ corporationID = 0 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "corp", "assets", corporationID],
     queryFn: () => loadCorpGlanceAssetData(corporationID),
-    refetchOnWindowFocus: false,
   });
 
   return (

@@ -25,7 +25,6 @@ const CharacterAssets = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["assetList", characterID, location_id],
     queryFn: () => loadAssetList(Number(characterID), location_id),
-    refetchOnWindowFocus: false,
     initialData: { characters: [], main: undefined, headers: [] },
   });
 

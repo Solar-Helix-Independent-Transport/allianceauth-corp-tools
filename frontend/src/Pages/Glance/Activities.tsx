@@ -146,7 +146,6 @@ const ActivitiesRatting = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "ratting", characterID],
     queryFn: () => loadGlanceRattingData(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
   });
 
   return <Ratting {...{ data, isLoading }} />;
@@ -158,7 +157,6 @@ export const CharacterGlancesActivities = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "activities", characterID],
     queryFn: () => loadGlanceActivityData(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
   });
 
   const { t } = useTranslation();
@@ -182,7 +180,6 @@ export const CharacterGlancesActivityHeatmap = () => {
   const { data } = useQuery({
     queryKey: ["glances", "activity_heatmap", characterID],
     queryFn: () => loadGlanceActivityHeatmapData(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
   });
 
   if (!data || (!data.cells.length && !data.mining.length && !data.ratting.length)) return null;
@@ -203,7 +200,6 @@ export const CorporationGlancesActivitiesPVE = ({ corporationID = 0 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "corp", "pve", corporationID],
     queryFn: () => loadCorpGlanceActivityDataPVE(corporationID),
-    refetchOnWindowFocus: false,
   });
 
   return <ActivitiesPVE {...{ data, isLoading }} />;
@@ -213,7 +209,6 @@ export const CorporationGlancesActivitiesEco = ({ corporationID = 0 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "corp", "eco", corporationID],
     queryFn: () => loadCorpGlanceActivityDataEco(corporationID),
-    refetchOnWindowFocus: false,
   });
 
   return <ActivitiesEco {...{ data, isLoading }} />;
@@ -223,7 +218,6 @@ export const CorporationGlancesActivitiesMining = ({ corporationID = 0 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "corp", "ore", corporationID],
     queryFn: () => loadCorpGlanceActivityDataMining(corporationID),
-    refetchOnWindowFocus: false,
   });
 
   return <ActivitiesMining {...{ data, isLoading }} />;

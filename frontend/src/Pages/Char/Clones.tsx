@@ -20,7 +20,6 @@ const CharacterClones = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["clones", characterID],
     queryFn: () => getCharacterClones(Number(characterID)),
-    refetchOnWindowFocus: false,
   });
   const columnHelper = createColumnHelper<components["schemas"]["CharacterClones"]>();
 

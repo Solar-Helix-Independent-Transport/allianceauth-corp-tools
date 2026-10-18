@@ -28,7 +28,6 @@ const CorporationStarbases = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["starbases"],
     queryFn: () => LoadAllStarbases(),
-    refetchOnWindowFocus: false,
   });
 
   const columnHelper = createColumnHelper<Starbase>();

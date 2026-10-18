@@ -16,7 +16,6 @@ function CorporationAssetModal({ item }: { item: components["schemas"]["AssetIte
   const { data, isFetching } = useQuery({
     queryKey: ["assets-corp", item.id],
     queryFn: () => loadAssetContents(item.id ? Number(item.id) : 0),
-    refetchOnWindowFocus: false,
     enabled: show,
   });
   return (

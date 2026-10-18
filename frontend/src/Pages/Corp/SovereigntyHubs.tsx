@@ -6,7 +6,6 @@ const SovereigntyHubs = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["sovhubs"],
     queryFn: () => loadSovHubs(),
-    refetchOnWindowFocus: false,
     initialData: [],
   });
 

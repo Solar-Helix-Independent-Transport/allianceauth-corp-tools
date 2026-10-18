@@ -19,7 +19,6 @@ export const CharacterGlancesAccount = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["glances", "account", characterID],
     queryFn: () => loadCharacterStatus(characterID ? Number(characterID) : 0),
-    refetchOnWindowFocus: false,
   });
 
   const isk =
