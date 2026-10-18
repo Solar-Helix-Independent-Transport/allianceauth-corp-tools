@@ -20,3 +20,19 @@ export const getCatApi = () => {
     headers: { "x-csrftoken": csrf ? csrf : "" },
   });
 };
+
+/** A failed API call, keeping the HTTP status - openapi-fetch's `error` is
+ * just the parsed response body. */
+export class ApiError extends Error {
+  status: number;
+  body: unknown;
+
+  constructor(response: Response, body: unknown) {
+    const detail =
+      body && typeof body === "object" && "detail" in body ? String(body.detail) : undefined;
+    super(detail ?? response.statusText ?? `HTTP ${response.status}`);
+    this.name = "ApiError";
+    this.status = response.status;
+    this.body = body;
+  }
+}

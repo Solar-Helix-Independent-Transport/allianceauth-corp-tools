@@ -7,7 +7,7 @@ import Button from "react-bootstrap/Button";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
-import { PanelLoader } from "../../Components/Loaders/loaders";
+import { ErrorLoader, PanelLoader } from "../../Components/Loaders/loaders";
 
 // getFitCheck's OpenAPI schema is under-specified (loose object), so the
 // response is asserted to the shape this page actually consumes.
@@ -21,7 +21,7 @@ const CharacterFitCheck = () => {
   const { characterID } = useParams();
 
   const [fit, setFit] = useState("");
-  const { data, refetch, isFetching, isFetched } = useQuery({
+  const { data, error, refetch, isFetching, isFetched } = useQuery({
     queryKey: ["getFitCheck", fit, characterID],
     queryFn: () => {
       const out = getFitCheck(fit, characterID ? Number(characterID) : 0);
@@ -29,6 +29,8 @@ const CharacterFitCheck = () => {
     },
     refetchOnWindowFocus: false,
     enabled: false,
+    retry: false,
+    throwOnError: false, // shown below, so the fit box stays usable
   });
 
   function fitUpdate(event: ChangeEvent<HTMLTextAreaElement>) {
@@ -126,7 +128,9 @@ const CharacterFitCheck = () => {
         </table>
       </div>
 
-      {!isFetching && isFetched ? (
+      {!isFetching && error ? (
+        <ErrorLoader title={t("Unable to check this fit")} message={error.message} />
+      ) : !isFetching && isFetched ? (
         <>
           <div className="row">
             <div className="col-sm-6 col-lg-4 col-xl-3">

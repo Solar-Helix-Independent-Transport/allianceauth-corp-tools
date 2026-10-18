@@ -4,7 +4,7 @@ import { BridgePair } from "../Components/Corporation/BridgeTypes";
 import { StructureType } from "../Components/Corporation/Structures";
 import { Den } from "../Components/Corporation/DenTypes";
 import { Poco } from "../Components/Corporation/PocoTypes";
-import { getCatApi, GetEndpoint } from "./Api";
+import { ApiError, getCatApi, GetEndpoint } from "./Api";
 import { components } from "./CtApi";
 import type { ActivityMapResponse } from "../Components/ActivityMap/types";
 import type { MiningLedgerData } from "../Components/Graphs/LedgerGraph";
@@ -26,9 +26,9 @@ export async function getCorporationEndpoint<Endpoint extends GetEndpoint>(
   // corporation endpoint takes exactly {corporation_id} as its path param,
   // but TS can't verify that generically from inside this function body.
   // @ts-expect-error - init shape is correct for every concrete Endpoint this is called with
-  const { data, error } = await GET(endpoint, init);
+  const { data, error, response } = await GET(endpoint, init);
   if (error) {
-    throw error;
+    throw new ApiError(response, error);
   }
   return data;
 }

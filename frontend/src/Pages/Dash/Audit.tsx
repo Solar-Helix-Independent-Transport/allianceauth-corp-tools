@@ -1,6 +1,6 @@
 import { Col } from "react-bootstrap";
 import { Outlet } from "react-router";
-import ErrorBoundary from "../../Components/Helpers/ErrorBoundary";
+import PageErrorBoundary from "../../Components/Helpers/PageErrorBoundary";
 
 // Deliberately no CorpMenuPortal/CorpMenuRight here (unlike Pages/Corp/Audit)
 // - this area isn't scoped to one selected corp, it's a single alliance-wide
@@ -8,9 +8,9 @@ import ErrorBoundary from "../../Components/Helpers/ErrorBoundary";
 const DashAudit = () => {
   return (
     <Col>
-      <ErrorBoundary>
+      <PageErrorBoundary>
         <Outlet />
-      </ErrorBoundary>
+      </PageErrorBoundary>
     </Col>
   );
 };

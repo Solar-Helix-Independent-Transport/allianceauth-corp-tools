@@ -14,6 +14,7 @@ export const RefreshCharButton = () => {
     },
     refetchOnWindowFocus: false,
     enabled: false,
+    throwOnError: false, // a failed refresh shouldn't replace the page
   });
   async function refreshChar() {
     return await refetch();

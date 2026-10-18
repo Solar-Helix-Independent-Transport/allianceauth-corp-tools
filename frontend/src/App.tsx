@@ -28,7 +28,8 @@ import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import React from "react";
 import { Card } from "react-bootstrap";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { createQueryClient } from "./queryClient";
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router";
 import { NuqsAdapter } from "nuqs/adapters/react-router/v8";
 
@@ -39,6 +40,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import CharacterWalletActivity from "./Pages/Char/WalletActivity";
 import CharacterMiningLedger from "./Pages/Char/MiningLedger";
 import { ErrorLoader } from "./Components/Loaders/loaders";
+import PageErrorBoundary from "./Components/Helpers/PageErrorBoundary";
 import Bridges from "./Pages/Corp/Bridges";
 import CorporationActivityMap from "./Pages/Corp/ActivityMap";
 import CorporationAssetGroups from "./Pages/Corp/AssetsGroups";
@@ -56,7 +58,7 @@ import DashSovereigntyMap from "./Pages/Dash/SovereigntyMap";
 
 TimeAgo.addDefaultLocale(en);
 
-const queryClient = new QueryClient();
+const queryClient = createQueryClient();
 
 i18n
   .use(Backend)
@@ -95,98 +97,101 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <Router>
           <NuqsAdapter>
-            <Routes>
-              <Route path="audit/r/:characterID/" element={<CharacterAudit />}>
-                <Route index element={<Navigate to="account/overview" replace />} />
-                <Route path="account/overview" element={<CharacterOverview />} />
-                <Route path="account/status" element={<CharacterStatus />} />
-                <Route path="account/assets" element={<CharacterAssetGroups />} />
-                <Route path="account/listassets" element={<CharacterAssets />} />
-                <Route path="account/activitymap" element={<CharacterActivityMap />} />
-                <Route path="account/pubdata" element={<CharacterPubData />} />
-                <Route path="account/clones" element={<CharacterClones />} />
-                <Route path="account/mercenarydens" element={<CharacterMercenaryDens />} />
-                <Route
-                  path="account/mercenarytacticaloperations"
-                  element={<CharacterMercenaryTacticalOperations />}
-                />
-                <Route path="account/roles" element={<CharacterRoles />} />
-                <Route path="account/wallet" element={<CharacterWallet />} />
-                <Route path="account/mail" element={<CharacterMail />} />
-                <Route path="account/mining" element={<CharacterMiningLedger />} />
-                <Route path="account/lp" element={<CharacterLP />} />
-                <Route path="account/walletactivity" element={<CharacterWalletActivity />} />
-                <Route path="account/notifications" element={<CharacterNotifications />} />
-                <Route path="account/contact" element={<CharacterContacts />} />
-                <Route path="account/contract" element={<CharacterContracts />} />
-                <Route path="account/skills" element={<CharacterSkills />} />
-                <Route path="account/skillqueue" element={<CharacterSkillQueues />} />
-                <Route path="account/doctrines" element={<CharacterDoctrine />} />
-                <Route path="account/fitcheck" element={<CharacterFitCheck />} />
-                <Route path="account/market" element={<Market />} />
-                <Route
-                  path="account/standings"
-                  element={
-                    <Card>
-                      <Card.Body className="text-center">
-                        {t("This is account/standings.")}
-                      </Card.Body>
-                    </Card>
-                  }
-                />
-                <Route path="account/list" element={<AccountList />} />
-                <Route
-                  path="*"
-                  element={
-                    <ErrorLoader
-                      title={t("Error 404")}
-                      message={t("This is not the path you are looking for! Page not found.")}
-                    />
-                  }
-                />
-              </Route>
-              <Route path="audit/r/corp/" element={<CorporationAudit />}>
-                <Route index element={<Navigate to="glance" replace />} />
-                <Route path="corporations" element={<CorporationStatus />} />
-                <Route path="glance" element={<CorporationAtAGlance />} />
-                <Route path="structures" element={<Structures />} />
-                <Route path="mining" element={<CorporationMiningLedger />} />
-                <Route path="wallets" element={<CorporationWallets />} />
-                <Route path="assetgroup" element={<CorporationAssetGroups />} />
-                <Route path="assetlist" element={<CorporationAssets />} />
-                <Route path="activitymap" element={<CorporationActivityMap />} />
-                <Route path="pocos" element={<CorporationPocos />} />
-                <Route path="starbases" element={<CorporationStarbases />} />
-                <Route path="bridges" element={<Bridges />} />
-                <Route path="dens" element={<Dens />} />
-                <Route path="sovhubs" element={<CorporationSovereigntyHubs />} />
-                <Route path="sovmap" element={<CorporationSovereigntyMap />} />
-                {/* <Route path="fuel" element={<Bridges />} /> */}
-                <Route
-                  path="*"
-                  element={
-                    <ErrorLoader
-                      title={t("Error 404")}
-                      message={t("This is not the path you are looking for! Page not found.")}
-                    />
-                  }
-                />
-              </Route>
-              <Route path="audit/r/dash/" element={<DashAudit />}>
-                <Route index element={<Navigate to="sovmap" replace />} />
-                <Route path="sovmap" element={<DashSovereigntyMap />} />
-                <Route
-                  path="*"
-                  element={
-                    <ErrorLoader
-                      title={t("Error 404")}
-                      message={t("This is not the path you are looking for! Page not found.")}
-                    />
-                  }
-                />
-              </Route>
-              <Route path="*" element={<Navigate to="audit/r/0" replace />} />
-            </Routes>
+            {/* Last resort for errors outside a page, e.g. in a menu */}
+            <PageErrorBoundary>
+              <Routes>
+                <Route path="audit/r/:characterID/" element={<CharacterAudit />}>
+                  <Route index element={<Navigate to="account/overview" replace />} />
+                  <Route path="account/overview" element={<CharacterOverview />} />
+                  <Route path="account/status" element={<CharacterStatus />} />
+                  <Route path="account/assets" element={<CharacterAssetGroups />} />
+                  <Route path="account/listassets" element={<CharacterAssets />} />
+                  <Route path="account/activitymap" element={<CharacterActivityMap />} />
+                  <Route path="account/pubdata" element={<CharacterPubData />} />
+                  <Route path="account/clones" element={<CharacterClones />} />
+                  <Route path="account/mercenarydens" element={<CharacterMercenaryDens />} />
+                  <Route
+                    path="account/mercenarytacticaloperations"
+                    element={<CharacterMercenaryTacticalOperations />}
+                  />
+                  <Route path="account/roles" element={<CharacterRoles />} />
+                  <Route path="account/wallet" element={<CharacterWallet />} />
+                  <Route path="account/mail" element={<CharacterMail />} />
+                  <Route path="account/mining" element={<CharacterMiningLedger />} />
+                  <Route path="account/lp" element={<CharacterLP />} />
+                  <Route path="account/walletactivity" element={<CharacterWalletActivity />} />
+                  <Route path="account/notifications" element={<CharacterNotifications />} />
+                  <Route path="account/contact" element={<CharacterContacts />} />
+                  <Route path="account/contract" element={<CharacterContracts />} />
+                  <Route path="account/skills" element={<CharacterSkills />} />
+                  <Route path="account/skillqueue" element={<CharacterSkillQueues />} />
+                  <Route path="account/doctrines" element={<CharacterDoctrine />} />
+                  <Route path="account/fitcheck" element={<CharacterFitCheck />} />
+                  <Route path="account/market" element={<Market />} />
+                  <Route
+                    path="account/standings"
+                    element={
+                      <Card>
+                        <Card.Body className="text-center">
+                          {t("This is account/standings.")}
+                        </Card.Body>
+                      </Card>
+                    }
+                  />
+                  <Route path="account/list" element={<AccountList />} />
+                  <Route
+                    path="*"
+                    element={
+                      <ErrorLoader
+                        title={t("Error 404")}
+                        message={t("This is not the path you are looking for! Page not found.")}
+                      />
+                    }
+                  />
+                </Route>
+                <Route path="audit/r/corp/" element={<CorporationAudit />}>
+                  <Route index element={<Navigate to="glance" replace />} />
+                  <Route path="corporations" element={<CorporationStatus />} />
+                  <Route path="glance" element={<CorporationAtAGlance />} />
+                  <Route path="structures" element={<Structures />} />
+                  <Route path="mining" element={<CorporationMiningLedger />} />
+                  <Route path="wallets" element={<CorporationWallets />} />
+                  <Route path="assetgroup" element={<CorporationAssetGroups />} />
+                  <Route path="assetlist" element={<CorporationAssets />} />
+                  <Route path="activitymap" element={<CorporationActivityMap />} />
+                  <Route path="pocos" element={<CorporationPocos />} />
+                  <Route path="starbases" element={<CorporationStarbases />} />
+                  <Route path="bridges" element={<Bridges />} />
+                  <Route path="dens" element={<Dens />} />
+                  <Route path="sovhubs" element={<CorporationSovereigntyHubs />} />
+                  <Route path="sovmap" element={<CorporationSovereigntyMap />} />
+                  {/* <Route path="fuel" element={<Bridges />} /> */}
+                  <Route
+                    path="*"
+                    element={
+                      <ErrorLoader
+                        title={t("Error 404")}
+                        message={t("This is not the path you are looking for! Page not found.")}
+                      />
+                    }
+                  />
+                </Route>
+                <Route path="audit/r/dash/" element={<DashAudit />}>
+                  <Route index element={<Navigate to="sovmap" replace />} />
+                  <Route path="sovmap" element={<DashSovereigntyMap />} />
+                  <Route
+                    path="*"
+                    element={
+                      <ErrorLoader
+                        title={t("Error 404")}
+                        message={t("This is not the path you are looking for! Page not found.")}
+                      />
+                    }
+                  />
+                </Route>
+                <Route path="*" element={<Navigate to="audit/r/0" replace />} />
+              </Routes>
+            </PageErrorBoundary>
           </NuqsAdapter>
         </Router>
       </QueryClientProvider>

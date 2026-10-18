@@ -1,4 +1,4 @@
-import { getCatApi, GetEndpoint } from "./Api";
+import { ApiError, getCatApi, GetEndpoint } from "./Api";
 import type { components } from "./CtApi";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -20,9 +20,9 @@ export async function getCharacterEndpoint<Endpoint extends GetEndpoint>(
   // of possible Endpoints from inside this function body - callers get the
   // real, narrowed response type from `Endpoint` regardless.
   // @ts-expect-error - init shape is correct for every concrete Endpoint this is called with
-  const { data, error } = await GET(endpoint, init);
+  const { data, error, response } = await GET(endpoint, init);
   if (error) {
-    throw error;
+    throw new ApiError(response, error);
   }
   return data;
 }
@@ -238,9 +238,9 @@ export async function getFitCheck(body: string, characterID: number) {
 export async function getCharacterList() {
   const { GET } = getCatApi();
 
-  const { data, error } = await GET(`/audit/api/account/list`);
+  const { data, error, response } = await GET(`/audit/api/account/list`);
   if (error) {
-    throw error;
+    throw new ApiError(response, error);
   }
   return data;
 }
@@ -248,7 +248,7 @@ export async function getCharacterList() {
 export async function getAssetGroups(characterID: number, locationID: number) {
   const { GET } = getCatApi();
 
-  const { data, error } = await GET(
+  const { data, error, response } = await GET(
     `/audit/api/account/{character_id}/asset/{location_id}/groups`,
     {
       params: {
@@ -260,7 +260,7 @@ export async function getAssetGroups(characterID: number, locationID: number) {
     },
   );
   if (error) {
-    throw error;
+    throw new ApiError(response, error);
   }
   return data;
 }
