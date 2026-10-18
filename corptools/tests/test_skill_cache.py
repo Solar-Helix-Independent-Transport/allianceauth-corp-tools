@@ -27,7 +27,8 @@ from corptools.tasks.character.skills import cache_user_skill_list
 
 from . import CorptoolsTestCase
 
-BUILD = "corptools.task_helpers.skill_helpers.SkillListCache.check_skill_lists"
+# every build, single account or batch, reads skills through this once
+BUILD = "corptools.task_helpers.skill_helpers.SkillListCache._load_skill_tables"
 
 
 class TestSkillListCache(CorptoolsTestCase):
@@ -107,8 +108,12 @@ class TestSkillListCache(CorptoolsTestCase):
                 [self.user1, self.user2, self.user3])
 
         self.assertEqual(mock_lists.call_count, 1)
-        # only the two uncached users were built
-        self.assertEqual(mock_build.call_count, 2)
+        # the two uncached users are built together, in one pass over the
+        # skills - user1 is served from cache
+        self.assertEqual(mock_build.call_count, 1)
+        self.assertEqual(
+            set(mock_build.call_args[0][0]),
+            {self.char3.character_id, self.char5.character_id, self.char7.character_id})
         self.assertEqual(
             set(result), {self.user1.id, self.user2.id, self.user3.id})
         for data in result.values():

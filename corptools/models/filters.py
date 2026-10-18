@@ -882,18 +882,20 @@ class Skillfilter(FilterBase):
 
     def process_filter(self, user: User):
         try:  # avatar 11567
-            skills_list = providers.skills.get_and_cache_user(user.id)
-            skill_lists = self.required_skill_lists.all()
-            req_one = self.single_req_skill_lists.all()
-            if skill_lists.count() == 0 and req_one.count() == 0:
+            # Evaluate each list once - they used to be re-queried by every
+            # .count() below, on every user checked.
+            skill_lists = list(self.required_skill_lists.all())
+            req_one = list(self.single_req_skill_lists.all())
+            if not skill_lists and not req_one:
                 return False
+            skills_list = providers.skills.get_and_cache_user(user.id)
 
             skill_list_base = {}
             for skl in skill_lists:
                 skill_list_base[skl.name] = {}
                 skill_list_base[skl.name]['pass'] = False
 
-            if req_one.count() > 0:
+            if req_one:
                 skill_list_single = {}
                 for skl in req_one:
                     skill_list_single[skl.name] = {}
@@ -912,7 +914,7 @@ class Skillfilter(FilterBase):
                 for d_name, d_list in skill_list_base.items():
                     if len(skill_tables[char]["doctrines"][d_name]) == 1:
                         skill_list_base[d_name]['pass'] = True
-            if req_one.count() > 0:
+            if req_one:
                 single_pass = False
                 for char in skill_tables:
                     if main_id and skill_tables[char].get("character_id") == main_id:
@@ -925,7 +927,7 @@ class Skillfilter(FilterBase):
             result = True
             for skill_list, skills_result in skill_list_base.items():
                 result = result and skills_result['pass']
-            if req_one.count() > 0:
+            if req_one:
                 return result and single_pass
             else:
                 return result

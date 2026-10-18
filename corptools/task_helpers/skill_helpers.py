@@ -7,7 +7,6 @@ from hashlib import md5
 from eve_sde.models import TypeDogma
 
 # Django
-from django.contrib.auth.models import User
 from django.core.cache import cache
 
 # Alliance Auth
@@ -29,6 +28,9 @@ SKILL_CACHE_TIMEOUT_SECONDS = 60 * 60 * 24 * 7  # 7 days
 # changes. Skill changes are handled by cache_user_skill_list rebuilding
 # after a character's skills are refetched.
 SKILL_CACHE_USER_KEY = "SKILL_LISTS_v2_{}"
+
+# Keep `IN (...)` lists under DB parameter limits when building many accounts.
+_CHARACTER_CHUNK = 1000
 
 
 class SkillListCache():
@@ -65,17 +67,30 @@ class SkillListCache():
         cache.touch(account_key, SKILL_CACHE_TIMEOUT_SECONDS)
         return cached_skills
 
+    def _build_accounts(self, accounts, skill_lists, skill_list_hash):
+        """Build and cache several accounts at once ({key: [character_ids]}),
+        reading every account's skills in one pass instead of per account."""
+        tables = self._load_skill_tables(
+            {c for chars in accounts.values() for c in chars})
+        requirements = self._doctrine_requirements(skill_lists)
+        built = {}
+        for key, characters in accounts.items():
+            account_key = self._build_account_cache_key(characters)
+            mine = set(characters)
+            ordered = [c for c in tables if c in mine]
+            built[key] = {"doctrines": skill_list_hash,  # doctrines listed
+                          "characters": account_key,  # characters listed
+                          "skills_list": self._skill_tables_for(
+                              ordered, tables, requirements)}
+        cache.set_many(
+            {v["characters"]: json.dumps(v) for v in built.values()},
+            SKILL_CACHE_TIMEOUT_SECONDS
+        )
+        return built
+
     def _build_and_cache(self, characters, skill_lists, skill_list_hash):
-        account_key = self._build_account_cache_key(characters)
-        output_array = {"doctrines": skill_list_hash,  # doctrines listed
-                        "characters": account_key,  # characters listed
-                        "skills_list": self.check_skill_lists(
-                            skill_lists,
-                            characters
-                        )}
-        cache.set(account_key, json.dumps(output_array),
-                  SKILL_CACHE_TIMEOUT_SECONDS)
-        return output_array
+        return self._build_accounts(
+            {None: characters}, skill_lists, skill_list_hash)[None]
 
     def get_and_cache_users(self, users):
         linked_characters = CharacterOwnership.objects.filter(user__in=users).values(
@@ -90,71 +105,83 @@ class SkillListCache():
             user_chars[u['user_id']]['chars'].append(
                 u['character__character_id'])
 
+        missing = {}
         for u, c in user_chars.items():
             account_key = self._build_account_cache_key(c['chars'])
             c['data'] = self._get_cached(account_key, skill_list_hash)
             if c['data'] is None:
-                c['data'] = self._build_and_cache(
-                    c['chars'], skill_lists, skill_list_hash)
+                missing[u] = c['chars']
+
+        if missing:
+            for u, data in self._build_accounts(
+                    missing, skill_lists, skill_list_hash).items():
+                user_chars[u]['data'] = data
 
         return user_chars
 
-    def check_skill_lists(self, skill_lists, linked_characters):
-        # build the arrays
+    def _load_skill_tables(self, character_ids):
+        """Per character {character_id: table} of trained skills and the
+        highest queued level per skill. Reads plain values rather than model
+        instances - building ~5 objects per skill row (with select_related)
+        was nearly all of the cost of a rebuild."""
         from ..models import Skill, SkillQueue
 
-        skills = Skill.objects.filter(
-            character__character__character_id__in=linked_characters
-        ).select_related(
-            'skill_name',
-            'skill_name__group',
-            'character__character'
-        ).order_by(
-            'skill_name__name'
-        )
-
-        skill_tables = {}
-        skill_list_base = {}
-
-        for skill in skills:
-            char = skill.character.character.character_name
-            grp = skill.skill_name.group.name_en
-            if char not in skill_tables:
-                skill_tables[char] = {
-                    "character_id": skill.character.character.character_id,
-                    "omega": True,
-                    "skills": {},
-                    "queue": {}
+        character_ids = list(character_ids)
+        tables = {}
+        for i in range(0, len(character_ids), _CHARACTER_CHUNK):
+            chunk = character_ids[i:i + _CHARACTER_CHUNK]
+            for (char_id, char_name, skill, grp, sp, active, trained) in Skill.objects.filter(
+                character__character__character_id__in=chunk
+            ).order_by(
+                'skill_name__name'
+            ).values_list(
+                'character__character__character_id',
+                'character__character__character_name',
+                'skill_name__name_en',
+                'skill_name__group__name_en',
+                'skillpoints_in_skill',
+                'active_skill_level',
+                'trained_skill_level',
+            ):
+                if char_id not in tables:
+                    tables[char_id] = {
+                        "name": char_name,
+                        "character_id": char_id,
+                        "omega": True,
+                        "skills": {},
+                        "queue": {}
+                    }
+                tables[char_id]["skills"][skill] = {
+                    "grp": grp,
+                    "sp_total": sp,
+                    "active_level": active,
+                    "trained_level": trained,
                 }
+                if trained != active:  # Skill.alpha
+                    tables[char_id]["omega"] = False
 
-            skill_tables[char]["skills"][skill.skill_name.name_en] = {
-                "grp": grp,
-                "sp_total": skill.skillpoints_in_skill,
-                "active_level": skill.active_skill_level,
-                "trained_level": skill.trained_skill_level,
-            }
+            # Highest queued finish_level per skill, per character - a skill can
+            # appear multiple times in the queue for successive levels, and the
+            # doctrine check only cares about where the queue will leave it.
+            for char_id, skill, finish_level in SkillQueue.objects.filter(
+                character__character__character_id__in=chunk,
+                skill_name__isnull=False,
+            ).values_list(
+                'character__character__character_id',
+                'skill_name__name_en',
+                'finish_level',
+            ):
+                if char_id not in tables:
+                    continue  # no trained skills at all - nothing to check against
+                queue = tables[char_id]["queue"]
+                queue[skill] = max(queue.get(skill, 0), finish_level)
+        return tables
 
-            if skill.alpha:
-                skill_tables[char]["omega"] = False
-
-        # Highest queued finish_level per skill, per character - a skill can
-        # appear multiple times in the queue for successive levels, and the
-        # doctrine check only cares about where the queue will leave it.
-        queue_entries = SkillQueue.objects.filter(
-            character__character__character_id__in=linked_characters,
-            skill_name__isnull=False,
-        ).select_related('skill_name', 'character__character')
-
-        for entry in queue_entries:
-            char = entry.character.character.character_name
-            if char not in skill_tables:
-                continue  # no trained skills at all - nothing to check against
-            skill_name = entry.skill_name.name_en
-            current = skill_tables[char]["queue"].get(skill_name, 0)
-            skill_tables[char]["queue"][skill_name] = max(
-                current, entry.finish_level)
-
+    def _doctrine_requirements(self, skill_lists):
+        """[(doctrine, total_sp, [(skill, level, sp for that level)])] - worked
+        out once per build, not once per character."""
         all_skill_sp = {}
+        skill_list_base = {}
         lists_skills = [(skl, skl.get_skills()) for skl in skill_lists]
 
         # One query for every skill's time constant, rather than one per
@@ -191,38 +218,78 @@ class SkillListCache():
 
             skill_list_base[skl.name] = _s
 
-        for char in skill_tables:
-            skill_tables[char]["doctrines"] = {}
-            for d_name, d_list in skill_list_base.items():
-                skill_tables[char]["doctrines"][d_name] = {
-                    "_meta": {
-                        "total_sp": 0,
-                        "trained_sp": 0
-                    }
-                }
-                for skill, level in d_list.items():
-                    level = int(level)
-                    trained_skill = skill_tables[char]["skills"].get(skill, {})
-                    skill_sp = all_skill_sp[d_name].get(skill, 0)
-                    skill_tables[char]["doctrines"][d_name]["_meta"]["total_sp"] += skill_sp
-                    if level > trained_skill.get('active_level', 0):
-                        skill_tables[char]["doctrines"][d_name][skill] = level
-                        if trained_skill.get('trained_level', 0) == trained_skill.get('active_level', 0):
-                            skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += trained_skill.get(
-                                'sp_total', 0)
-                        if trained_skill.get('active_level', 0) < trained_skill.get('trained_level', 0):
-                            skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += skill_sp
-                    else:
-                        skill_tables[char]["doctrines"][d_name]["_meta"]["trained_sp"] += skill_sp
+        requirements = []
+        for d_name, d_list in skill_list_base.items():
+            sps = all_skill_sp.get(d_name, {})
+            skills = [
+                (skill, int(level), sps.get(skill, 0))
+                for skill, level in (d_list or {}).items()
+            ]
+            requirements.append(
+                (d_name, sum(sp for _, _, sp in skills), skills))
+        return requirements
 
-        # Join them all and ship it.
+    def _apply_doctrines(self, table, requirements):
+        """The doctrine results for one character's skill table.
+
+        Per required skill at `level` (worth `sp` at that level):
+        - usable at or above `level`: counts `sp` as trained.
+        - below it: listed as missing, and counts what is trained so far -
+          `sp` if alpha-limited but trained higher, else the skill's own SP.
+        """
+        # (active, trained, sp_total) per skill, looked up once
+        levels = {
+            name: (s["active_level"], s["trained_level"], s["sp_total"])
+            for name, s in table["skills"].items()
+        }
+        untrained = (0, 0, 0)
+        doctrines = {}
+        for d_name, total_sp, skills in requirements:
+            meta = {"total_sp": total_sp, "trained_sp": 0}
+            result = {"_meta": meta}  # first, as before
+            trained_sp = 0
+            for skill, level, sp in skills:
+                active, trained, sp_total = levels.get(skill, untrained)
+                if level > active:
+                    result[skill] = level
+                    if trained == active:
+                        trained_sp += sp_total
+                    elif active < trained:
+                        trained_sp += sp
+                else:
+                    trained_sp += sp
+            meta["trained_sp"] = trained_sp
+            doctrines[d_name] = result
+        return doctrines
+
+    def _skill_tables_for(self, character_ids, tables, requirements):
+        """{character_name: table with doctrines} for one account."""
+        skill_tables = {}
+        for char_id in character_ids:
+            table = tables.get(char_id)
+            if table is None:
+                continue
+            skill_tables[table["name"]] = {
+                "character_id": table["character_id"],
+                "omega": table["omega"],
+                "skills": table["skills"],
+                "queue": table["queue"],
+                "doctrines": self._apply_doctrines(table, requirements),
+            }
         return skill_tables
+
+    def check_skill_lists(self, skill_lists, linked_characters):
+        tables = self._load_skill_tables(linked_characters)
+        return self._skill_tables_for(
+            list(tables),  # characters in the order their skills were read
+            tables,
+            self._doctrine_requirements(skill_lists),
+        )
 
     def get_and_cache_user(self, user_id, force_rebuild=False):
         linked_characters = list(
-            User.objects.get(
-                id=user_id
-            ).character_ownerships.all(
+            CharacterOwnership.objects.filter(
+                user_id=user_id
             ).values_list(
                 'character__character_id',
                 flat=True
