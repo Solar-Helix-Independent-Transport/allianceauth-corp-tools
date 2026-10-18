@@ -25,7 +25,7 @@ logger = get_extension_logger(__name__)
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_mercenary_dens"
 )
 @no_fail_chain
@@ -37,6 +37,7 @@ def update_char_mercenary_dens(self, character_id, force_refresh=False, chain=[]
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     name="corptools.tasks.update_mercenary_dens_for_den_holders"
 )
 def update_mercenary_dens_for_den_holders(self, force_refresh=False):
@@ -74,7 +75,7 @@ def update_mercenary_dens_for_den_holders(self, force_refresh=False):
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_mercenary_tactical_operations"
 )
 @no_fail_chain
@@ -86,6 +87,7 @@ def update_char_mercenary_tactical_operations(self, character_id, force_refresh=
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     name="corptools.tasks.update_mercenary_tactical_operations_for_den_holders"
 )
 def update_mercenary_tactical_operations_for_den_holders(self, force_refresh=False):

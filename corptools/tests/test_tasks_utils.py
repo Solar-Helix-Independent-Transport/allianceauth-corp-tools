@@ -4,8 +4,9 @@ from unittest.mock import MagicMock, call, patch
 
 # Third Party
 from aiopenapi3.errors import RequestError
-from celery import shared_task
+from celery import shared_task, states
 from celery.exceptions import Retry
+from celery.result import EagerResult
 from celery_once import AlreadyQueued
 from httpx2 import RequestError as httpx2_RequestError
 
@@ -127,6 +128,30 @@ class TestEnqueueNextTask(TestCase):
 
         self.assertEqual(sig1.apply_async.call_count, 1)
         self.assertEqual(sig2.apply_async.call_count, 1)
+
+    @patch("corptools.tasks.utils.signature")
+    def test_skips_graceful_rejected_and_enqueues_next(self, mock_sig_cls):
+        # QueueOnce(graceful=True) returns a REJECTED EagerResult instead of
+        # raising - that must not drop the rest of the chain.
+        sig1 = MagicMock()
+        sig1.kwargs = {}
+        sig1.apply_async.return_value = EagerResult(
+            None, None, states.REJECTED)
+
+        sig2 = MagicMock()
+        sig2.kwargs = {}
+
+        sig3 = MagicMock()
+        sig3.kwargs = {}
+
+        mock_sig_cls.side_effect = [sig1, sig2, sig3]
+
+        enqueue_next_task(["task1", "task2", "task3"])
+
+        self.assertEqual(sig1.apply_async.call_count, 1)
+        self.assertEqual(sig2.apply_async.call_count, 1)
+        self.assertEqual(sig2.kwargs["chain"], ["task3"])
+        sig3.apply_async.assert_not_called()
 
     @patch("corptools.tasks.utils.signature")
     def test_empty_chain_does_nothing(self, mock_sig_cls):

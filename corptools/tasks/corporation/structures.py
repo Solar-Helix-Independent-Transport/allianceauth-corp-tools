@@ -510,7 +510,7 @@ def corp_update_pocos(corp_id, full_update=False):
     return f"CT: Finished Pocos for: {audit_corp.corporation.corporation_name}"
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(bind=True, base=QueueOnce, once={"graceful": True})
 def build_jb_network(self):
     structures = Structure.objects.filter(type_id=35841).select_related(
         "corporation__corporation",

@@ -71,7 +71,7 @@ def update_all_characters(force_refresh=False, now=False):
         )
 
 
-@shared_task(bind=True, base=QueueOnce, name="corptools.tasks.update_subset_of_characters")
+@shared_task(bind=True, base=QueueOnce, once={"graceful": True}, name="corptools.tasks.update_subset_of_characters")
 def update_subset_of_characters(self, subset=48, min_runs=15, force=False):
     amount_of_updates = max(
         CharacterAudit.objects.all().count() // subset, min_runs)
@@ -96,7 +96,7 @@ def re_que_corp_histories():
     process_corp_histories.apply_async(priority=6)
 
 
-@shared_task(bind=True, base=QueueOnce, name="corptools.tasks.process_corp_histories")
+@shared_task(bind=True, base=QueueOnce, once={"graceful": True}, name="corptools.tasks.process_corp_histories")
 def process_corp_histories(self):
     after = timezone.now() - datetime.timedelta(
         hours=24 * (app_settings.CT_CHAR_MAX_INACTIVE_DAYS - 1)
@@ -128,7 +128,7 @@ def check_account(character_id):
         update_character.apply_async(args=[cid], priority=6)
 
 
-@shared_task(bind=True, base=QueueOnce, name="corptools.tasks.update_character")
+@shared_task(bind=True, base=QueueOnce, once={"graceful": True}, name="corptools.tasks.update_character")
 def update_character(self, char_id, force_refresh=False, now=False):
     character = CharacterAudit.objects.filter(
         character__character_id=char_id).first()

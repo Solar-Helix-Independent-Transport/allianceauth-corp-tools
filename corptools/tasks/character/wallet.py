@@ -28,7 +28,7 @@ logger = get_extension_logger(__name__)
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_wallet"
 )
 @no_fail_chain
@@ -52,7 +52,7 @@ def update_char_wallet(self, character_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_transactions"
 )
 @no_fail_chain
@@ -64,7 +64,7 @@ def update_char_transactions(self, character_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_orders"
 )
 @no_fail_chain
@@ -76,7 +76,7 @@ def update_char_orders(self, character_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_order_history"
 )
 @no_fail_chain
@@ -126,7 +126,7 @@ def update_char_contracts(self, character_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"keys": ["character_id", "entry_id"]},
+    once={"graceful": True, "keys": ["character_id", "entry_id"]},
     name="corptools.tasks.translate_char_wallet_bounty_text"
 )
 def update_char_wallet_bounty_text(self, character_id, entry_id, force_refresh=False):

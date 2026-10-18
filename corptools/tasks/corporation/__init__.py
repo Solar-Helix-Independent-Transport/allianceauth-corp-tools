@@ -28,6 +28,7 @@ logger = get_extension_logger(__name__)
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     name="corptools.tasks.update_corp_wallet"
 )
 @no_fail_chain
@@ -39,6 +40,7 @@ def update_corp_wallet(self, corp_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     name="corptools.tasks.update_corp_structures"
 )
 @no_fail_chain
@@ -50,6 +52,7 @@ def update_corp_structures(self, corp_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     name="corptools.tasks.update_corp_assets"
 )
 @esi_error_retry
@@ -60,6 +63,7 @@ def update_corp_assets(self, corp_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     name="corptools.tasks.update_corp_pocos"
 )
 @no_fail_chain
@@ -71,6 +75,7 @@ def update_corp_pocos(self, corp_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     name="corptools.tasks.update_corp_logins"
 )
 @no_fail_chain
@@ -82,6 +87,7 @@ def update_corp_logins(self, corp_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     name="corptools.tasks.update_corp_starbases"
 )
 @no_fail_chain
@@ -117,6 +123,7 @@ def update_corporate_contract_items(self, corp_id, contract_id, force_refresh=Fa
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     name="corptools.tasks.update_corp_contracts"
 )
 @no_fail_chain
@@ -145,6 +152,7 @@ def update_corp_contracts(self, corp_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     name="corptools.tasks.update_corp_industry_jobs"
 )
 @no_fail_chain
@@ -159,7 +167,7 @@ def update_corp_industry_jobs(self, corp_id: int, force_refresh: bool = False, c
     name="corptools.tasks.update_corp_sovereignty_hub_detail",
     once={
         "unlock_before_run": True,
-        "graceful": False,
+        "graceful": True,
         "keys": ["corp_id", "hub_id"]},
 )
 @rate_limited_task("120/15m", keys=["corp_id"])
@@ -181,6 +189,7 @@ def update_corp_sovereignty_hub_detail(self, corp_id: int, hub_id: int, force_re
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     name="corptools.tasks.update_corp_sovereignty_hubs"
 )
 @no_fail_chain

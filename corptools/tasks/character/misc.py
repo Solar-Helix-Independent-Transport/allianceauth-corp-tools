@@ -22,7 +22,7 @@ logger = get_extension_logger(__name__)
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_corp_history"
 )
 @no_fail_chain
@@ -34,7 +34,7 @@ def update_char_corp_history(self, character_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_roles"
 )
 @no_fail_chain
@@ -46,7 +46,7 @@ def update_char_roles(self, character_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_titles"
 )
 @no_fail_chain
@@ -58,7 +58,7 @@ def update_char_titles(self, character_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_location"
 )
 @no_fail_chain
@@ -70,7 +70,7 @@ def update_char_location(self, character_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_loyaltypoints"
 )
 @no_fail_chain
@@ -82,7 +82,7 @@ def update_char_loyaltypoints(self, character_id, force_refresh=False, chain=[])
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_industry_jobs"
 )
 @no_fail_chain
@@ -94,7 +94,7 @@ def update_char_industry_jobs(self, character_id, force_refresh=False, chain=[])
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_mining_ledger"
 )
 @no_fail_chain

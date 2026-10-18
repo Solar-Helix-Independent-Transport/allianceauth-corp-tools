@@ -14,7 +14,7 @@ logger = get_extension_logger(__name__)
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_clones"
 )
 @no_fail_chain

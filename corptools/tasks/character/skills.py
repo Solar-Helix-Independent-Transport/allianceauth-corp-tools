@@ -18,7 +18,7 @@ logger = get_extension_logger(__name__)
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_skill_list"
 )
 @no_fail_chain
@@ -30,7 +30,7 @@ def update_char_skill_list(self, character_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
+    once={"graceful": True, "keys": ["character_id"]},
     name="corptools.tasks.update_char_skill_queue"
 )
 @no_fail_chain
@@ -42,7 +42,7 @@ def update_char_skill_queue(self, character_id, force_refresh=False, chain=[]):
 @shared_task(
     bind=True,
     base=QueueOnce,
-    once={"keys": ["user_id"]},
+    once={"graceful": True, "keys": ["user_id"]},
     name="corptools.tasks.cache_user_skill_list"
 )
 @no_fail_chain

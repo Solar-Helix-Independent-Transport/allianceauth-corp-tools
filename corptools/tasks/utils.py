@@ -8,8 +8,9 @@ from typing import Any, Callable
 
 # Third Party
 from aiopenapi3.errors import RequestError as RequestError
-from celery import Task, signature
+from celery import Task, signature, states
 from celery.exceptions import Retry
+from celery.result import EagerResult
 from celery_once import AlreadyQueued
 from eve_sde.tasks import check_for_sde_updates
 from httpx2 import RequestError as httpx2_RequestError
@@ -44,17 +45,32 @@ def _needs_update(last_update, skip_date, force_refresh, min_date):
     return (last_update or min_date) <= skip_date or force_refresh
 
 
+def _was_rejected(result):
+    """
+        QueueOnce with graceful=True returns a REJECTED EagerResult instead of
+        raising AlreadyQueued. Only check EagerResult, `.state` on a real
+        AsyncResult would hit the result backend.
+    """
+    return isinstance(result, EagerResult) and result.state == states.REJECTED
+
+
 def enqueue_next_task(chain, delay=1):
     """
         Queue next task, and attach the rest of the chain to it.
+        If the next task is already queued, skip it and try the one after,
+        so a duplicate never drops the rest of the chain.
     """
     while (len(chain)):
         _t = chain.pop(0)
         _t = signature(_t)
         _t.kwargs.update({"chain": chain})
         try:
-            _t.apply_async(priority=6, countdown=delay)
+            rejected = _was_rejected(
+                _t.apply_async(priority=6, countdown=delay)
+            )
         except AlreadyQueued:
+            rejected = True
+        if rejected:
             # skip this task as it is already in the queue
             logger.warning(f"Skipping task as its already queued {_t}")
             continue

@@ -325,7 +325,7 @@ def build_managed_asset_locations(self, corp_id, force_refresh: bool = True):
         location_name_id=F("location_id"))
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(bind=True, base=QueueOnce, once={"graceful": True})
 def fetch_coordiantes(self, corp_id, force_refresh: bool = False):
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id
@@ -452,7 +452,7 @@ def corp_update_asset_names(corp_id, force_refresh: bool = False):
     return f"CT: Finished corp asset names for: {audit_corp.corporation}"
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(bind=True, base=QueueOnce, once={"graceful": True})
 def run_ozone_levels(self, corp_id):
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id

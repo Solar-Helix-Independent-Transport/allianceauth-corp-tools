@@ -48,6 +48,7 @@ def update_all_eve_names(chunk=False):
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     max_retries=None,
     name="corptools.tasks.update_eve_name"
 )

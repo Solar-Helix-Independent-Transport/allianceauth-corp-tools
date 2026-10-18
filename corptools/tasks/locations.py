@@ -69,6 +69,7 @@ def set_location_cooloff(location_id):
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     max_retries=None,
     name="corptools.tasks.update_citadel_names"
 )
@@ -162,6 +163,7 @@ def update_missing_locations(location_id):
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     max_retries=None,
     name="corptools.tasks.update_location"
 )
@@ -215,6 +217,7 @@ def update_location(self, location_id, character_ids=None, force_citadel=False):
 @shared_task(
     bind=True,
     base=QueueOnce,
+    once={"graceful": True},
     name="corptools.tasks.update_all_locations"
 )
 @no_fail_chain
