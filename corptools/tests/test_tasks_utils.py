@@ -20,6 +20,7 @@ from django.utils import timezone
 from esi.exceptions import ESIBucketLimitException, HTTPClientError, HTTPServerError
 
 # AA Example App
+from corptools.esi_errors import error_budget_low
 from corptools.models import EveName
 from corptools.tasks.rate_limiting import TaskBucketLimitException, TaskRateLimitBucket
 from corptools.tasks.utils import (
@@ -419,8 +420,9 @@ class TestRateLimitedTask(TestCase):
         result = my_task(task, 42)
         self.assertEqual(result, "done-42")
 
+    @patch("corptools.tasks.utils.random", return_value=0)
     @patch("corptools.tasks.utils.rate_limiter")
-    def test_rate_limited_decrements_retries_and_calls_task_retry(self, mock_limiter):
+    def test_rate_limited_decrements_retries_and_calls_task_retry(self, mock_limiter, _mock_random):
         bucket = TaskRateLimitBucket("key", 10, 60)
         mock_limiter.check_bucket.side_effect = TaskBucketLimitException(
             bucket, reset=15)
@@ -436,8 +438,9 @@ class TestRateLimitedTask(TestCase):
         self.assertEqual(task.request.retries, 2)  # decremented by 1
         task.retry.assert_called_once_with(countdown=15)
 
+    @patch("corptools.tasks.utils.random", return_value=0)
     @patch("corptools.tasks.utils.rate_limiter")
-    def test_rate_limited_uses_reset_from_exception(self, mock_limiter):
+    def test_rate_limited_uses_reset_from_exception(self, mock_limiter, _mock_random):
         bucket = TaskRateLimitBucket("key", 5, 30)
         mock_limiter.check_bucket.side_effect = TaskBucketLimitException(
             bucket, reset=7)
@@ -449,6 +452,55 @@ class TestRateLimitedTask(TestCase):
         task = _mock_celery_task()
         my_task(task)
         task.retry.assert_called_once_with(countdown=7)
+
+    @patch("corptools.tasks.utils.random", return_value=1)
+    @patch("corptools.tasks.utils.rate_limiter")
+    def test_repeat_hits_back_off_exponentially_up_to_the_window(self, mock_limiter, _mock_random):
+        # 10/m -> one slot every 6s. Waiting tasks must not all retry on
+        # the same reset, or they wake together and only one gets through.
+        cache.clear()
+        bucket = TaskRateLimitBucket("key", 10, 60)
+        mock_limiter.check_bucket.side_effect = TaskBucketLimitException(
+            bucket, reset=2)
+
+        @rate_limited_task(rate="10/m")
+        def my_task(self):
+            return "done"
+
+        task = _mock_celery_task()
+        task.request.id = "task-a"
+        countdowns = []
+        for _ in range(5):
+            my_task(task)
+            countdowns.append(task.retry.call_args.kwargs["countdown"])
+
+        # reset + spread, spread = 6s * 2^hits capped at the 60s window
+        self.assertEqual(countdowns, [2 + 12, 2 + 24, 2 + 48, 2 + 60, 2 + 60])
+
+    @patch("corptools.tasks.utils.random", return_value=1)
+    @patch("corptools.tasks.utils.rate_limiter")
+    def test_backoff_is_tracked_per_task(self, mock_limiter, _mock_random):
+        cache.clear()
+        bucket = TaskRateLimitBucket("key", 10, 60)
+        mock_limiter.check_bucket.side_effect = TaskBucketLimitException(
+            bucket, reset=2)
+
+        @rate_limited_task(rate="10/m")
+        def my_task(self):
+            return "done"
+
+        busy = _mock_celery_task()
+        busy.request.id = "task-busy"
+        for _ in range(3):
+            my_task(busy)
+
+        fresh = _mock_celery_task()
+        fresh.request.id = "task-fresh"
+        my_task(fresh)
+
+        # a task hitting the limit for the first time isn't penalised by
+        # another task's backoff
+        self.assertEqual(fresh.retry.call_args.kwargs["countdown"], 2 + 12)
 
     @patch("corptools.tasks.utils.rate_limiter")
     def test_keys_none_uses_full_task_signature_for_bucket_key(self, mock_limiter):
@@ -514,3 +566,21 @@ class TestEsiErrorRetryIntegrityErrorRealTask(TestCase):
         # Every retry call should have included force_refresh=True in kwargs.
         for c in mock_sde.apply_async.call_args_list:
             self.assertEqual(c, call(priority=1))
+
+
+class TestErrorBudgetLow(TestCase):
+    def test_low_remaining_is_low(self):
+        self.assertTrue(error_budget_low({"x-esi-error-limit-remain": "10"}))
+
+    def test_healthy_remaining_is_not_low(self):
+        self.assertFalse(error_budget_low({"x-esi-error-limit-remain": "80"}))
+
+    def test_missing_or_garbage_header_is_not_low(self):
+        self.assertFalse(error_budget_low({}))
+        self.assertFalse(error_budget_low(None))
+        self.assertFalse(error_budget_low({"x-esi-error-limit-remain": "?"}))
+
+    def test_esi_420_flag_is_seen_by_location_and_name_tasks(self):
+        cache.clear()
+        set_error_flag(60)
+        self.assertTrue(get_error_count_flag())

@@ -92,6 +92,32 @@ def get_token(character_id: int, scopes: list) -> "Token":
         return False
 
 
+# Keep `IN (...)` lists under DB parameter limits (e.g. SQLite).
+_ID_LOOKUP_CHUNK = 1000
+
+
+def _known_ids(model, field, ids):
+    """Which of `ids` already exist as `model.field`, without loading the
+    whole table."""
+    ids = list({i for i in ids if i is not None})
+    known = set()
+    for i in range(0, len(ids), _ID_LOOKUP_CHUNK):
+        known.update(
+            model.objects.filter(
+                **{f"{field}__in": ids[i:i + _ID_LOOKUP_CHUNK]}
+            ).values_list(field, flat=True)
+        )
+    return known
+
+
+def _known_location_ids(location_ids):
+    return _known_ids(EveLocation, "location_id", location_ids)
+
+
+def _known_eve_ids(eve_ids):
+    return _known_ids(EveName, "eve_id", eve_ids)
+
+
 def update_character_location(character_id, force_refresh=False):
     audit_char = CharacterAudit.objects.get(
         character__character_id=character_id)
@@ -435,14 +461,14 @@ def update_character_assets(character_id, force_refresh=False):
             f"CT: New assets for: {audit_char.character.character_name}")
 
         _st = time.perf_counter()
-        location_names = list(
-            EveLocation.objects.all().values_list('location_id', flat=True))
+        location_names = _known_location_ids(
+            item.location_id for item in assets)
 
-        item_ids = []
+        item_ids = set()
         items = []
 
         for item in assets:
-            item_ids.append(item.item_id)
+            item_ids.add(item.item_id)
             asset_item = CharacterAsset.from_esi_model(audit_char, item)
 
             # attach location name
@@ -461,7 +487,7 @@ def update_character_assets(character_id, force_refresh=False):
                 f"CT: New ship for: {audit_char.character.character_name}"
             )
             if ship.item_id not in item_ids:
-                if ship.location_id in location_names:
+                if ship.location_id in _known_location_ids([ship.location_id]):
                     ship.location_name_id = ship.location_id
 
                 items.append(ship)
@@ -970,15 +996,18 @@ def update_character_wallet(character_id, force_refresh=False):
         )
 
         _st = time.perf_counter()
-        _current_journal = CharacterWalletJournalEntry.objects.filter(
-            entry_id__in=[  # only fetch the ones we care about to reduce DB loading/ram
-                e.id for e in journal_items
-            ],
-            character=audit_char
-        ).values_list('entry_id', flat=True)
+        _current_journal = set(
+            CharacterWalletJournalEntry.objects.filter(
+                entry_id__in=[  # only fetch the ones we care about to reduce DB loading/ram
+                    e.id for e in journal_items
+                ],
+                character=audit_char
+            ).values_list('entry_id', flat=True)
+        )
 
-        _current_eve_ids = list(
-            EveName.objects.all().values_list('eve_id', flat=True)
+        _current_eve_ids = _known_eve_ids(
+            [e.first_party_id for e in journal_items]
+            + [e.second_party_id for e in journal_items]
         )
 
         _new_names = []
@@ -988,10 +1017,10 @@ def update_character_wallet(character_id, force_refresh=False):
             if item.id not in _current_journal:
                 if item.second_party_id not in _current_eve_ids:
                     _new_names.append(item.second_party_id)
-                    _current_eve_ids.append(item.second_party_id)
+                    _current_eve_ids.add(item.second_party_id)
                 if item.first_party_id not in _current_eve_ids:
                     _new_names.append(item.first_party_id)
-                    _current_eve_ids.append(item.first_party_id)
+                    _current_eve_ids.add(item.first_party_id)
 
                 items.append(
                     CharacterWalletJournalEntry.from_esi_model(
@@ -1140,8 +1169,8 @@ def update_character_clones(character_id, force_refresh=False):
             store_cache=False
         )
 
-        all_locations = list(EveLocation.objects.all(
-        ).values_list('location_id', flat=True))
+        all_locations = _known_location_ids(
+            clone.location_id for clone in jump_clones.jump_clones)
 
         home_loc = None  # Setting this to  none will force a lookup later on.
         try:
@@ -1462,15 +1491,14 @@ def update_character_orders(character_id, force_refresh=False):
 
         _st = time.perf_counter()
 
-        open_ids = list(
+        open_ids = set(
             CharacterMarketOrder.objects.filter(
                 character=audit_char,
                 state='active'
             ).values_list("order_id", flat=True)
         )
-        all_locations = list(
-            EveLocation.objects.all().values_list('location_id', flat=True)
-        )
+        all_locations = _known_location_ids(
+            order.location_id for order in open_orders)
 
         updates = []
         creates = []
@@ -1546,7 +1574,7 @@ def update_character_order_history(character_id, force_refresh=False):
         )
         _st = time.perf_counter()
 
-        closed_ids = list(
+        closed_ids = set(
             CharacterMarketOrder.objects.filter(
                 character=audit_char
             ).values_list(
@@ -1554,12 +1582,8 @@ def update_character_order_history(character_id, force_refresh=False):
                 flat=True
             )
         )
-        all_locations = list(
-            EveLocation.objects.all().values_list(
-                'location_id',
-                flat=True
-            )
-        )
+        all_locations = _known_location_ids(
+            order.location_id for order in order_history)
 
         updates = []
         creates = []
@@ -1796,13 +1820,10 @@ def update_character_mail_headers(character_id, force_refresh=False):
     if not token:
         return False
 
-    # Sets for O(1) membership checks throughout
-    _current_eve_ids = set(
-        EveName.objects.all().values_list('eve_id', flat=True)
-    )
-    _current_mail_rec = set(
-        MailRecipient.objects.all().values_list('recipient_id', flat=True)
-    )
+    # Known ids, filled in page by page for just the ids on that page rather
+    # than loading the whole EveName/MailRecipient tables up front.
+    _current_eve_ids = set()
+    _current_mail_rec = set()
 
     # Mail Labels
     labels = providers.esi_openapi.client.Mail.GetCharactersCharacterIdMailLabels(
@@ -1863,13 +1884,21 @@ def update_character_mail_headers(character_id, force_refresh=False):
         except HTTPNotModified:
             break
 
+        page_ids = set()
+        for msg in mail:
+            page_ids.add(getattr(msg, "from"))
+            page_ids.update(r.recipient_id for r in msg.recipients)
+        _current_eve_ids.update(_known_eve_ids(page_ids))
+        _current_mail_rec.update(
+            _known_ids(MailRecipient, "recipient_id", page_ids))
+
         names_to_create = set()
         for msg in mail:
             if getattr(msg, "from") not in _current_eve_ids and not _mail_sender_is_mailing_list(msg):
                 names_to_create.add(getattr(msg, "from"))
 
             for recip in msg.recipients:
-                if recip.recipient_type != "mailing_list":
+                if recip.recipient_type != "mailing_list" and recip.recipient_id not in _current_eve_ids:
                     names_to_create.add(recip.recipient_id)
         try:
             EveName.objects.create_bulk_from_esi(list(names_to_create))
@@ -2005,10 +2034,6 @@ def update_character_contacts(character_id, force_refresh=False):
     if not token:
         return False
 
-    _current_eve_ids = list(
-        EveName.objects.all().values_list('eve_id', flat=True)
-    )
-
     try:
         labels = providers.esi_openapi.client.Contacts.GetCharactersCharacterIdContactsLabels(
             character_id=character_id,
@@ -2051,6 +2076,8 @@ def update_character_contacts(character_id, force_refresh=False):
         )
         _st = time.perf_counter()
 
+        _current_eve_ids = _known_eve_ids(c.contact_id for c in contacts)
+
         ContactLabelThrough = CharacterContact.labels.through
         _contacts_to_create = []
         _through_to_create = []
@@ -2059,7 +2086,7 @@ def update_character_contacts(character_id, force_refresh=False):
                 EveName.objects.get_or_create_from_esi(
                     contact.contact_id
                 )
-                _current_eve_ids.append(contact.contact_id)
+                _current_eve_ids.add(contact.contact_id)
 
             _contact_item = CharacterContact.from_esi_model(
                 audit_char, contact)
@@ -2200,7 +2227,7 @@ def update_character_contracts(character_id, force_refresh=False):
 
         eve_names = set()
 
-        contract_ids = list(
+        contract_ids = set(
             Contract.objects.filter(
                 character=audit_char
             ).values_list(

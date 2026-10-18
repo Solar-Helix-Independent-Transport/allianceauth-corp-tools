@@ -7,6 +7,7 @@ from eve_sde import models as sde_models
 # Django
 from django.core.cache import cache
 from django.test import TestCase
+from django.utils import timezone
 
 # Alliance Auth
 from esi.exceptions import HTTPClientError
@@ -24,6 +25,7 @@ from corptools.task_helpers.update_tasks import (
     set_character_cooloff,
     untried_characters,
 )
+from corptools.tasks.utils import get_error_count_flag, get_error_flag
 
 
 def _client_error(status_code, remain=100, reset="60"):
@@ -88,6 +90,22 @@ class HandleEsiClientErrorTests(TestCase):
         with self.assertRaises(LocationUnresolvable):
             _handle_esi_client_error(err, 1000000000)
         mock_set_flag.assert_called_once()
+
+    @patch("corptools.task_helpers.update_tasks.set_error_count_flag")
+    def test_missing_error_budget_header_does_not_set_flag(self, mock_set_flag):
+        # Used to default a missing header to 0 remaining, so every 403/404
+        # without it paused ESI work globally for a minute.
+        err = HTTPClientError(403, {}, MagicMock())
+        _handle_esi_client_error(err, 1000000000)
+        mock_set_flag.assert_not_called()
+
+    def test_low_budget_sets_the_flag_esi_error_retry_checks(self):
+        # One shared back-off flag: a low budget seen while resolving a
+        # location must also pause every esi_error_retry task.
+        cache.clear()
+        _handle_esi_client_error(_client_error(403, remain=10), 1000000000)
+        self.assertTrue(get_error_count_flag())
+        self.assertGreater(get_error_flag(), timezone.now())
 
 
 class FetchLocationNameTests(TestCase):

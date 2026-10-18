@@ -1,8 +1,8 @@
 # Standard Library
-import datetime
 import functools
 import inspect
 from functools import wraps
+from random import random
 from time import time
 from typing import Any, Callable
 
@@ -30,6 +30,12 @@ from esi.exceptions import (
 )
 
 # AA Example App
+from corptools.esi_errors import (  # - re-exported
+    clear_error_flag,
+    error_flag_active,
+    get_error_flag,
+    set_error_flag,
+)
 from corptools.tasks.rate_limiting import (
     TaskBucketLimitException,
     TaskRateLimitBucket,
@@ -82,20 +88,8 @@ def enqueue_next_task(chain, delay=1):
 
 
 def get_error_count_flag():
-    return cache.get("esi_errors_timeout", False)
-
-
-def set_error_flag(timeout):
-    tout = timezone.now() + datetime.timedelta(seconds=timeout)
-    cache.set("esi_error_timeout", tout, timeout=timeout + 1)
-
-
-def get_error_flag():
-    return cache.get("esi_error_timeout", default=timezone.now())
-
-
-def clear_error_flag():
-    cache.delete("esi_error_timeout")
+    """Is the shared ESI back-off flag set? (see corptools.esi_errors)"""
+    return error_flag_active()
 
 
 def esi_error_retry(func):
@@ -179,6 +173,23 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 
+def _rate_limit_backoff(task: Task, bucket: TaskRateLimitBucket, reset) -> float:
+    """
+        Countdown for a rate limited task: capped exponential backoff with full
+        jitter. Retrying everything on the bucket's reset alone makes every
+        waiting task wake together, with only one getting through. Each hit by
+        the same task doubles its spread, up to the bucket window, so a lone
+        task in a chain retries almost immediately while a large backlog thins
+        itself out. Capped at the window to keep countdowns well under the
+        broker's visibility timeout.
+    """
+    key = f"task:bucket:hits:{task.request.id}"
+    cache.add(key, 0, timeout=bucket.window * 2)
+    hits = cache.incr(key)
+    spread = min(bucket.ttl * 2 ** hits, bucket.window)
+    return reset + random() * spread
+
+
 def rate_limited_task(rate: str, keys: list | None = None):
     """_summary_
 
@@ -204,7 +215,7 @@ def rate_limited_task(rate: str, keys: list | None = None):
             try:
                 rate_limiter.check_bucket(bucket)
             except TaskBucketLimitException as ex:
-                delay = ex.reset
+                delay = _rate_limit_backoff(task, bucket, ex.reset)
                 task.request.retries = task.request.retries - 1
                 return task.retry(countdown=delay)
             else:

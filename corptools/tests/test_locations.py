@@ -3,7 +3,9 @@ from unittest.mock import patch
 
 # Django
 from django.core.cache import cache
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 
 # AA Example App
@@ -266,3 +268,79 @@ class UpdateAllLocationsCorpScopingTests(CorptoolsTestCase):
         queued = {
             c.kwargs["args"][0] for c in mock_update_location.apply_async.call_args_list}
         self.assertEqual(queued, {60003760, 60003761})
+
+
+class UpdateAllLocationsQueryScopeTests(CorptoolsTestCase):
+    """update_all_locations runs at the end of every character update. It
+    used to exclude against every CharacterAsset/CorpAsset item_id in the
+    database (and the update_all sweep pulled every in-use location_id into
+    python for one giant IN list). The container exclusion is now scoped to
+    the filtered owners and update_all uses subqueries - same results."""
+
+    def setUp(self):
+        super().setUp()
+        cache.clear()
+
+    def _character_asset(self, character, item_id, location_id):
+        return CharacterAsset.objects.create(
+            character=character,
+            singleton=True,
+            item_id=item_id,
+            location_flag="Hangar",
+            location_id=location_id,
+            location_type="station",
+            quantity=1,
+            type_id=34,
+        )
+
+    @staticmethod
+    def _queued(mock_update_location):
+        return {
+            c.kwargs["args"][0] for c in mock_update_location.apply_async.call_args_list}
+
+    @patch("corptools.tasks.locations.update_location")
+    def test_character_container_contents_are_still_excluded(self, mock_update_location):
+        self._character_asset(self.ca1, item_id=555, location_id=60003760)
+        self._character_asset(self.ca1, item_id=556, location_id=555)
+
+        update_all_locations.apply(
+            kwargs={"character_filter": [self.char1.character_id]})
+
+        self.assertEqual(self._queued(mock_update_location), {60003760})
+
+    @patch("corptools.tasks.locations.update_location")
+    def test_container_check_does_not_scan_other_characters_assets(self, mock_update_location):
+        self._character_asset(self.ca1, item_id=1, location_id=60003760)
+        self._character_asset(self.ca2, item_id=2, location_id=60003761)
+
+        with CaptureQueriesContext(connection) as ctx:
+            update_all_locations.apply(
+                kwargs={"character_filter": [self.char1.character_id]})
+
+        self.assertEqual(self._queued(mock_update_location), {60003760})
+        # The container exclusion subquery must be limited to this
+        # character's assets, not every CharacterAsset in the DB.
+        asset_query = next(
+            q["sql"] for q in ctx.captured_queries
+            if "NOT (" in q["sql"] and "corptools_characterasset" in q["sql"])
+        exclusion = asset_query[asset_query.index("NOT ("):]
+        self.assertIn('"character_id" IN', exclusion)
+
+    @patch("corptools.tasks.locations.update_location")
+    def test_update_all_requeues_only_stale_locations_still_in_use(self, mock_update_location):
+        self._character_asset(self.ca1, item_id=1, location_id=60003760)
+        EveLocation.objects.create(
+            location_id=60003760, location_name="Jita IV - Moon 4")
+        EveLocation.objects.create(
+            location_id=60008494, location_name="Amarr VIII")
+        EveLocation.objects.create(
+            location_id=60004588, location_name="Rens VI")
+        # last_update is auto_now, so age them with a queryset update
+        stale = timezone.now() - timezone.timedelta(days=60)
+        EveLocation.objects.filter(
+            location_id__in=[60003760, 60008494]).update(last_update=stale)
+
+        update_all_locations.apply(kwargs={"update_all": True})
+
+        # stale + in use -> requeued; stale but unused, or fresh -> not
+        self.assertEqual(self._queued(mock_update_location), {60003760})

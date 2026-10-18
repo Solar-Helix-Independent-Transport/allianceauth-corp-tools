@@ -24,6 +24,7 @@ from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
 
 from .. import app_settings
+from ..esi_errors import error_budget_low
 from ..models import EveName, TypePrice
 from ..task_helpers.update_tasks import set_error_count_flag
 from .utils import get_error_count_flag
@@ -102,10 +103,8 @@ def update_eve_name(self, id):
                 name.name = update.name
             name.save()
         except Exception as e:  # no access
-            if hasattr(e, "response"):
-                if hasattr(e.response, "headers"):
-                    if int(e.response.headers.get('x-esi-error-limit-remain')) < 50:
-                        set_error_count_flag()
+            if error_budget_low(getattr(getattr(e, "response", None), "headers", None)):
+                set_error_count_flag()
             # cooloff for a while
             name.last_updated = timezone.now()
             name.save()

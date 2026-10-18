@@ -20,6 +20,7 @@ from esi.models import Token
 
 # AA Example App
 from corptools import providers
+from corptools.esi_errors import error_budget_low, set_error_flag
 from corptools.models import EveLocation
 
 logger = get_extension_logger(__name__)
@@ -42,7 +43,7 @@ CACHE_TIMEOUT = 60 * 60 * 24 * 30
 
 
 def set_error_count_flag():
-    return cache.set("esi_errors_timeout", 1, 60)
+    return set_error_flag()
 
 
 def _location_state_cache_tag(location_id):
@@ -109,7 +110,7 @@ def _handle_esi_client_error(e, location_id):
     - anything else (typically 403 - no docking access): log and return,
       treated by the caller as a normal per-character resolution failure.
     """
-    if int(e.headers.get('x-esi-error-limit-remain', 0)) < 50:
+    if error_budget_low(e.headers):
         set_error_count_flag()
 
     if e.status_code in (420, 429):

@@ -6,6 +6,7 @@ from celery import shared_task
 
 # Django
 from django.core.cache import cache
+from django.db.models import Q
 from django.utils import timezone
 
 # Alliance Auth
@@ -233,8 +234,6 @@ def update_all_locations(
 
     expire = timezone.now() - datetime.timedelta(days=30)  # 1 week refresh
 
-    asset_tops = CharacterAsset.objects.all().values_list("item_id", flat=True)
-
     # character_filter/corp_filter are independent scopes. A per-character
     # call (character_filter=[id]) should only touch that character's
     # locations, not every corp's - and vice versa. Only a bare call with
@@ -247,8 +246,6 @@ def update_all_locations(
     else:
         char_filter = CharacterAudit.objects.none()
 
-    corp_asset_tops = CorpAsset.objects.all().values_list("item_id", flat=True)
-
     if corp_filter is not None:
         corp_audit_filter = CorporationAudit.objects.filter(
             corporation__corporation_id__in=corp_filter)
@@ -256,6 +253,15 @@ def update_all_locations(
         corp_audit_filter = CorporationAudit.objects.all()
     else:
         corp_audit_filter = CorporationAudit.objects.none()
+
+    # Items sitting inside another item (containers, ships) aren't locations.
+    # Their parent always belongs to the same character/corp, so only check
+    # against the filtered owners' items instead of every asset in the DB -
+    # this runs at the end of every single character update.
+    asset_tops = CharacterAsset.objects.filter(
+        character__in=char_filter).values_list("item_id", flat=True)
+    corp_asset_tops = CorpAsset.objects.filter(
+        corporation__in=corp_audit_filter).values_list("item_id", flat=True)
 
     queryset1 = list(
         CharacterAsset.objects.filter(
@@ -375,40 +381,18 @@ def update_all_locations(
         f"CT LOCATIONS: {character_filter} all_locations {all_locations}")
 
     if update_all:
-        clones_all = list(
-            Clone.objects.all().values_list(
-                'location_id',
-                flat=True
-            )
+        # Subqueries rather than pulling every location_id into python and
+        # sending them back as one giant IN list.
+        in_use = (
+            Q(location_id__in=Clone.objects.values('location_id'))
+            | Q(location_id__in=JumpClone.objects.values('location_id'))
+            | Q(location_id__in=CharacterAsset.objects.values('location_id'))
+            | Q(location_id__in=CorpAsset.objects.values('location_id'))
         )
-
-        jump_clones_all = list(
-            JumpClone.objects.all().values_list(
-                'location_id',
-                flat=True
-            )
-        )
-
-        asset_all = list(
-            CharacterAsset.objects.all().values_list(
-                'location_id',
-                flat=True
-            )
-        )
-
-        corp_asset_all = list(
-            CorpAsset.objects.all().values_list(
-                'location_id',
-                flat=True
-            )
-        )
-
         queryset2 = list(
             EveLocation.objects.filter(
+                in_use,
                 last_update__lte=expire,
-                location_id__in=set(
-                    clones_all + jump_clones_all + asset_all + corp_asset_all
-                )
             ).values_list('location_id', flat=True)
         )
 

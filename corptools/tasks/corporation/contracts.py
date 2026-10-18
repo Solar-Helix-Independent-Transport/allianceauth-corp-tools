@@ -54,7 +54,7 @@ def corp_contract_update(corp_id, force_refresh=False):
     contract_models_new = []
     contract_models_old = []
     eve_names = set()
-    contract_ids = list(
+    contract_ids = set(
         CorporateContract.objects.filter(
             corporation=_corporation
         ).values_list(

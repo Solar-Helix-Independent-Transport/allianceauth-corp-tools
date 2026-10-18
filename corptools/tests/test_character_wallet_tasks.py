@@ -156,39 +156,104 @@ class TestUpdateCharWalletBountyText(CorptoolsTestCase):
             1
         )
 
-    @patch("corptools.tasks.character.wallet.CharacterBountyStat")
-    @patch("corptools.tasks.character.wallet.TypeDogma")
-    @patch("corptools.tasks.character.wallet.ItemType")
-    def test_success_creates_bounty_event_and_marks_processed(
-        self, mock_item_cls, mock_dogma_cls, mock_stat_cls
-    ):
+    def _bounty_types(self):
+        # Third Party
+        from eve_sde import models as sde_models
+        bounty_attr = sde_models.DogmaAttribute.objects.create(
+            id=481, name="entityKillBounty")
+        rifter = sde_models.ItemType.objects.create(
+            id=12345, name="Rifter", published=True)
+        sde_models.TypeDogma.objects.create(
+            item_type=rifter, dogma_attribute=bounty_attr, value=5000000.0)
+        # known type, but no bounty attribute
+        sde_models.ItemType.objects.create(
+            id=23456, name="Slasher", published=True)
+
+    def _bounty_entry(self, reason, entry_id=888):
+        return _make_journal_entry(
+            self.ca1, entry_id=entry_id, ref_type="bounty_prizes",
+            processed=False, reason=reason)
+
+    def test_success_creates_bounty_event_and_marks_processed(self):
         # AA Example App
         from corptools.models import CharacterBountyEvent
-
-        entry = _make_journal_entry(
-            self.ca1,
-            entry_id=888,
-            ref_type="bounty_prizes",
-            processed=False,
-            reason="12345: 3",
-        )
-
-        mock_ship = MagicMock()
-        mock_ship.id = 12345
-        mock_ship.name = "Rifter"
-        mock_item_cls.objects.get.return_value = mock_ship
-
-        mock_dogma = MagicMock()
-        mock_dogma.value = 5000000.0
-        mock_dogma_cls.objects.filter.return_value.first.return_value = mock_dogma
+        self._bounty_types()
+        entry = self._bounty_entry("12345: 3")
 
         update_char_wallet_bounty_text(self.char1.character_id, 888)
 
         entry.refresh_from_db()
         self.assertTrue(entry.processed)
-        self.assertTrue(
+        event = CharacterBountyEvent.objects.get(entry=entry)
+        self.assertEqual(event.message, "3x Rifter @ 5,000,000 ISK")
+        self.assertEqual(
+            list(event.stats.values_list("type_name_id", "qty")), [(12345, 3)])
+
+    def test_unknown_type_and_missing_bounty_do_not_block_processing(self):
+        # These used to raise (DoesNotExist / None.value), leaving the entry
+        # unprocessed so every wallet update re-queued it, forever.
+        # AA Example App
+        from corptools.models import CharacterBountyEvent
+        self._bounty_types()
+        entry = self._bounty_entry("12345: 3, 23456: 2, 99999: 1")
+
+        update_char_wallet_bounty_text(self.char1.character_id, 888)
+
+        entry.refresh_from_db()
+        self.assertTrue(entry.processed)
+        event = CharacterBountyEvent.objects.get(entry=entry)
+        self.assertEqual(
+            event.message.split("\n"),
+            ["3x Rifter @ 5,000,000 ISK", "2x Slasher", "1x Unknown Type 99999"],
+        )
+        # no stat row for a type we can't FK to
+        self.assertEqual(
+            sorted(event.stats.values_list("type_name_id", "qty")),
+            [(12345, 3), (23456, 2)],
+        )
+
+    def test_malformed_or_empty_reason_still_marks_processed(self):
+        # AA Example App
+        from corptools.models import CharacterBountyEvent
+        self._bounty_types()
+        for entry_id, reason in ((901, None), (902, ""), (903, "junk, 12345, 12345: x, 12345: 1")):
+            entry = self._bounty_entry(reason, entry_id=entry_id)
+            update_char_wallet_bounty_text(self.char1.character_id, entry_id)
+            entry.refresh_from_db()
+            self.assertTrue(entry.processed, reason)
+        self.assertEqual(
+            CharacterBountyEvent.objects.get(entry__entry_id=903).message,
+            "1x Rifter @ 5,000,000 ISK")
+
+    def test_leftover_event_from_a_half_finished_run_is_replaced(self):
+        # AA Example App
+        from corptools.models import CharacterBountyEvent
+        self._bounty_types()
+        entry = self._bounty_entry("12345: 3")
+        CharacterBountyEvent.objects.create(entry=entry, message="partial")
+
+        update_char_wallet_bounty_text(self.char1.character_id, 888)
+
+        entry.refresh_from_db()
+        self.assertTrue(entry.processed)
+        self.assertEqual(
+            CharacterBountyEvent.objects.get(entry=entry).message,
+            "3x Rifter @ 5,000,000 ISK")
+
+    def test_failure_while_writing_leaves_nothing_half_done(self):
+        # AA Example App
+        from corptools.models import CharacterBountyEvent, CharacterBountyStat
+        self._bounty_types()
+        entry = self._bounty_entry("12345: 3")
+
+        with patch.object(CharacterBountyStat.objects, "bulk_create", side_effect=RuntimeError("db")):
+            with self.assertRaises(RuntimeError):
+                update_char_wallet_bounty_text(self.char1.character_id, 888)
+
+        entry.refresh_from_db()
+        self.assertFalse(entry.processed)
+        self.assertFalse(
             CharacterBountyEvent.objects.filter(entry=entry).exists())
-        mock_stat_cls.objects.create.assert_called_once()
 
 
 class TestClearDupes(CorptoolsTestCase):
