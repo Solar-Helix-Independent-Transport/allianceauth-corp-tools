@@ -1665,12 +1665,14 @@ def update_character_notifications(character_id, force_refresh=False):
 
         _st = time.perf_counter()
 
-        last_five_hundred = list(
+        # Check against exactly the ids ESI sent. Comparing against only the
+        # newest 500 stored meant a busy character's older notifications that
+        # were still in the ESI window got inserted again on every update.
+        known = set(
             Notification.objects.filter(
-                character=audit_char
-            ).order_by(
-                '-timestamp'
-            )[:500].values_list(
+                character=audit_char,
+                notification_id__in=[n.notification_id for n in notifications]
+            ).values_list(
                 'notification_id',
                 flat=True
             )
@@ -1679,7 +1681,9 @@ def update_character_notifications(character_id, force_refresh=False):
         _creates = []
         _create_notifs = []
         for note in notifications:
-            if not note.notification_id in last_five_hundred:
+            if note.notification_id not in known:
+                # and any repeats within the response
+                known.add(note.notification_id)
                 _note, _text = Notification.from_esi_model(audit_char, note)
                 _creates.append(_note)
                 _create_notifs.append(_text)
