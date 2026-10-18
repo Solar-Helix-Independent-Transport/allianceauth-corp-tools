@@ -48,4 +48,6 @@ def update_char_skill_queue(self, character_id, force_refresh=False, chain=[]):
 @no_fail_chain
 @esi_error_retry
 def cache_user_skill_list(self, user_id, force_refresh=False, chain=[]):
-    providers.skills.get_and_cache_user(user_id, force_rebuild=force_refresh)
+    # Only queued after a character's skills were refetched, so always
+    # rebuild - the cached entry can't know the skills changed under it.
+    providers.skills.get_and_cache_user(user_id, force_rebuild=True)

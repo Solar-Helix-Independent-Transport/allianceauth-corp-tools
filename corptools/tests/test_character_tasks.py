@@ -110,8 +110,9 @@ class TestCharacterSkillsTasks(TestCase):
     @patch("corptools.tasks.character.skills.providers")
     def test_cache_user_skill_list_calls_provider(self, mock_providers):
         cache_user_skill_list(99)
+        # only queued after skills were refetched, so it must always rebuild
         mock_providers.skills.get_and_cache_user.assert_called_once_with(
-            99, force_rebuild=False)
+            99, force_rebuild=True)
 
 
 class TestCharacterMiscTasks(TestCase):

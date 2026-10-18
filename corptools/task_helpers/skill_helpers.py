@@ -19,11 +19,15 @@ logger = get_extension_logger(__name__)
 # Dogma attribute holding a skill's training time multiplier
 SKILL_TIME_CONSTANT_ATTRIBUTE_ID = 275
 
-SKILL_CACHE_TIMEOUT_SECONDS = 60 * 60 * 24 * 7  # 48h
-# Bump the "_v2" suffix on both keys whenever the cached data shape changes
-# (e.g. the "queue" list->dict change) so stale entries in the old shape are
-# orphaned instead of being served to a schema that no longer matches them.
-SKILL_CACHE_HEADERS_KEY = "CT_SKILL_HEADER_v2"
+SKILL_CACHE_TIMEOUT_SECONDS = 60 * 60 * 24 * 7  # 7 days
+# Bump the "_v2" suffix whenever the cached data shape changes (e.g. the
+# "queue" list->dict change) so stale entries in the old shape are orphaned
+# instead of being served to a schema that no longer matches them.
+#
+# An entry is keyed by the account's characters and stores the hash of the
+# doctrines it was built against, so it goes stale by itself when either
+# changes. Skill changes are handled by cache_user_skill_list rebuilding
+# after a character's skills are refetched.
 SKILL_CACHE_USER_KEY = "SKILL_LISTS_v2_{}"
 
 
@@ -35,19 +39,49 @@ class SkillListCache():
     def _build_account_cache_key(self, characters):
         return SKILL_CACHE_USER_KEY.format(self._get_chars_hash(characters))
 
-    def _get_skill_list_hash(self, skills):
-        return md5(",".join(str(x) for x in sorted(skills)).encode()).hexdigest()
+    def _get_skill_lists(self):
+        from ..models import SkillList  # TODO fix the recursive import
+        return list(SkillList.objects.all().order_by('order_weight', 'name'))
+
+    def _get_skill_list_hash(self, skill_lists):
+        """Hash of everything about the doctrines that feeds the cached
+        result - the skills too, not just the names, so editing a doctrine's
+        skills invalidates every entry built against the old version."""
+        return md5(
+            json.dumps(sorted(
+                [skl.name or "", skl.skill_list or ""] for skl in skill_lists
+            )).encode()
+        ).hexdigest()
+
+    def _get_cached(self, account_key, skill_list_hash):
+        """The cached entry for an account if it was built against the
+        current doctrines, else None. A hit gets its TTL refreshed."""
+        cached_skills = cache.get(account_key, False)
+        if cached_skills is False:
+            return None
+        cached_skills = json.loads(cached_skills)
+        if cached_skills.get("doctrines", False) != skill_list_hash:
+            return None
+        cache.touch(account_key, SKILL_CACHE_TIMEOUT_SECONDS)
+        return cached_skills
+
+    def _build_and_cache(self, characters, skill_lists, skill_list_hash):
+        account_key = self._build_account_cache_key(characters)
+        output_array = {"doctrines": skill_list_hash,  # doctrines listed
+                        "characters": account_key,  # characters listed
+                        "skills_list": self.check_skill_lists(
+                            skill_lists,
+                            characters
+                        )}
+        cache.set(account_key, json.dumps(output_array),
+                  SKILL_CACHE_TIMEOUT_SECONDS)
+        return output_array
 
     def get_and_cache_users(self, users):
-        from ..models import SkillList  # TODO fix the recursive import
-
         linked_characters = CharacterOwnership.objects.filter(user__in=users).values(
             'user_id', 'character__character_name', 'character__character_id')
-        skill_lists = SkillList.objects.all().order_by('order_weight', 'name')
-        skill_list_hash = self._get_skill_list_hash(
-            skill_lists.values_list('name'))
-        cached_header = cache.get(SKILL_CACHE_HEADERS_KEY, False)
-        skill_lists_up_to_date = cached_header == skill_list_hash
+        skill_lists = self._get_skill_lists()
+        skill_list_hash = self._get_skill_list_hash(skill_lists)
 
         user_chars = {}
         for u in linked_characters:
@@ -57,20 +91,11 @@ class SkillListCache():
                 u['character__character_id'])
 
         for u, c in user_chars.items():
-            if skill_lists_up_to_date:
-                cache_key = self._build_account_cache_key(c['chars'])
-                cached_skills = cache.get(cache_key, False)
-
-                if cached_skills is not False:  # check if cached at all?
-                    cached_skills = json.loads(cached_skills)
-                    if cached_skills.get("doctrines", False) != skill_list_hash:
-                        c['data'] = self.get_and_cache_user(u)
-                    else:
-                        c['data'] = cached_skills
-                else:
-                    c['data'] = self.get_and_cache_user(u)
-            else:
-                c['data'] = self.get_and_cache_user(u)
+            account_key = self._build_account_cache_key(c['chars'])
+            c['data'] = self._get_cached(account_key, skill_list_hash)
+            if c['data'] is None:
+                c['data'] = self._build_and_cache(
+                    c['chars'], skill_lists, skill_list_hash)
 
         return user_chars
 
@@ -194,49 +219,26 @@ class SkillListCache():
         return skill_tables
 
     def get_and_cache_user(self, user_id, force_rebuild=False):
-        from ..models import SkillList  # TODO fix the recursive import
-
-        linked_characters = User.objects.get(
-            id=user_id
-        ).character_ownerships.all(
-        ).values_list(
-            'character__character_id',
-            flat=True
+        linked_characters = list(
+            User.objects.get(
+                id=user_id
+            ).character_ownerships.all(
+            ).values_list(
+                'character__character_id',
+                flat=True
+            )
         )
 
-        skill_lists = SkillList.objects.all().order_by('order_weight', 'name')
+        skill_lists = self._get_skill_lists()
+        skill_list_hash = self._get_skill_list_hash(skill_lists)
 
-        skill_list_hash = self._get_skill_list_hash(
-            skill_lists.values_list('name')
-        )
+        if not force_rebuild:
+            cached_skills = self._get_cached(
+                self._build_account_cache_key(linked_characters),
+                skill_list_hash
+            )
+            if cached_skills is not None:
+                return cached_skills
 
-        account_key = self._build_account_cache_key(linked_characters)
-        cached_header = cache.get(SKILL_CACHE_HEADERS_KEY, False)
-        skill_lists_up_to_date = cached_header == skill_list_hash
-
-        if skill_lists_up_to_date and not force_rebuild:
-            cached_skills = cache.get(account_key, False)
-
-            if cached_skills is not False:  # check if cached at all?
-                cached_skills = json.loads(cached_skills)
-                # check what is in cache is valid
-                if cached_skills.get("doctrines", False) == skill_list_hash:
-                    cache.set(account_key, json.dumps(cached_skills),
-                              SKILL_CACHE_TIMEOUT_SECONDS)
-                    return cached_skills  # Else build it.
-
-        # build the arrays
-        output_array = {"doctrines": skill_list_hash,  # doctrines listed
-                        "characters": account_key,  # characters listed
-                        "skills_list": None}
-
-        # Join them all and ship it.
-        output_array["skills_list"] = self.check_skill_lists(
-            skill_lists,
-            linked_characters
-        )
-
-        out = json.dumps(output_array)
-        cache.set(account_key, out, SKILL_CACHE_TIMEOUT_SECONDS)
-        cache.set(SKILL_CACHE_HEADERS_KEY, skill_list_hash)
-        return output_array
+        return self._build_and_cache(
+            linked_characters, skill_lists, skill_list_hash)
