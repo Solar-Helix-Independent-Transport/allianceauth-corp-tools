@@ -1,6 +1,7 @@
 # Standard Library
 import datetime
 import json
+import math
 from random import random
 
 # Third Party
@@ -22,9 +23,10 @@ except ImportError:
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
+from esi.exceptions import ESIErrorLimitException
 
 from .. import app_settings
-from ..esi_errors import error_budget_low
+from ..esi_errors import ERROR_FLAG_SECONDS, error_budget_low, set_error_flag
 from ..models import EveName, TypePrice
 from ..task_helpers.update_tasks import set_error_count_flag
 from .utils import get_error_count_flag
@@ -102,6 +104,12 @@ def update_eve_name(self, id):
                 update = eve_names.get_alliance(id)
                 name.name = update.name
             name.save()
+        except ESIErrorLimitException as e:
+            # ESI-wide 420: back everything off and try this name again later,
+            # rather than cooling the name off as if it were a "no access".
+            reset = math.ceil(e.reset) if e.reset else ERROR_FLAG_SECONDS
+            set_error_flag(reset)
+            self.retry(countdown=reset + 1)
         except Exception as e:  # no access
             if error_budget_low(getattr(getattr(e, "response", None), "headers", None)):
                 set_error_count_flag()
@@ -119,11 +127,12 @@ def update_all_raw_minerals():
 @shared_task(name="corptools.tasks.update_prices_for_types")
 def update_prices_for_types(type_ids: list):
     logger.info("Pulling values from Jita @`buy`-`weightedAverage`")
-    _str = str(type_ids.pop())
-    for i in type_ids:
-        _str += f",{i}"
+    if not type_ids:
+        return json.dumps({})
+    _str = ",".join(str(i) for i in type_ids)
     url = f"https://market.fuzzwork.co.uk/aggregates/?station=60003760&types={_str}"
-    response = requests.get(url)
+    response = requests.get(url, timeout=30)
+    response.raise_for_status()
     price_data = response.json()
     price_cache = {}
     for key, item in price_data.items():

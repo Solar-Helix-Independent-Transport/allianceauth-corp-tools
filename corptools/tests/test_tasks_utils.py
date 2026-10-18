@@ -188,6 +188,10 @@ class TestEnqueueNextTask(TestCase):
 
 
 class TestEsiErrorRetry(TestCase):
+    def tearDown(self):
+        # test cache is a real redis shared across runs - don't leak the flag
+        clear_error_flag()
+
     def setUp(self):
         cache.clear()
 
@@ -618,6 +622,10 @@ class TestEsiErrorRetryIntegrityErrorRealTask(TestCase):
 
 
 class TestErrorBudgetLow(TestCase):
+    def tearDown(self):
+        # test cache is a real redis shared across runs - don't leak the flag
+        clear_error_flag()
+
     def test_low_remaining_is_low(self):
         self.assertTrue(error_budget_low({"x-esi-error-limit-remain": "10"}))
 

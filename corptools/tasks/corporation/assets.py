@@ -15,6 +15,7 @@ from django.db.models.aggregates import Sum
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
+from esi.exceptions import ESIErrorLimitException
 
 # AA Example App
 from corptools.app_settings import CT_DB_BULK_CREATE_BATCH_SIZE
@@ -102,10 +103,14 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
 
     try:
         corp_update_asset_names(corp_id)
+    except ESIErrorLimitException:
+        raise  # ESI-wide - let esi_error_retry pause everything
     except Exception as e:
         logger.error(e)
     try:
         update_corporation_blueprints(corp_id, force_refresh=force_refresh)
+    except ESIErrorLimitException:
+        raise  # ESI-wide - let esi_error_retry pause everything
     except Exception as e:
         logger.error(e)
 

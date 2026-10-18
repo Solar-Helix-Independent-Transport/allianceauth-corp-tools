@@ -25,7 +25,11 @@ from corptools.task_helpers.update_tasks import (
     set_character_cooloff,
     untried_characters,
 )
-from corptools.tasks.utils import get_error_count_flag, get_error_flag
+from corptools.tasks.utils import (
+    clear_error_flag,
+    get_error_count_flag,
+    get_error_flag,
+)
 
 
 def _client_error(status_code, remain=100, reset="60"):
@@ -44,6 +48,10 @@ class HandleEsiClientErrorTests(TestCase):
     location resolution failure is a global-ESI problem (420/429), a
     permanent one (404), or a normal per-character/location failure (403 and
     everything else)."""
+
+    def tearDown(self):
+        # test cache is a real redis shared across runs - don't leak the flag
+        clear_error_flag()
 
     def test_420_reraises_the_original_exception(self):
         err = _client_error(420)

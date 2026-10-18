@@ -11,7 +11,7 @@ from django.db.models.functions import Power, Sqrt
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
-from esi.exceptions import HTTPNotModified
+from esi.exceptions import ESIErrorLimitException, HTTPNotModified
 
 # AA Example App
 from corptools.models import (
@@ -109,6 +109,8 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
                         )
                 except ObjectDoesNotExist:
                     celestial = None
+                except ESIErrorLimitException:
+                    raise  # ESI-wide - let esi_error_retry pause everything
                 except Exception as e:
                     logger.warning(
                         f"CT: Unable to find nearest celestial for structure {_structure.structure_id}: {e}")

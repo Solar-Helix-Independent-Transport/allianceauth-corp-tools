@@ -16,7 +16,7 @@ from django.utils.html import strip_tags
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
-from esi.exceptions import HTTPNotModified
+from esi.exceptions import ESIErrorLimitException, HTTPNotModified
 from esi.models import Token
 
 # AA Example App
@@ -514,6 +514,8 @@ def update_character_assets(character_id, force_refresh=False):
         try:
             # Get Asset Names!
             update_character_assets_names(character_id)
+        except ESIErrorLimitException:
+            raise  # ESI-wide - let esi_error_retry pause everything
         except Exception as e:
             logger.error(e)
         try:
@@ -525,6 +527,8 @@ def update_character_assets(character_id, force_refresh=False):
             # Enrich blueprint assets with ME/TE/Runs!
             update_character_blueprints(
                 character_id, force_refresh=force_refresh)
+        except ESIErrorLimitException:
+            raise  # ESI-wide - let esi_error_retry pause everything
         except Exception as e:
             logger.error(e)
 
@@ -1903,6 +1907,8 @@ def update_character_mail_headers(character_id, force_refresh=False):
         try:
             EveName.objects.create_bulk_from_esi(list(names_to_create))
             _current_eve_ids.update(names_to_create)
+        except ESIErrorLimitException:
+            raise  # ESI-wide - let esi_error_retry pause everything
         except Exception as e:
             logger.error(
                 f"Error Bulk creating eve names for mail headers: {e}")
@@ -1932,6 +1938,8 @@ def update_character_mail_headers(character_id, force_refresh=False):
                                 getattr(msg, "from")
                             )
                             _current_eve_ids.add(getattr(msg, "from"))
+                        except ESIErrorLimitException:
+                            raise  # ESI-wide - let esi_error_retry pause everything
                         except Exception as e:
                             logger.error(
                                 f"Error creating eve name for mail header: {e} {vars(msg)}")
