@@ -113,8 +113,7 @@ def update_eve_name(self, id):
         except Exception as e:  # no access
             if error_budget_low(getattr(getattr(e, "response", None), "headers", None)):
                 set_error_count_flag()
-            # cooloff for a while
-            name.last_updated = timezone.now()
+            # cooloff for a while - last_update is auto_now, so saving bumps it
             name.save()
 
 

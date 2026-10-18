@@ -483,26 +483,22 @@ def run_ozone_levels(self, corp_id, chain=[]):
     )
 
     for structure in _structures:
+        # Sum() is None when the bridge holds no ozone at all - that's a level
+        # of 0, which used to fail the subtraction/insert and get swallowed,
+        # so an empty bridge was never recorded.
         _quantity = CorpAsset.objects.filter(
             corporation=_corporation,
             location_id=structure.structure_id,
             type_id=16273
         ).aggregate(
             ozone=Sum('quantity')
-        )['ozone']
-        _used = 0
+        )['ozone'] or 0
 
-        try:
-            last_ozone = BridgeOzoneLevel.objects.filter(
-                station_id=structure.structure_id
-            ).order_by('-date')[:1][0].quantity
-            delta = last_ozone - _quantity
-            _used = (delta if _quantity < last_ozone else 0)
-        except Exception:
-            pass
-        try:
-            BridgeOzoneLevel.objects.create(
-                station_id=structure.structure_id, quantity=_quantity, used=_used)
-        except Exception:
-            pass  # dont fail for now
+        last = BridgeOzoneLevel.objects.filter(
+            station_id=structure.structure_id
+        ).order_by('-date').first()
+        _used = max(last.quantity - _quantity, 0) if last else 0
+
+        BridgeOzoneLevel.objects.create(
+            station_id=structure.structure_id, quantity=_quantity, used=_used)
     return f"Finished Ozone for: {_corporation.corporation}"

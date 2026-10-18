@@ -496,6 +496,23 @@ class TestUpdateCharacter(CorptoolsTestCase):
         result = update_character(99999)
         self.assertFalse(result)
 
+    @patch("corptools.tasks.character.Token")
+    def test_no_audit_token_not_valid_returns_false(self, mock_token_cls):
+        # used to fall through with character=None and crash on .character
+        mock_token = MagicMock()
+        mock_token.valid_access_token.return_value = None
+        mock_token_cls.get_token.return_value = mock_token
+        self.assertFalse(update_character(99999))
+
+    @patch("corptools.tasks.character.EveCharacter")
+    @patch("corptools.tasks.character.Token")
+    def test_no_audit_character_unknown_to_auth_returns_false(self, mock_token_cls, mock_eve_char):
+        mock_token = MagicMock()
+        mock_token.valid_access_token.return_value = "access"
+        mock_token_cls.get_token.return_value = mock_token
+        mock_eve_char.objects.get_character_by_id.return_value = None
+        self.assertFalse(update_character(99999))
+
     @patch("corptools.tasks.character.enqueue_next_task")
     def test_existing_audit_enqueues_task_queue(self, mock_enqueue):
         # ca1 has no update_timestamps — all fields are stale → full queue built

@@ -118,7 +118,7 @@ def update_missing_locations(location_id):
         location_name__isnull=True
     ).update(location_name_id=location_id)
 
-    count = CorpAsset.objects.filter(
+    count += CorpAsset.objects.filter(
         location_id=location_id,
         location_name__isnull=True
     ).update(location_name_id=location_id)

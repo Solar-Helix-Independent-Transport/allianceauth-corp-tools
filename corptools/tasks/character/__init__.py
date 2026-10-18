@@ -137,15 +137,22 @@ def update_character(self, char_id, force_refresh=False, now=False):
         if token:
             try:
                 if token.valid_access_token():
-                    character, _ = CharacterAudit.objects.update_or_create(
-                        character=EveCharacter.objects.get_character_by_id(
-                            token.character_id)
-                    )
+                    eve_character = EveCharacter.objects.get_character_by_id(
+                        token.character_id)
+                    if eve_character is not None:
+                        character, _ = CharacterAudit.objects.update_or_create(
+                            character=eve_character
+                        )
             except TokenExpiredError:
                 return False
         else:
             logger.info(f"No Tokens for {char_id}")
             return False
+
+    if character is None:
+        # token didn't validate, or the character isn't known to auth
+        logger.info(f"Unable to set up an audit for {char_id}")
+        return False
 
     logger.info("Processing Updates for %s" %
                 character.character.character_name)
