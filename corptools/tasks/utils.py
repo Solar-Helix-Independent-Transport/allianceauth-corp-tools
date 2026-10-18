@@ -59,6 +59,7 @@ def enqueue_next_task(chain, delay=1):
         Queue next task, and attach the rest of the chain to it.
         If the next task is already queued, skip it and try the one after,
         so a duplicate never drops the rest of the chain.
+        Priority defaults to 6, set it per task with `.set(priority=n)`.
     """
     while (len(chain)):
         _t = chain.pop(0)
@@ -66,7 +67,10 @@ def enqueue_next_task(chain, delay=1):
         _t.kwargs.update({"chain": chain})
         try:
             rejected = _was_rejected(
-                _t.apply_async(priority=6, countdown=delay)
+                _t.apply_async(
+                    priority=_t.options.get("priority", 6),
+                    countdown=delay
+                )
             )
         except AlreadyQueued:
             rejected = True
@@ -129,8 +133,10 @@ def esi_error_retry(func):
                     sig = inspect.signature(func)
 
                     if "force_refresh" in sig.parameters:
+                        # retry(kwargs=) replaces the kwargs outright, so
+                        # merge or we lose `chain` and drop the rest of it.
                         args[0].retry(countdown=90, kwargs={
-                                      "force_refresh": True})
+                                      **kwargs, "force_refresh": True})
                     else:
                         args[0].retry(countdown=90)
             raise e

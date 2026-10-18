@@ -114,6 +114,28 @@ class TestEnqueueNextTask(TestCase):
         self.assertEqual(mock_sig.kwargs["chain"], ["task2", "task3"])
 
     @patch("corptools.tasks.utils.signature")
+    def test_priority_defaults_to_6(self, mock_sig_cls):
+        mock_sig = MagicMock()
+        mock_sig.kwargs = {}
+        mock_sig.options = {}
+        mock_sig_cls.return_value = mock_sig
+
+        enqueue_next_task(["task1"], delay=5)
+
+        mock_sig.apply_async.assert_called_once_with(priority=6, countdown=5)
+
+    @patch("corptools.tasks.utils.signature")
+    def test_priority_set_on_signature_is_used(self, mock_sig_cls):
+        mock_sig = MagicMock()
+        mock_sig.kwargs = {}
+        mock_sig.options = {"priority": 8}
+        mock_sig_cls.return_value = mock_sig
+
+        enqueue_next_task(["task1"])
+
+        mock_sig.apply_async.assert_called_once_with(priority=8, countdown=1)
+
+    @patch("corptools.tasks.utils.signature")
     def test_skips_already_queued_and_enqueues_next(self, mock_sig_cls):
         sig1 = MagicMock()
         sig1.kwargs = {}
@@ -298,6 +320,22 @@ class TestEsiErrorRetry(TestCase):
             my_func(task)
         task.retry.assert_called_with(
             countdown=90, kwargs={"force_refresh": True})
+
+    @patch("corptools.tasks.utils.check_for_sde_updates")
+    def test_integrity_error_retry_keeps_chain_and_other_kwargs(self, mock_sde):
+        # retry(kwargs=) replaces the kwargs, so dropping `chain` here used
+        # to silently lose the rest of the character's update chain.
+        @esi_error_retry
+        def my_func(self, character_id, force_refresh=False, chain=[]):
+            raise IntegrityError("missing SDE row")
+
+        task = _mock_task(retries=0)
+        with self.assertRaises(Retry):
+            my_func(task, 1234, force_refresh=False, chain=["t2", "t3"])
+        task.retry.assert_called_with(
+            countdown=90,
+            kwargs={"force_refresh": True, "chain": ["t2", "t3"]}
+        )
 
     @patch("corptools.tasks.utils.check_for_sde_updates")
     def test_integrity_error_reraises_when_retry_limit_reached(self, mock_sde):

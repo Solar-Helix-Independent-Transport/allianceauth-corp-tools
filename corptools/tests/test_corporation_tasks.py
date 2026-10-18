@@ -131,27 +131,28 @@ class TestUpdateCorporateContractItems(TestCase):
 
 
 class TestUpdateCorpContracts(CorptoolsTestCase):
-    @patch("corptools.tasks.corporation.Chain")
+    @patch("corptools.tasks.corporation.enqueue_next_task")
     @patch("corptools.tasks.corporation.corp_contract_update")
     def test_builds_chain_of_contract_item_tasks(self, mock_contracts, mock_chain_cls):
         mock_contracts.return_value = (None, [101, 102])
-        mock_chain_instance = MagicMock()
-        mock_chain_cls.return_value = mock_chain_instance
 
         result = update_corp_contracts(123)
 
         mock_contracts.assert_called_once_with(123, force_refresh=False)
-        mock_chain_instance.apply_async.assert_called_once_with(priority=8)
+        signatures = mock_chain_cls.call_args[0][0]
+        self.assertEqual(
+            [sig.args for sig in signatures], [(123, 101), (123, 102)])
+        for sig in signatures:
+            self.assertEqual(sig.options["priority"], 8)
         self.assertIn("123", result)
 
-    @patch("corptools.tasks.corporation.Chain")
+    @patch("corptools.tasks.corporation.enqueue_next_task")
     @patch("corptools.tasks.corporation.corp_contract_update")
     def test_force_refresh_is_propagated_to_item_chain(self, mock_contracts, mock_chain_cls):
         # force_refresh used to be dropped here, so forcing a contract
         # refresh never force-refreshed the resulting contracts' items -
         # unlike the character-side equivalent, which does propagate it.
         mock_contracts.return_value = (None, [101, 102])
-        mock_chain_cls.return_value = MagicMock()
 
         update_corp_contracts(123, force_refresh=True)
 
@@ -160,7 +161,7 @@ class TestUpdateCorpContracts(CorptoolsTestCase):
         for sig in signatures:
             self.assertTrue(sig.kwargs.get("force_refresh"))
 
-    @patch("corptools.tasks.corporation.Chain")
+    @patch("corptools.tasks.corporation.enqueue_next_task")
     @patch("corptools.tasks.corporation.corp_contract_update")
     def test_none_return_skips_item_chain(self, mock_contracts, mock_chain_cls):
         mock_contracts.return_value = None
@@ -170,12 +171,10 @@ class TestUpdateCorpContracts(CorptoolsTestCase):
         mock_chain_cls.assert_not_called()
         self.assertIn("123", result)
 
-    @patch("corptools.tasks.corporation.Chain")
+    @patch("corptools.tasks.corporation.enqueue_next_task")
     @patch("corptools.tasks.corporation.corp_contract_update")
     def test_empty_contract_ids_enqueues_empty_chain(self, mock_contracts, mock_chain_cls):
         mock_contracts.return_value = (None, [])
-        mock_chain_instance = MagicMock()
-        mock_chain_cls.return_value = mock_chain_instance
 
         update_corp_contracts(123)
 
@@ -183,27 +182,51 @@ class TestUpdateCorpContracts(CorptoolsTestCase):
 
 
 class TestUpdateCorp(CorptoolsTestCase):
-    @patch("corptools.tasks.corporation.Chain")
+    @patch("corptools.tasks.corporation.enqueue_next_task")
     def test_builds_and_queues_task_chain(self, mock_chain_cls):
-        mock_chain_instance = MagicMock()
-        mock_chain_cls.return_value = mock_chain_instance
-
         update_corp(123)
 
-        mock_chain_instance.apply_async.assert_called_once_with(priority=6)
+        mock_chain_cls.assert_called_once()
 
-    @patch("corptools.tasks.corporation.Chain")
+    @patch("corptools.tasks.corporation.enqueue_next_task")
     def test_chain_contains_all_eight_sub_tasks(self, mock_chain_cls):
         update_corp(123)
         tasks = mock_chain_cls.call_args[0][0]
         self.assertEqual(len(tasks), 9)
 
-    @patch("corptools.tasks.corporation.Chain")
+    @patch("corptools.tasks.corporation.enqueue_next_task")
     def test_force_refresh_propagated_to_chain(self, mock_chain_cls):
         update_corp(123, force_refresh=True)
         tasks = mock_chain_cls.call_args[0][0]
         for sig in tasks:
             self.assertTrue(sig.kwargs.get("force_refresh"))
+
+
+class TestCorpChainSurvivesFailures(TestCase):
+    """One corp module blowing up used to abort every module after it,
+    since the corp update ran as a native celery chain."""
+
+    @patch("corptools.tasks.utils.enqueue_next_task")
+    @patch("corptools.tasks.corporation.corp_update_pocos")
+    def test_failing_module_still_queues_rest_of_chain(self, mock_pocos, mock_enqueue):
+        mock_pocos.side_effect = AttributeError(
+            "'NoneType' has no attribute 'name'")
+
+        with self.assertRaises(AttributeError):
+            update_corp_pocos(123, chain=["next_task"])
+
+        mock_enqueue.assert_called_once_with(["next_task"])
+
+    @patch("corptools.tasks.utils.enqueue_next_task")
+    @patch("corptools.tasks.corporation.corp_update_assets")
+    def test_failing_assets_still_queues_rest_of_chain(self, mock_assets, mock_enqueue):
+        # update_corp_assets was the one corp task missing @no_fail_chain
+        mock_assets.side_effect = ValueError("boom")
+
+        with self.assertRaises(ValueError):
+            update_corp_assets(123, chain=["next_task"])
+
+        mock_enqueue.assert_called_once_with(["next_task"])
 
 
 class TestUpdateAllCorps(CorptoolsTestCase):

@@ -4,7 +4,7 @@ from typing import Union
 
 # Third Party
 from aiopenapi3 import HTTPError
-from celery import chain, shared_task
+from celery import shared_task
 from eve_sde.models import ItemType
 
 # Django
@@ -30,7 +30,7 @@ from corptools.models import (
 
 from ... import providers
 from ..locations import update_all_locations
-from ..utils import chunks
+from ..utils import chunks, enqueue_next_task, no_fail_chain
 from .utils import NoTokens, get_corp_token, update_corp_audit
 
 logger = get_extension_logger(__name__)
@@ -109,13 +109,14 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
     except Exception as e:
         logger.error(e)
 
-    que = []
-    que.append(fetch_coordiantes.si(corp_id, force_refresh=force_refresh))
-    que.append(run_ozone_levels.si(corp_id))
-    que.append(build_managed_asset_locations.si(
-        corp_id, force_refresh=force_refresh))
-    que.append(update_all_locations.si(corp_filter=[corp_id]))
-    chain(que).apply_async(priority=7)
+    enqueue_next_task([
+        fetch_coordiantes.si(
+            corp_id, force_refresh=force_refresh).set(priority=7),
+        run_ozone_levels.si(corp_id).set(priority=7),
+        build_managed_asset_locations.si(
+            corp_id, force_refresh=force_refresh).set(priority=7),
+        update_all_locations.si(corp_filter=[corp_id]).set(priority=7),
+    ])
 
     return f"Finished assets for: {audit_corp.corporation}"
 
@@ -175,7 +176,8 @@ def update_corporation_blueprints(corp_id, force_refresh: bool = False):
 
 
 @shared_task(bind=True)
-def build_managed_asset_locations(self, corp_id, force_refresh: bool = True):
+@no_fail_chain
+def build_managed_asset_locations(self, corp_id, force_refresh: bool = True, chain=[]):
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id)
     logger.debug("Updating Corporate Hangar Locations for: %s" %
@@ -325,8 +327,9 @@ def build_managed_asset_locations(self, corp_id, force_refresh: bool = True):
         location_name_id=F("location_id"))
 
 
-@shared_task(bind=True, base=QueueOnce, once={"graceful": True})
-def fetch_coordiantes(self, corp_id, force_refresh: bool = False):
+@shared_task(bind=True, base=QueueOnce, once={"graceful": True, "keys": ["corp_id"]})
+@no_fail_chain
+def fetch_coordiantes(self, corp_id, force_refresh: bool = False, chain=[]):
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id
     )
@@ -452,8 +455,9 @@ def corp_update_asset_names(corp_id, force_refresh: bool = False):
     return f"CT: Finished corp asset names for: {audit_corp.corporation}"
 
 
-@shared_task(bind=True, base=QueueOnce, once={"graceful": True})
-def run_ozone_levels(self, corp_id):
+@shared_task(bind=True, base=QueueOnce, once={"graceful": True, "keys": ["corp_id"]})
+@no_fail_chain
+def run_ozone_levels(self, corp_id, chain=[]):
     _corporation = CorporationAudit.objects.get(
         corporation__corporation_id=corp_id
     )

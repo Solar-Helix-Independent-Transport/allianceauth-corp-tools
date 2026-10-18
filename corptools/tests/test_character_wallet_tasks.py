@@ -101,30 +101,32 @@ class TestUpdateCharWallet(CorptoolsTestCase):
 
 
 class TestUpdateCharContracts(CorptoolsTestCase):
-    @patch("corptools.tasks.character.wallet.Chain")
+    @patch("corptools.tasks.character.wallet.enqueue_next_task")
     @patch("corptools.tasks.character.wallet.update_character_contracts")
-    def test_builds_chain_of_contract_item_tasks(self, mock_contracts, mock_chain_cls):
+    def test_builds_chain_of_contract_item_tasks(self, mock_contracts, mock_enqueue):
         mock_contracts.return_value = (None, [101, 102])
-        mock_chain_instance = MagicMock()
-        mock_chain_cls.return_value = mock_chain_instance
 
         result = update_char_contracts(self.char1.character_id)
 
         mock_contracts.assert_called_once_with(
             self.char1.character_id, force_refresh=False)
-        mock_chain_instance.apply_async.assert_called_once_with(priority=8)
+        signatures = mock_enqueue.call_args[0][0]
+        self.assertEqual(
+            [sig.args for sig in signatures],
+            [(self.char1.character_id, 101), (self.char1.character_id, 102)]
+        )
+        for sig in signatures:
+            self.assertEqual(sig.options["priority"], 8)
         self.assertIn(str(self.char1.character_id), result)
 
-    @patch("corptools.tasks.character.wallet.Chain")
+    @patch("corptools.tasks.character.wallet.enqueue_next_task")
     @patch("corptools.tasks.character.wallet.update_character_contracts")
-    def test_empty_contract_ids_enqueues_empty_chain(self, mock_contracts, mock_chain_cls):
+    def test_empty_contract_ids_enqueues_empty_chain(self, mock_contracts, mock_enqueue):
         mock_contracts.return_value = (None, [])
-        mock_chain_instance = MagicMock()
-        mock_chain_cls.return_value = mock_chain_instance
 
         update_char_contracts(self.char1.character_id)
 
-        mock_chain_cls.assert_called_once_with([])
+        mock_enqueue.assert_called_once_with([])
 
 
 class TestUpdateCharWalletBountyText(CorptoolsTestCase):

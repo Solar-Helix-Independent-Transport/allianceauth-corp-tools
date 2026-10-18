@@ -1,5 +1,4 @@
 # Third Party
-from celery import chain as Chain
 from celery import shared_task
 from eve_sde.models import ItemType, TypeDogma
 
@@ -20,7 +19,12 @@ from ...task_helpers.char_tasks import (
     update_character_transactions,
     update_character_wallet,
 )
-from ..utils import esi_error_retry, no_fail_chain, rate_limited_task
+from ..utils import (
+    enqueue_next_task,
+    esi_error_retry,
+    no_fail_chain,
+    rate_limited_task,
+)
 
 logger = get_extension_logger(__name__)
 
@@ -91,9 +95,10 @@ def update_char_order_history(self, character_id, force_refresh=False, chain=[])
     once={"graceful": True, "keys": ["character_id", "contract_id"]},
     name="corptools.tasks.update_char_contract_items"
 )
+@no_fail_chain
 @rate_limited_task("600/15m", keys=["character_id"])
 @esi_error_retry
-def update_char_contract_items(self, character_id, contract_id, force_refresh=False):
+def update_char_contract_items(self, character_id, contract_id, force_refresh=False, chain=[]):
     return update_character_contract_items(
         character_id,
         contract_id,
@@ -113,12 +118,14 @@ def update_char_contracts(self, character_id, force_refresh=False, chain=[]):
     _, ids = update_character_contracts(
         character_id, force_refresh=force_refresh)
 
-    _chain = [
+    # Separate chain from the one this task is part of, so the character's
+    # remaining updates aren't stuck behind a long run of contract items.
+    enqueue_next_task([
         update_char_contract_items.si(
-            character_id, contract_id, force_refresh=force_refresh)
+            character_id, contract_id, force_refresh=force_refresh
+        ).set(priority=8)
         for contract_id in ids
-    ]
-    Chain(_chain).apply_async(priority=8)
+    ])
 
     return "Completed Contracts for: %s" % str(character_id)
 

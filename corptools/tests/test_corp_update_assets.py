@@ -43,7 +43,7 @@ class CorpUpdateAssetsLocationHandlingTests(CorptoolsTestCase):
             location_id=60003760, location_name="Jita IV - Moon 4"
         )
 
-    @patch("corptools.tasks.corporation.assets.chain")
+    @patch("corptools.tasks.corporation.assets.enqueue_next_task")
     @patch("corptools.tasks.corporation.assets.update_all_locations")
     @patch("corptools.tasks.corporation.assets.build_managed_asset_locations")
     @patch("corptools.tasks.corporation.assets.run_ozone_levels")
@@ -90,6 +90,6 @@ class CorpUpdateAssetsLocationHandlingTests(CorptoolsTestCase):
             corp_filter=[self.corp1.corporation_id]
         )
         self.assertIn(
-            mock_update_all_locations.si.return_value,
+            mock_update_all_locations.si.return_value.set.return_value,
             mock_chain.call_args[0][0],
         )
