@@ -231,8 +231,9 @@ def build_managed_asset_locations(self, corp_id, force_refresh: bool = True, cha
         6
     ]
 
-    corp_hangars = {}
-    hangar_ids = []
+    hangar_sags = [f"CorpSAG{j}" for j in range(1, 8)]
+    hangar_for = {}  # (office item_id, CorpSAGn) -> managed location id
+    hangars = []
     for i in folders:
         system = None
         if i.location_name:
@@ -240,35 +241,40 @@ def build_managed_asset_locations(self, corp_id, force_refresh: bool = True, cha
             system = i.location_name.system
         else:
             names[i.item_id] = i.location_id
-        corp_hangars[i.item_id] = {}
-        for j in range(1, 8):
-
+        for j, sag in enumerate(hangar_sags, start=1):
             # Build the Managed Location for hangars
             id = -int(f"{i.item_id}{j}")
-            sag = f"CorpSAG{j}"
-            name = f"{names[i.item_id]} > {divisions.get(sag, sag)}"
-            hangar_ids.append(id)
-
-            # store for later?
-            corp_hangars[i.item_id][sag] = (id, name)
-
-            # update or create the location
-            EveLocation.objects.update_or_create(
+            hangar_for[(i.item_id, sag)] = id
+            hangars.append(EveLocation(
                 location_id=id,
-                defaults={
-                    "location_name": name,
-                    "managed": True,
-                    "managed_corp": _corporation,
-                    "system": system
-                }
-            )
+                location_name=f"{names[i.item_id]} > {divisions.get(sag, sag)}",
+                managed=True,
+                managed_corp=_corporation,
+                system=system
+            ))
+    hangar_ids = list(hangar_for.values())
 
-            # update all the assets.
-            CorpAsset.objects.filter(
-                corporation=_corporation,
-                location_id=i.item_id,
-                location_flag=sag
-            ).update(location_name_id=id)
+    # Upsert every hangar in one go rather than an update_or_create each.
+    EveLocation.objects.bulk_create(
+        hangars,
+        update_conflicts=True,
+        unique_fields=["location_id"],
+        update_fields=["location_name", "managed", "managed_corp", "system"],
+        batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
+    )
+
+    # Point every asset sitting in an office hangar at its managed location.
+    hangar_assets = []
+    for asset in CorpAsset.objects.filter(
+        corporation=_corporation,
+        location_id__in=folders.values("item_id"),
+        location_flag__in=hangar_sags
+    ).only("id", "location_id", "location_flag", "location_name_id"):
+        asset.location_name_id = hangar_for[(
+            asset.location_id, asset.location_flag)]
+        hangar_assets.append(asset)
+    CorpAsset.objects.bulk_update(
+        hangar_assets, ["location_name"], batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
     # get Containers in office folders and assign the names
 
     containers = CorpAsset.objects.filter(
@@ -452,10 +458,13 @@ def corp_update_asset_names(corp_id, force_refresh: bool = False):
 
         id_list = {i.item_id: i.name for i in assets_names}
 
+        named = []
         for asset in subset:
             if asset.item_id in id_list:
-                asset.name = id_list.get(asset.item_id)
-                asset.save()
+                asset.name = id_list[asset.item_id]
+                named.append(asset)
+        CorpAsset.objects.bulk_update(
+            named, ["name"], batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
     return f"CT: Finished corp asset names for: {audit_corp.corporation}"
 

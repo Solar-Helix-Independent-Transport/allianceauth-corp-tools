@@ -6,6 +6,16 @@ from django.db import models
 
 from .audits import CharacterAudit, CorporationAudit
 
+# Fields on a character/corp industry job that change after it is first seen.
+INDUSTRY_JOB_UPDATE_FIELDS = [
+    "completed_character_id",
+    "completed_date",
+    "end_date",
+    "pause_date",
+    "status",
+    "successful_runs",
+]
+
 
 class CharacterIndustryJob(models.Model):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)

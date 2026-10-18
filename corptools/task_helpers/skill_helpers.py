@@ -12,6 +12,12 @@ from django.core.cache import cache
 
 # Alliance Auth
 from allianceauth.authentication.models import CharacterOwnership
+from allianceauth.services.hooks import get_extension_logger
+
+logger = get_extension_logger(__name__)
+
+# Dogma attribute holding a skill's training time multiplier
+SKILL_TIME_CONSTANT_ATTRIBUTE_ID = 275
 
 SKILL_CACHE_TIMEOUT_SECONDS = 60 * 60 * 24 * 7  # 48h
 # Bump the "_v2" suffix on both keys whenever the cached data shape changes
@@ -124,23 +130,39 @@ class SkillListCache():
                 current, entry.finish_level)
 
         all_skill_sp = {}
-        for skl in skill_lists:
-            _s = skl.get_skills()
+        lists_skills = [(skl, skl.get_skills()) for skl in skill_lists]
+
+        # One query for every skill's time constant, rather than one per
+        # skill per doctrine on every cache rebuild.
+        skill_names = {
+            name for _, _s in lists_skills if _s for name in _s
+        }
+        time_constants = dict(
+            TypeDogma.objects.filter(
+                item_type__name__in=skill_names,
+                dogma_attribute_id=SKILL_TIME_CONSTANT_ATTRIBUTE_ID
+            ).values_list("item_type__name", "value")
+        )
+
+        for skl, _s in lists_skills:
             if _s:
                 if skl.name not in all_skill_sp:
                     all_skill_sp[skl.name] = {}
                 # 250 * skillTimeConstant * sqrt(32)^(skillLevel - 1)
-                try:
-                    for _sk_n, _sk_l in _s.items():
+                for _sk_n, _sk_l in _s.items():
+                    time_constant = time_constants.get(_sk_n)
+                    if time_constant is None:
+                        # unknown to the SDE - counts as 0 SP below
+                        logger.debug(f"No skill time constant for {_sk_n}")
+                        continue
+                    try:
                         all_skill_sp[skl.name][_sk_n] = int(
-                            250 * TypeDogma.objects.get(
-                                item_type__name=_sk_n,
-                                dogma_attribute_id=275
-                            ).value * math.sqrt(32) ** (int(_sk_l) - 1)
+                            250 * time_constant *
+                            math.sqrt(32) ** (int(_sk_l) - 1)
                         )
-                except Exception as e:
-                    print(e)
-                    pass
+                    except (TypeError, ValueError) as e:
+                        logger.debug(
+                            f"Bad skill level {_sk_l} for {_sk_n}: {e}")
 
             skill_list_base[skl.name] = _s
 

@@ -1,11 +1,10 @@
-# Third Party
-from eve_sde.models import ItemType
-
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
 # AA Example App
+from corptools.app_settings import CT_DB_BULK_CREATE_BATCH_SIZE
 from corptools.models import (
+    INDUSTRY_JOB_UPDATE_FIELDS,
     CorporationAudit,
     CorporationIndustryJob,
 )
@@ -42,34 +41,21 @@ def corp_update_industry_jobs(corp_id: int, force_refresh: bool = False) -> str:
         store_cache=False
     )
 
-    existing_pks: set[int] = set(
-        # only one we care about.
-        CorporationIndustryJob.objects.filter(
+    existing: dict[int, CorporationIndustryJob] = {
+        job.job_id: job
+        for job in CorporationIndustryJob.objects.filter(
             corporation=_corporation,
-            job_id__in=[
-                e.job_id for e in industry_jobs
-            ]
-        ).values_list("job_id", flat=True)
-    )
-    type_ids: set[int] = set()
+            job_id__in=[e.job_id for e in industry_jobs]
+        )
+    }
     new_events = []
+    updated_events = []
     for event in industry_jobs:
-        type_ids.add(event.blueprint_type_id)
-        if event.product_type_id:
-            type_ids.add(event.product_type_id)
-
-        if event.job_id in existing_pks:
-            _m: CorporationIndustryJob = CorporationIndustryJob.objects.get(
-                corporation=_corporation,
-                job_id=event.job_id
-            )
-            _m.completed_character_id = event.completed_character_id
-            _m.completed_date = event.completed_date
-            _m.end_date = event.end_date
-            _m.pause_date = event.pause_date
-            _m.status = event.status
-            _m.successful_runs = event.successful_runs
-            _m.save()
+        if event.job_id in existing:
+            _m = existing[event.job_id]
+            for field in INDUSTRY_JOB_UPDATE_FIELDS:
+                setattr(_m, field, getattr(event, field))
+            updated_events.append(_m)
             continue
 
         _e = CorporationIndustryJob(
@@ -105,7 +91,15 @@ def corp_update_industry_jobs(corp_id: int, force_refresh: bool = False) -> str:
     if len(new_events):
         CorporationIndustryJob.objects.bulk_create(
             new_events,
-            ignore_conflicts=True
+            ignore_conflicts=True,
+            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
+        )
+
+    if len(updated_events):
+        CorporationIndustryJob.objects.bulk_update(
+            updated_events,
+            INDUSTRY_JOB_UPDATE_FIELDS,
+            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
         )
 
     return f"Updated industry jobs for {_corporation}"

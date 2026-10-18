@@ -29,6 +29,7 @@ from corptools.task_helpers.update_tasks import (
 
 from .. import providers
 from ..models import (
+    INDUSTRY_JOB_UPDATE_FIELDS,
     CharacterAsset,
     CharacterAudit,
     CharacterContact,
@@ -577,7 +578,8 @@ def update_character_assets_names(character_id):
         singleton=True
     ).order_by("pk")
 
-    for subset in chunks(asset_list, 100):
+    # ESI takes up to 1000 ids per names call
+    for subset in chunks(asset_list, 900):
         assets_names = providers.esi_openapi.client.Assets.PostCharactersCharacterIdAssetsNames(
             character_id=character_id,
             body=[i.item_id for i in subset],
@@ -586,10 +588,13 @@ def update_character_assets_names(character_id):
 
         id_list = {i.item_id: i.name for i in assets_names}
 
+        named = []
         for asset in subset:
             if asset.item_id in id_list:
-                asset.name = id_list.get(asset.item_id)
-                asset.save()
+                asset.name = id_list[asset.item_id]
+                named.append(asset)
+        CharacterAsset.objects.bulk_update(
+            named, ["name"], batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
 
 def update_character_blueprints(character_id, force_refresh=False):
@@ -855,34 +860,21 @@ def update_character_industry_jobs(character_id, force_refresh=False):
         )
 
         _st = time.perf_counter()
-        existing_pks = set(
-            CharacterIndustryJob.objects.filter(
-                character=audit_char
-            ).values_list(
-                "job_id",
-                flat=True
+        existing = {
+            job.job_id: job
+            for job in CharacterIndustryJob.objects.filter(
+                character=audit_char,
+                job_id__in=[e.job_id for e in jobs]
             )
-        )
-        type_ids = set()
+        }
         new_events = []
-        # old_events = []
+        updated_events = []
         for event in jobs:
-            type_ids.add(event.blueprint_type_id)
-            if event.product_type_id:
-                type_ids.add(event.product_type_id)
-
-            if event.job_id in existing_pks:
-                _m = CharacterIndustryJob.objects.get(
-                    character=audit_char,
-                    job_id=event.job_id
-                )
-                _m.completed_character_id = event.completed_character_id
-                _m.completed_date = event.completed_date
-                _m.end_date = event.end_date
-                _m.pause_date = event.pause_date
-                _m.status = event.status
-                _m.successful_runs = event.successful_runs
-                _m.save()
+            if event.job_id in existing:
+                _m = existing[event.job_id]
+                for field in INDUSTRY_JOB_UPDATE_FIELDS:
+                    setattr(_m, field, getattr(event, field))
+                updated_events.append(_m)
                 continue
 
             _e = CharacterIndustryJob(
@@ -918,6 +910,13 @@ def update_character_industry_jobs(character_id, force_refresh=False):
             CharacterIndustryJob.objects.bulk_create(
                 new_events,
                 ignore_conflicts=True,
+                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
+            )
+
+        if len(updated_events):
+            CharacterIndustryJob.objects.bulk_update(
+                updated_events,
+                INDUSTRY_JOB_UPDATE_FIELDS,
                 batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
             )
 
@@ -1410,9 +1409,10 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
     if not token:
         return "No Tokens"
 
-    existing_lp_corps = LoyaltyPoint.objects.filter(
-        character=audit_char
-    ).values_list("corporation_id", flat=True)
+    existing_lp = {
+        lp.corporation_id: lp
+        for lp in LoyaltyPoint.objects.filter(character=audit_char)
+    }
 
     try:
         loyaltypoints = providers.esi_openapi.client.Loyalty.GetCharactersCharacterIdLoyaltyPoints(
@@ -1426,22 +1426,20 @@ def update_character_loyaltypoints(character_id, force_refresh=False):
         _bulkcreate = []
         _bulkupdate = []
 
-        for lp in loyaltypoints:
-            lp_corp, _ = EveName.objects.get_or_create_from_esi(
-                lp.corporation_id
-            )
+        corp_ids = {lp.corporation_id for lp in loyaltypoints}
+        EveName.objects.create_bulk_from_esi(
+            list(corp_ids - _known_eve_ids(corp_ids)))
 
-            if lp.corporation_id in existing_lp_corps:
-                existing = LoyaltyPoint.objects.get(
-                    character=audit_char, corporation=lp_corp
-                )
+        for lp in loyaltypoints:
+            if lp.corporation_id in existing_lp:
+                existing = existing_lp[lp.corporation_id]
                 existing.amount = lp.loyalty_points
                 _bulkupdate.append(existing)
             else:
                 _bulkcreate.append(
                     LoyaltyPoint(
                         character=audit_char,
-                        corporation=lp_corp,
+                        corporation_id=lp.corporation_id,
                         amount=lp.loyalty_points
                     )
                 )
