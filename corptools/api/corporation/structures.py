@@ -83,8 +83,9 @@ class StructureApiEndpoints:
 
         @api.get(
             "corp/structures/fuel",
-            response={200: dict, 403: str},
-            tags=self.tags
+            response={200: schema.StructureFuel, 403: str},
+            tags=self.tags,
+            by_alias=True,
         )
         def get_fuel_data(request):
             if not (request.user.has_perm('corptools.own_corp_manager')

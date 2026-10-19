@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Union
 
 # Third Party
 from ninja import Field, Schema
+from pydantic import BaseModel, ConfigDict
 
 
 class Message(Schema):
@@ -935,3 +936,80 @@ class FitCheck(Schema):
     # by character name, for each character on the account with any skills;
     # the fit is the doctrine "fit"
     chars: Dict[str, CharacterSkillCheck]
+
+
+# Skill graph (the Skills page's radar chart)
+
+class SkillGraphGroup(BaseModel):
+    # A plain pydantic model, not a ninja Schema - ninja's Schema drops
+    # extra keys, and the characters are extra keys.
+    #
+    # Besides these fields, one key per character name: the % of the
+    # group's SP they've trained, each skill weighted by its size.
+    model_config = ConfigDict(extra="allow")
+    __pydantic_extra__: Dict[str, int]
+
+    group: str
+    # SP the character has in the group
+    char_total: int
+    # SP of every skill in the group at level V
+    total: float
+
+
+class SkillGraph(Schema):
+    # unordered
+    characters: List[str]
+    # by group name; groups nobody has more than 2% of are left out
+    data: List[SkillGraphGroup]
+
+
+# Structure fuel
+
+class FuelExtra(Schema):
+    # Metenox magmatic gas in the fuel bay
+    qty: int
+    name: str
+    # when the gas runs out
+    expires: datetime
+
+
+class FuelStructure(Schema):
+    id: int
+    owner: IdName
+    name: str
+    type: IdName
+    location: IdName
+    constellation: IdName
+    region: IdName
+    fuel_expiry: Optional[datetime]
+    state: str
+    state_expiry: Optional[datetime]
+    # fuel blocks for the online services - per hour, day, 30 days
+    fuel_req: int
+    fuel_req_day: int
+    fuel_req_30d: int
+    # magmatic gas, Metenox only - per hour, day, 30 days
+    gas_req: Union[int, float]
+    gas_req_day: Union[int, float]
+    gas_req_30d: Union[int, float]
+    # blocks in the bay, from the hours left
+    current_blocks: int
+    # only for a Metenox with gas in its bay
+    extra_fuel_info: Optional[FuelExtra]
+    metenox_gas_hourly: Union[int, float]
+    current_metenox_gas: int
+    block_hours_left: int
+    gas_hours_left: int
+    # e.g. "1 month, 2 days, and 3 hours"
+    block_duration_left: str
+    gas_duration_left: str
+    # blocks/gas to buy to last 90 days - `90day` isn't a Python name, so
+    # aliased, and the endpoint serializes by alias
+    ninety_day: int = Field(..., alias="90day")
+    gas_90day: Union[int, float]
+
+
+class StructureFuel(Schema):
+    structures: List[FuelStructure]
+    # blocks/hour across every structure
+    total_hourly_fuel: Union[int, float]

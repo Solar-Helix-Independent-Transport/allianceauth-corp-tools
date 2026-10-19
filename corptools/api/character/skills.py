@@ -67,7 +67,7 @@ class SkillApiEndpoints:
 
         @api.get(
             "account/{character_id}/skillgraph",
-            response={200: dict, 403: str},
+            response={200: schema.SkillGraph, 403: str},
             tags=self.tags
         )
         def get_character_skillgraph(request, character_id: int):

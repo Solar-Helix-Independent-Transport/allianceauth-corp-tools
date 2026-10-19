@@ -9,6 +9,7 @@ the JSON each endpoint returned before it got a schema, so the schema can't
 quietly change it.
 """
 # Standard Library
+import math
 import sys
 import types
 from datetime import datetime, timedelta, timezone
@@ -926,4 +927,150 @@ class TestFitCheckShapes(ApiShapeTestCase):
                     }},
                 },
             },
+        })
+
+
+class TestSkillGraphShapes(ApiShapeTestCase):
+    def test_skill_graph(self):
+        skill_cat = sde.ItemCategory.objects.create(
+            id=16, name="Skill", published=True)
+        attr = sde.DogmaAttribute.objects.create(
+            id=275, name="skillTimeConstant")
+
+        def group(group_id, name):
+            return sde.ItemGroup.objects.create(
+                id=group_id, name=name, category=skill_cat,
+                anchorable=False, anchored=False,
+                fittable_non_singleton=False, published=True,
+                use_base_price=False)
+
+        def skill(type_id, name, grp, sp):
+            t = sde.ItemType.objects.create(
+                id=type_id, name=name, published=True, group=grp)
+            sde.TypeDogma.objects.create(
+                item_type=t, dogma_attribute=attr, value=1)
+            if sp is not None:
+                ct.Skill.objects.create(
+                    character=self.ca1, skill_id=type_id, skill_name=t,
+                    active_skill_level=1, trained_skill_level=1,
+                    skillpoints_in_skill=sp)
+
+        gunnery = group(255, "Gunnery")
+        skill(3300, "Gunnery", gunnery, 256000)
+        skill(3301, "Small Projectile Turret", gunnery, 128000)
+        # trained too little to show (rounds to 0) - the group is left out
+        skill(3449, "Navigation", group(275, "Navigation"), 1000)
+        # nobody has it - left out too
+        skill(3402, "Science", group(270, "Science"), None)
+
+        sp_5 = 250 * 1 * math.sqrt(32) ** 4  # a multiplier 1 skill at V
+        self.assertEqual(
+            self.get_json(f"/audit/api/account/{self.cid}/skillgraph"), {
+                "characters": [self.char1.character_name],
+                "data": [{
+                    "group": "Gunnery",
+                    # SP the character has in the group
+                    "char_total": 384000,
+                    # SP of every skill in the group at V
+                    "total": 2 * sp_5,
+                    # % of the group trained, weighted by each skill's size:
+                    # Gunnery at V is 50, half of Small Projectile 25
+                    self.char1.character_name: 75,
+                }],
+            })
+
+
+class TestFuelShapes(ApiShapeTestCase):
+    def test_structure_fuel(self):
+        now = datetime(2026, 6, 1, 12, 0, tzinfo=timezone.utc)
+        self.cp1.update_timestamps = {"structures": now.isoformat()}
+        self.cp1.save()
+        region = sde.Region.objects.create(id=10000060, name="Delve")
+        const = sde.Constellation.objects.create(
+            id=20000696, name="O-EIMK", region=region)
+        system = sde.SolarSystem.objects.create(
+            id=30004759, name="1DQ1-A", constellation=const)
+        fortizar = sde.ItemType.objects.create(
+            id=35833, name="Fortizar", published=True)
+        metenox = sde.ItemType.objects.create(
+            id=81826, name="Metenox Moon Drill", published=True)
+        gas = sde.ItemType.objects.create(
+            id=81143, name="Magmatic Gas", published=True)
+
+        def structure(structure_id, type_name, services, fuel_expires=None):
+            st = ct.Structure.objects.create(
+                corporation=self.cp1, profile_id=1, reinforce_hour=12,
+                state="shield_vulnerable", structure_id=structure_id,
+                system_id=system.id, system_name=system,
+                type_id=type_name.id, type_name=type_name,
+                name=f"1DQ1-A - {type_name.name}", fuel_expires=fuel_expires)
+            for name, state in services:
+                ct.StructureService.objects.create(
+                    structure=st, name=name, state=state)
+
+        # 30 blocks/h while online, 10.5h of fuel left
+        structure(1001, fortizar, [("Market", "online"),
+                                   ("Clone Bay", "offline")],
+                  fuel_expires=now + timedelta(hours=10, minutes=30))
+        # 5 blocks/h, out of blocks; 1000 gas at 200/h
+        structure(1002, metenox, [("Automatic Moon Drilling", "online")])
+        ct.CorpAsset.objects.create(
+            corporation=self.cp1, singleton=False, item_id=9001,
+            location_flag="StructureFuel", location_id=1002,
+            location_type="item", quantity=1000, type_id=gas.id,
+            type_name=gas)
+
+        with patch("django.utils.timezone.now", return_value=now):
+            data = self.get_json("/audit/api/corp/structures/fuel")
+
+        place = {
+            "location": {"id": system.id, "name": "1DQ1-A"},
+            "constellation": {"id": 20000696, "name": "O-EIMK"},
+            "region": {"id": 10000060, "name": "Delve"},
+        }
+        owner = {"id": self.corp1.corporation_id,
+                 "name": self.corp1.corporation_name}
+        self.assertEqual(data, {
+            "structures": [
+                {
+                    "id": 1001, "owner": owner,
+                    "name": "1DQ1-A - Fortizar",
+                    "type": {"id": 35833, "name": "Fortizar"}, **place,
+                    "fuel_expiry": "2026-06-01T22:30:00Z",
+                    "state": "shield_vulnerable", "state_expiry": None,
+                    "fuel_req": 30, "fuel_req_day": 720,
+                    "fuel_req_30d": 21600,
+                    "gas_req": 0, "gas_req_day": 0, "gas_req_30d": 0,
+                    # 11 hours (10.5 rounded up) at 30/h
+                    "current_blocks": 330,
+                    "extra_fuel_info": None,
+                    "metenox_gas_hourly": 0, "current_metenox_gas": 0,
+                    "block_hours_left": 11, "gas_hours_left": 0,
+                    "block_duration_left": "11 hours",
+                    "gas_duration_left": "0 hours",
+                    "90day": 30 * 24 * 90 - 330, "gas_90day": 0,
+                },
+                {
+                    "id": 1002, "owner": owner,
+                    "name": "1DQ1-A - Metenox Moon Drill",
+                    "type": {"id": 81826, "name": "Metenox Moon Drill"},
+                    **place,
+                    "fuel_expiry": None,
+                    "state": "shield_vulnerable", "state_expiry": None,
+                    "fuel_req": 5, "fuel_req_day": 120, "fuel_req_30d": 3600,
+                    "gas_req": 200, "gas_req_day": 4800,
+                    "gas_req_30d": 144000,
+                    "current_blocks": 0,
+                    "extra_fuel_info": {
+                        "qty": 1000, "name": "Magmatic Gas",
+                        "expires": "2026-06-01T17:00:00Z",
+                    },
+                    "metenox_gas_hourly": 200, "current_metenox_gas": 1000,
+                    "block_hours_left": 0, "gas_hours_left": 5,
+                    "block_duration_left": "0 hours",
+                    "gas_duration_left": "5 hours",
+                    "90day": 5 * 24 * 90, "gas_90day": 200 * 24 * 90 - 1000,
+                },
+            ],
+            "total_hourly_fuel": 35,
         })
