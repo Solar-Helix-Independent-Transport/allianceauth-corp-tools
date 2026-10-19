@@ -1,5 +1,6 @@
 # Standard Library
 from datetime import datetime
+from decimal import Decimal
 from typing import Dict, List, Optional, Union
 
 # Third Party
@@ -543,3 +544,114 @@ class WalletActivityEntry(Schema):
     value: int
     interactions: int
     own_account: bool = False
+
+
+class IdName(Schema):
+    id: int
+    name: str
+
+
+class IdNameQty(IdName):
+    qty: int
+
+
+class WalletDivision(Schema):
+    # the division number, as a string
+    division: str
+    # "None" (the string) when the division has no name
+    name: str
+    # sent as a string, e.g. "1234.50"
+    balance: Decimal
+
+
+class PocoOwner(Schema):
+    corporation_name: str
+    corporation_id: int
+
+
+class PocoLocation(Schema):
+    id: int
+    name: str
+    region: str
+    constellation: str
+
+
+class Poco(Schema):
+    id: int
+    owner: PocoOwner
+    name: Optional[str]
+    location: PocoLocation
+    standing_level: Optional[str]
+    alliance_tax_rate: Optional[float]
+    corporation_tax_rate: Optional[float]
+    terrible_standing_tax_rate: Optional[float]
+    bad_standing_tax_rate: Optional[float]
+    neutral_standing_tax_rate: Optional[float]
+    good_standing_tax_rate: Optional[float]
+    excellent_standing_tax_rate: Optional[float]
+    reinforce_exit_end: int
+    reinforce_exit_start: int
+    allow_access_with_standings: Optional[bool]
+    allow_alliance_access: Optional[bool]
+
+
+class StarbaseOwner(Schema):
+    corporation_id: int
+    corporation_name: str
+
+
+class Starbase(Schema):
+    starbase_id: int
+    owner: StarbaseOwner
+    name: Optional[str]
+    type: IdName
+    state: str
+    onlined_since: Optional[datetime]
+    reinforced_until: Optional[datetime]
+    unanchor_at: Optional[datetime]
+    allow_alliance_members: bool
+    allow_corporation_members: bool
+    attack_if_other_security_status_dropping: bool
+    use_alliance_standings: bool
+    attack_security_status_threshold: Optional[float]
+    attack_standing_threshold: Optional[float]
+    anchor: Optional[str]
+    online: Optional[str]
+    offline: Optional[str]
+    unanchor: Optional[str]
+    fuel_bay_take: Optional[str]
+    fuel_bay_view: Optional[str]
+    # the raw ESI fuel list as stored, not parsed
+    fuels: Optional[str]
+    # only sent when the starbase's moon/system is known - the endpoint
+    # leaves unset fields out rather than sending null
+    moon: Optional[IdName] = None
+    system: Optional[IdName] = None
+    constellation: Optional[IdName] = None
+    region: Optional[IdName] = None
+
+
+class StarbaseSpaceItem(Schema):
+    type: IdName
+    # metres from the tower
+    distance: float
+
+
+class StarbaseFit(Schema):
+    fuel: List[IdNameQty]
+    space: List[StarbaseSpaceItem]
+
+
+class StructureFit(Schema):
+    # by location flag: a fitted module ("HiSlot0", "FighterTube0", ...), or
+    # the contents of a bay ("Cargo", "StructureFuel", ...)
+    fit: Dict[str, Union[IdName, List[IdNameQty]]]
+    # slot counts - the type's SDE values (floats), else integer defaults;
+    # int | float keeps each as sent rather than turning 8 into 8.0
+    low: Union[int, float]
+    med: Union[int, float]
+    high: Union[int, float]
+    rig: Union[int, float]
+    service: Union[int, float]
+    fighter: Union[int, float]
+    subsystem: Union[int, float]

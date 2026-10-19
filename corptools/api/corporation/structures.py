@@ -255,7 +255,7 @@ class StructureApiEndpoints:
 
         @api.get(
             "corp/structures/{structure_id}",
-            response={200: dict, 404: str, 403: str},
+            response={200: schema.StructureFit, 404: str, 403: str},
             tags=self.tags
         )
         def get_corporation_structure_fitting(request, structure_id):
@@ -333,7 +333,7 @@ class StructureApiEndpoints:
 
         @api.get(
             "corp/pocos",
-            response={200: List, 403: str},
+            response={200: List[schema.Poco], 403: str},
             tags=self.tags
         )
         def get_visible_pocos(request):
@@ -408,8 +408,9 @@ class StructureApiEndpoints:
 
         @api.get(
             "corp/starbases",
-            response={200: List, 403: str},
-            tags=self.tags
+            response={200: List[schema.Starbase], 403: str},
+            tags=self.tags,
+            exclude_unset=True,
         )
         def get_visible_starbases(request):
             perms = (
@@ -484,7 +485,7 @@ class StructureApiEndpoints:
 
         @api.get(
             "corp/starbase/{starbase_id}",
-            response={200: dict, 403: str},
+            response={200: schema.StarbaseFit, 403: str},
             tags=self.tags
         )
         def get_visible_starbase_fit(request, starbase_id: int):
@@ -505,6 +506,30 @@ class StructureApiEndpoints:
                 request.user
             ).filter(starbase_id=starbase_id)
             if starbase.exists():
+                starbase = starbase.first()
+
+                # The fuel bay comes from the starbase itself, so it's
+                # available whether or not the tower is in the corp's assets.
+                assets_in_bay = []
+                try:
+                    # null for a starbase ESI never sent fuel for
+                    for f in json.loads((starbase.fuels or "").replace("'", '"')):
+                        # This is bad and i should feel bad....
+                        # TODO save this correctly...
+                        # TODO investigate if i can do this via assets betterer
+                        type_name = ItemType.objects.get(
+                            id=f['type_id'])
+                        assets_in_bay.append({
+                            "id": type_name.id,
+                            "name": type_name.name,
+                            "qty": f['quantity']
+                        })
+                except json.JSONDecodeError:
+                    pass
+
+                # What's anchored nearby needs the tower's position, which
+                # only the assets have - none until they've synced.
+                assets_in_space = []
                 parent = models.CorpAsset.objects.filter(
                     item_id=starbase_id,
                     coordinate__isnull=False
@@ -531,7 +556,6 @@ class StructureApiEndpoints:
                         distance__lte=100000
                     )
 
-                    assets_in_space = []
                     for d in distances:
                         assets_in_space.append({
                             "type": {
@@ -540,31 +564,15 @@ class StructureApiEndpoints:
                             },
                             "distance": d.distance
                         })
+                else:
+                    logger.warning(f"Tower {starbase_id} not found in assets")
 
-                    assets_in_bay = []
-                    starbase = starbase.first()
-                    try:
-                        for f in json.loads(starbase.fuels.replace("'", '"')):
-                            # This is bad and i should feel bad....
-                            # TODO save this correctly...
-                            # TODO investigate if i can do this via assets betterer
-                            type_name = ItemType.objects.get(
-                                id=f['type_id'])
-                            assets_in_bay.append({
-                                "id": type_name.id,
-                                "name": type_name.name,
-                                "qty": f['quantity']
-                            })
-                    except json.JSONDecodeError as e:
-                        pass
-
-                    return 200, {
-                        "fuel": assets_in_bay,
-                        "space": assets_in_space
-                    }
+                return 200, {
+                    "fuel": assets_in_bay,
+                    "space": assets_in_space
+                }
             else:
                 logging.error(
                     f"Permission Denied for {request.user} to view starbase {starbase_id}!")
-                logger.warning(f"Tower - not found in assets")
 
                 return 403, "Permission Denied!"

@@ -135,7 +135,7 @@ class FinancesApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/divisions",
-            response={200: List, 403: str},
+            response={200: List[schema.WalletDivision], 403: str},
             tags=self.tags
         )
         def get_corporation_divisions(request, corporation_id: int, type_refs: str = "", page: int = 1):
