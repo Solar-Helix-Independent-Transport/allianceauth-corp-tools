@@ -53,18 +53,20 @@ class StatusApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/character/status",
-            response={200: dict, 403: str},
+            response={200: schema.CorpCharacterStatus, 403: str},
             tags=self.tags
         )
         def get_corporation_character_status(request, corporation_id: int):
             if not corporation_id:
                 corporation_id = request.user.profile.main_character.corporation_id
 
+            # .first(), not .get() - .get() raised for a corp the user can't
+            # see, so they got a 500 instead of the 403 below
             corp = models.CorporationAudit.objects.visible_to(
                 request.user
-            ).get(
+            ).filter(
                 corporation__corporation_id=corporation_id
-            )
+            ).first()
 
             if not corp:
                 return 403, _("Permission Denied")

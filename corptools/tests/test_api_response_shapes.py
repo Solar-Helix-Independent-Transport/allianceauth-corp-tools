@@ -11,6 +11,7 @@ quietly change it.
 # Standard Library
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+from unittest.mock import patch
 
 # Third Party
 from eve_sde import models as sde
@@ -463,3 +464,45 @@ class TestDashboardShapes(ApiShapeTestCase):
                 },
             },
         ])
+
+
+class TestCorporationStatusShapes(ApiShapeTestCase):
+    def test_character_status(self):
+        # user1's characters, both in corp1: one active with ISK, one
+        # inactive with no balance recorded
+        self.ca1.balance = Decimal("1234.56")
+        self.ca1.save()
+        active = self.ca1.pk
+
+        with patch.object(ct.CharacterAudit, "is_active",
+                          lambda audit: audit.pk == active):
+            data = self.get_json(
+                f"/audit/api/corporation/{self.corp1.corporation_id}"
+                "/character/status")
+
+        self.assertEqual(data, {
+            "characters": {
+                "known_and_alts": 2,
+                "known_in_corp": 2,
+                "bad": 1,
+                "in_corp": self.corp1.member_count,
+                # a number, not a Decimal string
+                "liquid": 1234.56,
+            },
+            "corporation": {
+                "id": self.corp1.corporation_id,
+                "name": self.corp1.corporation_name,
+            },
+        })
+
+    def test_character_status_for_a_corp_not_visible(self):
+        # Used to 500 - .get() raised DoesNotExist before the 403 check
+        self.user1.is_superuser = False
+        self.user1.save()
+
+        resp = self.client.get(
+            f"/audit/api/corporation/{self.corp1.corporation_id}"
+            "/character/status")
+
+        self.assertEqual(resp.status_code, 403)
+        self.assertEqual(resp.json(), "Permission Denied")

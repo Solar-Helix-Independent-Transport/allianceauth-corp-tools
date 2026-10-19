@@ -695,3 +695,21 @@ class Den(Schema):
     expand: bool
     name: Optional[str]
     location: DenLocation
+
+
+class CorpCharacterCounts(Schema):
+    # every character of members whose main is in the corp
+    known_and_alts: int
+    # of those, the ones actually in the corp
+    known_in_corp: int
+    # not updating, or with no audit
+    bad: int
+    # the corp's member count from ESI
+    in_corp: int
+    # total wallet balance of known_and_alts
+    liquid: float
+
+
+class CorpCharacterStatus(Schema):
+    characters: CorpCharacterCounts
+    corporation: IdName
