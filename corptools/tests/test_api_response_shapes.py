@@ -9,6 +9,8 @@ the JSON each endpoint returned before it got a schema, so the schema can't
 quietly change it.
 """
 # Standard Library
+import sys
+import types
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from unittest.mock import patch
@@ -706,3 +708,135 @@ class TestSovereigntyShapes(ApiShapeTestCase):
                 {**self.hub_a_json, **public},
                 {**self.hub_b_json, **public},
             ], False))
+
+
+class TestMiningShapes(ApiShapeTestCase):
+    def setUp(self):
+        super().setUp()
+        region = sde.Region.objects.create(id=10000002, name="The Forge")
+        const = sde.Constellation.objects.create(
+            id=20000020, name="Kimotoro", region=region)
+        self.a = sde.SolarSystem.objects.create(
+            id=30000142, name="Jita", constellation=const)
+        self.b = sde.SolarSystem.objects.create(
+            id=30000144, name="Perimeter", constellation=const)
+        group = sde.ItemGroup.objects.create(
+            id=450, name="Arkonor", anchorable=False, anchored=False,
+            fittable_non_singleton=False, published=True,
+            use_base_price=False)
+        # volumes that are exact in binary, so the sums are too
+        self.veld = sde.ItemType.objects.create(
+            id=1230, name="Veldspar", published=True, group=group,
+            volume=0.5)
+        self.scord = sde.ItemType.objects.create(
+            id=1228, name="Scordite", published=True, group=group,
+            volume=0.25)
+
+        today = datetime.now(timezone.utc).date()
+        self.day = {n: str(today - timedelta(days=n)) for n in range(5)}
+
+        def row(row_id, audit, days_ago, ore, system, qty):
+            ct.CharacterMiningLedger.objects.create(
+                id=row_id, character=audit,
+                date=today - timedelta(days=days_ago), type_name=ore,
+                system=system, quantity=qty)
+
+        row("1", self.ca1, 2, self.veld, self.a, 1000)
+        row("2", self.ca1, 2, self.veld, self.a, 500)
+        row("3", self.ca2, 2, self.scord, self.b, 200)
+        row("4", self.ca1, 3, self.veld, self.a, 100)
+        row("5", self.ca1, 0, self.veld, self.a, 999)  # today - not shown
+        row("6", self.ca1, 10, self.veld, self.a, 999)  # outside look_back
+
+    def get_mining(self, url):
+        # the moons app prices the ore - not installed here, so stand in
+        helpers = types.ModuleType("moons.helpers")
+        helpers.OreHelper = type("OreHelper", (), {
+            "get_ore_array_with_value": staticmethod(
+                lambda: {1230: {"value": 2.5}})})
+        with patch.dict(sys.modules, {
+                "moons": types.ModuleType("moons"), "moons.helpers": helpers}):
+            data = self.get_json(url)
+        # built from sets - no stable order
+        for key in ("all_ores", "all_groups", "all_systems"):
+            data[key] = sorted(data[key])
+        return data
+
+    def empty_day(self, n):
+        return {"date": self.day[n], "ores": [], "characters": [],
+                "systems": [], "value": 0, "volume": 0}
+
+    def expected(self, day2_characters):
+        jita = {"id": self.a.id, "name": "Jita"}
+        return {
+            "all_ores": ["Scordite", "Veldspar"],
+            "all_groups": ["Arkonor"],
+            "all_systems": ["Jita", "Perimeter"],
+            "total_volume": 850.0,
+            "total_value": 4000.0,
+            # look_back=3 gives the 4 days before today, oldest first
+            "data": [
+                self.empty_day(4),
+                {
+                    "date": self.day[3],
+                    # NB: an ore's value counts its first row of the day
+                    # twice (entry starts at `value`, then += value) - 500
+                    # here where 250 is right, while the day's own value
+                    # is right
+                    "ores": [{"name": "Veldspar", "group": "Arkonor",
+                              "id": 1230, "volume": 50.0, "value": 500.0}],
+                    "characters": [{"id": self.char1.character_id,
+                                    "name": self.char1.character_name}],
+                    "systems": [jita],
+                    "value": 250.0,
+                    "volume": 50.0,
+                },
+                {
+                    "date": self.day[2],
+                    "ores": [
+                        # 3750 is right - see above
+                        {"name": "Veldspar", "group": "Arkonor", "id": 1230,
+                         "volume": 750.0, "value": 6250.0},
+                        {"name": "Scordite", "group": "Arkonor", "id": 1228,
+                         "volume": 50.0, "value": 0},
+                    ],
+                    "characters": day2_characters,
+                    "systems": [jita, {"id": self.b.id, "name": "Perimeter"}],
+                    "value": 3750.0,
+                    "volume": 800.0,
+                },
+                self.empty_day(1),
+            ],
+        }
+
+    def test_character_mining(self):
+        self.assertEqual(
+            self.get_mining(
+                f"/audit/api/account/{self.cid}/mining?look_back=3"),
+            self.expected([
+                {"id": self.char1.character_id,
+                 "name": self.char1.character_name},
+                {"id": self.char2.character_id,
+                 "name": self.char2.character_name},
+            ]))
+
+    def test_corporation_mining(self):
+        # characters are shown as their main - char2's main is char1
+        self.assertEqual(
+            self.get_mining(
+                f"/audit/api/corporation/{self.corp1.corporation_id}"
+                "/mining?look_back=3"),
+            self.expected([
+                {"id": self.char1.character_id,
+                 "name": self.char1.character_name},
+            ]))
+
+    def test_mining_characters(self):
+        self.assertEqual(
+            self.get_json(f"/audit/api/account/{self.cid}/mining/chars"),
+            {"characters": [
+                {"character_id": self.char1.character_id,
+                 "character_name": self.char1.character_name},
+                {"character_id": self.char2.character_id,
+                 "character_name": self.char2.character_name},
+            ]})

@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _
 
 # AA Example App
 from corptools import models
+from corptools.api import schema
 from corptools.api.helpers import resolve_character
 
 
@@ -21,7 +22,7 @@ class MiningApiEndpoints:
     def __init__(self, api: NinjaAPI):
         @api.get(
             "account/{character_id}/mining/chars",
-            response={200: dict, 403: str},
+            response={200: schema.MiningCharacters, 403: str},
             tags=["Account"]
         )
         def get_all_characters_character_mining(request, character_id: int):
@@ -33,7 +34,7 @@ class MiningApiEndpoints:
 
         @api.get(
             "account/{character_id}/mining",
-            response={200: dict, 403: str},
+            response={200: schema.MiningLedger, 403: str},
             tags=["Account"]
         )
         def get_character_mining(request,

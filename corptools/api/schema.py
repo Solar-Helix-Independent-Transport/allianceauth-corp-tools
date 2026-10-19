@@ -826,3 +826,47 @@ class SovMap(Schema):
     edges: List[MapEdge]
     jump_bridges: List[MapEdge]
     hubs: List[SovHub]
+
+
+# Mining ledgers - character and corporation share the shape
+
+class MiningOre(Schema):
+    name: str
+    group: str
+    id: int
+    # m3
+    volume: Union[int, float]
+    # ISK, 0 without the moons app to price ore. NB: counts the ore's first
+    # ledger row of each day twice - the day's own `value` doesn't
+    value: Union[int, float]
+
+
+class MiningDay(Schema):
+    # YYYY-MM-DD
+    date: str
+    ores: List[MiningOre]
+    # on the corporation ledger, each character's main
+    characters: List[IdName]
+    systems: List[IdName]
+    value: Union[int, float]
+    volume: Union[int, float]
+
+
+class MiningLedger(Schema):
+    # unordered
+    all_ores: List[str]
+    all_groups: List[str]
+    all_systems: List[str]
+    total_volume: Union[int, float]
+    total_value: Union[int, float]
+    # one entry per day, oldest first, ending yesterday
+    data: List[MiningDay]
+
+
+class MiningCharacter(Schema):
+    character_id: int
+    character_name: str
+
+
+class MiningCharacters(Schema):
+    characters: List[MiningCharacter]

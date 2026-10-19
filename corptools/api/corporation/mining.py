@@ -20,7 +20,7 @@ from corptools.api.helpers import (
     get_main_character,
 )
 
-from ..schema import Character
+from ..schema import Character, MiningLedger
 
 logger = get_extension_logger(__name__)
 
@@ -32,7 +32,7 @@ class MiningApiEndpoints:
     def __init__(self, api: NinjaAPI):
         @api.get(
             "corporation/{corporation_id}/mining",
-            response={200: dict, 403: str},
+            response={200: MiningLedger, 403: str},
             tags=self.tags
         )
         def get_corporation_agregated_mining(
