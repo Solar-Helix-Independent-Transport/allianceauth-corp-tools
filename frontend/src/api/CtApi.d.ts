@@ -3121,7 +3121,7 @@ export interface components {
       /** Name */
       name: string;
       /** Balance */
-      balance: number | string;
+      balance: number;
     };
     /** CorpStatus */
     CorpStatus: {

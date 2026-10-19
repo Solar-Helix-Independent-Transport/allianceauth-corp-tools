@@ -9092,16 +9092,8 @@
             "type": "string"
           },
           "balance": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-                "type": "string"
-              }
-            ],
-            "title": "Balance"
+            "title": "Balance",
+            "type": "number"
           }
         },
         "required": ["division", "name", "balance"],
