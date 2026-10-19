@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Union
 
 # Third Party
-from ninja import Schema
+from ninja import Field, Schema
 
 
 class Message(Schema):
@@ -197,6 +197,24 @@ class CharacterDoctrines(Schema):
     doctrines: dict
     skills: dict
     queue: dict
+
+
+class CharacterMail(Schema):
+    character: str
+    character_id: int
+    # always sent, but may be null - required, so the generated types say so
+    mail_id: Optional[int]
+    subject: Optional[str]
+    # `from` is a Python keyword - the endpoint serializes by alias
+    from_: str = Field(..., alias="from")
+    recipients: List[str]
+    # the label's name, or its id when ESI didn't give it a name
+    labels: List[Union[str, int]]
+    timestamp: Optional[datetime]
+
+
+class MailBody(Schema):
+    body: str
 
 
 class CharacterNotification(Schema):

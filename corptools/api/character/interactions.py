@@ -66,8 +66,9 @@ class InteractionApiEndpoints:
 
         @api.get(
             "account/{character_id}/mail",
-            response={200: List, 403: str},
-            tags=self.tags
+            response={200: List[schema.CharacterMail], 403: str},
+            tags=self.tags,
+            by_alias=True,
         )
         def get_character_mail(request, character_id: int):
             err, main, characters = resolve_character(request, character_id)
@@ -119,7 +120,7 @@ class InteractionApiEndpoints:
 
         @api.get(
             "account/{character_id}/mail/{mail_id}",
-            response={200: dict, 403: str},
+            response={200: schema.MailBody, 403: str},
             tags=self.tags
         )
         def get_mail_message_request(request, character_id: int, mail_id: int):
