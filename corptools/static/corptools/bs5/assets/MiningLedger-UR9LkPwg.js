@@ -1,0 +1,2 @@
+import{a as e,w as t}from"./@app-libs-eRbCtoJk.js";import{r as n}from"./loaders-DtPzTDup.js";import{t as r}from"./LedgerGraph-B7TdfRAm.js";import{t as i}from"./corporation-BWW62vd6.js";import{n as a,t as o}from"./useCorporationId-BETHbvGc.js";var s=t(),c=()=>{let t=o(),{data:c}=e({queryKey:[`mining-ledger-corp`,t],queryFn:()=>i(Number(t))});return(0,s.jsxs)(s.Fragment,{children:[(0,s.jsx)(a,{}),c?(0,s.jsx)(r,{data:c}):(0,s.jsx)(n,{})]})};export{c as default};
+//# sourceMappingURL=MiningLedger-UR9LkPwg.js.map

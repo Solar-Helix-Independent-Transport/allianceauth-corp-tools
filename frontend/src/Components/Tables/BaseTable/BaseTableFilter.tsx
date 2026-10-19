@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useDebouncedFilter } from "./useDebouncedFilter";
 import Styles from "./BaseTableFilter.module.css";
 import { Column, Table as ReactTable } from "@tanstack/react-table";
 import { Button, Dropdown, Form, OverlayTrigger, Popover } from "react-bootstrap";
@@ -204,16 +205,15 @@ export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> 
 
 export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
   const { t } = useTranslation();
+  const [value, setValue] = useDebouncedFilter(column);
   return (
     <div className={Styles.searchWrapper}>
       <Form.Control
         className={Styles.searchInput}
         type="text"
         placeholder={t("Search")}
-        value={(column.getFilterValue() as string) ?? ""}
-        onChange={(event) => {
-          column.setFilterValue(event.target.value ? event.target.value : "");
-        }}
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
       />
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -228,7 +228,13 @@ export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> 
           clip-rule="evenodd"
         ></path>
       </svg>
-      <button type="button" onClick={() => column.setFilterValue("")}>
+      <button
+        type="button"
+        onClick={() => {
+          setValue("");
+          column.setFilterValue("");
+        }}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -245,9 +251,79 @@ export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> 
   );
 };
 
-// function setSearchItems(allItems: any) {
-//   return allItems;
-// }
+// How many options the dropdown renders - a column can have thousands of
+// unique values (item names, locations), and rendering them all made opening
+// the dropdown slow. Typing narrows the list.
+export const MAX_SELECT_OPTIONS = 100;
+
+type SelectOption = { value: string; label: string };
+
+/** The dropdown's options. Its own component so the work (sorting the
+ * column's unique values, matching them against the search) only happens
+ * while the dropdown is open, not on every render of the table. */
+const SelectFilterOptions = <TData,>({
+  column,
+  search,
+  labelFor,
+}: {
+  column: Column<TData, unknown>;
+  search: string;
+  labelFor: (value: string) => string;
+}) => {
+  const { t } = useTranslation();
+  const uniqueValues = column.getFacetedUniqueValues();
+
+  const allOptions = useMemo(() => {
+    // Drop null/undefined up front - some columns (e.g. a contract's
+    // issuer/assignee/acceptor) are legitimately null for some rows, and a
+    // stray null here can otherwise trip the object/HTML check below into
+    // treating every value in the column as an object, hiding the options.
+    const sorted = Array.from(uniqueValues.keys())
+      .filter((v) => v !== null && v !== undefined)
+      .sort();
+    if (isHTML(sorted[0]) || typeof sorted[0] === "object") return [];
+    return (sorted as string[]).map((value): SelectOption & { search: string } => ({
+      value,
+      label: labelFor(value),
+      search: String(value).toLowerCase(),
+    }));
+  }, [uniqueValues, labelFor]);
+
+  const needle = search.toLowerCase();
+  const matching = needle ? allOptions.filter((o) => o.search.includes(needle)) : allOptions;
+  const shown = matching.slice(0, MAX_SELECT_OPTIONS);
+
+  if (shown.length === 0) {
+    return <Dropdown.Item disabled>{t("Start typing to search.")}</Dropdown.Item>;
+  }
+  return (
+    <>
+      {shown.map((item) => (
+        <Dropdown.Item
+          key={item.value}
+          className={Styles.capitaliseWords}
+          eventKey={item.value}
+          onClick={() => {
+            column.setFilterValue(item.value);
+            document.body.click();
+          }}
+        >
+          {item.label}
+        </Dropdown.Item>
+      ))}
+      {matching.length > shown.length && (
+        <Dropdown.Item disabled>
+          {t("{{count}} more, keep typing to narrow down.", {
+            count: matching.length - shown.length,
+          })}
+        </Dropdown.Item>
+      )}
+    </>
+  );
+};
+
+const defaultLabel = (v: string) => v?.replaceAll("_", " ") ?? v;
+
 export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
   const { t } = useTranslation();
   // The box doubles as both "what's currently applied" and "what you're
@@ -257,40 +333,10 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
   // matched, and applied as the filter itself, against the raw values -
   // see onChange), not a label for whatever they've typed so far.
   const [isEditing, setIsEditing] = useState(false);
-  // Drop null/undefined up front - some columns (e.g. a contract's
-  // issuer/assignee/acceptor) are legitimately null for some rows, and a
-  // stray null here can otherwise trip isObjectorHTML below into treating
-  // every value in the column as an object, hiding the filter entirely.
-  const sortedUniqueValues = Array.from(column.getFacetedUniqueValues().keys())
-    .filter((v) => v !== null && v !== undefined)
-    .sort();
-  const currentFilterValue = column.getFilterValue() as string;
-  const isObjectorHTML =
-    isHTML(sortedUniqueValues?.[0]) || typeof sortedUniqueValues?.[0] === "object";
+  const [search, setSearch] = useDebouncedFilter(column);
+  const currentFilterValue = column.getFilterValue() as string | undefined;
 
-  const labelFor =
-    column.columnDef.meta?.filterOptionLabel ?? ((v: string) => v?.replaceAll("_", " ") ?? v);
-
-  const selectOptions = (sortedUniqueValues as string[]).reduce(
-    (previousValue: { value: string; label: string }[], currentValue) => {
-      // Some columns (e.g. a contract's issuer/assignee/acceptor) are
-      // legitimately null for some rows - no reason to offer a "null"
-      // filter option for those, and the fallback labelFor would throw on
-      // it (`.replaceAll` on null) if it somehow got this far.
-      if (currentValue !== undefined && currentValue !== null) {
-        if (!isObjectorHTML) {
-          if (
-            currentFilterValue === undefined ||
-            currentValue?.toLowerCase().includes(currentFilterValue?.toLowerCase())
-          ) {
-            previousValue.push({ value: currentValue, label: labelFor(currentValue) });
-          }
-        }
-      }
-      return previousValue;
-    },
-    [],
-  );
+  const labelFor = column.columnDef.meta?.filterOptionLabel ?? defaultLabel;
 
   return (
     <OverlayTrigger
@@ -300,28 +346,7 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
       overlay={
         <Dropdown show drop={"down-centered"}>
           <Dropdown.Menu className={Styles.dropDown}>
-            <>
-              {selectOptions.length > 0 ? (
-                selectOptions.map((item) => {
-                  if (item?.value) {
-                    return (
-                      <Dropdown.Item
-                        className={Styles.capitaliseWords}
-                        eventKey={item.value}
-                        onClick={() => {
-                          column.setFilterValue(item.value ? item.value : "");
-                          document.body.click();
-                        }}
-                      >
-                        {item.label}
-                      </Dropdown.Item>
-                    );
-                  }
-                })
-              ) : (
-                <Dropdown.Item disabled>{t("Start typing to search.")}</Dropdown.Item>
-              )}
-            </>
+            <SelectFilterOptions column={column} search={search} labelFor={labelFor} />
           </Dropdown.Menu>
         </Dropdown>
       }
@@ -333,10 +358,10 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
             type="text"
             placeholder={t("Search")}
             value={
-              typeof currentFilterValue === "undefined"
-                ? ""
-                : isEditing
-                  ? currentFilterValue
+              isEditing
+                ? search
+                : currentFilterValue === undefined
+                  ? ""
                   : labelFor(currentFilterValue)
             }
             onFocus={(event) => {
@@ -348,9 +373,7 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
               event.target.select();
             }}
             onBlur={() => setIsEditing(false)}
-            onChange={(event) => {
-              column.setFilterValue(event.target.value ? event.target.value : "");
-            }}
+            onChange={(event) => setSearch(event.target.value)}
           />
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -370,6 +393,7 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
             onClick={(event) => {
               event.stopPropagation();
               setIsEditing(false);
+              setSearch("");
               column.setFilterValue(() => undefined);
             }}
           >
