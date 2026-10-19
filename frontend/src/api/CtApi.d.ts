@@ -2129,6 +2129,67 @@ export interface components {
       /** Cat Id */
       cat_id?: number | null;
     };
+    /** ActivityMap */
+    ActivityMap: {
+      /** Regions */
+      regions: components["schemas"]["IdName"][];
+      /** Systems */
+      systems: components["schemas"]["MapSystem"][];
+      /** Edges */
+      edges: components["schemas"]["MapEdge"][];
+      /** Values */
+      values: components["schemas"]["ActivityMapValue"][];
+    };
+    /** ActivityMapValue */
+    ActivityMapValue: {
+      /** System Id */
+      system_id: number;
+      /** Value */
+      value: number;
+      /** Count */
+      count: number;
+      /** Quantity */
+      quantity: number;
+    };
+    /** IdName */
+    IdName: {
+      /** Id */
+      id: number;
+      /** Name */
+      name: string;
+    };
+    /** MapEdge */
+    MapEdge: {
+      /** Source */
+      source: number;
+      /** Target */
+      target: number;
+    };
+    /** MapSystem */
+    MapSystem: {
+      /** Id */
+      id: number;
+      /** Name */
+      name: string;
+      /** Region Id */
+      region_id: number | null;
+      /** Constellation Id */
+      constellation_id: number | null;
+      /** X 2D */
+      x_2d: number | null;
+      /** Y 2D */
+      y_2d: number | null;
+      /** X Real */
+      x_real: number | null;
+      /** Y Real */
+      y_real: number | null;
+      /** Security Status */
+      security_status: number | null;
+      /** Security Class */
+      security_class: string | null;
+      /** External */
+      external: boolean;
+    };
     /** ValueLabel */
     ValueLabel: {
       /** Value */
@@ -2431,6 +2492,30 @@ export interface components {
       /** Watched */
       watched: boolean;
     };
+    /** CharacterMail */
+    CharacterMail: {
+      /** Character */
+      character: string;
+      /** Character Id */
+      character_id: number;
+      /** Mail Id */
+      mail_id: number | null;
+      /** Subject */
+      subject: string | null;
+      /** From */
+      from: string;
+      /** Recipients */
+      recipients: string[];
+      /** Labels */
+      labels: (string | number)[];
+      /** Timestamp */
+      timestamp: string | null;
+    };
+    /** MailBody */
+    MailBody: {
+      /** Body */
+      body: string;
+    };
     /** CharacterNotification */
     CharacterNotification: {
       character: components["schemas"]["Character"];
@@ -2483,6 +2568,61 @@ export interface components {
         [key: string]: unknown;
       } | null;
     };
+    /** MiningCharacter */
+    MiningCharacter: {
+      /** Character Id */
+      character_id: number;
+      /** Character Name */
+      character_name: string;
+    };
+    /** MiningCharacters */
+    MiningCharacters: {
+      /** Characters */
+      characters: components["schemas"]["MiningCharacter"][];
+    };
+    /** MiningDay */
+    MiningDay: {
+      /** Date */
+      date: string;
+      /** Ores */
+      ores: components["schemas"]["MiningOre"][];
+      /** Characters */
+      characters: components["schemas"]["IdName"][];
+      /** Systems */
+      systems: components["schemas"]["IdName"][];
+      /** Value */
+      value: number;
+      /** Volume */
+      volume: number;
+    };
+    /** MiningLedger */
+    MiningLedger: {
+      /** All Ores */
+      all_ores: string[];
+      /** All Groups */
+      all_groups: string[];
+      /** All Systems */
+      all_systems: string[];
+      /** Total Volume */
+      total_volume: number;
+      /** Total Value */
+      total_value: number;
+      /** Data */
+      data: components["schemas"]["MiningDay"][];
+    };
+    /** MiningOre */
+    MiningOre: {
+      /** Name */
+      name: string;
+      /** Group */
+      group: string;
+      /** Id */
+      id: number;
+      /** Volume */
+      volume: number;
+      /** Value */
+      value: number;
+    };
     /** CharacterRoles */
     CharacterRoles: {
       character: components["schemas"]["Character"];
@@ -2519,6 +2659,24 @@ export interface components {
       level: number;
       /** Active */
       active: number;
+    };
+    /** SkillGraph */
+    SkillGraph: {
+      /** Characters */
+      characters: string[];
+      /** Data */
+      data: components["schemas"]["SkillGraphGroup"][];
+    };
+    /** SkillGraphGroup */
+    SkillGraphGroup: {
+      /** Group */
+      group: string;
+      /** Char Total */
+      char_total: number;
+      /** Total */
+      total: number;
+    } & {
+      [key: string]: number;
     };
     /** CharacterSkillHistory */
     CharacterSkillHistory: {
@@ -2956,6 +3114,15 @@ export interface components {
       /** Reason */
       reason?: string | null;
     };
+    /** WalletDivision */
+    WalletDivision: {
+      /** Division */
+      division: string;
+      /** Name */
+      name: string;
+      /** Balance */
+      balance: number | string;
+    };
     /** CorpStatus */
     CorpStatus: {
       corporation: components["schemas"]["Corporation"];
@@ -2967,6 +3134,46 @@ export interface components {
       last_updates?: {
         [key: string]: unknown;
       } | null;
+    };
+    /** CorpCharacterCounts */
+    CorpCharacterCounts: {
+      /** Known And Alts */
+      known_and_alts: number;
+      /** Known In Corp */
+      known_in_corp: number;
+      /** Bad */
+      bad: number;
+      /** In Corp */
+      in_corp: number;
+      /** Liquid */
+      liquid: number;
+    };
+    /** CorpCharacterStatus */
+    CorpCharacterStatus: {
+      characters: components["schemas"]["CorpCharacterCounts"];
+      corporation: components["schemas"]["IdName"];
+    };
+    /** Gate */
+    Gate: {
+      start: components["schemas"]["GateEnd"];
+      end: components["schemas"]["GateEnd"];
+    };
+    /** GateEnd */
+    GateEnd: {
+      /** System Name */
+      system_name?: string | null;
+      /** System Id */
+      system_id?: number | null;
+      /** Ozone */
+      ozone?: number | null;
+      /** Known */
+      known: boolean;
+      /** Active */
+      active: boolean;
+      /** Expires */
+      expires?: number | null;
+      /** Name */
+      name?: string | null;
     };
     /** Metenox */
     Metenox: {
@@ -3013,6 +3220,382 @@ export interface components {
       /** State */
       state: string;
     };
+    /** Den */
+    Den: {
+      character: components["schemas"]["Character"];
+      item: components["schemas"]["EveName"];
+      /** Quantity */
+      quantity: number;
+      /** Id */
+      id: number;
+      /** Expand */
+      expand: boolean;
+      /** Name */
+      name: string | null;
+      location: components["schemas"]["DenLocation"];
+    };
+    /** DenLocation */
+    DenLocation: {
+      /** Id */
+      id: number;
+      /** Name */
+      name: string;
+      constellation: components["schemas"]["IdName"];
+      region: components["schemas"]["IdName"];
+    };
+    /** FuelExtra */
+    FuelExtra: {
+      /** Qty */
+      qty: number;
+      /** Name */
+      name: string;
+      /**
+       * Expires
+       * Format: date-time
+       */
+      expires: string;
+    };
+    /** FuelStructure */
+    FuelStructure: {
+      /** Id */
+      id: number;
+      owner: components["schemas"]["IdName"];
+      /** Name */
+      name: string;
+      type: components["schemas"]["IdName"];
+      location: components["schemas"]["IdName"];
+      constellation: components["schemas"]["IdName"];
+      region: components["schemas"]["IdName"];
+      /** Fuel Expiry */
+      fuel_expiry: string | null;
+      /** State */
+      state: string;
+      /** State Expiry */
+      state_expiry: string | null;
+      /** Fuel Req */
+      fuel_req: number;
+      /** Fuel Req Day */
+      fuel_req_day: number;
+      /** Fuel Req 30D */
+      fuel_req_30d: number;
+      /** Gas Req */
+      gas_req: number;
+      /** Gas Req Day */
+      gas_req_day: number;
+      /** Gas Req 30D */
+      gas_req_30d: number;
+      /** Current Blocks */
+      current_blocks: number;
+      extra_fuel_info: components["schemas"]["FuelExtra"] | null;
+      /** Metenox Gas Hourly */
+      metenox_gas_hourly: number;
+      /** Current Metenox Gas */
+      current_metenox_gas: number;
+      /** Block Hours Left */
+      block_hours_left: number;
+      /** Gas Hours Left */
+      gas_hours_left: number;
+      /** Block Duration Left */
+      block_duration_left: string;
+      /** Gas Duration Left */
+      gas_duration_left: string;
+      /** 90Day */
+      "90day": number;
+      /** Gas 90Day */
+      gas_90day: number;
+    };
+    /** StructureFuel */
+    StructureFuel: {
+      /** Structures */
+      structures: components["schemas"]["FuelStructure"][];
+      /** Total Hourly Fuel */
+      total_hourly_fuel: number;
+    };
+    /** IdNameQty */
+    IdNameQty: {
+      /** Id */
+      id: number;
+      /** Name */
+      name: string;
+      /** Qty */
+      qty: number;
+    };
+    /** StructureFit */
+    StructureFit: {
+      /** Fit */
+      fit: {
+        [key: string]: components["schemas"]["IdName"] | components["schemas"]["IdNameQty"][];
+      };
+      /** Low */
+      low: number;
+      /** Med */
+      med: number;
+      /** High */
+      high: number;
+      /** Rig */
+      rig: number;
+      /** Service */
+      service: number;
+      /** Fighter */
+      fighter: number;
+      /** Subsystem */
+      subsystem: number;
+    };
+    /** Poco */
+    Poco: {
+      /** Id */
+      id: number;
+      owner: components["schemas"]["PocoOwner"];
+      /** Name */
+      name: string | null;
+      location: components["schemas"]["PocoLocation"];
+      /** Standing Level */
+      standing_level: string | null;
+      /** Alliance Tax Rate */
+      alliance_tax_rate: number | null;
+      /** Corporation Tax Rate */
+      corporation_tax_rate: number | null;
+      /** Terrible Standing Tax Rate */
+      terrible_standing_tax_rate: number | null;
+      /** Bad Standing Tax Rate */
+      bad_standing_tax_rate: number | null;
+      /** Neutral Standing Tax Rate */
+      neutral_standing_tax_rate: number | null;
+      /** Good Standing Tax Rate */
+      good_standing_tax_rate: number | null;
+      /** Excellent Standing Tax Rate */
+      excellent_standing_tax_rate: number | null;
+      /** Reinforce Exit End */
+      reinforce_exit_end: number;
+      /** Reinforce Exit Start */
+      reinforce_exit_start: number;
+      /** Allow Access With Standings */
+      allow_access_with_standings: boolean | null;
+      /** Allow Alliance Access */
+      allow_alliance_access: boolean | null;
+    };
+    /** PocoLocation */
+    PocoLocation: {
+      /** Id */
+      id: number;
+      /** Name */
+      name: string;
+      /** Region */
+      region: string;
+      /** Constellation */
+      constellation: string;
+    };
+    /** PocoOwner */
+    PocoOwner: {
+      /** Corporation Name */
+      corporation_name: string;
+      /** Corporation Id */
+      corporation_id: number;
+    };
+    /** CorporationRef */
+    CorporationRef: {
+      /** Corporation Id */
+      corporation_id: number;
+      /** Corporation Name */
+      corporation_name: string;
+    };
+    /** Starbase */
+    Starbase: {
+      /** Starbase Id */
+      starbase_id: number;
+      owner: components["schemas"]["CorporationRef"];
+      /** Name */
+      name: string | null;
+      type: components["schemas"]["IdName"];
+      /** State */
+      state: string;
+      /** Onlined Since */
+      onlined_since: string | null;
+      /** Reinforced Until */
+      reinforced_until: string | null;
+      /** Unanchor At */
+      unanchor_at: string | null;
+      /** Allow Alliance Members */
+      allow_alliance_members: boolean;
+      /** Allow Corporation Members */
+      allow_corporation_members: boolean;
+      /** Attack If Other Security Status Dropping */
+      attack_if_other_security_status_dropping: boolean;
+      /** Use Alliance Standings */
+      use_alliance_standings: boolean;
+      /** Attack Security Status Threshold */
+      attack_security_status_threshold: number | null;
+      /** Attack Standing Threshold */
+      attack_standing_threshold: number | null;
+      /** Anchor */
+      anchor: string | null;
+      /** Online */
+      online: string | null;
+      /** Offline */
+      offline: string | null;
+      /** Unanchor */
+      unanchor: string | null;
+      /** Fuel Bay Take */
+      fuel_bay_take: string | null;
+      /** Fuel Bay View */
+      fuel_bay_view: string | null;
+      /** Fuels */
+      fuels: string | null;
+      moon?: components["schemas"]["IdName"] | null;
+      system?: components["schemas"]["IdName"] | null;
+      constellation?: components["schemas"]["IdName"] | null;
+      region?: components["schemas"]["IdName"] | null;
+    };
+    /** StarbaseFit */
+    StarbaseFit: {
+      /** Fuel */
+      fuel: components["schemas"]["IdNameQty"][];
+      /** Space */
+      space: components["schemas"]["StarbaseSpaceItem"][];
+    };
+    /** StarbaseSpaceItem */
+    StarbaseSpaceItem: {
+      type: components["schemas"]["IdName"];
+      /** Distance */
+      distance: number;
+    };
+    /** AnarchyDen */
+    AnarchyDen: {
+      /** Den Id */
+      den_id: number;
+      /** Anarchy Amount */
+      anarchy_amount: number;
+      /** Character Name */
+      character_name: string;
+      /** Type Name */
+      type_name: string;
+      /** Planet Name */
+      planet_name: string;
+    };
+    /** OptionalIdName */
+    OptionalIdName: {
+      /** Id */
+      id: number | null;
+      /** Name */
+      name: string;
+    };
+    /** SovHub */
+    SovHub: {
+      /** Hub Id */
+      hub_id: number;
+      owner: components["schemas"]["CorporationRef"];
+      location: components["schemas"]["OptionalIdName"];
+      constellation: components["schemas"]["OptionalIdName"];
+      region: components["schemas"]["OptionalIdName"];
+      /** Power Allocated */
+      power_allocated: number | null;
+      /** Power Available */
+      power_available: number | null;
+      /** Workforce Allocated */
+      workforce_allocated: number | null;
+      /** Workforce Available */
+      workforce_available: number | null;
+      /** Reagent Last Updated */
+      reagent_last_updated: string | null;
+      /** Reagents */
+      reagents: components["schemas"]["SovHubReagent"][];
+      /** Upgrades */
+      upgrades: components["schemas"]["SovHubUpgrade"][];
+      workforce_transport: components["schemas"]["WorkforceTransport"] | null;
+      /** Anarchy Dens */
+      anarchy_dens: components["schemas"]["AnarchyDen"][];
+    };
+    /** SovHubReagent */
+    SovHubReagent: {
+      /** Name */
+      name: string;
+      /** Type Id */
+      type_id: number | null;
+      /** Amount */
+      amount: number;
+      /** Burning Per Hour */
+      burning_per_hour: number;
+    };
+    /** SovHubUpgrade */
+    SovHubUpgrade: {
+      /** Name */
+      name: string;
+      /** Type Id */
+      type_id: number | null;
+      /** Power State */
+      power_state: string;
+    };
+    /** TransportSystem */
+    TransportSystem: {
+      /** System Id */
+      system_id: number;
+      /** System Name */
+      system_name: string;
+    };
+    /** TransportSystemAmount */
+    TransportSystemAmount: {
+      /** System Id */
+      system_id: number;
+      /** System Name */
+      system_name: string;
+      /** Amount */
+      amount: number | null;
+    };
+    /** WorkforceTransport */
+    WorkforceTransport: {
+      /** Mode */
+      mode: string | null;
+      /** Config Sources */
+      config_sources: components["schemas"]["TransportSystem"][];
+      /** State Sources */
+      state_sources: components["schemas"]["TransportSystemAmount"][];
+      config_destination: components["schemas"]["TransportSystemAmount"] | null;
+      state_destination: components["schemas"]["TransportSystemAmount"] | null;
+    };
+    /** SovMap */
+    SovMap: {
+      /** Regions */
+      regions: components["schemas"]["IdName"][];
+      /** Systems */
+      systems: components["schemas"]["SovMapSystem"][];
+      /** Edges */
+      edges: components["schemas"]["MapEdge"][];
+      /** Jump Bridges */
+      jump_bridges: components["schemas"]["MapEdge"][];
+      /** Hubs */
+      hubs: components["schemas"]["SovHub"][];
+    };
+    /** SovMapSystem */
+    SovMapSystem: {
+      /** Id */
+      id: number;
+      /** Name */
+      name: string;
+      /** Region Id */
+      region_id: number | null;
+      /** Constellation Id */
+      constellation_id: number | null;
+      /** X 2D */
+      x_2d: number | null;
+      /** Y 2D */
+      y_2d: number | null;
+      /** X Real */
+      x_real: number | null;
+      /** Y Real */
+      y_real: number | null;
+      /** Security Status */
+      security_status: number | null;
+      /** Security Class */
+      security_class: string | null;
+      /** External */
+      external: boolean;
+      /** Is Hub */
+      is_hub: boolean;
+      /** Anarchy Alert */
+      anarchy_alert: boolean;
+      /** Anarchy Dens */
+      anarchy_dens: components["schemas"]["AnarchyDen"][];
+    };
     /** GlanceCorporateAssets */
     GlanceCorporateAssets: {
       corporate: components["schemas"]["GlanceAssets"];
@@ -3052,6 +3635,63 @@ export interface components {
       mining_gas?: number | null;
       /** Mining Ice */
       mining_ice?: number | null;
+    };
+    /** CharacterSkillCheck */
+    CharacterSkillCheck: {
+      /** Character Id */
+      character_id: number;
+      /** Omega */
+      omega: boolean;
+      /** Skills */
+      skills: {
+        [key: string]: components["schemas"]["SkillCheckSkill"];
+      };
+      /** Queue */
+      queue: {
+        [key: string]: number;
+      };
+      /** Doctrines */
+      doctrines: {
+        [key: string]: {
+          [key: string]: number | components["schemas"]["DoctrineMeta"];
+        };
+      };
+    };
+    /** DoctrineMeta */
+    DoctrineMeta: {
+      /** Total Sp */
+      total_sp: number;
+      /** Trained Sp */
+      trained_sp: number;
+    };
+    /** FitCheck */
+    FitCheck: {
+      /** Skills */
+      skills: components["schemas"]["FitSkill"][];
+      /** Chars */
+      chars: {
+        [key: string]: components["schemas"]["CharacterSkillCheck"];
+      };
+    };
+    /** FitSkill */
+    FitSkill: {
+      /** S */
+      s: number;
+      /** L */
+      l: number;
+      /** N */
+      n: string;
+    };
+    /** SkillCheckSkill */
+    SkillCheckSkill: {
+      /** Grp */
+      grp: string | null;
+      /** Sp Total */
+      sp_total: number;
+      /** Active Level */
+      active_level: number;
+      /** Trained Level */
+      trained_level: number;
     };
     /** PingStats */
     PingStats: {
@@ -3225,9 +3865,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3258,9 +3896,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3291,9 +3927,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3324,9 +3958,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3357,9 +3989,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3390,9 +4020,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3423,9 +4051,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3456,9 +4082,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3489,9 +4113,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3522,9 +4144,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3555,9 +4175,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3588,9 +4206,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3621,9 +4237,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3654,9 +4268,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3687,9 +4299,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -3720,9 +4330,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -4131,7 +4739,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown[];
+          "application/json": components["schemas"]["CharacterMail"][];
         };
       };
       /** @description Forbidden */
@@ -4163,9 +4771,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["MailBody"];
         };
       };
       /** @description Forbidden */
@@ -4258,9 +4864,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["MiningCharacters"];
         };
       };
       /** @description Forbidden */
@@ -4297,9 +4901,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["MiningLedger"];
         };
       };
       /** @description Forbidden */
@@ -4392,9 +4994,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["SkillGraph"];
         };
       };
       /** @description Forbidden */
@@ -4951,9 +5551,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -4984,9 +5582,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5017,9 +5613,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5050,9 +5644,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5083,9 +5675,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5116,9 +5706,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5149,9 +5737,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5182,9 +5768,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5215,9 +5799,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5248,9 +5830,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5281,9 +5861,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5314,9 +5892,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5347,9 +5923,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5380,9 +5954,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5413,9 +5985,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5446,9 +6016,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5479,9 +6047,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5512,9 +6078,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5545,9 +6109,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5578,9 +6140,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5611,9 +6171,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5644,9 +6202,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5677,9 +6233,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5710,9 +6264,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["ActivityMap"];
         };
       };
       /** @description Forbidden */
@@ -5939,7 +6491,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown[];
+          "application/json": components["schemas"]["WalletDivision"][];
         };
       };
       /** @description Forbidden */
@@ -6102,9 +6654,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["CorpCharacterStatus"];
         };
       };
       /** @description Forbidden */
@@ -6133,7 +6683,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown[];
+          "application/json": components["schemas"]["Gate"][];
         };
       };
       /** @description Forbidden */
@@ -6220,7 +6770,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown[];
+          "application/json": components["schemas"]["Den"][];
         };
       };
       /** @description Forbidden */
@@ -6278,9 +6828,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["StructureFuel"];
         };
       };
       /** @description Forbidden */
@@ -6311,9 +6859,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["StructureFit"];
         };
       };
       /** @description Forbidden */
@@ -6351,7 +6897,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown[];
+          "application/json": components["schemas"]["Poco"][];
         };
       };
       /** @description Forbidden */
@@ -6409,7 +6955,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown[];
+          "application/json": components["schemas"]["Starbase"][];
         };
       };
       /** @description Forbidden */
@@ -6440,9 +6986,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["StarbaseFit"];
         };
       };
       /** @description Forbidden */
@@ -6471,7 +7015,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown[];
+          "application/json": components["schemas"]["SovHub"][];
         };
       };
       /** @description Forbidden */
@@ -6500,9 +7044,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["SovMap"];
         };
       };
       /** @description Forbidden */
@@ -6531,9 +7073,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["SovMap"];
         };
       };
       /** @description Forbidden */
@@ -6721,9 +7261,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["MiningLedger"];
         };
       };
       /** @description Forbidden */
@@ -6809,9 +7347,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            [key: string]: unknown;
-          };
+          "application/json": components["schemas"]["FitCheck"];
         };
       };
       /** @description Forbidden */

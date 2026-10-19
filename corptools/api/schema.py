@@ -1,6 +1,5 @@
 # Standard Library
 from datetime import datetime
-from decimal import Decimal
 from typing import Dict, List, Optional, Union
 
 # Third Party
@@ -561,8 +560,7 @@ class WalletDivision(Schema):
     division: str
     # "None" (the string) when the division has no name
     name: str
-    # sent as a string, e.g. "1234.50"
-    balance: Decimal
+    balance: float
 
 
 class PocoOwner(Schema):

@@ -265,9 +265,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -313,9 +311,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -361,9 +357,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -409,9 +403,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -457,9 +449,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -505,9 +495,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -553,9 +541,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -601,9 +587,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -649,9 +633,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -697,9 +679,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -745,9 +725,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -793,9 +771,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -841,9 +817,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -889,9 +863,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -937,9 +909,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -985,9 +955,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -1674,7 +1642,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {},
+                  "items": {
+                    "$ref": "#/components/schemas/CharacterMail"
+                  },
                   "title": "Response",
                   "type": "array"
                 }
@@ -1731,9 +1701,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/MailBody"
                 }
               }
             }
@@ -1880,9 +1848,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/MiningCharacters"
                 }
               }
             }
@@ -1945,9 +1911,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/MiningLedger"
                 }
               }
             }
@@ -2115,9 +2079,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/SkillGraph"
                 }
               }
             }
@@ -2977,9 +2939,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3025,9 +2985,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3073,9 +3031,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3121,9 +3077,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3169,9 +3123,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3217,9 +3169,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3265,9 +3215,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3313,9 +3261,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3361,9 +3307,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3409,9 +3353,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3457,9 +3399,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3505,9 +3445,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3553,9 +3491,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3601,9 +3537,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3649,9 +3583,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3697,9 +3629,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3745,9 +3675,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3793,9 +3721,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3841,9 +3767,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3889,9 +3813,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3937,9 +3859,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -3985,9 +3905,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -4033,9 +3951,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -4081,9 +3997,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ActivityMap"
                 }
               }
             }
@@ -4493,7 +4407,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {},
+                  "items": {
+                    "$ref": "#/components/schemas/WalletDivision"
+                  },
                   "title": "Response",
                   "type": "array"
                 }
@@ -4739,9 +4655,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/CorpCharacterStatus"
                 }
               }
             }
@@ -4777,7 +4691,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {},
+                  "items": {
+                    "$ref": "#/components/schemas/Gate"
+                  },
                   "title": "Response",
                   "type": "array"
                 }
@@ -4892,7 +4808,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {},
+                  "items": {
+                    "$ref": "#/components/schemas/Den"
+                  },
                   "title": "Response",
                   "type": "array"
                 }
@@ -4970,9 +4888,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StructureFuel"
                 }
               }
             }
@@ -5018,9 +4934,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StructureFit"
                 }
               }
             }
@@ -5067,7 +4981,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {},
+                  "items": {
+                    "$ref": "#/components/schemas/Poco"
+                  },
                   "title": "Response",
                   "type": "array"
                 }
@@ -5142,7 +5058,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {},
+                  "items": {
+                    "$ref": "#/components/schemas/Starbase"
+                  },
                   "title": "Response",
                   "type": "array"
                 }
@@ -5190,9 +5108,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/StarbaseFit"
                 }
               }
             }
@@ -5228,7 +5144,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {},
+                  "items": {
+                    "$ref": "#/components/schemas/SovHub"
+                  },
                   "title": "Response",
                   "type": "array"
                 }
@@ -5266,9 +5184,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/SovMap"
                 }
               }
             }
@@ -5304,9 +5220,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/SovMap"
                 }
               }
             }
@@ -5599,9 +5513,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/MiningLedger"
                 }
               }
             }
@@ -5718,9 +5630,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
+                  "$ref": "#/components/schemas/FitCheck"
                 }
               }
             }
@@ -6285,6 +6195,234 @@
         },
         "required": ["id", "name"],
         "title": "EveName",
+        "type": "object"
+      },
+      "ActivityMap": {
+        "properties": {
+          "regions": {
+            "items": {
+              "$ref": "#/components/schemas/IdName"
+            },
+            "title": "Regions",
+            "type": "array"
+          },
+          "systems": {
+            "items": {
+              "$ref": "#/components/schemas/MapSystem"
+            },
+            "title": "Systems",
+            "type": "array"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/MapEdge"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityMapValue"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": ["regions", "systems", "edges", "values"],
+        "title": "ActivityMap",
+        "type": "object"
+      },
+      "ActivityMapValue": {
+        "properties": {
+          "system_id": {
+            "title": "System Id",
+            "type": "integer"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Value"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Count"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Quantity"
+          }
+        },
+        "required": ["system_id", "value", "count", "quantity"],
+        "title": "ActivityMapValue",
+        "type": "object"
+      },
+      "IdName": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": ["id", "name"],
+        "title": "IdName",
+        "type": "object"
+      },
+      "MapEdge": {
+        "properties": {
+          "source": {
+            "title": "Source",
+            "type": "integer"
+          },
+          "target": {
+            "title": "Target",
+            "type": "integer"
+          }
+        },
+        "required": ["source", "target"],
+        "title": "MapEdge",
+        "type": "object"
+      },
+      "MapSystem": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "region_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region Id"
+          },
+          "constellation_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Constellation Id"
+          },
+          "x_2d": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X 2D"
+          },
+          "y_2d": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y 2D"
+          },
+          "x_real": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Real"
+          },
+          "y_real": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y Real"
+          },
+          "security_status": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Security Status"
+          },
+          "security_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Security Class"
+          },
+          "external": {
+            "title": "External",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "region_id",
+          "constellation_id",
+          "x_2d",
+          "y_2d",
+          "x_real",
+          "y_real",
+          "security_status",
+          "security_class",
+          "external"
+        ],
+        "title": "MapSystem",
         "type": "object"
       },
       "ValueLabel": {
@@ -7316,6 +7454,100 @@
         "title": "Contact",
         "type": "object"
       },
+      "CharacterMail": {
+        "properties": {
+          "character": {
+            "title": "Character",
+            "type": "string"
+          },
+          "character_id": {
+            "title": "Character Id",
+            "type": "integer"
+          },
+          "mail_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mail Id"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "from": {
+            "title": "From",
+            "type": "string"
+          },
+          "recipients": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Recipients",
+            "type": "array"
+          },
+          "labels": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "timestamp": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timestamp"
+          }
+        },
+        "required": [
+          "character",
+          "character_id",
+          "mail_id",
+          "subject",
+          "from",
+          "recipients",
+          "labels",
+          "timestamp"
+        ],
+        "title": "CharacterMail",
+        "type": "object"
+      },
+      "MailBody": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          }
+        },
+        "required": ["body"],
+        "title": "MailBody",
+        "type": "object"
+      },
       "CharacterNotification": {
         "properties": {
           "character": {
@@ -7488,6 +7720,194 @@
         "title": "CharacterStatus",
         "type": "object"
       },
+      "MiningCharacter": {
+        "properties": {
+          "character_id": {
+            "title": "Character Id",
+            "type": "integer"
+          },
+          "character_name": {
+            "title": "Character Name",
+            "type": "string"
+          }
+        },
+        "required": ["character_id", "character_name"],
+        "title": "MiningCharacter",
+        "type": "object"
+      },
+      "MiningCharacters": {
+        "properties": {
+          "characters": {
+            "items": {
+              "$ref": "#/components/schemas/MiningCharacter"
+            },
+            "title": "Characters",
+            "type": "array"
+          }
+        },
+        "required": ["characters"],
+        "title": "MiningCharacters",
+        "type": "object"
+      },
+      "MiningDay": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "ores": {
+            "items": {
+              "$ref": "#/components/schemas/MiningOre"
+            },
+            "title": "Ores",
+            "type": "array"
+          },
+          "characters": {
+            "items": {
+              "$ref": "#/components/schemas/IdName"
+            },
+            "title": "Characters",
+            "type": "array"
+          },
+          "systems": {
+            "items": {
+              "$ref": "#/components/schemas/IdName"
+            },
+            "title": "Systems",
+            "type": "array"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Value"
+          },
+          "volume": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Volume"
+          }
+        },
+        "required": ["date", "ores", "characters", "systems", "value", "volume"],
+        "title": "MiningDay",
+        "type": "object"
+      },
+      "MiningLedger": {
+        "properties": {
+          "all_ores": {
+            "items": {
+              "type": "string"
+            },
+            "title": "All Ores",
+            "type": "array"
+          },
+          "all_groups": {
+            "items": {
+              "type": "string"
+            },
+            "title": "All Groups",
+            "type": "array"
+          },
+          "all_systems": {
+            "items": {
+              "type": "string"
+            },
+            "title": "All Systems",
+            "type": "array"
+          },
+          "total_volume": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Total Volume"
+          },
+          "total_value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Total Value"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/MiningDay"
+            },
+            "title": "Data",
+            "type": "array"
+          }
+        },
+        "required": [
+          "all_ores",
+          "all_groups",
+          "all_systems",
+          "total_volume",
+          "total_value",
+          "data"
+        ],
+        "title": "MiningLedger",
+        "type": "object"
+      },
+      "MiningOre": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "volume": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Volume"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": ["name", "group", "id", "volume", "value"],
+        "title": "MiningOre",
+        "type": "object"
+      },
       "CharacterRoles": {
         "properties": {
           "character": {
@@ -7585,6 +8005,49 @@
         },
         "required": ["group", "skill", "sp", "level", "active"],
         "title": "Skill",
+        "type": "object"
+      },
+      "SkillGraph": {
+        "properties": {
+          "characters": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Characters",
+            "type": "array"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/SkillGraphGroup"
+            },
+            "title": "Data",
+            "type": "array"
+          }
+        },
+        "required": ["characters", "data"],
+        "title": "SkillGraph",
+        "type": "object"
+      },
+      "SkillGraphGroup": {
+        "additionalProperties": {
+          "type": "integer"
+        },
+        "properties": {
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "char_total": {
+            "title": "Char Total",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          }
+        },
+        "required": ["group", "char_total", "total"],
+        "title": "SkillGraphGroup",
         "type": "object"
       },
       "CharacterSkillHistory": {
@@ -8618,6 +9081,33 @@
         "title": "CorporationWalletEvent",
         "type": "object"
       },
+      "WalletDivision": {
+        "properties": {
+          "division": {
+            "title": "Division",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "balance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "title": "Balance"
+          }
+        },
+        "required": ["division", "name", "balance"],
+        "title": "WalletDivision",
+        "type": "object"
+      },
       "CorpStatus": {
         "properties": {
           "corporation": {
@@ -8646,6 +9136,129 @@
         },
         "required": ["corporation", "characters", "active"],
         "title": "CorpStatus",
+        "type": "object"
+      },
+      "CorpCharacterCounts": {
+        "properties": {
+          "known_and_alts": {
+            "title": "Known And Alts",
+            "type": "integer"
+          },
+          "known_in_corp": {
+            "title": "Known In Corp",
+            "type": "integer"
+          },
+          "bad": {
+            "title": "Bad",
+            "type": "integer"
+          },
+          "in_corp": {
+            "title": "In Corp",
+            "type": "integer"
+          },
+          "liquid": {
+            "title": "Liquid",
+            "type": "number"
+          }
+        },
+        "required": ["known_and_alts", "known_in_corp", "bad", "in_corp", "liquid"],
+        "title": "CorpCharacterCounts",
+        "type": "object"
+      },
+      "CorpCharacterStatus": {
+        "properties": {
+          "characters": {
+            "$ref": "#/components/schemas/CorpCharacterCounts"
+          },
+          "corporation": {
+            "$ref": "#/components/schemas/IdName"
+          }
+        },
+        "required": ["characters", "corporation"],
+        "title": "CorpCharacterStatus",
+        "type": "object"
+      },
+      "Gate": {
+        "properties": {
+          "start": {
+            "$ref": "#/components/schemas/GateEnd"
+          },
+          "end": {
+            "$ref": "#/components/schemas/GateEnd"
+          }
+        },
+        "required": ["start", "end"],
+        "title": "Gate",
+        "type": "object"
+      },
+      "GateEnd": {
+        "properties": {
+          "system_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System Name"
+          },
+          "system_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System Id"
+          },
+          "ozone": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ozone"
+          },
+          "known": {
+            "title": "Known",
+            "type": "boolean"
+          },
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "expires": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": ["known", "active"],
+        "title": "GateEnd",
         "type": "object"
       },
       "Metenox": {
@@ -8797,6 +9410,1425 @@
         },
         "required": ["name", "state"],
         "title": "StructureService",
+        "type": "object"
+      },
+      "Den": {
+        "properties": {
+          "character": {
+            "$ref": "#/components/schemas/Character"
+          },
+          "item": {
+            "$ref": "#/components/schemas/EveName"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "expand": {
+            "title": "Expand",
+            "type": "boolean"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "location": {
+            "$ref": "#/components/schemas/DenLocation"
+          }
+        },
+        "required": ["character", "item", "quantity", "id", "expand", "name", "location"],
+        "title": "Den",
+        "type": "object"
+      },
+      "DenLocation": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "constellation": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "region": {
+            "$ref": "#/components/schemas/IdName"
+          }
+        },
+        "required": ["id", "name", "constellation", "region"],
+        "title": "DenLocation",
+        "type": "object"
+      },
+      "FuelExtra": {
+        "properties": {
+          "qty": {
+            "title": "Qty",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "expires": {
+            "format": "date-time",
+            "title": "Expires",
+            "type": "string"
+          }
+        },
+        "required": ["qty", "name", "expires"],
+        "title": "FuelExtra",
+        "type": "object"
+      },
+      "FuelStructure": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "location": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "constellation": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "region": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "fuel_expiry": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fuel Expiry"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "state_expiry": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State Expiry"
+          },
+          "fuel_req": {
+            "title": "Fuel Req",
+            "type": "integer"
+          },
+          "fuel_req_day": {
+            "title": "Fuel Req Day",
+            "type": "integer"
+          },
+          "fuel_req_30d": {
+            "title": "Fuel Req 30D",
+            "type": "integer"
+          },
+          "gas_req": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Gas Req"
+          },
+          "gas_req_day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Gas Req Day"
+          },
+          "gas_req_30d": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Gas Req 30D"
+          },
+          "current_blocks": {
+            "title": "Current Blocks",
+            "type": "integer"
+          },
+          "extra_fuel_info": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FuelExtra"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metenox_gas_hourly": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Metenox Gas Hourly"
+          },
+          "current_metenox_gas": {
+            "title": "Current Metenox Gas",
+            "type": "integer"
+          },
+          "block_hours_left": {
+            "title": "Block Hours Left",
+            "type": "integer"
+          },
+          "gas_hours_left": {
+            "title": "Gas Hours Left",
+            "type": "integer"
+          },
+          "block_duration_left": {
+            "title": "Block Duration Left",
+            "type": "string"
+          },
+          "gas_duration_left": {
+            "title": "Gas Duration Left",
+            "type": "string"
+          },
+          "90day": {
+            "title": "90Day",
+            "type": "integer"
+          },
+          "gas_90day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Gas 90Day"
+          }
+        },
+        "required": [
+          "id",
+          "owner",
+          "name",
+          "type",
+          "location",
+          "constellation",
+          "region",
+          "fuel_expiry",
+          "state",
+          "state_expiry",
+          "fuel_req",
+          "fuel_req_day",
+          "fuel_req_30d",
+          "gas_req",
+          "gas_req_day",
+          "gas_req_30d",
+          "current_blocks",
+          "extra_fuel_info",
+          "metenox_gas_hourly",
+          "current_metenox_gas",
+          "block_hours_left",
+          "gas_hours_left",
+          "block_duration_left",
+          "gas_duration_left",
+          "90day",
+          "gas_90day"
+        ],
+        "title": "FuelStructure",
+        "type": "object"
+      },
+      "StructureFuel": {
+        "properties": {
+          "structures": {
+            "items": {
+              "$ref": "#/components/schemas/FuelStructure"
+            },
+            "title": "Structures",
+            "type": "array"
+          },
+          "total_hourly_fuel": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Total Hourly Fuel"
+          }
+        },
+        "required": ["structures", "total_hourly_fuel"],
+        "title": "StructureFuel",
+        "type": "object"
+      },
+      "IdNameQty": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "qty": {
+            "title": "Qty",
+            "type": "integer"
+          }
+        },
+        "required": ["id", "name", "qty"],
+        "title": "IdNameQty",
+        "type": "object"
+      },
+      "StructureFit": {
+        "properties": {
+          "fit": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/IdName"
+                },
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/IdNameQty"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "title": "Fit",
+            "type": "object"
+          },
+          "low": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Low"
+          },
+          "med": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Med"
+          },
+          "high": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "High"
+          },
+          "rig": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Rig"
+          },
+          "service": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Service"
+          },
+          "fighter": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Fighter"
+          },
+          "subsystem": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Subsystem"
+          }
+        },
+        "required": ["fit", "low", "med", "high", "rig", "service", "fighter", "subsystem"],
+        "title": "StructureFit",
+        "type": "object"
+      },
+      "Poco": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/PocoOwner"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "location": {
+            "$ref": "#/components/schemas/PocoLocation"
+          },
+          "standing_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Standing Level"
+          },
+          "alliance_tax_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alliance Tax Rate"
+          },
+          "corporation_tax_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corporation Tax Rate"
+          },
+          "terrible_standing_tax_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Terrible Standing Tax Rate"
+          },
+          "bad_standing_tax_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bad Standing Tax Rate"
+          },
+          "neutral_standing_tax_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Neutral Standing Tax Rate"
+          },
+          "good_standing_tax_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Good Standing Tax Rate"
+          },
+          "excellent_standing_tax_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Excellent Standing Tax Rate"
+          },
+          "reinforce_exit_end": {
+            "title": "Reinforce Exit End",
+            "type": "integer"
+          },
+          "reinforce_exit_start": {
+            "title": "Reinforce Exit Start",
+            "type": "integer"
+          },
+          "allow_access_with_standings": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allow Access With Standings"
+          },
+          "allow_alliance_access": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allow Alliance Access"
+          }
+        },
+        "required": [
+          "id",
+          "owner",
+          "name",
+          "location",
+          "standing_level",
+          "alliance_tax_rate",
+          "corporation_tax_rate",
+          "terrible_standing_tax_rate",
+          "bad_standing_tax_rate",
+          "neutral_standing_tax_rate",
+          "good_standing_tax_rate",
+          "excellent_standing_tax_rate",
+          "reinforce_exit_end",
+          "reinforce_exit_start",
+          "allow_access_with_standings",
+          "allow_alliance_access"
+        ],
+        "title": "Poco",
+        "type": "object"
+      },
+      "PocoLocation": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "region": {
+            "title": "Region",
+            "type": "string"
+          },
+          "constellation": {
+            "title": "Constellation",
+            "type": "string"
+          }
+        },
+        "required": ["id", "name", "region", "constellation"],
+        "title": "PocoLocation",
+        "type": "object"
+      },
+      "PocoOwner": {
+        "properties": {
+          "corporation_name": {
+            "title": "Corporation Name",
+            "type": "string"
+          },
+          "corporation_id": {
+            "title": "Corporation Id",
+            "type": "integer"
+          }
+        },
+        "required": ["corporation_name", "corporation_id"],
+        "title": "PocoOwner",
+        "type": "object"
+      },
+      "CorporationRef": {
+        "properties": {
+          "corporation_id": {
+            "title": "Corporation Id",
+            "type": "integer"
+          },
+          "corporation_name": {
+            "title": "Corporation Name",
+            "type": "string"
+          }
+        },
+        "required": ["corporation_id", "corporation_name"],
+        "title": "CorporationRef",
+        "type": "object"
+      },
+      "Starbase": {
+        "properties": {
+          "starbase_id": {
+            "title": "Starbase Id",
+            "type": "integer"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/CorporationRef"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "type": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "onlined_since": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Onlined Since"
+          },
+          "reinforced_until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reinforced Until"
+          },
+          "unanchor_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unanchor At"
+          },
+          "allow_alliance_members": {
+            "title": "Allow Alliance Members",
+            "type": "boolean"
+          },
+          "allow_corporation_members": {
+            "title": "Allow Corporation Members",
+            "type": "boolean"
+          },
+          "attack_if_other_security_status_dropping": {
+            "title": "Attack If Other Security Status Dropping",
+            "type": "boolean"
+          },
+          "use_alliance_standings": {
+            "title": "Use Alliance Standings",
+            "type": "boolean"
+          },
+          "attack_security_status_threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attack Security Status Threshold"
+          },
+          "attack_standing_threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attack Standing Threshold"
+          },
+          "anchor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Anchor"
+          },
+          "online": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Online"
+          },
+          "offline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offline"
+          },
+          "unanchor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unanchor"
+          },
+          "fuel_bay_take": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fuel Bay Take"
+          },
+          "fuel_bay_view": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fuel Bay View"
+          },
+          "fuels": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fuels"
+          },
+          "moon": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IdName"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "system": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IdName"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "constellation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IdName"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "region": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IdName"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "starbase_id",
+          "owner",
+          "name",
+          "type",
+          "state",
+          "onlined_since",
+          "reinforced_until",
+          "unanchor_at",
+          "allow_alliance_members",
+          "allow_corporation_members",
+          "attack_if_other_security_status_dropping",
+          "use_alliance_standings",
+          "attack_security_status_threshold",
+          "attack_standing_threshold",
+          "anchor",
+          "online",
+          "offline",
+          "unanchor",
+          "fuel_bay_take",
+          "fuel_bay_view",
+          "fuels"
+        ],
+        "title": "Starbase",
+        "type": "object"
+      },
+      "StarbaseFit": {
+        "properties": {
+          "fuel": {
+            "items": {
+              "$ref": "#/components/schemas/IdNameQty"
+            },
+            "title": "Fuel",
+            "type": "array"
+          },
+          "space": {
+            "items": {
+              "$ref": "#/components/schemas/StarbaseSpaceItem"
+            },
+            "title": "Space",
+            "type": "array"
+          }
+        },
+        "required": ["fuel", "space"],
+        "title": "StarbaseFit",
+        "type": "object"
+      },
+      "StarbaseSpaceItem": {
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/IdName"
+          },
+          "distance": {
+            "title": "Distance",
+            "type": "number"
+          }
+        },
+        "required": ["type", "distance"],
+        "title": "StarbaseSpaceItem",
+        "type": "object"
+      },
+      "AnarchyDen": {
+        "properties": {
+          "den_id": {
+            "title": "Den Id",
+            "type": "integer"
+          },
+          "anarchy_amount": {
+            "title": "Anarchy Amount",
+            "type": "integer"
+          },
+          "character_name": {
+            "title": "Character Name",
+            "type": "string"
+          },
+          "type_name": {
+            "title": "Type Name",
+            "type": "string"
+          },
+          "planet_name": {
+            "title": "Planet Name",
+            "type": "string"
+          }
+        },
+        "required": ["den_id", "anarchy_amount", "character_name", "type_name", "planet_name"],
+        "title": "AnarchyDen",
+        "type": "object"
+      },
+      "OptionalIdName": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": ["id", "name"],
+        "title": "OptionalIdName",
+        "type": "object"
+      },
+      "SovHub": {
+        "properties": {
+          "hub_id": {
+            "title": "Hub Id",
+            "type": "integer"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/CorporationRef"
+          },
+          "location": {
+            "$ref": "#/components/schemas/OptionalIdName"
+          },
+          "constellation": {
+            "$ref": "#/components/schemas/OptionalIdName"
+          },
+          "region": {
+            "$ref": "#/components/schemas/OptionalIdName"
+          },
+          "power_allocated": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Power Allocated"
+          },
+          "power_available": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Power Available"
+          },
+          "workforce_allocated": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workforce Allocated"
+          },
+          "workforce_available": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workforce Available"
+          },
+          "reagent_last_updated": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reagent Last Updated"
+          },
+          "reagents": {
+            "items": {
+              "$ref": "#/components/schemas/SovHubReagent"
+            },
+            "title": "Reagents",
+            "type": "array"
+          },
+          "upgrades": {
+            "items": {
+              "$ref": "#/components/schemas/SovHubUpgrade"
+            },
+            "title": "Upgrades",
+            "type": "array"
+          },
+          "workforce_transport": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkforceTransport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "anarchy_dens": {
+            "items": {
+              "$ref": "#/components/schemas/AnarchyDen"
+            },
+            "title": "Anarchy Dens",
+            "type": "array"
+          }
+        },
+        "required": [
+          "hub_id",
+          "owner",
+          "location",
+          "constellation",
+          "region",
+          "power_allocated",
+          "power_available",
+          "workforce_allocated",
+          "workforce_available",
+          "reagent_last_updated",
+          "reagents",
+          "upgrades",
+          "workforce_transport",
+          "anarchy_dens"
+        ],
+        "title": "SovHub",
+        "type": "object"
+      },
+      "SovHubReagent": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "type_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type Id"
+          },
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "burning_per_hour": {
+            "title": "Burning Per Hour",
+            "type": "integer"
+          }
+        },
+        "required": ["name", "type_id", "amount", "burning_per_hour"],
+        "title": "SovHubReagent",
+        "type": "object"
+      },
+      "SovHubUpgrade": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "type_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type Id"
+          },
+          "power_state": {
+            "title": "Power State",
+            "type": "string"
+          }
+        },
+        "required": ["name", "type_id", "power_state"],
+        "title": "SovHubUpgrade",
+        "type": "object"
+      },
+      "TransportSystem": {
+        "properties": {
+          "system_id": {
+            "title": "System Id",
+            "type": "integer"
+          },
+          "system_name": {
+            "title": "System Name",
+            "type": "string"
+          }
+        },
+        "required": ["system_id", "system_name"],
+        "title": "TransportSystem",
+        "type": "object"
+      },
+      "TransportSystemAmount": {
+        "properties": {
+          "system_id": {
+            "title": "System Id",
+            "type": "integer"
+          },
+          "system_name": {
+            "title": "System Name",
+            "type": "string"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          }
+        },
+        "required": ["system_id", "system_name", "amount"],
+        "title": "TransportSystemAmount",
+        "type": "object"
+      },
+      "WorkforceTransport": {
+        "properties": {
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode"
+          },
+          "config_sources": {
+            "items": {
+              "$ref": "#/components/schemas/TransportSystem"
+            },
+            "title": "Config Sources",
+            "type": "array"
+          },
+          "state_sources": {
+            "items": {
+              "$ref": "#/components/schemas/TransportSystemAmount"
+            },
+            "title": "State Sources",
+            "type": "array"
+          },
+          "config_destination": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TransportSystemAmount"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state_destination": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TransportSystemAmount"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "mode",
+          "config_sources",
+          "state_sources",
+          "config_destination",
+          "state_destination"
+        ],
+        "title": "WorkforceTransport",
+        "type": "object"
+      },
+      "SovMap": {
+        "properties": {
+          "regions": {
+            "items": {
+              "$ref": "#/components/schemas/IdName"
+            },
+            "title": "Regions",
+            "type": "array"
+          },
+          "systems": {
+            "items": {
+              "$ref": "#/components/schemas/SovMapSystem"
+            },
+            "title": "Systems",
+            "type": "array"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/MapEdge"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "jump_bridges": {
+            "items": {
+              "$ref": "#/components/schemas/MapEdge"
+            },
+            "title": "Jump Bridges",
+            "type": "array"
+          },
+          "hubs": {
+            "items": {
+              "$ref": "#/components/schemas/SovHub"
+            },
+            "title": "Hubs",
+            "type": "array"
+          }
+        },
+        "required": ["regions", "systems", "edges", "jump_bridges", "hubs"],
+        "title": "SovMap",
+        "type": "object"
+      },
+      "SovMapSystem": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "region_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region Id"
+          },
+          "constellation_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Constellation Id"
+          },
+          "x_2d": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X 2D"
+          },
+          "y_2d": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y 2D"
+          },
+          "x_real": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X Real"
+          },
+          "y_real": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y Real"
+          },
+          "security_status": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Security Status"
+          },
+          "security_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Security Class"
+          },
+          "external": {
+            "title": "External",
+            "type": "boolean"
+          },
+          "is_hub": {
+            "title": "Is Hub",
+            "type": "boolean"
+          },
+          "anarchy_alert": {
+            "title": "Anarchy Alert",
+            "type": "boolean"
+          },
+          "anarchy_dens": {
+            "items": {
+              "$ref": "#/components/schemas/AnarchyDen"
+            },
+            "title": "Anarchy Dens",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "region_id",
+          "constellation_id",
+          "x_2d",
+          "y_2d",
+          "x_real",
+          "y_real",
+          "security_status",
+          "security_class",
+          "external",
+          "is_hub",
+          "anarchy_alert",
+          "anarchy_dens"
+        ],
+        "title": "SovMapSystem",
         "type": "object"
       },
       "GlanceCorporateAssets": {
@@ -8971,6 +11003,151 @@
           }
         },
         "title": "GlanceMiningActivities",
+        "type": "object"
+      },
+      "CharacterSkillCheck": {
+        "properties": {
+          "character_id": {
+            "title": "Character Id",
+            "type": "integer"
+          },
+          "omega": {
+            "title": "Omega",
+            "type": "boolean"
+          },
+          "skills": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SkillCheckSkill"
+            },
+            "title": "Skills",
+            "type": "object"
+          },
+          "queue": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Queue",
+            "type": "object"
+          },
+          "doctrines": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DoctrineMeta"
+                  }
+                ]
+              },
+              "type": "object"
+            },
+            "title": "Doctrines",
+            "type": "object"
+          }
+        },
+        "required": ["character_id", "omega", "skills", "queue", "doctrines"],
+        "title": "CharacterSkillCheck",
+        "type": "object"
+      },
+      "DoctrineMeta": {
+        "properties": {
+          "total_sp": {
+            "title": "Total Sp",
+            "type": "integer"
+          },
+          "trained_sp": {
+            "title": "Trained Sp",
+            "type": "integer"
+          }
+        },
+        "required": ["total_sp", "trained_sp"],
+        "title": "DoctrineMeta",
+        "type": "object"
+      },
+      "FitCheck": {
+        "properties": {
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/FitSkill"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "chars": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CharacterSkillCheck"
+            },
+            "title": "Chars",
+            "type": "object"
+          }
+        },
+        "required": ["skills", "chars"],
+        "title": "FitCheck",
+        "type": "object"
+      },
+      "FitSkill": {
+        "properties": {
+          "s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "S"
+          },
+          "l": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "L"
+          },
+          "n": {
+            "title": "N",
+            "type": "string"
+          }
+        },
+        "required": ["s", "l", "n"],
+        "title": "FitSkill",
+        "type": "object"
+      },
+      "SkillCheckSkill": {
+        "properties": {
+          "grp": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grp"
+          },
+          "sp_total": {
+            "title": "Sp Total",
+            "type": "integer"
+          },
+          "active_level": {
+            "title": "Active Level",
+            "type": "integer"
+          },
+          "trained_level": {
+            "title": "Trained Level",
+            "type": "integer"
+          }
+        },
+        "required": ["grp", "sp_total", "active_level", "trained_level"],
+        "title": "SkillCheckSkill",
         "type": "object"
       },
       "PingStats": {

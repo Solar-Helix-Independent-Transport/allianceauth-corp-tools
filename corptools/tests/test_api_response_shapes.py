@@ -150,9 +150,8 @@ class TestStructureShapes(ApiShapeTestCase):
         self.assertEqual(self.get_json(
             f"/audit/api/corporation/{self.corp1.corporation_id}/divisions"
         ), [
-            # balance is a string - a Decimal, as Django's encoder sends it
-            {"division": "1", "name": "Master", "balance": "1234.50"},
-            {"division": "2", "name": "None", "balance": "0.00"},
+            {"division": "1", "name": "Master", "balance": 1234.5},
+            {"division": "2", "name": "None", "balance": 0.0},
         ])
 
     def test_pocos(self):
