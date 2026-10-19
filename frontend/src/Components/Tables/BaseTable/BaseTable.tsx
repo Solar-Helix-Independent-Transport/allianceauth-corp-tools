@@ -30,6 +30,7 @@ import {
   Tooltip,
 } from "react-bootstrap";
 import { useLocation } from "react-router";
+import { csvSafe } from "./csvSafe";
 
 function MyTooltip(message: string) {
   return (
@@ -46,25 +47,28 @@ const exportToCSV = <TData,>(table: ReactTable<TData>, exportFileName: string) =
 
   const headerRows = table.getHeaderGroups().map((headerGroup: HeaderGroup<TData>) =>
     headerGroup.headers.map((header: Header<TData, unknown>) => {
-      if (typeof header.column.columnDef.header === "function") {
-        return (header.column.columnDef as { accessorKey?: string }).accessorKey;
-      }
-      return header.column.columnDef.header;
+      const label = header.column.columnDef.header;
+      // A rendered (function) header has no text to export - fall back to the
+      // column id, which is the accessorKey or the column's explicit id.
+      return csvSafe(typeof label === "string" ? label : header.column.id);
     }),
   );
 
-  const csvData = rows.map((row) => row.getVisibleCells().map((cell) => cell.getValue()));
+  const csvData = rows.map((row) => row.getVisibleCells().map((cell) => csvSafe(cell.getValue())));
 
   const csv = stringify([...headerRows, ...csvData]);
   const blob = new Blob([csv], { type: "text/csv;charset=utf8;" });
+  const url = URL.createObjectURL(blob);
 
   const link = document.createElement("a");
   link.download = exportFileName;
-  link.href = URL.createObjectURL(blob);
+  link.href = url;
   link.style.visibility = "hidden";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  // Give the browser a moment to start the download before freeing the blob.
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 
 export interface BaseTableProps<TData> {

@@ -1,2 +1,0 @@
-import{a as e,w as t}from"./@app-libs-eRbCtoJk.js";import{r as n}from"./@react-libs-BDwbc9op.js";import{V as r}from"./index-COzOh439.js";import{n as i}from"./LabeledSelect-C16avbpv.js";var a=t(),o=i,s=({characterID:t,setLocation:i})=>{let{isLoading:s,data:c}=e({queryKey:[`asset_loc`,t],queryFn:()=>r(t)});return(0,a.jsx)(n,{isLoading:s,styles:o,options:c,onChange:e=>e&&i(Number(e.value))})};export{s as t};
-//# sourceMappingURL=CharacterAssetLocationSelect-d58CHDux.js.map

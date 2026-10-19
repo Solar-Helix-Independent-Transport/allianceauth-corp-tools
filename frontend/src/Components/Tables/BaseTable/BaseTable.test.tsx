@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ColumnDef } from "@tanstack/react-table";
 import BaseTable, { BaseTableProps } from "./BaseTable";
+import { csvSafe } from "./csvSafe";
 
 type Row = { name: string; count: number };
 
@@ -136,6 +137,72 @@ describe("BaseTable", () => {
       expect(createObjectURL).toHaveBeenCalledTimes(1);
       const blob = createObjectURL.mock.calls[0][0] as Blob;
       expect(blob.type).toBe("text/csv;charset=utf8;");
+    });
+
+    const exportedCsv = async () => {
+      fireEvent.click(screen.getByText("Export Table to CSV"));
+      return (createObjectURL.mock.calls[0][0] as Blob).text();
+    };
+
+    it("escapes player-written text that a spreadsheet would run as a formula", async () => {
+      renderTable({
+        data: [
+          { name: '=HYPERLINK("http://evil","click")', count: -5 },
+          { name: "@SUM(A1)", count: 1 },
+          { name: "+cmd", count: 2 },
+          { name: "-1+2", count: 3 },
+          { name: "Plain name", count: 4 },
+        ],
+      });
+
+      const csv = await exportedCsv();
+
+      expect(csv).toContain(`"'=HYPERLINK(""http://evil"",""click"")",-5`);
+      expect(csv).toContain("'@SUM(A1),1");
+      expect(csv).toContain("'+cmd,2");
+      expect(csv).toContain("'-1+2,3");
+      expect(csv).toContain("Plain name,4");
+    });
+
+    it("uses the column id as the header when the header is rendered by a function", async () => {
+      renderTable({
+        columns: [
+          { accessorKey: "name", header: () => <span>Name</span> },
+          { id: "doubled", accessorFn: (r) => r.count * 2, header: () => <span>Doubled</span> },
+        ],
+        data: [{ name: "a", count: 2 }],
+      });
+
+      const csv = await exportedCsv();
+
+      expect(csv.split("\n")[0]).toBe("name,doubled");
+      expect(csv).toContain("a,4");
+    });
+
+    it("frees the download's object URL afterwards", () => {
+      vi.useFakeTimers();
+      renderTable();
+
+      fireEvent.click(screen.getByText("Export Table to CSV"));
+      expect(revokeObjectURL).not.toHaveBeenCalled();
+      vi.runAllTimers();
+
+      expect(revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
+      vi.useRealTimers();
+    });
+  });
+
+  describe("csvSafe", () => {
+    it("leaves numbers and numeric strings alone", () => {
+      expect(csvSafe(-5)).toBe(-5);
+      expect(csvSafe("-5")).toBe("-5");
+      expect(csvSafe("+1.5")).toBe("+1.5");
+      expect(csvSafe(null)).toBe(null);
+    });
+
+    it("escapes tab and carriage return prefixes too", () => {
+      expect(csvSafe("\t=1")).toBe("'\t=1");
+      expect(csvSafe("\r=1")).toBe("'\r=1");
     });
   });
 });

@@ -1,0 +1,2 @@
+import{a as e,w as t}from"./@app-libs-eRbCtoJk.js";import{D as n}from"./@react-libs-BDwbc9op.js";import{r}from"./loaders-DtPzTDup.js";import{Y as i}from"./index-26RTPgTv.js";import{t as a}from"./LedgerGraph-D8TGoGyi.js";var o=t(),s=()=>{let{characterID:t}=n(),{data:s}=e({queryKey:[`mining-ledger`,t],queryFn:()=>i(Number(t))});return s?(0,o.jsx)(a,{data:s}):(0,o.jsx)(r,{})};export{s as default};
+//# sourceMappingURL=MiningLedger-BN0-Pq4x.js.map
