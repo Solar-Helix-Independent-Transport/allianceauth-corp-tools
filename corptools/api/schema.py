@@ -740,6 +740,25 @@ class MapEdge(Schema):
     target: int
 
 
+class ActivityMapValue(Schema):
+    system_id: int
+    # what the map scales the system's marker by - its meaning depends on
+    # the map (asset count, mining volume, ISK, ...)
+    value: Union[int, float]
+    # detail for the system's panel, again map-specific
+    count: Union[int, float]
+    quantity: Union[int, float]
+
+
+class ActivityMap(Schema):
+    # the whole known-space map, with the activity as values on top
+    regions: List[IdName]
+    systems: List[MapSystem]
+    edges: List[MapEdge]
+    # only systems with any activity
+    values: List[ActivityMapValue]
+
+
 # Sovereignty
 
 class OptionalIdName(Schema):

@@ -6,6 +6,7 @@ from django.db.models import Q
 
 # AA Example App
 from corptools import models
+from corptools.api import schema
 from corptools.api.activity_map_shared import (
     LOGISTICS_CONTRACT_TYPES,
     SALES_CONTRACT_TYPES,
@@ -33,7 +34,7 @@ class ActivityMapApiEndpoints:
     def __init__(self, api: NinjaAPI):
         @api.get(
             "account/{character_id}/activitymap/assets",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_assets(request, character_id: int):
@@ -47,7 +48,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/assets/ships",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_assets_ships(request, character_id: int):
@@ -64,7 +65,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/assets/capitals",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_assets_capitals(request, character_id: int):
@@ -81,7 +82,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/contracts",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_contracts(request, character_id: int):
@@ -95,7 +96,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/contracts/sales",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_contracts_sales(request, character_id: int):
@@ -112,7 +113,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/contracts/logistics",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_contracts_logistics(request, character_id: int):
@@ -129,7 +130,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/industry",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_industry(request, character_id: int):
@@ -143,7 +144,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/location",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_location(request, character_id: int):
@@ -155,7 +156,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/clones/home",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_clones_home(request, character_id: int):
@@ -167,7 +168,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/clones/jump",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_clones_jump(request, character_id: int):
@@ -179,7 +180,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/orders",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_orders(request, character_id: int):
@@ -193,7 +194,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/mercenarydens",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_mercenary_dens(request, character_id: int):
@@ -207,7 +208,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/mercenarytacticaloperations",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_mercenary_tactical_operations(request, character_id: int):
@@ -219,7 +220,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/pi",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_pi(request, character_id: int):
@@ -231,7 +232,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/mining",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_mining(request, character_id: int):
@@ -243,7 +244,7 @@ class ActivityMapApiEndpoints:
 
         @api.get(
             "account/{character_id}/activitymap/ratting",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_character_activity_map_ratting(request, character_id: int):

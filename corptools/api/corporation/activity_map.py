@@ -9,6 +9,7 @@ from allianceauth.eveonline.models import EveCharacter
 
 # AA Example App
 from corptools import models
+from corptools.api import schema
 from corptools.api.activity_map_shared import (
     LOGISTICS_CONTRACT_TYPES,
     SALES_CONTRACT_TYPES,
@@ -76,7 +77,7 @@ class CorpActivityMapApiEndpoints:
     def __init__(self, api: NinjaAPI):
         @api.get(
             "corporation/{corporation_id}/activitymap/assets",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_assets(request, corporation_id: int):
@@ -91,7 +92,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/assets/ships",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_assets_ships(request, corporation_id: int):
@@ -109,7 +110,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/assets/capitals",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_assets_capitals(request, corporation_id: int):
@@ -127,7 +128,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/assets/members",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_assets_members(request, corporation_id: int):
@@ -141,7 +142,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/assets/members/ships",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_assets_members_ships(request, corporation_id: int):
@@ -158,7 +159,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/assets/members/capitals",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_assets_members_capitals(request, corporation_id: int):
@@ -175,7 +176,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/structures",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_structures(request, corporation_id: int):
@@ -190,7 +191,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/starbases",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_starbases(request, corporation_id: int):
@@ -205,7 +206,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/pocos",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_pocos(request, corporation_id: int):
@@ -220,7 +221,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/pocos/revenue",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_pocos_revenue(request, corporation_id: int):
@@ -236,7 +237,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/orders",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_orders(request, corporation_id: int):
@@ -253,7 +254,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/orders/members",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_orders_members(request, corporation_id: int):
@@ -267,7 +268,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/contracts",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_contracts(request, corporation_id: int):
@@ -280,7 +281,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/contracts/sales",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_contracts_sales(request, corporation_id: int):
@@ -296,7 +297,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/contracts/logistics",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_contracts_logistics(request, corporation_id: int):
@@ -312,7 +313,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/industry",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_industry(request, corporation_id: int):
@@ -325,7 +326,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/location",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_location(request, corporation_id: int):
@@ -337,7 +338,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/clones/home",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_clones_home(request, corporation_id: int):
@@ -349,7 +350,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/clones/jump",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_clones_jump(request, corporation_id: int):
@@ -361,7 +362,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/mercenarydens",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_mercenary_dens(request, corporation_id: int):
@@ -375,7 +376,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/mercenarytacticaloperations",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_mercenary_tactical_operations(request, corporation_id: int):
@@ -387,7 +388,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/pi",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_pi(request, corporation_id: int):
@@ -399,7 +400,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/mining",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_mining(request, corporation_id: int):
@@ -411,7 +412,7 @@ class CorpActivityMapApiEndpoints:
 
         @api.get(
             "corporation/{corporation_id}/activitymap/ratting",
-            response={200: dict, 403: str},
+            response={200: schema.ActivityMap, 403: str},
             tags=self.tags
         )
         def get_corporation_activity_map_ratting(request, corporation_id: int):

@@ -2,7 +2,7 @@
 import logging
 
 # Third Party
-from eve_sde.models import Region, SolarSystem, Stargate
+from eve_sde.models import EveSDE, Region, SolarSystem, Stargate
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
@@ -44,6 +44,31 @@ def _normalize_positions(systems, x_attr: str, y_attr: str, target_span: float =
     return result
 
 
+# The whole known-space map, by SDE build - see _cached_universe_map.
+_universe_map_cache = {}
+
+
+def _cached_universe_map() -> dict:
+    """The whole known-space map comes purely from the SDE, so it's the same
+    for every request until the SDE changes - and it's most of the cost of
+    every activity map. Cached per process, keyed on the SDE build eve_sde
+    records once a load completes, so an SDE update rebuilds it.
+
+    Returns a shallow copy - callers add their own keys (e.g. "values") - so
+    they must not modify the shared regions/systems/edges lists.
+    """
+    build = EveSDE.get_solo().build_number
+    if build is None:
+        # SDE not loaded through eve_sde - nothing to key a cache on
+        return _build_base_map_payload(None)
+    cached = _universe_map_cache.get(build)
+    if cached is None:
+        cached = _build_base_map_payload(None)
+        _universe_map_cache.clear()  # only ever keep the current build
+        _universe_map_cache[build] = cached
+    return {**cached}
+
+
 def build_base_map_payload(anchor_system_ids, extra_system_ids=frozenset()) -> dict:
     """Build the generic {regions, systems, edges} map payload shared by every
     space-map feature (sovereignty map, activity map, ...).
@@ -57,7 +82,16 @@ def build_base_map_payload(anchor_system_ids, extra_system_ids=frozenset()) -> d
 
     extra_system_ids pulls in systems outside those regions (e.g. workforce
     transport / jump bridge endpoints) as "external" systems, same as today.
+
+    The whole-map case (anchor_system_ids=None, no extras) is cached - see
+    _cached_universe_map.
     """
+    if anchor_system_ids is None and not extra_system_ids:
+        return _cached_universe_map()
+    return _build_base_map_payload(anchor_system_ids, extra_system_ids)
+
+
+def _build_base_map_payload(anchor_system_ids, extra_system_ids=frozenset()) -> dict:
     if anchor_system_ids is None:
         base_systems = list(
             _exclude_wh_and_abyssal(SolarSystem.objects.all())
