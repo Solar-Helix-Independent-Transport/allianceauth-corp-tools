@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import ErrorBoundary from "../../Components/Helpers/ErrorBoundary";
 import { NativeSelectFilter } from "../../Components/Helpers/NativeSelectFilter";
 import { TextFilter } from "../../Components/Helpers/TextFilter";
-import { ErrorLoader, PanelLoader } from "../../Components/Loaders/loaders";
+import { PanelLoader } from "../../Components/Loaders/loaders";
 import CharSkillGroups from "../../Components/Skills/CharacterSkills";
 import { SkillBlockKey } from "../../Components/Skills/SkillBlockKey";
 import {
@@ -23,7 +23,7 @@ const CharacterSkills = () => {
   const [skill_filter, setFilter] = useState("");
   const [level_filter, setLevel] = useState(-1);
 
-  const { isLoading, error, data } = useQuery({
+  const { isLoading, data } = useQuery({
     queryKey: ["skills", characterID],
     queryFn: () => getCharacterSkills(characterID ? Number(characterID) : 0),
   });
@@ -49,9 +49,10 @@ const CharacterSkills = () => {
   });
   const mainCharacterId = statusData?.main?.character_id;
 
-  if (isLoading) return <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />;
-
-  if (error || !data) return <ErrorLoader />;
+  // A failed load throws to the page's error boundary, so no data here
+  // just means still loading.
+  if (isLoading || !data)
+    return <PanelLoader title={t("Data Loading")} message={t("Please Wait")} />;
 
   if (char_id === "0") {
     // The skills query alone can resolve before the status query does -

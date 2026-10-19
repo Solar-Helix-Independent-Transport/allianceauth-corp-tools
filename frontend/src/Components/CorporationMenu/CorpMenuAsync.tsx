@@ -12,6 +12,7 @@ const CorpMenuAsync = () => {
       const api = await axios.get(`/audit/api/corp/menu`);
       return api.data;
     },
+    throwOnError: false, // handled below
   });
   if (!menuRoot) {
     return <></>;

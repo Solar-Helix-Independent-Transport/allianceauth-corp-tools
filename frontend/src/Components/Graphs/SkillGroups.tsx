@@ -21,6 +21,7 @@ export const SkillsRadarGraph = ({ characterID }: { characterID: number }) => {
       getCharacterSkillGraph(
         characterID ? Number(characterID) : 0,
       ) as unknown as Promise<SkillGraphResponse>,
+    throwOnError: false, // handled below
   });
   const bg = getCSSVariable("--bs-body-bg");
   const txt = getCSSVariable("--bs-body-color");

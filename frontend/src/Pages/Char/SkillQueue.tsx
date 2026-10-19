@@ -1,5 +1,5 @@
 import { PortraitCard } from "../../Components/Cards/PortraitCard";
-import { ErrorLoader, PanelLoader } from "../../Components/Loaders/loaders";
+import { PanelLoader } from "../../Components/Loaders/loaders";
 import { SkillLevelBlock } from "../../Components/Skills/SkillLevelBlock";
 import { getCharacterSkillQueues } from "../../api/character";
 import { ChangeEvent, useState } from "react";
@@ -12,7 +12,7 @@ import ReactTimeAgo from "react-time-ago";
 const CharacterSkillQueues = () => {
   const { t } = useTranslation();
   const { characterID } = useParams();
-  const { isLoading, isFetching, error, data } = useQuery({
+  const { isLoading, isFetching, data } = useQuery({
     queryKey: ["skills", "queue", characterID],
     queryFn: () => getCharacterSkillQueues(characterID ? Number(characterID) : 0),
   });
@@ -21,9 +21,9 @@ const CharacterSkillQueues = () => {
   const [pausedFilter, setPaused] = useState(true);
   const [emptyFilter, setEmpty] = useState(false);
 
-  if (isLoading) return <PanelLoader />;
-
-  if (error || !data) return <ErrorLoader />;
+  // A failed load throws to the page's error boundary, so no data here
+  // just means still loading.
+  if (isLoading || !data) return <PanelLoader />;
 
   const handleActive = (e: ChangeEvent<HTMLInputElement>) => {
     setActive(e.currentTarget.checked);
@@ -54,10 +54,6 @@ const CharacterSkillQueues = () => {
     }
     return (activeFilter && active) || (emptyFilter && empty) || (pausedFilter && paused);
   });
-
-  if (isLoading) return <PanelLoader />;
-
-  if (error) return <ErrorLoader />;
 
   return (
     <>

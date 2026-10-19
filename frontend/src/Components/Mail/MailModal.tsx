@@ -19,6 +19,7 @@ function MailModal({
   const { isFetching, error, data } = useQuery({
     queryKey: ["mailBody", msg_data?.character_id, msg_data?.mail_id],
     queryFn: () => getMailBody(msg_data?.character_id ?? 0, msg_data?.mail_id ?? 0),
+    throwOnError: false, // handled below
   });
 
   return (
