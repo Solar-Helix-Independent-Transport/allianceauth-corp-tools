@@ -655,3 +655,43 @@ class StructureFit(Schema):
     service: Union[int, float]
     fighter: Union[int, float]
     subsystem: Union[int, float]
+
+
+class GateEnd(Schema):
+    # Only `known` and `active` are sent for an end that isn't known - the
+    # endpoint leaves the rest out rather than sending null.
+    system_name: Optional[str] = None
+    system_id: Optional[int] = None
+    # liquid ozone in the fuel bay
+    ozone: Optional[int] = None
+    known: bool
+    active: bool
+    # whole days of fuel left
+    expires: Optional[int] = None
+    name: Optional[str] = None
+
+
+class Gate(Schema):
+    start: GateEnd
+    end: GateEnd
+
+
+class DenLocation(Schema):
+    id: int
+    # the location's name, or "<id> (<flag>)" when it isn't known
+    name: str
+    # NB: as built, this pairs the *system's* id with the constellation's
+    # name, and `region` the constellation's id with the region's name;
+    # {"id": 0, "name": ""} when unknown
+    constellation: IdName
+    region: IdName
+
+
+class Den(Schema):
+    character: Character
+    item: EveName
+    quantity: int
+    id: int
+    expand: bool
+    name: Optional[str]
+    location: DenLocation

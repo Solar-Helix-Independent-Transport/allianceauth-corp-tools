@@ -33,8 +33,9 @@ class DashboardApiEndpoints:
     def __init__(self, api: NinjaAPI):
         @api.get(
             "dashboard/gates",
-            response={200: List, 403: schema.Message},
-            tags=self.tags
+            response={200: List[schema.Gate], 403: schema.Message},
+            tags=self.tags,
+            exclude_unset=True,
         )
         def get_dashboard_gates(request):
             perms = (
@@ -178,7 +179,7 @@ class DashboardApiEndpoints:
 
         @api.get(
             "dashboard/dens",
-            response={200: list, 403: str},
+            response={200: List[schema.Den], 403: str},
             tags=self.tags
         )
         def get_visible_dens(

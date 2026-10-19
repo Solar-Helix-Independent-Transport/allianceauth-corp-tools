@@ -9,7 +9,7 @@ the JSON each endpoint returned before it got a schema, so the schema can't
 quietly change it.
 """
 # Standard Library
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 # Third Party
@@ -327,3 +327,139 @@ class TestStructureShapes(ApiShapeTestCase):
             "low": 6.0, "med": 8, "high": 8, "rig": 3,
             "service": 5.0, "fighter": 0, "subsystem": 0,
         })
+
+
+class TestDashboardShapes(ApiShapeTestCase):
+    def setUp(self):
+        super().setUp()
+        region = sde.Region.objects.create(id=10000060, name="Delve")
+        const = sde.Constellation.objects.create(
+            id=20000696, name="O-EIMK", region=region)
+
+        def system(system_id, name):
+            return sde.SolarSystem.objects.create(
+                id=system_id, name=name, security_status=-0.5, x=0, y=0,
+                z=0, security_class="nullsec", constellation=const)
+
+        self.a = system(30004759, "1DQ1-A")
+        self.b = system(30004760, "8QT-H4")
+        self.c = system(30004761, "PDE-U3")
+        cat = sde.ItemCategory.objects.create(
+            id=4809, name="Infrastructure Upgrades", published=True)
+        self.den_group = sde.ItemGroup.objects.create(
+            id=4810, name="Mercenary Dens", category=cat, anchorable=False,
+            anchored=False, fittable_non_singleton=False, published=True,
+            use_base_price=False)
+        self.den = sde.ItemType.objects.create(
+            id=85230, name="Mercenary Den", published=True,
+            group=self.den_group)
+
+    def gate(self, structure_id, system, name, ozone=None, online=True,
+             fuel_days=None):
+        gate = ct.Structure.objects.create(
+            corporation=self.cp1, profile_id=1, reinforce_hour=12,
+            state="shield_vulnerable", structure_id=structure_id,
+            system_id=system.id, system_name=system, type_id=35841,
+            name=name, fuel_expires=(
+                datetime.now(timezone.utc) + timedelta(days=fuel_days, hours=1)
+                if fuel_days is not None else None))
+        ct.StructureService.objects.create(
+            structure=gate, name="Jump Bridge Access",
+            state="online" if online else "offline")
+        if ozone:
+            ct.CorpAsset.objects.create(
+                corporation=self.cp1, singleton=False, item_id=structure_id + 1,
+                location_flag="StructureFuel", location_id=structure_id,
+                location_type="item", quantity=ozone, type_id=16273)
+
+    def test_gates(self):
+        # structures only count as visible after a recent structure update
+        self.cp1.update_timestamps = {
+            "structures": datetime.now(timezone.utc).isoformat()}
+        self.cp1.save()
+        # a pair, and a gate whose other end isn't known
+        self.gate(1001, self.a, "1DQ1-A » 8QT-H4 - Highway", ozone=500,
+                  fuel_days=10)
+        self.gate(1002, self.b, "8QT-H4 » 1DQ1-A - Highway", online=False)
+        self.gate(1003, self.c, "PDE-U3 » 4-HWWF - Spur", fuel_days=3)
+
+        self.assertEqual(self.get_json("/audit/api/dashboard/gates"), [
+            {
+                "start": {
+                    "system_name": "1DQ1-A", "system_id": 30004759,
+                    "ozone": 500, "known": True, "active": True,
+                    "expires": 10, "name": "1DQ1-A » 8QT-H4 - Highway",
+                },
+                "end": {
+                    "system_name": "8QT-H4", "system_id": 30004760,
+                    "ozone": 0, "known": True, "active": False,
+                    "expires": 0, "name": "8QT-H4 » 1DQ1-A - Highway",
+                },
+            },
+            {
+                "start": {
+                    "system_name": "PDE-U3", "system_id": 30004761,
+                    "ozone": 0, "known": True, "active": True,
+                    "expires": 3, "name": "PDE-U3 » 4-HWWF - Spur",
+                },
+                # just these two keys - nothing else is known about it
+                "end": {"known": False, "active": False},
+            },
+        ])
+
+    def test_dens(self):
+        located = ct.EveLocation.objects.create(
+            location_id=self.a.id, location_name="1DQ1-A", system=self.a)
+
+        def den(item_id, character, location_id, location_name=None,
+                name=None):
+            ct.CharacterAsset.objects.create(
+                character=character, singleton=True, item_id=item_id,
+                location_flag="AutoFit", location_id=location_id,
+                location_type="solar_system", quantity=1,
+                type_id=self.den.id, type_name=self.den,
+                location_name=location_name, name=name)
+
+        den(5001, self.ca1, self.a.id, located, name="My Den")
+        # location never resolved
+        den(5002, self.ca1, self.b.id)
+
+        character = {
+            "character_id": self.char1.character_id,
+            # "Main (Alt)" - here the character is its own main
+            "character_name":
+                f"{self.char1.character_name} ({self.char1.character_name})",
+            "corporation_id": self.char1.corporation_id,
+            "corporation_name": self.char1.corporation_name,
+            "alliance_id": self.char1.alliance_id,
+            "alliance_name": self.char1.alliance_name,
+        }
+        item = {
+            "id": 85230, "name": "Mercenary Den",
+            "cat": "Infrastructure Upgrades - Mercenary Dens", "cat_id": 4810,
+        }
+        self.assertEqual(self.get_json("/audit/api/dashboard/dens"), [
+            {
+                "character": character,
+                "item": {**item, "name": "Mercenary Den (My Den)"},
+                "quantity": 1, "id": 5001, "expand": False, "name": "My Den",
+                "location": {
+                    "id": self.a.id, "name": "1DQ1-A",
+                    # as built today: the system's id with the
+                    # constellation's name, and the constellation's id with
+                    # the region's name
+                    "constellation": {"id": self.a.id, "name": "O-EIMK"},
+                    "region": {"id": 20000696, "name": "Delve"},
+                },
+            },
+            {
+                "character": character,
+                "item": item,
+                "quantity": 1, "id": 5002, "expand": False, "name": None,
+                "location": {
+                    "id": self.b.id, "name": f"{self.b.id} (AutoFit)",
+                    "constellation": {"id": 0, "name": ""},
+                    "region": {"id": 0, "name": ""},
+                },
+            },
+        ])
