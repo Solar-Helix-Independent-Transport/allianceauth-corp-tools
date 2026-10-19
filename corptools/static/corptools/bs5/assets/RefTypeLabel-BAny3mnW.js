@@ -1,0 +1,2 @@
+import{o as e,s as t}from"./@bootstrap-libs-CFNqqKgW.js";import{w as n}from"./@app-libs-eRbCtoJk.js";var r=e=>e.toLowerCase().replace(/\b\w/g,e=>e.toUpperCase()),i=(e,t)=>t||r(e.replaceAll(`_`,` `)),a=n(),o=({refType:n,name:r,description:o})=>{let s=i(n,r);return o?(0,a.jsx)(e,{trigger:[`hover`,`focus`],overlay:(0,a.jsx)(t,{id:`ref-type-${n}`,style:{position:`fixed`},children:o}),children:(0,a.jsx)(`span`,{children:s})}):(0,a.jsx)(`span`,{children:s})};export{i as n,o as t};
+//# sourceMappingURL=RefTypeLabel-BAny3mnW.js.map

@@ -1,0 +1,2 @@
+import{f as e,m as t}from"./@bootstrap-libs-CFNqqKgW.js";import{w as n}from"./@app-libs-eRbCtoJk.js";var r=n(),i=({setFilterText:n,labelText:i})=>(0,r.jsxs)(`div`,{className:`flex-grow-1 flex-even d-flex text-nowrap`,children:[(0,r.jsx)(`div`,{className:`my-auto mx-2`,children:(0,r.jsx)(e.Label,{className:`m-0 p-0`,children:i})}),(0,r.jsx)(t,{className:`m-2`,type:`text`,onChange:e=>n(e.target.value)})]});export{i as t};
+//# sourceMappingURL=TextFilter-DLGp7UO5.js.map

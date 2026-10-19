@@ -24,6 +24,19 @@ export default defineConfig({
       },
     },
   },
+  experimental: {
+    // Django serves the build from /static/corptools/bs5/, not Vite's base
+    // "/". The templates load the entry from the manifest, but the chunks of
+    // lazily loaded pages are fetched at runtime - load those relative to the
+    // chunk importing them. Everything else (CSS, images) keeps its absolute
+    // path, which assetFileNames below already fakes to the right place.
+    renderBuiltUrl(filename, { hostType }) {
+      if (hostType === "js" && filename.endsWith(".js")) {
+        return { relative: true };
+      }
+      return "/" + filename;
+    },
+  },
   build: {
     sourcemap: true,
     manifest: true,
@@ -42,7 +55,6 @@ export default defineConfig({
         manualChunks(id) {
           // creating a chunk to react routes deps. Reducing the vendor chunk size
           if (
-            id.includes("react-router-dom") ||
             id.includes("react-router") ||
             id.includes("react-select") ||
             id.includes("react-slider") ||
@@ -50,15 +62,10 @@ export default defineConfig({
           ) {
             return "@react-libs";
           }
-          if (
-            id.includes("react-query") ||
-            id.includes("javascript-time-ago") ||
-            id.includes("@nivo/bar") ||
-            id.includes("@nivo/core") ||
-            id.includes("@nivo/chord") ||
-            id.includes("@nivo/radar") ||
-            id.includes("recharts")
-          ) {
+          // Only libraries every page needs - anything forced in here is
+          // loaded up front, even with the pages split out. Page-specific
+          // libraries (nivo, xyflow) split off with the pages that use them.
+          if (id.includes("react-query") || id.includes("javascript-time-ago")) {
             return "@app-libs";
           }
           if (id.includes("react-bootstrap") || id.includes("bootstrap")) {
