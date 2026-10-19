@@ -870,3 +870,49 @@ class MiningCharacter(Schema):
 
 class MiningCharacters(Schema):
     characters: List[MiningCharacter]
+
+
+# Skill checks - a character's table from SkillListCache.check_skill_lists,
+# as the fit check returns it (the doctrine checks build the same tables)
+
+class SkillCheckSkill(Schema):
+    # the skill's group name
+    grp: Optional[str]
+    sp_total: int
+    active_level: int
+    trained_level: int
+
+
+class DoctrineMeta(Schema):
+    total_sp: int
+    trained_sp: int
+
+
+class CharacterSkillCheck(Schema):
+    character_id: int
+    # false if any skill is trained above what the clone can use
+    omega: bool
+    # by skill name
+    skills: Dict[str, SkillCheckSkill]
+    # skill name -> the level the queue ends on
+    queue: Dict[str, int]
+    # doctrine name -> its "_meta" SP totals, plus each skill still missing
+    # (skill name -> the level needed)
+    doctrines: Dict[str, Dict[str, Union[int, DoctrineMeta]]]
+
+
+class FitSkill(Schema):
+    # skill type id - a float, from SDE dogma
+    s: Union[int, float]
+    # level needed - a float, from SDE dogma
+    l: Union[int, float]
+    # skill name
+    n: str
+
+
+class FitCheck(Schema):
+    # sorted by name
+    skills: List[FitSkill]
+    # by character name, for each character on the account with any skills;
+    # the fit is the doctrine "fit"
+    chars: Dict[str, CharacterSkillCheck]

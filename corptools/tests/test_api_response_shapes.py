@@ -39,6 +39,11 @@ class ApiShapeTestCase(CorptoolsTestCase):
         self.assertEqual(resp.status_code, 200, resp.content)
         return resp.json()
 
+    def post_text_json(self, url, body):
+        resp = self.client.post(url, data=body, content_type="text/plain")
+        self.assertEqual(resp.status_code, 200, resp.content)
+        return resp.json()
+
 
 class TestMailShapes(ApiShapeTestCase):
     def setUp(self):
@@ -840,3 +845,85 @@ class TestMiningShapes(ApiShapeTestCase):
                 {"character_id": self.char2.character_id,
                  "character_name": self.char2.character_name},
             ]})
+
+
+class TestFitCheckShapes(ApiShapeTestCase):
+    def setUp(self):
+        super().setUp()
+        skills_group = sde.ItemGroup.objects.create(
+            id=255, name="Gunnery", anchorable=False, anchored=False,
+            fittable_non_singleton=False, published=True,
+            use_base_price=False)
+        attrs = {
+            a: sde.DogmaAttribute.objects.create(id=a, name=f"attr{a}")
+            for a in (182, 183, 277, 278, 275)}
+
+        def item(type_id, name, group=None, **dogma):
+            t = sde.ItemType.objects.create(
+                id=type_id, name=name, published=True, group=group)
+            for attr, value in dogma.items():
+                sde.TypeDogma.objects.create(
+                    item_type=t, dogma_attribute=attrs[int(attr[1:])],
+                    value=value)
+            return t
+
+        # skills, with their training time multiplier (attribute 275)
+        self.gunnery = item(3300, "Gunnery", skills_group, a275=1)
+        self.frig = item(3329, "Minmatar Frigate", skills_group, a275=2)
+        item(3301, "Small Projectile Turret", skills_group, a275=1)
+        # the fit: the ship needs Minmatar Frigate III, the gun Gunnery I
+        # and Small Projectile Turret I
+        item(587, "Rifter", a182=3329, a277=3)
+        item(2873, "200mm AutoCannon I", a182=3300, a277=1, a183=3301,
+             a278=1)
+
+        ct.Skill.objects.create(
+            character=self.ca1, skill_id=3300, skill_name=self.gunnery,
+            active_skill_level=5, trained_skill_level=5,
+            skillpoints_in_skill=256000)
+        ct.Skill.objects.create(
+            character=self.ca1, skill_id=3329, skill_name=self.frig,
+            active_skill_level=2, trained_skill_level=2,
+            skillpoints_in_skill=2829)
+
+    def test_fit_check(self):
+        eft = (
+            "[Rifter, Test fit]\n"
+            "200mm AutoCannon I, EMP S\n"
+            "\n"
+            "Nanite Repair Paste x10\n"  # not in the SDE - ignored
+        )
+        data = self.post_text_json(
+            f"/audit/api/extras/fitting2skills/{self.cid}", eft)
+
+        self.assertEqual(data, {
+            # skill id and level are floats - SDE dogma values
+            "skills": [
+                {"s": 3300.0, "l": 1.0, "n": "Gunnery"},
+                {"s": 3329.0, "l": 3.0, "n": "Minmatar Frigate"},
+                {"s": 3301.0, "l": 1.0, "n": "Small Projectile Turret"},
+            ],
+            # characters on the account with any skills, by name
+            "chars": {
+                self.char1.character_name: {
+                    "character_id": self.char1.character_id,
+                    "omega": True,
+                    "skills": {
+                        "Gunnery": {"grp": "Gunnery", "sp_total": 256000,
+                                    "active_level": 5, "trained_level": 5},
+                        "Minmatar Frigate": {
+                            "grp": "Gunnery", "sp_total": 2829,
+                            "active_level": 2, "trained_level": 2},
+                    },
+                    "queue": {},
+                    "doctrines": {"fit": {
+                        # SP: 250 * multiplier * sqrt(32)^(level - 1)
+                        "_meta": {"total_sp": 250 + 16000 + 250,
+                                  "trained_sp": 250 + 2829},
+                        # what's missing, at the level needed
+                        "Minmatar Frigate": 3,
+                        "Small Projectile Turret": 1,
+                    }},
+                },
+            },
+        })

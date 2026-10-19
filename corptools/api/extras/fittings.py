@@ -3,6 +3,7 @@ from eve_sde.models import ItemType, TypeDogma
 from ninja import NinjaAPI
 
 # AA Example App
+from corptools.api import schema
 from corptools.api.helpers import get_alts_queryset, get_main_character
 from corptools.models.skills import SkillList
 from corptools.task_helpers.skill_helpers import SkillListCache
@@ -121,7 +122,7 @@ class FittingsApiEndpoints:
 
         @api.post(
             "/extras/fitting2skills/{character_id}",
-            response={200: dict, 403: str, 404: str, 500: str},
+            response={200: schema.FitCheck, 403: str, 404: str, 500: str},
             tags=["Fittings"],
             openapi_extra={
                 "requestBody": {
