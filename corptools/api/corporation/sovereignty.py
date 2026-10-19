@@ -11,6 +11,7 @@ from allianceauth.services.hooks import get_extension_logger
 
 # AA Example App
 from corptools import models
+from corptools.api import schema
 from corptools.api.spacemap import build_base_map_payload
 
 logger = get_extension_logger(__name__)
@@ -335,7 +336,7 @@ class SovereigntyApiEndpoints:
     def __init__(self, api: NinjaAPI):
         @api.get(
             "corp/sovhubs",
-            response={200: List, 403: str},
+            response={200: List[schema.SovHub], 403: str},
             tags=self.tags
         )
         def get_visible_sovhubs(request):
@@ -365,7 +366,7 @@ class SovereigntyApiEndpoints:
 
         @api.get(
             "corp/sovhubs/map",
-            response={200: dict, 403: str},
+            response={200: schema.SovMap, 403: str},
             tags=self.tags
         )
         def get_sov_map(request):
@@ -395,7 +396,7 @@ class SovereigntyApiEndpoints:
 
         @api.get(
             "dash/sovmap",
-            response={200: dict, 403: str},
+            response={200: schema.SovMap, 403: str},
             tags=self.tags
         )
         def get_sov_map_public(request):

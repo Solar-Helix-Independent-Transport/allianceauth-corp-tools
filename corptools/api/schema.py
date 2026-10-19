@@ -595,14 +595,14 @@ class Poco(Schema):
     allow_alliance_access: Optional[bool]
 
 
-class StarbaseOwner(Schema):
+class CorporationRef(Schema):
     corporation_id: int
     corporation_name: str
 
 
 class Starbase(Schema):
     starbase_id: int
-    owner: StarbaseOwner
+    owner: CorporationRef
     name: Optional[str]
     type: IdName
     state: str
@@ -713,3 +713,116 @@ class CorpCharacterCounts(Schema):
 class CorpCharacterStatus(Schema):
     characters: CorpCharacterCounts
     corporation: IdName
+
+
+# Space maps - the shared {regions, systems, edges} payload from
+# spacemap.build_base_map_payload, also used by the activity maps.
+
+class MapSystem(Schema):
+    id: int
+    name: str
+    region_id: Optional[int]
+    constellation_id: Optional[int]
+    # two layouts, each normalised to 0-20000: the SDE's 2D map projection,
+    # and real universe X/Z - null when the SDE has no position for it
+    x_2d: Optional[float]
+    y_2d: Optional[float]
+    x_real: Optional[float]
+    y_real: Optional[float]
+    security_status: Optional[float]
+    security_class: Optional[str]
+    # outside the map's regions - only shown as a link endpoint
+    external: bool
+
+
+class MapEdge(Schema):
+    source: int
+    target: int
+
+
+# Sovereignty
+
+class OptionalIdName(Schema):
+    # null id (and name "Unknown") when the SDE doesn't know it
+    id: Optional[int]
+    name: str
+
+
+class SovHubReagent(Schema):
+    # "Unknown", with a null type_id, when the type isn't in the SDE
+    name: str
+    type_id: Optional[int]
+    amount: int
+    burning_per_hour: int
+
+
+class SovHubUpgrade(Schema):
+    # "Unknown", with a null type_id, when the type isn't in the SDE
+    name: str
+    type_id: Optional[int]
+    power_state: str
+
+
+class TransportSystem(Schema):
+    system_id: int
+    # "#<id>" when the system isn't in the SDE
+    system_name: str
+
+
+class TransportSystemAmount(TransportSystem):
+    amount: Optional[int]
+
+
+class WorkforceTransport(Schema):
+    # "import", "export" or "transit", or null when not configured
+    mode: Optional[str]
+    # import mode only
+    config_sources: List[TransportSystem]
+    state_sources: List[TransportSystemAmount]
+    # export mode only
+    config_destination: Optional[TransportSystemAmount]
+    state_destination: Optional[TransportSystemAmount]
+
+
+class AnarchyDen(Schema):
+    den_id: int
+    anarchy_amount: int
+    character_name: str
+    type_name: str
+    planet_name: str
+
+
+class SovHub(Schema):
+    hub_id: int
+    owner: CorporationRef
+    location: OptionalIdName
+    constellation: OptionalIdName
+    region: OptionalIdName
+    # the public map leaves these null/empty - operational detail
+    power_allocated: Optional[int]
+    power_available: Optional[int]
+    workforce_allocated: Optional[int]
+    workforce_available: Optional[int]
+    reagent_last_updated: Optional[datetime]
+    reagents: List[SovHubReagent]
+    upgrades: List[SovHubUpgrade]
+    workforce_transport: Optional[WorkforceTransport]
+    # high-anarchy dens in the hub's system - only filled in on the hub
+    # list; the maps list them per system instead
+    anarchy_dens: List[AnarchyDen]
+
+
+class SovMapSystem(MapSystem):
+    is_hub: bool
+    # a high-anarchy den is threatening this system's hub - always false on
+    # the public map, which shows no den info
+    anarchy_alert: bool
+    anarchy_dens: List[AnarchyDen]
+
+
+class SovMap(Schema):
+    regions: List[IdName]
+    systems: List[SovMapSystem]
+    edges: List[MapEdge]
+    jump_bridges: List[MapEdge]
+    hubs: List[SovHub]

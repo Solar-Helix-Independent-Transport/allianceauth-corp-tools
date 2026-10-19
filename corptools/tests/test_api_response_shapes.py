@@ -506,3 +506,203 @@ class TestCorporationStatusShapes(ApiShapeTestCase):
 
         self.assertEqual(resp.status_code, 403)
         self.assertEqual(resp.json(), "Permission Denied")
+
+
+class TestSovereigntyShapes(ApiShapeTestCase):
+    """The sov hub list and both sov maps - the map payload is the shared
+    space-map shape (regions/systems/edges) with sov data on top."""
+
+    def setUp(self):
+        super().setUp()
+        delve = sde.Region.objects.create(id=10000060, name="Delve")
+        fountain = sde.Region.objects.create(id=10000058, name="Fountain")
+        delve_c = sde.Constellation.objects.create(
+            id=20000696, name="O-EIMK", region=delve)
+        fountain_c = sde.Constellation.objects.create(
+            id=20000672, name="Fountain C", region=fountain)
+
+        def system(system_id, name, const, x, z, has_2d=True):
+            return sde.SolarSystem.objects.create(
+                id=system_id, name=name, constellation=const,
+                security_status=-0.4, security_class="nullsec",
+                x=x, y=0, z=z,
+                x_2d=x if has_2d else None, y_2d=z if has_2d else None)
+
+        # picked so the normalised positions are round numbers: span 100
+        # scales to 20000
+        self.a = system(30004759, "1DQ1-A", delve_c, 0, 0)
+        self.b = system(30004760, "8QT-H4", delve_c, 100, 100)
+        # another region, no 2D position - only on the map as a workforce
+        # source / jump bridge endpoint
+        self.c = system(30004761, "PDE-U3", fountain_c, 50, 50, has_2d=False)
+        sde.Stargate.objects.create(
+            id=50001, name="Stargate (8QT-H4)", solar_system=self.a,
+            destination=self.b)
+        sde.Stargate.objects.create(
+            id=50002, name="Stargate (1DQ1-A)", solar_system=self.b,
+            destination=self.a)
+
+        fuel = sde.ItemType.objects.create(
+            id=81143, name="Magmatic Gas", published=True)
+        upgrade = sde.ItemType.objects.create(
+            id=81615, name="Power Monitoring Division", published=True)
+        den_type = sde.ItemType.objects.create(
+            id=85230, name="Mercenary Den", published=True)
+        planet = sde.Planet.objects.create(
+            id=40300001, name="1DQ1-A I", solar_system=self.a)
+
+        self.hub_a = ct.SovereigntyHub.objects.create(
+            corporation=self.cp1, hub_id=5001, solar_system_id=self.a.id,
+            solar_system_name=self.a, power_allocated=100,
+            power_available=200, workforce_allocated=10,
+            workforce_available=20,
+            reagent_last_updated=datetime(2026, 5, 6, tzinfo=timezone.utc),
+            workforce_transport={
+                "configuration": {"import": {"sources": [
+                    {"solar_system_id": self.c.id}]}},
+                "state": {"import": {"sources": [
+                    {"solar_system_id": self.c.id, "amount": 5}]}},
+            })
+        self.hub_a.reagents.create(
+            type_name=fuel, amount=50, burning_per_hour=2)
+        self.hub_a.reagents.create(amount=0, burning_per_hour=0)
+        self.hub_a.upgrades.create(type_name=upgrade, power_state="online")
+        self.hub_a.upgrades.create(power_state="offline")
+        ct.SovereigntyHub.objects.create(
+            corporation=self.cp1, hub_id=5002, solar_system_id=self.b.id,
+            solar_system_name=self.b,
+            workforce_transport={
+                "configuration": {"export": {
+                    "solar_system_id": self.a.id, "amount": 7}},
+                "state": {},
+            })
+        ct.CharacterMercenaryDen.objects.create(
+            character=self.ca1, den_id=7001, planet_id=planet.id,
+            planet_name=planet, type_id=den_type.id, type_name=den_type,
+            state="running", development_level="level0",
+            anarchy_amount=55, anarchy_level="level4")
+        # a jump bridge from 1DQ1-A out to PDE-U3
+        self.cp1.update_timestamps = {
+            "structures": datetime.now(timezone.utc).isoformat()}
+        self.cp1.save()
+        ct.Structure.objects.create(
+            corporation=self.cp1, profile_id=1, reinforce_hour=12,
+            state="shield_vulnerable", structure_id=1001,
+            system_id=self.a.id, system_name=self.a, type_id=35841,
+            name="1DQ1-A » PDE-U3 - Out")
+
+        owner = {
+            "corporation_id": self.corp1.corporation_id,
+            "corporation_name": self.corp1.corporation_name,
+        }
+        delve_ref = {"id": 10000060, "name": "Delve"}
+        const_ref = {"id": 20000696, "name": "O-EIMK"}
+        self.den = {
+            "den_id": 7001, "anarchy_amount": 55,
+            "character_name": self.char1.character_name,
+            "type_name": "Mercenary Den", "planet_name": "1DQ1-A I",
+        }
+        self.hub_a_json = {
+            "hub_id": 5001, "owner": owner,
+            "location": {"id": self.a.id, "name": "1DQ1-A"},
+            "constellation": const_ref, "region": delve_ref,
+            "power_allocated": 100, "power_available": 200,
+            "workforce_allocated": 10, "workforce_available": 20,
+            "reagent_last_updated": "2026-05-06T00:00:00Z",
+            "reagents": [
+                {"name": "Magmatic Gas", "type_id": 81143, "amount": 50,
+                 "burning_per_hour": 2},
+                {"name": "Unknown", "type_id": None, "amount": 0,
+                 "burning_per_hour": 0},
+            ],
+            "upgrades": [
+                {"name": "Power Monitoring Division", "type_id": 81615,
+                 "power_state": "online"},
+                {"name": "Unknown", "type_id": None,
+                 "power_state": "offline"},
+            ],
+            "workforce_transport": {
+                "mode": "import",
+                "config_sources": [
+                    {"system_id": self.c.id, "system_name": "PDE-U3"}],
+                "state_sources": [
+                    {"system_id": self.c.id, "system_name": "PDE-U3",
+                     "amount": 5}],
+                "config_destination": None,
+                "state_destination": None,
+            },
+            "anarchy_dens": [self.den],
+        }
+        self.hub_b_json = {
+            "hub_id": 5002, "owner": owner,
+            "location": {"id": self.b.id, "name": "8QT-H4"},
+            "constellation": const_ref, "region": delve_ref,
+            "power_allocated": None, "power_available": None,
+            "workforce_allocated": None, "workforce_available": None,
+            "reagent_last_updated": None,
+            "reagents": [], "upgrades": [],
+            "workforce_transport": {
+                "mode": "export", "config_sources": [], "state_sources": [],
+                "config_destination": {
+                    "system_id": self.a.id, "system_name": "1DQ1-A",
+                    "amount": 7},
+                "state_destination": None,
+            },
+            "anarchy_dens": [],
+        }
+
+    def map_system(self, system, region_id, const_id, p2d, preal,
+                   external=False, **sov):
+        return {
+            "id": system.id, "name": system.name, "region_id": region_id,
+            "constellation_id": const_id,
+            "x_2d": p2d[0] if p2d else None, "y_2d": p2d[1] if p2d else None,
+            "x_real": preal[0], "y_real": preal[1],
+            "security_status": -0.4, "security_class": "nullsec",
+            "external": external, **sov,
+        }
+
+    def expected_map(self, hubs, den_detail):
+        alert = {"anarchy_alert": den_detail,
+                 "anarchy_dens": [self.den] if den_detail else []}
+        quiet = {"anarchy_alert": False, "anarchy_dens": []}
+        return {
+            "regions": [{"id": 10000060, "name": "Delve"}],
+            "systems": [
+                self.map_system(self.a, 10000060, 20000696, (0, 20000),
+                                (0, 20000), is_hub=True, **alert),
+                self.map_system(self.b, 10000060, 20000696, (20000, 0),
+                                (20000, 0), is_hub=True, **quiet),
+                self.map_system(self.c, 10000058, 20000672, None,
+                                (10000, 10000), external=True,
+                                is_hub=False, **quiet),
+            ],
+            "edges": [{"source": self.a.id, "target": self.b.id}],
+            "jump_bridges": [{"source": self.a.id, "target": self.c.id}],
+            "hubs": hubs,
+        }
+
+    def test_sov_hubs(self):
+        self.assertEqual(self.get_json("/audit/api/corp/sovhubs"),
+                         [self.hub_a_json, self.hub_b_json])
+
+    def test_sov_map(self):
+        # map lists dens per system
+        hub_a = {**self.hub_a_json, "anarchy_dens": []}
+        self.assertEqual(self.get_json("/audit/api/corp/sovhubs/map"),
+                         self.expected_map([hub_a, self.hub_b_json], True))
+
+    def test_public_sov_map(self):
+        # no power/workforce/reagents/transport, and no den info at all
+        public = {
+            "power_allocated": None, "power_available": None,
+            "workforce_allocated": None, "workforce_available": None,
+            "reagent_last_updated": None, "reagents": [],
+            "workforce_transport": None, "anarchy_dens": [],
+        }
+        self.assertEqual(
+            self.get_json("/audit/api/dash/sovmap"),
+            self.expected_map([
+                {**self.hub_a_json, **public},
+                {**self.hub_b_json, **public},
+            ], False))
