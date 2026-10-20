@@ -18,7 +18,9 @@ function MailModal({
 
   const { isFetching, error, data } = useQuery({
     queryKey: ["mailBody", msg_data?.character_id, msg_data?.mail_id],
-    queryFn: () => getMailBody(msg_data?.character_id ?? 0, msg_data?.mail_id ?? 0),
+    queryFn: () => getMailBody(msg_data!.character_id, msg_data!.mail_id!),
+    // nothing to fetch until a mail with an id is picked
+    enabled: msg_data?.mail_id != null,
     throwOnError: false, // handled below
   });
 
@@ -39,7 +41,9 @@ function MailModal({
           <StrToFields text={t("Labels:")}>
             <span style={{ overflowWrap: "anywhere" }}>
               {msg_data?.labels.map((name) => (
-                <Badge style={{ marginLeft: "5px" }}>{name}</Badge>
+                <Badge key={name} style={{ marginLeft: "5px" }}>
+                  {name}
+                </Badge>
               ))}
             </span>
           </StrToFields>
@@ -52,7 +56,9 @@ function MailModal({
 
             <span style={{ overflowWrap: "anywhere" }}>
               {msg_data?.recipients.map((name) => (
-                <Badge style={{ marginLeft: "5px" }}>{name}</Badge>
+                <Badge key={name} style={{ marginLeft: "5px" }}>
+                  {name}
+                </Badge>
               ))}
             </span>
           </StrToFields>

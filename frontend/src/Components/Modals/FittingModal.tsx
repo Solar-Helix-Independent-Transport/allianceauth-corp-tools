@@ -425,7 +425,7 @@ export const FittingModal = ({
   setShowModal: (show: boolean) => void;
 }) => {
   const { data, isFetching } = useQuery({
-    queryKey: ["glances", "account", ship.id],
+    queryKey: ["structureFit", ship.id],
     queryFn: () => loadStructureFit(ship.id ? Number(ship.id) : 0),
   });
 

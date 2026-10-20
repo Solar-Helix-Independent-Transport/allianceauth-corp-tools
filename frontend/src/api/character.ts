@@ -264,13 +264,7 @@ export async function loadMail(character_id: number) {
   return getCharacterEndpoint("/audit/api/account/{character_id}/mail", character_id);
 }
 
-export async function getMailBody(
-  character_id: number,
-  mail_id: number,
-): Promise<components["schemas"]["MailBody"] | Record<string, never>> {
-  if (!character_id && !mail_id) {
-    return {};
-  }
+export async function getMailBody(character_id: number, mail_id: number) {
   const { GET } = getCatApi();
   return unwrap(
     GET("/audit/api/account/{character_id}/mail/{mail_id}", {

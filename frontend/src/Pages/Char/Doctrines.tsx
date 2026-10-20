@@ -167,7 +167,6 @@ const CharacterDoctrine = () => {
                       <>
                         {(Object.entries(char.doctrines) as Array<[string, DoctrineSkillReqs]>).map(
                           ([k, v]) => {
-                            console.log(k, v);
                             return (
                               (!hideFailures || Object.entries(v).length === 1) &&
                               Math.floor((v?._meta?.trained_sp / v?._meta?.total_sp) * 100) >=

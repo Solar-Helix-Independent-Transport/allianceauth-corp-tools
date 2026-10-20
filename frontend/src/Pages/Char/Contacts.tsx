@@ -66,6 +66,7 @@ const CharacterContacts = () => {
                   size="sm"
                   href={`https://zkillboard.com/${cell.getValue().cat}/${cell.getValue().id}/`}
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   zKill
                 </Button>
@@ -74,6 +75,7 @@ const CharacterContacts = () => {
                   size="sm"
                   href={`https://evewho.com/${cell.getValue().cat}/${cell.getValue().id}`}
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   EVE Who
                 </Button>
@@ -84,6 +86,7 @@ const CharacterContacts = () => {
                       size="sm"
                       href={`https://www.eve411.com/${cell.getValue().cat}/${cell.getValue().id}`}
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       EVE411
                     </Button>
@@ -94,6 +97,7 @@ const CharacterContacts = () => {
                         .getValue()
                         .name.replace(" ", "_")}/summary`}
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       EVE Forums
                     </Button>
@@ -102,6 +106,7 @@ const CharacterContacts = () => {
                       size="sm"
                       href={`https://eve-search.com/search/author/${cell.getValue().name}`}
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       EVE Search
                     </Button>

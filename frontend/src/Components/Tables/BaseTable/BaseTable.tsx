@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import tableStyles from "./BaseTable.module.css";
 import Filter from "./BaseTableFilter";
@@ -94,6 +94,15 @@ const BaseTable = <TData,>({
 }: BaseTableProps<TData>) => {
   const location = useLocation();
   const { t } = useTranslation();
+
+  // When the last fetch finished - not when this last re-rendered. Tables
+  // that never fetch (isFetching always false) don't show a time.
+  const [loadedAt, setLoadedAt] = useState<Date | undefined>(undefined);
+  const wasFetching = useRef(isFetching);
+  useEffect(() => {
+    if (wasFetching.current && !isFetching) setLoadedAt(new Date());
+    wasFetching.current = isFetching;
+  }, [isFetching]);
 
   // TanStack Table's useReactTable() returns functions the compiler can't
   // safely memoize; this is inherent to the library, not fixable here.
@@ -204,7 +213,11 @@ const BaseTable = <TData,>({
             <OverlayTrigger
               placement="bottom"
               trigger={["hover", "focus"]}
-              overlay={MyTooltip(t("Data Loaded: {{date}}", { date: new Date().toLocaleString() }))}
+              overlay={MyTooltip(
+                loadedAt
+                  ? t("Data Loaded: {{date}}", { date: loadedAt.toLocaleString() })
+                  : t("Data Loaded"),
+              )}
             >
               <Button variant="info">
                 <i className="far fa-check-circle"></i>

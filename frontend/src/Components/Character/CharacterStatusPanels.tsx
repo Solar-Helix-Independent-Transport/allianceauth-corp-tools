@@ -94,6 +94,7 @@ const CharacterStatusPanels = ({
                     size="sm"
                     href={`https://zkillboard.com/character/${char.character.character_id}/`}
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     zKill
                   </Button>
@@ -102,6 +103,7 @@ const CharacterStatusPanels = ({
                     size="sm"
                     href={`https://evewho.com/character/${char.character.character_id}`}
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     EVE Who
                   </Button>
@@ -113,6 +115,7 @@ const CharacterStatusPanels = ({
                       "_",
                     )}`}
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     DotLan
                   </Button>
@@ -121,6 +124,7 @@ const CharacterStatusPanels = ({
                     size="sm"
                     href={`https://www.eve411.com/character/${char.character.character_id}`}
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     EVE411
                   </Button>
@@ -134,6 +138,7 @@ const CharacterStatusPanels = ({
                       "_",
                     )}/summary`}
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     EVE Forums
                   </Button>
@@ -142,6 +147,7 @@ const CharacterStatusPanels = ({
                     size="sm"
                     href={`https://eve-search.com/search/author/${char.character.character_name}`}
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     EVE Search
                   </Button>

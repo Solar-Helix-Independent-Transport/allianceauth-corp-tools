@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { useDebouncedFilter } from "./useDebouncedFilter";
 import Styles from "./BaseTableFilter.module.css";
 import { Column, Table as ReactTable } from "@tanstack/react-table";
@@ -121,24 +121,28 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
 export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
   const { t } = useTranslation();
   const passFail = column.getFilterValue();
+  // per filter, so two bool columns on one page aren't one radio group
+  const id = useId();
 
   const popoverBool = (
     <Popover id="popover-positioned-top" className={Styles.popover}>
       <Popover.Body className={Styles.radioWrapper}>
         <Form.Check
           label={t("True")}
-          name="group1"
+          name={id}
           type="radio"
-          id="radio-true"
+          id={`${id}-true`}
+          checked={passFail === true}
           onChange={() => {
             column.setFilterValue(true);
           }}
         />
         <Form.Check
           label={t("False")}
-          name="group1"
+          name={id}
           type="radio"
-          id="radio-false"
+          id={`${id}-false`}
+          checked={passFail === false}
           onChange={() => {
             column.setFilterValue(false);
           }}
@@ -223,9 +227,9 @@ export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> 
       >
         <path
           fill="currentColor"
-          fill-rule="evenodd"
+          fillRule="evenodd"
           d="M15.62 17.03a9 9 0 1 1 1.41-1.41l4.68 4.67a1 1 0 0 1-1.42 1.42l-4.67-4.68ZM17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
-          clip-rule="evenodd"
+          clipRule="evenodd"
         ></path>
       </svg>
       <button
@@ -383,9 +387,9 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
           >
             <path
               fill="currentColor"
-              fill-rule="evenodd"
+              fillRule="evenodd"
               d="M15.62 17.03a9 9 0 1 1 1.41-1.41l4.68 4.67a1 1 0 0 1-1.42 1.42l-4.67-4.68ZM17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
-              clip-rule="evenodd"
+              clipRule="evenodd"
             ></path>
           </svg>
           <button
