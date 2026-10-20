@@ -26,11 +26,11 @@ export const BridgeLink = ({ start, end }: { start: BridgeGate; end: BridgeGate 
           </div>
 
           <div className="d-flex justify-content-evenly align-content-center flex-column">
-            <Badge bg={start.ozone > 2500000 ? "info" : "danger"}>
+            <Badge bg={(start.ozone ?? 0) > 2500000 ? "info" : "danger"}>
               {" "}
-              {t("Ozone: {{ozone}}", { ozone: start.ozone.toLocaleString() })}
+              {t("Ozone: {{ozone}}", { ozone: (start.ozone ?? 0).toLocaleString() })}
             </Badge>
-            <Badge bg={start.expires > 13 ? "info" : "danger"}>
+            <Badge bg={(start.expires ?? 0) > 13 ? "info" : "danger"}>
               {" "}
               {t("Fuel: {{days}} days", { days: start.expires })}
             </Badge>
@@ -80,10 +80,10 @@ export const BridgeLink = ({ start, end }: { start: BridgeGate; end: BridgeGate 
           {end.system_name ? (
             <>
               <div className="d-flex justify-content-evenly align-content-center flex-column">
-                <Badge className="flex-child" bg={end.ozone > 2500000 ? "info" : "danger"}>
-                  {t("Ozone: {{ozone}}", { ozone: end.ozone.toLocaleString() })}
+                <Badge className="flex-child" bg={(end.ozone ?? 0) > 2500000 ? "info" : "danger"}>
+                  {t("Ozone: {{ozone}}", { ozone: (end.ozone ?? 0).toLocaleString() })}
                 </Badge>
-                <Badge className="flex-child" bg={end.expires > 13 ? "info" : "danger"}>
+                <Badge className="flex-child" bg={(end.expires ?? 0) > 13 ? "info" : "danger"}>
                   {t("Fuel: {{days}} days", { days: end.expires })}
                 </Badge>
               </div>

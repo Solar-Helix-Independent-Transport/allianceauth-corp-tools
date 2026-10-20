@@ -4923,7 +4923,7 @@
             "name": "structure_id",
             "schema": {
               "title": "Structure Id",
-              "type": "string"
+              "type": "integer"
             },
             "required": true
           }
@@ -5680,7 +5680,7 @@
           "content": {
             "text/plain": {
               "schema": {
-                "type": "str"
+                "type": "string"
               }
             }
           },

@@ -4,23 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { getCharacterSkillGraph } from "../../api/character";
 import { getCSSVariable } from "./GraphHelpers";
 
-// getCharacterSkillGraph's OpenAPI schema is under-specified (loose
-// object), so the response is asserted to the shape this component
-// actually consumes:
-// { data: [{ group: "Gunnery", "Name 1": 500, ... }, ...], characters: ["Name 1", ...] }
-type SkillGraphResponse = {
-  data: Record<string, unknown>[];
-  characters: string[];
-};
-
 export const SkillsRadarGraph = ({ characterID }: { characterID: number }) => {
   const { t } = useTranslation();
   const { isLoading, error, data } = useQuery({
     queryKey: ["skillgraph", characterID ? Number(characterID) : 0],
-    queryFn: () =>
-      getCharacterSkillGraph(
-        characterID ? Number(characterID) : 0,
-      ) as unknown as Promise<SkillGraphResponse>,
+    queryFn: () => getCharacterSkillGraph(characterID ? Number(characterID) : 0),
     throwOnError: false, // handled below
   });
   const bg = getCSSVariable("--bs-body-bg");

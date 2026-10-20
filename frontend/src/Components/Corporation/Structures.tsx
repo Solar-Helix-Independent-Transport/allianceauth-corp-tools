@@ -7,36 +7,9 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { Badge, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FittingModal } from "../Modals/FittingModal";
 import { useState } from "react";
+import type { components } from "../../api/CtApi";
 
-type Corporation = {
-  corporation_id: number;
-  corporation_name: string;
-  alliance_name: string;
-};
-
-type BaseItemType = {
-  id: number;
-  name: string;
-  cat?: string;
-};
-
-type ServiceType = {
-  name: string;
-  state: string;
-};
-
-export type StructureType = {
-  id: number;
-  owner: Corporation;
-  type: BaseItemType;
-  location: BaseItemType;
-  constellation: BaseItemType;
-  region: BaseItemType;
-  name: string;
-  state: string;
-  fuel_expiry: string;
-  services: ServiceType[];
-};
+export type StructureType = components["schemas"]["Structure"];
 
 const showTooltip = (toolTipText: string | undefined) => {
   return toolTipText ? (
@@ -68,7 +41,7 @@ const StructuresTable = ({ data, isFetching }: { data: StructureType[]; isFetchi
       header: t("Constellation"),
       cell: (cell) => (
         <a
-          href={`https://evemaps.dotlan.net/map/${cell.row.original.region.name.replace(
+          href={`https://evemaps.dotlan.net/map/${(cell.row.original.region?.name ?? "").replace(
             " ",
             "_",
           )}/${cell.getValue().replace(" ", "_")}`}
@@ -81,7 +54,7 @@ const StructuresTable = ({ data, isFetching }: { data: StructureType[]; isFetchi
       header: t("Region"),
       cell: (cell) => (
         <a
-          href={`https://evemaps.dotlan.net/map/${cell.row.original.region.name.replace(" ", "_")}`}
+          href={`https://evemaps.dotlan.net/map/${(cell.row.original.region?.name ?? "").replace(" ", "_")}`}
         >
           {cell.getValue()}
         </a>
@@ -135,12 +108,18 @@ const StructuresTable = ({ data, isFetching }: { data: StructureType[]; isFetchi
     columnHelper.accessor("fuel_expiry", {
       header: t("Fuel Expiry"),
       enableColumnFilter: false,
-      cell: (props) => <TimeTill date={props.getValue()} />,
+      // null for a structure with no fuel - TimeTill would show it as 1970
+      cell: (props) => {
+        const expiry = props.getValue();
+        return expiry ? <TimeTill date={expiry} /> : null;
+      },
     }),
     columnHelper.accessor("state", {
       header: t("State"),
       cell: (cell) => (
-        <span style={{ textTransform: "capitalize" }}>{cell.getValue().replaceAll("_", " ")}</span>
+        <span style={{ textTransform: "capitalize" }}>
+          {(cell.getValue() ?? "").replaceAll("_", " ")}
+        </span>
       ),
     }),
     columnHelper.accessor("services", {
@@ -160,7 +139,7 @@ const StructuresTable = ({ data, isFetching }: { data: StructureType[]; isFetchi
               flexDirection: "row",
             }}
           >
-            {props.getValue().map((service) => {
+            {props.getValue()?.map((service) => {
               return (
                 <Badge bg={service.state === "online" ? "primary" : "danger"}>{service.name}</Badge>
               );

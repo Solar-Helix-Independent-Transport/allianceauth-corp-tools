@@ -33,7 +33,7 @@ describe("transportMismatch", () => {
     const wt: WorkforceTransport = {
       mode: "import",
       config_sources: [{ system_id: 1, system_name: "A" }],
-      state_sources: [{ system_id: 1, system_name: "A" }],
+      state_sources: [{ system_id: 1, system_name: "A", amount: null }],
       config_destination: null,
       state_destination: null,
     };
@@ -44,7 +44,7 @@ describe("transportMismatch", () => {
     const wt: WorkforceTransport = {
       mode: "import",
       config_sources: [{ system_id: 1, system_name: "A" }],
-      state_sources: [{ system_id: 2, system_name: "B" }],
+      state_sources: [{ system_id: 2, system_name: "B", amount: null }],
       config_destination: null,
       state_destination: null,
     };
@@ -56,8 +56,8 @@ describe("transportMismatch", () => {
       mode: "import",
       config_sources: [{ system_id: 1, system_name: "A" }],
       state_sources: [
-        { system_id: 1, system_name: "A" },
-        { system_id: 2, system_name: "B" },
+        { system_id: 1, system_name: "A", amount: null },
+        { system_id: 2, system_name: "B", amount: null },
       ],
       config_destination: null,
       state_destination: null,
@@ -70,8 +70,8 @@ describe("transportMismatch", () => {
       mode: "export",
       config_sources: [],
       state_sources: [],
-      config_destination: { system_id: 5, system_name: "Dest" },
-      state_destination: { system_id: 5, system_name: "Dest" },
+      config_destination: { system_id: 5, system_name: "Dest", amount: null },
+      state_destination: { system_id: 5, system_name: "Dest", amount: null },
     };
     expect(transportMismatch(wt)).toBe(false);
   });
@@ -81,8 +81,8 @@ describe("transportMismatch", () => {
       mode: "export",
       config_sources: [],
       state_sources: [],
-      config_destination: { system_id: 5, system_name: "Dest" },
-      state_destination: { system_id: 6, system_name: "Other" },
+      config_destination: { system_id: 5, system_name: "Dest", amount: null },
+      state_destination: { system_id: 6, system_name: "Other", amount: null },
     };
     expect(transportMismatch(wt)).toBe(true);
   });
@@ -91,7 +91,7 @@ describe("transportMismatch", () => {
     const wt: WorkforceTransport = {
       mode: "transit",
       config_sources: [{ system_id: 1, system_name: "A" }],
-      state_sources: [{ system_id: 2, system_name: "B" }],
+      state_sources: [{ system_id: 2, system_name: "B", amount: null }],
       config_destination: null,
       state_destination: null,
     };

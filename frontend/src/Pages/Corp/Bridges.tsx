@@ -27,10 +27,10 @@ const Bridges = () => {
             const levels_a = [];
             const levels_b = [];
 
-            if (a.start.known) levels_a.push(a.start.ozone);
-            if (a.end.known) levels_a.push(a.end.ozone);
-            if (b.start.known) levels_b.push(b.start.ozone);
-            if (b.end.known) levels_b.push(b.end.ozone);
+            if (a.start.known) levels_a.push(a.start.ozone ?? 0);
+            if (a.end.known) levels_a.push(a.end.ozone ?? 0);
+            if (b.start.known) levels_b.push(b.start.ozone ?? 0);
+            if (b.end.known) levels_b.push(b.end.ozone ?? 0);
 
             if (Math.min(...levels_a) > Math.min(...levels_b)) {
               return 1;

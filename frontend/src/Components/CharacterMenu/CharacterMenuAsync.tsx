@@ -1,5 +1,5 @@
 import CharMenu from "./CharMenu";
-import axios from "axios";
+import { getCharacterMenu } from "../../api/character";
 import ReactDOM from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 
@@ -8,17 +8,14 @@ const menuRoot = document.getElementById("nav-left");
 const CharMenuAsync = () => {
   const { isLoading, error, data } = useQuery({
     queryKey: ["Menu"],
-    queryFn: async () => {
-      const api = await axios.get(`/audit/api/account/menu`);
-      return api.data;
-    },
+    queryFn: getCharacterMenu,
     throwOnError: false, // handled below
   });
   if (!menuRoot) {
     return <></>;
   }
   return ReactDOM.createPortal(
-    <CharMenu error={error ? true : false} {...{ isLoading, data }} />,
+    <CharMenu error={error ? true : false} isLoading={isLoading} data={data ?? []} />,
     menuRoot,
   );
 };

@@ -2,20 +2,12 @@ import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Link, MemoryRouter, Route, Routes } from "react-router";
-import { AxiosError, AxiosHeaders } from "axios";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "../../api/Api";
 import { createQueryClient } from "../../queryClient";
 import PageErrorBoundary from "./PageErrorBoundary";
 
-const axiosError = (status: number) =>
-  new AxiosError("Request failed", "ERR_BAD_REQUEST", undefined, undefined, {
-    status,
-    statusText: "",
-    data: {},
-    headers: {},
-    config: { headers: new AxiosHeaders() },
-  });
+const httpError = (status: number) => new ApiError(new Response(null, { status }), undefined);
 
 const Page = ({ queryFn }: { queryFn: () => Promise<string> }) => {
   const { data } = useQuery({ queryKey: ["page"], queryFn, retry: false });
@@ -47,7 +39,7 @@ describe("PageErrorBoundary with the app's query defaults", () => {
   });
 
   it("shows a failed request as an error, not an empty page", async () => {
-    renderPage(() => Promise.reject(axiosError(500)));
+    renderPage(() => Promise.reject(httpError(500)));
     expect(await screen.findByText("Error 500")).toBeInTheDocument();
     // a request failure isn't a bug report
     expect(screen.queryByText(/report this error/)).not.toBeInTheDocument();
@@ -61,14 +53,14 @@ describe("PageErrorBoundary with the app's query defaults", () => {
   });
 
   it("shows a network failure as a connection problem", async () => {
-    renderPage(() => Promise.reject(new AxiosError("Network Error", "ERR_NETWORK")));
+    renderPage(() => Promise.reject(new ApiError(undefined, undefined, "Failed to fetch")));
     expect(await screen.findByText("Connection problem")).toBeInTheDocument();
   });
 
   it("try again refetches the failed query", async () => {
     const queryFn = vi
       .fn<() => Promise<string>>()
-      .mockRejectedValueOnce(axiosError(500))
+      .mockRejectedValueOnce(httpError(500))
       .mockResolvedValue("loaded");
     renderPage(queryFn);
 
@@ -79,7 +71,7 @@ describe("PageErrorBoundary with the app's query defaults", () => {
   });
 
   it("clears when navigating to another page", async () => {
-    renderPage(() => Promise.reject(axiosError(500)));
+    renderPage(() => Promise.reject(httpError(500)));
     await screen.findByText("Error 500");
 
     await userEvent.click(screen.getByRole("link", { name: "to b" }));
@@ -91,7 +83,7 @@ describe("PageErrorBoundary with the app's query defaults", () => {
     const queryFn = vi
       .fn<() => Promise<string>>()
       .mockResolvedValueOnce("loaded")
-      .mockRejectedValue(axiosError(500));
+      .mockRejectedValue(httpError(500));
     const client = createQueryClient();
     const { container } = renderPage(queryFn, client);
     await screen.findByText("loaded");

@@ -25,7 +25,7 @@ const CharacterAssets = () => {
   const { data, isFetching } = useQuery({
     queryKey: ["assetList", characterID, location_id],
     queryFn: () => loadAssetList(Number(characterID), location_id),
-    initialData: { characters: [], main: undefined, headers: [] },
+    initialData: [],
   });
 
   const columnHelper = createColumnHelper<components["schemas"]["CharacterAssetItem"]>();

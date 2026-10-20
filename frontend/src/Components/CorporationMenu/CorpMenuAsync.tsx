@@ -1,5 +1,5 @@
 import CorpMenu from "./CorpMenu";
-import axios from "axios";
+import { getCorporationMenu } from "../../api/corporation";
 import ReactDOM from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 
@@ -8,17 +8,14 @@ const menuRoot = document.getElementById("nav-left");
 const CorpMenuAsync = () => {
   const { isLoading, error, data } = useQuery({
     queryKey: ["CorpMenu"],
-    queryFn: async () => {
-      const api = await axios.get(`/audit/api/corp/menu`);
-      return api.data;
-    },
+    queryFn: getCorporationMenu,
     throwOnError: false, // handled below
   });
   if (!menuRoot) {
     return <></>;
   }
   return ReactDOM.createPortal(
-    <CorpMenu error={error ? true : false} {...{ isLoading, data }} />,
+    <CorpMenu error={error ? true : false} isLoading={isLoading} data={data ?? []} />,
     menuRoot,
   );
 };

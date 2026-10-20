@@ -62,7 +62,10 @@ const CharacterMail = () => {
     }),
     columnHelper.accessor("timestamp", {
       header: t("Date"),
-      cell: (cell) => <div>{new Date(cell.getValue()).toLocaleString()}</div>,
+      cell: (cell) => {
+        const timestamp = cell.getValue();
+        return <div>{timestamp ? new Date(timestamp).toLocaleString() : ""}</div>;
+      },
     }),
     columnHelper.accessor("subject", {
       header: t("Subject"),

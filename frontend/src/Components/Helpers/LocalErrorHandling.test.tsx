@@ -7,10 +7,11 @@
  */
 import { render, screen } from "@testing-library/react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import axios, { AxiosError, AxiosHeaders } from "axios";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ApiError } from "../../api/Api";
 import * as characterApi from "../../api/character";
+import * as corporationApi from "../../api/corporation";
 import { createQueryClient } from "../../queryClient";
 import PageErrorBoundary from "./PageErrorBoundary";
 import { CharMenuAsync } from "../CharacterMenu/CharacterMenuAsync";
@@ -27,16 +28,15 @@ vi.mock("../../api/character", async (importOriginal) => ({
   getCharacterSkillGraph: vi.fn(),
   getMailBody: vi.fn(),
   loadCharacterStatus: vi.fn(),
+  getCharacterMenu: vi.fn(),
 }));
 
-const http500 = () =>
-  new AxiosError("Request failed", "ERR_BAD_RESPONSE", undefined, undefined, {
-    status: 500,
-    statusText: "",
-    data: {},
-    headers: {},
-    config: { headers: new AxiosHeaders() },
-  });
+vi.mock("../../api/corporation", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../api/corporation")>()),
+  getCorporationMenu: vi.fn(),
+}));
+
+const http500 = () => new ApiError(new Response(null, { status: 500 }), undefined);
 
 /** The app's real query client, minus retries so failures land at once. */
 const testClient = () => {
@@ -86,10 +86,10 @@ describe("where query errors are handled", () => {
   });
 
   it.each([
-    ["character menu", <CharMenuAsync />],
-    ["corporation menu", <CorpMenuAsync />],
-  ])("a failing %s leaves the page alone", async (_name, menu) => {
-    const get = vi.spyOn(axios, "get").mockRejectedValue(http500());
+    ["character menu", <CharMenuAsync />, () => vi.mocked(characterApi.getCharacterMenu)],
+    ["corporation menu", <CorpMenuAsync />, () => vi.mocked(corporationApi.getCorporationMenu)],
+  ])("a failing %s leaves the page alone", async (_name, menu, getMenu) => {
+    const get = getMenu().mockRejectedValue(http500());
     renderInPage(menu);
 
     await vi.waitFor(() => expect(get).toHaveBeenCalled());

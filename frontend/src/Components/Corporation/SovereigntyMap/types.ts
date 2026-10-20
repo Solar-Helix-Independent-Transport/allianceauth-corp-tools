@@ -1,13 +1,10 @@
-import type { BaseMapEdge, BaseMapRegion, BaseMapSystem, MapCoordMode } from "../../SpaceMap/types";
-import { AnarchyDenAlert, SovHub, Upgrade, WorkforceTransport } from "../sovereigntyShared";
+import type { components } from "../../../api/CtApi";
+import type { BaseMapEdge, BaseMapRegion, MapCoordMode } from "../../SpaceMap/types";
+import { AnarchyDenAlert, Upgrade, WorkforceTransport } from "../sovereigntyShared";
 
 export type { AnarchyDenAlert };
 
-export type SovMapSystem = BaseMapSystem & {
-  is_hub: boolean;
-  anarchy_alert: boolean;
-  anarchy_dens: AnarchyDenAlert[];
-};
+export type SovMapSystem = components["schemas"]["SovMapSystem"];
 
 export type SovMapCoordMode = MapCoordMode;
 
@@ -15,13 +12,7 @@ export type SovMapEdge = BaseMapEdge;
 
 export type SovMapRegion = BaseMapRegion;
 
-export type SovMapResponse = {
-  regions: SovMapRegion[];
-  systems: SovMapSystem[];
-  edges: SovMapEdge[];
-  jump_bridges: SovMapEdge[];
-  hubs: SovHub[];
-};
+export type SovMapResponse = components["schemas"]["SovMap"];
 
 export type SovMapMode = "upgrades" | "flow";
 

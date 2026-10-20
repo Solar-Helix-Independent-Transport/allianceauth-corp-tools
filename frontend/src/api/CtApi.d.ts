@@ -6847,7 +6847,7 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
-        structure_id: string;
+        structure_id: number;
       };
       cookie?: never;
     };
@@ -7337,7 +7337,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "text/plain": Record<string, never>;
+        "text/plain": string;
       };
     };
     responses: {

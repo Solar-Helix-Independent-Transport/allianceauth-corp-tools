@@ -129,7 +129,7 @@ class FittingsApiEndpoints:
                     "content": {
                         "text/plain": {
                             "schema": {
-                                "type": "str",
+                                "type": "string",
                             }
                         }
                     },

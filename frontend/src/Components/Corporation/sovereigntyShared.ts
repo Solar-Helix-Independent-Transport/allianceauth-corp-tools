@@ -1,64 +1,12 @@
-export type Corporation = {
-  corporation_id: number;
-  corporation_name: string;
-};
+import type { components } from "../../api/CtApi";
 
-export type EveName = {
-  id: number;
-  name: string;
-};
+type Schemas = components["schemas"];
 
-export type Reagent = {
-  name: string;
-  type_id: number | null;
-  amount: number;
-  burning_per_hour: number;
-};
-
-export type Upgrade = {
-  name: string;
-  type_id: number | null;
-  power_state: string;
-};
-
-export type TransportSystem = {
-  system_id: number;
-  system_name: string;
-  amount?: number | null;
-};
-
-export type WorkforceTransport = {
-  mode: "import" | "export" | "transit" | null;
-  config_sources: TransportSystem[];
-  state_sources: TransportSystem[];
-  config_destination: TransportSystem | null;
-  state_destination: TransportSystem | null;
-} | null;
-
-export type AnarchyDenAlert = {
-  den_id: number;
-  anarchy_amount: number;
-  character_name: string;
-  type_name: string;
-  planet_name: string;
-};
-
-export type SovHub = {
-  hub_id: number;
-  owner: Corporation;
-  location: EveName;
-  constellation: EveName;
-  region: EveName;
-  power_allocated: number | null;
-  power_available: number | null;
-  workforce_allocated: number | null;
-  workforce_available: number | null;
-  reagent_last_updated: string | null;
-  reagents: Reagent[];
-  upgrades: Upgrade[];
-  anarchy_dens: AnarchyDenAlert[];
-  workforce_transport: WorkforceTransport;
-};
+export type Reagent = Schemas["SovHubReagent"];
+export type Upgrade = Schemas["SovHubUpgrade"];
+export type WorkforceTransport = Schemas["WorkforceTransport"] | null;
+export type AnarchyDenAlert = Schemas["AnarchyDen"];
+export type SovHub = Schemas["SovHub"];
 
 export const modeBg: Record<string, string> = {
   import: "info",

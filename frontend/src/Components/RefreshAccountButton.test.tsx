@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { AxiosError } from "axios";
+import { ApiError } from "../api/Api";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -34,7 +34,7 @@ describe("RefreshCharButton", () => {
   });
 
   it("calls postAccountRefresh with the characterID route param when clicked", async () => {
-    vi.mocked(postAccountRefresh).mockResolvedValue(undefined);
+    vi.mocked(postAccountRefresh).mockResolvedValue({ message: "Requested Update!" });
 
     renderButton();
     fireEvent.click(screen.getByRole("button"));
@@ -43,7 +43,9 @@ describe("RefreshCharButton", () => {
   });
 
   it("posts once per click, with no retries when it fails", async () => {
-    vi.mocked(postAccountRefresh).mockRejectedValue(new AxiosError("boom"));
+    vi.mocked(postAccountRefresh).mockRejectedValue(
+      new ApiError(new Response(null, { status: 500 }), undefined),
+    );
 
     renderButton();
     const button = screen.getByRole("button");

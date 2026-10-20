@@ -1,4 +1,5 @@
-import type { BaseMapEdge, BaseMapRegion, BaseMapSystem } from "../SpaceMap/types";
+import type { components } from "../../api/CtApi";
+import type { BaseMapSystem } from "../SpaceMap/types";
 
 export type ActivityMapSystem = BaseMapSystem;
 
@@ -6,19 +7,9 @@ export type ActivityMapSystem = BaseMapSystem;
 // `quantity` are the data-source-specific detail shown in the panel on
 // click. A data source (assets, mining, ratting, ...) populates `value`
 // differently without the map itself needing to know what it means.
-export type ActivityMapValue = {
-  system_id: number;
-  value: number;
-  count: number;
-  quantity: number;
-};
+export type ActivityMapValue = components["schemas"]["ActivityMapValue"];
 
-export type ActivityMapResponse = {
-  regions: BaseMapRegion[];
-  systems: ActivityMapSystem[];
-  edges: BaseMapEdge[];
-  values: ActivityMapValue[];
-};
+export type ActivityMapResponse = components["schemas"]["ActivityMap"];
 
 // One thing the map can show, and how to fetch/label it. `id` is whatever
 // scope the map is fetching for (a character id, a corporation id, ...) -

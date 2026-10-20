@@ -30,7 +30,12 @@ const renderSelect = (
 };
 
 const makeStatus = (corps: { corporation_id: number; corporation_name: string }[]) => ({
-  corps: corps.map((corporation) => ({ corporation, last_updates: {} })),
+  corps: corps.map((corporation) => ({
+    corporation,
+    characters: 0,
+    active: true,
+    last_updates: {},
+  })),
   headers: [],
 });
 

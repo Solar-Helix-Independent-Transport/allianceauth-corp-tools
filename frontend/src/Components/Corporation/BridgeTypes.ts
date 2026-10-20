@@ -1,16 +1,4 @@
-// The backend's OpenAPI schema for the gates dashboard endpoint is
-// under-specified (loose `unknown[]`), so these shapes are derived from
-// how BridgeLink/Bridges actually consume them.
-export interface BridgeGate {
-  known: boolean;
-  active: boolean;
-  system_name?: string;
-  name?: string;
-  ozone: number;
-  expires: number;
-}
+import type { components } from "../../api/CtApi";
 
-export interface BridgePair {
-  start: BridgeGate;
-  end: BridgeGate;
-}
+export type BridgeGate = components["schemas"]["GateEnd"];
+export type BridgePair = components["schemas"]["Gate"];

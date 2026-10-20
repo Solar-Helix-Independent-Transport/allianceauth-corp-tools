@@ -259,7 +259,7 @@ class StructureApiEndpoints:
             response={200: schema.StructureFit, 404: str, 403: str},
             tags=self.tags
         )
-        def get_corporation_structure_fitting(request, structure_id):
+        def get_corporation_structure_fitting(request, structure_id: int):
             perms = (
                 request.user.has_perm('corptools.own_corp_manager')
                 | request.user.has_perm('corptools.alliance_corp_manager')

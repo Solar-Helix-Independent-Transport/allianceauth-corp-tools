@@ -1,5 +1,5 @@
 import { DoctrineCheck } from "../../Components/Skills/DoctrineCheck";
-import { DoctrineSkillList, DoctrineSkillReqs } from "../../Components/Skills/DoctrineTypes";
+import { DoctrineSkillReqs } from "../../Components/Skills/DoctrineTypes";
 import { getFitCheck } from "../../api/character";
 import { ChangeEvent, useState } from "react";
 import { Form } from "react-bootstrap";
@@ -9,13 +9,6 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 import { ErrorLoader, PanelLoader } from "../../Components/Loaders/loaders";
 
-// getFitCheck's OpenAPI schema is under-specified (loose object), so the
-// response is asserted to the shape this page actually consumes.
-interface FitCheckResponse {
-  skills?: { n: string; l: number }[];
-  chars: Record<string, { doctrines?: { fit?: DoctrineSkillReqs }; skills: DoctrineSkillList }>;
-}
-
 const CharacterFitCheck = () => {
   const { t } = useTranslation();
   const { characterID } = useParams();
@@ -23,10 +16,7 @@ const CharacterFitCheck = () => {
   const [fit, setFit] = useState("");
   const { data, error, refetch, isFetching, isFetched } = useQuery({
     queryKey: ["getFitCheck", fit, characterID],
-    queryFn: () => {
-      const out = getFitCheck(fit, characterID ? Number(characterID) : 0);
-      return out as unknown as Promise<FitCheckResponse>;
-    },
+    queryFn: () => getFitCheck(fit, characterID ? Number(characterID) : 0),
     enabled: false,
     retry: false,
     throwOnError: false, // shown below, so the fit box stays usable
@@ -168,7 +158,9 @@ const CharacterFitCheck = () => {
                       <>
                         <DoctrineCheck
                           name={name[0]}
-                          skill_reqs={reqs}
+                          // the schema's doctrine type is a plain dict, so it
+                          // can't say the backend always includes `_meta`
+                          skill_reqs={reqs as DoctrineSkillReqs}
                           skill_list={name[1].skills}
                         />
                       </>
