@@ -80,6 +80,10 @@ class MiningApiEndpoints:
                 'character__character__character_ownership__user__profile__main_character',
                 'type_name',
                 'type_name__group'
+            ).order_by(
+                # Fixed row order, so each day's ores/characters/systems
+                # come out the same on every database.
+                'date', 'id'
             )
 
             all_ores = set()
