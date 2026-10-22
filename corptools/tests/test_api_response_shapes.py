@@ -347,7 +347,7 @@ class TestDashboardShapes(ApiShapeTestCase):
         def system(system_id, name):
             return sde.SolarSystem.objects.create(
                 id=system_id, name=name, security_status=-0.5, x=0, y=0,
-                z=0, security_class="nullsec", constellation=const)
+                z=0, security_class="E", constellation=const)
 
         self.a = system(30004759, "1DQ1-A")
         self.b = system(30004760, "8QT-H4")
@@ -531,7 +531,7 @@ class TestSovereigntyShapes(ApiShapeTestCase):
         def system(system_id, name, const, x, z, has_2d=True):
             return sde.SolarSystem.objects.create(
                 id=system_id, name=name, constellation=const,
-                security_status=-0.4, security_class="nullsec",
+                security_status=-0.4, security_class="E",
                 x=x, y=0, z=z,
                 x_2d=x if has_2d else None, y_2d=z if has_2d else None)
 
@@ -665,7 +665,7 @@ class TestSovereigntyShapes(ApiShapeTestCase):
             "constellation_id": const_id,
             "x_2d": p2d[0] if p2d else None, "y_2d": p2d[1] if p2d else None,
             "x_real": preal[0], "y_real": preal[1],
-            "security_status": -0.4, "security_class": "nullsec",
+            "security_status": -0.4, "security_class": "E",
             "external": external, **sov,
         }
 

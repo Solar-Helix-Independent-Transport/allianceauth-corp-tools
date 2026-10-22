@@ -324,7 +324,8 @@ class UpdateAllLocationsQueryScopeTests(CorptoolsTestCase):
             q["sql"] for q in ctx.captured_queries
             if "NOT (" in q["sql"] and "corptools_characterasset" in q["sql"])
         exclusion = asset_query[asset_query.index("NOT ("):]
-        self.assertIn('"character_id" IN', exclusion)
+        self.assertIn(
+            f"{connection.ops.quote_name('character_id')} IN", exclusion)
 
     @patch("corptools.tasks.locations.update_location")
     def test_update_all_requeues_only_stale_locations_still_in_use(self, mock_update_location):

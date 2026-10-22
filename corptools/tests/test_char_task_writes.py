@@ -139,6 +139,13 @@ class TestDeleteRecreateIsAtomic(CorptoolsTestCase):
     @patch("corptools.tasks.corporation.sovereignty.get_corp_token")
     @patch("corptools.tasks.corporation.sovereignty.providers")
     def test_sov_hub_failure_keeps_existing_reagents(self, mock_providers, mock_get_corp_token):
+        region = sde_models.Region.objects.create(
+            id=10000002, name="The Forge")
+        const = sde_models.Constellation.objects.create(
+            id=20000020, name="Kimotoro", region=region)
+        sde_models.SolarSystem.objects.create(
+            id=30000142, name="Jita", security_status=0.9, x=0, y=0, z=0,
+            constellation=const)
         hub = SovereigntyHub.objects.create(
             corporation=self.cp1, hub_id=1, solar_system_id=30000142)
         reagent_type = sde_models.ItemType.objects.create(

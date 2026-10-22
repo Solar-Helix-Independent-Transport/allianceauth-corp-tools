@@ -220,7 +220,7 @@ class TestGetAltsQueryset(CorptoolsTestCase):
         # char4 has no CharacterOwnership in the fixture
         alts = get_alts_queryset(self.char4)
         char_ids = list(alts.values_list("character_id", flat=True))
-        self.assertEqual(char_ids, [self.char4.pk])
+        self.assertEqual(char_ids, [self.char4.character_id])
 
 
 # ---------------------------------------------------------------------------

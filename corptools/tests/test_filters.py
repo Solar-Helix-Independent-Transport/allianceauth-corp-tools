@@ -9,16 +9,19 @@ from eve_sde import models as sde_models
 # Django
 from django.contrib.auth.models import Group, User
 from django.db.models import F
+from django.db.models.signals import pre_save
 from django.test import TestCase
 from django.utils import timezone
 
 # Alliance Auth
 from allianceauth.authentication.models import CharacterOwnership
+from allianceauth.authentication.signals import assign_state_on_active_change
 from allianceauth.eveonline.models import (
     EveAllianceInfo,
     EveCharacter,
     EveCorporationInfo,
 )
+from allianceauth.services.signals import disable_services_on_inactive
 from allianceauth.tests.auth_utils import AuthUtils
 
 # AA Example App
@@ -46,8 +49,18 @@ class TestSecGroupBotFilters(TestCase):
 
         users = []
         characters = []
-        for uid in userids:
-            user = AuthUtils.create_user(f"User_{uid}")
+        # The tests look users up as ids 1-10, and MySQL doesn't roll
+        # AUTO_INCREMENT back between tests, so pin the ids. These two AA
+        # receivers treat a user with a pk as an existing row and fetch it.
+        pre_save.disconnect(assign_state_on_active_change, sender=User)
+        pre_save.disconnect(disable_services_on_inactive, sender=User)
+        try:
+            pinned = [User.objects.create(id=uid, username=f"User_{uid}")
+                      for uid in userids]
+        finally:
+            pre_save.connect(assign_state_on_active_change, sender=User)
+            pre_save.connect(disable_services_on_inactive, sender=User)
+        for uid, user in zip(userids, pinned):
             main_char = AuthUtils.add_main_character_2(user,
                                                        f"Main {uid}",
                                                        uid,
@@ -1921,7 +1934,7 @@ class TestSecGroupBotFilters(TestCase):
 
         now_iso = timezone.now().isoformat()
         c1_qs = ct_models.CharacterAudit.objects.filter(
-            id__gte=11)  # All the alts
+            character__character_id__gte=11)  # All the alts
         c1_qs.update(last_known_login=timezone.now() - timedelta(days=15))
         c1 = list(c1_qs)
         for ca in c1:

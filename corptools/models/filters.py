@@ -416,7 +416,7 @@ class PVEIskFilter(FilterBase):
         for u in users:
             total = by_user.get(u.id, 0)
             check = (total >= self.isk_threshold) != self.reversed_logic
-            output[u.id] = {"message": f"{total:,} ISK", "check": check}
+            output[u.id] = {"message": f"{total:,.0f} ISK", "check": check}
         return output
 
 

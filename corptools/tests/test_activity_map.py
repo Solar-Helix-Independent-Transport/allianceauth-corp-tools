@@ -95,7 +95,7 @@ class ActivityMapAssetsTestCase(CorptoolsTestCase):
             name="J123456",
             security_status=-1.0,
             x=3, y=3, z=3,
-            security_class="wormhole",
+            security_class="C2",
             constellation=self.wh_constellation,
         )
 
@@ -109,7 +109,7 @@ class ActivityMapAssetsTestCase(CorptoolsTestCase):
             name="Abyssal System",
             security_status=0.0,
             x=4, y=4, z=4,
-            security_class="abyssal",
+            security_class=None,
             constellation=self.abyssal_constellation,
         )
 
