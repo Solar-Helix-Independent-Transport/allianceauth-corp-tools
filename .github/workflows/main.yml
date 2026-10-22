@@ -63,6 +63,76 @@ jobs:
             echo "</details>" >> $GITHUB_STEP_SUMMARY
           fi
 
+  # Production runs on MySQL/MariaDB, which the SQLite run above can't catch.
+  python-test-db:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - db: mysql
+            image: "mysql:8.4"
+            health: "mysqladmin ping -h 127.0.0.1 -proot"
+          - db: mariadb
+            image: "mariadb:11.4"
+            health: "healthcheck.sh --connect --innodb_initialized"
+    services:
+      db:
+        image: ${{ matrix.image }}
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="${{ matrix.health }}"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    env:
+      CT_TEST_DB: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: shogo82148/actions-setup-redis@v1
+        with:
+          redis-version: "latest"
+
+      - run: redis-cli ping
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: install dependencies
+        run: make dev
+
+      - name: Run Tests
+        run: make test
+
+      - name: Upload test coverage
+        if: ${{ !env.ACT }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: Python3.13 ${{ matrix.db }} Test Coverage
+          path: htmlcov/
+
+      - name: Output reports to the job summary when tests fail
+        if: failure()
+        shell: bash
+        run: |
+          if [ -f "test-summary.md" ]; then
+            echo "<details><summary>Failed Test Report (${{ matrix.db }})</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            cat "test-summary.md" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+          fi
+
   js-test:
     runs-on: ubuntu-latest
     steps:
@@ -79,7 +149,7 @@ jobs:
         run: cd frontend && npm test
 
   build:
-    needs: [python-test, js-test]
+    needs: [python-test, python-test-db, js-test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

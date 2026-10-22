@@ -8,7 +8,7 @@ from celery import shared_task
 from eve_sde.models import ItemType
 
 # Django
-from django.db import transaction
+from django.db import connection, transaction
 from django.db.models import F, Q
 from django.db.models.aggregates import Sum
 
@@ -255,12 +255,20 @@ def build_managed_asset_locations(self, corp_id, force_refresh: bool = True, cha
     hangar_ids = list(hangar_for.values())
 
     # Upsert every hangar in one go rather than an update_or_create each.
+    # MySQL/MariaDB upsert on any unique key and refuse unique_fields, but the
+    # SQLite test DB requires it. location_id is the pk, so both hit the same row.
+    conflict_target = (
+        {"unique_fields": ["location_id"]}
+        if connection.features.supports_update_conflicts_with_target
+        else {}
+    )
     EveLocation.objects.bulk_create(
         hangars,
         update_conflicts=True,
-        unique_fields=["location_id"],
-        update_fields=["location_name", "managed", "managed_corp", "system"],
-        batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
+        update_fields=["location_name", "managed",
+                       "managed_corp", "system", "last_update"],
+        batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
+        **conflict_target
     )
 
     # Point every asset sitting in an office hangar at its managed location.
