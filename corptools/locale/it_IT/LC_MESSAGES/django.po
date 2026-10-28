@@ -3,13 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
+# Translators:
+# mrCabez, 2026
+# 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-08 18:52+1000\n"
-"PO-Revision-Date: 2023-10-08 08:55+0000\n"
+"POT-Creation-Date: 2026-08-09 18:32+0800\n"
+"PO-Revision-Date: 2024-05-27 04:09+0000\n"
+"Last-Translator: mrCabez, 2026\n"
 "Language-Team: Italian (Italy) (https://app.transifex.com/alliance-auth/teams/107430/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,34 +21,1003 @@ msgstr ""
 "Language: it_IT\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: corptools/models.py:1208
-msgid "Character"
-msgstr ""
+#: corptools/admin.py:26
+msgid "Search by name. Supports multiple selections."
+msgstr "Cerca per nome. Supporta selezioni multiple."
 
-#: corptools/models.py:1210
-msgid "NPC Corporation"
-msgstr ""
+#: corptools/api/character/assets.py:41
+msgid "Everywhere"
+msgstr "Ovunque"
 
-#: corptools/models.py:1211
-msgid "LP"
-msgstr ""
+#: corptools/api/character/assets.py:42
+msgid "AssetSafety"
+msgstr "Asset Safety"
 
-#: corptools/models.py:1214
-msgid "Loyalty Point"
-msgstr ""
+#: corptools/api/character/assets.py:255
+msgid "Capital Ships"
+msgstr "Navi capital"
 
-#: corptools/templates/corptools/base.html:71
-msgid "Add All Token"
-msgstr ""
+#: corptools/api/character/assets.py:257
+msgid "Subcaps Ships"
+msgstr "Navi subcapital"
 
-#: corptools/templates/corptools/corporation/react_base.html:3
-msgid "Corporation Audit"
-msgstr ""
+#: corptools/api/character/assets.py:259
+msgid "Noteable Assets"
+msgstr "Asset rilevanti"
 
-#: corptools/templates/corptools/dashboard.corptools.status.html:6
+#: corptools/api/character/assets.py:261 corptools/api/core/menu.py:215
+#: corptools/api/core/menu.py:220
+msgid "Structures"
+msgstr "Strutture"
+
+#: corptools/api/character/assets.py:263
+msgid "BPO"
+msgstr "BPO"
+
+#: corptools/api/character/assets.py:265
+msgid "Remaining"
+msgstr "Rimanenti"
+
+#: corptools/api/character/finances.py:205
+#: corptools/api/character/status.py:105
+#: corptools/api/corporation/at_a_glance.py:63
+#: corptools/api/corporation/at_a_glance.py:79
+#: corptools/api/corporation/at_a_glance.py:102
+#: corptools/api/corporation/at_a_glance.py:122
+#: corptools/api/corporation/at_a_glance.py:143
+#: corptools/api/corporation/list.py:167 corptools/api/corporation/list.py:192
+#: corptools/api/corporation/status.py:70 corptools/api/extras/fittings.py:147
+#: corptools/api/helpers.py:108
+msgid "Permission Denied"
+msgstr "Accesso negato"
+
+#: corptools/api/core/menu.py:27
+msgid "Interactions"
+msgstr "Interazioni"
+
+#: corptools/api/core/menu.py:31
+msgid "Finances"
+msgstr "Finanze"
+
+#: corptools/api/core/menu.py:35 corptools/templates/corptools/admin.html:220
+msgid "Industry"
+msgstr "Industria"
+
+#: corptools/api/core/menu.py:39
+#: corptools/templates/corptools/dashboard.corptools.status.html:5
 msgid "Characters"
+msgstr "Personaggi"
+
+#: corptools/api/core/menu.py:42
+msgid "Status"
+msgstr "Stato"
+
+#: corptools/api/core/menu.py:46
+msgid "Corp History"
+msgstr "Cronologia corporazioni"
+
+#: corptools/api/core/menu.py:54
+msgid "Contact"
+msgstr "Contatti"
+
+#: corptools/api/core/menu.py:60 corptools/templates/corptools/admin.html:166
+#: corptools/views.py:527
+msgid "Notifications"
+msgstr "Notifiche"
+
+#: corptools/api/core/menu.py:72 corptools/views.py:524
+msgid "Wallet"
+msgstr "Portafoglio"
+
+#: corptools/api/core/menu.py:80
+msgid "Wallet Activity"
+msgstr "Attività del portafoglio"
+
+#: corptools/api/core/menu.py:84
+msgid "Contracts"
+msgstr "Contratti"
+
+#: corptools/api/core/menu.py:89
+msgid "Market"
+msgstr "Mercato"
+
+#: corptools/api/core/menu.py:95 corptools/templates/corptools/admin.html:364
+#: corptools/views.py:533
+msgid "Loyalty Points"
+msgstr "Punti fedeltà"
+
+#: corptools/api/core/menu.py:101 corptools/api/core/menu.py:236
+msgid "Asset Overview"
+msgstr "Panoramica asset"
+
+#: corptools/api/core/menu.py:105 corptools/api/core/menu.py:238
+msgid "Asset List"
+msgstr "Elenco asset"
+
+#: corptools/api/core/menu.py:109 corptools/api/core/menu.py:256
+msgid "Activity Map"
+msgstr "Mappa delle attività"
+
+#: corptools/api/core/menu.py:115
+msgid "Mining Ledger"
+msgstr "Registro minerario"
+
+#: corptools/api/core/menu.py:121 corptools/templates/corptools/admin.html:316
+#: corptools/views.py:519
+msgid "Clones"
+msgstr "Cloni"
+
+#: corptools/api/core/menu.py:127
+msgid "Mercenary Dens"
+msgstr "Mercenary Den"
+
+#: corptools/api/core/menu.py:131
+msgid "Mercenary Tactical Operations"
+msgstr "Mercenary Tactical Operations"
+
+#: corptools/api/core/menu.py:137 corptools/templates/corptools/admin.html:196
+#: corptools/views.py:529
+msgid "Roles"
+msgstr "Ruoli"
+
+#: corptools/api/core/menu.py:143 corptools/templates/corptools/admin.html:340
+#: corptools/views.py:531
+msgid "Mail"
+msgstr "Posta"
+
+#: corptools/api/core/menu.py:149 corptools/templates/corptools/admin.html:292
+#: corptools/views.py:521
+msgid "Skills"
+msgstr "Skill"
+
+#: corptools/api/core/menu.py:153
+msgid "Skill Queues"
+msgstr "Code di skill"
+
+#: corptools/api/core/menu.py:157
+msgid "Skill List Checks"
+msgstr "Controlli elenchi di skill"
+
+#: corptools/api/core/menu.py:161
+msgid "Fitting Skill Checks"
+msgstr "Controlli skill per fitting"
+
+#: corptools/api/core/menu.py:165 corptools/api/core/menu.py:278
+msgid "Admin"
+msgstr "Amministrazione"
+
+#: corptools/api/core/menu.py:222
+msgid "Pocos"
+msgstr "POCO"
+
+#: corptools/api/core/menu.py:224
+msgid "Starbases"
+msgstr "Starbase"
+
+#: corptools/api/core/menu.py:226
+msgid "Sovereignty Hubs"
+msgstr "Sovereignty Hub"
+
+#: corptools/api/core/menu.py:228
+msgid "Sovereignty Map"
+msgstr "Mappa della sovranità"
+
+#: corptools/api/core/menu.py:231 corptools/templates/corptools/admin.html:88
+#: corptools/views.py:517
+msgid "Assets"
+msgstr "Asset"
+
+#: corptools/api/core/menu.py:241
+msgid "Dashboards"
+msgstr "Dashboard"
+
+#: corptools/api/core/menu.py:246
+msgid "Fuel"
+msgstr "Carburante"
+
+#: corptools/api/core/menu.py:248
+msgid "Metenox"
+msgstr "Metenox"
+
+#: corptools/api/core/menu.py:250
+msgid "Bridges"
+msgstr "Bridge"
+
+#: corptools/api/core/menu.py:253
+msgid "Character Mining Ledger"
+msgstr "Registro minerario del personaggio"
+
+#: corptools/api/core/menu.py:263
+msgid "Overview"
+msgstr "Panoramica"
+
+#: corptools/api/core/menu.py:269
+msgid "Wallets"
+msgstr "Portafogli"
+
+#: corptools/api/core/search.py:34 corptools/api/core/search.py:44
+#: corptools/api/core/search.py:55
+msgid "Hard no pall!"
+msgstr "Assolutamente no, amico!"
+
+#: corptools/api/corporation/list.py:198
+msgid "Not Found"
+msgstr "Non trovato"
+
+#: corptools/models/filters.py:317
+msgid "{char_corp_data[\"days_in_corp\"]:d} day (Since: {start_date_localized})"
+msgid_plural ""
+"{char_corp_data[\"days_in_corp\"]:d} days (Since: {start_date_localized})"
+msgstr[0] ""
+"{char_corp_data[\"days_in_corp\"]:d} giorno (dal: {start_date_localized})"
+msgstr[1] ""
+"{char_corp_data[\"days_in_corp\"]:d} giorni (dal: {start_date_localized})"
+msgstr[2] ""
+"{char_corp_data[\"days_in_corp\"]:d} giorni (dal: {start_date_localized})"
+
+#: corptools/models/filters.py:323
+msgid "{char_corp_data[\"days_in_corp\"]:d} day (Until: {end_date_localized})"
+msgid_plural ""
+"{char_corp_data[\"days_in_corp\"]:d} days (Until: {end_date_localized})"
+msgstr[0] ""
+"{char_corp_data[\"days_in_corp\"]:d} giorno (fino al: {end_date_localized})"
+msgstr[1] ""
+"{char_corp_data[\"days_in_corp\"]:d} giorni (fino al: {end_date_localized})"
+msgstr[2] ""
+"{char_corp_data[\"days_in_corp\"]:d} giorni (fino al: {end_date_localized})"
+
+#: corptools/models/filters.py:1182
+msgid "{char_corp_data[\"age\"]:d} day old (Since: {start_date_localized})"
+msgid_plural ""
+"{char_corp_data[\"age\"]:d} days old (Since: {start_date_localized})"
+msgstr[0] "{char_corp_data[\"age\"]:d} giorno (dal: {start_date_localized})"
+msgstr[1] "{char_corp_data[\"age\"]:d} giorni (dal: {start_date_localized})"
+msgstr[2] "{char_corp_data[\"age\"]:d} giorni (dal: {start_date_localized})"
+
+#: corptools/models/filters.py:1188
+msgid "{char_corp_data[\"age\"]:d} day old (Until: {end_date_localized})"
+msgid_plural "{char_corp_data[\"age\"]:d} days old (Until: {end_date_localized})"
+msgstr[0] "{char_corp_data[\"age\"]:d} giorno (fino al: {end_date_localized})"
+msgstr[1] "{char_corp_data[\"age\"]:d} giorni (fino al: {end_date_localized})"
+msgstr[2] "{char_corp_data[\"age\"]:d} giorni (fino al: {end_date_localized})"
+
+#: corptools/models/interactions.py:190
+#: corptools/templates/corptools/dashboards/character_updates_dash.html:23
+#: corptools/templates/corptools/wallet_export_list.html:89
+msgid "Character"
+msgstr "Personaggio"
+
+#: corptools/models/interactions.py:192
+msgid "NPC Corporation"
+msgstr "Corporazione NPC"
+
+#: corptools/models/interactions.py:193
+msgid "LP"
+msgstr "LP"
+
+#: corptools/models/interactions.py:196
+msgid "Loyalty Point"
+msgstr "Punto fedeltà"
+
+#: corptools/models/skills.py:90
+#, python-brace-format
+msgid ""
+"Please enter a valid skill name for `{skill}`. Hint: a known character must "
+"have trained the skill for auth to know about it."
 msgstr ""
+"Inserisci un nome di skill valido per `{skill}`. Suggerimento: perché l'auth"
+" conosca la skill, un personaggio noto deve averla addestrata."
+
+#: corptools/models/skills.py:99
+#, python-brace-format
+msgid "Please enter a valid skill level for `{skill}`. Hint: between 0 and 5."
+msgstr ""
+"Inserisci un livello di skill valido per `{skill}`. Suggerimento: tra 0 e 5."
+
+#: corptools/models/skills.py:103
+msgid ""
+"Please check format for valid JSON. Hint: [\"skill name\": 4, \"skill name "
+"2\": 1]"
+msgstr ""
+"Controlla che il formato sia JSON valido. Suggerimento: [\"skill name\": 4, "
+"\"skill name 2\": 1]"
+
+#: corptools/templates/corptools/admin.html:3
+msgid "Corptools Admin"
+msgstr "Amministrazione Corptools"
+
+#: corptools/templates/corptools/admin.html:10
+msgid "Corptools Configuration Info"
+msgstr "Informazioni sulla configurazione di Corptools"
+
+#: corptools/templates/corptools/admin.html:18
+msgid "Manual Task Run"
+msgstr "Esecuzione manuale delle attività"
+
+#: corptools/templates/corptools/admin.html:24
+msgid "Force update all Citadel Locations"
+msgstr "Forza l'aggiornamento di tutte le posizioni delle citadel"
+
+#: corptools/templates/corptools/admin.html:25
+msgid "Attempt to update all citadel names from ESI"
+msgstr "Tenta di aggiornare tutti i nomi delle citadel da ESI"
+
+#: corptools/templates/corptools/admin.html:30
+msgid "Force all character updates"
+msgstr "Forza tutti gli aggiornamenti dei personaggi"
+
+#: corptools/templates/corptools/admin.html:31
+msgid "Force updates to ALL character audits"
+msgstr "Forza l'aggiornamento di TUTTI gli audit dei personaggi"
+
+#: corptools/templates/corptools/admin.html:36
+msgid "Force all corp updates"
+msgstr "Forza tutti gli aggiornamenti delle corporazioni"
+
+#: corptools/templates/corptools/admin.html:37
+msgid "Force updates to ALL corporation audits"
+msgstr "Forza l'aggiornamento di TUTTI gli audit delle corporazioni"
+
+#: corptools/templates/corptools/admin.html:42
+msgid "Update EVE Entity Models"
+msgstr "Aggiorna i modelli delle entità EVE"
+
+#: corptools/templates/corptools/admin.html:43
+msgid "Force updates to ALL EVE entity names"
+msgstr "Forza l'aggiornamento di TUTTI i nomi delle entità EVE"
+
+#: corptools/templates/corptools/admin.html:48
+msgid "Submit"
+msgstr "Invia"
+
+#: corptools/templates/corptools/admin.html:55
+msgid "Clear Specific ETags"
+msgstr "Cancella ETag specifici"
+
+#: corptools/templates/corptools/admin.html:67
+msgid "Clear Selected ETags"
+msgstr "Cancella gli ETag selezionati"
+
+#: corptools/templates/corptools/admin.html:73
+msgid "Corptools Module Configuration"
+msgstr "Configurazione dei moduli di Corptools"
+
+#: corptools/templates/corptools/admin.html:80
+msgid "Module"
+msgstr "Modulo"
+
+#: corptools/templates/corptools/admin.html:81
+msgid "Enabled"
+msgstr "Abilitato"
+
+#: corptools/templates/corptools/admin.html:82
+msgid "Include in Active"
+msgstr "Includi negli attivi"
+
+#: corptools/templates/corptools/admin.html:83
+msgid "Temp Disabled"
+msgstr "Disattivato temporaneamente"
+
+#: corptools/templates/corptools/admin.html:90
+#: corptools/templates/corptools/admin.html:168
+msgid "(Validation Disabled)"
+msgstr "(Validazione disattivata)"
+
+#: corptools/templates/corptools/admin.html:92
+#: corptools/templates/corptools/admin.html:170
+msgid "(Validation Enabled)"
+msgstr "(Validazione attiva)"
+
+#: corptools/templates/corptools/admin.html:118
+msgid "Standings"
+msgstr "Reputazioni"
+
+#: corptools/templates/corptools/admin.html:142
+msgid "Contacts"
+msgstr "Contatti"
+
+#: corptools/templates/corptools/admin.html:244 corptools/views.py:535
+msgid "Mining"
+msgstr "Estrazione mineraria"
+
+#: corptools/templates/corptools/admin.html:268
+msgid "Wallets/Markets/Contracts"
+msgstr "Portafogli/Mercati/Contratti"
+
+#: corptools/templates/corptools/admin.html:395
+msgid "Audit Models"
+msgstr "Modelli di audit"
+
+#: corptools/templates/corptools/admin.html:401
+msgid "Corporation Audits"
+msgstr "Audit delle corporazioni"
+
+#: corptools/templates/corptools/admin.html:405
+msgid "Character Audits (Active/Total)"
+msgstr "Audit dei personaggi (attivi/totali)"
+
+#: corptools/templates/corptools/admin.html:409
+#: corptools/templates/corptools/admin.html:452
+msgid "Skill Lists"
+msgstr "Elenchi di skill"
+
+#: corptools/templates/corptools/admin.html:413
+msgid "Entity Names"
+msgstr "Nomi delle entità"
+
+#: corptools/templates/corptools/admin.html:417
+msgid "Structure Names"
+msgstr "Nomi delle strutture"
+
+#: corptools/templates/corptools/admin.html:421
+msgid "Jump Bridge Links"
+msgstr "Collegamenti Jump Bridge"
+
+#: corptools/templates/corptools/admin.html:427
+msgid "Audit Tasks"
+msgstr "Attività di audit"
+
+#: corptools/templates/corptools/admin.html:432
+msgid "Character Task"
+msgstr "Attività dei personaggi"
+
+#: corptools/templates/corptools/admin.html:438
+msgid "Corporation Task"
+msgstr "Attività delle corporazioni"
+
+#: corptools/templates/corptools/admin.html:446
+msgid "Create or Update Periodic Tasks"
+msgstr "Crea o aggiorna le attività periodiche"
+
+#: corptools/templates/corptools/admin.html:458
+msgid "Skill List Description"
+msgstr "Descrizione dell'elenco di skill"
+
+#: corptools/templates/corptools/admin.html:459
+msgid "Enter Description"
+msgstr "Inserisci la descrizione"
+
+#: corptools/templates/corptools/admin.html:460
+#: corptools/templates/corptools/admin.html:500
+msgid "This will show as the name of the Skill List"
+msgstr "Verrà mostrato come nome dell'elenco di skill"
+
+#: corptools/templates/corptools/admin.html:469
+msgid "Browse"
+msgstr "Sfoglia"
+
+#: corptools/templates/corptools/admin.html:473
+msgid "PYFA XML Skills required list"
+msgstr "Elenco XML di PYFA delle skill richieste"
+
+#: corptools/templates/corptools/admin.html:485
+msgid "Import Fitting as Skill List"
+msgstr "Importa fitting come elenco di skill"
+
+#: corptools/templates/corptools/admin.html:490
+msgid "Fitting"
+msgstr "Fitting"
+
+#: corptools/templates/corptools/admin.html:498
+msgid "Skill List Name"
+msgstr "Nome dell'elenco di skill"
+
+#: corptools/templates/corptools/admin.html:499
+msgid "Enter name"
+msgstr "Inserisci il nome"
+
+#: corptools/templates/corptools/admin.html:504
+msgid "Import Fitting"
+msgstr "Importa fitting"
+
+#: corptools/templates/corptools/base.html:80
+msgid "Add All Token"
+msgstr "Aggiungi token completo"
+
+#: corptools/templates/corptools/base_bs5.html:15
+msgid "Loading Page"
+msgstr "Caricamento pagina"
+
+#: corptools/templates/corptools/base_bs5.html:16
+#: corptools/templates/corptools/character/react_base.html:177
+#: corptools/templates/corptools/corporation/react_base.html:177
+msgid "Please Wait"
+msgstr "Attendere"
+
+#: corptools/templates/corptools/base_bs5.html:34
+#: corptools/templates/corptools/character/react_base.html:195
+#: corptools/templates/corptools/corporation/react_base.html:195
+msgid "Error Loading JavaScript"
+msgstr "Errore durante il caricamento di JavaScript"
+
+#: corptools/templates/corptools/base_bs5.html:35
+#: corptools/templates/corptools/character/react_base.html:196
+#: corptools/templates/corptools/corporation/react_base.html:196
+msgid "Check Browser Console for Logs"
+msgstr "Controlla i log nella console del browser"
+
+#: corptools/templates/corptools/character/react_base.html:176
+#: corptools/templates/corptools/corporation/react_base.html:176
+msgid "Loading Page?"
+msgstr "Caricamento pagina?"
+
+#: corptools/templates/corptools/dashboard.corptools.status.html:8
+msgid "Add Character"
+msgstr "Aggiungi personaggio"
+
+#: corptools/templates/corptools/dashboards/character_updates_dash.html:7
+#: corptools/templates/corptools/dashboards/character_updates_dash.html:10
+msgid "Character Update Dashboard"
+msgstr "Dashboard aggiornamenti personaggi"
+
+#: corptools/templates/corptools/dashboards/character_updates_dash.html:13
+#: corptools/templates/corptools/dashboards/character_updates_dash.html:16
+#: corptools/templates/corptools/dashboards/character_updates_dash.html:27
+#: corptools/templates/corptools/stubs/char_updates/active.html:1
+msgid "Active"
+msgstr "Attivi"
+
+#: corptools/templates/corptools/dashboards/character_updates_dash.html:15
+msgid "All"
+msgstr "Tutti"
+
+#: corptools/templates/corptools/dashboards/character_updates_dash.html:17
+#: corptools/templates/corptools/stubs/char_updates/active.html:1
+msgid "Inactive"
+msgstr "Inattivi"
+
+#: corptools/templates/corptools/dashboards/character_updates_dash.html:24
+msgid "Main"
+msgstr "Main"
+
+#: corptools/templates/corptools/dashboards/character_updates_dash.html:25
+msgid "Main Corporation"
+msgstr "Corporazione principale"
+
+#: corptools/templates/corptools/dashboards/character_updates_dash.html:26
+msgid "Main Alliance"
+msgstr "Alleanza principale"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:8
+msgid "Fuel Dashboard"
+msgstr "Dashboard carburante"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:17
+msgid "Corporation Logistics"
+msgstr "Logistica della corporazione"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:18
+msgid "Structure and Fuel Stats"
+msgstr "Statistiche di strutture e carburante"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:20
+msgid ""
+"Filter structures, review block and Magmatic Gas demand, and size refuels "
+"from one view."
+msgstr ""
+"Filtra le strutture, controlla il fabbisogno di blocchi e di gas magmatico e"
+" dimensiona i rifornimenti da un'unica vista."
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:25
+msgid "Refuel for days"
+msgstr "Rifornisci per giorni"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:34
+msgid "Minimum 30 days."
+msgstr "Minimo 30 giorni."
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:37
+msgid "Hide structures not needing refuel"
+msgstr "Nascondi le strutture che non hanno bisogno di rifornimento"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:46
+msgid "Filtered Structures"
+msgstr "Strutture filtrate"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:52
+msgid "Systems"
+msgstr "Sistemi"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:58
+msgid "Constellations"
+msgstr "Costellazioni"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:64
+msgid "Regions"
+msgstr "Regioni"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:70
+msgid "Current Blocks"
+msgstr "Blocchi attuali"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:76
+msgid "Current Magmatic Gas"
+msgstr "Gas magmatico attuale"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:86
+#: corptools/templates/corptools/dashboards/fuel_dash.html:122
+msgid "Fuel Demand"
+msgstr "Fabbisogno di carburante"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:87
+#: corptools/templates/corptools/dashboards/fuel_dash.html:179
+msgid "Blocks Usage"
+msgstr "Consumo di blocchi"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:93
+#: corptools/templates/corptools/dashboards/fuel_dash.html:129
+#: corptools/templates/corptools/dashboards/fuel_dash.html:228
+#: corptools/templates/corptools/dashboards/fuel_dash.html:263
+msgid "Per Hour"
+msgstr "All'ora"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:99
+#: corptools/templates/corptools/dashboards/fuel_dash.html:135
+#: corptools/templates/corptools/dashboards/fuel_dash.html:234
+#: corptools/templates/corptools/dashboards/fuel_dash.html:269
+msgid "Per Day"
+msgstr "Al giorno"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:105
+#: corptools/templates/corptools/dashboards/fuel_dash.html:141
+#: corptools/templates/corptools/dashboards/fuel_dash.html:240
+#: corptools/templates/corptools/dashboards/fuel_dash.html:275
+msgid "Per Month"
+msgstr "Al mese"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:112
+#: corptools/templates/corptools/dashboards/fuel_dash.html:148
+#: corptools/templates/corptools/dashboards/fuel_dash.html:250
+#: corptools/templates/corptools/dashboards/fuel_dash.html:286
+msgid "Refuel For"
+msgstr "Rifornimento per"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:123
+msgid "Magmatic Gas Usage"
+msgstr "Consumo di gas magmatico"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:159
+msgid "Filtered Inventory"
+msgstr "Inventario filtrato"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:160
+msgid "Structure Mix"
+msgstr "Composizione delle strutture"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:178
+#: corptools/templates/corptools/dashboards/metenox_dash.html:28
+msgid "Structure"
+msgstr "Struttura"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:180
+msgid "Blocks Refuel"
+msgstr "Rifornimento blocchi"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:181
+msgid "Gas Usage"
+msgstr "Consumo di gas"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:182
+msgid "Gas Refuel"
+msgstr "Rifornimento gas"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:183
+msgid "Current Stock"
+msgstr "Scorte attuali"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:184
+msgid "Time Left"
+msgstr "Tempo rimanente"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:185
+msgid "Services"
+msgstr "Servizi"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:186
+#: corptools/templates/corptools/dashboards/metenox_dash.html:30
+msgid "System"
+msgstr "Sistema"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:187
+#: corptools/templates/corptools/dashboards/metenox_dash.html:31
+msgid "Constellation"
+msgstr "Costellazione"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:188
+#: corptools/templates/corptools/dashboards/metenox_dash.html:32
+msgid "Region"
+msgstr "Regione"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:189
+msgid "Corp"
+msgstr "Corp"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:190
+#: corptools/templates/corptools/dashboards/metenox_dash.html:53
+msgid "Type"
+msgstr "Tipo"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:253
+#: corptools/templates/corptools/dashboards/fuel_dash.html:289
+msgid "Copy"
+msgstr "Copia"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:299
+#: corptools/templates/corptools/dashboards/fuel_dash.html:316
+#: corptools/templates/corptools/dashboards/fuel_dash.html:332
+msgid "Blocks"
+msgstr "Blocchi"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:306
+msgid "Gas"
+msgstr "Gas"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:319
+#: corptools/templates/corptools/dashboards/fuel_dash.html:327
+#: corptools/templates/corptools/dashboards/fuel_dash.html:335
+#, python-format
+msgid "%(time_left)s left"
+msgstr "%(time_left)s rimanenti"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:366
+#: corptools/templates/corptools/dashboards/metenox_dash.html:79
+msgid "No Structures Available"
+msgstr "Nessuna struttura disponibile"
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:373
+msgid "Minimum 30 days. Current window: "
+msgstr "Minimo 30 giorni. Intervallo attuale: "
+
+#: corptools/templates/corptools/dashboards/fuel_dash.html:374
+msgid "No structures in the current filter."
+msgstr "Nessuna struttura nel filtro attuale."
+
+#: corptools/templates/corptools/dashboards/metenox_dash.html:8
+#: corptools/templates/corptools/dashboards/metenox_dash.html:12
+msgid "Metenox Stats"
+msgstr "Statistiche Metenox"
+
+#: corptools/templates/corptools/dashboards/metenox_dash.html:16
+msgid "Filtered Stats"
+msgstr "Statistiche filtrate"
+
+#: corptools/templates/corptools/dashboards/metenox_dash.html:17
+msgid "Structures Matching Filter"
+msgstr "Strutture che corrispondono al filtro"
+
+#: corptools/templates/corptools/dashboards/metenox_dash.html:18
+msgid "Total Value in Drills"
+msgstr "Valore totale nelle trivelle"
+
+#: corptools/templates/corptools/dashboards/metenox_dash.html:19
+msgid "Filtered System Count"
+msgstr "Numero di sistemi filtrati"
+
+#: corptools/templates/corptools/dashboards/metenox_dash.html:20
+msgid "Filtered Constellation Count"
+msgstr "Numero di costellazioni filtrate"
+
+#: corptools/templates/corptools/dashboards/metenox_dash.html:21
+msgid "Filtered Region Count"
+msgstr "Numero di regioni filtrate"
+
+#: corptools/templates/corptools/dashboards/metenox_dash.html:29
+msgid "Owner"
+msgstr "Proprietario"
+
+#: corptools/templates/corptools/dashboards/metenox_dash.html:33
+#: corptools/templates/corptools/dashboards/metenox_dash.html:55
+msgid "Value"
+msgstr "Valore"
+
+#: corptools/templates/corptools/dashboards/metenox_dash.html:34
+msgid "Contents"
+msgstr "Contenuto"
+
+#: corptools/templates/corptools/dashboards/metenox_dash.html:54
+msgid "Qty"
+msgstr "Q.tà"
+
+#: corptools/templates/corptools/fittings/characters.html:6
+msgid "Character Base Skill Checks"
+msgstr "Controlli delle skill di base del personaggio"
+
+#: corptools/templates/corptools/fittings/characters.html:29
+#: corptools/templates/corptools/fittings/characters.html:74
+msgid ""
+"Basic skills required to <b>sit in the hull</b> and <b>fit the modules</b>."
+msgstr ""
+"Skill di base richieste per <b>pilotare lo scafo</b> e <b>montare i "
+"moduli</b>."
+
+#: corptools/templates/corptools/fittings/characters.html:31
+#: corptools/templates/corptools/fittings/characters.html:76
+msgid ""
+"Extra skills <b>will</b> be required to use this fitting properly in fleets"
+msgstr ""
+"Per usare correttamente questo fitting in flotta <b>saranno</b> necessarie "
+"altre skill"
+
+#: corptools/templates/corptools/fittings/characters.html:51
+msgid "Base Skills Required"
+msgstr "Skill di base richieste"
+
+#: corptools/templates/corptools/menu.html:14
+msgid "Toggle navigation"
+msgstr "Mostra/nascondi navigazione"
+
+#: corptools/templates/corptools/menu.html:19
+msgid "Account Audit"
+msgstr "Audit dell'account"
+
+#: corptools/templates/corptools/menu.html:26
+msgid "DB Admin"
+msgstr "Amministrazione DB"
+
+#: corptools/templates/corptools/menu.html:32
+msgid "Corporations"
+msgstr "Corporazioni"
+
+#: corptools/templates/corptools/menu.html:39
+msgid "Add Character Token"
+msgstr "Aggiungi token personaggio"
+
+#: corptools/templates/corptools/menu.html:43
+msgid "Add Corporate Token"
+msgstr "Aggiungi token corporazione"
+
+#: corptools/templates/corptools/menu.html:56
+msgid "Main Character"
+msgstr "Personaggio principale"
+
+#: corptools/templates/corptools/menu.html:57
+#: corptools/templates/corptools/wallet_export_list.html:89
+msgid "Corporation"
+msgstr "Corporazione"
+
+#: corptools/templates/corptools/menu.html:58
+msgid "Alliance"
+msgstr "Alleanza"
+
+#: corptools/templates/corptools/menu.html:59
+msgid "Alts"
+msgstr "Alt"
+
+#: corptools/templates/corptools/top_menu.html:3
+msgid "Character Audit"
+msgstr "Audit dei personaggi"
+
+#: corptools/templates/corptools/top_menu.html:6
+msgid "Corporate Audit"
+msgstr "Audit delle corporazioni"
+
+#: corptools/templates/corptools/wallet_export_list.html:3
+#: corptools/templates/corptools/wallet_export_list.html:10
+msgid "Wallet Archive Export"
+msgstr "Esportazione dell'archivio del portafoglio"
+
+#: corptools/templates/corptools/wallet_export_list.html:20
+msgid "Export Fixtures"
+msgstr "Esporta fixture"
+
+#: corptools/templates/corptools/wallet_export_list.html:23
+#, python-format
+msgid ""
+"\n"
+"                Exports all NPC wallet journal entries older than %(days)s days to\n"
+"                Django fixture files (one chunk per run, watermarked to avoid re-exporting).\n"
+"                "
+msgstr ""
+"\n"
+"                Esporta tutte le voci NPC del registro del portafoglio più vecchie di %(days)s giorni in\n"
+"                file fixture di Django (un blocco per esecuzione, con un segnalibro per evitare di riesportarle).\n"
+"                "
+
+#: corptools/templates/corptools/wallet_export_list.html:29
+#, python-format
+msgid ""
+"\n"
+"                %(count)s NPC ref_types are tracked for export and purge.\n"
+"                "
+msgstr ""
+"\n"
+"                %(count)s ref_type NPC vengono tracciati per l'esportazione e l'eliminazione.\n"
+"                "
+
+#: corptools/templates/corptools/wallet_export_list.html:35
+msgid "Queue Fixture Export"
+msgstr "Metti in coda l'esportazione delle fixture"
+
+#: corptools/templates/corptools/wallet_export_list.html:47
+msgid "Purge NPC Wallet Data"
+msgstr "Elimina i dati NPC del portafoglio"
+
+#: corptools/templates/corptools/wallet_export_list.html:50
+#, python-format
+msgid ""
+"\n"
+"                Deletes all NPC wallet journal entries older than %(days)s days from the database.\n"
+"                Run the fixture export first to archive data before purging.\n"
+"                "
+msgstr ""
+"\n"
+"                Elimina dal database tutte le voci NPC del registro del portafoglio più vecchie di %(days)s giorni.\n"
+"                Prima di eliminarle, esegui l'esportazione delle fixture per archiviare i dati.\n"
+"                "
+
+#: corptools/templates/corptools/wallet_export_list.html:56
+#, python-format
+msgid ""
+"\n"
+"                Purges the same %(count)s NPC ref_types tracked for export.\n"
+"                "
+msgstr ""
+"\n"
+"                Elimina gli stessi %(count)s ref_type NPC tracciati per l'esportazione.\n"
+"                "
+
+#: corptools/templates/corptools/wallet_export_list.html:61
+msgid ""
+"Run `python manage.py ct_wallet_stats` on the server to see current entry "
+"counts."
+msgstr ""
+"Esegui `python manage.py ct_wallet_stats` sul server per vedere il numero "
+"attuale di voci."
+
+#: corptools/templates/corptools/wallet_export_list.html:67
+msgid "I understand this permanently deletes wallet data"
+msgstr ""
+"Ho capito che questa operazione elimina definitivamente i dati del "
+"portafoglio"
+
+#: corptools/templates/corptools/wallet_export_list.html:74
+msgid "Queue Purge"
+msgstr "Metti in coda l'eliminazione"
+
+#: corptools/templates/corptools/wallet_export_list.html:90
+msgid "Fixtures"
+msgstr "Fixture"
+
+#: corptools/templates/corptools/wallet_export_list.html:97
+msgid "Entity"
+msgstr "Entità"
+
+#: corptools/templates/corptools/wallet_export_list.html:98
+msgid "File"
+msgstr "File"
+
+#: corptools/templates/corptools/wallet_export_list.html:99
+msgid "Size"
+msgstr "Dimensione"
+
+#: corptools/templates/corptools/wallet_export_list.html:100
+msgid "Exported"
+msgstr "Esportato"
+
+#: corptools/templates/corptools/wallet_export_list.html:113
+msgid ""
+"No fixture files have been exported yet. Queue the export above to generate "
+"them."
+msgstr ""
+"Non è ancora stato esportato alcun file fixture. Metti in coda "
+"l'esportazione qui sopra per generarli."
 
 #: corptools/validators.py:12
 msgid "This is not valid JSON, please check it and try again."
-msgstr ""
+msgstr "Questo non è un JSON valido, controllalo e riprova."
+
+#: corptools/views.py:515
+msgid "Public Data"
+msgstr "Dati pubblici"
+
+#: corptools/views.py:522
+msgid "Skill Queue"
+msgstr "Coda di skill"
+
+#: corptools/views.py:525
+msgid "Orders"
+msgstr "Ordini"
+
+#: corptools/views.py:858
+msgid "Download"
+msgstr "Scarica"
