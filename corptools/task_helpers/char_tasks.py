@@ -21,6 +21,7 @@ from esi.models import Token
 
 # AA Example App
 from corptools.app_settings import CT_DB_BULK_CREATE_BATCH_SIZE
+from corptools.task_helpers.sync import sync_assets
 from corptools.task_helpers.update_tasks import (
     SOLAR_SYSTEM_ID_MAX,
     SOLAR_SYSTEM_ID_MIN,
@@ -493,18 +494,13 @@ def update_character_assets(character_id, force_refresh=False):
 
                 items.append(ship)
 
-        # We now have some FKeys so slow it down...
-        # Flush + recreate in one transaction so concurrent readers never see
-        # the character with zero assets mid-refresh (e.g. securegroups asset
-        # filters false-failing during the update window).
-        with transaction.atomic():
-            CharacterAsset.objects.filter(
-                character=audit_char
-            ).delete()
-            CharacterAsset.objects.bulk_create(
-                items,
-                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
-            )
+        # Sync in place so rows keep their pk, coordinates and the names/blueprint
+        # stats from the follow-up calls below.
+        sync_assets(
+            CharacterAsset.objects.filter(character=audit_char),
+            items,
+            CharAssetCoordiante
+        )
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_assets {character_id}"
@@ -625,8 +621,8 @@ def update_character_blueprints(character_id, force_refresh=False):
         token=token
     ).results(
         force_refresh=force_refresh,
-        # the asset rows are recreated on every asset pull, so an unchanged
-        # blueprint list must still be applied to the fresh rows.
+        # assets new since the last pull still need their stats even when the
+        # blueprint list itself is unchanged.
         use_etag=False,
         store_cache=False
     )

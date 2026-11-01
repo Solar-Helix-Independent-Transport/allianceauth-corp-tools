@@ -8,7 +8,7 @@ from celery import shared_task
 from eve_sde.models import ItemType
 
 # Django
-from django.db import connection, transaction
+from django.db import connection
 from django.db.models import F, Q
 from django.db.models.aggregates import Sum
 
@@ -28,6 +28,7 @@ from corptools.models import (
     EveLocation,
     Structure,
 )
+from corptools.task_helpers.sync import sync_assets
 
 from ... import providers
 from ..locations import update_all_locations
@@ -89,17 +90,13 @@ def corp_update_assets(corp_id, force_refresh: bool = False):
 
         items.append(asset_item)
 
-    # Flush + recreate in one transaction so concurrent readers never see the
-    # corporation with zero assets mid-refresh (e.g. securegroups asset filters
-    # false-failing during the update window).
-    with transaction.atomic():
-        CorpAsset.objects.filter(
-            corporation=audit_corp
-        ).delete()
-        CorpAsset.objects.bulk_create(
-            items,
-            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
-        )
+    # Sync in place so rows keep their pk, coordinates and the names/blueprint
+    # stats from the follow-up calls below.
+    sync_assets(
+        CorpAsset.objects.filter(corporation=audit_corp),
+        items,
+        AssetCoordiante
+    )
 
     try:
         corp_update_asset_names(corp_id)
@@ -154,8 +151,8 @@ def update_corporation_blueprints(corp_id, force_refresh: bool = False):
         token=token
     ).results(
         force_refresh=force_refresh,
-        # the asset rows are recreated on every asset pull, so an unchanged
-        # blueprint list must still be applied to the fresh rows.
+        # assets new since the last pull still need their stats even when the
+        # blueprint list itself is unchanged.
         use_etag=False,
         store_cache=False
     )
