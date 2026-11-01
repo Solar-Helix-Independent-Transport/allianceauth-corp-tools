@@ -111,7 +111,7 @@ class MailMessage(models.Model):
 
 
 class Contact(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     contact_id = models.BigIntegerField()
     contact_type = models.CharField(max_length=255, null=False)
     contact_name = models.ForeignKey(EveName, on_delete=models.CASCADE)
@@ -122,7 +122,7 @@ class Contact(models.Model):
 
 
 class ContactLabel(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     label_id = models.BigIntegerField()
     label_name = models.CharField(max_length=255, null=False)
 
@@ -133,9 +133,8 @@ class ContactLabel(models.Model):
 class CharacterContactLabel(ContactLabel):
     character = models.ForeignKey(CharacterAudit, on_delete=models.CASCADE)
 
-    def build_id(self):
-        self.id = int(str(self.character_id) + str(self.label_id))
-        return self.id
+    class Meta:
+        unique_together = (("character", "label_id"),)
 
     @classmethod
     def from_esi_model(cls, character: CharacterAudit, esi_model: "CharactersCharacterIdContactsLabelsGetItem"):
@@ -144,7 +143,6 @@ class CharacterContactLabel(ContactLabel):
             label_id=esi_model.label_id,
             label_name=esi_model.label_name,
         )
-        _mdl.build_id()
         return _mdl
 
 
@@ -158,9 +156,8 @@ class CharacterContact(Contact):
     watched = models.BooleanField(default=False)
     labels = models.ManyToManyField(CharacterContactLabel)
 
-    def build_id(self):
-        self.id = int(str(self.character_id) + str(self.contact_id))
-        return self.id
+    class Meta:
+        unique_together = (("character", "contact_id"),)
 
     @classmethod
     def from_esi_model(cls, character: CharacterAudit, esi_model: "CharactersCharacterIdContactsGetItem"):
@@ -175,7 +172,6 @@ class CharacterContact(Contact):
             blocked=blocked,
             watched=watched,
         )
-        _mdl.build_id()
         return _mdl
 
 

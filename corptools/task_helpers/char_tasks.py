@@ -21,7 +21,7 @@ from esi.models import Token
 
 # AA Example App
 from corptools.app_settings import CT_DB_BULK_CREATE_BATCH_SIZE
-from corptools.task_helpers.sync import sync_assets
+from corptools.task_helpers.sync import sync_assets, sync_rows
 from corptools.task_helpers.update_tasks import (
     SOLAR_SYSTEM_ID_MAX,
     SOLAR_SYSTEM_ID_MIN,
@@ -2051,18 +2051,13 @@ def update_character_contacts(character_id, force_refresh=False):
 
         _st = time.perf_counter()
 
-        labels_to_create = []
-
-        for label in labels:  # update labels
-            _label_item = CharacterContactLabel.from_esi_model(
-                audit_char, label)
-            _label_item.build_id()
-            labels_to_create.append(_label_item)
-
-        with transaction.atomic():
-            CharacterContactLabel.objects.filter(character=audit_char).delete()
-            CharacterContactLabel.objects.bulk_create(
-                labels_to_create, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+        sync_rows(
+            CharacterContactLabel.objects.filter(character=audit_char),
+            [CharacterContactLabel.from_esi_model(audit_char, label)
+             for label in labels],
+            key_fields=["label_id"],
+            fields=["label_name"]
+        )
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} CharacterContactLabel {character_id}"
@@ -2084,37 +2079,47 @@ def update_character_contacts(character_id, force_refresh=False):
 
         _current_eve_ids = _known_eve_ids(c.contact_id for c in contacts)
 
-        ContactLabelThrough = CharacterContact.labels.through
-        _contacts_to_create = []
-        _through_to_create = []
-        for contact in contacts:  # update contacts
+        for contact in contacts:
             if contact.contact_id not in _current_eve_ids:
                 EveName.objects.get_or_create_from_esi(
                     contact.contact_id
                 )
                 _current_eve_ids.add(contact.contact_id)
 
-            _contact_item = CharacterContact.from_esi_model(
-                audit_char, contact)
-
-            _contacts_to_create.append(_contact_item)
-
-            if contact.label_ids:  # add labels
-                for _label in contact.label_ids:
-                    _label_id = int(str(audit_char.id) + str(_label))
-                    _lbl = ContactLabelThrough(
-                        charactercontact_id=_contact_item.id,
-                        charactercontactlabel_id=_label_id
-                    )
-                    _through_to_create.append(_lbl)
-
+        ContactLabelThrough = CharacterContact.labels.through
         with transaction.atomic():
-            CharacterContact.objects.filter(character=audit_char).delete()
+            sync_rows(
+                CharacterContact.objects.filter(character=audit_char),
+                [CharacterContact.from_esi_model(audit_char, contact)
+                 for contact in contacts],
+                key_fields=["contact_id"],
+                fields=["contact_type", "contact_name",
+                        "standing", "blocked", "watched"]
+            )
 
-            CharacterContact.objects.bulk_create(
-                _contacts_to_create, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
-            ContactLabelThrough.objects.bulk_create(
-                _through_to_create, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+            # MySQL doesn't hand back pks from bulk_create, so look them up.
+            contact_pks = dict(CharacterContact.objects.filter(
+                character=audit_char).values_list("contact_id", "pk"))
+            label_pks = dict(CharacterContactLabel.objects.filter(
+                character=audit_char).values_list("label_id", "pk"))
+
+            # labels the label list didn't return are skipped rather than
+            # failing the whole update on the FK.
+            sync_rows(
+                ContactLabelThrough.objects.filter(
+                    charactercontact__character=audit_char),
+                [
+                    ContactLabelThrough(
+                        charactercontact_id=contact_pks[contact.contact_id],
+                        charactercontactlabel_id=label_pks[label_id]
+                    )
+                    for contact in contacts
+                    for label_id in (contact.label_ids or [])
+                    if label_id in label_pks
+                ],
+                key_fields=["charactercontact", "charactercontactlabel"],
+                fields=[]
+            )
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_contacts {character_id}"

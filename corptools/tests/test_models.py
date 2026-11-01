@@ -13,12 +13,7 @@ from django.utils import timezone
 # AA Example App
 from corptools.models.audits import CharacterAudit, CorporationAudit, EveLocation
 from corptools.models.eve_models import EveName
-from corptools.models.interactions import (
-    CharacterContact,
-    CharacterContactLabel,
-    CharacterTitle,
-    LoyaltyPoint,
-)
+from corptools.models.interactions import CharacterTitle, LoyaltyPoint
 from corptools.models.skills import Skill, SkillList, SkillTotalHistory, valid_skills
 
 from . import CorptoolsTestCase
@@ -160,26 +155,6 @@ class TestEveNameNeedsUpdate(TestCase):
 # ---------------------------------------------------------------------------
 # interactions.py
 # ---------------------------------------------------------------------------
-
-class TestCharacterContactLabelBuildId(TestCase):
-    def test_build_id_concatenates_character_and_label(self):
-        label = CharacterContactLabel(character_id=123, label_id=456)
-        result = label.build_id()
-        self.assertEqual(result, 123456)
-        self.assertEqual(label.id, 123456)
-
-    def test_build_id_returns_integer(self):
-        label = CharacterContactLabel(character_id=1, label_id=1)
-        self.assertIsInstance(label.build_id(), int)
-
-
-class TestCharacterContactBuildId(TestCase):
-    def test_build_id_concatenates_character_and_contact(self):
-        contact = CharacterContact(character_id=100, contact_id=200)
-        result = contact.build_id()
-        self.assertEqual(result, 100200)
-        self.assertEqual(contact.id, 100200)
-
 
 class TestCharacterTitleStr(TestCase):
     def test_str_includes_corp_name_and_title(self):

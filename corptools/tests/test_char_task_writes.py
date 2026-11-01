@@ -118,10 +118,8 @@ class TestDeleteRecreateIsAtomic(CorptoolsTestCase):
     @patch(f"{CHAR_TASKS}.get_token")
     @patch(f"{CHAR_TASKS}.providers")
     def test_contact_labels_failure_keeps_existing_labels(self, mock_providers, mock_get_token):
-        old = CharacterContactLabel(
+        old = CharacterContactLabel.objects.create(
             character=self.ca1, label_id=1, label_name="Blues")
-        old.build_id()
-        old.save()
         mock_get_token.return_value = MagicMock()
         contacts = mock_providers.esi_openapi.client.Contacts
         new_label = MagicMock(label_id=2)
