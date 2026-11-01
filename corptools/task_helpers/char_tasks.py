@@ -333,10 +333,8 @@ def update_character_skill_list(character_id, force_refresh=False):
             unallocated_sp=skills.unallocated_sp if skills.unallocated_sp else 0
         )
 
-        _check_skills = []
-        _create_skills = []
+        _skills = []
         for skill in skills.skills:
-            _check_skills.append(skill.skill_id)
             _skill = Skill(
                 character=audit_char,
                 skill_id=skill.skill_id,
@@ -345,14 +343,15 @@ def update_character_skill_list(character_id, force_refresh=False):
                 skillpoints_in_skill=skill.skillpoints_in_skill,
                 trained_skill_level=skill.trained_skill_level
             )
-            _create_skills.append(_skill)
+            _skills.append(_skill)
 
-        # Flush + recreate in one transaction so readers (e.g. securegroups
-        # skill filters) never see the character with no skills mid-refresh.
-        with transaction.atomic():
-            Skill.objects.filter(character=audit_char).delete()
-            Skill.objects.bulk_create(
-                _create_skills, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+        sync_rows(
+            Skill.objects.filter(character=audit_char),
+            _skills,
+            key_fields=["skill_id"],
+            fields=["skill_name", "active_skill_level",
+                    "skillpoints_in_skill", "trained_skill_level"]
+        )
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_list {character_id}"
@@ -397,9 +396,7 @@ def update_character_skill_queue(character_id, force_refresh=False):
         _st = time.perf_counter()
 
         items = []
-        _check_skills = []
         for item in queue:
-            _check_skills.append(item.skill_id)
             queue_item = SkillQueue(
                 character=audit_char,
                 finish_level=item.finished_level,
@@ -414,12 +411,14 @@ def update_character_skill_queue(character_id, force_refresh=False):
             )
             items.append(queue_item)
 
-        with transaction.atomic():
-            SkillQueue.objects.filter(
-                character=audit_char
-            ).delete()
-            SkillQueue.objects.bulk_create(
-                items, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+        sync_rows(
+            SkillQueue.objects.filter(character=audit_char),
+            items,
+            key_fields=["queue_position"],
+            fields=["finish_level", "skill_id", "skill_name", "finish_date",
+                    "level_end_sp", "level_start_sp", "start_date",
+                    "training_start_sp"]
+        )
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_queue {character_id}"
