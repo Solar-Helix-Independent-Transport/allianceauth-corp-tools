@@ -62,14 +62,19 @@ def update_corp_wallet_divisions(corp_id, full_update=False):  # pagnated result
     )
 
     for division in divisions:
+        # Names need a Director token; with only an accountant one keep the
+        # names we have rather than overwriting them with "Unknown".
+        defaults = {'balance': division.balance}
+        if division.division in names:
+            defaults['name'] = names[division.division]
         _division_item, _created = CorporationWalletDivision.objects.update_or_create(
             corporation=audit_corp,
             division=division.division,
-            defaults={
-                'balance': division.balance,
-                'name': names.get(division.division, "Unknown")
-            }
+            defaults=defaults
         )
+        if _created and 'name' not in defaults:
+            _division_item.name = "Unknown"
+            _division_item.save(update_fields=["name"])
 
         if _division_item:
             update_corp_wallet_journal(

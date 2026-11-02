@@ -39,6 +39,7 @@ from corptools.esi_errors import (  # - re-exported
     get_error_flag,
     set_error_flag,
 )
+from corptools.task_helpers.etags import clear_etags_on_error
 from corptools.tasks.rate_limiting import (
     TaskBucketLimitException,
     TaskRateLimitBucket,
@@ -110,7 +111,8 @@ def esi_error_retry(func):
         else:
             clear_error_flag()
         try:
-            _ret = func(*args, **kwargs)
+            with clear_etags_on_error():
+                _ret = func(*args, **kwargs)
         except Exception as e:
             if isinstance(e, (ESIBucketLimitException)):  # OpenAPI
                 logger.warning(f"Hit ESI rate bucket! Pausing Task! {e}")

@@ -1555,6 +1555,17 @@ def update_character_orders(character_id, force_refresh=False):
             CharacterMarketOrder.objects.bulk_create(
                 creates, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
+        # Anything no longer open has closed. Order history (run next) says
+        # whether it was cancelled, but only covers 90 days, so without this
+        # an order closed during a longer token lapse stays active forever.
+        # ESI itself reports filled orders as expired.
+        CharacterMarketOrder.objects.filter(
+            character=audit_char,
+            state='active'
+        ).exclude(
+            order_id__in=[order.order_id for order in open_orders]
+        ).update(state='expired')
+
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_orders {character_id}"
         )
@@ -1860,7 +1871,7 @@ def update_character_mail_headers(character_id, force_refresh=False):
         store_cache=False
     )
 
-    for label in labels.labels:
+    for label in labels.labels or []:
         MailLabel.objects.update_or_create(
             character=audit_char,
             label_id=label.label_id,
@@ -1870,6 +1881,10 @@ def update_character_mail_headers(character_id, force_refresh=False):
                 'unread_count': label.unread_count
             }
         )
+    # labels deleted in game
+    MailLabel.objects.filter(character=audit_char).exclude(
+        label_id__in=[label.label_id for label in labels.labels or []]
+    ).delete()
 
     # Materialise to a set so `in` checks are O(1) rather than per-iteration DB queries
     mail_id_set = set(
@@ -1938,16 +1953,25 @@ def update_character_mail_headers(character_id, force_refresh=False):
         messages = []
         m_l_map = {}
         m_r_map = {}
+        known_read = {}
+        known_labels = {}
         failed_ids = set()
         stop = False
         for msg in mail:
             already_known = msg.mail_id in mail_id_set
-            if already_known and not force_refresh:
-                stop = True
-                break
 
             id_k = int(str(audit_char.character.character_id) +
                        str(msg.mail_id))
+
+            if already_known:
+                # read state and labels change after delivery, so refresh
+                # them for the stored mail on the pages we fetch anyway.
+                known_read[id_k] = msg.is_read
+                known_labels[id_k] = msg.labels or []
+                if not force_refresh:
+                    # everything older is stored; just finish this page
+                    stop = True
+                    continue
 
             if not already_known:
                 if (
@@ -1984,8 +2008,8 @@ def update_character_mail_headers(character_id, force_refresh=False):
 
                 messages.append(msg_obj)
 
-            if msg.labels:
-                m_l_map[id_k] = msg.labels
+                if msg.labels:
+                    m_l_map[id_k] = msg.labels
 
             m_r_map[id_k] = [
                 (r.recipient_id, r.recipient_type)
@@ -2011,6 +2035,24 @@ def update_character_mail_headers(character_id, force_refresh=False):
 
         LabelThroughModel.objects.bulk_create(
             lms, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+
+        for is_read in (True, False):
+            MailMessage.objects.filter(
+                id_key__in=[k for k, r in known_read.items() if r == is_read]
+            ).exclude(is_read=is_read).update(is_read=is_read)
+
+        sync_rows(
+            LabelThroughModel.objects.filter(mailmessage_id__in=known_labels),
+            [
+                LabelThroughModel(
+                    mailmessage_id=id_k, maillabel_id=label_pk_map[label])
+                for id_k, msg_labels in known_labels.items()
+                for label in msg_labels
+                if label in label_pk_map
+            ],
+            key_fields=["mailmessage", "maillabel"],
+            fields=[]
+        )
 
         RecipThroughModel = MailMessage.recipients.through
         rms = []
