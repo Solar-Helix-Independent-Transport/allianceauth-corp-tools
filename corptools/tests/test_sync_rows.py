@@ -18,9 +18,15 @@ from corptools.models import (
     CorpAsset,
     EveLocation,
 )
-from corptools.task_helpers.char_tasks import update_character_assets
-from corptools.task_helpers.sync import sync_rows
-from corptools.tasks.corporation.assets import corp_update_assets
+from corptools.task_helpers.char_tasks import (
+    update_asset_locations,
+    update_character_assets,
+)
+from corptools.task_helpers.sync import sync_rows, upsert_coordinates
+from corptools.tasks.corporation.assets import (
+    corp_update_assets,
+    fetch_coordiantes,
+)
 
 from . import CorptoolsTestCase
 
@@ -37,11 +43,12 @@ def _corp_asset(corp, item_id, quantity=1, location_id=60003760, **kwargs):
         quantity=quantity, type_id=34, type_name_id=34, **kwargs)
 
 
-def _esi_asset(item_id, quantity=1, location_id=60003760, location_flag="Hangar"):
+def _esi_asset(item_id, quantity=1, location_id=60003760, location_flag="Hangar",
+               singleton=False):
     return MagicMock(
         item_id=item_id, location_id=location_id, location_flag=location_flag,
         location_type="station", type_id=34, quantity=quantity,
-        is_blueprint_copy=None, is_singleton=False)
+        is_blueprint_copy=None, is_singleton=singleton)
 
 
 class TestSyncRows(CorptoolsTestCase):
@@ -165,13 +172,14 @@ class TestCorpAssetsSyncInPlace(CorptoolsTestCase):
 
     def test_refresh_keeps_rows_and_enrichment(self, mock_providers, mock_token, *_):
         self._run(mock_providers, mock_token,
-                  [_esi_asset(1), _esi_asset(2), _esi_asset(3)])
+                  [_esi_asset(1, singleton=True), _esi_asset(2), _esi_asset(3)])
         before = dict(CorpAsset.objects.values_list("item_id", "pk"))
         CorpAsset.objects.filter(item_id=1).update(
             name="Loot Can", material_efficiency=10, time_efficiency=20, runs=-1)
 
         self._run(mock_providers, mock_token,
-                  [_esi_asset(1), _esi_asset(2, quantity=7), _esi_asset(4)])
+                  [_esi_asset(1, singleton=True), _esi_asset(2, quantity=7),
+                   _esi_asset(4)])
 
         rows = {a.item_id: a for a in CorpAsset.objects.all()}
         self.assertEqual(set(rows), {1, 2, 4})
@@ -198,6 +206,14 @@ class TestCorpAssetsSyncInPlace(CorptoolsTestCase):
             list(AssetCoordiante.objects.values_list(
                 "item__item_id", flat=True)),
             [1])
+
+    def test_repackaged_item_loses_its_name(self, mock_providers, mock_token, *_):
+        self._run(mock_providers, mock_token, [_esi_asset(1, singleton=True)])
+        CorpAsset.objects.update(name="Hauler")
+
+        self._run(mock_providers, mock_token, [_esi_asset(1)])
+
+        self.assertIsNone(CorpAsset.objects.get(item_id=1).name)
 
     def test_managed_hangar_location_survives_refresh(self, mock_providers, mock_token, *_):
         office = 1000000000001
@@ -241,7 +257,7 @@ class TestCharacterAssetsSyncInPlace(CorptoolsTestCase):
 
     def test_refresh_keeps_rows_enrichment_and_coordinates(self, mock_providers, mock_token, *_):
         self._run(mock_providers, mock_token,
-                  [_esi_asset(1, location_id=30000142),
+                  [_esi_asset(1, location_id=30000142, singleton=True),
                    _esi_asset(2, location_id=30000142),
                    _esi_asset(3)])
         before = dict(CharacterAsset.objects.values_list("item_id", "pk"))
@@ -251,7 +267,7 @@ class TestCharacterAssetsSyncInPlace(CorptoolsTestCase):
             CharAssetCoordiante.objects.create(item=a, x=1, y=2, z=3)
 
         self._run(mock_providers, mock_token,
-                  [_esi_asset(1, location_id=30000142),
+                  [_esi_asset(1, location_id=30000142, singleton=True),
                    _esi_asset(2, location_id=30000144, quantity=4)])
 
         rows = {a.item_id: a for a in CharacterAsset.objects.filter(
@@ -265,3 +281,99 @@ class TestCharacterAssetsSyncInPlace(CorptoolsTestCase):
             list(CharAssetCoordiante.objects.values_list(
                 "item__item_id", flat=True)),
             [1])
+
+
+class TestUpsertCoordinates(CorptoolsTestCase):
+    """Coordinates used to be written once per (recreated) row; rows now
+    persist, so a re-deployed object must get its new position."""
+
+    def setUp(self):
+        super().setUp()
+        sde_models.ItemType.objects.create(
+            id=34, name="Tritanium", published=True)
+
+    def test_overwrites_existing_and_adds_new(self):
+        moved = _corp_asset(self.cp1, 1, location_id=30000142)
+        moved.save()
+        new = _corp_asset(self.cp1, 2, location_id=30000142)
+        new.save()
+        AssetCoordiante.objects.create(item=moved, x=1, y=2, z=3)
+
+        upsert_coordinates(AssetCoordiante, [
+            AssetCoordiante(item=moved, x=4, y=5, z=6),
+            AssetCoordiante(item=new, x=7, y=8, z=9)])
+
+        self.assertEqual(
+            sorted(AssetCoordiante.objects.values_list(
+                "item__item_id", "x", "y", "z")),
+            [(1, 4, 5, 6), (2, 7, 8, 9)])
+
+    def test_character_coordinates(self):
+        asset = CharacterAsset.objects.create(
+            character=self.ca1, singleton=True, item_id=1, location_flag="AutoFit",
+            location_id=30000142, location_type="solar_system", quantity=1,
+            type_id=34, type_name_id=34)
+        CharAssetCoordiante.objects.create(item=asset, x=1, y=2, z=3)
+
+        upsert_coordinates(CharAssetCoordiante, [
+            CharAssetCoordiante(item=asset, x=4, y=5, z=6)])
+
+        self.assertEqual(
+            list(CharAssetCoordiante.objects.values_list("x", "y", "z")),
+            [(4, 5, 6)])
+
+
+class TestCoordinateFetchRefreshes(CorptoolsTestCase):
+    """The coordinate fetches themselves must overwrite, not skip, a stored
+    position for something re-deployed within the same system."""
+
+    def setUp(self):
+        super().setUp()
+        cat = sde_models.ItemCategory.objects.create(
+            id=22, name="Deployable", published=True)
+        grp = sde_models.ItemGroup.objects.create(
+            id=1246, name="Mobile Depot", category=cat, published=True)
+        sde_models.ItemType.objects.create(
+            id=33474, name="Mobile Depot", group=grp, published=True)
+
+    def _positions(self, *coords):
+        return [MagicMock(item_id=1, position=MagicMock(x=x, y=y, z=z))
+                for x, y, z in coords]
+
+    @patch(f"{CORP_ASSETS}.get_corp_token")
+    @patch(f"{CORP_ASSETS}.providers")
+    def test_corp_fetch_overwrites(self, mock_providers, mock_token):
+        asset = CorpAsset.objects.create(
+            corporation=self.cp1, singleton=True, item_id=1, location_flag="AutoFit",
+            location_id=30000142, location_type="solar_system", quantity=1,
+            type_id=33474, type_name_id=33474)
+        AssetCoordiante.objects.create(item=asset, x=1, y=2, z=3)
+        mock_token.return_value = MagicMock()
+        mock_providers.esi_openapi.chunk_ids.side_effect = lambda ids: [
+            list(ids)]
+        mock_providers.esi_openapi.client.Assets.PostCorporationsCorporationIdAssetsLocations.return_value.result.return_value = self._positions(
+            (4, 5, 6))
+
+        fetch_coordiantes(self.corp1.corporation_id)
+
+        self.assertEqual(
+            list(AssetCoordiante.objects.values_list("x", "y", "z")),
+            [(4, 5, 6)])
+
+    @patch(f"{CHAR_TASKS}.get_token")
+    @patch(f"{CHAR_TASKS}.providers")
+    def test_character_fetch_overwrites(self, mock_providers, mock_token):
+        asset = CharacterAsset.objects.create(
+            character=self.ca1, singleton=True, item_id=1, location_flag="AutoFit",
+            location_id=30000142, location_type="solar_system", quantity=1,
+            type_id=33474, type_name_id=33474)
+        CharAssetCoordiante.objects.create(item=asset, x=1, y=2, z=3)
+        mock_token.return_value = MagicMock()
+        mock_providers.esi_openapi.client.Assets.PostCharactersCharacterIdAssetsLocations.return_value.result.return_value = self._positions(
+            (4, 5, 6))
+
+        update_asset_locations(self.char1.character_id)
+
+        self.assertEqual(
+            list(CharAssetCoordiante.objects.values_list("x", "y", "z")),
+            [(4, 5, 6)])

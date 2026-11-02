@@ -21,7 +21,11 @@ from esi.models import Token
 
 # AA Example App
 from corptools.app_settings import CT_DB_BULK_CREATE_BATCH_SIZE
-from corptools.task_helpers.sync import sync_assets, sync_rows
+from corptools.task_helpers.sync import (
+    sync_assets,
+    sync_rows,
+    upsert_coordinates,
+)
 from corptools.task_helpers.update_tasks import (
     SOLAR_SYSTEM_ID_MAX,
     SOLAR_SYSTEM_ID_MIN,
@@ -743,8 +747,7 @@ def update_asset_locations(character_id, force_refresh=False):
                 )
             )
 
-    CharAssetCoordiante.objects.bulk_create(
-        new_models, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+    upsert_coordinates(CharAssetCoordiante, new_models)
 
     return f"CT: Finished asset locations for: {audit_char.character.character_name}"
 

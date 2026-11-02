@@ -28,7 +28,7 @@ from corptools.models import (
     EveLocation,
     Structure,
 )
-from corptools.task_helpers.sync import sync_assets
+from corptools.task_helpers.sync import sync_assets, upsert_coordinates
 
 from ... import providers
 from ..locations import update_all_locations
@@ -420,7 +420,7 @@ def fetch_coordiantes(self, corp_id, force_refresh: bool = False, chain=[]):
             logger.info(
                 f"CT: COORD - {a.type_name.name} {new_coords[a.item_id]}")
 
-    AssetCoordiante.objects.bulk_create(new_models, ignore_conflicts=True)
+    upsert_coordinates(AssetCoordiante, new_models)
 
     return f"CT: Finished Coords for {_corporation.corporation.corporation_name}"
 

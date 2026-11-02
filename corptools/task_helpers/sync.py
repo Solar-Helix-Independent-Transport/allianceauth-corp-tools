@@ -115,6 +115,7 @@ ASSET_SYNC_FIELDS = [
     "type_id",
     "type_name",
     "location_name",
+    "name",
 ]
 
 
@@ -125,11 +126,14 @@ def sync_assets(queryset: QuerySet, items: Iterable[Model], coordinate_model) ->
     ESI only gives a location_name when the location is already known, so a
     None for an asset that hasn't moved keeps what's stored (e.g. the managed
     corp hangar locations). Assets that moved lose their coordinates so the
-    coordinate fetch writes fresh ones.
+    coordinate fetch writes fresh ones. The custom name comes from a later
+    call so it's kept, unless the item was repackaged and can't have one.
     """
     moved_pks = []
 
     def merge(existing, incoming):
+        if incoming.singleton:
+            incoming.name = existing.name
         if (existing.location_id, existing.location_flag) != (
                 incoming.location_id, incoming.location_flag):
             moved_pks.append(existing.pk)
@@ -145,3 +149,23 @@ def sync_assets(queryset: QuerySet, items: Iterable[Model], coordinate_model) ->
                 item_id__in=moved_pks[i:i + CT_DB_BULK_CREATE_BATCH_SIZE]
             ).delete()
     return result
+
+
+def upsert_coordinates(coordinate_model, objs: Iterable[Model]):
+    """
+    Write asset coordinates, overwriting stored ones. Rows now outlive a
+    refresh, so something re-deployed within the same system would otherwise
+    keep its first position forever.
+    """
+    conflict_target = (
+        {"unique_fields": ["item"]}
+        if connection.features.supports_update_conflicts_with_target
+        else {}
+    )
+    coordinate_model.objects.bulk_create(
+        objs,
+        update_conflicts=True,
+        update_fields=["x", "y", "z"],
+        batch_size=CT_DB_BULK_CREATE_BATCH_SIZE,
+        **conflict_target
+    )
