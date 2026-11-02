@@ -1150,13 +1150,14 @@ def update_character_clones(character_id, force_refresh=False):
             defaults={"name": "Active Clone"}
         )
 
-        Implant.objects.filter(clone=active_jumpclone).delete()
-        Implant.objects.bulk_create(
+        sync_rows(
+            Implant.objects.filter(clone=active_jumpclone),
             [
                 Implant(clone=active_jumpclone, type_name_id=implant)
                 for implant in active_clone
             ],
-            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
+            key_fields=["type_name"],
+            fields=[]
         )
 
     try:
@@ -1189,37 +1190,58 @@ def update_character_clones(character_id, force_refresh=False):
             }
         )
 
+        _jumpclones = []
+        for clone in jump_clones.jump_clones:
+            _jumpclone = JumpClone(
+                character=audit_char,
+                jump_clone_id=clone.jump_clone_id,
+                location_id=clone.location_id,
+                location_type=clone.location_type,
+                name=clone.name
+            )
+            if clone.location_id in all_locations:
+                _jumpclone.location_name_id = clone.location_id
+            _jumpclones.append(_jumpclone)
+
+        def _keep_location_name(existing, incoming):
+            # the location pipeline fills this in later; don't null it while
+            # the clone hasn't moved.
+            if incoming.location_name_id is None and \
+                    existing.location_id == incoming.location_id:
+                incoming.location_name_id = existing.location_name_id
+
         with transaction.atomic():
-            # remove all but the active clone row, which is managed separately above
-            JumpClone.objects.filter(
+            # all but the active clone row, which is managed separately above
+            sync_rows(
+                JumpClone.objects.filter(
+                    character=audit_char).exclude(jump_clone_id=0),
+                _jumpclones,
+                key_fields=["jump_clone_id"],
+                fields=["location_id", "location_type",
+                        "name", "location_name"],
+                merge=_keep_location_name
+            )
+
+            # MySQL doesn't hand back pks from bulk_create, so look them up.
+            clone_pks = dict(JumpClone.objects.filter(
                 character=audit_char
-            ).exclude(jump_clone_id=0).delete()
+            ).exclude(jump_clone_id=0).values_list("jump_clone_id", "pk"))
 
-            implants = []
-
-            for clone in jump_clones.jump_clones:
-                _jumpclone = JumpClone(
-                    character=audit_char,
-                    jump_clone_id=clone.jump_clone_id,
-                    location_id=clone.location_id,
-                    location_type=clone.location_type,
-                    name=clone.name
-                )
-                if clone.location_id in all_locations:
-                    _jumpclone.location_name_id = clone.location_id
-
-                _jumpclone.save()
-
-                for implant in clone.implants:
-                    implants.append(
-                        Implant(
-                            clone=_jumpclone,
-                            type_name_id=implant
-                        )
+            sync_rows(
+                Implant.objects.filter(
+                    clone__character=audit_char
+                ).exclude(clone__jump_clone_id=0),
+                [
+                    Implant(
+                        clone_id=clone_pks[clone.jump_clone_id],
+                        type_name_id=implant
                     )
-
-            Implant.objects.bulk_create(
-                implants, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+                    for clone in jump_clones.jump_clones
+                    for implant in clone.implants
+                ],
+                key_fields=["clone", "type_name"],
+                fields=[]
+            )
     except HTTPNotModified:
         logger.info(
             f"CT: No New Clone data for: {audit_char.character.character_name}"

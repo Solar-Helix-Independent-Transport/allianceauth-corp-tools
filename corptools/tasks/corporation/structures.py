@@ -1,3 +1,6 @@
+# Standard Library
+import re
+
 # Third Party
 import requests
 from celery import shared_task
@@ -5,8 +8,10 @@ from eve_sde.models import ItemType, Moon, Planet, SolarSystem
 
 # Django
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.db import transaction
 from django.db.models import F
 from django.db.models.functions import Power, Sqrt
+from django.utils import timezone
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
@@ -24,6 +29,7 @@ from corptools.models import (
     StructureService,
 )
 from corptools.models.eve_models import MapJumpBridge
+from corptools.task_helpers.sync import sync_rows
 from corptools.task_helpers.update_tasks import resolve_location
 
 from ... import providers
@@ -551,8 +557,15 @@ def build_jb_network(self):
             "name": _exit.name
         }
 
+    # structure_id is the pk, so a manual entry for the same bridge wins
+    # rather than failing the whole build on the conflict.
+    manual_ids = set(MapJumpBridge.objects.filter(
+        manually_input=True).values_list("structure_id", flat=True))
+
     new_jbs = []
     for k, m in output.items():
+        if m["start"]["structure_id"] in manual_ids:
+            continue
         new_jbs.append(
             MapJumpBridge(
                 structure_id=m["start"]["structure_id"],
@@ -562,7 +575,17 @@ def build_jb_network(self):
             )
         )
 
-    MapJumpBridge.objects.filter(manually_input=False).delete()
-    MapJumpBridge.objects.bulk_create(new_jbs)
+    with transaction.atomic():
+        result = sync_rows(
+            MapJumpBridge.objects.filter(manually_input=False),
+            new_jbs,
+            key_fields=["structure_id"],
+            fields=["from_solar_system", "to_solar_system", "owner"]
+        )
+        if result.created or result.updated or result.deleted:
+            # EveRouter rebuilds its graph off the newest `updated`.
+            MapJumpBridge.objects.filter(manually_input=False).update(
+                updated=timezone.now())
 
-    return f"Created {len(new_jbs)} new JB links"
+    return (f"JB links: {result.created} created, {result.updated} updated, "
+            f"{result.deleted} removed")
