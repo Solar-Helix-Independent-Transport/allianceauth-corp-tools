@@ -143,6 +143,9 @@ def update_character(self, char_id, force_refresh=False, now=False):
                         character, _ = CharacterAudit.objects.update_or_create(
                             character=eve_character
                         )
+                        # etags outlive a deleted audit, so a re-added
+                        # character would otherwise 304 its way to empty.
+                        force_refresh = True
             except TokenExpiredError:
                 return False
         else:

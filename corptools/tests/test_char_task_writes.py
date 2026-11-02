@@ -68,19 +68,20 @@ class TestDeleteRecreateIsAtomic(CorptoolsTestCase):
         mock_get_token.return_value = MagicMock()
         mock_providers.esi_openapi.client.Skills.GetCharactersCharacterIdSkills.return_value.result.return_value = MagicMock(
             total_sp=1, unallocated_sp=0,
-            skills=[MagicMock(skill_id=3300, active_skill_level=5,
-                              skillpoints_in_skill=256000, trained_skill_level=5)],
+            skills=[MagicMock(skill_id=3300, active_skill_level=4,
+                              skillpoints_in_skill=45255, trained_skill_level=4)],
         )
 
         with patch.object(Skill.objects, "bulk_create", side_effect=RuntimeError("db")):
             with self.assertRaises(RuntimeError):
                 update_character_skill_list(self.char1.character_id)
 
-        self.assertTrue(Skill.objects.filter(pk=self.old_skill.pk).exists())
+        self.old_skill.refresh_from_db()
+        self.assertEqual(self.old_skill.active_skill_level, 5)
 
     @patch(f"{CHAR_TASKS}.get_token")
     @patch(f"{CHAR_TASKS}.providers")
-    def test_skill_list_success_replaces_skills(self, mock_providers, mock_get_token):
+    def test_skill_list_success_updates_skills_in_place(self, mock_providers, mock_get_token):
         mock_get_token.return_value = MagicMock()
         mock_providers.esi_openapi.client.Skills.GetCharactersCharacterIdSkills.return_value.result.return_value = MagicMock(
             total_sp=1, unallocated_sp=0,
@@ -93,7 +94,7 @@ class TestDeleteRecreateIsAtomic(CorptoolsTestCase):
         skills = Skill.objects.filter(character=self.ca1)
         self.assertEqual(skills.count(), 1)
         self.assertEqual(skills.get().active_skill_level, 4)
-        self.assertFalse(Skill.objects.filter(pk=self.old_skill.pk).exists())
+        self.assertEqual(skills.get().pk, self.old_skill.pk)
 
     @patch(f"{CHAR_TASKS}.get_token")
     @patch(f"{CHAR_TASKS}.providers")
@@ -106,7 +107,10 @@ class TestDeleteRecreateIsAtomic(CorptoolsTestCase):
         mock_providers.esi_openapi.client.Skills.GetCharactersCharacterIdSkillqueue.return_value.result.return_value = [
             MagicMock(skill_id=3300, finished_level=5, queue_position=0,
                       finish_date=None, level_end_sp=None, level_start_sp=None,
-                      start_date=None, training_start_sp=None)
+                      start_date=None, training_start_sp=None),
+            MagicMock(skill_id=3300, finished_level=4, queue_position=1,
+                      finish_date=None, level_end_sp=None, level_start_sp=None,
+                      start_date=None, training_start_sp=None),
         ]
 
         with patch.object(SkillQueue.objects, "bulk_create", side_effect=RuntimeError("db")):
@@ -118,10 +122,8 @@ class TestDeleteRecreateIsAtomic(CorptoolsTestCase):
     @patch(f"{CHAR_TASKS}.get_token")
     @patch(f"{CHAR_TASKS}.providers")
     def test_contact_labels_failure_keeps_existing_labels(self, mock_providers, mock_get_token):
-        old = CharacterContactLabel(
+        old = CharacterContactLabel.objects.create(
             character=self.ca1, label_id=1, label_name="Blues")
-        old.build_id()
-        old.save()
         mock_get_token.return_value = MagicMock()
         contacts = mock_providers.esi_openapi.client.Contacts
         new_label = MagicMock(label_id=2)

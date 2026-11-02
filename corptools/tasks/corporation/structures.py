@@ -1,3 +1,6 @@
+# Standard Library
+import re
+
 # Third Party
 import requests
 from celery import shared_task
@@ -5,8 +8,10 @@ from eve_sde.models import ItemType, Moon, Planet, SolarSystem
 
 # Django
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.db import transaction
 from django.db.models import F
 from django.db.models.functions import Power, Sqrt
+from django.utils import timezone
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
@@ -24,6 +29,7 @@ from corptools.models import (
     StructureService,
 )
 from corptools.models.eve_models import MapJumpBridge
+from corptools.task_helpers.sync import sync_rows
 from corptools.task_helpers.update_tasks import resolve_location
 
 from ... import providers
@@ -126,40 +132,22 @@ def corp_structure_update(corp_id, force_refresh=False):  # pagnated results
             else:
                 celestial = None
 
-            if _structure.services:
-                db_services = StructureService.objects.filter(
-                    structure=_structure_ob)
-                current_services = []
-                for service in _structure.services:
-                    db_service = db_services.filter(name=service.name)
-                    if db_service.exists():
-                        if db_service.count() == 1:
-                            if db_service[0].state == service.state:
-                                current_services.append(db_service[0].id)
-                                pass
-                            else:
-                                db_service.update(state=service.state)
-                                current_services.append(db_service[0].id)
-                        else:
-                            StructureService.objects.filter(
-                                structure=_structure_ob,
-                                name=service.name
-                            ).delete()
-                            new_service = StructureService.objects.create(
-                                structure=_structure_ob,
-                                state=service.state,
-                                name=service.name
-                            )
-                            current_services.append(new_service.id)
-
-                    else:
-                        new_service = StructureService.objects.create(
-                            structure=_structure_ob,
-                            state=service.state,
-                            name=service.name
-                        )
-                        current_services.append(new_service.id)
-                db_services.exclude(id__in=current_services).delete()
+            # ESI leaves services out entirely once the last service module
+            # is removed, so None has to clear them rather than be skipped.
+            # Duplicate names collapse to one row.
+            sync_rows(
+                StructureService.objects.filter(structure=_structure_ob),
+                [
+                    StructureService(
+                        structure=_structure_ob,
+                        name=service.name,
+                        state=service.state
+                    )
+                    for service in (_structure.services or [])
+                ],
+                key_fields=["name"],
+                fields=["state"]
+            )
 
         return _structure_ob, _created
 
@@ -346,7 +334,25 @@ def corp_starbase_update(corp_id, force_refresh=True):  # Set true as we have ba
         for nm in names:
             starbase_names[nm.item_id] = nm.name
 
+    known_ids = set(Starbase.objects.filter(
+        corporation=_corporation).values_list("starbase_id", flat=True))
+
     for sb in starbases:
+        update_fields = {}
+
+        # Only overwrite the name when we got one, so a run without an assets
+        # token doesn't wipe names resolved on an earlier run.
+        if sb.starbase_id in starbase_names:
+            update_fields["name"] = starbase_names[sb.starbase_id]
+
+        list_fields = {
+            "onlined_since": sb.onlined_since,
+            "reinforced_until": sb.reinforced_until,
+            "unanchor_at": sb.unanchor_at,
+            "state": sb.state,
+            **update_fields
+        }
+
         try:
             starbase = providers.esi_openapi.client.Corporation.GetCorporationsCorporationIdStarbasesStarbaseId(
                 corporation_id=_corporation.corporation.corporation_id,
@@ -355,12 +361,19 @@ def corp_starbase_update(corp_id, force_refresh=True):  # Set true as we have ba
                 token=_token
             ).result(
                 force_refresh=force_refresh,
-                store_cache=False
+                store_cache=False,
+                # a remembered etag for a starbase we hold no row for (pruned
+                # earlier, or a failed write) would 304 and never create it.
+                use_etag=sb.starbase_id in known_ids
             )
         except HTTPNotModified:
+            # The detail is unchanged but the listing isn't, so its state and
+            # timers still need writing.
+            Starbase.objects.filter(
+                starbase_id=sb.starbase_id,
+                corporation=_corporation
+            ).update(**list_fields)
             continue
-
-        update_fields = {}
 
         if sb.moon_id:
             moon = Moon.objects.get(id=sb.moon_id)
@@ -378,11 +391,7 @@ def corp_starbase_update(corp_id, force_refresh=True):  # Set true as we have ba
             starbase_id=sb.starbase_id,
             corporation=_corporation,
             defaults={
-                "name": starbase_names.get(sb.starbase_id),
-                "onlined_since": sb.onlined_since,
-                "reinforced_until": sb.reinforced_until,
-                "unanchor_at": sb.unanchor_at,
-                "state": sb.state,
+                **list_fields,
                 "system_id": sb.system_id,
                 "type_name": eve_type,
                 "allow_alliance_members": starbase.allow_alliance_members,
@@ -551,8 +560,15 @@ def build_jb_network(self):
             "name": _exit.name
         }
 
+    # structure_id is the pk, so a manual entry for the same bridge wins
+    # rather than failing the whole build on the conflict.
+    manual_ids = set(MapJumpBridge.objects.filter(
+        manually_input=True).values_list("structure_id", flat=True))
+
     new_jbs = []
     for k, m in output.items():
+        if m["start"]["structure_id"] in manual_ids:
+            continue
         new_jbs.append(
             MapJumpBridge(
                 structure_id=m["start"]["structure_id"],
@@ -562,7 +578,17 @@ def build_jb_network(self):
             )
         )
 
-    MapJumpBridge.objects.filter(manually_input=False).delete()
-    MapJumpBridge.objects.bulk_create(new_jbs)
+    with transaction.atomic():
+        result = sync_rows(
+            MapJumpBridge.objects.filter(manually_input=False),
+            new_jbs,
+            key_fields=["structure_id"],
+            fields=["from_solar_system", "to_solar_system", "owner"]
+        )
+        if result.created or result.updated or result.deleted:
+            # EveRouter rebuilds its graph off the newest `updated`.
+            MapJumpBridge.objects.filter(manually_input=False).update(
+                updated=timezone.now())
 
-    return f"Created {len(new_jbs)} new JB links"
+    return (f"JB links: {result.created} created, {result.updated} updated, "
+            f"{result.deleted} removed")

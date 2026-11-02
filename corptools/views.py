@@ -117,7 +117,9 @@ def add_corp(request, token):
                                                                        'corporation_name': char.corporation_name
                                                                        })
     CorporationAudit.objects.update_or_create(corporation=corp)
-    update_all_corps.apply_async(priority=6)
+    # forced: etags outlive a deleted audit, so a re-added corp would 304 empty
+    update_corp.apply_async(priority=6, args=[corp.corporation_id], kwargs={
+                            "force_refresh": True})
     messages.success(
         request, f"Update Tasks for `{corp.corporation_name}` added to queue.")
 
@@ -153,7 +155,8 @@ def add_corp_section(request, *args, **kwargs):
                                                                            'corporation_name': char.corporation_name
                                                                            })
         CorporationAudit.objects.update_or_create(corporation=corp)
-        update_corp.apply_async(priority=6, args=[char.corporation_id])
+        update_corp.apply_async(priority=6, args=[char.corporation_id], kwargs={
+                                "force_refresh": True})
         messages.success(
             request, f"Update Tasks for `{corp.corporation_name}` added to queue.")
         return redirect("{}#status".format(reverse('corptools:corp_react')))

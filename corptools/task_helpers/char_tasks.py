@@ -21,6 +21,11 @@ from esi.models import Token
 
 # AA Example App
 from corptools.app_settings import CT_DB_BULK_CREATE_BATCH_SIZE
+from corptools.task_helpers.sync import (
+    sync_assets,
+    sync_rows,
+    upsert_coordinates,
+)
 from corptools.task_helpers.update_tasks import (
     SOLAR_SYSTEM_ID_MAX,
     SOLAR_SYSTEM_ID_MIN,
@@ -332,10 +337,8 @@ def update_character_skill_list(character_id, force_refresh=False):
             unallocated_sp=skills.unallocated_sp if skills.unallocated_sp else 0
         )
 
-        _check_skills = []
-        _create_skills = []
+        _skills = []
         for skill in skills.skills:
-            _check_skills.append(skill.skill_id)
             _skill = Skill(
                 character=audit_char,
                 skill_id=skill.skill_id,
@@ -344,14 +347,15 @@ def update_character_skill_list(character_id, force_refresh=False):
                 skillpoints_in_skill=skill.skillpoints_in_skill,
                 trained_skill_level=skill.trained_skill_level
             )
-            _create_skills.append(_skill)
+            _skills.append(_skill)
 
-        # Flush + recreate in one transaction so readers (e.g. securegroups
-        # skill filters) never see the character with no skills mid-refresh.
-        with transaction.atomic():
-            Skill.objects.filter(character=audit_char).delete()
-            Skill.objects.bulk_create(
-                _create_skills, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+        sync_rows(
+            Skill.objects.filter(character=audit_char),
+            _skills,
+            key_fields=["skill_id"],
+            fields=["skill_name", "active_skill_level",
+                    "skillpoints_in_skill", "trained_skill_level"]
+        )
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_list {character_id}"
@@ -396,9 +400,7 @@ def update_character_skill_queue(character_id, force_refresh=False):
         _st = time.perf_counter()
 
         items = []
-        _check_skills = []
         for item in queue:
-            _check_skills.append(item.skill_id)
             queue_item = SkillQueue(
                 character=audit_char,
                 finish_level=item.finished_level,
@@ -413,12 +415,14 @@ def update_character_skill_queue(character_id, force_refresh=False):
             )
             items.append(queue_item)
 
-        with transaction.atomic():
-            SkillQueue.objects.filter(
-                character=audit_char
-            ).delete()
-            SkillQueue.objects.bulk_create(
-                items, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+        sync_rows(
+            SkillQueue.objects.filter(character=audit_char),
+            items,
+            key_fields=["queue_position"],
+            fields=["finish_level", "skill_id", "skill_name", "finish_date",
+                    "level_end_sp", "level_start_sp", "start_date",
+                    "training_start_sp"]
+        )
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_skill_queue {character_id}"
@@ -493,18 +497,13 @@ def update_character_assets(character_id, force_refresh=False):
 
                 items.append(ship)
 
-        # We now have some FKeys so slow it down...
-        # Flush + recreate in one transaction so concurrent readers never see
-        # the character with zero assets mid-refresh (e.g. securegroups asset
-        # filters false-failing during the update window).
-        with transaction.atomic():
-            CharacterAsset.objects.filter(
-                character=audit_char
-            ).delete()
-            CharacterAsset.objects.bulk_create(
-                items,
-                batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
-            )
+        # Sync in place so rows keep their pk, coordinates and the names/blueprint
+        # stats from the follow-up calls below.
+        sync_assets(
+            CharacterAsset.objects.filter(character=audit_char),
+            items,
+            CharAssetCoordiante
+        )
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_assets {character_id}"
@@ -625,8 +624,8 @@ def update_character_blueprints(character_id, force_refresh=False):
         token=token
     ).results(
         force_refresh=force_refresh,
-        # the asset rows are recreated on every asset pull, so an unchanged
-        # blueprint list must still be applied to the fresh rows.
+        # assets new since the last pull still need their stats even when the
+        # blueprint list itself is unchanged.
         use_etag=False,
         store_cache=False
     )
@@ -748,8 +747,7 @@ def update_asset_locations(character_id, force_refresh=False):
                 )
             )
 
-    CharAssetCoordiante.objects.bulk_create(
-        new_models, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+    upsert_coordinates(CharAssetCoordiante, new_models)
 
     return f"CT: Finished asset locations for: {audit_char.character.character_name}"
 
@@ -1155,13 +1153,14 @@ def update_character_clones(character_id, force_refresh=False):
             defaults={"name": "Active Clone"}
         )
 
-        Implant.objects.filter(clone=active_jumpclone).delete()
-        Implant.objects.bulk_create(
+        sync_rows(
+            Implant.objects.filter(clone=active_jumpclone),
             [
                 Implant(clone=active_jumpclone, type_name_id=implant)
                 for implant in active_clone
             ],
-            batch_size=CT_DB_BULK_CREATE_BATCH_SIZE
+            key_fields=["type_name"],
+            fields=[]
         )
 
     try:
@@ -1194,37 +1193,58 @@ def update_character_clones(character_id, force_refresh=False):
             }
         )
 
+        _jumpclones = []
+        for clone in jump_clones.jump_clones:
+            _jumpclone = JumpClone(
+                character=audit_char,
+                jump_clone_id=clone.jump_clone_id,
+                location_id=clone.location_id,
+                location_type=clone.location_type,
+                name=clone.name
+            )
+            if clone.location_id in all_locations:
+                _jumpclone.location_name_id = clone.location_id
+            _jumpclones.append(_jumpclone)
+
+        def _keep_location_name(existing, incoming):
+            # the location pipeline fills this in later; don't null it while
+            # the clone hasn't moved.
+            if incoming.location_name_id is None and \
+                    existing.location_id == incoming.location_id:
+                incoming.location_name_id = existing.location_name_id
+
         with transaction.atomic():
-            # remove all but the active clone row, which is managed separately above
-            JumpClone.objects.filter(
+            # all but the active clone row, which is managed separately above
+            sync_rows(
+                JumpClone.objects.filter(
+                    character=audit_char).exclude(jump_clone_id=0),
+                _jumpclones,
+                key_fields=["jump_clone_id"],
+                fields=["location_id", "location_type",
+                        "name", "location_name"],
+                merge=_keep_location_name
+            )
+
+            # MySQL doesn't hand back pks from bulk_create, so look them up.
+            clone_pks = dict(JumpClone.objects.filter(
                 character=audit_char
-            ).exclude(jump_clone_id=0).delete()
+            ).exclude(jump_clone_id=0).values_list("jump_clone_id", "pk"))
 
-            implants = []
-
-            for clone in jump_clones.jump_clones:
-                _jumpclone = JumpClone(
-                    character=audit_char,
-                    jump_clone_id=clone.jump_clone_id,
-                    location_id=clone.location_id,
-                    location_type=clone.location_type,
-                    name=clone.name
-                )
-                if clone.location_id in all_locations:
-                    _jumpclone.location_name_id = clone.location_id
-
-                _jumpclone.save()
-
-                for implant in clone.implants:
-                    implants.append(
-                        Implant(
-                            clone=_jumpclone,
-                            type_name_id=implant
-                        )
+            sync_rows(
+                Implant.objects.filter(
+                    clone__character=audit_char
+                ).exclude(clone__jump_clone_id=0),
+                [
+                    Implant(
+                        clone_id=clone_pks[clone.jump_clone_id],
+                        type_name_id=implant
                     )
-
-            Implant.objects.bulk_create(
-                implants, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+                    for clone in jump_clones.jump_clones
+                    for implant in clone.implants
+                ],
+                key_fields=["clone", "type_name"],
+                fields=[]
+            )
     except HTTPNotModified:
         logger.info(
             f"CT: No New Clone data for: {audit_char.character.character_name}"
@@ -1535,6 +1555,17 @@ def update_character_orders(character_id, force_refresh=False):
             CharacterMarketOrder.objects.bulk_create(
                 creates, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
 
+        # Anything no longer open has closed. Order history (run next) says
+        # whether it was cancelled, but only covers 90 days, so without this
+        # an order closed during a longer token lapse stays active forever.
+        # ESI itself reports filled orders as expired.
+        CharacterMarketOrder.objects.filter(
+            character=audit_char,
+            state='active'
+        ).exclude(
+            order_id__in=[order.order_id for order in open_orders]
+        ).update(state='expired')
+
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_orders {character_id}"
         )
@@ -1840,7 +1871,7 @@ def update_character_mail_headers(character_id, force_refresh=False):
         store_cache=False
     )
 
-    for label in labels.labels:
+    for label in labels.labels or []:
         MailLabel.objects.update_or_create(
             character=audit_char,
             label_id=label.label_id,
@@ -1850,6 +1881,10 @@ def update_character_mail_headers(character_id, force_refresh=False):
                 'unread_count': label.unread_count
             }
         )
+    # labels deleted in game
+    MailLabel.objects.filter(character=audit_char).exclude(
+        label_id__in=[label.label_id for label in labels.labels or []]
+    ).delete()
 
     # Materialise to a set so `in` checks are O(1) rather than per-iteration DB queries
     mail_id_set = set(
@@ -1918,16 +1953,25 @@ def update_character_mail_headers(character_id, force_refresh=False):
         messages = []
         m_l_map = {}
         m_r_map = {}
+        known_read = {}
+        known_labels = {}
         failed_ids = set()
         stop = False
         for msg in mail:
             already_known = msg.mail_id in mail_id_set
-            if already_known and not force_refresh:
-                stop = True
-                break
 
             id_k = int(str(audit_char.character.character_id) +
                        str(msg.mail_id))
+
+            if already_known:
+                # read state and labels change after delivery, so refresh
+                # them for the stored mail on the pages we fetch anyway.
+                known_read[id_k] = msg.is_read
+                known_labels[id_k] = msg.labels or []
+                if not force_refresh:
+                    # everything older is stored; just finish this page
+                    stop = True
+                    continue
 
             if not already_known:
                 if (
@@ -1964,8 +2008,8 @@ def update_character_mail_headers(character_id, force_refresh=False):
 
                 messages.append(msg_obj)
 
-            if msg.labels:
-                m_l_map[id_k] = msg.labels
+                if msg.labels:
+                    m_l_map[id_k] = msg.labels
 
             m_r_map[id_k] = [
                 (r.recipient_id, r.recipient_type)
@@ -1991,6 +2035,24 @@ def update_character_mail_headers(character_id, force_refresh=False):
 
         LabelThroughModel.objects.bulk_create(
             lms, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+
+        for is_read in (True, False):
+            MailMessage.objects.filter(
+                id_key__in=[k for k, r in known_read.items() if r == is_read]
+            ).exclude(is_read=is_read).update(is_read=is_read)
+
+        sync_rows(
+            LabelThroughModel.objects.filter(mailmessage_id__in=known_labels),
+            [
+                LabelThroughModel(
+                    mailmessage_id=id_k, maillabel_id=label_pk_map[label])
+                for id_k, msg_labels in known_labels.items()
+                for label in msg_labels
+                if label in label_pk_map
+            ],
+            key_fields=["mailmessage", "maillabel"],
+            fields=[]
+        )
 
         RecipThroughModel = MailMessage.recipients.through
         rms = []
@@ -2055,18 +2117,13 @@ def update_character_contacts(character_id, force_refresh=False):
 
         _st = time.perf_counter()
 
-        labels_to_create = []
-
-        for label in labels:  # update labels
-            _label_item = CharacterContactLabel.from_esi_model(
-                audit_char, label)
-            _label_item.build_id()
-            labels_to_create.append(_label_item)
-
-        with transaction.atomic():
-            CharacterContactLabel.objects.filter(character=audit_char).delete()
-            CharacterContactLabel.objects.bulk_create(
-                labels_to_create, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+        sync_rows(
+            CharacterContactLabel.objects.filter(character=audit_char),
+            [CharacterContactLabel.from_esi_model(audit_char, label)
+             for label in labels],
+            key_fields=["label_id"],
+            fields=["label_name"]
+        )
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} CharacterContactLabel {character_id}"
@@ -2088,37 +2145,47 @@ def update_character_contacts(character_id, force_refresh=False):
 
         _current_eve_ids = _known_eve_ids(c.contact_id for c in contacts)
 
-        ContactLabelThrough = CharacterContact.labels.through
-        _contacts_to_create = []
-        _through_to_create = []
-        for contact in contacts:  # update contacts
+        for contact in contacts:
             if contact.contact_id not in _current_eve_ids:
                 EveName.objects.get_or_create_from_esi(
                     contact.contact_id
                 )
                 _current_eve_ids.add(contact.contact_id)
 
-            _contact_item = CharacterContact.from_esi_model(
-                audit_char, contact)
-
-            _contacts_to_create.append(_contact_item)
-
-            if contact.label_ids:  # add labels
-                for _label in contact.label_ids:
-                    _label_id = int(str(audit_char.id) + str(_label))
-                    _lbl = ContactLabelThrough(
-                        charactercontact_id=_contact_item.id,
-                        charactercontactlabel_id=_label_id
-                    )
-                    _through_to_create.append(_lbl)
-
+        ContactLabelThrough = CharacterContact.labels.through
         with transaction.atomic():
-            CharacterContact.objects.filter(character=audit_char).delete()
+            sync_rows(
+                CharacterContact.objects.filter(character=audit_char),
+                [CharacterContact.from_esi_model(audit_char, contact)
+                 for contact in contacts],
+                key_fields=["contact_id"],
+                fields=["contact_type", "contact_name",
+                        "standing", "blocked", "watched"]
+            )
 
-            CharacterContact.objects.bulk_create(
-                _contacts_to_create, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
-            ContactLabelThrough.objects.bulk_create(
-                _through_to_create, ignore_conflicts=True, batch_size=CT_DB_BULK_CREATE_BATCH_SIZE)
+            # MySQL doesn't hand back pks from bulk_create, so look them up.
+            contact_pks = dict(CharacterContact.objects.filter(
+                character=audit_char).values_list("contact_id", "pk"))
+            label_pks = dict(CharacterContactLabel.objects.filter(
+                character=audit_char).values_list("label_id", "pk"))
+
+            # labels the label list didn't return are skipped rather than
+            # failing the whole update on the FK.
+            sync_rows(
+                ContactLabelThrough.objects.filter(
+                    charactercontact__character=audit_char),
+                [
+                    ContactLabelThrough(
+                        charactercontact_id=contact_pks[contact.contact_id],
+                        charactercontactlabel_id=label_pks[label_id]
+                    )
+                    for contact in contacts
+                    for label_id in (contact.label_ids or [])
+                    if label_id in label_pks
+                ],
+                key_fields=["charactercontact", "charactercontactlabel"],
+                fields=[]
+            )
 
         logger.debug(
             f"CT_TIME: {time.perf_counter() - _st} update_character_contacts {character_id}"

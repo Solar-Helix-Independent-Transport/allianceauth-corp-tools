@@ -12,6 +12,7 @@ from corptools.models.sovereignty import (
     SovereigntyHubReagent,
     SovereigntyHubUpgrade,
 )
+from corptools.task_helpers.sync import sync_rows
 
 from ... import providers
 from .utils import NoTokens, get_corp_token, update_corp_audit
@@ -121,27 +122,36 @@ def corp_sovereignty_hub_detail_update(corp_id, hub_id, force_refresh=False):
             defaults=defaults
         )
 
-        hub_ob.reagents.all().delete()
+        reagents = []
         if hub_detail.reagent_bay and hub_detail.reagent_bay.reagents:
-            SovereigntyHubReagent.objects.bulk_create([
+            reagents = hub_detail.reagent_bay.reagents
+        sync_rows(
+            hub_ob.reagents.all(),
+            [
                 SovereigntyHubReagent(
                     hub=hub_ob,
                     type_name_id=reagent.type_id,
                     amount=reagent.amount,
                     burning_per_hour=reagent.burning_per_hour,
                 )
-                for reagent in hub_detail.reagent_bay.reagents
-            ])
+                for reagent in reagents
+            ],
+            key_fields=["type_name"],
+            fields=["amount", "burning_per_hour"]
+        )
 
-        hub_ob.upgrades.all().delete()
-        if hub_detail.upgrades:
-            SovereigntyHubUpgrade.objects.bulk_create([
+        sync_rows(
+            hub_ob.upgrades.all(),
+            [
                 SovereigntyHubUpgrade(
                     hub=hub_ob,
                     type_name_id=upgrade.type_id,
                     power_state=upgrade.power_state,
                 )
-                for upgrade in hub_detail.upgrades
-            ])
+                for upgrade in (hub_detail.upgrades or [])
+            ],
+            key_fields=["type_name"],
+            fields=["power_state"]
+        )
 
     return f"CT: Updated sovereignty hub {hub_id} for {_corporation.corporation.corporation_name}"

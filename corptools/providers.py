@@ -19,6 +19,7 @@ class EveRouter():
     def __init__(self):
         self.G = nx.Graph()
         self.last_update = None
+        self.bridge_count = 0
         self.bridges = {}
 
     def bulid_graph(self):
@@ -40,24 +41,30 @@ class EveRouter():
         self.G.add_edges_from(gates, type="gate")
         self.G.add_edges_from(bridges, type="bridge")
         self.bridges = bridge_ids
+        self.bridge_count = len(bridges)
         self.last_update = timezone.now()
 
+    def graph_stale(self):
+        from .models import MapJumpBridge
+
+        if not self.last_update:
+            return True
+        # a removed bridge doesn't move `updated`, so watch the count too
+        if MapJumpBridge.objects.count() != self.bridge_count:
+            return True
+        last_update = MapJumpBridge.objects.order_by(
+            "-updated").values_list("updated", flat=True).first()
+        return last_update is not None and last_update > self.last_update
+
     def route(self, source_id, destination_id):
-        from .models import MapJumpBridge, MapSystem
+        from .models import MapSystem
 
         # logger.debug("----------")
         # logger.debug(f"Source: {source_id}")
         # logger.debug(f"Destination: {destination_id}")
 
-        if not self.last_update:
+        if self.graph_stale():
             self.bulid_graph()
-        else:
-            try:
-                last_update = MapJumpBridge.objects.latest("updated").updated
-                if last_update > self.last_update:
-                    self.bulid_graph()
-            except MapJumpBridge.DoesNotExist:
-                pass
 
         path = nx.shortest_path(self.G, source_id, destination_id)
         path_length = len(path) - 1

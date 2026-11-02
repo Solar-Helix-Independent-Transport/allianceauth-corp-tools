@@ -21,6 +21,7 @@ from esi.models import Token
 
 # AA Example App
 from corptools.models import CorporationAudit, EveName
+from corptools.task_helpers.etags import clear_etags_on_error
 
 from ... import providers
 
@@ -39,7 +40,10 @@ def update_corp_audit(update_field: str = ""):
                 corporation__corporation_id=args[0]
             )
             try:
-                result = function(*args, **kwargs)
+                # errors are swallowed below, so the etags of a half-done
+                # update have to be cleared here
+                with clear_etags_on_error():
+                    result = function(*args, **kwargs)
                 now = timezone.now().isoformat()
                 audit_corp.update_timestamps[update_field] = now
                 audit_corp.change_timestamps[update_field] = now
